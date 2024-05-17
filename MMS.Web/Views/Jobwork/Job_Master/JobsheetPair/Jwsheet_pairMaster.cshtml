@@ -1,0 +1,529 @@
+﻿@{
+    ViewBag.Title = "Jwsheet_pair";
+    Layout = "~/Views/Shared/_jobLayout.cshtml";
+}
+
+
+<div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+    <div class="dashboard-content col-xs-12 no-padding">
+        <div class="dashboard_head dashboard-title congest col-lg-12 col-md-12 col-sm-12  col-xs-12">
+            <div class="dashboard-title  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+                <h2>Sheet to pairs (CONVERSION)</h2>
+            </div>
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("JobWorkGrid", "JobSheet_pair")
+    </div>
+
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+
+        $("#EditColorPartial").hide();
+        $('#example').DataTable();
+
+
+    });
+
+    function AddSheet_toLeather() {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("EditJobLeathertoLeatherList", "JobSheet_pair")',
+            data: { jobsheet_pair_Code_id: 0 },
+            success: function (data) {
+                $("#EditSheet_topairPartial").html(data);
+                $("#EditSheet_topairPartial").show();
+                $("input[type='hidden'][name='IsInspection']").remove();
+                $('#Update_edit').hide()
+            }
+        });
+
+    }
+    function Edit(arg) {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("EditJobLeathertoLeatherList", "JobSheet_pair")',
+            data: { jobsheet_pair_Code_id: arg },
+            success: function (data) {
+                debugger;
+                $("#EditSheet_topairPartial").html(data);
+                $("#EditSheet_topairPartial").show();
+                $("input[type='hidden'][name='IsInspection']").remove();
+                $('#Update_edit').hide()
+            }
+        });
+
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Job_Sheet_Delete_detail", "JobSheet_pair")',
+                data: { jobsheet_pair_Code_id: arg },
+                success: function (data) {
+                    alert('Deleted Successfully.');
+                    if (data.items == "0") {
+                      
+                        location.href = "/JobSheet_pair/JobSheet_pairMaster";
+                        return false;
+                    }
+                    else {
+                        alert(' Details deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+    function save() {
+        debugger;
+        var fromDate = $('#Date').val();
+        fromDate = fromDate.split("/");
+        var Date_from = fromDate[2] + "/" + fromDate[1] + "/" + fromDate[0];
+
+
+
+        var deliveryDate = $('#Delivery_Date').val();
+        deliveryDate = deliveryDate.split("/");
+        var D_date = deliveryDate[2] + "/" + deliveryDate[1] + "/" + deliveryDate[0];
+
+        var Extra_Piece = $("#Extra_Piece").val();
+        var Reduce_Piece = $("#Reduce_Piece").val()
+        var Piece = (Extra_Piece - Reduce_Piece);
+        if (Validation() != false) {
+            var Qty_ = 0;
+            var count = 0
+            var size = [];
+
+            $('#sizeRangeTable tbody tr').find('.Qty').each(function () {
+                Qty_ += Number($(this).val());
+                count++;
+
+            });
+            var qty = $('#Qty').val();
+            if (count > 0) {
+                if (qty != Qty_) {
+                    swal("Quantity is not equal!", "", "info");
+                    return false;
+                }
+            }
+            // CalculateTotal_()
+            var Qty_ = [];
+            var size = [];
+            $('#sizeRangeTable tbody tr').find('.Qty').each(function () {
+                Qty_ += $(this).val() + ";" + $(this).attr('id') + ",";
+
+            });
+            $('#sizeRangeTable tbody tr').find('.SizeRangeRefValue').each(function () {
+                size += $(this).text() + ",";
+
+            });
+            if ($('#Date').val() == "") {
+                alert("Please Enter Date .")
+                $('#Date').css('border-color', 'red');
+                $('#Date').focus();
+                return false;
+            }
+            else {
+                $('#Date').css('border-color', '');
+            }
+            if ($("input[name='Exertnal_work']:checked").prop("checked", true).val() == 1) {
+                var bool = "true";
+            }
+            else {
+                var bool = "false";
+
+            }
+
+            var codeobj = {};
+            codeobj.jobsheet_pair_Code = $('#code_jobsheet_pair_Code').val();
+            var requestData = {};
+            requestData.Exertnal_work = bool;
+            requestData.jobsheet_pair_Code = $('#code_jobsheet_pair_Code').val();
+            requestData.Date = Date_from;
+            requestData.code = codeobj;
+            requestData.JW_Name = $('#JW_Name').val();
+            requestData.Process_Name = $('#Process_Name').val();
+            requestData.UC_NO_id = $('#UC_NO_id').val();
+            requestData.Buyer = $('#Buyer').val();
+            requestData.Season = $('#Season').val();
+            requestData.Stores = $('#Stores').val();
+            requestData.Group_ = $('#Group_').val();
+            requestData.Category = $('#Category').val();
+            requestData.Issue_Material = $('#Issue_Material').val();
+            requestData.Material = $('#Material').val();
+            requestData.Qty = $('#Qty').val();
+            requestData.Qty_Uom = $('#Qty_Uom').val();
+            requestData.Uc_Noms = $('#Uc_Noms').val();
+            requestData.Uc_Noms_Uom = $('#Uc_Noms_Uom').val();
+            requestData.Delivery_Date = D_date;
+            requestData.Jw_Rate = $('#Jw_Rate').val();
+            requestData.Value = $('#Value').val();
+            requestData.Reduce_Piece = $('#Reduce_Piece').val();
+            requestData.Extra_Piece = $('#Extra_Piece').val();
+            requestData.Sizerange = Qty_;
+            requestData.size = size;
+            requestData.GST = $('#GST').val();
+            requestData.Gst_Amt = $('#Gst_Amt').val();
+            requestData.Total = $('#Total').val();
+            console.log(JSON.stringify(requestData));
+
+            $.ajax({
+                type: 'POST',
+                url: '/JobSheet_pair/saveJob',
+                contentType: 'application/json',
+                data: JSON.stringify({ JobSheet_pairModel: requestData }),
+                success: function (data) {
+                    debugger;
+                    if (data == "0") {
+                        swal("Material alredy saved!", "", "error");
+                    }
+                    else if (data.jobsheet_pair_id != "" || data.jobsheet_pair_id != 0) {
+
+                        alert('Save Successfully.');
+                        var row = "<tr>";
+                        row += "<td data-title='OperationType'>" + $('#Material option:selected').text() + "</td>";
+                        row += "<td data-title='OperationType'>" + $('#Qty').val() + "</td>";
+                        row += "<td data-title='OperationType' >" + $('#Uc_Noms').val() + "</td>";
+                        row += "<td data-title='OperationType' >" + data.R_qty + "</td>";
+                        row += "<td data-title='OperationType' >" + data.Sheet + "</td>";
+                        row += "<td data-title='OperationType' >" + $('#Jw_Rate').val() + "</td>";
+                        row += "<td data-title='OperationType' >" + $('#Value').val() + "</td>";
+                        row += "<td data-title='OperationType' ></td></tr>";
+
+                        $('#table_grid_ROW').append(row);
+                        console.log(row);
+                        //    clear();
+                    }
+                    else if (data.Jw_ApprovedPriceID == 0 && data.Jw_ApprovedPriceID != "") {
+                        alert('Already Exist in the database.');
+                        return false;
+                    }
+                    else {
+                        alert('Save process Failed.');
+                        location.href = "/StageMaster_Job/StageMaster";
+                        return false;
+                    }
+
+                },
+                error: function (ex) {
+                    console.log(ex);
+                    alert('Already Exist in the database.');
+                }
+            });
+        }
+    }
+    function UpdateJobdetail(arg) {
+        var deliveryDate = $('#Delivery_Date').val();
+        deliveryDate = deliveryDate.split("/");
+        var D_date = deliveryDate[2] + "/" + deliveryDate[1] + "/" + deliveryDate[0];
+        if (Validation() != false) {
+            var Qty_ = [];
+            var size = [];
+            $('#sizeRangeTable tbody tr').find('.Qty').each(function () {
+                Qty_ += $(this).val() + ";" + $(this).attr('id') + ",";
+
+            });
+            $('#sizeRangeTable tbody tr').find('.SizeRangeRefValue').each(function () {
+                size += $(this).text() + ",";
+
+            });
+            if ($('#Date').val() == "") {
+                alert("Please Enter Date .")
+                $('#Date').css('border-color', 'red');
+                $('#Date').focus();
+                return false;
+            }
+            else {
+                $('#Date').css('border-color', '');
+            }
+            if ($("input[name='Exertnal_work']:checked").prop("checked", true).val() == 1) {
+                var bool = "true";
+            }
+            else {
+                var bool = "false";
+
+            }
+
+            var requestData = {};
+            requestData.Exertnal_work = bool;
+            requestData.jobsheet_pair_id = $('#jobsheet_pair_id').val();
+            requestData.jobsheet_pair_Code = $('#code_jobsheet_pair_Code').val();
+            requestData.Date = $('#Date').val();
+            requestData.JW_Name = $('#JW_Name').val();
+            requestData.Process_Name = $('#Process_Name').val();
+            requestData.UC_NO_id = $('#UC_NO_id').val();
+            requestData.Buyer = $('#Buyer').val();
+            requestData.Season = $('#Season').val();
+            requestData.Stores = $('#Stores').val();
+            requestData.Group_ = $('#Group_').val();
+            requestData.Category = $('#Category').val();
+            requestData.Issue_Material = $('#Issue_Material').val();
+            requestData.Material = $('#Material').val();
+            requestData.Qty = $('#Qty').val();
+            requestData.Qty_Uom = $('#Qty_Uom').val();
+            requestData.Uc_Noms = $('#Uc_Noms').val();
+            requestData.Uc_Noms_Uom = $('#Uc_Noms_Uom').val();
+            requestData.Delivery_Date = D_date;
+            requestData.Jw_Rate = $('#Jw_Rate').val();
+            requestData.Value = $('#Value').val();
+            requestData.Reduce_Piece = $('#Reduce_Piece').val();
+            requestData.Extra_Piece = $('#Extra_Piece').val();
+            requestData.Sizerange = Qty_;
+            requestData.size = size;
+            requestData.GST = $('#GST').val();
+            requestData.Gst_Amt = $('#Gst_Amt').val();
+            requestData.Total = $('#Total').val();
+            $.ajax({
+                type: 'POST',
+                url: '/JobSheet_pair/UpdateJob_jobsheet',
+                contentType: 'application/json',
+                data: JSON.stringify({ JobSheet_pairModel: requestData }),
+                success: function (data) {
+
+                    if (data.jobsheet_pair_id != "" || data.jobsheet_pair_id != 0) {
+
+                        alert('Updated Successfully.');
+                        id = $('#jobsheet_pair_id').val();
+                        $('#' + id).find("td").eq(0).html($('#Material option:selected').text())
+                        $('#' + id).find("td").eq(1).html($('#Qty').val())
+                        $('#' + id).find("td").eq(2).html($('#Uc_Noms').val())
+
+                        $('#' + id).find("td").eq(3).html(data.R_qty)
+                        $('#' + id).find("td").eq(4).html(data.Sheet)
+                        $('#' + id).find("td").eq(5).html($('#Jw_Rate').val())
+                        $('#' + id).find("td").eq(6).html($('#Value').val())
+                        $('#' + id).find("td").eq(7).html('')
+                        $("#" + id).find("td").show();
+                        clear();
+                    }
+                    else {
+                        alert('Updation failed.');
+                        location.href = "/StageMaster_Job/StageMaster";
+                        return false;
+                    }
+
+                },
+                error: function (ex) {
+                    alert('Already Exist in the database.');
+                }
+            });
+        }
+    }
+    function CalculateTotal__() {
+
+        //var add = 0;
+        //$("#sizeRangeTable .Qty").each(function () {
+        //    add += Number($(this).val());
+        //    add+=Number($(this).val());
+        //});
+        //alert(add);
+        var Qty_ = 0;
+        var size = [];
+        $('#sizeRangeTable tbody tr').find('.Qty').each(function () {
+            Qty_ += Number($(this).val());
+
+
+        });
+        var qty = $('#Qty').val();
+        if (qty != Qty_) {
+            swal("Quantity is not equal!", "", "info");
+            return false;
+        }
+    }
+    function clear() {
+        $('#UC_NO_id').val(0).trigger('chosen:updated'),
+
+            $('#Process_Name').val(0).trigger('chosen:updated'),
+            $("#Uc_Noms_Uom").val(0).trigger('chosen:updated'),
+            $('#Buyer').val(0).trigger('chosen:updated'),
+            $('#Stores').val(0).trigger('chosen:updated'),
+            $('#Group_').val(0).trigger('chosen:updated'),
+            $('#Category').val(0).trigger('chosen:updated'),
+            $('#Material').val(0).trigger('chosen:updated'),
+            $('#Extra_Piece').val(0),
+            $('#Delivery_Date').val('')
+
+        $('#Reduce_Piece').val(0),
+        $('#Qty').val(0),
+        $('#Qty_Uom').val(0),
+        $('#Uc_Noms').val(0),
+        $('#Uc_Noms_Uom').val(0),
+        $('#Jw_Rate').val(0),
+        $('#Value').val(0)
+
+    }
+
+    function Validation() {
+        if ($('#Qty').val() == "0") {
+            alert("Please Enter Qty .")
+            $('#Qty').css('border-color', 'red');
+            $('#Qty').focus();
+            return false;
+        }
+        else {
+            $('#Qty').css('border-color', '');
+        }
+        if ($('#JW_Name').val() == "") {
+            alert("Please Enter JW_Name .")
+            $('#JW_Name').css('border-color', 'red');
+            $('#JW_Name').focus();
+            return false;
+        }
+        else {
+            $('#JW_Name').css('border-color', '');
+        }
+        if ($('#Process_Name').val() == "") {
+            alert("Please Enter Process_Name .")
+            $('#Process_Name').css('border-color', 'red');
+            $('#Process_Name').focus();
+            return false;
+        }
+        else {
+            $('#Process_Name').css('border-color', '');
+        }
+
+        if ($('#UC_NO_id').val() == "") {
+            alert("Please Enter UC_NO_id .")
+            $('#UC_NO_id').css('border-color', 'red');
+            $('#UC_NO_id').focus();
+            return false;
+        }
+        else {
+            $('#UC_NO_id').css('border-color', '');
+        }
+        if ($('#Uc_Noms_Uom').val() == "") {
+            alert("Please Enter Uc_Noms_Uom .")
+            $('#Uc_Noms_Uom').css('border-color', 'red');
+            $('#Uc_Noms_Uom').focus();
+            return false;
+        }
+        else {
+            $('#Uc_Noms_Uom').css('border-color', '');
+        }
+        if ($('#Buyer').val() == "") {
+            alert("Please Enter Buyer .")
+            $('#Buyer').css('border-color', 'red');
+            $('#Buyer').focus();
+            return false;
+        }
+        else {
+            $('#Buyer').css('border-color', '');
+        }
+        if ($('#Season').val() == "") {
+            alert("Please Enter Season .")
+            $('#Season').css('border-color', 'red');
+            $('#Season').focus();
+            return false;
+        }
+        else {
+            $('#Season').css('border-color', '');
+        }
+        if ($('#Stores').val() == "") {
+            alert("Please Enter Stores .")
+            $('#Stores').css('border-color', 'red');
+            $('#Stores').focus();
+            return false;
+        }
+        else {
+            $('#Stores').css('border-color', '');
+        }
+        if ($('#Group_').val() == "") {
+            alert("Please Enter Group_ .")
+            $('#Group_').css('border-color', 'red');
+            $('#Group_').focus();
+            return false;
+        }
+        else {
+            $('#Group_').css('border-color', '');
+        }
+        if ($('#Category').val() == "") {
+            alert("Please Enter Category .")
+            $('#Category').css('border-color', 'red');
+            $('#Category').focus();
+            return false;
+        }
+        else {
+            $('#Category').css('border-color', '');
+        }
+        if ($('#Material').val() == "") {
+            alert("Please Enter Material .")
+            $('#Material').css('border-color', 'red');
+            $('#Material').focus();
+            return false;
+        }
+        else {
+            $('#Material').css('border-color', '');
+        }
+        if ($('#Qty').val() == "") {
+            alert("Please Enter Qty .")
+            $('#Qty').css('border-color', 'red');
+            $('#Qty').focus();
+            return false;
+        }
+        else {
+            $('#Qty').css('border-color', '');
+        }
+        if ($('#Qty_Uom').val() == "") {
+            alert("Please Enter Qty_Uom .")
+            $('#Qty_Uom').css('border-color', 'red');
+            $('#Qty_Uom').focus();
+            return false;
+        }
+        else {
+            $('#Qty_Uom').css('border-color', '');
+        }
+        if ($('#Uc_Noms_Uom').val() == "") {
+            alert("Please Enter Uc_Noms_Uom .")
+            $('#Uc_Noms_Uom').css('border-color', 'red');
+            $('#Uc_Noms_Uom').focus();
+            return false;
+        }
+        else {
+            $('#Uc_Noms_Uom').css('border-color', '');
+        }
+        if ($('#Jw_Rate').val() == "") {
+            alert("Please Enter Jw_Rate .")
+            $('#Jw_Rate').css('border-color', 'red');
+            $('#Jw_Rate').focus();
+            return false;
+        }
+        else {
+            $('#Jw_Rate').css('border-color', '');
+        }
+        if ($('#Value').val() == "") {
+            alert("Please Enter Value .")
+            $('#Value').css('border-color', 'red');
+            $('#Value').focus();
+            return false;
+        }
+        else {
+            $('#Value').css('border-color', '');
+        }
+    }
+
+
+</script>

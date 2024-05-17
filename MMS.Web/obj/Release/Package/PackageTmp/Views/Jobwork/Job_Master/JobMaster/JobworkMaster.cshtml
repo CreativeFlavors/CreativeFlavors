@@ -1,0 +1,308 @@
+﻿@{
+    ViewBag.Title = "View1";
+    Layout = "~/Views/Shared/_jobLayout.cshtml";
+}
+<div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+    <div class="dashboard-content col-xs-12 no-padding">
+        <div class="dashboard_head dashboard-title congest col-lg-12 col-md-12 col-sm-12  col-xs-12">
+            <div class="dashboard-title  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+                <h2>Jobworker Master</h2>
+            </div>
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("JobWorkGrid", "JobWorkMaster")
+    </div>
+
+</div>
+<script>
+
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $('#example').DataTable();
+        $("#EditJobPartial").hide();
+    });
+    function AddJob() {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("EditJobprocessList", "JobWorkMaster")',
+            data: { JW_Id: 0 },
+            success: function (data) {
+                $("#EditJobPartial").html(data);
+                $("#EditJobPartial").show();
+            }
+        });
+
+    }
+    function Edit(arg) {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("EditJobprocessList", "JobWorkMaster")',
+            data: { JW_Id: arg },
+            success: function (data) {
+                
+               
+                $("#EditJobPartial").html(data);
+                $("#EditJobPartial").show();
+              
+            }
+        });
+
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("DeleteJob", "JobWorkMaster")',
+                data: { OperationMasterId: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/JobWorkMaster/JobWorkMaster";
+                        return false;
+                    }
+                    else {
+                        alert('deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+    function save() {
+        if ($("input[name='Jobworker_Type']:checked").prop("checked", true).val() == 1) {
+            var bool = "true";
+        }
+        else {
+            var bool = "false";
+
+        }
+        if ($('#JW_Name').val() == "") {
+            alert("Please Enter JW_Name.")
+            $('#JW_Name').css('border-color', 'red');
+            $('#JW_Name').focus();
+            return false;
+        }
+        else {
+            $('#JW_Name').css('border-color', '');
+        }
+        if ($('#Currency').val() == "") {
+            alert("Please Enter Currency Name.")
+            $('#Currency').css('border-color', 'red');
+            $('#Currency').focus();
+            return false;
+        }
+        else {
+            $('#Currency').css('border-color', '');
+        }
+        if ($('#Address').val() == "") {
+            alert("Please Enter Currency Name.")
+            $('#Address').css('border-color', 'red');
+            $('#Address').focus();
+            return false;
+        }
+        else {
+            $('#Address').css('border-color', '');
+        }
+        if ($('#Country').val() == "") {
+            alert("Please Enter Country Name.")
+            $('#Country').css('border-color', 'red');
+            $('#Country').focus();
+            return false;
+        }
+        else {
+            $('#Country').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/JobWorkMaster/saveJob',
+            data: {
+                JW_Code: $("#JW_Code").val(),
+                JW_Name: $("#JW_Name").val(),
+                Jobworker_Type: bool,
+                Currency: $("#Currency").val(),
+                Address: $("#Address").val(),
+                Country: $('#Country').val(),
+                Contact_Person: $('#Contact_Person').val(),
+                Designation: $('#Designation').val(),
+                Mobile: $('#Mobile').val(),
+                Phone: $('#Phone').val(),
+                Fax: $('#Fax').val(),
+                Email: $("#Email").val(),
+                St_No_Head: $("#St_No_Head").val(),
+                Cst_No_Head: $("#Cst_No_Head").val(),
+                Range: $("#Range").val(),
+                Division: $("#Division").val(),
+                PLA_No: $('#PLA_No').val(),
+                EOC_No: $("#EOC_No").val(),
+                Regn_No: $("#Regn_No").val(),
+                Payment_Terms: $("#Payment_Terms").val(),
+                Delivery_Terms: $("#Delivery_Terms").val(),
+                Packing_Details: $("#Packing_Details").val(),
+                Insurance: $("#Insurance").val(),
+                Port_Of_Loading: $("#Port_Of_Loading").val(),
+                Despatch_Through: $("#Despatch_Through").val(),
+                Freight: $("#Freight").val(),
+                FreightName: $("#FreightName").val(),
+                Form: $("#Form").val(),
+                FormName: $("#FormName").val(),
+                Forwarder: $("#Forwarder").val(),
+                BankName: $("#BankName").val(),
+                AccountNumber: $("#AccountNumber").val(),
+                BankCode: $("#BankCode").val(),
+                SwiftCode: $("#SwiftCode").val(),
+                BankName: $("#BankName").val(),
+                IBAN: $("#IBAN").val(),
+                OtherInformation: $("#OtherInformation").val()
+            },
+
+            success: function (data) {
+                if (data.OperationMasterId != "" || data.OperationMasterId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/JobWorkMaster/JobWorkMaster";
+                    return false;
+                }
+                else if (data.OperationMasterId == 0 && data.OperationName != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/JobWorkMaster/JobWorkMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function UpdateJobwork(arg) {
+
+        if ($("input[name='Jobworker_Type']:checked").prop("checked", true).val() == 1) {
+            var bool = "true";
+        }
+        else {
+            var bool = "false";
+
+        }
+        if ($('#JW_Name').val() == "") {
+            alert("Please Enter JW_Name.")
+            $('#JW_Name').css('border-color', 'red');
+            $('#JW_Name').focus();
+            return false;
+        }
+        else {
+            $('#JW_Name').css('border-color', '');
+        }
+        if ($('#Currency').val() == "") {
+            alert("Please Enter Currency Name.")
+            $('#Currency').css('border-color', 'red');
+            $('#Currency').focus();
+            return false;
+        }
+        else {
+            $('#Currency').css('border-color', '');
+        }
+        if ($('#Address').val() == "") {
+            alert("Please Enter Currency Name.")
+            $('#Address').css('border-color', 'red');
+            $('#Address').focus();
+            return false;
+        }
+        else {
+            $('#Address').css('border-color', '');
+        }
+        if ($('#Country').val() == "") {
+            alert("Please Enter Country Name.")
+            $('#Country').css('border-color', 'red');
+            $('#Country').focus();
+            return false;
+        }
+        else {
+            $('#Country').css('border-color', '');
+        }
+        
+        $.ajax({
+            type: 'POST',
+            url: '/JobWorkMaster/UpdateJob',
+            data: {
+                JW_Id: $("#JW_Id").val(),
+                JW_Code: $("#JW_Code").val(),
+                JW_Name: $("#JW_Name").val(),
+                Jobworker_Type: bool,
+                Currency: $("#Currency").val(),
+                Address: $("#Address").val(),
+                Country: $('#Country').val(),
+                Contact_Person: $('#Contact_Person').val(),
+                Designation: $('#Designation').val(),
+                Mobile: $('#Mobile').val(),
+                Phone: $('#Phone').val(),
+                Fax: $('#Fax').val(),
+                Email: $("#Email").val(),
+                St_No_Head: $("#St_No_Head").val(),
+                Cst_No_Head: $("#Cst_No_Head").val(),
+                Range: $("#Range").val(),
+                Division: $("#Division").val(),
+                PLA_No: $('#PLA_No').val(),
+                EOC_No: $("#EOC_No").val(),
+                Regn_No: $("#Regn_No").val(),
+                Payment_Terms: $("#Payment_Terms").val(),
+                Delivery_Terms: $("#Delivery_Terms").val(),
+                Packing_Details: $("#Packing_Details").val(),
+                Insurance: $("#Insurance").val(),
+                Port_Of_Loading: $("#Port_Of_Loading").val(),
+                Despatch_Through: $("#Despatch_Through").val(),
+                Freight: $("#Freight").val(),
+                FreightName: $("#FreightName").val(),
+                Form: $("#Form").val(),
+                FormName: $("#FormName").val(),
+                Forwarder: $("#Forwarder").val(),
+                BankName: $("#BankName").val(),
+                AccountNumber: $("#AccountNumber").val(),
+                BankCode: $("#BankCode").val(),
+                SwiftCode: $("#SwiftCode").val(),
+                BankName: $("#BankName").val(),
+                IBAN: $("#IBAN").val(),
+                OtherInformation: $("#OtherInformation").val()
+            },
+            success: function (data) {
+                if (data.OperationMasterId != "" || data.OperationMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/JobWorkMaster/JobWorkMaster";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/JobWorkMaster/JobWorkMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+
+</script>

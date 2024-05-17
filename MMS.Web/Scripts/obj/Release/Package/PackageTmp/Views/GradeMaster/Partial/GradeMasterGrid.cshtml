@@ -1,0 +1,183 @@
+﻿@model MMS.Web.Models.GradeMasterModel.GradeMasterModel
+@{
+  
+   
+}
+<div class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+        <div class="table-responsive table-td-padding padding-lr-6px table-row-bg">
+            <table class="veh-table" id="empTable">
+                <thead>
+                    <tr class="color-code-top-btn">
+                        <td colspan="7">
+                            <input type="text" id="SearchID" placeholder="Search.." />
+                            <input type="button" value="Add" onclick="Add()" />
+                            <input type="button" value="Search" onclick="Search()">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="veh-1">
+                            SNO
+                        </th>
+                        <th class="veh-2">
+                            CodeNo
+                        </th>
+                        <th class="veh-3">
+                            Category
+                        </th>
+                        <th class="veh-4">
+                            Designation
+                        </th>
+                        <th class="veh-5">
+                            Grade
+                        </th>
+                        <th class="veh-6">
+                            Efficiency
+                        </th>
+                        <th class="veh-7">
+                            Edit/Delete
+                        </th>
+                    </tr>
+                </thead>
+                @if (Model.GradeMasterList != null && Model.GradeMasterList.Count > 0)
+                {
+                    int count = 1;
+                    <tbody>
+                        @foreach (var Indent in Model.GradeMasterList)
+                        {
+                            <tr>
+                                <td class="veh-1" onclick="">@count</td>
+                                <td class="veh-3">@Indent.CodeNo</td>
+                                <td class="veh-3">@Indent.Category</td>
+                                <td class="veh-4">@Indent.Designation</td>
+                                <td class="veh-5">@Indent.Grade</td>
+                                <td class="veh-6">@Indent.Efficiency</td>
+                                <td class="veh-1 edit-del-wrap">
+                                    <a href="javascript:void(0)" onclick="Edit('@Indent.GradeMasterID')" class="watchlist-edit" title="Edit"></a>
+                                    <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@Indent.GradeMasterID')" class="watchlist-delete" title="Delete"></a>
+
+                                </td>
+                            </tr>
+                            count++;
+                        }
+
+                    </tbody>
+                    <tfoot class="footer-pager">
+                        <tr>
+                            <td colspan="4">
+                                <div id="pager">
+                                    <form>
+                                        <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                        <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                        <input type="text" class="pagedisplay" />
+                                        <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                        <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                        <select class="pagesize">
+                                            <option selected="selected" value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="30">30</option>
+                                            <option value="40">40</option>
+                                        </select>
+                                    </form>
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    </tfoot>
+
+                }
+                
+            </table>
+            @if (Model.GradeMasterList != null && Model.GradeMasterList.Count == 0)
+            {
+                <div style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+            }
+        </div>
+        </div>
+    <div id="EditColorPartial">
+        @Html.Partial("Partial/GradeMasterDetails", Model)
+    </div>
+</div>
+
+
+<script>
+    function Search() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Search", "GradeMaster")',
+            data: { filter: $('#SearchID').val() },
+            success: function (data) {
+                //console.log(data);
+                //$('#DivShow').hide();
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                $('#DivShow').hide();
+            }
+        });
+    }
+    
+    function Cancel() {
+        //$('#EditColorPartial').hide()
+        location.reload();
+    }
+    function Add() {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("GradeMasterDetails", "GradeMaster")',
+            data: { GradeMasterID: 0 },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+
+    }
+    function Edit(arg) {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("GradeMasterDetails", "GradeMaster")',
+            data: { GradeMasterID: arg },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "GradeMaster")',
+                data: { GradeMasterID: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/GradeMaster/GradeMaster";
+                        return false;
+                    }
+                    else {
+                        alert('deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+
+</script>
+

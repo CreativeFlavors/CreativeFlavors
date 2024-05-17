@@ -1,0 +1,207 @@
+﻿@model MMS.Web.Models.ColorMasterModel.ColorMasterModel
+@{
+    ViewBag.Title = "Color";
+    Layout = "~/Views/Shared/_Layout.cshtml";    
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+}
+<style>
+    .color-layout {
+    height: 247px;
+    width: 366px !important;
+}
+</style>
+
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    //$("#UploadImg").change(function () {
+    //    var data = new FormData();
+    //    var files = $("#UploadImg").get(0).files;
+    //    if (files.length > 0) {
+    //        data.append("MyImages", files[0]);
+    //    }
+
+    //    $.ajax({
+    //        url: "/Color/UploadFile",
+    //        type: "POST",
+    //        processData: false,
+    //        contentType: false,
+    //        data: data,
+    //        success: function (response) {
+    //            //code after success
+    //            $("#txtImg").val(response);
+    //            $("#imgPreview").attr('src', '/Upload/' + response);
+    //        },
+    //        error: function (er) {
+    //            alert(er);
+    //        }
+
+    //    });
+    //});
+    var imageGuid = "";
+    function SaveColor() {
+       
+        var data = new FormData();
+        var files = $("#UploadImg").get(0).files;
+        console.log(files)
+        if (files.length > 0) {
+            data.append("MyImages", files[0]);
+        }
+
+        $.ajax({
+            url: "/Color/UploadFile",
+            type: "POST",
+            processData: false,
+            contentType: false,
+            data: data,
+            success: function (response) {
+                //code after success
+                imageGuid = response;
+               // alert(imageGuid)
+                $("#txtImg").val(response);
+                $("#imgPreview").attr('src', '/Upload/' + response);
+            },
+            error: function (er) {
+                alert(er);
+            }
+        });
+
+        if ($('#Color').val() == "") {
+            alert("Please Enter the Color.")
+            $('#Color').css('border-color', 'red');
+            $('#Color').focus();
+            return false;
+        }
+        else {
+            $('#Color').css('border-color', '');
+        }
+        if ($('#BuyerColorCode').val() == "") {
+            alert("Please Enter the Buyer Color Code.")
+            $('#BuyerColorCode').css('border-color', 'red');
+            $('#BuyerColorCode').focus();
+            return false;
+        }
+        else {
+            $('#BuyerColorCode').css('border-color', '');
+        }
+       
+        $.ajax({
+            type: 'POST',
+            url: '/Color/Color',
+            data: {
+                Color: $('#Color').val(),
+                BuyerColorCode: $('#BuyerColorCode').val(),
+                ColorMasterIdb: $('#ColorMasterIdb').val(),
+                ColorImages: imageGuid
+            },
+            success: function (data) {
+                if (data.ColorMasterId != "" || data.ColorMasterId != 0) {
+                    alert('Color Details Saved Successfully.');
+                    location.href = "/Color/Color";
+                    return false;
+                }
+                else if(data.ColorMasterId == 0 && data.Color != "")
+                {
+                    alert('This Color Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('This Color Already Exist in the database.');
+                    location.href = "/Color/Color";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('This Color Already Exist in the database.');
+            }
+        });
+    }
+    var UpdateimageGuid = "";
+    function UpdateColor(arg) {
+        var data = new FormData();
+        var files = $("#UploadImg").get(0).files;
+        console.log(files)
+        if (files.length > 0) {
+            data.append("MyImages", files[0]);
+        }
+
+        $.ajax({
+            url: "/Color/UploadFile",
+            type: "POST",
+            processData: false,
+            contentType: false,
+            data: data,
+            success: function (response) {
+                //code after success
+                UpdateimageGuid = response;
+                alert("Upload Successfully")
+                //$("#txtImg").val(response);
+                //$("#imgPreview").attr('src', '/Upload/' + response);
+            },
+            error: function (er) {
+                alert(er);
+            }
+        });
+        //alert(UpdateimageGuid);
+        //alert($('#ColorMasterId').val());
+        if ($('#Color').val() == "") {
+            alert("Please Enter the Color.")
+            $('#Color').css('border-color', 'red');
+            $('#Color').focus();
+            return false;
+        }
+        else {
+            $('#Color').css('border-color', '');
+        }
+        if ($('#BuyerColorCode').val() == "") {
+            alert("Please Enter the Buyer Color Code.")
+            $('#BuyerColorCode').css('border-color', 'red');
+            $('#BuyerColorCode').focus();
+            return false;
+        }
+        else {
+            $('#BuyerColorCode').css('border-color', '');
+        }       
+        $.ajax({
+            type: 'POST',
+            url: '/Color/UpdateColor',
+            data: {
+                Color: $('#Color').val(),
+                BuyerColorCode: $('#BuyerColorCode').val(),
+                ColorMasterId: $('#ColorMasterId').val(),
+                ColorImages: UpdateimageGuid
+            },
+            success: function (data) {
+                if (data.ColorMasterIdb != "" || data.ColorMasterIdb != 0) {
+                    alert('Color Details Updated Successfully.');
+                    location.href = "/Color/Color";
+                    return false;
+                }
+                else {
+                    alert('Color Details Updation failed.');
+                    location.href = "/Color/Color";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('This Color Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Color Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("ColorGrid", "Color")
+    </div>
+</div>

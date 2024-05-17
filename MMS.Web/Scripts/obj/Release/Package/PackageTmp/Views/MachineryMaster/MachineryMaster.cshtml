@@ -1,0 +1,371 @@
+﻿@{
+    ViewBag.Title = "MachineryMaster";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+}
+
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    var UpdateimageGuid = "";
+    function Save() {
+        var data = new FormData();
+        var files = $("#UploadImg").get(0).files;
+        console.log(files)
+        if (files.length > 0) {
+            data.append("MyImages", files[0]);
+        }
+
+        $.ajax({
+            url: "/MachineryMaster/UploadFile",
+            type: "POST",
+            processData: false,
+            contentType: false,
+            data: data,
+            success: function (response) {
+                //code after success
+                UpdateimageGuid = response;
+                // alert("Upload Successfully")
+                //$("#txtImg").val(response);
+                //$("#imgPreview").attr('src', '/Upload/' + response);
+            },
+            error: function (er) {
+                alert(er);
+            }
+        });
+        //alert(UpdateimageGuid);
+        if ($('#MachineCode').val() == "") {
+            alert("Please Enter Machine Code.")
+            $('#MachineCode').css('border-color', 'red');
+            $('#MachineCode').focus();
+            return false;
+        }
+        else {
+            $('#MachineCode').css('border-color', '');
+        }
+        if ($('#MachineName').val() == "") {
+            alert("Please Enter Machine Name.")
+            $('#MachineName').css('border-color', 'red');
+            $('#MachineName').focus();
+            return false;
+        }
+        else {
+            $('#MachineName').css('border-color', '');
+        }
+        if ($('#Make').val() == "") {
+            alert("Please Enter Make.")
+            $('#Make').css('border-color', 'red');
+            $('#Make').focus();
+            return false;
+        }
+        else {
+            $('#Make').css('border-color', '');
+        }
+        if ($('#Model').val() == "") {
+            alert("Please Enter Model.")
+            $('#Model').css('border-color', 'red');
+            $('#Model').focus();
+            return false;
+        }
+        else {
+            $('#Model').css('border-color', '');
+        }
+        if ($('#AssesListNo').val() == "") {
+            alert("Please Enter AssesList No.")
+            $('#AssesListNo').css('border-color', 'red');
+            $('#AssesListNo').focus();
+            return false;
+        }
+        else {
+            $('#AssesListNo').css('border-color', '');
+        }
+        if ($('#MachineSerialNo').val() == "") {
+            alert("Please Enter Machine Serial No.")
+            $('#MachineSerialNo').css('border-color', 'red');
+            $('#MachineSerialNo').focus();
+            return false;
+        }
+        else {
+            $('#MachineSerialNo').css('border-color', '');
+        }
+        if ($('#Kilowatt').val() == "") {
+            alert("Please Enter Kilowatt.")
+            $('#Kilowatt').css('border-color', 'red');
+            $('#Kilowatt').focus();
+            return false;
+        }
+        else {
+            $('#Kilowatt').css('border-color', '');
+        }
+        if ($('#HorsePower').val() == "") {
+            alert("Please Enter Horse Power.")
+            $('#HorsePower').css('border-color', 'red');
+            $('#HorsePower').focus();
+            return false;
+        }
+        else {
+            $('#HorsePower').css('border-color', '');
+        }
+        if ($('#Volt').val() == "") {
+            alert("Please Enter Volt.")
+            $('#Volt').css('border-color', 'red');
+            $('#Volt').focus();
+            return false;
+        }
+        else {
+            $('#Volt').css('border-color', '');
+        }
+        if ($('#OperationUsedFor').val() == "") {
+            alert("Please Enter Operation Used For.")
+            $('#OperationUsedFor').css('border-color', 'red');
+            $('#OperationUsedFor').focus();
+            return false;
+        }
+        else {
+            $('#OperationUsedFor').css('border-color', '');
+        }
+        if ($('#Specification').val() == "") {
+            alert("Please Enter Specification.")
+            $('#Specification').css('border-color', 'red');
+            $('#Specification').focus();
+            return false;
+        }
+        else {
+            $('#Specification').css('border-color', '');
+        }
+
+        //if ($('#UploadImg').val() == "") {
+        //    alert("Please Select UploadImg.")
+        //    $('#UploadImg').css('border-color', 'red');
+        //    $('#UploadImg').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#UploadImg').css('border-color', '');
+        //}
+
+        $.ajax({
+            type: 'POST',
+            url: '/MachineryMaster/MachineryMaster',
+            data: {
+                MachineCode: $('#MachineCode').val(),
+                MachineName: $('#MachineName').val(),
+                Make: $('#Make').val(),
+                Model: $('#Model').val(),
+                AssesListNo: $('#AssesListNo').val(),
+                MachineSerialNo: $('#MachineSerialNo').val(),
+                Kilowatt: $('#Kilowatt').val(),
+                HorsePower: $('#HorsePower').val(),
+                Volt: $('#Volt').val(),
+                OperationUsedFor: $('#OperationUsedFor').val(),
+                Specification: $('#Specification').val(),
+                Image: UpdateimageGuid,
+                MachineryMasterId: $('#MachineryMasterId').val()
+
+            },
+            success: function (data) {
+                if (data.MachineryMasterId != "" || data.MachineryMasterId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/MachineryMaster/MachineryMaster";
+                    return false;
+                }
+                else if (data.MachineryMasterId == 0 && data.MachineName != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/MachineryMaster/MachineryMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    var imageGuid = "";
+    function Update(arg) {
+        if ($('#MachineCode').val() == "") {
+            alert("Please Enter Machine Code.")
+            $('#MachineCode').css('border-color', 'red');
+            $('#MachineCode').focus();
+            return false;
+        }
+        else {
+            $('#MachineCode').css('border-color', '');
+        }
+        if ($('#MachineName').val() == "") {
+            alert("Please Enter Machine Name.")
+            $('#MachineName').css('border-color', 'red');
+            $('#MachineName').focus();
+            return false;
+        }
+        else {
+            $('#MachineName').css('border-color', '');
+        }
+        if ($('#Make').val() == "") {
+            alert("Please Enter Make.")
+            $('#Make').css('border-color', 'red');
+            $('#Make').focus();
+            return false;
+        }
+        else {
+            $('#Make').css('border-color', '');
+        }
+        if ($('#Model').val() == "") {
+            alert("Please Enter Model.")
+            $('#Model').css('border-color', 'red');
+            $('#Model').focus();
+            return false;
+        }
+        else {
+            $('#Model').css('border-color', '');
+        }
+        if ($('#AssesListNo').val() == "") {
+            alert("Please Enter AssesList No.")
+            $('#AssesListNo').css('border-color', 'red');
+            $('#AssesListNo').focus();
+            return false;
+        }
+        else {
+            $('#AssesListNo').css('border-color', '');
+        }
+        if ($('#MachineSerialNo').val() == "") {
+            alert("Please Enter Machine Serial No.")
+            $('#MachineSerialNo').css('border-color', 'red');
+            $('#MachineSerialNo').focus();
+            return false;
+        }
+        else {
+            $('#MachineSerialNo').css('border-color', '');
+        }
+        if ($('#Kilowatt').val() == "") {
+            alert("Please Enter Kilowatt.")
+            $('#Kilowatt').css('border-color', 'red');
+            $('#Kilowatt').focus();
+            return false;
+        }
+        else {
+            $('#Kilowatt').css('border-color', '');
+        }
+        if ($('#HorsePower').val() == "") {
+            alert("Please Enter Horse Power.")
+            $('#HorsePower').css('border-color', 'red');
+            $('#HorsePower').focus();
+            return false;
+        }
+        else {
+            $('#HorsePower').css('border-color', '');
+        }
+        if ($('#Volt').val() == "") {
+            alert("Please Enter Volt.")
+            $('#Volt').css('border-color', 'red');
+            $('#Volt').focus();
+            return false;
+        }
+        else {
+            $('#Volt').css('border-color', '');
+        }
+        if ($('#OperationUsedFor').val() == "") {
+            alert("Please Enter Operation Used For.")
+            $('#OperationUsedFor').css('border-color', 'red');
+            $('#OperationUsedFor').focus();
+            return false;
+        }
+        else {
+            $('#OperationUsedFor').css('border-color', '');
+        }
+        if ($('#Specification').val() == "") {
+            alert("Please Enter Specification.")
+            $('#Specification').css('border-color', 'red');
+            $('#Specification').focus();
+            return false;
+        }
+        else {
+            $('#Specification').css('border-color', '');
+        }
+
+        //if ($('#UploadImg').val() == "") {
+        //    alert("Please Select UploadImg.")
+        //    $('#UploadImg').css('border-color', 'red');
+        //    $('#UploadImg').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#UploadImg').css('border-color', '');
+        //}
+
+        var data = new FormData();
+        var files = $("#UploadImg").get(0).files;
+      //  console.log(files)
+        if (files.length > 0) {
+            data.append("MyImages", files[0]);
+        }
+
+        $.ajax({
+            url: "/MachineryMaster/UploadFile",
+            type: "POST",
+            processData: false,
+            contentType: false,
+            data: data,
+            success: function (response) {
+                //code after success
+                imageGuid = response;              
+            },
+            error: function (er) {
+                alert(er);
+            }
+        });     
+        $.ajax({
+            type: 'POST',
+            url: '/MachineryMaster/Update',
+            data: {
+                MachineCode: $('#MachineCode').val(),
+                MachineName: $('#MachineName').val(),
+                Make: $('#Make').val(),
+                Model: $('#Model').val(),
+                AssesListNo: $('#AssesListNo').val(),
+                MachineSerialNo: $('#MachineSerialNo').val(),
+                Kilowatt: $('#Kilowatt').val(),
+                HorsePower: $('#HorsePower').val(),
+                Volt: $('#Volt').val(),
+                OperationUsedFor: $('#OperationUsedFor').val(),
+                Specification: $('#Specification').val(),
+                MachineryMasterId: $('#MachineryMasterId').val(),
+                Image: imageGuid
+            },
+            success: function (data) {
+                if (data.MachineryMasterId != "" || data.MachineryMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/MachineryMaster/MachineryMaster";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/MachineryMaster/MachineryMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Machinery  Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("MachineryMasterGrid", "MachineryMaster")
+    </div>
+</div>

@@ -1,0 +1,260 @@
+﻿@model MMS.Data.StoredProcedureModel.IssueSlip_SingleModel
+@*@model MMS.Web.Models.StockModel.IssueSlip_SingleModel*@
+@using MMS.Repository.Managers.StockManager
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+@{
+    tbl_PermissionSetting PermissionSettingModel = new MMS.Core.Entities.tbl_PermissionSetting();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<tbl_Permission> PermissionModel = new List<tbl_Permission>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Multiple Issue", PermissionSettingModel.PermissionID);
+    }
+}
+@{
+    bool Save = false; bool Add = false; bool Update = false; bool Display = false; bool Edit = false; bool Delete = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Save")
+        {
+            Save = true;
+        }
+        if (item.PermissionDesc == "Add")
+        {
+            Add = true;
+        }
+        if (item.PermissionDesc == "Update")
+        {
+            Update = true;
+        }
+        if (item.PermissionDesc == "Display")
+        {
+            Display = true;
+        }
+        if (item.PermissionDesc == "Edit")
+        {
+            Edit = true;
+        }
+        if (item.PermissionDesc == "Delete")
+        {
+            Delete = true;
+        }
+    }
+
+}
+
+<div class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+        <table class="veh-table" id="empTable">
+            <thead>
+                <tr class="color-code-top-btn">
+                    <td colspan="9">
+                        @if (Add == true)
+                        {
+                            <input type="text" id="SeaarchID" placeholder="Search.." /><input type="button" value="Add" onclick="Add()">
+                        }
+                        <input type="button" value="Search" onclick="Search()">
+                    </td>
+                </tr>
+                <tr>
+                    <th class="veh-1">
+
+                        Si.No
+                    </th>
+                    <th class="veh-2">
+                        IssueSlipNo
+                    </th>
+                    @*<th class="veh-3">
+                        InternalOderID
+                    </th>
+                    <th class="veh-5">
+                        StyleNo
+                    </th>
+                    <th class="veh-6">
+                        ConveyorID
+                    </th>*@
+                    <th class="veh-3">
+                        Edit / Delete
+                    </th>
+                </tr>
+            </thead>
+            @if (Model.IssueSlip_ModelList != null && Model.IssueSlip_ModelList.Count > 0)
+            {
+                int count = 1;
+                <tbody>
+                    @foreach (var item in Model.IssueSlip_ModelList)
+                    {
+   
+                        <tr>
+                            <td class="veh-1">@count</td>
+                            <td class="veh-2">@item.IssueSlipNo</td>
+                            @*<td class="veh-3">@item.InternalOderID</td>
+                            <td class="veh-5">@item.StyleNo</td>
+                            <td class="veh-6">@item.ConveyorID</td>*@
+                            <td class="veh-1 edit-del-wrap">
+                                <a href="javascript:void(0)" onclick="Edit('@item.MultipleIssueSlipID')" class="watchlist-edit" title="Edit"></a>
+                                @if (Delete == true)
+                                {
+                                    <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.MultipleIssueSlipID')" class="watchlist-delete" title="Delete"></a>
+                                }
+
+                            </td>
+                        </tr>
+                        count++;
+                    }
+                </tbody>
+                <tfoot class="footer-pager">
+                    <tr>
+                        <td colspan="4">
+                            <!-- pager -->
+                            @if (Model.Pager != null && Model.Pager.EndPage > 1)
+                            {
+                                <ul class="pagination">
+                                    @if (Model.Pager.CurrentPage > 1)
+                                    {
+                                        <li>
+                                            <a href="~/MultipleIssue/MuplitpleIssue">First</a>
+                                        </li>
+                                        <li>
+                                            <a href="~/MultipleIssue/MuplitpleIssue?page=@(Model.Pager.CurrentPage - 1)">Previous</a>
+                                        </li>
+                                    }
+
+                                    @for (var page = Model.Pager.StartPage; page <= Model.Pager.EndPage; page++)
+                                    {
+                                        <li class="@(page == Model.Pager.CurrentPage ? "active" : "")">
+                                            <a href="~/MultipleIssue/MuplitpleIssue?page=@page">@page</a>
+                                        </li>  
+                                    }
+
+                                    @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
+                                    {
+                                        <li>
+                                            <a href="~/MultipleIssue/MuplitpleIssue?page=@(Model.Pager.CurrentPage + 1)">Next</a>
+                                        </li>
+                                        <li>
+                                            <a href="~/MultipleIssue/MuplitpleIssue?page=@(Model.Pager.TotalPages)">Last</a>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </td>
+                    </tr>
+                </tfoot>
+            }
+        </table>
+        @if (Model.IssueSlip_ModelList != null && Model.IssueSlip_ModelList.Count == 0)
+        {
+            <div class="noRecordsFound" style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+        }
+    </div>
+    <div id="EditColorPartial" style="display: none;">
+        @Html.Partial("~/Views/Stock/MultipleIssue/Partial/MultipleIssueDetails.cshtml", Model)
+    </div>
+
+
+</div>
+<script>
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    $(function () {
+        $('.loader-overlay').ajaxStart(function () {
+            $(this).fadeIn('slow');
+        }).ajaxStop(function () {
+            $(this).stop().fadeOut('fast');
+        });
+    });
+    $(function () {
+
+        $("#multipleOrder_").html("");
+    });
+    function Add() {
+        $('.veh-tablecont').hide();
+        $('#empTable').hide();
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetIssueDetails", "MultipleIssue")',
+            data: { IssueSlipId: 0 },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+    }
+    function Search() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Search", "MultipleIssue")',
+            data: { filter: $('#SeaarchID').val() },
+            success: function (data) {
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                $('#DivShow').hide();
+            }
+        });
+    }
+
+    function Cancel() {
+        location.reload();
+    }
+    function Edit(arg) {
+        $('.veh-tablecont').hide();
+        $('#empTable').hide();
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetIssueDetails", "MultipleIssue")',
+            data: { IssueSlipId: arg },
+            success: function (data) {
+
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+
+            }
+        });
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $('.loader-overlay').fadeIn('slow');
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("DeleteIssueDetails", "MultipleIssue")',
+                data: { IssueSlipId: arg },
+                success: function (status) {
+                    $('.loader-overlay').fadeOut('fast');
+                    if (status == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/MultipleIssue/MuplitpleIssue";
+                        return false;
+                    }
+                    else {
+                        alert('deletion failed.');
+                    }
+
+                },
+
+            });
+        }
+        else {
+            return false;
+        }
+    }
+</script>
+<script>
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    $(function () {
+        $('.loader-overlay').ajaxStart(function () {
+            $(this).fadeIn('slow');
+        }).ajaxStop(function () {
+            $(this).stop().fadeOut('fast');
+        });
+    });
+</script>
+<script>
+
+</script>

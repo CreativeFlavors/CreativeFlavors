@@ -1,0 +1,105 @@
+﻿@{
+    ViewBag.Title = "JobWorkTransaction";
+    Layout = "~/Views/Shared/_jobLayout.cshtml";
+}
+
+<div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+    <div class="dashboard-content col-xs-12 no-padding">
+        <div class="dashboard_head dashboard-title congest col-lg-12 col-md-12 col-sm-12  col-xs-12">
+            <div class="dashboard-title  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+                <h2>Job Work Transaction</h2>
+            </div>
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("JobWorkTransactionGrid", "JobWorkTransaction")
+    </div>
+
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $('#example').DataTable();
+        $("#EditJobPartial").hide();
+    });
+
+    function AddJobWorkTransaction() {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("GetDetails", "JobWorkTransaction")',
+            data: { GrnID: 0 },
+            success: function (data) {
+                $("#JobWorkTransactionPartial").html(data);
+                $("#JobWorkTransactionPartial").show();
+            }
+        });
+    }
+
+
+    function Edit(arg) {
+        
+        $('.veh-tablecont').hide();
+        
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetDetails", "JobWorkTransaction")',
+            data: { GrnID: arg },
+            success: function (data) {
+                $("#JobWorkTransactionPartial").html(data);
+                $("#JobWorkTransactionPartial").show();
+            }
+        });
+    }
+
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "JobWorkTransaction")',
+                data: { OtherJobWork_Id: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Other Job Work Deleted Successfully.');
+                        location.href = "/JobWorkTransaction/JobWorkTransaction";
+                        return false;
+                    }
+                    else {
+                        alert('Other Job Work deletion failed.');
+                    }
+                },
+            });
+        }
+        else {
+            return false;
+        }
+    }
+    function Delete(arg) {
+        $('#list-amended-material tr#' + arg + '').remove();
+        $.ajax({
+            url: '/GRN_DetailNew/Delete',
+            type: "Post",
+            dataType: "JSON",
+            data: { GrnID: arg },
+            success: function (cities) {
+                if (cities == "Success") {
+                    alert("Grn Material deleted successfuly.");
+                    location.href = "/JobWorkTransaction/JobWorkTransaction";
+                    return false;
+                }
+            }
+        });
+    }
+</script>

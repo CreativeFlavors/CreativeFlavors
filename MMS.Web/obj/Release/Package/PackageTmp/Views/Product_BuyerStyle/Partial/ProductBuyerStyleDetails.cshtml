@@ -1,0 +1,452 @@
+﻿@model MMS.Web.Models.Product_BuyerStyleModel.Product_BuyerStyleModel
+@using MMS.Core.Entities
+@{
+    int id = Model.ProductOrBuyerStyleId;
+    Session["CountryMasterId"] = id;
+    tbl_PermissionSetting PermissionSettingModel = new MMS.Core.Entities.tbl_PermissionSetting();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+
+    List<tbl_Permission> PermissionModel = new List<tbl_Permission>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Product Buyer Style", PermissionSettingModel.PermissionID);
+    }
+
+
+    bool Save = false; bool Update = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Save")
+        {
+            Save = true;
+        }
+        if (item.PermissionDesc == "Update")
+        {
+            Update = true;
+        }
+    }
+}
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+<style>
+    .popup-wrap {
+        background: #eaf1f7 none repeat scroll 0 0;
+        border-radius: 6px;
+        box-shadow: 1px 1px 13px #858585;
+        left: 25%;
+        line-height: 1px;
+        padding: 16px;
+        position: absolute;
+        top: 2%;
+        font-family: verdana;
+        font-size: 12px;
+        width: 615px !important;
+    }
+</style>
+<script>
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    $("#LeatherName_1").combobox();
+    $("#toggle").click(function () {
+        $("#LeatherName_1").toggle();
+    });
+    $("#LeatherName_2").combobox();
+    $("#toggle").click(function () {
+        $("#LeatherName_2").toggle();
+    });
+    $("#LeatherName_3").combobox();
+    $("#toggle").click(function () {
+        $("#LeatherName_3").toggle();
+    });
+    $("#LeatherName_4").combobox();
+    $("#toggle").click(function () {
+        $("#LeatherName_4").toggle();
+    });
+    $("#BuyerStyle").blur(function () {
+        var style = $('#BuyerStyle').val();
+        var arryString = [];
+        arryString = style.split(/ +/);
+        $('#Last').val(arryString[1]);
+        $('#ProductColour').val(arryString[2]);
+    });
+</script>
+<html>
+<body>
+
+
+
+    <div class="right-form-section clearfix" id="DivShow">
+        <form role="form" class="form-inline">
+            <div class="container-fluid">
+                <div class="field-section">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                        <p class="section-title">Product/Buyer Style</p>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Buyer Name /<br />Product group</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @Html.HiddenFor(x => x.ProductOrBuyerStyleId)
+                                            @Html.DropDownListFor(m => m.BuyerName_ProductGroup, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Buyer Model</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.BuyerModel_ProductType, MMS.Web.ExtensionMethod.HtmlHelper.BuyerModel(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Buyer Style </label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.BuyerStyle, new { @class = "form-control text-field", @id = "BuyerStyle" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Last</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.Last, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Product colour</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @if (Model != null && Model.ProductOrBuyerStyleId != 0)
+                                            {
+                                                
+                                                @Html.DropDownListFor(m => m.Color, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), "Please Select", new { @class = "select-style text-field" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.ProductColour, new { @class = "form-control text-field" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Our Style</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.OurStyle, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Size Range</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.SizeRange, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "select-style text-field" })
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">BOM No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.BomNo, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Leather Name  -1</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.LeatherName_1, MMS.Web.ExtensionMethod.HtmlHelper.leatherStoreWithMaterialName(), "Please Select", new { @class = "select-style text-field" })
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Leather Name  -2</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.LeatherName_2, MMS.Web.ExtensionMethod.HtmlHelper.leatherStoreWithMaterialName(), "Please Select", new { @class = "select-style text-field" })
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Leather Name  -3</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.LeatherName_3, MMS.Web.ExtensionMethod.HtmlHelper.leatherStoreWithMaterialName(), "Please Select", new { @class = "select-style text-field" })
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Leather Name  -4</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.LeatherName_4, MMS.Web.ExtensionMethod.HtmlHelper.leatherStoreWithMaterialName(), "Please Select", new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label class="form-label" for="text">UOM</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.UOM, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label class="form-label" for="text">Width/Fit</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(m => m.Width_Fit, new { @class = "form-control text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label class="form-label" for="text">Finished Product type</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @{
+                                                    List<SelectListItem> listItems = new List<SelectListItem>();
+                                                    listItems.Add(new SelectListItem
+                                                    {
+                                                        Text = "Full Shoes",
+                                                        Value = "Full Shoes"
+                                                    });
+                                                    listItems.Add(new SelectListItem
+                                                    {
+                                                        Text = "Upper",
+                                                        Value = "Upper"
+                                                    });
+                                                }
+                                                @Html.DropDownListFor(model => model.FinishedProductType, listItems, "Please Select", new { @class = "select-style text-field" })
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label class="form-label" for="text">Standard Price</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(m => m.StandardPrice, new { @class = "form-control text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label class="form-label" for="text">Weight</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(m => m.Weight, new { @class = "form-control text-field allownumericwithdecimal" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label class="form-label" for="text">Destination</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(m => m.Destination, new { @class = "form-control text-field " })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+                                    <div id="showImage">
+                                        <img id="ImgPrv" src="~/content/images/man-image.png" class="img-responsive img-rounded">
+                                    </div>
+                                    @if (Model != null && Model.Product_Image != "" && Model.Product_Image != null)
+                                    {
+                                        string scr = "../Images/" + Model.Product_Image;
+
+                                        
+                                        <img id="imgupdate" src="@scr" alt="Image" style="float: right;height: 34px;" />
+                                        <input type="file" id="ImgUpload" name="fileUpload" onchange="ShowImagePreview(this);" onclick="hideimage(this);" id="file" />
+                                         
+
+                                    }
+                                    else
+                                    {
+
+                                        <input type="file" id="ImgUpload" onchange="ShowImagePreview(this);" name="fileUpload" id="file" />
+
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-footer">
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+
+                            <input type="button" onclick="Cancel()" class="btn btn-default btn-style" title="Back" value="Back">
+                            @if (Model.ProductOrBuyerStyleId == 0)
+                            {
+                                if (Save == true)
+                                {
+                                    <input type="button" onclick="Save()" style="cursor: pointer;" class="btn btn-default btn-style" title="Save" value="Save">
+                                }
+                                else
+                                {
+                                    <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Save">
+                                }
+                            }
+                            else
+                            {
+                                if (Update == true)
+                                {
+                                    <input type="button" onclick="Save('@Model.ProductOrBuyerStyleId')" style="cursor: pointer;" class="btn btn-default btn-style" id="ProductOrBuyerStyleId" title="Update" value="Update">
+                                }
+                                else
+                                {
+                                    <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Update">
+                                }
+                            }
+                            <button class="btn btn-default btn-style" onclick="Clear()" type="button">Clear</button>
+                        </div>
+                    </div>
+                </div>
+        </form>
+    </div>
+
+
+    <script>
+        function Clear() {
+            $('#BuyerName_ProductGroup').val('');
+            $('#BuyerModel_ProductType').val('');
+            $('#BuyerStyle').val('');
+            $('#Last').val('');
+            $('#ProductColour').val('');
+            $('#OurStyle').val('');
+            $('#SizeRange').val('');
+            $('#BomNo').val('');
+            $('#LeatherName_1').val('');
+            $('#LeatherName_2').val('');
+            $('#LeatherName_3').val('');
+            $('#LeatherName_4').val('');
+            $('#UOM').val('');
+            $('#Width_Fit').val('');
+            $('#FinishedProductType').val('');
+            $('#StandardPrice').val('');
+            $('#Weight').val('');
+            $('#Destination').val('');
+        }
+    </script>
+
+    <script type="text/javascript">
+        $(".allownumericwithdecimal").on("keypress keyup blur", function (event) {
+            //this.value = this.value.replace(/[^0-9\.]/g,'');
+            $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+            if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+                event.preventDefault();
+            }
+        });
+        $("#BuyerStyle").blur(function () {
+            var style = $('#BuyerStyle').val();
+            $('#OurStyle').val(style);
+        });
+
+        function ShowImagePreview(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#ImgPrv').prop('src', e.target.result)
+                        .width(100)
+                        .height(75);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function hideimage(input) {
+            $('#imgupdate').hide()
+        }
+
+    </script>
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <link href="~/Scripts/EasyAutocomplete-1.3.5/comboStyles.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="~/Scripts/EasyAutocomplete-1.3.5/ComboBox.js"></script>
+    <script>
+        
+        $("#SizeRange").combobox();
+        $("#FinishedProductType").combobox();
+        $("#UOM").combobox();
+        $("#BuyerName_ProductGroup").combobox();
+        $("#BuyerModel_ProductType").combobox();
+    </script>
+</body>
+</html>

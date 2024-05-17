@@ -1,0 +1,162 @@
+﻿@model MMS.Web.Models.StockModel.IssueSlip_SingleModel
+@using MMS.Repository.Managers.StockManager
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+@{
+    List<InternalOrderForm> orderEntryEntityModelist = new List<InternalOrderForm>();
+    BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
+    orderEntryEntityModelist = buyerOrderEntryManager.Get();
+    MMS.Web.Models.StockModel.OrderEntryModel model = new MMS.Web.Models.StockModel.OrderEntryModel();
+  
+
+    MMS.Repository.Managers.SeasonManager seasonManager = new MMS.Repository.Managers.SeasonManager();
+    SeasonMaster seasonMaster = new SeasonMaster();
+}
+
+<div class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+        <table class="veh-table" id="empTable">
+            <thead>
+                <tr class="color-code-top-btn">
+                    <td colspan="9">
+                        <input type="text" id="SeaarchID" placeholder="Search.." /><input type="button" value="Add" onclick="Add()">
+                        <input type="button" value="Search" onclick="Search()">
+                    </td>
+                </tr>
+                <tr>
+                    <th class="veh-1">Si.No
+                    </th>
+                    <th class="veh-2">IssueSlipNo
+                    </th>
+                    <th class="veh-3">InternalOderID
+                    </th>                 
+                    <th class="veh-5">StyleNo
+                    </th>
+                    <th class="veh-6">ConveyorID
+                    </th>
+                    <th class="veh-7">Edit / Delete
+                    </th>
+                </tr>
+            </thead>
+            @if (Model.IssueSlip_SingleModelList != null && Model.IssueSlip_SingleModelList.Count > 0)
+            {
+                int count = 1;
+                <tbody>
+                    @foreach (var item in Model.IssueSlip_SingleModelList)
+                    {
+                        
+                        <tr>
+
+                            <td class="veh-1">@count</td>
+                            <td class="veh-2">@item.IssueSlipNo</td>
+                            <td class="veh-3">@item.InternalOderID</td>                          
+                            <td class="veh-5">@item.StyleNo</td>
+                            <td class="veh-6">@item.ConveyorID</td>
+                            <td class="veh-1 edit-del-wrap">
+                                <a href="javascript:void(0)" onclick="Edit('@item.IssueSlipID')" class="watchlist-edit" title="Edit"></a>
+                                <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.IssueSlipID')" class="watchlist-delete" title="Delete"></a>
+                            </td>
+                        </tr>
+                        count++;
+                    }
+                </tbody>
+                <tfoot class="footer-pager">
+                    <tr>
+                        <td colspan="4">
+                            <div id="pager">
+                                <form>
+                                    <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                    <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                    <input type="text" class="pagedisplay" />
+                                    <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                    <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                    <select class="pagesize">
+                                        <option selected="selected" value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="40">40</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+            }
+        </table>
+        @if (Model.IssueSlip_SingleModelList != null && Model.IssueSlip_SingleModelList.Count == 0)
+        {
+            <div class="noRecordsFound" style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+        }
+    </div>
+    <div id="EditColorPartial" style="display: none;">
+        @Html.Partial("~/Views/Stock/IssueSlips/Partial/SingleIssueSlipeDetails.cshtml", Model)
+    </div>
+
+
+</div>
+<script>
+    function Add() {
+        $('.veh-tablecont').hide();
+        $("#EditColorPartial").show();
+    }
+    function Search() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Search", "IssueSlip_Single")',
+            data: { filter: $('#SeaarchID').val() },
+            success: function (data) {
+                
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                $('#DivShow').hide();
+            }
+        });
+    }
+
+    function Cancel() {
+        
+        location.reload();
+    }
+    function Edit(arg) {
+
+        $('.veh-tablecont').hide();
+        $('#empTable').hide();
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetIssueDetails", "IssueSlip_Single")',
+            data: { IssueSlipId: arg },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("DeleteIssueDetails", "IssueSlip_Single")',
+                data: { IssueSlipId: arg },
+                success: function (status) {
+                   
+                    if (status == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/IssueSlip_Single/SingleIssueSlip";
+                        return false;
+                    }
+                    else {
+                        alert('deletion failed.');
+                    }
+
+                },
+
+            });
+        }
+        else {
+            return false;
+        }
+    }
+</script>

@@ -1,0 +1,268 @@
+﻿@model MMS.Data.StoredProcedureModel.IssueSlip_SingleModel
+@using MMS.Repository.Managers.StockManager
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+
+@{
+    ViewBag.Title = "JobWorkIssues";
+    Layout = "~/Views/Shared/_jobLayout.cshtml";
+}
+
+
+<div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+    <div class="dashboard-content col-xs-12 no-padding">
+        <div class="dashboard_head dashboard-title congest col-lg-12 col-md-12 col-sm-12  col-xs-12">
+            <div class="dashboard-title  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+                <h2>Job Work Issues</h2>
+            </div>
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("JobWorkIssuesGrid", "JobWorkIssues")
+    </div>
+
+</div>
+
+<script>
+    //$(function () {
+    //    $("#Delivery_Date").datepicker({
+    //        autoclose: true,
+    //        todayHighlight: true,
+    //        format: "dd/mm/yyyy"
+    //    }).datepicker('update', new Date());
+    //});
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+
+        $('#example').DataTable();
+        $("#JobWorkIssuesPartial").hide();
+        $("#select_id").hide();
+        
+    });
+    function SaveIssue() {
+        debugger;
+        var jobsheet_pair_Code_id = $("#Jobworktype_Id option:selected").map(function () { return this.value }).get().join(',');
+        var fromDate = $('#IssueDate').val();
+        fromDate = fromDate.split("/");
+        var Date_from = fromDate[2] + "/" + fromDate[1] + "/" + fromDate[0];
+
+
+
+
+        var MaterialId_val, Jobworktype_Id;
+        MaterialId = $('#MaterialDescription').val();
+        var splict = MaterialId.split('_');
+        if ($("#IssueType option:selected").text() == "JobWork(Leather To Leather)")
+        {
+            if (splict != null) {
+                MaterialId_val = splict[0];
+                Jobworktype_Id = $("#Jobworktype_Id option:selected").map(function () { return this.value }).get().join(',');
+            }
+            else{
+                MaterialId_val = $('#MaterialDescription').val();
+                Jobworktype_Id = $("#Jobworktype_Id option:selected").map(function () { return this.value }).get().join(',');
+            }
+        }
+        else{
+        
+            MaterialId_val = $('#MaterialDescription').val();
+            Jobworktype_Id = $("#Jobworktype_Id option:selected").val();
+        }
+
+        var issueid = $("#IssueSlipID").val();
+        if ($('#Jw_Name').val() == "") {
+            alert("Please Enter Job work Name .")
+            $('#Jw_Name').css('border-color', 'red');
+            $('#Jw_Name').focus();
+            return false;
+        }
+        else {
+            $('#Jw_Name').css('border-color', '');
+        }
+        //validation();
+        var CurrentIssue_ = $("#CurrentIssue").val();
+        var CurrentStock = $("#CurrentStock").val();
+
+        var type = $("#CurrentIssuesType").val();
+        var RequiredQty = $("#RequiredQty").val();
+        var Balance = RequiredQty - CurrentIssue_;
+        var Alredyissue = $("#AlredayIssued").val();
+        var CurrentStock = $("#CurrentStock").val();
+        var ExcessApproval = $("#ExcessApproval").val();
+        var excessqty = 0;
+        debugger;
+        excessqty = ((parseFloat(ExcessApproval) / 100) * parseFloat(RequiredQty));
+
+        var Alredyissue_value = parseFloat(Alredyissue) + parseFloat(CurrentIssue_);
+        if (parseFloat(CurrentIssue_) > parseFloat(CurrentStock)) {
+            alert("Current issues can't be High");
+            return false;
+        }
+        else if (parseFloat(parseFloat(RequiredQty) + parseFloat(excessqty)) < parseFloat(CurrentIssue_)) {
+            alert("Current issues can't be High Requried qty");
+            return false;
+        }
+        else {
+            $("#BalanceInThisListlot").val(Balance);
+            $("#BalanceInthisListType").val(type).trigger('chosen:updated');
+        }
+
+
+        var qtyCount = 0;
+        var qtyArr = [];
+        var size = "";
+        if (parseInt(CurrentIssue_) > parseInt(CurrentStock)) {
+            alert("Current issues can't be High");
+            return false;
+        }
+        $('#sizeRangeTable tbody tr').find('.SizeRangeRefValue').each(function () {
+
+            size += $(this).text() + ",";
+
+        });
+        size = size.slice(0, -1);
+        var Qty_ = "";
+        $('#sizeRangeTable tbody tr').find('.Qty').each(function () {
+            Qty_ += $(this).val() + ",";
+
+        });
+        Qty_ = Qty_.slice(0, -1);
+
+        var add = 0;
+        $("#sizeRangeTable .Qty").each(function () {
+            add += Number($(this).val());
+        });
+        if ($('#sizeRangeTable tbody tr').find('.SizeRangeRefValue').length != 0) {
+            if (Number(CurrentIssue_) != add) {
+                alert("Current issues and SizeRanges Qty are differed");
+                return false;
+            }
+        }
+        var MaterialType;
+        if ($("#IssueType option:selected").text() == "JobWork Production") {
+
+            MaterialId_val = $('#MaterialDescription').val();
+            if (MaterialId_val != "") {
+                var splict = MaterialId_val.split('_');
+                if (splict != null) {
+                    MaterialId_val = splict[0];
+                    Jobworktype_Id = splict[1];
+                }
+                else {
+                    MaterialId_val = $('#MaterialDescription').val();
+                    Jobworktype_Id = $("#Jobworktype_Id option:selected").map(function () { return this.value }).get().join(',');
+
+
+                }
+            }
+            jobsheet_pair_Code_id = "";
+            jobsheet_pair_Code_id = $('#Io').val();
+        }
+        else {
+            MaterialType = $('#MaterialType').val();
+
+        }
+        debugger;
+         $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: '/JobWorkIssues/Save_jobLeather_issue',
+             data: {
+                        CurrentStock: $("#CurrentStock").val(),
+                        IssueSlipID: issueid,
+                        MultipleIssueSlipID: $("#MultipleIssueSlipID").val(),
+                        Jobworktype_Id:  jobsheet_pair_Code_id,
+                        IssueType: $('#IssueType').val(),
+                        IssueSlipNo: $('#IssueSlipNo').val(),
+                        InternalValue: $('#InternalValue').val(),
+                        DirectIssue_Style: $('#Style').val(),
+                        StoreName: $('#StoreName option:selected').val(),
+                        CategoryName: $('#CategoryName').val(),
+                        InternalOrderingFor: $("#IssueType").val(),
+                        BuyerMasterId: $("#BuyerMasterId").val(),
+                        GroupName: $('#GroupName').val(),
+                        MaterialDescription: MaterialId_val,
+                        Piecies: $('#PiecesCurrentIssue').val(),
+                        PieciesType: $('#PiecesCurrentType').val(),
+                        LotNo: $('#LotNo').val(),
+                        BalanceInThisListlot: $('#BalanceInThisListlot').val(),
+                        BalanceInthisListType: $('#BalanceInthisListType').val(),
+                        MachineName:'',
+                        NoOfSets: $('#NoOfSets').val(),
+                        Color: $('#Color').val(),
+                        Rate: $('#Rate').val(),
+                        SubtanceID: $('#SubtanceID').val(),
+                        Color: $('#Color').val(),
+                        RequiredQty: $('#RequiredQty').val(),
+                        AlredayIssued: Alredyissue_value,
+                        CurrentIssue: $('#CurrentIssue').val(),
+                        RequiredType: $('#RequiredType').val(),
+                        AlreadyUsedType: $('#AlreadyUsedType').val(),
+                        CurrentIssuesType: $('#CurrentIssuesType').val(),
+                        ConveyorID: $('#ConveyorID').val(),
+                        PiecesRequiredQTY: $('#PiecesRequiredQTY').val(),
+                        PiecesRequiredQtyType: $('#PiecesRequiredQtyType').val(),
+                        PiecesAlreadyIssueType: $('#PiecesAlreadyIssueType').val(),
+                        PiecesCurrentIssue: $('#PiecesCurrentIssue').val(),
+                        PiecesCurrentType: $('#PiecesCurrentType').val(),
+                        PiecesAlreadyIssue: $('#PiecesAlreadyIssue').val(),
+                        ConveyorID: $('#ConveyorID').val(),
+                   //    IssueSlipID: $('#MultipleIssueSlipID').val(),
+                        IssueSlipFK: $('#IssueSlipFK').val(),
+                        IssueDate: $('#IssueDate').val(),
+                        TotalQty: $('#TotalQty').val(),
+                        MaterialType: $('#MaterialType').val(),
+                        Finished_Material: $('#Finished_Material').val(),
+                        ExcessApproval: $('#ExcessApproval').val(),
+                        jobsheet_pair_Code_id: Jobworktype_Id,
+                        Type:$("#IssueType option:selected").text() ,
+                        Size: size,
+                        Qty: Qty_,
+                        Season: $('#Season').val(),
+                        Jw_Name: $('#Jw_Name').val(),
+                        SupplierName_Lotno: $("#SupplierName_Lotno :selected").text(),
+                        SupplierNameId: $('#SupplierNameId').val(),
+                        Component_Id: $('#Component_Id').val()
+                    },
+                    success: function (data) {
+
+                        if (data.issue != null) {
+                            debugger;
+                            alert("Saved Successfully");
+                            $("#MultipleIssueSlipID").val(data.Parent.MultipleIssueSlipID)
+                            $("#EditStagePartial_sequence").html(data.issueSlipMaterialList);
+                         //   $("#EditStagePartial_sequence").show();
+                            //var row = "";
+                            //var rowCount = 0;
+                            //$.each(data.issueSlipMaterialList.issueSlip_MaterialDetails, function (i, item) {
+                            //    debugger;
+
+                            //    row += "<tr><td id='IssueSlipNo" + rowCount + "' class='General_IssueSlipNo'>" + item.MaterialDescription + "</td>"
+                            //    row += "<td id='InternalValue" + rowCount + "' class='InternalValue_general'>" + item.qty + "</td>"
+                            //    row += "<td id='InternalValue" + rowCount + "' class='InternalValue_general'>" + item.Uc_Noms + "</td>"
+                            //    row += "<td id='InternalValue" + rowCount + "' class='InternalValue_general'>" + item.Req_Qty + "</td>"
+                            //    row += "<td id='InternalValue" + rowCount + "' class='InternalValue_general'>" + item.sheet + "</td>"
+                            //    row += "<td data-title='Sequence'><input type='number' class='form-control Sequence' id='" + item.jobsheet_pair_id + "' onchange='value_chenge(" + item.jobsheet_pair_id + ',' + item.qty + ',' + item.Material + ")' value='0' style='width: 76px;'></td>"
+                            //    row += "<td id='DirectIssue_Style" + rowCount + "' class='DirectIssue_Style_general'>" + item.Jw_Rate + "</td>"
+
+                            //    row += "<td id='IssueType" + rowCount + "' class='issueTypecls'>" + item.Value + "</td></tr>"
+                            //    rowCount++;
+                            //});
+                            //$('#table_grid_ROW').append(row);
+
+                        }
+
+                    }
+                });
+
+    }
+</script>

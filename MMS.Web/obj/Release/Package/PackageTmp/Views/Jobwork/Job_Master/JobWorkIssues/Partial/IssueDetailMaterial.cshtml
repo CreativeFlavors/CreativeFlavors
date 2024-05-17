@@ -1,0 +1,507 @@
+﻿@model MMS.Data.StoredProcedureModel.IssueSlip_SingleModel
+
+<div id="no-more-tables" class="col-xs-12 no-padding hole_table">
+    <table id="table_grid_sequence" class="col-md-12 table-striped table-condensed cf table-change home_dahboard color_table">
+        <thead>
+            <tr>
+                <td>Edit</td>
+                <td>Issue Slip No</td>
+                <td>NoofSets</td>
+                <td>Group</td>
+                <td>Category</td>
+                <td>StoresName</td>
+                <td>Material</td>
+                <td>Color</td>
+                <td>Reqd qty</td>
+                <td>Alreday issued</td>
+                <td>Current Issue</td>
+                <td>Balance Issue</td>
+                <td>Sheet</td>
+                <td>Rate</td>
+            </tr>
+        </thead>
+        <tbody class="common-table-head" id="">
+
+            @if (Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+            {
+                // int count = 1;
+
+                foreach (var Jobsheet in Model.issueSlip_MaterialDetails)
+                {
+
+                    <tr id="@Jobsheet.IssueSlipId">
+                        <td data-title="Action">
+                            <span class="action-icons">
+
+                                <a><img onclick="EditClick('@Jobsheet.IssueSlipId')" class="use-address" src="~/Scripts/Jobwork/images/edit.png"></a>
+                                <img onclick="Delete_Grid('@Jobsheet.IssueSlipId')" class="use-address" src="~/Scripts/Jobwork/images/delete.png">
+                            </span>
+                        </td>
+                        <td data-title="OperationType Code">@Jobsheet.IssueSlipNo</td>
+                        <td data-title="OperationType Code">@Jobsheet.TotalQty</td>
+                        <td data-title="OperationType Code">@Jobsheet.GroupId</td>
+                        <td data-title="OperationType Code">@Jobsheet.CategoryId</td>
+                        <td data-title="OperationType Code">@Jobsheet.StoreName</td>
+                        <td data-title="OperationType Code">@Jobsheet.MaterialName</td>
+                        <td data-title="OperationType Code">@Jobsheet.ColourId</td>
+                        <td data-title="OperationType Code">@Jobsheet.RequiredQty</td>
+                        <td data-title="OperationType Code">@Jobsheet.AlredayIssued</td>
+                        <td data-title="OperationType Code">@Jobsheet.CurrentIssue</td>
+                        <td data-title="OperationType Code">@Jobsheet.BalanceInThisListlot</td>
+                        <td data-title="OperationType Code">@Jobsheet.sheet</td>
+                        <td data-title="OperationType Code">@Jobsheet.Rate</td>
+
+
+                    </tr>
+                    //  count++;
+                }
+
+            }
+        </tbody>
+    </table>
+  
+</div>
+
+<script>
+    function EditClick(arg) {
+        clear();
+        
+        $('#table_grid_sequence >tbody').find('tr#' + arg + '').remove();
+        $.ajax({
+            url: '/MultipleIssue/getIssueID',
+            type: "GET",
+            dataType: "JSON",
+            data: { IssueSlipID: arg },
+            success: function (cities) {                //disabled and enabled
+                
+                if (cities.materialCategoryMaster != null) {
+                    if (cities.materialCategoryMaster.CategoryName != null && cities.materialCategoryMaster.CategoryName.trim() == "Leathers") {
+                     
+                    }
+                    else {
+                    
+                    }
+                }
+                $('#CurrentIssue').val(cities.issueSlipeDetails.CurrentIssue);
+                //   $('#CurrentStock').val(cities.issueSlipeDetails.CurrentStock);
+                $('#IssueSlipID').val(cities.issueSlipeDetails.IssueSlipId);
+                //$("#IssueType_").val();issueTypecls 
+                $('#IssueSlipFK').val(cities.issueSlipeDetails.IssueSlipFK);
+                $('#StoreName').val(cities.issueSlipeDetails.StoreMasterId).trigger('chosen:updated');
+                $('#CategoryName').val(cities.issueSlipeDetails.CategoryId).trigger('chosen:updated');
+                $('#Season').val(cities.issueSlipeDetails.Season).trigger('chosen:updated');
+                $('#GroupName').val(cities.issueSlipeDetails.GroupId).trigger('chosen:updated');
+                $('#Piecies').val(cities.issueSlipeDetails.Piecies);
+                $('#PieciesType').val(cities.issueSlipeDetails.PieciesType);
+                $('.LotNo_general').val(cities.issueSlipeDetails.LotNo);
+                $('#BalanceInThisListlot').val(cities.issueSlipeDetails.BalanceInThisListlot);
+                $('#BalanceInthisListType').val(cities.issueSlipeDetails.BalanceInthisListType);
+                $('#MachineName').val(cities.issueSlipeDetails.MachineName).trigger('chosen:updated');;
+                $('#NoOfSets').val(cities.issueSlipeDetails.NoOfSets);
+                $('#Color').val(cities.issueSlipeDetails.ColourId).trigger('chosen:updated');
+                $('#SubtanceID').val(cities.issueSlipeDetails.StoreMasterId).trigger('chosen:updated');
+                $('#Rate').val(cities.issueSlipeDetails.Rate);
+                $('#ConveyorID').val(cities.issueSlipeDetails.ConveyorID);
+                $('#DirectIssue_Style').val(cities.issueSlipeDetails.DirectIssue_Style);
+                $('#InternalValue').val(cities.issueSlipeDetails.InternalValue).trigger('chosen:updated');
+                $('#IssueSlipNo').val(cities.issueSlipeDetails.IssueSlipNo);
+                $('#Finished_Material').val(cities.issueSlipeDetails.Finished_Material);
+                $('#MaterialMasterId_div .custom-combobox input').val('');
+                $('#MaterialDescription').val(cities.issueSlipeDetails.MaterialMasterId).trigger('chosen:updated');
+                $('#Jw_Name').val(cities.issueSlipeDetails.Jw_Name).trigger('chosen:updated');
+                $('#ExcessApproval').val(cities.issueSlipeDetails.ExcessApproval);
+                //    $('#Jobworktype_Id').val(cities.issueSlipeDetails.Jobworktype_Id).trigger('chosen:updated');
+                ///   GetJob_code(cities.issueSlipeDetails.Jw_Name, cities.issueSlipeDetails.Jobworktype_Id);
+                $('#sizeRangeTable tbody tr').each(function () {
+                    $(this).find("td:not(:first)").remove();
+
+                });
+             
+                var count = 1;
+                for (var i = 0; i <= cities.SizeRange.length - 1; i++) {
+                    $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + cities.SizeRange[i].SizeRange + ' </td> ');
+                    $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='stockInHand' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' readonly class='currentstock' id='currentstock" + i + "' value=" + cities.currentStocklist[i].StockInHand + " style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                    $('#sizeRangeTable tbody tr:last').append("<td class='Qty' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='Qty' onchange='CalculateTotal(this," + cities.currentStocklist[i].StockInHand + ")' id='Qty" + i + "' value='" + cities.SizeRange[i].Qty + "' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                    //$('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + cities.SizeRange[i].SizeRange + ' </td> ');
+                    //$('#sizeRangeTable tbody tr:last').append("<td class='Rate' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='Qty'  onchange='CalculateTotal(this)'  id='Qty" + i + "' value='" + cities.SizeRange[i].Qty + "' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                    count++;
+                }
+           
+                if (cities.SizeRange.length == 0)
+        {
+                    for (var i = 0; i <= cities.SizeRange_new.length - 1; i++) {
+                        isSizeRangeMaster = true;
+                        $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + cities.SizeRange_new[i].IssueSize1 + ' </td> ');
+                        $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='stockInHand' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' readonly class='currentstock' id='currentstock" + i + "' value=" + cities.SizeRange_new[i].StockInHand + " style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                        $('#sizeRangeTable tbody tr:last').append("<td class='Qty' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='Qty' onchange='CalculateTotal(this," + cities.SizeRange_new[i].StockInHand + ")' id='Qty" + i + "' value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                        count++;
+                    }
+        
+        }
+                //disabled and enabled
+                if (cities.issueSlipeDetails != null) {
+                    if ((cities.issueSlipeDetails.StoreName == "Leather Store" || cities.issueSlipeDetails.StoreName == "Leather Store-Local" || cities.issueSlipeDetails.StoreName == "Leather Stores-Import")) {
+                        //$("#divWithoutPieces").hide();
+                        //$("#divPiecesIssue").show();
+                        if (cities.issueSlipeDetails.AlredayIssued == null) {
+                            cities.issueSlipeDetails.AlredayIssued = 0;
+                        }
+                        if (cities.issueSlipeDetails.RequiredQty == null) {
+                            cities.issueSlipeDetails.RequiredQty = 0;
+                        }
+                        $('#IssueDate').val(cities.issueSlipeDetails.IssueDate);
+                        if (cities.materialCategoryMaster.CategoryName.trim() == "Leathers") {
+                            $('#CurrentIssue').val(cities.issueSlipeDetails.CurrentIssue);
+                        }
+                        else {
+                            $('#CurrentIssue').val(cities.issueSlipeDetails.CurrentIssue);
+                        }
+
+                        $('#RequiredQty').val(cities.issueSlipeDetails.RequiredQty);
+                        $('#AlredayIssued').val(cities.issueSlipeDetails.AlredayIssued);
+                        $('#RequiredType').val(cities.issueSlipeDetails.RequiredType);
+                        $('#CurrentStockType').val(cities.issueSlipeDetails.RequiredType);
+                        $("#MaterialType").val(cities.issueSlipeDetails.MaterialType);
+                        $('#AlreadyUsedType').val(cities.issueSlipeDetails.AlreadyUsedType);
+                        $('#CurrentIssuesType').val(cities.issueSlipeDetails.CurrentIssuesType);
+                        $('#PiecesRequiredQTY').val(cities.issueSlipeDetails.PiecesRequiredQTY);
+                        $('#PiecesRequiredQtyType').val(cities.issueSlipeDetails.PiecesRequiredQtyType);
+                        $('#PiecesAlreadyIssue').val(cities.issueSlipeDetails.PiecesAlreadyIssue);
+                        $('#PiecesAlreadyIssueType').val(cities.issueSlipeDetails.PiecesAlreadyIssueType);
+                        $('#PiecesCurrentIssue').val(cities.issueSlipeDetails.PiecesCurrentIssue);
+                        $('#CurrentIssuesType').val(cities.issueSlipeDetails.PiecesCurrentType);
+                        $('#InternalOrderingFor').val(cities.issueSlipeDetails.InternalOrderingFor).trigger('chosen:updated');
+                        $('#BuyerMasterId ').val(cities.issueSlipeDetails.BuyerMasterId).trigger('chosen:updated');
+                    }
+                    else {
+                        $("#divPiecesIssue").hide();
+                        $("#divWithoutPieces").show();
+                        $('#RequiredQty').val(cities.issueSlipeDetails.RequiredQty);
+                        $('#CurrentIssue').val(cities.issueSlipeDetails.CurrentIssue);
+                        $('#AlredayIssued').val(cities.issueSlipeDetails.AlredayIssued);
+                        $('#RequiredType').val(cities.issueSlipeDetails.RequiredType);
+                        $('#CurrentStockType').val(cities.issueSlipeDetails.RequiredType);
+                        $("#MaterialType").val(cities.issueSlipeDetails.MaterialType);
+                        $('#AlreadyUsedType').val(cities.issueSlipeDetails.AlreadyUsedType);
+                        $('#CurrentIssuesType').val(cities.issueSlipeDetails.CurrentIssuesType);
+                        $('#PiecesRequiredQTY').val(cities.issueSlipeDetails.PiecesRequiredQTY);
+                        $('#PiecesRequiredQtyType').val(cities.issueSlipeDetails.PiecesRequiredQtyType);
+                        $('#PiecesAlreadyIssueType').val(cities.issueSlipeDetails.PiecesAlreadyIssueType);
+                        $('#PiecesCurrentIssue').val(cities.issueSlipeDetails.PiecesCurrentIssue);
+                        $('#PiecesCurrentType').val(cities.issueSlipeDetails.PiecesCurrentType);
+                        $('#IssueDate').val(cities.issueSlipeDetails.IssueDate);
+                        $('#TotalQty').val(cities.issueSlipeDetails.TotalQty);
+                        $('#PiecesAlreadyIssue').val(cities.issueSlipeDetails.PiecesAlreadyIssue);
+                        $('#InternalOrderingFor').val(cities.issueSlipeDetails.InternalOrderingFor).trigger('chosen:updated');
+                        $('#BuyerMasterId ').val(cities.issueSlipeDetails.BuyerMasterId).trigger('chosen:updated');
+                    }
+
+                }
+               Material_val_Edit();
+
+            }
+        });
+    }
+    function Material_val_Edit() {
+
+        var internalOrderNo = "";
+        var MaterialId = $('#MaterialDescription').val();
+        var issueNo = $("#IssueSlipNo").val();
+        if (issueNo == "") {
+            issueNo = 0;
+        }
+        if ($("#IssueDate").val() == "") {
+            alert("Please select issue date");
+            return false;
+        }
+        else {
+            var issueDate = $("#IssueDate").val();
+            $.ajax({
+                url: '/JobWorkIssues/MultipleIssueMaterialName_detail_SheetMAterial',
+                type: "GET",
+                dataType: "JSON",
+                data: { MaterialNameID: MaterialId, IssueSlipNo: issueNo, InternalOrderNo: internalOrderNo, IssueDate: issueDate },
+                success: function (data) {
+                    
+                    if (data.Message == "Already existed") {
+                        alert("This Material name already existed this issue slip no");
+                        return false;
+                    }
+                    else if (data.Message == "Please make a entry on approved price list") {
+                        alert("Please make a entry on approved price list");
+                        return false;
+                    }
+                    else {
+                        if (data.BalanceStock != null) {
+                            var stock = parseFloat(data.BalanceStock);
+
+                            if (parseFloat(data.BalanceStock) > 0) {
+                                var count = 1;
+                               // if (cities.issueSlipeDetails.CurrentIssue == 0 || cities.issueSlipeDetails.CurrentIssue == "0" || cities.issueSlipeDetails.CurrentIssue == "") {
+
+                                    $("#CurrentStock").val(data.BalanceStock).prop("disabled", true);
+                                //  }  $("#CurrentStock").val(data.BalanceStock).prop("disabled", true);
+                              
+                                if ($('#TotalQty').val() == "" || $('#TotalQty').val() == "0") {
+                                    $('#sizeRangeTable tbody tr').each(function () {
+                                        $(this).find("td:not(:first)").remove();
+                                    });
+                                    for (var i = 0; i <= data.SizeRangelist.length - 1; i++) {
+                                        isSizeRangeMaster = true;
+                                        $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + data.SizeRangelist[i].IssueSize1 + ' </td> ');
+                                        $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='stockInHand' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' readonly class='currentstock' id='currentstock" + i + "' value=" + data.SizeRangelist[i].StockInHand + " style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                                        $('#sizeRangeTable tbody tr:last').append("<td class='Qty' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='Qty' onchange='CalculateTotal(this," + data.SizeRangelist[i].StockInHand + ")' id='Qty" + i + "' value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                                        count++;
+                                    }
+                                }
+                                $.each(data.Material, function (i, city) {
+
+                                    $("#StoreName").val(city.StoreMasterId).trigger('chosen:updated');
+                                    $("#CategoryName").val(city.MaterialCategoryMasterId).trigger('chosen:updated');
+                                    $("#GroupName").val(city.MaterialGroupMasterId).trigger('chosen:updated');
+                                    $("#Color").val(city.ColorMasterId).trigger('chosen:updated');
+                                    $("#RequiredType").val(city.Uom).trigger('chosen:updated');
+                                    $("#CurrentStockType").val(city.Uom).trigger('chosen:updated');
+                                    $("#AlreadyUsedType").val(city.Uom).trigger('chosen:updated');
+                                    $("#CurrentIssuesType").val(city.Uom).trigger('chosen:updated');
+                                    $("#SubtanceID").val(city.SubstanceMasterId).trigger('chosen:updated');
+                                    $("#Rate").val(city.Price);
+                                    if (city.isLocal == true && city.isImport == true) {
+                                        var int = 1;
+                                        $("#MaterialType").html("").trigger('chosen:updated');
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+
+                                        for (i = 1; i <= 2; i++) {
+                                            var type = "";
+                                            if (i == 1) {
+                                                type = "Local";
+                                            }
+                                            else if (i == 2) {
+                                                type = "Direct Import";
+                                                i = 3;
+                                            }
+                                            $("#MaterialType").append(
+                                                $('<option></option>').val(i).html(type)).trigger('chosen:updated');
+                                           // $("#MaterialType").val(i).trigger('chosen:updated');
+                                        }
+                                    }
+                                    else if (city.isImportCustomer == true && city.isImport == true) {
+                                        var int = 1;
+                                        $("#MaterialType").html("").trigger('chosen:updated');
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        for (i = 1; i <= 2; i++) {
+                                            var type = "";
+                                            if (i == 1) {
+                                                type = "Customer Import";
+                                                i = 2;
+                                            }
+                                            else if (i == 2) {
+                                                type = "Direct Import";
+                                                i = 3;
+                                            }
+                                            $("#MaterialType").append(
+                                                $('<option></option>').val(i).html(type)).trigger('chosen:updated');
+                                         //   $("#MaterialType").val(i).trigger('chosen:updated');
+                                        }
+                                    }
+                                    else if (city.isImportCustomer == true && city.isLocal == true) {
+                                        $("#MaterialType").html("").trigger('chosen:updated');
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        for (i = 1; i <= 2; i++) {
+                                            var types = "";
+                                            if (i == 1) {
+                                                types = "Local";
+                                                i = 1;
+                                            }
+                                            else if (i == 2) {
+                                                types = "Customer Import";
+                                                i = 2;
+                                            }
+                                            $("#MaterialType").append(
+                                                $('<option></option>').val(i).html(types)).trigger('chosen:updated');
+                                         //   $("#MaterialType").val(i).trigger('chosen:updated');
+                                        }
+                                    }
+                                    else if (city.isImportCustomer == true) {
+                                        $("#MaterialType").html("").trigger('chosen:updated');
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        $("#MaterialType").append(
+                                            $('<option></option>').val(2).html("Customer Import")).trigger('chosen:updated');
+                                        $("#MaterialType").val(2).trigger('chosen:updated');
+                                    }
+                                    else if (city.isLocal == true) {
+                                        $("#MaterialType").html("");
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        $("#MaterialType").append(
+                                            $('<option></option>').val(1).html("Local")).trigger('chosen:updated');
+                                        $("#MaterialType").val(1).trigger('chosen:updated');
+                                    }
+                                    else if (city.isImport == true) {
+                                        $("#MaterialType").html("").trigger('chosen:updated');
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        $("#MaterialType").append(
+                                            $('<option></option>').val(3).html("Direct Import")).trigger('chosen:updated');
+                                        $("#MaterialType").val(3).trigger('chosen:updated');
+                                    }
+                                    else {
+                                        $("#MaterialType").html("");
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        for (i = 1; i <= 3; i++) {
+                                            var materialType = "";
+                                            if (i == 1) {
+                                                materialType = "Local";
+                                                i = 1;
+                                            }
+                                            else if (i == 2) {
+                                                materialType = "Customer Import";
+                                                i = 2;
+                                            }
+                                            else if (i == 3) {
+                                                materialType = "Direct Import";
+                                                i = 3;
+                                            }
+                                            $("#MaterialType").append(
+                                                $('<option></option>').val(i).html(materialType)).trigger('chosen:updated');
+                                        }
+                                    }
+                                    if (data.store.StoreName == "Leather Store" || data.store.StoreName == "Leather Store-Local" || data.store.StoreName == "Leather Stores-Import" || data.store.StoreName == "Wetblue Stores") {
+
+                                      
+                                        $("#RequiredType").val(city.Uom);
+                                        $("#AlreadyUsedType").val(city.Uom);
+                                        $("#CurrentIssuesType").val(city.Uom);
+                                        $("#PiecesRequiredQtyType").val(city.UomUnit);
+                                        $("#PiecesAlreadyIssueType").val(city.UomUnit);
+                                        $("#PiecesCurrentType").val(city.UomUnit);
+                                        $("#SubtanceID").val(city.SubstanceMasterId);
+                                    }
+                                    else {
+                                        $("#PiecesRequiredQtyType").attr("disabled", true).trigger('chosen:updated');
+                                        $("#PiecesAlreadyIssueType").attr("disabled", true).trigger('chosen:updated');
+                                        $("#PiecesCurrentType").attr("disabled", true).trigger('chosen:updated');
+
+                                        $("#PiecesRequiredQTY").attr("disabled", true);
+                                        $("#PiecesAlreadyIssue").attr("disabled", true);
+                                        $("#PiecesCurrentIssue").attr("disabled", true);
+
+                                        $("#RequiredType").val(city.Uom);
+                                        $("#CurrentStockType").val(city.Uom);
+                                        $("#AlreadyUsedType").val(city.Uom);
+                                        $("#CurrentIssuesType").val(city.Uom);
+                                        $("#PiecesRequiredQtyType").val(city.UomUnit);
+                                        $("#PiecesAlreadyIssueType").val(city.UomUnit);
+                                        $("#PiecesCurrentType").val(city.UomUnit);
+                                        $("#SubtanceID").val(city.SubstanceMasterId);
+                                    }
+                                });
+                                
+                                $.each(data.approvedPriceList, function (i, PRICE) {
+                                    $("#Rate").val(PRICE.MRPPrice);
+                                });
+                            }
+                            else {
+                                $("#CurrentStock").val("0").prop("disabled", true);
+                                alert("Stock is not avaible Please contact store department");
+                                return false;
+                            }
+                        }
+                        else {
+                            $('#sizeRangeTable tbody tr').each(function () {
+                                $(this).find("td:not(:first)").remove();
+                            });
+                        }
+
+                    }
+                }
+            });
+        }
+
+
+
+    }
+    // if (cities.issueSlipeDetails.CurrentIssue == 0 || cities.issueSlipeDetails.CurrentIssue == "0" || cities.issueSlipeDetails.CurrentIssue == "") {
+
+    function CalculateTotal(agr1, arg2) {
+        
+        var CurrentIssue_ = $("#CurrentIssue").val();
+        if ($("#CurrentIssue").val() != "") {
+
+            if (parseFloat(agr1.value) > parseFloat(arg2)) {
+                $("#Add").hide();
+                alert("Actual size current stock exceed issue quantity");
+                return false;
+            }
+            else if (parseFloat(arg2) == 0 && parseFloat(agr1.value) != 0) {
+                $("#Add").hide();
+                alert("Actual size current stock is zero");
+                return false;
+            }
+            else {
+                $("#Add").show();
+                var add = 0;
+                $("#sizeRangeTable .Qty").each(function () {
+                    add += Number($(this).val());
+                });
+
+                $('#TotalQty').val(add);
+                $('#TotalQty').prop("disabled", true);
+                if (parseFloat(CurrentIssue_) < parseFloat(add)) {
+                    $("#Add").hide();
+                    alert("Current stock exceed issue qty");
+                    return false;
+                }
+                else {
+                    $("#Add").show();
+                }
+            }
+
+        }
+        else {
+            $("#Add").hide();
+            alert("Please add current issue quantity");
+            return false;
+        }
+
+    }
+    function Get_detail_Requrid_qty() {
+        var jobWorkId_list = 0;
+        jobWorkId_list += $(this).val();
+        $.ajax({
+            url: '/JobWorkIssues/Get_detail_Requrid_qty',
+            type: "GET",
+            dataType: "JSON",
+            data: {
+                jobWorkId: jobWorkId_list,
+                MaterialDescription: $('#MaterialDescription').val(),
+                IssueType: $('#IssueType').val()
+            },
+            success: function (data) {
+                
+                if (data.Message == "Job work name cannot be diffrent") {
+                    alert(data.Message)
+                    return false;
+                }
+                if (data.Message != "") {
+                    alert("Please make a entry on approved price list" + data.Message);
+                }
+                $("#EditStagePartial_sequence").html(data.issueSlipMaterialList);
+                $('#MultipleIssueSlipID').val(data.MultipleIssueSlipID)
+            }
+        });
+
+    }
+    function GetJob_code(arg1,arg2)
+    {
+      //  
+     //   alert(arg1, arg2);
+    }
+    function clear()
+    {
+        $("#BalanceInThisListlot").val('0');
+        $("#RequiredQty").val('0');
+        $("#CurrentIssue").val('0');
+        $("#Rate").val('0');
+        $("#CurrentStock").val('0');
+        
+    }
+</script>

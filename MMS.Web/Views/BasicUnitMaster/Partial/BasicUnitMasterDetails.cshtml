@@ -1,0 +1,95 @@
+﻿@model MMS.Web.Models.BasicUnitMasterModel.BasicUnitMasterModel
+
+@{
+    int id = Model.BasicUnitMasterID;
+    Session["UomMasterId"] = id;
+}
+
+<div class="popup-wrap edit-popup-wrap " id="DivShow">
+</div>
+
+<div class="right-form-section clearfix">
+    <div class="container-fluid">
+        <div class="row">
+
+            <div id="" style="" class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                <h3>Add Units</h3>
+                <div class="field-section">
+                    <div class="form-group">
+                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                            <label for="text" class="form-label">Short Unit Name</label>
+                        </div>
+                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                            @Html.HiddenFor(x=>x.UomMasterId)
+                            @Html.TextBoxFor(m => m.ShortUnitName)
+                        </div>
+                    </div>
+                </div>
+                <div class="field-section">
+                    <div class="form-group">
+                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                            <label for="text" class="form-label">Long Unit Name</label>
+                        </div>
+                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                            @Html.TextBoxFor(m => m.LongUnitName)
+                        </div>
+                    </div>
+                </div>             
+            </div>
+
+
+
+           
+           
+        </div>
+    </div>
+    
+    <div id="DivConversionBtns" class="row">
+        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center" style="margin: 15px 0px;">
+            <input type="button" onclick="Cancel()" style="cursor: pointer;" class="btn btn-default btn-style width-78" title="Back" value="Back">
+            @if (Model != null && Model.UomMasterId != 0)
+            {
+
+                <input type="button" onclick="Update()" style="cursor: pointer;" class="btn btn-default btn-style width-78" id="Save" title="Update" value="Update">
+            }
+            else
+            {
+                <input type="button" onclick="Save()" style="cursor: pointer;" class="btn btn-default btn-style width-78" title="Save" value="Save">
+            }
+            <input type="button" style="cursor: pointer;" class="btn btn-default btn-style width-78" title="Clear" value="Clear">
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    var specialKeys = new Array();
+    specialKeys.push(8); //Backspace
+    function Numeric() {
+
+        $("#ShortUnitNameValue,#LongUnitNameValue").bind("keypress", function (e) {
+            var keyCode = e.which ? e.which : e.keyCode
+            var ret = ((keyCode >= 48 && keyCode <= 57) || specialKeys.indexOf(keyCode) != -1);
+            $(".error").css("display", ret ? "none" : "inline");
+            return ret;
+        });
+        $("#ShortUnitNameValue,#LongUnitNameValue").bind("paste", function (e) {
+            return false;
+        });
+        $("#ShortUnitNameValue,#LongUnitNameValue").bind("drop", function (e) {
+            return false;
+        });
+    }
+</script>

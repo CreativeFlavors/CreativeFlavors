@@ -1,0 +1,701 @@
+﻿@model MMS.Data.StoredProcedureModel.FloorReturnMaterialGrid
+@using MMS.Repository.Managers
+@using MMS.Core.Entities
+@{
+
+    int id = Model.FloorReturnMaterialId;
+    Session["FloorReturnMaterialId"] = id;
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("FloorReturnMaterial", PermissionSettingModel.PermissionID);
+    }
+    int count = 1;
+}
+
+<style>
+    #MaterialMasterId {
+        min-width: 200px;
+    }
+</style>
+@using System.Web.Optimization;
+@Scripts.Render("~/bundles/MultiplIssue")
+@Styles.Render("~/Content/MMS/css")
+<script>
+    $("#FloorDate").datepicker({ dateFormat: "dd/mm/yy", maxDate: new Date() });
+
+</script>
+<div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99; display:none">
+    <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+        <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+    </div>
+</div>
+@if (@HttpContext.Current.Session["UserType"].ToString() == "1" || @HttpContext.Current.Session["UserType"].ToString() == "2")
+{
+<div class="col-xs-12 no-padding" >
+    <div style="width: 514px;margin: auto;">
+        <div class="field-section">
+            <div class="form-group">
+                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                    <label for="text" class="form-label">Issue Type </label>
+                </div>
+                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                    @Html.DropDownListFor(m => m.Is_IssueNo, new SelectList(
+                                            new List<object>
+                                                {
+                                                new { value=0, text="With Issue No" },
+                                                new { value=1, text="Without Issue No" },
+                                                },
+                                                "value",
+                                                "text", 0), new { @class = "select-style text-field InternalOrderingFor_cls" })
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+<div class="right-form-section clearfix">
+    <form role="form" class="form-inline">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 ">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">FRM NO</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.HiddenFor(m => m.FloorReturnMaterialId)
+                                    <input type="hidden" id="floormaterialdetailsid_row" />
+                                    @Html.TextBoxFor(m => m.FrmNo, new { @class = "allownumericwithdecimal form-control text-field", @readonly = "true" })
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Date</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model != null && Model.FloorReturnMaterialId != 0)
+                                    {
+                                        var from = Convert.ToDateTime(Model.FloorDate).ToString("dd/MM/yyyy");
+                                        @Html.TextBoxFor(m => m.FloorDate, new { @Value = from, @class = "form-control text-field" })
+                                    }
+                                    else
+                                    {
+                                        var today = System.DateTime.Now;
+                                        var day= Convert.ToDateTime(today).ToString("dd/MM/yyyy");
+                                        @Html.TextBoxFor(m => m.FloorDate, new { @Value = day, @class = "form-control text-field" })
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Store</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.HiddenFor(m => m.StoreMasterId, new { @class = "form-control text-field" })
+                                    @Html.TextBoxFor(m => m.StoreName, new { @class = "form-control text-field ", @readonly = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Group</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.HiddenFor(m => m.GroupMasterId, new { @class = "form-control text-field" })
+                                    @Html.TextBoxFor(m => m.GroupName, new { @class = "form-control text-field", @readonly = "true" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section" id="issue_no">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Issue No</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.IssueNo, MMS.Web.ExtensionMethod.HtmlHelper.IssueNo(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Material</label>
+                                </div>
+                                @{
+
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12" id="materialName" style="width: 378px;">
+                                        @Html.DropDownListFor(m => m.MaterialMasterId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName(), new { @class = "select-style text-field" })
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">IO No</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.IoNo, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section" id="leather">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Piecies</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.Piecies, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">UOM</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.HiddenFor(m => m.Uom, new { @class = "form-control text-field" })
+                                    @Html.TextBoxFor(m => m.LongUnitName, new { @class = "form-control text-field", @readonly = "true" })
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Style</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.Style, new { @class = "form-control text-field", @readonly = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Issued Quantity</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.IssuedQuantity, new { @class = "form-control text-field", @readonly = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Return Quantity</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.ReturnQuantity, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Rate</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.Rate, new { @class = "form-control text-field", @readonly = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Lot No</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.LotNo, new { @class = "form-control text-field", @readonly = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Category</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.Category, new { @class = "form-control text-field", @readonly = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Material Type</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                    @Html.DropDownListFor(m => m.MaterialType, new SelectList(
+                                       new List<object> {
+                                            new { value=0, text="Please select" },
+                                           new { value=1, text="Local" },
+                                           new { value=2, text="Customer Import"},
+                                            new { value=3, text="Direct Import"}
+                                       },
+                                       "value",
+                                       "text", 0), new { @class = "select-style text-field" })
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Remarks</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding" style="margin-top: 15px; margin-bottom: 15px; overflow-x:auto;">
+                    <table class="table" id="sizeRangeTable" style="float: left; width: 98.5%;">
+                        <tbody>
+                            @if (Model.sizeItemsIssueSlipList == null || Model.sizeItemsIssueSlipList.Count == 0)
+                            {
+                                <tr>
+                                    <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 39px !important;">Size</td>
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important;">Quantity</td>
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important;">Return Quantity</td>
+                                </tr>
+                                <tr>
+                                    <td style="visibility:hidden;    background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important;">id</td>
+                                </tr>
+                            }
+                            @if (Model.sizeItemsIssueSlipList != null && Model.sizeItemsIssueSlipList.Count > 0)
+                            {
+                                <tr>
+
+                                    @if (Model.sizeItemsIssueSlipList != null)
+                                    {
+                                        <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 39px !important; float: left;">Size</td>
+                                        foreach (var item in Model.sizeItemsIssueSlipList)
+                                        {
+                                            <td class="sizeVal">@item.SizeRange</td>
+                                            count++;
+                                        }
+                                    }
+                                </tr>
+
+                                <tr>
+
+                                    @if (Model.sizeItemsIssueSlipList != null)
+                                    {
+                                        <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important; float: left;">Rate</td>
+                                        foreach (var item in Model.sizeItemsIssueSlipList)
+                                        {
+                                            <td><input type="text" class="SizeReturnedQty" id="qtyId@(count)" value="@item.Rate" style='width:50px;' onchange="CalculateTotal(this)" /></td>
+                                            count++;
+                                        }
+                                    }
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div style="margin: 15px 0px;" class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                        <input type="button" onclick="Cancel()" class="btn btn-default btn-style width-78" style="cursor: pointer;" title="Back" value="Back">
+
+                        @{
+                            bool Save = false; bool Update = false;
+                            foreach (var item in PermissionModel)
+                            {
+                                if (item.PermissionDesc == "Save")
+                                {
+                                    Save = true;
+                                }
+                                if (item.PermissionDesc == "Update")
+                                {
+                                    Update = true;
+                                }
+                            }
+
+
+                            if (Model.FloorReturnMaterialId == 0)
+                            {
+                                if (Save == true)
+                                {
+                                    <div id="savebtn" style="display:inline-block">
+                                        <input type="button" onclick="Save()" class="btn btn-default btn-style width-78" style="cursor: pointer;" title="Save" value="Save">
+                                    </div>
+                                        <div id="updatebtn" style="display:none;">
+                                            <input type="button" onclick="Update()" class="btn btn-default btn-style width-78" style="cursor: pointer;" id="FloorReturnMaterialDetailsId" title="Update" value="Update">
+                                        </div>
+                                }
+                                else
+                                {
+
+                                    <input type="button" id="BtnSave" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style width-78" value=" save">
+                                }
+                            }
+                            else
+                            {
+                                if (Update == true)
+                                {
+
+                                    <input type="button" onclick="Update()" class="btn btn-default btn-style width-78" style="cursor: pointer;" id="FloorReturnMaterialDetailsId" title="Update" value="Update">
+
+                                }
+                                else
+                                {
+                                    <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style width-78" value="Update">
+                                }
+                            }
+                        }
+
+                        <input type="button" onclick="Clear()" class="btn btn-default btn-style width-78" title="Clear" value="Clear">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                        <div class="field-section">
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+
+                                <div class="table-responsive table-td-padding parent-table-height">
+                                    <table class="table" id="list-amended-material_">
+                                        <thead>
+                                            <tr>
+                                                <td>Edit</td>
+                                                <td>Remove</td>
+                                                <td>StoresName</td>
+                                                <td>Group</td>
+                                                <td>Style</td>
+                                                <td>Material</td>
+                                                <td>Category</td>
+                                                <td>ReturnQuantity</td>
+                                                <td>IssuedQuantity</td>
+                                                <td>Rate</td>
+                                                <td>Material Type</td>
+                                            </tr>
+                                        </thead>
+                                        @if (Model != null && Model.floorReturnMaterialDetails != null && Model.floorReturnMaterialDetails.Count > 0)
+                                        {
+                                            <tbody>
+                                                @foreach (var item in Model.floorReturnMaterialDetails)
+                                                {
+                                                    <tr id="@item.FloorReturnMaterialDetailsId">
+                                                        <td><input type='button' value='Remove' onclick='DeleteMaterial("@item.FloorReturnMaterialDetailsId","@Model.FloorReturnMaterialId")' class='' /></td>
+
+                                                        <td><input type='button' name='Edit' id='EditRow' value='Edit' onclick='Edit_Click("@item.FloorReturnMaterialDetailsId")' class='' /></td>
+
+                                                        <td id='StoreName' class='General_IssueSlipNo'>@item.StoreName</td>
+                                                        <td id='GroupName' class='General_OrderNo'>@item.GroupName</td>
+                                                        <td id='MStyle' class='InternalValue_general'>@item.Style </td>
+                                                        <td id='MaterialName' class='issueTypecls'>@item.MaterialName</td>
+                                                        <td id='CategoryName' class='categoryGeneral_'>@item.Category</td>
+                                                        <td id='RQuantity' class='storeGeneral_'>@item.ReturnQuantity</td>
+                                                        <td id='IQuantity' class=''>@item.IssuedQuantity</td>
+                                                        <td style='' id='MRate' class='rate_general'>@item.Rate</td>
+                                                        <td style='' id='MaterialType_' class='MaterialType_general'>@item.MaterialType</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        }
+                                        else
+                                        {
+                                            <tbody></tbody>
+                                        }
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-footer">
+
+        </div>
+    </form>
+</div>
+<script>
+   
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    $("#IssueNo").combobox();
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    function Clear() {
+        $('#FrmNo').val('');
+        $('#StoreMasterId').val('');
+        $('#GroupMasterId').val('');
+        $('#IssueNo').val('');
+        $('#IoNo').val('');
+        $('#MaterialMasterId').val('');
+        $('#Uom').val('');
+        $('#Style').val('');
+        $('#Rate').val('');
+        $('#Quantity').val('');
+        $('#LotNo').val('');
+        $('#Remarks').val('');
+        $('#Is_IssueNo').val('');
+    }
+    $(function () {
+      
+        $("#IssueNo").combobox({
+            select: function (event, ui) {
+                $('.loader-overlay').fadeIn('slow');
+                var IssueNo = $('#IssueNo').val();
+                debugger;
+                $.ajax({
+                    url: '/FloorReturnMaterial/GetMaterial',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { IssueSlipNo: IssueNo },
+                    success: function (data) {
+                        $('.loader-overlay').fadeOut('fast');
+                        $("#MaterialMasterId").html(""); // clear before appending new list
+                        $.each(data, function (i, city) {
+                            $("#MaterialMasterId").append(
+                                $('<option></option>').val(city.MaterialMasterId).html(city.MaterialName));
+                        });
+                    //    $("#MaterialMasterId").combobox('destory');
+                        $("#MaterialMasterId").combobox();
+                      //  $("#MaterialMasterId").combobox('destory');
+                     
+                       $('#MaterialMasterId').siblings('.custom-combobox').children('input').attr('disabled', false);
+                    }
+                });
+            },
+
+        });
+        $("#Is_IssueNo").change(function () {
+            var username = @HttpContext.Current.Session["UserType"].ToString();
+            // alert("d");
+            if ((username == "1") ||  (username == "2"))
+            {
+                if ($("#Is_IssueNo").val() == 1) {
+                    $("#issue_no").hide();
+                    $('#MaterialMasterId').siblings('.custom-combobox').children('input').attr('disabled', false);
+                    $('#sizeRangeTable').find('tr:nth-child(2)').hide();
+                }
+                else
+                {
+                    $("#issue_no").show();
+                    $('#MaterialMasterId').siblings('.custom-combobox').children('input').attr('disabled', true);
+                    $('#sizeRangeTable').find('tr:nth-child(2)').show();
+                }
+            }
+        });
+        $("#IssueType").change(function () {
+            $("#IssueNo").hidden();
+        });
+        var isSizeRangeMaster = false;
+        $("#MaterialMasterId").combobox({
+            select: function (event, ui) {
+                var Materialname = $(this).find("option:selected").text();
+                var Materialname_id = $(this).find("option:selected").val();
+                var IssueSlipNo = $('#IssueNo').find("option:selected").text();
+                $.ajax({
+                    url: '/FloorReturnMaterial/GetMaterialDetails',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { MaterialName: Materialname, IssueSlipNo: IssueSlipNo, Materialname_id: Materialname_id },
+                    success: function (data) {
+                        var count = 1;
+                        debugger;
+                        $('#sizeRangeTable tbody tr').each(function () {
+                            $(this).find("td:not(:first)").remove();
+                        });
+
+
+                        //$.each(data.SizeRangelist,function(i,e){
+                        //    $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + e.SizeRange+ ' </td> ');
+                        //     $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='SizeRangeRefQty' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'>" + e.Qty + "</td>");
+
+                        //          $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='SizeReturnedQty' onchange='CalculateTotal(this," + e.Qty + ")' id='Qty" + i + "' value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                        //})
+                        if (data.SizeRangelist.length > 0) {
+                            for (var i = 0; i <= data.SizeRangelist.length - 1; i++) {
+                                if ($("#Is_IssueNo").val() == 1)
+                               {
+
+                                isSizeRangeMaster = true;
+                                $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + data.SizeRangelist[i].IssueSize1+ ' </td> ');
+                                $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='SizeRangeRefQty' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'>" + data.SizeRangelist[i].StockInHand + "</td>");
+
+                                $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='SizeReturnedQty' onchange='CalculateTotal(this," + data.SizeRangelist[i].StockInHand + ")' id='Qty" + i + "' value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                                count++;
+                               }
+                        else{
+                                    isSizeRangeMaster = true;
+                                    $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + data.SizeRangelist[i].SizeRange + ' </td> ');
+                                    $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='SizeRangeRefQty' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'>" + data.SizeRangelist[i].Qty + "</td>");
+
+                                    $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='SizeReturnedQty' onchange='CalculateTotal(this," + data.SizeRangelist[i].Qty + ")' id='Qty" + i + "' value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                                    count++;
+                            }
+                           }
+                        }
+
+                        $.each(data.data, function (i, item) {
+                            debugger;
+                            $("#Style").val(item.Style);
+                            $("#GroupMasterId").val(item.Groupid);
+                            $("#GroupName").val(item.Groupname);
+                            $("#LotNo").val(item.Lotno);
+                            $("#Rate").val(item.Rate);
+                            $("#MaterialType").val(item.MaterialType);
+                            if (item.IoNo == null) {
+                                $("#IoNo").val("0");
+                            }
+                            else {
+                                $("#IoNo").val(item.IoNo);
+                            }
+                            $("#IssuedQuantity").val(parseFloat(data.quantity).toFixed(2));
+                            $("#StoreMasterId").val(item.StoreMasterId);
+                            $("#StoreName").val(item.StoreName);
+                            $("#Uom").val(item.Uom);
+                            $("#LongUnitName").val(item.LongUnitName);
+                            $("#Category").val(item.Category);
+                            if ((data.pieces) == null || (parseFloat(data.pieces) == 0)) {
+                                $('#leather').hide();
+                            }
+                            else {
+                                $('#leather').show();
+                                $("#Piecies").val(parseFloat(data.pieces).toFixed(2));
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        $('#MaterialMasterId').siblings('.custom-combobox').children('input').attr('disabled', true);
+    });
+    function Delete(arg) {
+        $('#list-amended-material_  tr#' + arg + '').remove();
+        $.ajax({
+            url: '/FloorReturnMaterial/DeleteMaterial/',
+            type: "GET",
+            dataType: "JSON",
+            data: { FloorReturnMaterialId: arg },
+            success: function (data) {
+                alert("Deleted Successfully");
+                return false;
+            }
+        });
+    }
+    function CalculateTotal(agr1, arg2) {
+      
+        debugger;
+        var CurrentIssue_ = $("#CurrentIssue").val();
+        if ($("#Is_IssueNo").val() != 1)
+        {
+        if ($("#CurrentIssue").val() != "" ) {
+
+            if (parseFloat(agr1.value) > parseFloat(arg2)) {
+                $("#Add").hide();
+                alert("Actual size current stock exceed issue quantity");
+                $(agr1).val(0);
+                return false;
+            }
+            else if (parseFloat(arg2) == 0 && parseFloat(agr1.value) != 0) {
+                $("#Add").hide();
+                alert("Actual size current stock is zero");
+                return false;
+            }
+            else {
+                $("#Add").show();
+                var add = 0;
+                $("#sizeRangeTable .Qty").each(function () {
+                    add += Number($(this).val());
+                });
+
+                $('#TotalQty').val(add);
+                $('#TotalQty').prop("disabled", true);
+                if (parseFloat(CurrentIssue_) < parseFloat(add)) {
+                    $("#Add").hide();
+                    alert("Current stock exceed issue qty");
+                    return false;
+                }
+                else {
+                    $("#Add").show();
+                }
+            }
+
+        }
+        else {
+            $("#Add").hide();
+            alert("Please add current issue quantity");
+            return false;
+        }
+    }
+
+    }
+</script>

@@ -1,0 +1,469 @@
+﻿@model MMS.Web.Models.StockModel.ApprovedPriceListModel
+@using MMS.Repository.Managers;
+@using MMS.Core.Entities
+@{
+    int id = Model.ApprovedPriceID;
+    Session["ApprovedPriceID"] = id;
+    MMS.Repository.Managers.StockManager.ApprovedPriceListManager approvedPriceListManager = new MMS.Repository.Managers.StockManager.ApprovedPriceListManager();
+    MMS.Core.Entities.Stock.ApprovedPriceList approcedPriceList = new MMS.Core.Entities.Stock.ApprovedPriceList();
+   //Model.ApprovedPriceID =MMS.Web.ExtensionMethod.HtmlHelper.getAutoGenerateID();
+
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("ApprovedPriceList", PermissionSettingModel.PermissionID);
+
+    bool Save = false; bool Update = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Save")
+        {
+            Save = true;
+        }
+        if (item.PermissionDesc == "Update")
+        {
+            Update = true;
+        }
+    }
+    
+    }
+<script type="text/javascript">  
+    $("#Date").datepicker({dateFormat: "dd/mm/yy"});
+    //$("#Date").datepicker('option', 'dateFormat', 'dd/mm/yy');
+    function Back() {
+        location.reload();
+    }
+</script>
+ 
+
+<div class="" id="DivShow">
+
+    <div class="right-form-section clearfix">
+        <form class="form-inline" role="form">
+            <div class="tab-content">
+                <div id="step1" class="tab-pane fade in active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12  no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Supplier</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.HiddenFor(x => x.ApprovedPriceID)
+                                            @Html.DropDownListFor(m => m.SupplierId, MMS.Web.ExtensionMethod.HtmlHelper.SupplierName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12   no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Date</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @*<input type="text" class="form-control text-field" placeholder="enter text">*@
+                                            @if (Model != null && Model.ApprovedPriceID != 0)
+                                            {
+                                                var priceDate = Model.Date;
+                                                @Html.TextBoxFor(m => m.Date, new { @Value = priceDate, @class = "form-control text-field" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.Date, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field" })
+                                            }
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Category</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @*<input type="text" class="form-control text-field" placeholder="enter text">*@
+                                            @Html.DropDownListFor(m => m.CategoryID, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Group</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @*<input type="text" class="form-control text-field" placeholder="enter text">*@
+                                            @Html.DropDownListFor(m => m.GroupID, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Material</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @*<input type="text" class="form-control text-field" placeholder="enter text">*@
+                                            @*@Html.DropDownListFor(m => m.MaterialID, MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName(), new { @class = "select-style text-field" })*@
+                                            @*@Html.HiddenFor(m => m.ApprovedPriceID)*@
+                                             @Html.DropDownListFor(m => m.MaterialID, MMS.Web.ExtensionMethod.HtmlHelper.DynamicMaterialName(Model.GroupID), new { @class = "select-style form-control text-field", @disabled = "disabled", placeholder = "Please Select"  })
+                                            <button type="button" class="btn btn-info btn-sm but_search_styles" data-toggle="modal" title="Material List" data-target="#auto_search">...</button>
+                                                                                
+                                        
+                                         </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Colour</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @*<input type="text" class="form-control text-field" placeholder="enter text">*@
+                                            @Html.DropDownListFor(m => m.ColorID, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { @class = "select-style text-field", @disabled = "disabled" })
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Price Rs.</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12 no-padding">
+                                                <div class="col-md-6 col-lg-12 col-sm-12 col-xs-12 no-padding">
+                                                    @*<input type="text" placeholder="enter text" class="form-control text-field">*@
+                                                    @Html.TextBoxFor(m => m.PriceRs, new {  @class = "form-control text-field", @onkeypress = "return isNumberKey(event)" })
+                                                </div>
+                                                <div class="col-md-6 col-lg-12 col-sm-12 col-xs-12">
+                                             
+                                                    <label  for="text" name="Uom" class="form-label"> 
+                                                    <span id="Uom" >Per UOM </span></label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Tax Details</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @*<input type="text" placeholder="enter text" class="form-control text-field">*@
+                                            @Html.DropDownListFor(m => m.TaxDetails, MMS.Web.ExtensionMethod.HtmlHelper.GetTaxRef(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Lead Time</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12 no-padding">
+                                                <div class="col-md-6 col-lg-12 col-sm-12 col-xs-12 no-padding">
+                                                    @*<input type="text" placeholder="enter text" class="form-control text-field">*@
+                                                    @Html.TextBoxFor(m => m.LeadTime, new { @class = "form-control text-field" })
+                                                </div>
+                                                <div class="col-md-6 col-lg-12 col-sm-12 col-xs-12">
+                                                    <span>Days</span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">MRP Margin % </label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @*<input type="text" placeholder="enter text" class="form-control text-field">*@
+                                            @Html.TextBoxFor(m => m.MRPMargin, new {  @class = "form-control text-field", @onkeypress = "return isNumberKey(event)" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">MRP Price</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @*<input type="text" placeholder="enter text" class="form-control text-field">*@
+                                            @Html.TextBoxFor(m => m.MRPPrice, new {   @class = "form-control text-field", @onkeypress = "return isNumberKey(event)" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Supplier Description(if any)</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @*<input type="text" placeholder="enter text" class="form-control text-field">*@
+                                            @Html.TextBoxFor(m => m.SupplierDescription, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Accessiable value</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12 no-padding">
+                                                <div class="col-md-6 col-lg-12 col-sm-12 col-xs-12 no-padding">
+                                                    @*<input type="text" placeholder="enter text" class="form-control text-field">*@
+                                                    @Html.TextBoxFor(m => m.AccessibleValue, new { @class = "form-control text-field", @onkeypress = "return isNumberKey(event)" })
+                                                </div>
+                                                <div class="col-md-6 col-lg-12 col-sm-12 col-xs-12">
+                                                    @*<input type="button" class="btn btn-default btn-style" name="name" value="Save" />*@
+                                                    <input type="button" onclick="Cancel()" style="cursor: pointer;" title="Back" value="Back">
+                                                    @if (Model.ApprovedPriceID == 0)
+                                                    {
+                                                        if (Save == true)
+                                                        {
+                                                            <input type="button" onclick="Save()" style="cursor: pointer;" title="Save" value="Save">
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Save">
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        if (Update == true)
+                                                        {
+                                                            <input type="button" onclick="Update()" style="cursor: pointer;" id="ApprovedPriceID" title="Update" value="Update">
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Update">
+                                                        }
+                                                    }
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <span>List of Other Supplier Supplied the Meterial </span>
+                                <div class="field-section">
+                                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+
+                                        <!-- <p class="section-title">List of Amended Material </p> -->
+                                        <!-- <div class="table-scroll content mCustomScrollbar light" data-mcs-theme="minimal-dark"> -->
+                                        <div class="table-responsive table-td-padding parent-table-height">
+                                            <table class="table" id="listSupplier">
+                                                <thead>
+                                                    <tr>
+                                                        <td>Supplier Name</td>
+                                                        <td>Approved Price</td>
+                                                        <td>Approved Date</td>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        
+
+                                                    </tr>
+                                                    
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- </div> -->
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <hr> 
+                        <div class="row">
+                            <div class="field-section">
+                                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+
+                                    <!-- <p class="section-title">List of Amended Material </p> -->
+                                    <!-- <div class="table-scroll content mCustomScrollbar light" data-mcs-theme="minimal-dark"> -->
+                                    <div class="table-responsive table-td-padding parent-table-height">
+                                        <table class="table" id="list-amended-material">
+                                            <thead>
+                                                <tr>
+                                                    <td>SI. No</td>
+                                                    <td>Category</td>
+                                                    <td>Group </td>
+                                                    <td>Material</td>
+                                                    <td>Colour </td>
+                                                    <td>Uom</td>
+                                                    <td>Price</td>
+                                                    <td>Tax Details</td>
+                                                    <td>Lead Time</td>
+                                                    <td>MRP Margin</td>
+                                                    <td>MRP Price</td>
+                                                    <td>Supplier Disc</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                               
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- </div> -->
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
+            </div>
+            <div class="form-footer">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                        <button type="submit" class="btn btn-default btn-style">Close</button>
+                        <button type="submit" class="btn btn-default btn-style">Notify Msg / MSS</button>
+                        <button type="submit" class="btn btn-default btn-style">Excel</button>
+                        <button type="submit" class="btn btn-default btn-style">SetUp</button>
+                        <button type="submit" class="btn btn-default btn-style">Preview</button>
+                        <button type="submit" class="btn btn-default btn-style">Print</button>
+                        <button type="submit" class="btn btn-default btn-style">Delete</button>
+                        <button type="submit" class="btn btn-default btn-style">Clear</button>
+                        <button type="submit" class="btn btn-default btn-style">Save</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+ </div>
+
+
+<script>
+    function isNumberKey(evt) {
+
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode != 46 && charCode > 31
+          && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+
+    var specialKeys = new Array();
+    specialKeys.push(8); //Backspace
+    function Numeric() {
+
+        $("#PriceRs,#MRPMargin,#MRPPrice").bind("keypress", function (e) {
+            var keyCode = e.which ? e.which : e.keyCode
+            var ret = ((keyCode >= 48 && keyCode <= 57) || specialKeys.indexOf(keyCode) != -1);
+
+            $(".error").css("Average", ret ? "none" : "inline");
+            return ret;
+        });
+        $("#PriceRs,#MRPMargin,#MRPPrice").bind("paste", function (e) {
+            return false;
+        });
+        $("#PriceRs,#MRPMargin,#MRPPrice").bind("drop", function (e) {
+            return false;
+        });
+    }
+
+    $("#GroupID").change(function () {          
+        var MaterialCategoryMasterId = $('#GroupID').val();         
+    $.ajax({
+        url: '/ApprovedPriceList/FillMaterialName',
+        type: "GET",
+        dataType: "JSON",
+        data: { MaterialGroupMasterId : parseInt(MaterialCategoryMasterId) },
+        success: function (cities) {
+            
+            $("#MaterialID").prop("disabled", false);
+            $("#MaterialID").html("");
+            $("#MaterialID").append("<option value='0'>--Select--</option>");
+            $.each(cities, function (i, city) {         
+
+                $("#MaterialID").append('<option value=' + city.MaterialMasterID + '>' + city.MaterialDescription + '</option>');
+                });      
+
+            //$("#MaterialID").append('<option value=' + data.Resource_ID[i].Value + '>' + data.Resource_ID[i].Text + '</option>');
+        }    
+    });
+    });
+
+    $("#MaterialID").change(function () {     
+        var MaterialColorId = $('#MaterialID').val();
+        $("#MaterialID").append("<option value='0'>Please Select </option>");      
+        $.ajax({       
+           
+            url: '/ApprovedPriceList/FillColorName',
+            type: "GET",
+            dataType: "JSON",
+            data: { MaterialmasterId: parseInt(MaterialColorId) },
+            success: function (cities) {                 
+                //$("#MaterialID").html("");               
+                $.each(cities, function (i, city)
+                {                    
+                    $("#MaterialID").append('<option value=' + city.MaterialMasterID + '>' + city.MaterialDescription + '</option>');
+
+                    $('#ColorID').val(city.ColorMasterId);
+                    document.getElementById("ColorID").disabled = true;
+                    //$('#ColorID').prop("disabled", false); 
+                    $('#PriceRs').val(city.Price);                    
+                    $('#Uom').text(city.Uom).append("<b> Per Uom</b>");
+
+                });
+                //$("#MaterialID").append('<option value=' + data.Resource_ID[i].Value + '>' + data.Resource_ID[i].Text + '</option>');
+            }
+        });
+    });
+    $("#MaterialID").change(function () {            
+        var MaterialCategoryMasterId = $('#MaterialID').val();
+        var row = "";
+        $("#listSupplier tbody").html("");
+        $.ajax({
+            url: '/ApprovedPriceList/ListSupplierMaster',
+            type: "GET",
+            dataType: "JSON",
+            data: { ListSupplierId: parseInt(MaterialCategoryMasterId) },
+            success: function (cities) {             
+              
+                $.each(cities, function (i, city) {
+                    row += "<tr><td>" + city.SupplierName + "</td><td>" + city.Price + "</td><td>" +ToDateFormat(city.CreatedDate) + "</td></tr>";                    
+                });
+                $("#listSupplier").append(row);
+                //$("#MaterialID").append('<option value=' + data.Resource_ID[i].Value + '>' + data.Resource_ID[i].Text + '</option>');
+            }
+        });
+    });
+
+    function ToDateFormat(value) {
+        var pattern = /Date\(([^)]+)\)/;
+        var results = pattern.exec(value);
+        var dt = new Date(parseFloat(results[1]));
+        var month = parseInt(dt.getMonth()) + parseInt(1);
+        return (dt.getDate() + "/" + month + "/" + dt.getFullYear());
+    }
+</script>

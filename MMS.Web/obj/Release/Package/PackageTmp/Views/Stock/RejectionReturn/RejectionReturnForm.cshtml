@@ -1,0 +1,405 @@
+﻿@{
+    ViewBag.Title = "RejectionReturnForm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $('#EditColorPartial').hide();
+    })
+        function Save()
+        {
+            var actv = null;
+            if ($('#returnable').is(":checked")) {
+                actv = true;
+            }
+            else {
+                actv = false;
+            }
+            if ($('#RejectionDcNo').val() == "") {
+                alert("Please Enter RejectionDcNo.")
+                $('#RejectionDcNo').css('border-color', 'red');
+                $('#RejectionDcNo').focus();
+                return false;
+            }
+            else {
+                $('#RejectionDcNo').css('border-color', '');
+            }
+            if ($('#GrnNo').val() == "") {
+                alert('Please Enter GrnNo')
+                $('#GrnNo').css('border-color', 'red');
+                $('#GrnNo').focus();
+                return false;
+            }
+            else {
+                $('#GrnNo').css('border-color', '');
+            }
+            if ($('#Date').val() == "") {
+                alert('Please Enter Date')
+                $('#Date').css('border-color', 'red');
+                $('#Date').focus();
+                return false;
+            }
+            else {
+                $('#Date').css('border-color', '');
+            }
+            if ($('#PoNo').val() == "") {
+                alert('Please Enter PoNo')
+                $('#PoNo').css('border-color', 'red');
+                $('#PoNo').focus();
+                return false;
+            }
+            else {
+                $('#PoNo').css('border-color', '');
+            }
+            if ($('#SupplierMasterId').val() == "") {
+                alert('Please Select Supplier')
+                $('#SupplierMasterId').css('border-color', 'red');
+                $('#SupplierMasterId').focus();
+                return false;
+            }
+            else {
+                $('#SupplierMasterId').css('border-color', '');
+            }
+            if ($('#IMIRNo').val() == "") {
+                alert('Please Enter IMIRNo')
+                $('#IMIRNo').css('border-color', 'red');
+                $('#IMIRNo').focus();
+                return false;
+            }
+            else {
+                $('#IMIRNo').css('border-color', '');
+            }
+            if ($('#MaterialGroupId').val() == "") {
+                alert('Please Select Group.')
+                $('#MaterialGroupId').css('border-color', 'red');
+                $('#MaterialGroupId').focus();
+                return false;
+            }
+            else {
+                $('#MaterialGroupId').css('border-color', '');
+            }
+            if ($('#Uom').val() == "") {
+                alert('Please Select Uom.')
+                $('#Uom').css('border-color', 'red');
+                $('#Uom').focus();
+                return false;
+            }
+            else {
+                $('#Uom').css('border-color', '');
+            }
+            if ($('#MaterialMasterId').val() == "") {
+                alert('Please Select Material.')
+                $('#MaterialMasterId').css('border-color', 'red');
+                $('#MaterialMasterId').focus();
+                return false;
+            }
+            else {
+                $('#MaterialMasterId').css('border-color', '');
+            }
+            if ($('#Quantity').val() == "") {
+                alert('Please Enter Quantity.')
+                $('#Quantity').css('border-color', 'red');
+                $('#Quantity').focus();
+                return false;
+            }
+            else {
+                $('#Quantity').css('border-color', '');
+            }
+            if ($('#Pcs').val() == "") {
+                alert('Please Enter Pcs.')
+                $('#Pcs').css('border-color', 'red');
+                $('#Pcs').focus();
+                return false;
+            }
+            else {
+                $('#Pcs').css('border-color', '');
+            }
+            if ($('#ColourMasterId').val() == "") {
+                alert('Please Select Colour.')
+                $('#ColourMasterId').css('border-color', 'red');
+                $('#ColourMasterId').focus();
+                return false;
+            }
+            else {
+                $('#ColourMasterId').css('border-color', '');
+            }
+            if ($('#Rate').val() == "") {
+                alert('Please Enter Rate.')
+                $('#Rate').css('border-color', 'red');
+                $('#Rate').focus();
+                return false;
+            }
+            else {
+                $('#Rate').css('border-color', '');
+            }
+            if ($('#AmountTotal').val() == "") {
+                alert('Please Enter TotalAmount.')
+                $('#AmountTotal').css('border-color', 'red');
+                $('#AmountTotal').focus();
+                return false;
+            }
+            else {
+                $('#AmountTotal').css('border-color', '');
+            }
+            if ($('#Remarks').val() == "") {
+                alert('Please Enter Remarks.')
+                $('#Remarks').css('border-color', 'red');
+                $('#Remarks').focus();
+                return false;
+            }
+            else {
+                $('#Remarks').css('border-color', '');
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/RejectionReturn/RejectionReturnForm/',
+                data: {
+                    RejectionReturnId : $('#RejectionReturnId').val(),
+                    RejectionDcNo: $('#RejectionDcNo').val(),
+                    GrnNo: $('#GrnNo').val(),
+                    Date: $('#Date').val(),
+                    PoNo: $('#PoNo').val(),
+                    SupplierMasterId: $('#SupplierMasterId').val(),
+                    IMIRNo: $('#IMIRNo').val(),
+                    MaterialGroupId: $('#MaterialGroupId').val(),
+                    Uom: $('#Uom').val(),
+                    MaterialMasterId: $('#MaterialMasterId').val(),
+                    Quantity: $('#Quantity').val(),
+                    ColourMasterId: $('#ColourMasterId').val(),
+                    Rate: $('#Rate').val(),
+                    Remarks: $('#Remarks').val(),
+                    Pcs: $('#Pcs').val(),
+                    AmountTotal: $('#AmountTotal').val(),
+                    GatePassDc: actv
+                },
+                success: function (data) {
+                    if (data.RejectionReturnId != "" || data.RejectionReturnId != 0) {
+                        alert('Saved Successfully.');
+                        location.href = "/RejectionReturn/RejectionReturnForm/";
+                        return false;
+                    }
+                    else {
+                        alert('Save Process Failed.');
+                        location.href = "/RejectionReturn/RejectionReturnForm/";
+                        return false;
+                    }
+
+                },
+                error: function (ex) {
+                    alert('Already Exist in the database.');
+                }
+            })
+        }
+        function Update(arg)
+        {
+            var actv = null;
+            if ($('#returnable').is(":checked")) {
+                actv = true;
+            }
+            else {
+                actv = false;
+            }
+            if ($('#RejectionDcNo').val() == "") {
+                alert("Please Enter RejectionDcNo.")
+                $('#RejectionDcNo').css('border-color', 'red');
+                $('#RejectionDcNo').focus();
+                return false;
+            }
+            else {
+                $('#RejectionDcNo').css('border-color', '');
+            }
+            if ($('#GrnNo').val() == "") {
+                alert('Please Enter GrnNo')
+                $('#GrnNo').css('border-color', 'red');
+                $('#GrnNo').focus();
+                return false;
+            }
+            else {
+                $('#GrnNo').css('border-color', '');
+            }
+            if ($('#Date').val() == "") {
+                alert('Please Enter Date')
+                $('#Date').css('border-color', 'red');
+                $('#Date').focus();
+                return false;
+            }
+            else {
+                $('#Date').css('border-color', '');
+            }
+            if ($('#PoNo').val() == "") {
+                alert('Please Enter PoNo')
+                $('#PoNo').css('border-color', 'red');
+                $('#PoNo').focus();
+                return false;
+            }
+            else {
+                $('#PoNo').css('border-color', '');
+            }
+            if ($('#SupplierMasterId').val() == "") {
+                alert('Please Select Supplier')
+                $('#SupplierMasterId').css('border-color', 'red');
+                $('#SupplierMasterId').focus();
+                return false;
+            }
+            else {
+                $('#SupplierMasterId').css('border-color', '');
+            }
+            if ($('#IMIRNo').val() == "") {
+                alert('Please Enter IMIRNo')
+                $('#IMIRNo').css('border-color', 'red');
+                $('#IMIRNo').focus();
+                return false;
+            }
+            else {
+                $('#IMIRNo').css('border-color', '');
+            }
+            if ($('#MaterialGroupId').val() == "") {
+                alert('Please Select Group.')
+                $('#MaterialGroupId').css('border-color', 'red');
+                $('#MaterialGroupId').focus();
+                return false;
+            }
+            else {
+                $('#MaterialGroupId').css('border-color', '');
+            }
+            if ($('#Uom').val() == "") {
+                alert('Please Select Uom.')
+                $('#Uom').css('border-color', 'red');
+                $('#Uom').focus();
+                return false;
+            }
+            else {
+                $('#Uom').css('border-color', '');
+            }
+            if ($('#MaterialMasterId').val() == "") {
+                alert('Please Select Material.')
+                $('#MaterialMasterId').css('border-color', 'red');
+                $('#MaterialMasterId').focus();
+                return false;
+            }
+            else {
+                $('#MaterialMasterId').css('border-color', '');
+            }
+            if ($('#Quantity').val() == "") {
+                alert('Please Enter Quantity.')
+                $('#Quantity').css('border-color', 'red');
+                $('#Quantity').focus();
+                return false;
+            }
+            else {
+                $('#Quantity').css('border-color', '');
+            }
+            if ($('#Pcs').val() == "") {
+                alert('Please Enter Pcs.')
+                $('#Pcs').css('border-color', 'red');
+                $('#Pcs').focus();
+                return false;
+            }
+            else {
+                $('#Pcs').css('border-color', '');
+            }
+            if ($('#ColourMasterId').val() == "") {
+                alert('Please Select Colour.')
+                $('#ColourMasterId').css('border-color', 'red');
+                $('#ColourMasterId').focus();
+                return false;
+            }
+            else {
+                $('#ColourMasterId').css('border-color', '');
+            }
+            if ($('#Rate').val() == "") {
+                alert('Please Enter Rate.')
+                $('#Rate').css('border-color', 'red');
+                $('#Rate').focus();
+                return false;
+            }
+            else {
+                $('#Rate').css('border-color', '');
+            }
+            if ($('#AmountTotal').val() == "") {
+                alert('Please Enter TotalAmount.')
+                $('#AmountTotal').css('border-color', 'red');
+                $('#AmountTotal').focus();
+                return false;
+            }
+            else {
+                $('#AmountTotal').css('border-color', '');
+            }
+            if ($('#Remarks').val() == "") {
+                alert('Please Enter Remarks.')
+                $('#Remarks').css('border-color', 'red');
+                $('#Remarks').focus();
+                return false;
+            }
+            else {
+                $('#Remarks').css('border-color', '');
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/RejectionReturn/Update/',
+                data: {
+                    RejectionReturnId: $('#RejectionReturnId').val(),
+                    RejectionDcNo: $('#RejectionDcNo').val(),
+                    GrnNo: $('#GrnNo').val(),
+                    Date: $('#Date').val(),
+                    PoNo: $('#PoNo').val(),
+                    SupplierMasterId: $('#SupplierMasterId').val(),
+                    IMIRNo: $('#IMIRNo').val(),
+                    MaterialGroupId: $('#MaterialGroupId').val(),
+                    Uom: $('#Uom').val(),
+                    MaterialMasterId: $('#MaterialMasterId').val(),
+                    Quantity: $('#Quantity').val(),
+                    ColourMasterId: $('#ColourMasterId').val(),
+                    Rate: $('#Rate').val(),
+                    Remarks: $('#Remarks').val(),
+                    Pcs: $('#Pcs').val(),
+                    AmountTotal: $('#AmountTotal').val(),
+                    GatePassDc: actv
+                },
+                success: function (data) {
+                    if (data.RejectionReturnId != "" || data.RejectionReturnId != 0) {
+                        alert('Updated Successfully.');
+                        location.href = "/RejectionReturn/RejectionReturnForm/";
+                        return false;
+                    }
+                    else {
+                        alert('Updated Failed.');
+                        location.href = "/RejectionReturn/RejectionReturnForm/";
+                        return false;
+                    }
+
+                },
+                error: function (ex) {
+                    alert('Already Exist in the database.');
+                }
+            })
+        }
+</script>
+
+<h2 class="content-title">Rejection Return Form</h2>
+<div style="width: 100%; float: left;">
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("RejectionReturnGrid", "RejectionReturn")
+    </div>
+</div>

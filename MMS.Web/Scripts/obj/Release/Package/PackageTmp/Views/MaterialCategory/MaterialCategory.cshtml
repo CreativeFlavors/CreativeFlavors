@@ -1,0 +1,120 @@
+﻿@{
+    ViewBag.Title = "Material Category";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+}
+
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#CategoryCode').val() == "") {
+            alert("Please Enter Category Code.")
+            $('#CategoryCode').css('border-color', 'red');
+            $('#CategoryCode').focus();
+            return false;
+        }
+        else {
+            $('#CategoryCode').css('border-color', '');
+        }
+        if ($('#CategoryName').val() == "") {
+            alert("Please Enter Category Name.")
+            $('#CategoryName').css('border-color', 'red');
+            $('#CategoryName').focus();
+            return false;
+        }
+        else {
+            $('#CategoryName').css('border-color', '');
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/MaterialCategory/MaterialCategory',
+            data: {
+                CategoryCode: $('#CategoryCode').val(),
+                CategoryName: $('#CategoryName').val(),
+                MaterialCategoryMasterId: $('#MaterialCategoryMasterId').val()
+            },
+            success: function (data) {
+                if (data.MaterialCategoryMasterId != "" || data.MaterialCategoryMasterId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/MaterialCategory/MaterialCategory";
+                    return false;
+                }
+                else if (data.MaterialCategoryMasterId == 0 && data.CategoryName != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/MaterialCategory/MaterialCategory";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#CategoryCode').val() == "") {
+            alert("Please Enter Category Code.")
+            $('#CategoryCode').css('border-color', 'red');
+            $('#CategoryCode').focus();
+            return false;
+        }
+        else {
+            $('#CategoryCode').css('border-color', '');
+        }
+        if ($('#CategoryName').val() == "") {
+            alert("Please Enter Category Name.")
+            $('#CategoryName').css('border-color', 'red');
+            $('#CategoryName').focus();
+            return false;
+        }
+        else {
+            $('#CategoryName').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/MaterialCategory/Update',
+            data: {
+                CategoryCode: $('#CategoryCode').val(),
+                CategoryName: $('#CategoryName').val(),
+                MaterialCategoryMasterId: $('#MaterialCategoryMasterId').val()
+            },
+            success: function (data) {
+                if (data.MaterialCategoryMasterId != "" || data.MaterialCategoryMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/MaterialCategory/MaterialCategory";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/MaterialCategory/MaterialCategory";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Material Category Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("MaterialCategoryGrid", "MaterialCategory")
+    </div>
+</div>

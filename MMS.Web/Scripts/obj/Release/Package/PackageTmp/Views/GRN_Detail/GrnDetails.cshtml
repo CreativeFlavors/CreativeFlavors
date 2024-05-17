@@ -1,0 +1,1357 @@
+﻿@model MMS.Web.Models.StockModel.GRN_Details_Model
+@using MMS.Repository.Managers.StockManager
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+
+
+
+<link type="text/css" href="~/Datepicker/css/ui-lightness/jquery-ui-1.8.19.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/Datepicker/js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="~/Datepicker/js/jquery-ui-1.8.19.custom.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        //$("#GEDate,#GrnDate,#DCDate,#INVoiceDate,#DOM").datepicker();
+        //$("#GEDate,#GrnDate,#DCDate,#INVoiceDate,#DOM").datepicker('option', 'dateFormat', 'dd/mm/yy');
+
+
+        $("#buttonSId").hide();
+        $("#div_show1").hide();
+        $("#div_show2").hide();
+        $("#div_show3").hide();
+        $("#SpnMsgId").hide();
+        $("#BtnSave").val("Save");
+
+        $('#GrnNo').val("");
+        $('#GateEntryNo').val("");
+        $('#SupplierNameId').val("");
+        $('#GrnType').val("");
+
+        $('#GEDate').val("");
+        $('#GrnDate').val("");
+        $('#DCDate').val("");
+        $('#INVoiceDate').val("");
+        
+        var divshow = 2;
+        $("#FnAdd").click(function () {
+            $("#buttonSId").show();
+            $("#div_show1").show();
+            $("#div_show2").hide();
+            $("#div_show3").hide();
+            $("#GridDetails").hide();
+
+        });
+
+        $("#next").click(function () {
+            $("#buttonSId").show();
+            $("#GridDetails").hide();
+
+
+            if (divshow == 2) {
+
+                $("#div_show1").hide();
+                $("#div_show2").show();
+                $("#div_show3").hide();
+                divshow = 3;
+                return false;
+            }
+            if (divshow == 3) {
+
+                $("#div_show1").hide();
+                $("#div_show2").hide();
+                $("#div_show3").show();
+                divshow = 3;
+            }
+
+
+        });
+
+        $("#Back").click(function () {
+          
+            if (divshow == 3) {
+                $("#div_show1").hide();
+                $("#div_show2").show();
+                $("#div_show3").hide();
+                divshow = 1;
+                return false;
+            }
+            if (divshow == 1) {
+                $("#div_show1").show();
+                $("#div_show2").hide();
+                $("#div_show3").hide();
+                divshow = 2;
+            }
+
+        });
+
+   
+    
+
+
+    });
+    function Save() {
+
+
+        if ($('#GrnNo').val() == "") {
+            alert("Please Enter Grn No."); $('#GrnNo').css('border-color', 'red'); $('#GrnNo').focus(); return false;
+        }
+        else {
+            $('#GrnNo').css('border-color', '');
+        }
+        if ($('#GateEntryNo').val() == "") {
+            alert("Please Enter Gate Entry No."); $('#GateEntryNo').css('border-color', 'red'); $('#GateEntryNo').focus(); return false;
+        }
+        else {
+            $('#GrnNo').css('border-color', '');
+        }
+        if ($('#FreightAmount').val() == "") {
+            alert("Please Enter Freight Amount."); $('#FreightAmount').css('border-color', 'red'); $('#FreightAmount').focus(); return false;
+        }
+        else {
+            $('#FreightAmount').css('border-color', '');
+        }
+
+        if ($('#GrnDate').val() == "") {
+            alert("Please Enter Grn Date."); $('#GrnDate').css('border-color', 'red'); $('#GrnDate').focus(); return false;
+        }
+        else {
+            $('#GrnDate').css('border-color', '');
+        }
+        if ($('#GEDate').val() == "") {
+            alert("Please Enter GE Date."); $('#GEDate').css('border-color', 'red'); $('#GEDate').focus(); return false;
+        }
+        else {
+            $('#GEDate').css('border-color', '');
+        }
+
+
+        if ($('#GETime').val() == "") {
+            alert("Please Enter GE Time."); $('#GETime').css('border-color', 'red'); $('#GETime').focus(); return false;
+        }
+        else {
+            $('#GETime').css('border-color', '');
+        }
+        if ($('#InsuranceAmount').val() == "") {
+            alert("Please Enter Insurance Amount."); $('#InsuranceAmount').css('border-color', 'red'); $('#InsuranceAmount').focus(); return false;
+        }
+        else {
+            $('#InsuranceAmount').css('border-color', '');
+        }
+
+        if ($('#GrnRefNo').val() == "") {
+            alert("Please Enter Grn Ref No."); $('#GrnRefNo').css('border-color', 'red'); $('#GrnRefNo').focus(); return false;
+        }
+        else {
+            $('#GrnRefNo').css('border-color', '');
+        }
+        if ($('#GateRefNo').val() == "") {
+            alert("Please Enter Gate Ref No."); $('#GateRefNo').css('border-color', 'red'); $('#GateRefNo').focus(); return false;
+        }
+        else {
+            $('#GateRefNo').css('border-color', '');
+        }
+        if ($('#CustomsDuty').val() == "") {
+            alert("Please Enter Customs Duty."); $('#CustomsDuty').css('border-color', 'red'); $('#CustomsDuty').focus(); return false;
+        }
+        else {
+            $('#CustomsDuty').css('border-color', '');
+        }
+
+        if ($('#SupplierNameId  option:selected').val() == "") {
+            alert("Please Select Supplier Name."); $('#SupplierNameId').css('border-color', 'red'); $('#SupplierNameId').focus(); return false;
+        }
+        else {
+            $('#SupplierNameId').css('border-color', '');
+        }
+
+        if ($('#GrnType').val() == "") {
+            alert("Please Enter Grn Type."); $('#GrnType').css('border-color', 'red'); $('#GrnType').focus(); return false;
+        }
+        else {
+            $('#GrnType').css('border-color', '');
+        }
+        if ($('#Pack_Forward').val() == "") {
+            alert("Please Enter Pack & Forward."); $('#Pack_Forward').css('border-color', 'red'); $('#Pack_Forward').focus(); return false;
+        }
+        else {
+            $('#Pack_Forward').css('border-color', '');
+        }
+
+        if ($('#DC_No').val() == "") {
+            alert("Please Enter DC No."); $('#DC_No').css('border-color', 'red'); $('#DC_No').focus(); return false;
+        }
+        else {
+            $('#DC_No').css('border-color', '');
+        }
+        if ($('#ST_VATcredit').val() == "") {
+            alert("Please Enter ST-VATcredit."); $('#ST_VATcredit').css('border-color', 'red'); $('#ST_VATcredit').focus(); return false;
+        }
+        else {
+            $('#GrnType').css('border-color', '');
+        }
+        if ($('#ServiceTax').val() == "") {
+            alert("Please Enter Service Tax."); $('#ServiceTax').css('border-color', 'red'); $('#ServiceTax').focus(); return false;
+        }
+        else {
+            $('#ServiceTax').css('border-color', '');
+        }
+        if ($('#GrnDCDateType').val() == "") {
+            alert("Please Enter Grn Type."); $('#GrnDCDateType').css('border-color', 'red'); $('#GrnDCDateType').focus(); return false;
+        }
+        else {
+            $('#GrnDCDateType').css('border-color', '');
+        }
+
+        if ($('#BENo').val() == "") {
+            alert("Please Enter BE No."); $('#BENo').css('border-color', 'red'); $('#BENo').focus(); return false;
+        }
+        else {
+            $('#BENo').css('border-color', '');
+        }
+        if ($('#ImportClearance').val() == "") {
+            alert("Please Enter Import Clearance."); $('#ImportClearance').css('border-color', 'red'); $('#ImportClearance').focus(); return false;
+        }
+        else {
+            $('#ImportClearance').css('border-color', '');
+        }
+        if ($('#OtherCharges').val() == "") {
+            alert("Please Enter Other Charges."); $('#OtherCharges').css('border-color', 'red'); $('#OtherCharges').focus(); return false;
+        }
+        else {
+            $('#OtherCharges').css('border-color', '');
+        }
+        if ($('#INVoiceNo').val() == "") {
+            alert("Please Enter INVoiceNo."); $('#INVoiceNo').css('border-color', 'red'); $('#INVoiceNo').focus(); return false;
+        }
+        else {
+            $('#INVoiceNo').css('border-color', '');
+        }
+        if ($('#ExchangeRate').val() == "") {
+            alert("Please Enter ExchangeRate."); $('#ExchangeRate').css('border-color', 'red'); $('#ExchangeRate').focus(); return false;
+        }
+        else {
+            $('#ExchangeRate').css('border-color', '');
+        }
+
+        if ($('#Transporter').val() == "") {
+            alert("Please Enter Transporter."); $('#Transporter').css('border-color', 'red'); $('#Transporter').focus(); return false;
+        }
+        else {
+            $('#Transporter').css('border-color', '');
+        }
+        if ($('#INVoiceDate').val() == "") {
+            alert("Please Enter INVoice Date."); $('#INVoiceDate').css('border-color', 'red'); $('#INVoiceDate').focus(); return false;
+        }
+        else {
+            $('#INVoiceDate').css('border-color', '');
+        }
+        if ($('#ShipmentMode').val() == "") {
+            alert("Please Enter Shipment Mode."); $('#ShipmentMode').css('border-color', 'red'); $('#ShipmentMode').focus(); return false;
+        }
+        else {
+            $('#ShipmentMode').css('border-color', '');
+        }
+        if ($('#GeneralRemarks').val() == "") {
+            alert("Please Enter General Remarks."); $('#GeneralRemarks').css('border-color', 'red'); $('#GeneralRemarks').focus(); return false;
+        }
+        else {
+            $('#GeneralRemarks').css('border-color', '');
+        }
+
+        if ($('#PoNO').val() == "") {
+            alert("Please Enter PoNO."); $('#PoNO').css('border-color', 'red'); $('#PoNO').focus(); return false;
+        }
+        else {
+            $('#PoNO').css('border-color', '');
+        }
+        if ($('#LOTNo').val() == "") {
+            alert("Please Enter LOT No."); $('#LOTNo').css('border-color', 'red'); $('#LOTNo').focus(); return false;
+        }
+        else {
+            $('#LOTNo').css('border-color', '');
+        }
+        if ($('#IndentNo').val() == "") {
+            alert("Please Enter IndentNo."); $('#IndentNo').css('border-color', 'red'); $('#IndentNo').focus(); return false;
+        }
+        else {
+            $('#IndentNo').css('border-color', '');
+        }
+        if ($('#Stores').val() == "") {
+            alert("Please Enter Stores."); $('#Stores').css('border-color', 'red'); $('#Stores').focus(); return false;
+        }
+        else {
+            $('#Stores').css('border-color', '');
+        }
+        if ($('#MaterialId').val() == "") {
+            alert("Please Enter MaterialId."); $('#MaterialId').css('border-color', 'red'); $('#MaterialId').focus(); return false;
+        }
+        else {
+            $('#MaterialId').css('border-color', '');
+        }
+
+
+        if ($('#GroupID').val() == "") {
+            alert("Please Enter Group ID."); $('#GroupID').css('border-color', 'red'); $('#GroupID').focus(); return false;
+        }
+        else {
+            $('#GroupID').css('border-color', '');
+        }
+        if ($('#CategoryId').val() == "") {
+            alert("Please Enter CategoryId."); $('#CategoryId').css('border-color', 'red'); $('#CategoryId').focus(); return false;
+        }
+        else {
+            $('#CategoryId').css('border-color', '');
+        }
+        //if ($('#IfGroupIsMaintenance').val() == "") {
+        //    alert("Please Enter IfGroupIsMaintenance."); $('#IfGroupIsMaintenance').css('border-color', 'red'); $('#IfGroupIsMaintenance').focus(); return false;
+        //}
+        //else {
+        //    $('#IfGroupIsMaintenance').css('border-color', '');
+        //}
+        if ($('#ColourId').val() == "") {
+            alert("Please Enter Grn Type."); $('#ColourId').css('border-color', 'red'); $('#ColourId').focus(); return false;
+        }
+        else {
+            $('#ColourId').css('border-color', '');
+        }
+
+
+
+        if ($('#Substance').val() == "") {
+            alert("Please Enter Substance."); $('#Substance').css('border-color', 'red'); $('#Substance').focus(); return false;
+        }
+        else {
+            $('#Substance').css('border-color', '');
+        }
+        if ($('#QtyAsPerDc').val() == "") {
+            alert("Please Enter QtyAsPerDc."); $('#QtyAsPerDc').css('border-color', 'red'); $('#QtyAsPerDc').focus(); return false;
+        }
+        else {
+            $('#QtyAsPerDc').css('border-color', '');
+        }
+        if ($('#QtyExcess').val() == "") {
+            alert("Please Enter Qty Excess."); $('#QtyExcess').css('border-color', 'red'); $('#QtyExcess').focus(); return false;
+        }
+        else {
+            $('#QtyExcess').css('border-color', '');
+        }
+        if ($('#UOMId').val() == "") {
+            alert("Please Enter UOM Id."); $('#UOMId').css('border-color', 'red'); $('#UOMId').focus(); return false;
+        }
+        else {
+            $('#UOMId').css('border-color', '');
+        }
+        if ($('#Weight').val() == "") {
+            alert("Please Enter Weight."); $('#Weight').css('border-color', 'red'); $('#Weight').focus(); return false;
+        }
+        else {
+            $('#Weight').css('border-color', '');
+        }
+        //,,,,,,,,,,
+        if ($('#ReceivedQty').val() == "") {
+            alert("Please Enter Received Qty."); $('#ReceivedQty').css('border-color', 'red'); $('#ReceivedQty').focus(); return false;
+        }
+        else {
+            $('#ReceivedQty').css('border-color', '');
+        }
+        if ($('#ExcessApproval').val() == "") {
+            alert("Please Enter ExcessApproval."); $('#ExcessApproval').css('border-color', 'red'); $('#ExcessApproval').focus(); return false;
+        }
+        else {
+            $('#ExcessApproval').css('border-color', '');
+        }
+        if ($('#DOM').val() == "") {
+            alert("Please Enter DOM."); $('#DOM').css('border-color', 'red'); $('#DOM').focus(); return false;
+        }
+        else {
+            $('#DOM').css('border-color', '');
+        }
+        if ($('#AcceptedQty').val() == "") {
+            alert("Please Enter AcceptedQty."); $('#AcceptedQty').css('border-color', 'red'); $('#AcceptedQty').focus(); return false;
+        }
+        else {
+            $('#AcceptedQty').css('border-color', '');
+        }
+        if ($('#PendingQty').val() == "") {
+            alert("Please Enter Pending Qty."); $('#PendingQty').css('border-color', 'red'); $('#PendingQty').focus(); return false;
+        }
+        else {
+            $('#PendingQty').css('border-color', '');
+        }
+        if ($('#StoreLocation').val() == "") {
+            alert("Please Enter Store Location."); $('#StoreLocation').css('border-color', 'red'); $('#StoreLocation').focus(); return false;
+        }
+        else {
+            $('#StoreLocation').css('border-color', '');
+        }
+
+
+
+        if ($('#Disp_SelectedMatOfPO').val() == "") {
+            alert("Please Enter Disp_SelectedMatOfPO."); $('#Disp_SelectedMatOfPO').css('border-color', 'red'); $('#Disp_SelectedMatOfPO').focus(); return false;
+        }
+        else {
+            $('#Disp_SelectedMatOfPO').css('border-color', '');
+        }
+        if ($('#Disp_AllPOBasedOnSelecMat').val() == "") {
+            alert("Please Enter Disp_All POBasedOnSelecMat."); $('#Disp_AllPOBasedOnSelecMat').css('border-color', 'red'); $('#Disp_AllPOBasedOnSelecMat').focus(); return false;
+        }
+        else {
+            $('#Disp_AllPOBasedOnSelecMat').css('border-color', '');
+        }
+        if ($('#Remarks').val() == "") {
+            alert("Please Enter Remarks."); $('#Remarks').css('border-color', 'red'); $('#Remarks').focus(); return false;
+        }
+        else {
+            $('#Remarks').css('border-color', '');
+        }
+
+
+
+        if ($('#Disp_AllMatOfPO').val() == "") {
+            alert("Please Enter Disp_AllMatOfPO."); $('#Disp_AllMatOfPO').css('border-color', 'red'); $('#Disp_AllMatOfPO').focus(); return false;
+        }
+        else {
+            $('#Disp_AllMatOfPO').css('border-color', '');
+        }
+        if ($('#Rate').val() == "") {
+            alert("Please Enter Rate."); $('#Rate').css('border-color', 'red'); $('#Rate').focus(); return false;
+        }
+        else {
+            $('#Rate').css('border-color', '');
+        }
+        if ($('#Value').val() == "") {
+            alert("Please Enter Value."); $('#Value').css('border-color', 'red'); $('#Value').focus(); return false;
+        }
+        else {
+            $('#Value').css('border-color', '');
+        }
+        if ($('#MRPMargin').val() == "") {
+            alert("Please Enter MRPMargin."); $('#MRPMargin').css('border-color', 'red'); $('#MRPMargin').focus(); return false;
+        }
+        else {
+            $('#MRPMargin').css('border-color', '');
+        }
+        if ($('#MRPPrice').val() == "") {
+            alert("Please Enter MRPPrice."); $('#MRPPrice').css('border-color', 'red'); $('#MRPPrice').focus(); return false;
+        }
+        else {
+            $('#MRPPrice').css('border-color', '');
+        }
+        if ($('#AccessibleValue').val() == "") {
+            alert("Please Enter AccessibleValue."); $('#AccessibleValue').css('border-color', 'red'); $('#AccessibleValue').focus(); return false;
+        }
+        else {
+            $('#AccessibleValue').css('border-color', '');
+        }
+
+
+        if ($('#Discount_Per').val() == "") {
+            alert("Please Enter Discount_Per."); $('#Discount_Per').css('border-color', 'red'); $('#Discount_Per').focus(); return false;
+        }
+        else {
+            $('#Discount_Per').css('border-color', '');
+        }
+        if ($('#Discount_Val').val() == "") {
+            alert("Please Enter Discount_Val."); $('#Discount_Val').css('border-color', 'red'); $('#Discount_Val').focus(); return false;
+        }
+        else {
+            $('#Discount_Val').css('border-color', '');
+        }
+
+
+
+        if ($('#Ecess_Per').val() == "") {
+            alert("Please Enter Grn Type."); $('#Ecess_Per').css('border-color', 'red'); $('#Ecess_Per').focus(); return false;
+        }
+        else {
+            $('#Ecess_Per').css('border-color', '');
+        }
+        if ($('#Ecess_Val').val() == "") {
+            alert("Please Enter Ecess_Val."); $('#Ecess_Val').css('border-color', 'red'); $('#Ecess_Val').focus(); return false;
+        }
+        else {
+            $('#Ecess_Val').css('border-color', '');
+        }
+        if ($('#MRPMargin').val() == "") {
+            alert("Please Enter MRP Margin."); $('#MRPMargin').css('border-color', 'red'); $('#MRPMargin').focus(); return false;
+        }
+        else {
+            $('#MRPMargin').css('border-color', '');
+        }
+        if ($('#ExciseDuty_Per').val() == "") {
+            alert("Please Enter Excise Duty_Per."); $('#ExciseDuty_Per').css('border-color', 'red'); $('#ExciseDuty_Per').focus(); return false;
+        }
+        else {
+            $('#ExciseDuty_Per').css('border-color', '');
+        }
+        if ($('#ExciseDuty_Val').val() == "") {
+            alert("Please Enter ExciseDuty_Val."); $('#ExciseDuty_Val').css('border-color', 'red'); $('#ExciseDuty_Val').focus(); return false;
+        }
+        else {
+            $('#ExciseDuty_Val').css('border-color', '');
+        }
+
+
+        if ($('#SH_Ecess_Per').val() == "") {
+            alert("Please Enter Grn Type."); $('#SH_Ecess_Per').css('border-color', 'red'); $('#SH_Ecess_Per').focus(); return false;
+        }
+        else {
+            $('#SH_Ecess_Per').css('border-color', '');
+        }
+        if ($('#SH_Ecess_Val').val() == "") {
+            alert("Please Enter SH_Ecess_Val."); $('#SH_Ecess_Val').css('border-color', 'red'); $('#SH_Ecess_Val').focus(); return false;
+        }
+        else {
+            $('#SH_Ecess_Val').css('border-color', '');
+        }
+        if ($('#ST_VAT_CST_Per').val() == "") {
+            alert("Please Enter ST_VAT_CST_Per."); $('#ST_VAT_CST_Per').css('border-color', 'red'); $('#ST_VAT_CST_Per').focus(); return false;
+        }
+        else {
+            $('#ST_VAT_CST_Per').css('border-color', '');
+        }
+        if ($('#ST_VAT_CST_Val').val() == "") {
+            alert("Please Enter ST/VAT/CST/Val ."); $('#ST_VAT_CST_Val').css('border-color', 'red'); $('#ST_VAT_CST_Val').focus(); return false;
+        }
+        else {
+            $('#ST_VAT_CST_Val').css('border-color', '');
+        }
+        if ($('#Surcharge_Per').val() == "") {
+            alert("Please Enter Surcharge_Per."); $('#Surcharge_Per').css('border-color', 'red'); $('#Surcharge_Per').focus(); return false;
+        }
+        else {
+            $('#Surcharge_Per').css('border-color', '');
+        }
+
+        //,,,,,,
+        if ($('#Surcharge_Val').val() == "") {
+            alert("Please Enter Surcharge_Val."); $('#Surcharge_Val').css('border-color', 'red'); $('#Surcharge_Val').focus(); return false;
+        }
+        else {
+            $('#Surcharge_Val').css('border-color', '');
+        }
+        if ($('#IONo').val() == "") {
+            alert("Please Enter IONo."); $('#IONo').css('border-color', 'red'); $('#IONo').focus(); return false;
+        }
+        else {
+            $('#IONo').css('border-color', '');
+        }
+
+
+        if ($('#RejectedQty').val() == "") {
+            alert("Please Enter Rejected Qty."); $('#RejectedQty').css('border-color', 'red'); RejectedQty('#IONo').focus(); return false;
+        }
+        else {
+            $('#RejectedQty').css('border-color', '');
+        }
+        if ($('#TagsPiecesDiscount_Val').val() == "") {
+            alert("Please Enter TagsPiecesDiscount_Val."); $('#TagsPiecesDiscount_Val').css('border-color', 'red'); $('#TagsPiecesDiscount_Val').focus(); return false;
+        }
+        else {
+            $('#TagsPiecesDiscount_Val').css('border-color', '');
+        }
+        if ($('#TagsPiecesDiscount_Per').val() == "") {
+            alert("Please Enter TagsPiecesDiscount_Per."); $('#TagsPiecesDiscount_Per').css('border-color', 'red'); $('#TagsPiecesDiscount_Per').focus(); return false;
+        }
+        else {
+            $('#TagsPiecesDiscount_Per').css('border-color', '');
+        }
+
+
+        //var RetGrn = AddAttr("GrnDate", "Grn Date");
+        //return RetGrn;
+        //var RetGrn = AddAttr("GEDate", "GE Date");
+        //return RetGrn;
+        //var RetGrn = AddAttr("GETime", "GE Time");
+        //return RetGrn;
+
+
+
+        var Model = {};
+        Model.GrnId = $("#GrnID").val();
+        Model.GrnNo = $("#GrnNo").val();
+        Model.GateEntryNo = $("#GateEntryNo").val();
+        Model.FreightAmount = $("#FreightAmount").val();
+        Model.GrnDate = $("#GrnDate").val();
+        Model.GEDate = $("#GEDate").val();
+        Model.GETime = $("#GETime").val();
+        Model.InsuranceAmount = $("#InsuranceAmount").val();
+        Model.GrnRefNo = $("#GrnRefNo").val();
+        Model.GateRefNo = $("#GateRefNo").val();
+        Model.CustomsDuty = $("#CustomsDuty").val();
+        Model.SupplierNameId = $("#SupplierNameId  option:selected").val();
+        Model.GrnType = $("#GrnType").val();
+        Model.Pack_Forward = $("#Pack_Forward").val();
+        Model.DC_No = $("#DC_No").val();
+        Model.ST_VATcredit = $("#ST_VATcredit").val();
+        Model.ServiceTax = $("#ServiceTax").val();
+        Model.DCDate = $("#DCDate").val();
+        Model.BENo = $("#BENo").val();
+        Model.ImportClearance = $("#ImportClearance").val();
+        Model.OtherCharges = $("#OtherCharges").val();
+        Model.INVoiceNo = $("#INVoiceNo").val();
+        Model.ExchangeRate = $("#ExchangeRate").val();
+        Model.Transporter = $("#Transporter").val();
+        Model.INVoiceDate = $("#INVoiceDate").val();
+        Model.ShipmentMode = $("#ShipmentMode").val();
+        Model.GeneralRemarks = $("#GeneralRemarks").val();
+        Model.PoNO = $("#PoNO").val();
+        Model.LOTNo = $("#LOTNo").val();
+        Model.IndentNo = $("#IndentNo").val();
+        Model.Stores = $("#Stores option:selected").val();
+        Model.MaterialId = $("#MaterialId option:selected").val();
+        Model.Grade = 1; //$scope.Grade;
+        Model.GroupID = $("#GroupID option:selected").val();
+        Model.CategoryId = $("#CategoryId option:selected").val();
+        Model.IfGroupIsMaintenance = 1; //$scope.IfGroupIsMaintenance;
+        Model.ColourId = $("#ColourId option:selected").val();
+        Model.Substance = $("#Substance").val();
+        Model.QtyAsPerDc = $("#QtyAsPerDc").val();
+        Model.QtyExcess = $("#QtyExcess").val();
+        Model.UOMId = $("#UOMId option:selected").val();
+        Model.Weight = $("#Weight").val();
+        Model.ReceivedQty = $("#ReceivedQty").val();
+        Model.ExcessApproval = $("#ExcessApproval").val();
+        Model.DOM = $("#DOM").val();
+        Model.AcceptedQty = $("#AcceptedQty").val();
+        Model.PendingQty = $("#PendingQty").val();
+        Model.StoreLocation = $("#StoreLocation").val();
+        Model.Disp_SelectedMatOfPO = $("#Disp_SelectedMatOfPO").val();
+        Model.Disp_AllPOBasedOnSelecMat = $("#Disp_AllPOBasedOnSelecMat").val();
+        Model.Remarks = $("#Remarks").val();
+        Model.Disp_AllMatOfPO = $("#Disp_AllMatOfPO").val();
+        Model.Rate = $("#Rate").val();
+        Model.Value = $("#Value").val();
+        Model.MRPMargin = $("#MRPMargin").val();
+        Model.MRPPrice = $("#MRPPrice").val();
+        Model.AccessibleValue = $("#AccessibleValue").val();
+        Model.Discount_Per = $("#Discount_Per").val();
+        Model.Discount_Val = $("#Discount_Val").val();
+        Model.Ecess_Per = $("#Ecess_Per").val();
+        Model.Ecess_Val = $("#Ecess_Val").val();
+        Model.MRPMargin = $("#MRPMargin").val();
+        Model.ExciseDuty_Per = $("#ExciseDuty_Per").val();;
+        Model.ExciseDuty_Val = $("#ExciseDuty_Val").val();
+        Model.SH_Ecess_Per = $("#SH_Ecess_Per").val();
+        Model.SH_Ecess_Val = $("#SH_Ecess_Val").val();
+        Model.ST_VAT_CST_Per = $("#ST_VAT_CST_Per").val();
+        Model.ST_VAT_CST_Val = $("#ST_VAT_CST_Val").val();
+        Model.Surcharge_Per = $("#Surcharge_Per").val();
+        Model.Surcharge_Val = $("#Surcharge_Val").val();
+        Model.IONo = $("#IONo").val();
+        Model.RejectedQty = $("#RejectedQty").val();
+        Model.TagsPiecesDiscount_Val = $("#TagsPiecesDiscount_Val").val();
+        Model.TagsPiecesDiscount_Per = $("#TagsPiecesDiscount_Per").val();
+
+        $.post('/GRN_Detail/SaveDetails/', Model, function (data) {
+            if (data == true) {
+                alert("Saved Successfully");
+                window.location.reload();
+            }
+        });
+    }
+
+
+    function Edit(GrnId) {
+
+        $("#buttonSId").show();
+        $("#div_show1").show();
+        $("#div_show2").hide();
+        $("#div_show3").hide();
+        $("#GridDetails").hide();
+
+        $("#BtnSave").val("Update");
+        $.getJSON('/GRN_Detail/GetDetails/', { GrnID: GrnId }, function (data) {
+
+            //var GrnDate = $.datepicker.formatDate('mm/dd/yy', new Date(Date(data.GrnDate)));
+            //var GEDate = $.datepicker.formatDate('mm/dd/yy', new Date(Date(data.GEDate)));
+            //var DCDate = $.datepicker.formatDate('mm/dd/yy', new Date(Date(data.DCDate)));
+            //var DOM = $.datepicker.formatDate('mm/dd/yy', new Date(Date(data.DOM)));
+            //var INVoiceDate = $.datepicker.formatDate('mm/dd/yy', new Date(Date(data.INVoiceDate)));
+            $("#GrnID").val(GrnId);
+            $("#GrnNo").val(data.GrnNo);
+            $("#GateEntryNo").val(data.GateEntryNo);
+            $("#FreightAmount").val(data.FreightAmount);
+            $("#GrnDate").val(GrnDate);
+            $("#GEDate").val(GEDate);
+            $("#GETime").val(data.GETime);
+            $("#InsuranceAmount").val(data.InsuranceAmount);
+            $("#GrnRefNo").val(data.GrnRefNo);
+            $("#GateRefNo").val(data.GateRefNo);
+            $("#CustomsDuty").val(data.CustomsDuty);
+            $("#SupplierNameId").val(data.SupplierNameId);
+            $("#GrnType").val(data.GrnType);
+            $("#Pack_Forward").val(data.Pack_Forward);
+            $("#DC_No").val(data.DC_No);
+            $("#ST_VATcredit").val(data.ST_VATcredit);
+            $("#ServiceTax").val(data.ServiceTax);
+            $("#DCDate").val(DCDate);
+            $("#BENo").val(data.BENo);
+            $("#ImportClearance").val(data.ImportClearance);
+            $("#OtherCharges").val(data.OtherCharges);
+            $("#INVoiceNo").val(data.INVoiceNo);
+            $("#ExchangeRate").val(data.ExchangeRate);
+            $("#Transporter").val(data.Transporter);
+            $("#INVoiceDate").val(INVoiceDate);
+            $("#ShipmentMode").val(data.ShipmentMode);
+            $("#GeneralRemarks").val(data.GeneralRemarks);
+            $("#PoNO").val(data.PoNO);
+            $("#LOTNo").val(data.LOTNo);
+            $("#IndentNo").val(data.IndentNo);
+            $("#Stores").val(data.Stores);
+            $("#MaterialId").val(data.MaterialId);
+            $("#Grade").val(data.Grade);
+            $("#GroupID").val(data.GroupID);
+            $("#CategoryId").val(data.CategoryId);
+            $("#IfGroupIsMaintenance").val(data.IfGroupIsMaintenance);
+            $("#ColourId").val(data.ColourId);
+            $("#Substance").val(data.Substance);
+            $("#QtyAsPerDc").val(data.QtyAsPerDc);
+            $("#QtyExcess").val(data.QtyExcess);
+            $("#UOMId").val(data.UOMId);
+            $("#Weight").val(data.Weight);
+            $("#ReceivedQty").val(data.ReceivedQty);
+            $("#ExcessApproval").val(data.ExcessApproval);
+            $("#DOM").val(DOM);
+            $("#AcceptedQty").val(data.AcceptedQty);
+            $("#PendingQty").val(data.PendingQty);
+            $("#StoreLocation").val(data.StoreLocation);
+            $("#Disp_SelectedMatOfPO").prop("checked", data.Disp_SelectedMatOfPO);
+            $("#Disp_AllPOBasedOnSelecMat").prop("checked", data.Disp_AllPOBasedOnSelecMat);
+            $("#Remarks").val(data.Remarks);
+            $("#Disp_AllMatOfPO").prop("checked", data.Disp_AllMatOfPO);
+            $("#Rate").val(data.Rate);
+            $("#Value").val(data.Value);
+            $("#MRPMargin").val(data.MRPMargin);
+            $("#MRPPrice").val(data.MRPPrice);
+            $("#AccessibleValue").val(data.AccessibleValue);
+            $("#Discount_Per").val(data.Discount_Per);
+            $("#Discount_Val").val(data.Discount_Val);
+            $("#Ecess_Per").val(data.Ecess_Per);
+            $("#Ecess_Val").val(data.Ecess_Val);
+            $("#MRPMargin").val(data.MRPMargin);
+            $("#ExciseDuty_Per").val(data.ExciseDuty_Per);
+            $("#ExciseDuty_Val").val(data.ExciseDuty_Val);
+            $("#SH_Ecess_Per").val(data.SH_Ecess_Per);
+            $("#SH_Ecess_Val").val(data.SH_Ecess_Val);
+            $("#ST_VAT_CST_Per").val(data.ST_VAT_CST_Per);
+            $("#ST_VAT_CST_Val").val(data.ST_VAT_CST_Val);
+            $("#Surcharge_Per").val(data.Surcharge_Per);
+            $("#Surcharge_Val").val(data.Surcharge_Val);
+            $("#IONo").val(data.IONo);
+            $("#RejectedQty").val(data.RejectedQty);
+            $("#TagsPiecesDiscount_Val").val(data.TagsPiecesDiscount_Val);
+            $("#TagsPiecesDiscount_Per").val(data.TagsPiecesDiscount_Per);
+        });
+    }
+
+    function Delete(GrnId) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.getJSON('/GRN_Detail/Delete?GrnId=' + GrnId + '').success(function (data) {
+
+                if (data == "Success") {
+                    alert("Deleted Successfully");
+                    window.location.reload();
+                }
+                {
+                    alert("Deletion Failed");
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+
+    function Search() {
+        var Search = $("#txtSearch").val();
+        window.location = "/GRN_Detail/GrnDetails?SearchFilter=" + Search;
+    }
+
+
+
+</script>
+@using (Html.BeginForm("GrnDetails", "Form", FormMethod.Post))
+{
+    <div ng-app="MyApp" ng-controller="MyController">
+
+        <div class="veh-tablecont" id="GridDetails">
+            <div id="sortMsg" style="text-align: center; color: Red;"></div>
+            <table class="veh-table" id="empTable">
+                <thead>
+                    <tr class="color-code-top-btn">
+                        <td colspan="13">
+                            <input type="text" id="txtSearch" placeholder="Search.." /><input type="button" value="Add" id="FnAdd">
+                            <input type="button" value="Search" onclick="Search()"></td>
+                    </tr>
+                    <tr>
+                        <th class="veh-1">GrnNo
+                        </th>
+                        <th class="veh-2">GateEntryNo
+                        </th>
+                        <th class="veh-3">FreightAmount
+                        </th>
+                        <th class="veh-4">GrnDate
+                        </th>
+                        <th class="veh-5">IndentNo
+                        </th>
+
+                        <th class="veh-6">GEDate
+                        </th>
+                        <th class="veh-7">GrnRefNo
+                        </th>
+                        <th class="veh-9">Edit / Delete
+                        </th>
+                    </tr>
+                </thead>
+                @if (Model.GRNDetailsModelList != null)
+                {
+                    <tbody>
+                        @foreach (var GrnModel in Model.GRNDetailsModelList)
+                        {
+                          
+                            <tr>
+
+                                <td style="" class="veh-1">@GrnModel.GrnNo</td>
+                                <td style="" class="veh-2">@GrnModel.GateEntryNo</td>
+                                <td style="" class="veh-3">@GrnModel.FreightAmount</td>
+                                <td style="" class="veh-4">@GrnModel.GrnDate</td>
+                                <td style="" class="veh-5">@GrnModel.IndentNo</td>
+                                <td style="" class="veh-6">@GrnModel.GEDate</td>
+                                <td style="" class="veh-7">@GrnModel.GrnRefNo</td>
+                                <td class="veh-1 edit-del-wrap">
+
+
+                                    <a href="Javascript:Void();" onclick="Edit('@GrnModel.GrnID')"  class="watchlist-edit" title="Edit"></a>
+                                    <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@GrnModel.GrnID')" class="watchlist-delete" title="Delete"></a>
+                                </td>
+                            </tr>                       
+                        }
+                    </tbody>
+                }
+                <tfoot class="footer-pager">
+                    <tr>
+                        <td colspan="4">
+                            <div id="pager">
+                                <form>
+                                    <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                    <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                    <input type="text" class="pagedisplay" />
+                                    <img src="@Url.Content("~/Content/images/next.png")" class="next"/>
+                                    <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                    <select class="pagesize">
+                                        <option selected="selected" value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="40">40</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+                
+            </table>
+        </div>
+
+        <div  class="content-wrapper" id="Append">
+            <h2 class="content-title">GRN Details</h2>
+            <span id="SpnMsgId" style="color: red;"></span>
+            <div class="purchase-order-wrapper grn_details_wrap">
+                <div class="purchase-order-row" id="buttonSId">
+                        <ul>
+                            <li class="width-160">
+                                <input type="button" onclick="Save()" id="BtnSave" value="Save" />
+                            </li>
+                            <li class="width-160">
+                                <input type="button"  id="next" value="Next" />
+                            </li>
+                            <li class="width-160">
+                                <input type="button" id="Back" value="Back" />
+                            </li>
+
+                        </ul>
+                    </div>
+                <div  class="purchase-order-section" id="div_show1">
+                    
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Grn No</label></li>
+                            <li>@Html.HiddenFor(m => m.GrnID)</li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.GrnNo, new {   @onkeypress = "return isNumberKey(event)"  })
+
+
+                            </li>
+
+                            <li class="width-150">
+                                <label>Gate Entry No</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.GateEntryNo, new { @ng_model = "GateEntryNo",  @onkeypress = "return isNumberKey(event)"  })
+
+
+                            </li>
+
+                            <li class="width-90 ">
+                                <label>Freight Amount</label></li>
+                            <li class="width-90 ">@Html.TextBoxFor(m => m.FreightAmount, new { @ng_model = "FreightAmount",  @onkeypress = "return isNumberKey(event)"  })</li>
+
+
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Grn Date</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.GrnDate, new { @ng_model = "GrnDate", @readonly = true })</li>
+                            <li class="width-150">
+                                <label>Insurance Amt</label></li>
+                            <li class="width-90">
+                            @Html.TextBoxFor(m => m.InsuranceAmount, new { @ng_model = "InsuranceAmount",  @onkeypress = "return isNumberKey(event)"  })
+                            <li class="width-90">
+                                <label class="init-lable">G E Date/Time</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.GEDate, new { @ng_model = "GEDate", @readonly = true })
+                                @Html.TextBoxFor(m => m.GETime, new { @ng_model = "GETime" })
+                            </li>
+
+
+
+                        </ul>
+
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Grn Ref No</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.GrnRefNo, new { @ng_model = "GrnRefNo",  @onkeypress = "return isNumberKey(event)"  })</li>
+
+                            <li class="width-150">
+                                <label class="init-lable">Gate Ref No:</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.GateRefNo, new { @ng_model = "GateRefNo",  @onkeypress = "return isNumberKey(event)"  })
+                            </li>
+
+                            <li class="width-90">
+                                <label>Custom's Duty</label></li>
+                            <li class="width-90">
+                            @Html.TextBoxFor(m => m.CustomsDuty, new { @ng_model = "CustomsDuty" })
+                        </ul>
+                    </div>
+
+
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Supplier Name</label></li>
+                            <li class="width-90">
+                                @Html.DropDownListFor(m => m.SupplierNameId, MMS.Web.ExtensionMethod.HtmlHelper.SupplierName(), new { Style = "width:160px;" })</li>
+                             
+                            <li class="width-150">
+                                <label class="init-lable">Grn Type</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.GrnType, new { @ng_model = "GrnType" })
+                            </li>
+
+                            <li class="width-90">
+                                <label>Pack & Forward</label></li>
+                            <li class="width-90">
+                            @Html.TextBoxFor(m => m.Pack_Forward, new { @ng_model = "Pack_Forward" })
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Dc No</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.DC_No, new { @ng_model = "DC_No",  @onkeypress = "return isNumberKey(event)"  })</li>
+
+                            <li class="width-150">
+                                <label class="init-lable">ST / VAT Credit</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.ST_VATcredit, new { @ng_model = "ST_VATcredit",  @onkeypress = "return isNumberKey(event)"  })
+                            </li>
+
+                            <li class="width-90">
+                                <label>Service Tax %</label></li>
+                            <li class="width-90">
+                            @Html.TextBoxFor(m => m.ServiceTax, new { @ng_model = "ServiceTax",  @onkeypress = "return isNumberKey(event)"  })
+                        </ul>
+                    </div>
+
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Dc Date</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.DCDate, new { @ng_model = "DCDate", @readonly = true })</li>
+
+                            <li class="width-150">
+                                <label>BENo</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.BENo, new { @ng_model = "BENo",  @onkeypress = "return isNumberKey(event)"  })</li>
+
+                            <li class="width-90">
+                                <label class="init-lable">Import Clearance</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.ImportClearance, new { @ng_model = "ImportClearance" })
+                            </li>
+
+                        </ul>
+                    </div>
+
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Invoice No.</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.INVoiceNo, new { @ng_model = "INVoiceNo",  @onkeypress = "return isNumberKey(event)"  })</li>
+
+                            <li class="width-150">
+                                <label class="init-lable">Exchange Rate</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.ExchangeRate, new { @ng_model = "ExchangeRate",  @onkeypress = "return isNumberKey(event)"  })
+                            </li>
+
+                            <li class="width-90">
+                                <label>Transporter</label></li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.Transporter, new { @ng_model = "Transporter",  @onkeypress = "return isNumberKey(event)"  })</li>
+                        </ul>
+                    </div>
+
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Invoice Date.</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.INVoiceDate, new { @ng_model = "INVoiceDate", @readonly = true })</li>
+
+                            <li class="width-150">
+                                <label class="init-lable">Shipment Mode</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.ShipmentMode, new { @ng_model = "ShipmentMode" })
+                            </li>
+                            <li class="width-90">
+                                <label>Other Charges</label></li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.OtherCharges, new { @ng_model = "OtherCharges",  @onkeypress = "return isNumberKey(event)"  })</li>
+
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">General Remarks</label></li>
+                            <li class="width-90">
+                            @Html.TextAreaFor(m => m.GeneralRemarks, new { @ng_model = "GeneralRemarks" })
+                        </ul>
+                    </div>
+                </div>
+
+
+                <div id="div_show2" class="purchase-order-section">
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">PO No</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.PoNO, new { @ng_model = "PoNO",  @onkeypress = "return isNumberKey(event)"  })</li>
+
+                            <li class="width-150">
+                                <label class="init-lable">LOT No</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.LOTNo, new { @ng_model = "LOTNo",  @onkeypress = "return isNumberKey(event)"  })
+                            </li>
+
+                            <li class="width-90">
+                                <label>Indent No</label></li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.IndentNo, new { @ng_model = "IndentNo",  @onkeypress = "return isNumberKey(event)"  })</li>
+
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Group</label></li>
+                            <li class="width-90">
+                                @Html.DropDownListFor(m => m.GroupID, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @ng_model = "GroupID" })</li>
+                            <li class="width-150">
+                                <label>Io No</label></li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.IONo, new { @ng_model = "IONo",  @onkeypress = "return isNumberKey(event)"  })</li>
+                            <li class="width-90">
+                                <label>Qty Excess Io No</label></li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.QtyExcess, new { @ng_model = "QtyExcess" })</li>
+                        </ul>
+                    </div>
+
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Stores</label></li>
+                            <li class="width-90">
+                                @Html.DropDownListFor(m => m.Stores, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @ng_model = "Stores" })</li>
+                            <li class="width-150">
+                                <label>Material</label></li>
+                            <li class="width-90">@Html.DropDownListFor(m => m.MaterialId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialName(), new { Style = "width:160px;", @ng_model = "MaterialId" })
+                            </li>
+
+
+
+                            <li class="width-90">
+                                <label class="init-lable">Grade</label>
+                            </li>
+                            <li class="width-90">
+                            
+                            </li>
+
+
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Colour</label></li>
+                            <li class="width-90">@Html.DropDownListFor(m => m.ColourId, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { Style = "width:160px;", @ng_model = "ColourId" })</li>
+
+                            <li class="width-150">
+                                <label class="init-lable">Substance</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.Substance, new { @ng_model = "Substance" })
+                            </li>
+
+                            <li class="width-90">
+                                <label>Qty As Per DC</label></li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.QtyAsPerDc, new { @ng_model = "QtyAsPerDc",  @onkeypress = "return isNumberKey(event)"  }) </li>
+
+                        </ul>
+                    </div>
+
+
+
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">UOM</label></li>
+                            <li class="width-90">@Html.DropDownListFor(m => m.UOMId, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @ng_model = "UOMId" })</li>
+
+                            <li class="width-150">
+                                <label>Weight</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.Weight, new { @ng_model = "Weight",  @onkeypress = "return isNumberKey(event)"  })
+                            </li>
+
+                            <li class="width-90">
+                                <label>Received Qty</label></li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.ReceivedQty, new { @ng_model = "ReceivedQty",  @onkeypress = "return isNumberKey(event)"  }) </li>
+
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">DOM</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.DOM, new { @ng_model = "DOM", @readonly = true })</li>
+
+                            <li class="width-150">
+                                <label class="init-lable">Rejected Qty</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.RejectedQty, new { @ng_model = "RejectedQty",  @onkeypress = "return isNumberKey(event)"  })
+                            </li>
+
+                            <li class="width-90">
+                                <label class="init-lable">Accepted Qty</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.AcceptedQty, new { @ng_model = "AcceptedQty",  @onkeypress = "return isNumberKey(event)"  })
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Store Location</label></li>
+                            <li class="width-90">@Html.DropDownListFor(m => m.StoreLocation, MMS.Web.ExtensionMethod.HtmlHelper.StoreLocation(), new { @ng_model = "StoreLocation" })</li>
+
+
+                            <li class="width-150">
+                                <label>Category</label></li>
+                            <li class="width-90">
+                                @Html.DropDownListFor(m => m.CategoryId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @ng_model = "CategoryId" })</li>
+
+                            <li class="width-90">
+                                <label>If Group Is Maintenance</label></li>
+                            <li class="width-90">
+                                @Html.DropDownListFor(m => m.IfGroupIsMaintenance, MMS.Web.ExtensionMethod.HtmlHelper.MachineName(), new { @ng_model = "IfGroupIsMaintenance" })</li>
+
+
+
+                        </ul>
+                    </div>
+
+                    <div class="purchase-order-row">
+                        <ul>
+
+                            <li>
+                                <label class="init-lable">Pending Qty</label></li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.PendingQty, new { @ng_model = "PendingQty",  @onkeypress = "return isNumberKey(event)"  }) </li>
+
+                            <li class="width-150">
+                                <label class="init-lable">Display Selected Material of PO</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.CheckBoxFor(m => m.Disp_SelectedMatOfPO, new { @ng_model = "Disp_SelectedMatOfPO" })
+                            </li>
+                            <li class="width-90">
+                                <label>Excess Approval</label></li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.ExcessApproval, new { @ng_model = "ExcessApproval" })</li>
+
+                        </ul>
+                    </div>
+
+
+                </div>
+
+
+                <div id="div_show3" class="purchase-order-section">
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Remarks</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.Remarks, new { @ng_model = "Remarks" })</li>
+                            <li class="width-150">
+                                <label>MRP Price</label></li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.MRPPrice, new { @ng_model = "MRPPrice",  @onkeypress = "return isNumberKey(event)"  })</li>
+
+                            <li class="width-90">
+                                <label>Accessible Value</label></li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.AccessibleValue, new { @ng_model = "AccessibleValue",  @onkeypress = "return isNumberKey(event)"  })</li>
+
+                        </ul>
+                    </div>
+
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Rate</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.Rate, new { @ng_model = "Rate",  @onkeypress = "return isNumberKey(event)"  })</li>
+
+                            <li class="width-150">
+                                <label class="init-lable">Value</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.Value, new { @ng_model = "Value",  @onkeypress = "return isNumberKey(event)"  })
+                            </li>
+
+                            <li class="width-90">
+                                <label>MRP Margin %</label></li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.MRPMargin, new { @ng_model = "MRPMargin",  @onkeypress = "return isNumberKey(event)"  }) </li>
+
+                        </ul>
+                    </div>
+
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Discount %</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.Discount_Per, new { @ng_model = "Discount_Per",  @onkeypress = "return isNumberKey(event)"  })@Html.TextBoxFor(m => m.Discount_Val, new { @ng_model = "Discount_Val",  @onkeypress = "return isNumberKey(event)"  })</li>
+
+                            <li class="width-150">
+                                <label class="init-lable">E CESS</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.Ecess_Per, new { @ng_model = "Ecess_Per",  @onkeypress = "return isNumberKey(event)"  })   @Html.TextBoxFor(m => m.Ecess_Val, new { @ng_model = "Ecess_Val",  @onkeypress = "return isNumberKey(event)"  })
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Excise Duty %</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.ExciseDuty_Per, new { @ng_model = "ExciseDuty_Per",  @onkeypress = "return isNumberKey(event)"  })@Html.TextBoxFor(m => m.ExciseDuty_Val, new { @ng_model = "ExciseDuty_Val",  @onkeypress = "return isNumberKey(event)"  })</li>
+
+                            <li class="width-150">
+                                <label class="init-lable">SH ECESS</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.SH_Ecess_Per, new { @ng_model = "SH_Ecess_Per",  @onkeypress = "return isNumberKey(event)"  })   @Html.TextBoxFor(m => m.SH_Ecess_Val, new { @ng_model = "SH_Ecess_Val",  @onkeypress = "return isNumberKey(event)"  })
+                            </li>
+
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">ST/VAT/CST %</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.ST_VAT_CST_Per, new { @ng_model = "ST_VAT_CST_Per",  @onkeypress = "return isNumberKey(event)"  })@Html.TextBoxFor(m => m.ST_VAT_CST_Val, new { @ng_model = "ST_VAT_CST_Val",  @onkeypress = "return isNumberKey(event)"  })</li>
+                            <li class="width-150">
+                                <label class="init-lable">Surchage</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.Surcharge_Per, new { @ng_model = "Surcharge_Per",  @onkeypress = "return isNumberKey(event)"  })   @Html.TextBoxFor(m => m.Surcharge_Val, new { @ng_model = "Surcharge_Val",  @onkeypress = "return isNumberKey(event)"  })
+                            </li>
+                        </ul>
+                    </div>
+
+
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Tags Pieces Discount %</label></li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.TagsPiecesDiscount_Per, new { @ng_model = "TagsPiecesDiscount_Per",  @onkeypress = "return isNumberKey(event)"  }) @Html.TextBoxFor(m => m.TagsPiecesDiscount_Val, new { @ng_model = "TagsPiecesDiscount_Val",  @onkeypress = "return isNumberKey(event)"  })</li>
+                            <li class="width-150">
+                                <label>Display All PO based on Selected Material</label>
+                            </li>
+                            <li class="width-150">
+                                @Html.CheckBoxFor(m => m.Disp_AllPOBasedOnSelecMat, new { @ng_model = "Disp_AllPOBasedOnSelecMat" })
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Display All Material of PO. </label>
+                            </li>
+                            <li class="width-90">
+                                @Html.CheckBoxFor(m => m.Disp_AllMatOfPO, new { @ng_model = "Disp_AllMatOfPO" })
+                            </li>
+
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+ 
+<script>
+    function isNumberKey(evt) {
+
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode != 46 && charCode > 31
+          && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+</script>

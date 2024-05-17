@@ -1,0 +1,142 @@
+﻿@{
+    ViewBag.Title = "Registration";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    function Register() {
+        var sEmail = $('#Email').val();
+        if ($('#FirstName').val() == "") {
+            alert("Enter FirstName.")
+            return false;
+        }
+        if ($('#Email').val() == "") {
+            alert("Enter Email Address.");
+            return false;
+        }
+        if ($('#Password').val() == "") {
+            alert("Enter Password.")
+            return false;
+        }
+        if ($('#UserType').val() == "") {
+            alert("Select User Type.")
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Registration", "Accounts")',
+            data: {
+                Email: $('#Email').val(),
+                Password: $('#Password').val(),
+                UserType: $('#UserType').val(),
+                FirstName: $('#FirstName').val(),
+                LastName: $('#LastName').val()
+            },
+            dataType: "json",
+            success: function (user) {
+                if (user.EmailExist == true) {
+                    alert('This Email Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('User details saved successfully.');
+                    location.href = "/Accounts/Login";
+                }
+
+            },
+            error: function (ex) {
+                alert('This Email Already Exist in the database.');
+                return false;
+            }
+        });
+
+    }
+    function Cancel() {
+        location.href = "Login";
+    }
+
+</script>
+<style>
+    .text-field1 {
+        width: 100%;
+        padding: 0;
+        background: #fff;
+        height: 32px;
+        float: left;
+        border: 2px solid #dedede;
+        box-shadow: none;
+        -moz-box-shadow: none;
+        -webkit-box-shadow: none;
+        border-radius: 0px;
+        -moz-border-radius: 0px;
+        -webkit-border-radius: 0px;
+        margin-bottom: 10px;
+    }
+
+        .text-field1 input {
+            width: 100%;
+            border: none;
+            padding: 3px 10px;
+        }
+</style>
+<h2 class="content-title col-xs-12" style="margin-bottom:20px;margin-top:20px;"> Registration</h2>
+<div style="width:532px;margin:auto;">
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div class="mCustomScrollbar col-xs-12">
+        <div class="col-sm-6 col-xs-12">
+            <div class="text-field1">
+                <input type="text" id="FirstName" placeholder="First Name">
+            </div>
+        </div>
+        <div class="col-sm-6 col-xs-12">
+            <div class="text-field1">
+                <input type="text" id="LastName" class="last-name" placeholder="Last Name">
+            </div>
+        </div>
+        <div class="col-sm-6 col-xs-12">
+            <div class="text-field1">
+                <input type="text" id="Email" placeholder="Enter Email">
+            </div>
+        </div>
+        <div class="col-sm-6 col-xs-12">
+            <div class="text-field1">
+                <input type="password" id="Password" placeholder="Enter Password">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="select-field">
+                @Html.DropDownList("UserType", MMS.Web.ExtensionMethod.HtmlHelper.UserTypeName(), new { @class = "select-style text-field" })
+             
+            </div>
+        </div>
+        <div class="col-sm-6 col-xs-12">
+            <div class="submit-button register-footer">
+                <input class="cancel_btn" type="button" value="CANCEL" onclick="Cancel()">
+
+            </div>
+        </div>
+        <div class="col-sm-6 col-xs-12">
+            <div class="submit-button register-footer">
+
+                <input class="submit_btn" type="button" value="REGISTER" onclick="Register()" style="float:right;">
+            </div>
+        </div>
+    </div>
+</div>
+

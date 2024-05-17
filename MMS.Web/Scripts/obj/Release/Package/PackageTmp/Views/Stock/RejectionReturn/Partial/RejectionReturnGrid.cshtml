@@ -1,0 +1,241 @@
+﻿@model MMS.Web.Models.StockModel.RejectionReturnModel
+@using MMS.Core.Entities.Stock;
+@using MMS.Core.Entities;
+@{
+    MMS.Repository.Managers.MaterialGroupManager materialGroupManager = new MMS.Repository.Managers.MaterialGroupManager();
+    MaterialGroupMaster_ materialGroupMaster_ = new MaterialGroupMaster_();
+    MMS.Repository.Managers.MaterialManager materialManager = new MMS.Repository.Managers.MaterialManager();
+    MaterialMaster materialMaster = new MaterialMaster();
+    MMS.Repository.Managers.ColorManager colorManager = new MMS.Repository.Managers.ColorManager();
+    ColorMaster colorMaster = new ColorMaster();
+    MMS.Repository.Managers.UOMManager uOMManager = new MMS.Repository.Managers.UOMManager();
+    UomMaster uomMaster = new UomMaster();
+
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Rejection Return Form", PermissionSettingModel.PermissionID);
+
+    bool Add = false; bool Edit = false; bool Delete = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Add")
+        {
+            Add = true;
+        }
+        if (item.PermissionDesc == "Edit")
+        {
+            Edit = true;
+        }
+        if (item.PermissionDesc == "Delete")
+        {
+            Delete = true;
+        }
+    }
+}
+
+<div class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+
+        <table class="veh-table" id="empTable">
+            <thead>
+                <tr class="color-code-top-btn">
+                    <td colspan="9">
+                        <input type="text" id="SeaarchID" placeholder="Search.." />
+                    
+                        @if (Add == true)
+                        {
+                            <input type="button" value="Add" onclick="Add()">
+                        }
+                        else
+                        {
+                            <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Add">
+                        }
+                        <input type="button" value="Search" onclick="Search()"></td>
+                </tr>
+                <tr>
+                    <th class="veh-1">Si.NO
+                    </th>
+                    <th class="veh-1">Grn No
+                    </th>
+                    <th class="veh-1">Po No
+                    </th>
+                    <th class="veh-1">Group
+                    </th>
+                    <th class="veh-1">Material 
+                    </th>
+                    <th class="veh-1">Colour
+                    </th>
+                    <th class="veh-1">Uom
+                    </th>
+                    <th class="veh-1">Quantity
+                    </th>
+                    <th class="veh-4">Edit/Delete
+                    </th>
+
+                </tr>
+            </thead>
+            @if (Model.RejectionReturnSupList.Count > 0 && Model.RejectionReturnSupList != null )
+            {
+                int count = 1;
+                <tbody>
+
+                    @foreach (var RejectionReturn in Model.RejectionReturnSupList)
+                    {
+                        materialGroupMaster_ = materialGroupManager.GetMaterialGroupMaster_Id(RejectionReturn.MaterialGroupId);
+                        materialMaster = materialManager.GetMaterialMasterId(RejectionReturn.MaterialMasterId);
+                        colorMaster = colorManager.GetColorMasterID(RejectionReturn.ColourMasterId);
+                        uomMaster = uOMManager.GetUomMasterId(RejectionReturn.Uom);
+                        <tr>
+                            <td class="veh-1" onclick="">@count</td>
+                            <td class="veh-1" onclick="">@RejectionReturn.GrnNo</td>
+                            <td class="veh-1" onclick="">@RejectionReturn.PoNo</td>
+                            <td class="veh-1" onclick="">@materialGroupMaster_.GroupName</td>
+                            <td class="veh-1" onclick="">@RejectionReturn.MaterialMasterId</td>
+                            <td class="veh-1" onclick="">@colorMaster.Color</td>
+                            <td class="veh-1" onclick="">@uomMaster.LongUnitName</td>
+                            <td class="veh-1" onclick="">@RejectionReturn.Quantity</td>
+                           
+                            <td class="veh-1 edit-del-wrap">
+                                @if (Edit == true)
+                                {
+                                    <a href="javascript:void(0)" onclick="Edit('@RejectionReturn.RejectionReturnId')" class="watchlist-edit" title="Edit"></a>
+                                }
+                                else
+                                {
+                                    <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-edit" title="Edit"></a>
+                                }
+                                @if (Delete == true)
+                                {
+                                    <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@RejectionReturn.RejectionReturnId')" class="watchlist-delete" title="Delete"></a>
+                                }
+                                else
+                                {
+                                    <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-delete" title="Delete"></a>
+                                }
+                            </td>
+                        </tr>
+                        count++;
+                    }
+
+
+                </tbody>
+                <tfoot class="footer-pager">
+                    <tr>
+                        <td colspan="4">
+                            <div id="pager">
+                                <form>
+                                    <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                    <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                    <input type="text" class="pagedisplay" />
+                                    <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                    <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                    <select class="pagesize">
+                                        <option selected="selected" value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="40">40</option>
+                                    </select>
+                                </form>
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                </tfoot>
+                
+            }
+            else
+            {
+                <li style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</li>
+            }
+        </table>
+
+    </div>
+
+    <div id="EditColorPartial">
+       @Html.Partial("~/Views/Stock/RejectionReturn/Partial/RejectionReturnDetails.cshtml", Model)
+    </div>
+
+
+</div>
+
+ <script>
+     function Search() {
+         $.ajax({
+             type: "POST",
+             url: ' @Url.Action("Search", "RejectionReturn")',
+            data: { filter: $('#SeaarchID').val() },
+            success: function (data) {
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                $('#DivShow').hide();
+                $('#EditColorPartial').hide();
+            }
+        });
+    }
+    
+    function Cancel() {
+        //$('#EditColorPartial').hide()
+        location.reload();
+    }
+    function Add() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("RejectionReturnDetails", "RejectionReturn")',
+            data: { RejectionReturnId: 0 },
+            success: function (data) {
+                $('.veh-tablecont').hide();
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+
+    }
+    function Edit(arg) {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("RejectionReturnDetails", "RejectionReturn")',
+            data: { RejectionReturnId: arg },
+            success: function (data) {
+                $('.veh-tablecont').hide();
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "RejectionReturn")',
+                data: { RejectionReturnId: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/RejectionReturn/RejectionReturnForm/";
+                        return false;
+                    }
+                    else {
+                        alert('Color Details deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+
+</script>

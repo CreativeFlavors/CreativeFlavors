@@ -1,0 +1,161 @@
+﻿@{
+    ViewBag.Title = "BOEMaster";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+}
+
+
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+    });
+    function Save() {
+        if ($('#CountryStamp').val() == "") {
+            alert("Please Enter Country Stamp.")
+            $('#CountryStamp').css('border-color', 'red');
+            $('#CountryStamp').focus();
+            return false;
+        }
+        else {
+            $('#CountryStamp').css('border-color', '');
+        }
+        if ($('#ShipmentFrom').val() == "") {
+            alert("Please Enter Shipment From.")
+            $('#ShipmentFrom').css('border-color', 'red');
+            $('#ShipmentFrom').focus();
+            return false;
+        }
+        else {
+            $('#ShipmentFrom').css('border-color', '');
+        }
+        if ($('#ShipmentTo').val() == "") {
+            alert("Please Enter Shipment To.")
+            $('#ShipmentTo').css('border-color', 'red');
+            $('#ShipmentTo').focus();
+            return false;
+        }
+        else {
+            $('#ShipmentTo').css('border-color', '');
+        }
+        if ($('#OtherInstructionFromBuyer').val() == "") {
+            alert("Please Enter Other Instruction From Buyer.")
+            $('#OtherInstructionFromBuyer').css('border-color', 'red');
+            $('#OtherInstructionFromBuyer').focus();
+            return false;
+        }
+        else {
+            $('#OtherInstructionFromBuyer').css('border-color', '');
+        }
+           
+        
+        $.ajax({
+            type: 'POST',
+            url: '/BOEShipment/BOEMaster',
+            data: {
+                CountryStamp: $('#CountryStamp').val(),
+                ShipmentFrom: $('#ShipmentFrom').val(),
+                ShipmentTo: $('#ShipmentTo').val(),
+                OtherInstructionFromBuyer: $('#OtherInstructionFromBuyer').val(),                            
+            },
+                
+            success: function (data) {
+               
+                if (data.BOEId != "" || data.BOEId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/BOEShipment/BOEMaster";
+                    return false;
+                }
+                else {
+                    alert('Already Exist in the database.');
+                    location.href = "/BOEShipment/BOEMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#CountryStamp').val() == "") {
+            alert("Please Enter Country Stamp.")
+            $('#CountryStamp').css('border-color', 'red');
+            $('#CountryStamp').focus();
+            return false;
+        }
+        else {
+            $('#CountryStamp').css('border-color', '');
+        }
+        if ($('#ShipmentFrom').val() == "") {
+            alert("Please Enter Shipment From.")
+            $('#ShipmentFrom').css('border-color', 'red');
+            $('#ShipmentFrom').focus();
+            return false;
+        }
+        else {
+            $('#ShipmentFrom').css('border-color', '');
+        }
+        if ($('#ShipmentTo').val() == "") {
+            alert("Please Enter Shipment To.")
+            $('#ShipmentTo').css('border-color', 'red');
+            $('#ShipmentTo').focus();
+            return false;
+        }
+        else {
+            $('#ShipmentTo').css('border-color', '');
+        }
+        if ($('#OtherInstructionFromBuyer').val() == "") {
+            alert("Please Enter Other Instruction From Buyer.")
+            $('#OtherInstructionFromBuyer').css('border-color', 'red');
+            $('#OtherInstructionFromBuyer').focus();
+            return false;
+        }
+        else {
+            $('#OtherInstructionFromBuyer').css('border-color', '');
+        }
+
+
+
+            $.ajax({
+                type: 'POST',
+                url: '/BOEShipment/Update',
+                data: {
+                    CountryStamp: $('#CountryStamp').val(),
+                    ShipmentFrom: $('#ShipmentFrom').val(),
+                    ShipmentTo: $('#ShipmentTo').val(),
+                    OtherInstructionFromBuyer: $('#OtherInstructionFromBuyer').val(),                      
+                    BOEId: $('#BOEId').val()
+                },
+                success: function (data) {
+                    if (data.BOEId != "" || data.BOEId != 0) {
+                        alert('Updated Successfully.');
+                        location.href = "/BOEShipment/BOEMaster";
+                        return false;
+                    }
+                    else {
+                        alert('Updation failed.');
+                        location.href = "/BOEShipment/BOEMaster";
+                        return false;
+                    }
+
+                },
+                error: function (ex) {
+                    alert('Already Exist in the database.');
+                }
+            });
+        }
+     
+</script>
+<h2 class="content-title">BOE Shipment Details</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("BOEMasterGrid","BOEShipment")
+    </div>
+</div>

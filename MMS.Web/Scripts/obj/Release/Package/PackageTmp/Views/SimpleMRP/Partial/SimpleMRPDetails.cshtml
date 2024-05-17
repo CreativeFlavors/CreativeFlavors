@@ -1,0 +1,330 @@
+﻿@model MMS.Web.Models.SimpleMRPModel.SimpleMRPModel
+@using MMS.Repository.Managers
+@using MMS.Core.Entities
+@{
+
+}
+
+<link href="~/Content/css/style.css" rel="stylesheet" />
+<script src="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.js"></script>
+<link href="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.css" rel="stylesheet" />
+
+@*<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>*@
+@*<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>*@
+
+@using (Html.BeginForm("Importexcel", "SimpleMRP", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken();;
+    <div style="float:left;width:100%;background-color:#eaf1f7 ">
+    <div class="col-xs-12">
+        <div class="row">
+            <div class="col-xs-3">
+                <div class="checkbox chk-lbl">
+                    <label>@Html.CheckBoxFor(m => m.ProductionPlanBasic) Production Plan Basis</label>
+                </div>
+            </div>
+            <div class="col-xs-3">
+                <div class="checkbox chk-lbl">
+                    <label>@Html.CheckBoxFor(m => m.OrderBasic) Order Basis</label>
+                </div>
+            </div>
+            <div class="col-xs-3">
+                <div class="checkbox chk-lbl">
+                    <label>@Html.CheckBoxFor(m => m.RejectionorReplacement) Rejection / Replacement</label>
+                </div>
+            </div>
+            <div class="col-xs-3">
+                <div class="checkbox chk-lbl">
+                    <label>@Html.CheckBoxFor(m => m.OverConsumption) Over Consumption</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-xs-12">
+        <div class="col-xs-3 input-block">
+            <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                <div class="form-label1">
+                    <h2>MRP No:</h2>
+                </div>
+            </div>
+            <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                @Html.HiddenFor(x => x.SimpleMRPID)
+                @Html.TextBoxFor(m => m.MRPCode, new { @class = "form-control text-field" })
+                @Html.ValidationMessageFor(m => m.MRPNO)
+            </div>
+        </div>
+        <div class="col-xs-3 input-block">
+            <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                <div class="form-label1">
+                    <h2>Date</h2>
+                </div>
+            </div>
+            <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                @Html.TextBoxFor(m => m.MRPDate, new { @class = "form-control text-field" })
+            </div>
+        </div>
+        <div class="col-xs-3 input-block">
+            <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                <div class="form-label1">
+                    <h2>MRP Type</h2>
+                </div>
+            </div>
+            <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                @Html.DropDownListFor(m => m.MRPType, new SelectList(
+               new List<Object>{
+                      new { value = 0 , text = "Please Select"  },
+                       new { value = 1 , text = "Purchase"  },
+                       new { value = 2 , text = "Enco" }
+
+                 },
+               "value",
+               "text",
+                0), new { @class = "select-style text-field " })
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-12">
+        <div class="col-xs-3 input-block">
+            <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                <div class="form-label1">
+                    <h2>Buyer</h2>
+
+                </div>
+            </div>
+            <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                @Html.DropDownListFor(m => m.BuyerNameid, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field" })
+            </div>
+        </div>
+        <div class="col-xs-3 input-block">
+            <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                <div class="form-label1">
+                    <h2>Week No</h2>
+                </div>
+            </div>
+            <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                @Html.DropDownListFor(m => m.WeekNO, MMS.Web.ExtensionMethod.HtmlHelper.WeekNo(), new { @class = "select-style text-field" })
+            </div>
+        </div>
+        <div class="col-xs-3 input-block">
+            <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                <div class="form-label1">
+                    <h2>Season</h2>
+                </div>
+            </div>
+            <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                @Html.DropDownListFor(m => m.SeasonID, MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "select-style text-field" })
+            </div>
+        </div>
+        <div class="col-xs-3 input-block">
+            <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                <div class="form-label1">
+                    <h2>Lot No</h2>
+                </div>
+            </div>
+            <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                @Html.DropDownListFor(m => m.LotNO, MMS.Web.ExtensionMethod.HtmlHelper.LOtNo(), new { @class = "select-style text-field" })
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-12">
+        <div class="col-xs-3 input-block">
+            <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                <div class="form-label1">
+                    <h2>Size Range</h2>
+                </div>
+            </div>
+            <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                @Html.DropDownListFor(m => m.SizeRangeID, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "select-style text-field" })
+            </div>
+        </div>
+        <div class="col-xs-3 input-block">
+            <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                <div class="form-label1 form-label2">
+                    <h2 class="text-center">From:</h2>
+                </div>
+            </div>
+            <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                @Html.TextBoxFor(m => m.From, new { @class = "form-control text-field" })
+            </div>
+        </div>
+        <div class="col-xs-3 input-block">
+            <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                <div class="form-label1 form-label2">
+                    <h2 class="text-center">To</h2>
+                </div>
+            </div>
+            <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                @Html.TextBoxFor(m => m.TO, new { @class = "form-control text-field"})
+            </div>
+        </div>
+        <div class="col-xs-3 input-block">
+            <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                <div class="form-label1">
+                    <h2>Cust. Plan</h2>
+                </div>
+            </div>
+            <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                @Html.DropDownListFor(m => m.CustomerPlan, new SelectList(new List<Object>{new { value = 1 , text = "As Planned" },
+                                                                                    new { value = 2 , text = "Scheduled" } }, "value", "text"), "Please Select",
+                                                                                 new { @class = "select-style text-field" })
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12   col-sm-10  choose-mtp">
+        <div class="col-lg-3 col-sm-3">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="form-label1">
+                        <h2>Display IO's</h2>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="file" id="dataFile" name="upload" />
+                    <br />
+                    <span id="lblError" style="color: red;"></span>
+                    <br />
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Upload" onclick="return ValidateExtension()" class="btn btn-default btn-style" />
+
+
+                </div>
+                @*<div class="col-xs-12">
+                        <button type="button" style="margin-top: 65px;">Import IO's</button>
+                    </div>*@
+            </div>
+        </div>
+        <div class="col-lg-6 col-sm-9">
+            <div class="row">
+                <div class="col-xs-5">
+                    @if (Model != null && Model.IOS != null)
+                    {
+                    @Html.ListBoxFor(model => model.SelectedCities, new MultiSelectList(Model.IOS, "Value", "Text"), new { size = "10",@style= "width: 125px;" })
+                    }
+                    else
+                    {
+                        @Html.ListBoxFor(m => m.MoveSelectedIOS, Model.selectlist ?? new List<SelectListItem>())
+                    }
+
+                </div>
+                <div class="col-xs-2">
+                    <input id="btnAddAll" type="button" value=">>" onclick="addallItems();" />
+                    <input id="btnAdd" type="button" value=">" onclick="addItem();" />
+                    <input id="btnRemove" type="button" value="<" onclick="removeItem();" />
+                    <input id="btnRemoveAll" type="button" value="<<" onclick="removeallItems();" />
+                </div>
+                <div class="col-xs-5" id="SelectedItems">
+                    @if (Model != null && Model.IOS != null&&Model.selectlist!=null)
+                    {
+                    @Html.ListBoxFor(model => model.MoveSelectedIOS, new MultiSelectList(Model.selectlist, "Value", "Text"), new { @class = "SelectedValue", size = "10", @style = "width: 125px;" })
+                    }
+                    else
+                    {
+                       @Html.ListBoxFor(m => m.MoveSelectedIOS, Model.selectlist ?? new List<SelectListItem>())
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="form-footer">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                    <input type="button" onclick="Cancel()" style="cursor: pointer;" title="Back" value="Back" class="btn btn-default btn-style">
+                    @if (Model != null && Model.SimpleMRPID != 0)
+                {
+                    <input type="button" onclick="Save()" class="btn btn-default btn-style" id="CountryMasterId" title="Update" value="Update">
+                    }
+                    else
+                    {
+                    <input type="button" id="Btnsave" onclick="Save()" class="btn btn-default btn-style" title="Save" value="Save">
+                    }
+                    <button class="btn btn-default btn-style" type="submit">Clear</button>
+                    @if (Model != null && Model.IOS != null)
+                    {
+                    <input type="button" id="BtnCalculte" onclick="Calculate()" class="btn btn-default btn-style" style="cursor:pointer;" title="Calculate" value="Calculate">
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    </div>
+}
+<script type="text/javascript">
+    //$('.table-responsive').hide();
+    // $(document).ready(function () {
+    $("#MRPDate").datepicker({ dateFormat: "dd/mm/yy" });
+    $("#From").datepicker({ dateFormat: "dd/mm/yy" });
+    $("#TO").datepicker({ dateFormat: "dd/mm/yy" });
+    // });
+
+    function ValidateExtension() {
+        var allowedFiles = [".xls", ".xlsx", ".ods"];
+        var fileUpload = document.getElementById("dataFile");
+        var lblError = document.getElementById("lblError");
+        var regex = new RegExp("([a-zA-Z0-9\s_\\.\-:])+(" + allowedFiles.join('|') + ")$");
+        if (!regex.test(fileUpload.value.toLowerCase())) {
+            lblError.innerHTML = "Please upload files having extensions: <b>" + allowedFiles.join(', ') + "</b> only.";
+            return false;
+        }
+        lblError.innerHTML = "";
+        return true;
+    }
+
+
+    function addItem() {
+        $("#SelectedCities option:selected").appendTo("#MoveSelectedIOS");
+        $("#MoveSelectedIOS option").attr("selected", false);
+    }
+    function addallItems() {
+        $("#SelectedCities option").appendTo("#MoveSelectedIOS");
+        $("#MoveSelectedIOS option").attr("selected", false);
+    }
+    function removeItem() {
+        $("#MoveSelectedIOS option:selected").appendTo("#SelectedCities");
+        $("#SelectedCities option").attr("selected", false);
+    }
+    function removeallItems() {
+        $("#MoveSelectedIOS option").appendTo("#SelectedCities");
+        $("#SelectedCities option").attr("selected", false);
+    }
+    function Calculate() {
+        var optionValues = [];
+        $('#MoveSelectedIOS option').each(function () {
+            optionValues.push($(this).text());
+        });
+        var ParseText = JSON.stringify(optionValues);
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("IOSelectList", "SimpleMRP")',
+            data: { SelectText: ParseText, SimpleMRPID: $('#SimpleMRPID').val() },
+            success: function (data) {
+                //console.log(data);
+                //$('#DivShow').hide();
+                alert(data);
+                if (data != null) {
+                    alert(Message);
+                    return false;
+                }
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                $('#DivShow').hide();
+                $('#EditColorPartial').hide();
+            }
+        });
+    }
+</script>
+<script src="~/Scripts/jquery-1.9.1.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

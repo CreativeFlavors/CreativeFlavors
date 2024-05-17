@@ -1,0 +1,106 @@
+﻿@{
+    ViewBag.Title = "SizeMatching";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    
+    function AddUnits() {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("SizeMatchingDetails", "SizeMatching")',
+            data: { BasicUnitID: 0 },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+                $("#DivUnitConversion").hide();
+                $("#DivConversion").hide();
+                $("#DivConversionBtns").hide();
+                $("#DivUnits").show();
+            }
+        });
+      
+    }
+    function Save() {
+        if ($('#SizeMatchingName').val() == "") {
+            alert("Please Enter Size Matching Name.")
+            $('#SizeMatchingName').css('border-color', 'red');
+            $('#SizeMatchingName').focus();
+            return false;
+        }
+        else {
+            $('#SizeMatchingName').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/SizeMatching/SizeMatching',
+            data: {
+                SizeMatchingName: $('#SizeMatchingName').val(),
+                SizeMatchingCode: $('#SizeMatchingCode').val(),
+                SizeMatchingMasterID: $('#SizeMatchingMasterID').val()
+            },
+            success: function (data) {
+                if (data.SizeMatchingMasterID != "" && data.SizeMatchingMasterID != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/SizeMatching/SizeMatching";
+                    return false;
+                }
+                else if (data.SizeMatchingMasterID == 0 && data.SizeMatchingName != "")
+                {
+                    alert("Already exist in the database");
+                    return false;
+                }
+            }
+        });
+    }
+
+       
+
+    function Update() {
+    
+        if ($('#SizeMatchingName').val() == "") {
+            alert("Please Enter Size Matching Name.")
+                $('#SizeMatchingName').css('border-color', 'red');
+                $('#SizeMatchingName').focus();
+                return false;
+            }
+            else {
+            $('#SizeMatchingName').css('border-color', '');
+            }
+            
+            $.ajax({
+                type: 'POST',
+                url: '/SizeMatching/Update',
+                data: {
+                    SizeMatchingName: $('#SizeMatchingName').val(),
+                    SizeMatchingCode: $('#SizeMatchingCode').val(),
+                    SizeMatchingMasterID: $('#SizeMatchingMasterID').val()
+                },
+                success: function (data) {
+                    if (data.SizeMatchingMasterID != "" && data.SizeMatchingMasterID != 0) {
+                        alert('Updated Successfully.');
+                        location.href = "/SizeMatching/SizeMatching";
+                        return false;
+                    }
+                }
+            });
+        }
+</script>
+<h2 class="content-title">Size Matching </h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("SizeMatchingGrid", "SizeMatching")
+    </div>
+</div>

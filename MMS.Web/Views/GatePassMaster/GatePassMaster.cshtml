@@ -1,0 +1,402 @@
+﻿@{
+    ViewBag.Title = "GatePassMaster";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+<style>
+    .popup-wrap {
+    background: #eaf1f7  none repeat scroll 0 0;
+    border-radius: 6px;
+    box-shadow: 1px 1px 13px #858585;
+    left: 36%;
+    padding: 16px;
+    position: absolute;
+    top: 46%;
+    width: 408px !important;
+}
+</style>
+<script>
+   
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+
+        $("#EditColorPartial").hide();
+    });
+    function Save() {
+ 
+        if ($('#GatePassNo').val() == "") {
+            alert("Please Enter GatePass No.")
+            $('#GatePassNo').css('border-color', 'red');
+            $('#GatePassNo').focus();
+            return false;
+        }
+        else {
+            $('#GatePassNo').css('border-color', '');
+        }
+        var ret = null;
+        if ($('#return').is(":checked")) {
+            ret = true;
+        }
+        else {
+            ret = false;
+        }
+        if ($('#Date').val() == "") {
+            alert("Please Enter Date.")
+            $('#Date').css('border-color', 'red');
+            $('#Date').focus();
+            return false;
+        }
+        else {
+            $('#Date').css('border-color', '');
+        }
+        if ($('#PartyName').val() == "") {
+            alert("Please Enter PartyName.")
+            $('#PartyName').css('border-color', 'red');
+            $('#PartyName').focus();
+            return false;
+        }
+        else {
+            $('#PartyName').css('border-color', '');
+        }
+
+        if ($('#DeliveryAddress').val() == "") {
+            alert("Please Enter Delivery Address.")
+            $('#DeliveryAddress').css('border-color', 'red');
+            $('#DeliveryAddress').focus();
+            return false;
+        }
+        else {
+            $('#DeliveryAddress').css('border-color', '');
+        }
+
+        if ($('#Material').val() == "") {
+            alert("Please Enter MaterialName.")
+            $('#Material').css('border-color', 'red');
+            $('#Material').focus();
+            return false;
+        }
+        else {
+            $('#Material').css('border-color', '');
+        }
+
+        if ($('#PartyName').val() == "") {
+            alert("Please Enter Party Name.")
+            $('#PartyName').css('border-color', 'red');
+            $('#PartyName').focus();
+            return false;
+        }
+        else {
+            $('#PartyName').css('border-color', '');
+        }
+
+        if ($('#Quantity').val() == "") {
+            alert("Please Enter Quantity.")
+            $('#Quantity').css('border-color', 'red');
+            $('#Quantity').focus();
+            return false;
+        }
+        else {
+            $('#Quantity').css('border-color', '');
+        }
+
+        if ($('#UOM').val() == "") {
+            alert("Please Enter UOM.")
+            $('#UOM').css('border-color', 'red');
+            $('#UOM').focus();
+            return false;
+        }
+        else {
+            $('#UOM').css('border-color', '');
+        }
+
+        if ($('#Rate').val() == "") {
+            alert("Please Enter Rate.")
+            $('#Rate').css('border-color', 'red');
+            $('#Rate').focus();
+            return false;
+        }
+        else {
+            $('#Rate').css('border-color', '');
+        }
+        if ($('#Amount').val() == "") {
+            alert("Please Enter Amount.")
+            $('#Amount').css('border-color', 'red');
+            $('#Amount').focus();
+            return false;
+        }
+        else {
+            $('#Amount').css('border-color', '');
+        }
+        if ($('#IfReturnable').val() == "") {
+            alert("Please Enter If Returnable.")
+            $('#IfReturnable').css('border-color', 'red');
+            $('#IfReturnable').focus();
+            return false;
+        }
+        else {
+            $('#IfReturnable').css('border-color', '');
+        }
+        if ($('#Remarks').val() == "") {
+            alert("Please Enter Remarks.")
+            $('#Remarks').css('border-color', 'red');
+            $('#Remarks').focus();
+            return false;
+        }
+        else {
+            $('#Remarks').css('border-color', '');
+        }
+        var IsPrint  = null;
+        if ($('#IsPrintWithRateValue').is(":checked")) {
+            IsPrint = true;
+        }
+        else {
+            IsPrint = false;
+        }
+        
+        var IsPrintWithout = null;
+        if ($('#IsPrintWithoutCompanyAddress').is(":checked")) {
+            IsPrintWithout = true;
+        }
+        else {
+            IsPrintWithout = false;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/GatePassMaster/GatePassMaster',
+            data: {               
+                GatePassNo: $('#GatePassNo').val(),
+                IsReturnable: ret,
+                Date: $('#Date').val(),
+                IsSupplier: $('#IsSupplier').val(),
+                PartyName: $('#PartyName').val(),
+                DeliveryAddress: $('#DeliveryAddress').val(),
+                MaterialName: $('#MaterialName').val(),
+                Quantity: $('#Quantity').val(),
+                UOM: $('#UOM').val(),                
+                Rate: $('#Rate').val(),
+                Amount: $('#Amount').val(),
+                IfReturnable: $('#IfReturnable').val(),
+                Remarks: $('#Remarks').val(),
+                IsPrintWithRateValue:IsPrint,
+                IsPrintWithoutCompanyAddress: IsPrintWithout
+            },
+                
+            success: function (data) {             
+                if (data.GatePassId != "" || data.GatePassId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/GatePassMaster/GatePassMaster";
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/GatePassMaster/GatePassMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#GatePassNo').val() == "") {
+            alert("Please Enter GatePass No.")
+            $('#GatePassNo').css('border-color', 'red');
+            $('#GatePassNo').focus();
+            return false;
+        }
+        else {
+            $('#GatePassNo').css('border-color', '');
+        }
+        var ret = null;
+        if ($('#return').is(":checked")) {
+            ret = true;
+        }
+        else {
+            ret = false;
+        }
+        if ($('#Date').val() == "") {
+            alert("Please Enter Date.")
+            $('#Date').css('border-color', 'red');
+            $('#Date').focus();
+            return false;
+        }
+        else {
+            $('#Date').css('border-color', '');
+        }
+        if ($('#PartyName').val() == "") {
+            alert("Please Enter PartyName.")
+            $('#PartyName').css('border-color', 'red');
+            $('#PartyName').focus();
+            return false;
+        }
+        else {
+            $('#PartyName').css('border-color', '');
+        }
+
+        if ($('#DeliveryAddress').val() == "") {
+            alert("Please Enter Delivery Address.")
+            $('#DeliveryAddress').css('border-color', 'red');
+            $('#DeliveryAddress').focus();
+            return false;
+        }
+        else {
+            $('#DeliveryAddress').css('border-color', '');
+        }
+
+        if ($('#Material').val() == "") {
+            alert("Please Enter MaterialName.")
+            $('#Material').css('border-color', 'red');
+            $('#Material').focus();
+            return false;
+        }
+        else {
+            $('#Material').css('border-color', '');
+        }
+
+        if ($('#PartyName').val() == "") {
+            alert("Please Enter Party Name.")
+            $('#PartyName').css('border-color', 'red');
+            $('#PartyName').focus();
+            return false;
+        }
+        else {
+            $('#PartyName').css('border-color', '');
+        }
+
+        if ($('#Quantity').val() == "") {
+            alert("Please Enter Quantity.")
+            $('#Quantity').css('border-color', 'red');
+            $('#Quantity').focus();
+            return false;
+        }
+        else {
+            $('#Quantity').css('border-color', '');
+        }
+
+        if ($('#UOM').val() == "") {
+            alert("Please Enter UOM.")
+            $('#UOM').css('border-color', 'red');
+            $('#UOM').focus();
+            return false;
+        }
+        else {
+            $('#UOM').css('border-color', '');
+        }
+
+        if ($('#Rate').val() == "") {
+            alert("Please Enter Rate.")
+            $('#Rate').css('border-color', 'red');
+            $('#Rate').focus();
+            return false;
+        }
+        else {
+            $('#Rate').css('border-color', '');
+        }
+        if ($('#Amount').val() == "") {
+            alert("Please Enter Amount.")
+            $('#Amount').css('border-color', 'red');
+            $('#Amount').focus();
+            return false;
+        }
+        else {
+            $('#Amount').css('border-color', '');
+        }
+        if ($('#IfReturnable').val() == "") {
+            alert("Please Enter If Returnable.")
+            $('#IfReturnable').css('border-color', 'red');
+            $('#IfReturnable').focus();
+            return false;
+        }
+        else {
+            $('#IfReturnable').css('border-color', '');
+        }
+        if ($('#Remarks').val() == "") {
+            alert("Please Enter Remarks.")
+            $('#Remarks').css('border-color', 'red');
+            $('#Remarks').focus();
+            return false;
+        }
+        else {
+            $('#Remarks').css('border-color', '');
+        }
+        var IsPrint = null;
+        if ($('#IsPrintWithRateValue').is(":checked")) {
+            IsPrint = true;
+        }
+        else {
+            IsPrint = false;
+        }
+        var IsPrintWithout = null;
+        if ($('#IsPrintWithoutCompanyAddress').is(":checked")) {
+            IsPrintWithout = true;
+        }
+        else {
+            IsPrintWithout = false;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/GatePassMaster/Update',
+            data: {               
+                GatePassNo: $('#GatePassNo').val(),
+                IsReturnable: ret,
+                Date: $('#Date').val(),
+                IsSupplier: $('#IsSupplier').val(),
+                PartyName: $('#PartyName').val(),
+                DeliveryAddress: $('#DeliveryAddress').val(),
+                Material: $('#Material').val(),
+                Quantity: $('#Quantity').val(),
+                UOM: $('#UOM').val(),                
+                Rate: $('#Rate').val(),
+                Amount: $('#Amount').val(),
+                IfReturnable: $('#IfReturnable').val(),
+                Remarks: $('#Remarks').val(),
+                IsPrintWithRateValue:IsPrint,
+                IsPrintWithoutCompanyAddress: IsPrintWithout,
+                GatePassId: $('#GatePassId').val()
+            },
+            success: function (data) {
+                if (data.GatePassId != "" || data.GatePassId != 0) {
+                        alert('Updated Successfully.');
+                        location.href = "/GatePassMaster/GatePassMaster";
+                        return false;
+                    }
+                    else {
+                        alert('Updation failed.');
+                        location.href = "/GatePassMaster/GatePassMaster";
+                        return false;
+                    }
+                },
+                error: function (ex) {
+                    alert('Already Exist in the database.');
+                }
+            });
+        }
+     
+</script>
+<h2 class="content-title">Gate Pass DC(Outward)</h2>
+<div style="width: 100%; float: left;">
+
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("GatePassMasterGrid", "GatePassMaster")
+    </div>
+</div>

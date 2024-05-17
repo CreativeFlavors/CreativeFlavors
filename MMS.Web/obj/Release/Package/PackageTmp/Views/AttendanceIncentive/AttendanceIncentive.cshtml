@@ -1,0 +1,132 @@
+﻿@{
+    ViewBag.Title = "AttendanceIncentive";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#Leave').val() == "") {
+            alert("Please Enter Leave.")
+            $('#Leave').css('border-color', 'red');
+            $('#Leave').focus();
+            return false;
+        }
+        else {
+            $('#Leave').css('border-color', '');
+        }
+        if ($('#Absent').val() == "") {
+            alert("Please Enter Absent.")
+            $('#Absent').css('border-color', 'red');
+            $('#Absent').focus();
+            return false;
+        }
+        else {
+            $('#Absent').css('border-color', '');
+        }
+        if ($('#Amount').val() == "") {
+            alert("Please Enter Amount.")
+            $('#Amount').css('border-color', 'red');
+            $('#Amount').focus();
+            return false;
+        }
+        else {
+            $('#Amount').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/AttendanceIncentive/AttendanceIncentive',
+            data: {
+                Amount: $('#Amount').val(),
+                Absent: $('#Absent').val(),
+                Leave: $('#Leave').val()
+            },
+            success: function (data) {
+                if (data.AttendanceIncentiveCalcualtionId != "" || data.AttendanceIncentiveCalcualtionId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/AttendanceIncentive/AttendanceIncentive";
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/AttendanceIncentive/AttendanceIncentive";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#Leave').val() == "") {
+            alert("Please Enter Leave.")
+            $('#Leave').css('border-color', 'red');
+            $('#Leave').focus();
+            return false;
+        }
+        else {
+            $('#Leave').css('border-color', '');
+        }
+        if ($('#Absent').val() == "") {
+            alert("Please Enter Absent.")
+            $('#Absent').css('border-color', 'red');
+            $('#Absent').focus();
+            return false;
+        }
+        else {
+            $('#Absent').css('border-color', '');
+        }
+        if ($('#Amount').val() == "") {
+            alert("Please Enter Amount.")
+            $('#Amount').css('border-color', 'red');
+            $('#Amount').focus();
+            return false;
+        }
+        else {
+            $('#Amount').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/AttendanceIncentive/Update',
+            data: {
+                Amount: $('#Amount').val(),
+                Absent: $('#Absent').val(),
+                Leave: $('#Leave').val(),
+                AttendanceIncentiveCalcualtionId: $('#AttendanceIncentiveCalcualtionId').val()
+            },
+            success: function (data) {
+                if (data.AttendanceIncentiveCalcualtionId != "" || data.AttendanceIncentiveCalcualtionId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/AttendanceIncentive/AttendanceIncentive";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/AttendanceIncentive/AttendanceIncentive";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Attendance Incentive</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("AttendanceIncentiveGrid", "AttendanceIncentive")
+    </div>
+</div>

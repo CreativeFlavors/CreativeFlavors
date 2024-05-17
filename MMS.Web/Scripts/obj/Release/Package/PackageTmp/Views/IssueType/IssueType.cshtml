@@ -1,0 +1,100 @@
+﻿@{
+    ViewBag.Title = "IssueType";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+
+<script>
+    
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#IssueType').val() == "") {
+            alert("Please Enter Issue Type.")
+            $('#IssueType').css('border-color', 'red');
+            $('#IssueType').focus();
+            return false;
+        }
+        else {
+            $('#IssueType').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/IssueType/IssueType',
+            data: {
+                IssueType: $('#IssueType').val(),
+                IssueTypeCode: $('#IssueTypeCode').val(),
+                IssueTypeMasterId: $('#IssueTypeMasterId').val()
+            },
+            success: function (data) {
+                if (data.IssueTypeMasterId != "" || data.IssueTypeMasterId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/IssueType/IssueType";
+                    return false;
+                }
+                else if (data.IssueTypeMasterId == 0 && data.IssueType != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/IssueType/IssueType";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#IssueType').val() == "") {
+            alert("Please Enter Issue Type.")
+            $('#IssueType').css('border-color', 'red');
+            $('#IssueType').focus();
+            return false;
+        }
+        else {
+            $('#IssueType').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/IssueType/Update',
+            data: {
+                IssueType: $('#IssueType').val(),   
+                IssueTypeMasterId: $('#IssueTypeMasterId').val(),
+                IssueTypeCode: $('#IssueTypeCode').val()
+            },
+            success: function (data) {
+                if (data.IssueTypeMasterId != "" || data.IssueTypeMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/IssueType/IssueType";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/IssueType/IssueType";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">GRN/Issue Type</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("IssueTypeGrid", "IssueType")
+    </div>
+</div>

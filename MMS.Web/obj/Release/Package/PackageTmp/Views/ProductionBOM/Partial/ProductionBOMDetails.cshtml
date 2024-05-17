@@ -1,0 +1,330 @@
+﻿@model MMS.Web.Models.ProductionBOM.ProductionBOMModel
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table, th, td {
+            border: 1px solid #C9C9C9;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        td {
+            padding: 1px;
+        }
+
+        th {
+            padding: 22px 25px;
+            font-size: 14px;
+            font-family: 'Poppins';
+            color: #292b2c;
+        }
+
+        .salesOrder td input {
+            border: navajowhite;
+            width: 100px;
+            text-align: center;
+        }
+
+        .salesOrder {
+            margin-left: 11px;
+            margin-top: 7%;
+        }
+
+        div#billingadd {
+            margin-top: -8%;
+        }
+
+        .form-group.col-3.mt-4 {
+            margin-left: 9px;
+        }
+
+        p#Grandtotal {
+            padding: 15%;
+        }
+
+        .alert {
+            position: relative;
+            padding: 5px 1rem;
+        }
+
+        .alert-danger {
+            color: #842029;
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+            width: 118%;
+        }
+
+        strong#close {
+            margin-left: 16%;
+            cursor: pointer;
+        }
+
+        #alert {
+            margin-left: 24%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-page">
+        <!-- page-contents here -->
+        <section class="inner-section">
+            <div class="edit-customer">
+                <a href="/AddressDetails/AddressMaster">
+                    <div class="back-button"><img src="~/Content/assets/images/choose-plan.png" alt="back arrow"></div>
+                </a>
+                <h2 class=" font-20">Production Bom Details</h2>
+                <div id="alert">
+
+                </div>
+            </div>
+
+            <div class="edit-section">
+                @*<h3 class="font-20">Basic Information</h3>*@
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#Bomid">BOM</label>
+                            @Html.DropDownListFor(m => m.Bomid, MMS.Web.ExtensionMethod.HtmlHelper.GetBomNo(), new { @class = "sel-dropdown form-control" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#BOMProductName">BOM Product Name</label>
+                            @Html.TextBoxFor(m => m.BOMProductName, new { @class = "form-control text-field" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#BOMProductCode">Bom Product Code</label>
+                            @Html.TextBoxFor(m => m.BOMProductCode, new { @class = "form-control text-field" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#materialcategorymasterid">Material Category</label>
+                            @Html.DropDownListFor(m => m.MaterialCategoryMasterid, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "sel-dropdown form-control" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#ProductType">Product Type</label>
+                            @Html.DropDownListFor(m => m.ProductType, MMS.Web.ExtensionMethod.HtmlHelper.ProductType(), new { @class = "select-style text-field" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#UomId">Uom</label>
+                            @Html.DropDownListFor(m => m.UomIdMaster, MMS.Web.ExtensionMethod.HtmlHelper.LongUnitName(), new { @class = "select-style text-field" })
+                        </div>
+                    </div>
+                    @*<div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="input-part">
+                                <label class="font-14" for="#Consume">Consume Qty</label>
+                                @Html.TextBoxFor(m => m.Consume, new { @class = "form-control text-field" })
+                            </div>
+                        </div>*@
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#Description">Description</label>
+                            @Html.TextAreaFor(m => m.Description, new { @class = "form-control text-field" })
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="DivMaterialLiest" style="display:none;">
+                    <br />
+                    <h3>Material List</h3>
+                    <table class="table table-striped text-center" id="tblMaterialList" style="width: 50%;">
+                        <tr>
+                            <th>
+                                Sno.
+                            </th>
+
+
+                            <th>
+                                Material List
+                            </th>
+                        </tr>
+                        <tbody id="tbodymaterialList">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="inner-section-button mt-4">
+
+                    <button class="fill-color font-15" onclick="Save()">
+                        SAVE
+                    </button>
+
+                    <a href="/AddressDetails/AddressMaster">
+                        <button class="border-color font-15">
+                            CANCEL
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+    <!-- page-contents end -->
+    <script src="~/Content/js/custom.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>*@
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $('#Bomid').change(function () {
+            if ($("#Bomid").val() != "0" && $("#Bomid").val() != null && $("#Bomid").val() != "") {
+                $(".alert-danger").hide();
+                $.ajax({
+                    url: '/ProductionBOM/GetBOMMaterialList',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { BomId: $('#Bomid').val() },
+                    success: function (data) {
+                        console.log(data);
+                        var tbl = "";
+                        var count = 1;
+                        $.each(data, function (i, dat) {
+                            if (tbl == "") {
+                                tbl = "<tr><td class='veh-1' style='text-align:center'>" + count + "</td><td class='veh-1' style='width:85%;text-align:center'><div class='form-check'><input class='form-check-input' type='checkbox' value='" + dat.MaterialMasterID + "' id='" + dat.MaterialMasterID + "'><label style='margin-left:-50%;' class='form-check-label' for='" + dat.MaterialDescription + "'>" + dat.MaterialDescription + "</label></div></td></tr>";
+                            }
+                            else {
+                                tbl = tbl + "<tr><td class='veh-1' style='text-align:center'>" + count + "</td><td class='veh-1' style='width:85%;text-align:center'><div class='form-check'><input class='form-check-input' type='checkbox' value='" + dat.MaterialMasterID + "' id='" + dat.MaterialMasterID + "'><label style='margin-left:-50%;' class='form-check-label' for='" + dat.MaterialDescription + "'>" + dat.MaterialDescription + "</label></div></td></tr>";
+                            }
+                            count++;
+                        });
+
+                        $("#tbodymaterialList").html(tbl);
+                        $("#DivMaterialLiest").css("display", "block")
+                    }
+                });
+            }
+            else {
+                $("#DivMaterialLiest").css("display", "none")
+                $("#alert").append(
+                    '<div class="alert alert-danger">' +
+                    '<strong>Alert!</strong> BOM not selected ' +
+                    '<strong id="close">x</strong>' +
+                    '</div>'
+                );
+                $(document).on('click', '#close', function () {
+                    $(".alert-danger").hide();
+                });
+            }
+        });
+        function Save() {
+            if ($("#Bomid").val() == null && $("#Bomid").val() == '') {
+                $("#DivMaterialLiest").css("display", "none");
+                $("#alert").append(
+                    '<div class="alert alert-danger">' +
+                    '<strong>Alert!</strong> BOM not selected ' +
+                    '<strong id="close">x</strong>' +
+                    '</div>'
+                );
+                $(document).on('click', '#close', function () {
+                    $(".alert-danger").hide();
+                });
+            }
+            if ($("#BOMProductName").val() == "" && $("#BOMProductName").val() == null) {
+                $("#alert").append(
+                    '<div class="alert alert-danger">' +
+                    '<strong>Alert!</strong> Please Enter BOM Product Name' +
+                    '<strong id="close">x</strong>' +
+                    '</div>'
+                );
+                $(document).on('click', '#close', function () {
+                    $(".alert-danger").hide();
+                });
+            }
+            if ($("#BOMProductCode").val() == "" && $("#BOMProductCode").val() == null) {
+                $("#alert").append(
+                    '<div class="alert alert-danger">' +
+                    '<strong>Alert!</strong> Please Enter BOM Product Code' +
+                    '<strong id="close">x</strong>' +
+                    '</div>'
+                );
+                $(document).on('click', '#close', function () {
+                    $(".alert-danger").hide();
+                });
+            }
+            if ($("#MaterialCategoryMasterid").val() == null && $("#MaterialCategoryMasterid").val() == '') {
+                $("#alert").append(
+                    '<div class="alert alert-danger">' +
+                    '<strong>Alert!</strong> Material Category not selected ' +
+                    '<strong id="close">x</strong>' +
+                    '</div>'
+                );
+                $(document).on('click', '#close', function () {
+                    $(".alert-danger").hide();
+                });
+            }
+            if ($("#ProductType").val() == null && $("#ProductType").val() == '') {
+                $("#alert").append(
+                    '<div class="alert alert-danger">' +
+                    '<strong>Alert!</strong> Product Type not selected ' +
+                    '<strong id="close">x</strong>' +
+                    '</div>'
+                );
+                $(document).on('click', '#close', function () {
+                    $(".alert-danger").hide();
+                });
+            }
+            if ($("#UomIdMaster").val() == null && $("#UomIdMaster").val() == '') {
+                $("#alert").append(
+                    '<div class="alert alert-danger">' +
+                    '<strong>Alert!</strong> Uom not selected ' +
+                    '<strong id="close">x</strong>' +
+                    '</div>'
+                );
+                $(document).on('click', '#close', function () {
+                    $(".alert-danger").hide();
+                });
+            }
+            $('#tblMaterialList tbody tr input[type="checkbox"]').each(function () {
+                var checkboxValues = [];
+                console.log($(this).val());
+                var isEmpty = $(this).find('td:empty').length > 0;
+                if ($(this).prop('checked')) {
+                    checkboxValues.push($(this).val());
+                }
+                if (checkboxValues.length === 0) {
+                    $("#alert").append(
+                        '<div class="alert alert-danger">' +
+                        '<strong>Alert!</strong> Material List not selected ' +
+                        '<strong id="close">x</strong>' +
+                        '</div>'
+                    );
+                    $(document).on('click', '#close', function () {
+                        $(".alert-danger").hide();
+                    });
+                    return false;
+                }
+            });
+            $.ajax({
+                url: '/ProductionBOM/GetBOMMaterialList',
+                type: "GET",
+                dataType: "JSON",
+                data: { BomId: $('#Bomid').val() },
+                success: function (data) {
+
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

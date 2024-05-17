@@ -1,0 +1,305 @@
+﻿@{
+    ViewBag.Title = "StockAdjustment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script>
+    $(document).ready(function () {
+        $('#EditColorPartial').hide();
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    function Save() {
+        if ($('#AsOnDate').val() == "") {
+            alert("Please Select ToDate.")
+            $('#ToDate').css('border-color', 'red');
+            $('#ToDate').focus();
+            return false;
+        }
+        else {
+            $('#AsOnDate').css('border-color', '');
+        }
+        if ($('#StoreId').val() == "") {
+            alert("Please Enter StoreId.")
+            $('#StoreId').css('border-color', 'red');
+            $('#StoreId').focus();
+            return false;
+        }
+        else {
+            $('#StoreId').css('border-color', '');
+        }
+        if ($('#CategoryId').val() == "") {
+            alert("Please Enter CategoryId.")
+            $('#CategoryId').css('border-color', 'red');
+            $('#CategoryId').focus();
+            return false;
+        }
+        else {
+            $('#CategoryId').css('border-color', '');
+        }
+        if ($('#GroupId').val() == "") {
+            alert("Please Enter GroupId.")
+            $('#GroupId').css('border-color', 'red');
+            $('#GroupId').focus();
+            return false;
+        }
+        else {
+            $('#GroupId').css('border-color', '');
+        }
+      
+        if ($('#MaterialType').val() == "") {
+            alert("Please Enter MaterialType.")
+            $('#MaterialType').css('border-color', 'red');
+            $('#MaterialType').focus();
+            return false;
+        }
+        else {
+            $('#MaterialType').css('border-color', '');
+        }
+
+        if ($('#PlusStock').val() == "")
+            $('#PlusStock').val() = 0;
+        if ($('#MinusStock').val() == "")
+            $('#MinusStock').val() = 0;
+
+
+        var qtyCount = 0;
+        var qtyArr = [];
+        var plusstock;
+        $('#stockVariation tbody tr').each(function () {
+            if ($(this).find('.PlusStock').val() == null && $(this).find('.PlusStock').val() == "")
+                $(this).find('.PlusStock').val() = 0;
+            if ($(this).find('.MinusStock').val() == null && $(this).find('.MinusStock').val() == "")
+                $(this).find('.MinusStock').val() = 0;
+            qtyCount++
+            qtyArr.push(
+                {
+                    MaterialDescription: $(this).find('.MaterialName').text(),
+                    Size: $(this).find('.Size_').text(),
+                    Quantity: $(this).find('.Qty_').text(),
+                    ShortUnitName: $(this).find('.ShortUnitName_').text(),
+                    Rate: $(this).find('.Rateclass_').text(),
+                    BookStock: $(this).find('.BookStock').text(),
+                    BookStockValue: $(this).find('.BookStockValue').text(),
+                    PhysicalStock: $(this).find('.gridQTy').val(),
+                    PhysicalStockValue: $(this).find('.PhysicalStockValue').text(),
+                    VariationStock: $(this).find('.VariationStock').val(),
+                    VariationStockValue: $(this).find('.VariationStockValue').val(),
+                    PlusStock: $(this).find('.PlusStock').val(),
+                    PlusStockValue: $(this).find('.PlusStockValue').val(),
+                    MinusStock: $(this).find('.MinusStock').val(),
+                    MinusStockValue: $(this).find('.MinusStockValue').val(),
+                    MaterialMasterId: $(this).find('.MaterialMasterId').text(),
+                });
+
+        
+        });
+
+        $('#SizeQuantityRate').val(JSON.stringify(qtyArr));
+
+        $.ajax({
+
+            type: 'POST',
+            url: '/StockAdjustment/StockAdjustment/',
+            data: {
+                StockAdjustmentId: $('#StockAdjustmentId').val(),
+                AsOnDate: $('#AsOnDate').val(),
+                StoreId: $('#StoreId').val(),
+                StockNo: $("#StockNo").val(),
+                CategoryId: $('#CategoryId').val(),
+                GroupId: $('#GroupId').val(),
+                SubGroupId: $('#SubGroupId').val(),
+                MaterialType: $('#MaterialType').val(),
+
+                SizeQuantityRate: JSON.stringify(qtyArr),
+            },
+            success: function (data) {
+                
+                if (data.Message != "" && data.Message == "Saved") {
+                    alert('Saved Successfully.');
+                    $('#EditColorPartial').hide();
+                    $('.veh-tablewrap').show();
+                    location.href = "/StockAdjustment/StockAdjustment/";
+                    return false;
+                }
+                else if (data.Message != "" && data.Message == "Updated") {
+                    alert('Saved Successfully.');
+                    $('#EditColorPartial').hide();
+                    $('.veh-tablewrap').show();
+                    location.href = "/StockAdjustment/StockAdjustment/";
+                    return false;
+                }
+                else if (data.Message != "" && data.Message == "Already exists") {
+                    alert("Already exists! Please delete and try again");
+                    return false;
+                }
+                else {
+                    alert('Save Process Failed.');
+                    location.href = "/StockAdjustment/StockAdjustment/";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        })
+    }
+
+    function Update(arg) {
+
+        if ($('#AsOnDate').val() == "") {
+            alert("Please Select AsOnDate.")
+            $('#AsOnDate').css('border-color', 'red');
+            $('#AsOnDate').focus();
+            return false;
+        }
+        else {
+            $('#AsOnDate').css('border-color', '');
+        }
+        if ($('#StoreId').val() == "") {
+            alert("Please Enter StoreId.")
+            $('#StoreId').css('border-color', 'red');
+            $('#StoreId').focus();
+            return false;
+        }
+        else {
+            $('#CategoryId').css('border-color', '');
+        }
+        if ($('#CategoryId').val() == "") {
+            alert("Please Enter CategoryId.")
+            $('#CategoryId').css('border-color', 'red');
+            $('#CategoryId').focus();
+            return false;
+        }
+        else {
+            $('#CategoryId').css('border-color', '');
+        }
+        if ($('#GroupId').val() == "") {
+            alert("Please Enter GroupId.")
+            $('#GroupId').css('border-color', 'red');
+            $('#GroupId').focus();
+            return false;
+        }
+        else {
+            $('#GroupId').css('border-color', '');
+        }
+        
+        if ($('#MaterialType').val() == "") {
+            alert("Please Enter FromStore.")
+            $('#MaterialType').css('border-color', 'red');
+            $('#MaterialType').focus();
+            return false;
+        }
+        else {
+            $('#MaterialType').css('border-color', '');
+        }
+        if ($('#MaterialName').val() == "") {
+            alert("Please Enter MaterialName.")
+            $('#MaterialName').css('border-color', 'red');
+            $('#MaterialName').focus();
+            return false;
+        }
+        else {
+            $('#MaterialName').css('border-color', '');
+        }
+        if ($('#UomId').val() == "") {
+            alert("Please Enter UomId.")
+            $('#UomId').css('border-color', 'red');
+            $('#UomId').focus();
+            return false;
+        }
+        else {
+            $('#UomId').css('border-color', '');
+        }
+        if ($('#Rate').val() == "") {
+            alert("Please Select Group.")
+            $('#Rate').css('border-color', 'red');
+            $('#Rate').focus();
+            return false;
+        }
+        else {
+            $('#Rate').css('border-color', '');
+        }
+
+        var qtyCount = 0;
+        var qtyArr = [];
+        var plusstock;
+        $('#stockVariation tbody tr').each(function () {
+            if ($(this).find('.PlusStock').text() == null && $(this).find('.PlusStock').text() == "")
+                $(this).find('.PlusStock').text() = 0;
+            if ($(this).find('.MinusStock').text() == null && $(this).find('.MinusStock').text() == "")
+                $(this).find('.MinusStock').text() = 0;
+            qtyCount++
+            qtyArr.push(
+                {
+                    MaterialDescription: $(this).find('.MaterialName').text(),
+                    Size: $(this).find('.Size_').text(),
+                    Quantity: $(this).find('.Qty_').text(),
+                    ShortUnitName: $(this).find('.ShortUnitName_').text(),
+                    Rate: $(this).find('.Rateclass_').text(),
+                    BookStock: $(this).find('.BookStock').text(),
+                    BookStockValue: $(this).find('.BookStockValue').text(),
+                    PhysicalStock: $(this).find('.gridQTy').val(),
+                    PhysicalStockValue: $(this).find('.PhysicalStockValue').text(),
+                    VariationStock: $(this).find('.VariationStock').text(),
+                    VariationStockValue: $(this).find('.VariationStockValue').text(),
+                    PlusStock: $(this).find('.PlusStock').text(),
+                    PlusStockValue: $(this).find('.PlusStockValue').text(),
+                    MinusStock: $(this).find('.MinusStock').text(),
+                    MinusStockValue: $(this).find('.MinusStockValue').text(),
+                    MaterialMasterId: $(this).find('.MaterialMasterId').text(),
+
+                });
+            console.log(qtyArr)
+        });
+        alert(JSON.stringify(qtyArr))
+
+        $.ajax({
+            type: 'POST',
+            url: '/StockAdjustment/StockAdjustment/',
+            data: {
+                StockAdjustmentId: $('#StockAdjustmentId').val(),
+                AsOnDate: $('#AsOnDate').val(),
+                StoreId: $('#StoreId').val(),
+                CategoryId: $('#CategoryId').val(),
+                GroupId: $('#GroupId').val(),
+                SubGroupId: $('#SubGroupId').val(),
+                MaterialType: $('#MaterialType').val(),
+                SizeQuantityRate: JSON.stringify(qtyArr),
+            },
+            success: function (data) {
+                if (data.StockAdjustmentId != "" || data.StockAdjustmentId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/StockAdjustment/StockAdjustment/";
+                    return false;
+                }
+                else {
+                    alert('Updated Failed.');
+                    location.href = "/StockAdjustment/StockAdjustment/";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        })
+    }
+
+</script>
+
+<h2 class="content-title">Stock Adjustment</h2>
+<div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+    <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+        <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+    </div>
+</div>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("StockAdjustmentGrid", "StockAdjustment")
+    </div>
+</div>

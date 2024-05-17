@@ -1,0 +1,156 @@
+﻿@{
+    ViewBag.Title = "Job_QcControl";
+    Layout = "~/Views/Shared/_jobLayout.cshtml";
+}
+
+@**@
+
+
+
+<div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+    <div class="dashboard-content col-xs-12 no-padding">
+        <div class="dashboard_head dashboard-title congest col-lg-12 col-md-12 col-sm-12  col-xs-12">
+            <div class="dashboard-title  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+                <h2>Jobwork Quality</h2>
+            </div>
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("ProductionJobworkGrid", "ProductionQualityControl")
+    </div>
+
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+
+        $("#EditColorPartial").hide();
+        $('#example').DataTable();
+    });
+
+    function Add_Qc() {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("EditQcList", "ProductionQualityControl")',
+            data: { ProductionQc_ID: 0 },
+            success: function (data) {
+                $("#EditProductionPartial").html(data)
+                $("#EditProductionPartial").show();
+                $('#Update_edit').hide();
+                $('#Material').attr("disabled", true).trigger('chosen:updated');
+            }
+        }); 
+
+    }
+    function Save() {
+        var Stage = $('#Stage option:selected').text().slice(2);
+        var To_stage = $('#To_stage option:selected').text().slice(2);
+        if ($('#Stage').val() == "") {
+            alert("Please Enter Stage .")
+            $('#Stage').css('border-color', 'red');
+            $('#Stage').focus();
+            return false;
+        }
+        else {
+            $('#Stage').css('border-color', '');
+        }
+        if ($('#QC_Io').val() == "") {
+            alert("Please Enter  lot.")
+            $('#QC_Io').css('border-color', 'red');
+            $('#QC_Io').focus();
+            return false;
+        }
+        else {
+            $('#QC_Io').css('border-color', '');
+        }
+
+        
+        var Qty_ = [];
+        var size = [];
+
+        $('#sizeRangeTable tbody tr').find('.Qty').each(function () {
+            Qty_ += $(this).prop("checked") + ";";
+        });
+        $('#sizeRangeTable tbody tr').find('.Size').each(function () {
+            size += $(this).text() + ";";
+
+        });
+
+        var Date = $('#Date').val();
+        fromDate = Date.split("/");
+        var Date_from = fromDate[2] + "/" + fromDate[1] + "/" + fromDate[0];
+
+            $.ajax({
+                type: 'POST',
+                url: '/ProductionQualityControl/saveQualityControl_Issue',
+                data: {
+                    Date: Date_from,
+                    Production_Code_new: $('#Production_Code__Production_Code').val(),
+                    Buyer: $('#Buyer').val(),
+                    Season: $('#Season').val(),
+                    Stage: Stage,
+                    LOtNo: $('#LOtNo').val(),
+                    Moved_Io: $('#Moved_Io').val(),
+                    Style: $('#Style').val(),
+
+                    QC_Io: $('#QC_Io').val(),
+                    Total_Pairs: $('#Total_Pairs').val(),
+                    Size: $('#Size').val(),
+                    IO_Size: $('#IO_Size').val(),
+                    Qty: $('#Qty').val(),
+                    Side: $('#Side').val(),
+
+                    Reason: $('#Reason').val(),
+                    Type: $('#Type').val(),
+                    Component: $('#Component').val(),
+                    Style: $('#Style').val(),
+                    To_stage: To_stage,
+                    Qty_: Qty_,
+                    size_: size
+                },
+
+                success: function (data) {
+                    if (data.ProductionQc_ID != "" || data.ProductionQc_ID != 0) {
+                        alert('Saved Successfully.');
+                        var row = "<tr>";
+                        row += "<td data-title='OperationType'>" + $('#Stage option:selected').text() + "</td>";
+                        row += "<td data-title='OperationType'>" + $('#QC_Io option:selected').text() + "</td>";
+                        row += "<td data-title='OperationType' >" + $('#To_stage option:selected').text() + "</td>";
+                        row += "<td data-title='OperationType' >" + $('#Qty').val() + "</td>";
+                        row += "<td data-title='OperationType' ></td></tr>";
+
+                        $('#table_grid_ROW').append(row);
+                        console.log(row);
+                        return false
+                    }
+                    else if (data.ProductionQc_ID == 0 && data.ProductionQc_ID != "") {
+                        alert('Already Exist in the database.');
+                        return false
+                    }
+                    else {
+                        alert('Save process Failed.');
+                        location.href = "/ProductionJobwork_/ProductionJobworkMaster";
+                        return false;
+                    }
+
+                },
+                error: function (ex) {
+                    alert('Already Exist in the database.')
+                }
+            });
+        }
+ 
+
+</script>

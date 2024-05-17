@@ -1,0 +1,357 @@
+﻿@{
+    ViewBag.Title = "View1";
+    Layout = "~/Views/Shared/_jobLayout.cshtml";
+}
+
+<div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+    <div class="dashboard-content col-xs-12 no-padding">
+        <div class="dashboard_head dashboard-title congest col-lg-12 col-md-12 col-sm-12  col-xs-12">
+            <div class="dashboard-title  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+                <h2>Approved Price list Master</h2>
+            </div>
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("Jw_ApprovedPriceGrid", "Jw_ApprovedPrice")
+    </div>
+
+</div>
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+
+        $("#EditColorPartial").hide();
+        $('#example').DataTable();
+
+    });
+
+    function AddJobAp() {
+
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("EditJw_ApprovedPriceList", "Jw_ApprovedPrice")',
+            data: { Jw_ApprovedPriceID: 0 },
+            success: function (data) {
+                $("#EditJob_AprovepricePartial").html(data);
+                $("#EditJob_AprovepricePartial").show();
+                $("input[type='hidden'][name='IsInspection']").remove();
+                $('#Update_edit').hide();
+            }
+        });
+
+    }
+    function Edit(arg) {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("EditJw_ApprovedPriceList", "Jw_ApprovedPrice")',
+            data: { Jw_ApprovedPriceID: arg },
+            success: function (data) {
+                $("#EditJob_AprovepricePartial").html(data);
+                $("#EditJob_AprovepricePartial").show();
+                $("input[type='hidden'][name='IsInspection']").remove();
+                $('#Update').hide();
+                $('#Update_edit').show();
+            }
+        });
+
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("DeleteApprove_Jobname", "Jw_ApprovedPrice")',
+                data: { Jobname: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/StageMaster_Job/StageMaster";
+                        return false;
+                    }
+                    else {
+                        alert('Color Details deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+    function Save() {
+        if ($('#JW_Name').val() == "") {
+            alert("Please Enter JW_Name.")
+            $('#JW_Name').css('border-color', 'red');
+            $('#JW_Name').focus();
+            return false;
+        }
+        else {
+            $('#JW_Name').css('border-color', '');
+        }
+        if ($('#Process_Name').val() == "") {
+            alert("Please Enter Process Name.")
+            $('#Process_Name').css('border-color', 'red');
+            $('#Process_Name').focus();
+            return false;
+        }
+        else {
+            $('#Process_Name').css('border-color', '');
+        }
+     
+        if ($('#Rate_For_JW_id').val() == "") {
+            alert("Please Enter Rate For JW_id.")
+            $('#Rate_For_JW_id').css('border-color', 'red');
+            $('#Rate_For_JW_id').focus();
+            return false;
+        }
+        else {
+            $('#Rate_For_JW_id').css('border-color', '');
+        }
+        if ($('#Tax_Details').val() == "") {
+            alert("Please Enter Tax Details.")
+            $('#Tax_Details').css('border-color', 'red');
+            $('#Tax_Details').focus();
+            return false;
+        }
+        else {
+            $('#Tax_Details').css('border-color', '');
+        }
+        if ($('#Lead_Time_Days').val() == "") {
+            alert("Please Enter Lead Time Days.")
+            $('#Lead_Time_Days').css('border-color', 'red');
+            $('#Lead_Time_Days').focus();
+            return false;
+        }
+        else {
+            $('#Lead_Time_Days').css('border-color', '');
+        }
+        if ($('#Rate_For_JW').val() == "") {
+            alert("Please Enter Rate_For_JW.")
+            $('#Rate_For_JW').css('border-color', 'red');
+            $('#Rate_For_JW').focus();
+            return false;
+        }
+        else {
+            $('#Rate_For_JW').css('border-color', '');
+        }
+        if ($('#Issue_Type').val() == "") {
+            alert("Please Enter Issue_Type.");
+            $('#Issue_Type').css('border-color', 'red');
+            $('#Issue_Type').focus();
+            return false;
+        }
+        else {
+            $('#Issue_Type').css('border-color', '');
+        }
+        if ($('#Issue_Type option:selected').text() == "JobWork(Leather To Leather)")
+        {
+            if ($('#Finished_Material').val() == "") {
+                alert("Please Enter Finished Material.")
+                $('#Finished_Material').css('border-color', 'red');
+                $('#Finished_Material').focus();
+                return false;
+            }
+            else {
+                $('#Finished_Material').css('border-color', '');
+            }
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/Jw_ApprovedPrice/saveJob_ApprovedPrice',
+            data: {
+                Date: $('#Date').val(),
+                JW_Name: $('#JW_Name').val(),
+                Process_Name: $('#Process_Name').val(),
+                Stage_From: $('#Stage_From').val(),
+                Stage_To: $('#Stage_To').val(),
+                Rate_For_JW_id: $('#Rate_For_JW_id').val(),
+                Tax_Details:"0",
+                Lead_Time_Days: $('#Lead_Time_Days').val(),
+                Rate_For_JW: $('#Rate_For_JW').val(),
+                Job_ExcessPercentage: $('#Job_ExcessPercentage').val(),
+                Finished_Material: $('#Finished_Material').val(),
+                Issue_Type: $('#Issue_Type').val(),
+                Product_BuyerStyle: $('#Product_BuyerStyle').val(),
+                GSt: $('#GSt').val()
+            },
+            success: function (data) {
+                debugger;
+                if (data.Jw_ApprovedPriceID != "" || data.Jw_ApprovedPriceID != 0) {
+              
+                    alert('Save Successfully.');
+                    var row = "<tr>";
+                    row += "<td data-title='Approved Date' >" + ($("#table_grid_ROW tr").length + 1) + "</td>";
+                    row += "<td data-title='OperationType'>" + $('#JW_Name option:selected').text() + "</td>";
+                    row += "<td data-title='OperationType'>" + $('#Process_Name option:selected').text() + "</td>";
+                    row += "<td data-title='OperationType' >" + $('#Stage_From option:selected').text() + "</td>";
+                    row += "<td data-title='OperationType' >" + $('#Stage_To option:selected').text() + "</td>";
+                    row += "<td data-title='OperationType' >" + $('#Date').val() + "</td>";
+                    row += "<td data-title='OperationType' >" + $('#Rate_For_JW').val() + "</td>";
+                    row += "<td data-title='OperationType' >" + $('#Tax_Details option:selected').text() + "</td>";
+                    row += "<td data-title='OperationType' ></td></tr>";
+
+                    $('#table_grid_ROW').append(row);
+                    console.log(row);
+                    $('#Stage_From').val(0).trigger('chosen:updated'),
+              $('#Stage_To').val(0).trigger('chosen:updated'),
+              $('#Rate_For_JW_id').val(''),
+              $('#Tax_Details').val(0).trigger('chosen:updated'),
+              $('#Lead_Time_Days').val(''),
+              $('#Rate_For_JW').val('')
+                }
+                else if (data.StageMasterId == 0 && data.StageName != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/Jw_ApprovedPrice/Jw_ApprovedPrice";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function UpdateApproved(arg) {
+        if ($('#JW_Name').val() == "") {
+            alert("Please Enter JW_Name.")
+            $('#JW_Name').css('border-color', 'red');
+            $('#JW_Name').focus();
+            return false;
+        }
+        else {
+            $('#JW_Name').css('border-color', '');
+        }
+        if ($('#Process_Name').val() == "") {
+            alert("Please Enter Process Name.")
+            $('#Process_Name').css('border-color', 'red');
+            $('#Process_Name').focus();
+            return false;
+        }
+        else {
+            $('#Process_Name').css('border-color', '');
+        }
+     
+        if ($('#Rate_For_JW_id').val() == "") {
+            alert("Please Enter Rate For JW_id.")
+            $('#Rate_For_JW_id').css('border-color', 'red');
+            $('#Rate_For_JW_id').focus();
+            return false;
+        }
+        else {
+            $('#Rate_For_JW_id').css('border-color', '');
+        }
+        if ($('#Tax_Details').val() == "") {
+            alert("Please Enter Tax Details.")
+            $('#Tax_Details').css('border-color', 'red');
+            $('#Tax_Details').focus();
+            return false;
+        }
+        else {
+            $('#Tax_Details').css('border-color', '');
+        }
+        if ($('#Lead_Time_Days').val() == "") {
+            alert("Please Enter Lead Time Days.")
+            $('#Lead_Time_Days').css('border-color', 'red');
+            $('#Lead_Time_Days').focus();
+            return false;
+        }
+        else {
+            $('#Lead_Time_Days').css('border-color', '');
+        }
+        if ($('#Rate_For_JW').val() == "") {
+            alert("Please Enter Rate_For_JW.")
+            $('#Rate_For_JW').css('border-color', 'red');
+            $('#Rate_For_JW').focus();
+            return false;
+        }
+        else {
+            $('#Rate_For_JW').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/Jw_ApprovedPrice/Update_Approve',
+            data: {
+                Jw_ApprovedPriceID: $('#Jw_ApprovedPriceID').val(),
+                Date: $('#Date').val(),
+                JW_Name: $('#JW_Name').val(),
+                Process_Name: $('#Process_Name').val(),
+                Stage_From: $('#Stage_From').val(),
+                Stage_To: $('#Stage_To').val(),
+                Rate_For_JW_id: $('#Rate_For_JW_id').val(),
+                Tax_Details: $('#Tax_Details').val(),
+                Lead_Time_Days: $('#Lead_Time_Days').val(),
+                Rate_For_JW: $('#Rate_For_JW').val(),
+                Job_ExcessPercentage: $('#Job_ExcessPercentage').val(),
+                Finished_Material: $('#Finished_Material').val(),
+                Issue_Type: $('#Issue_Type').val(),
+                Product_BuyerStyle: $('#Product_BuyerStyle').val(),
+                GSt: $('#GSt').val()
+            },
+            success: function (data) {
+                if (data.Jw_ApprovedPriceID != "" || data.Jw_ApprovedPriceID != 0) {
+                    alert('Updated Successfully.');
+                    //location.href = "/Jw_ApprovedPrice/Jw_ApprovedPrice";
+                    //return false;
+                    debugger
+                    var id = $('#Jw_ApprovedPriceID').val();
+                    //$('#' + id).find("td").eq(0).html('')
+                    $('#' + id).find("td").eq(1).html($('#JW_Name option:selected').text())
+                    $('#' + id).find("td").eq(2).html($('#Process_Name option:selected').text())
+                    $('#' + id).find("td").eq(3).html($('#Stage_From option:selected').text())
+                    $('#' + id).find("td").eq(4).html($('#Stage_To option:selected').text())
+                    $('#' + id).find("td").eq(5).html($('#Date').val())
+                    $('#' + id).find("td").eq(6).html($('#Rate_For_JW ').val())
+                    $('#' + id).find("td").eq(7).html($('#Tax_Details option:selected').text())
+                    $('#' + id).find("td").eq(8).html('')
+                    $("#" + id).find("td").show()
+                    close();
+                }
+                else {
+                    alert('Updation failed.');
+                    //location.href = "/Jw_ApprovedPrice/Jw_ApprovedPrice";
+                    //return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+
+    function close()
+    {
+        $('#JW_Name').val(0).trigger('chosen:updated');
+        $('#Process_Name').val(0).trigger('chosen:updated');
+        $('#Stage_From').val(0).trigger('chosen:updated');
+        $('#Stage_To').val(0).trigger('chosen:updated');
+        $('#Tax_Details').val(0).trigger('chosen:updated');
+        $('#Rate_For_JW_id').val(0).trigger('chosen:updated');
+        $('#Lead_Time_Days').val('');
+        $('#Rate_For_JW').val('');
+    }
+    function Back() {
+        location.href = "/Jw_ApprovedPrice/Jw_ApprovedPrice";
+    }
+
+</script>

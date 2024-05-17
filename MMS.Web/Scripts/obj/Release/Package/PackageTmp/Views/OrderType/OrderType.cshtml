@@ -1,0 +1,120 @@
+﻿@model MMS.Web.Models.OrderTypeModel.OrderTypeModel
+@{
+    ViewBag.Title = "Component";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#OrderTypeCode').val() == "") {
+            alert("Please Enter Order Type Code.")
+            $('#OrderTypeCode').css('border-color', 'red');
+            $('#OrderTypeCode').focus();
+            return false;
+        }
+        else {
+            $('#OrderTypeCode').css('border-color', '');
+        }
+        if ($('#OrderTypeName').val() == "") {
+            alert("Please Enter Order Type Name.")
+            $('#OrderTypeName').css('border-color', 'red');
+            $('#OrderTypeName').focus();
+            return false;
+        }
+        else {
+            $('#OrderTypeName').css('border-color', '');
+        }
+       
+        $.ajax({
+            type: 'POST',
+            url: '/OrderType/OrderType',
+            data: {             
+                OrderTypeCode: $('#OrderTypeCode').val(),
+                OrderTypeName: $('#OrderTypeName').val(),
+                OrderTypeID: $('#OrderTypeID').val()
+            },
+            success: function (data) {
+                if (data.OrderTypeID != "" || data.OrderTypeID != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/OrderType/OrderType";
+                    return false;
+                }
+                else if (data.OrderTypeID == 0 && data.OrderTypeName != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/OrderType/OrderType";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+       if ($('#OrderTypeCode').val() == "") {
+            alert("Please Enter Order Type Code.")
+            $('#OrderTypeCode').css('border-color', 'red');
+            $('#OrderTypeCode').focus();
+            return false;
+        }
+        else {
+            $('#OrderTypeCode').css('border-color', '');
+        }
+        if ($('#OrderTypeName').val() == "") {
+            alert("Please Enter Order Type Name.")
+            $('#OrderTypeName').css('border-color', 'red');
+            $('#OrderTypeName').focus();
+            return false;
+        }
+        else {
+            $('#OrderTypeName').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/OrderType/Update',
+            data: {
+                OrderTypeCode: $('#OrderTypeCode').val(),
+                OrderTypeName: $('#OrderTypeName').val(),
+                OrderTypeID: $('#OrderTypeID').val()               
+            },
+            success: function (data) {
+                if (data.OrderTypeID != "" || data.OrderTypeID != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/OrderType/OrderType";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/OrderType/OrderType";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Order Type</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("OrderTypeGrid", "OrderType")
+    </div>
+</div>
+

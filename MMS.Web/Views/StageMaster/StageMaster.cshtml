@@ -1,0 +1,195 @@
+﻿@{
+    ViewBag.Title = "Material Category";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+}
+
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#ProcessCode').val() == "") {
+            alert("Please Enter Process Code.")
+            $('#ProcessCode').css('border-color', 'red');
+            $('#ProcessCode').focus();
+            return false;
+        }
+        else {
+            $('#ProcessCode').css('border-color', '');
+        }
+        if ($('#OrderType').val() == "") {
+            alert("Please Enter Order Type.")
+            $('#OrderType').css('border-color', 'red');
+            $('#OrderType').focus();
+            return false;
+        }
+        else {
+            $('#OrderType').css('border-color', '');
+        }
+        if ($('#StageCode').val() == "") {
+            alert("Please Enter Stage Code.")
+            $('#StageCode').css('border-color', 'red');
+            $('#StageCode').focus();
+            return false;
+        }
+        else {
+            $('#StageCode').css('border-color', '');
+        }
+        if ($('#StageName').val() == "") {
+            alert("Please Enter Stage Name.")
+            $('#StageName').css('border-color', 'red');
+            $('#StageName').focus();
+            return false;
+        }
+        else {
+            $('#StageName').css('border-color', '');
+        }
+        if ($('#SubStage').val() == "") {
+            alert("Please Enter SubStage.")
+            $('#SubStage').css('border-color', 'red');
+            $('#SubStage').focus();
+            return false;
+        }
+        else {
+            $('#SubStage').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/StageMaster/StageMaster',
+            data: {
+                ProcessCode: $('#ProcessCode').val(),
+                OrderType: $('#OrderType').val(),
+                StageCode: $('#StageCode').val(),
+                StageName: $('#StageName').val(),
+                SubStage: $('#SubStage').val(),
+                Sequence: $('#Sequence').val(),
+                IsInspection: $('#IsInspection').is(":checked"),
+            },
+            success: function (data) {
+                if (data.StageMasterId != "" || data.StageMasterId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/StageMaster/StageMaster";
+                    return false;
+                }
+                else if (data.StageMasterId == 0 && data.StageName != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/StageMaster/StageMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#ProcessCode').val() == "") {
+            alert("Please Enter Process Code.")
+            $('#ProcessCode').css('border-color', 'red');
+            $('#ProcessCode').focus();
+            return false;
+        }
+        else {
+            $('#ProcessCode').css('border-color', '');
+        }
+        if ($('#OrderType').val() == "") {
+            alert("Please Enter Order Type.")
+            $('#OrderType').css('border-color', 'red');
+            $('#OrderType').focus();
+            return false;
+        }
+        else {
+            $('#OrderType').css('border-color', '');
+        }
+        if ($('#StageCode').val() == "") {
+            alert("Please Enter Stage Code.")
+            $('#StageCode').css('border-color', 'red');
+            $('#StageCode').focus();
+            return false;
+        }
+        else {
+            $('#StageCode').css('border-color', '');
+        }
+        if ($('#StageName').val() == "") {
+            alert("Please Enter Stage Name.")
+            $('#StageName').css('border-color', 'red');
+            $('#StageName').focus();
+            return false;
+        }
+        else {
+            $('#StageName').css('border-color', '');
+        }
+        if ($('#SubStage').val() == "") {
+            alert("Please Enter SubStage.")
+            $('#SubStage').css('border-color', 'red');
+            $('#SubStage').focus();
+            return false;
+        }
+        else {
+            $('#SubStage').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/StageMaster/Update',
+            data: {
+                StageMasterId: $('#StageMasterId').val(),
+                ProcessCode: $('#ProcessCode').val(),
+                OrderType: $('#OrderType').val(),
+                StageCode: $('#StageCode').val(),
+                StageName: $('#StageName').val(),
+                SubStage: $('#SubStage').val(),
+                Sequence: $('#Sequence').val(),
+                IsInspection: $('#IsInspection').is(":checked"),
+            },
+            success: function (data) {
+                if (data.StageMasterId != "" || data.StageMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/StageMaster/StageMaster";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/StageMaster/StageMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Stage Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("StageMaserGrid", "StageMaster")
+    </div>
+</div>

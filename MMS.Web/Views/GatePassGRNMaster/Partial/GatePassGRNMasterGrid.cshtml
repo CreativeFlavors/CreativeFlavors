@@ -1,0 +1,232 @@
+﻿@model MMS.Web.Models.GatePassGRNModel.GatePassGRNModel
+@using MMS.Core.Entities
+@using MMS.Repository.Managers
+@{
+  
+    MMS.Repository.Managers.MaterialManager materialManager = new MMS.Repository.Managers.MaterialManager();
+    MaterialMaster materialMaster = new MaterialMaster();
+    MMS.Repository.Managers.UOMManager uOMManager = new MMS.Repository.Managers.UOMManager();
+    UomMaster uomMaster = new UomMaster();
+}
+<div class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+        <div class="table-responsive table-td-padding padding-lr-6px table-row-bg" style="overflow: auto;">
+            <table class="veh-table" id="empTable">
+                <thead>
+                    <tr class="color-code-top-btn">
+                        <td colspan="8">
+                            <input type="text" id="SearchID" placeholder="Search.." style="color:gray;" />
+                            <input type="button" value="Add" onclick="Add()" />
+                            <input type="button" value="Search" onclick="Search()">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="veh-1">
+                            Si.NO
+                        </th>
+                        <th class="veh-2">
+                            Material Name
+                        </th>
+                        <th class="veh-3">
+                            Quantity
+                        </th>
+                        <th class="veh-4">
+                            UOM
+                        </th>
+                        <th class="veh-5">
+                            Rate
+                        </th>
+                        <th class="veh-6">
+                            Amount
+                        </th>
+                        <th class="veh-7">
+                            Instructions
+                        </th>
+                        <th class="veh-8">
+                            Edit/Delete
+                        </th>
+                    </tr>
+                </thead>
+                @if (Model.GatePassGRNMasterList != null && Model.GatePassGRNMasterList.Count > 0)
+                {
+                    int count = 1;
+                    <tbody>
+                        @foreach (var Gate in Model.GatePassGRNMasterList)
+                    {
+                        materialMaster = materialManager.GetMaterialMasterId(Gate.Material);
+                        uomMaster = uOMManager.GetUomMasterId(Gate.UOM);
+                <tr>
+                    <td class="veh-1" onclick="">@count</td>
+                    <td class="veh-3">@Gate.Material</td>
+                    <td class="veh-4">@Gate.Quantity</td>
+                    <td class="veh-5">@uomMaster.LongUnitName</td>
+                    <td class="veh-6">@Gate.Rate</td>
+                    <td class="veh-7">@Gate.Amount</td>
+                    <td class="veh-6">@Gate.Instructions</td>
+                    <td class="veh-8 edit-del-wrap">
+                        <a href="javascript:void(0)" onclick="Edit('@Gate.GatePassInvwardId')" class="watchlist-edit" title="Edit"></a>
+                        <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@Gate.GatePassInvwardId')" class="watchlist-delete" title="Delete"></a>
+
+                    </td>
+                </tr>
+                        count++;
+                    }
+
+                    </tbody>
+                    <tfoot class="footer-pager">
+                        <tr>
+                            <td colspan="4">
+                                <div id="pager">
+                                    <form>
+                                        <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                        <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                        <input type="text" class="pagedisplay" />
+                                        <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                        <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                        <select class="pagesize">
+                                            <option selected="selected" value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="30">30</option>
+                                            <option value="40">40</option>
+                                        </select>
+                                    </form>
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    </tfoot>
+
+                }
+            </table>
+            @if (Model.GatePassGRNMasterList != null && Model.GatePassGRNMasterList.Count == 0)
+            {
+                <div style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+            }
+        </div>
+        </div>
+    <div id="EditColorPartial">
+        @Html.Partial("Partial/GatePassGRNMasterDetails", Model)
+    </div>
+</div>
+
+
+<script>
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    function Search() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Search", "GatePassGRNMaster")',
+            data: { filter: $('#SearchID').val() },
+            success: function (data) {
+                 
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                $('#DivShow').hide();
+                $('#DivDetails').hide();
+                $('#EditColorPartial').hide();
+            }
+        });
+    }
+    
+    function Cancel() {
+        
+        location.reload();
+    }
+    function Next() {            
+        if ($("#DivShow").show()) {
+            $("#DivShow").hide()
+            $("#DivDetails").show()
+        }           
+    }
+    function Back() {
+   
+        $("#DivDetails").hide();
+        $('#DivShow').show()
+    }
+    function Add() {
+      
+        $('.veh-tablecont').hide();
+        
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("GatePassGRNMasterDetails", "GatePassGRNMaster")',
+            data: { GatePassInvwardId: 0 },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+                if ($("#DivShow").show()) {
+                    $("#DivDetails").hide()               
+                }
+                else {
+                    $("#DivDetails").show()
+                }
+                 
+            }
+            
+        });
+        $("#EditColorPartial").show();
+    }
+    function Edit(arg) {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("GatePassGRNMasterDetails", "GatePassGRNMaster")',
+            data: { GatePassInvwardId: arg },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+                if ($("#DivShow").show()) {
+                    $("#DivDetails").hide()
+                }
+                else {
+                    $("#DivDetails").show()
+                }
+            }
+        });
+        $("#EditColorPartial").show();
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "GatePassGRNMaster")',
+                data: { GatePassInvwardId: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/GatePassGRNMaster/GatePassGRNMaster";
+                        return false;
+                    }
+                    else {
+                        alert('deletion failed.');
+                    }
+
+                },
+                error: function (data) {
+                    alert('This Gate Pass Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+
+</script>
+

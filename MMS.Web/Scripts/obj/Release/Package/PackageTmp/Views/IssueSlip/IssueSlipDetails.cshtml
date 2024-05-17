@@ -1,0 +1,294 @@
+﻿@model MMS.Web.Models.StockModel.IssueSlipModel
+
+@using MMS.Repository.Managers.StockManager;
+@using MMS.Core.Entities.Stock;
+@using MMS.Core.Entities;
+
+@{
+
+    MMS.Repository.Managers.ColorManager ColorMasterManager = new MMS.Repository.Managers.ColorManager();
+    ColorMaster ColorMaster = new ColorMaster();
+
+
+    MMS.Repository.Managers.MaterialGroupManager MaterialGroupManager = new MMS.Repository.Managers.MaterialGroupManager();
+    MaterialGroupMaster_ MaterialMaster = new MaterialGroupMaster_();
+
+    MMS.Repository.Managers.MaterialCategoryManager MaterialCategoryManager = new MMS.Repository.Managers.MaterialCategoryManager();
+    MaterialCategoryMaster MaterialCategoryMaster = new MaterialCategoryMaster();
+}
+
+<script type="text/javascript" src="~/Datepicker/js/jquery-1.7.2.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $("#GridDetails").show();
+        $("#div_show1").hide();
+
+        $("#FnAdd").click(function () {
+            $("#GridDetails").hide();
+            $("#div_show1").show();
+        });
+        $("#btnViewDet").click(function () {
+            $("#div_show1").hide();
+            $("#GridDetails").show();
+        });
+    });
+
+    function Save() {
+        var Model = {};
+        Model.IssueSlipId = $("#IssueSlipId").val();
+        Model.Style_ProductByer = $("#txtStyleProductBuyer").val();
+        Model.CustomerId = $("#DdlCustomer option:selected").val();
+        Model.LeatherName = $("#txtLeatherName").val();
+        Model.CategoryId = $("#CategoryId option:selected").val();
+        Model.ColourId = $("#ColourId option:selected").val();
+        Model.GroupId = $("#GroupId option:selected").val();
+
+        $.post('/IssueSlip/SaveDetails/', Model, function (data) {
+            if (data == true) {
+                if ($("#btnSave").val() == "Save") {
+                    alert("Saved Successfully");
+                }
+                else {
+                    alert("Update Successfully");
+                }
+                $("#IssueSlipId").val("");
+                $("#txtStyleProductBuyer").val("");
+                $("#DdlCustomer").val("");
+                $("#txtLeatherName").val("");
+                $("#CategoryId").val("");
+                $("#ColourId").val("");
+                $("#GroupId").val("");
+                window.location.reload();
+            }
+            else {
+                alert("Save Failed");
+            }
+        });
+    }
+
+    function Update(IssueId) {
+        $.getJSON('/IssueSlip/GetIssueDetails/', { IssueSlipId: IssueId }, function (data) {
+            $("#IssueSlipId").val(data.IssueSlipId);
+            $("#txtStyleProductBuyer").val(data.Style_ProductByer);
+            $("#DdlCustomer").val(data.CustomerId);
+            $("#txtLeatherName").val(data.LeatherName);
+            $("#CategoryId").val(data.CategoryId);
+            $("#ColourId").val(data.ColourId);
+            $("#GroupId").val(data.GroupId);
+            $("#GridDetails").hide();
+            $("#div_show1").show();
+            $("#btnSave").val("Update");
+        });
+    }
+
+    function Delete(IssueId) {
+        $.getJSON('/IssueSlip/DeleteIssueDetails/', { IssueSlipId: IssueId }, function (data) {
+
+            if (data == true) {
+                alert("Deleted Successfully");
+                window.location.reload();
+            }
+            else {
+                alert("Deletion Failed");
+            }
+        });
+    }
+
+    function Search() {
+        window.location = "/IssueSlip/IssueSlipDetails?SearchFilter=" + $("#SearchID").val();
+    }
+</script>
+
+<div class="veh-tablecont" id="GridDetails">
+    <div id="sortMsg" style="text-align: center; color: Red;">
+    </div>
+    <table class="veh-table" id="empTable">
+        <thead>
+            <tr class="color-code-top-btn">
+                <td colspan="13">
+                    <input type="text" id="SearchID" placeholder="Search.." />
+                    <input type="button" value="Add" id="FnAdd">
+                    <input type="button" value="Search" onclick="Search()">
+                </td>
+            </tr>
+            <tr>
+                <th class="veh-1">Style(Product / Buyer)
+                </th>
+                <th class="veh-2">Customer
+                </th>
+                <th class="veh-3">Leather Name
+                </th>
+                <th class="veh-4">Category
+                </th>
+                <th class="veh-5">Colour Code
+                </th>
+
+                <th class="veh-6">Group
+                </th>
+                <th class="veh-7">I/O No.
+                </th>
+                <th class="veh-7">No. Of Sets/Pairs
+                </th>
+                <th class="veh-9">Edit / Delete
+                </th>
+            </tr>
+        </thead>
+        @if (Model.IssueSlipList != null)
+        {
+            <tbody>
+                @foreach (var IssueLst in Model.IssueSlipList)
+                {
+                    ColorMaster = ColorMasterManager.GetcolorID(IssueLst.ColourId);
+                    MaterialMaster = MaterialGroupManager.GetMaterialGroupMaster_Id(IssueLst.GroupId);
+                    MaterialCategoryMaster = MaterialCategoryManager.GetMaterialCategoryMaster(IssueLst.CategoryId);
+                    //MaterialGroupMaster_ = MaterialGroupManager.GetMaterialGroupMaster_Id(Indent.MaterialGrpId);
+                    //ColorMaster = ColorManager.GetcolorID(Indent.ColourId);
+                    //UomMaster = UOMManager.GetUomMasterId(Indent.UOMId);
+                    //supplierMaster = supplierMasterManager.GetSupplierMasterId(GrnModel.Supplier);
+                    //machineryMaster = machineryMasterManager.GetMachineryMasterId(PurchaserOrder.Machinename);
+                    <tr>
+
+                        <td style="" class="veh-1">@IssueLst.Style_ProductByer</td>
+                        <td style="" class="veh-2">@IssueLst.CustomerId</td>
+                        <td style="" class="veh-3">@IssueLst.LeatherName</td>
+                        <td style="" class="veh-4">@MaterialCategoryMaster.CategoryName</td>
+                        <td style="" class="veh-5">@ColorMaster.Color</td>
+                        <td style="" class="veh-6">@MaterialMaster.GroupName</td>
+                        <td style="" class="veh-7"></td>
+                        <td style="" class="veh-8">@IssueLst.NosSets_Pair</td>
+                        <td class="veh-1 edit-del-wrap">
+
+
+                            <a href="Javascript:Void();" onclick="Update('@IssueLst.IssueSlipId')"  class="watchlist-edit" title="Edit"></a>
+                            <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@IssueLst.IssueSlipId')" class="watchlist-delete" title="Delete"></a>
+                        </td>
+                    </tr>                       
+                }
+            </tbody>
+        }
+        <tfoot class="footer-pager">
+            <tr>
+                <td colspan="4">
+                    <div id="pager">
+                        <form>
+                            <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                            <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                            <input type="text" class="pagedisplay" />
+                            <img src="@Url.Content("~/Content/images/next.png")" class="next"/>
+                            <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                            <select class="pagesize">
+                                <option selected="selected" value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                                <option value="40">40</option>
+                            </select>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        </tfoot>
+        }       
+    </table>
+</div>
+
+<div class="content-wrapper" id="div_show1">
+    <h2 class="content-title">Issue Slip (Multiple I/O)</h2>
+    <span id="SpnMsgId" style="color: red;"></span>
+    <div class="purchase-order-wrapper grn_details_wrap">
+        <div class="purchase-order-row" id="buttonSId">
+            <ul>
+                <li class="width-160">
+                    <input type="button" id="btnSave" onclick="Save()" value="Save" />
+                </li>
+                <li class="width-160">
+                    <input type="button" id="btnViewDet" value="View Details" />
+                </li>
+
+
+            </ul>
+        </div>
+        <div class="purchase-order-section">
+
+            <div class="purchase-order-row">
+                <ul>
+                    <li>
+                        <label class="init-lable">Style(Product / Buyer)</label></li>
+                    <li>@Html.HiddenFor(m => m.IssueSlipId)</li>
+                    <li class="width-160" style="width: 280px;">
+                        <input type="text" id="txtStyleProductBuyer" />
+                    </li>
+
+                    <li class="width-150">
+                        <label>Customer</label></li>
+                    <li class="width-90">
+                        <select id="DdlCustomer"></select>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="purchase-order-row">
+                <ul>
+                    <li>
+                        <label class="init-lable">Leather Name</label></li>
+                    <li class="width-160" style="width: 280px;">
+                        <input type="text" id="txtLeatherName" />
+                    </li>
+
+                    <li class="width-150">
+                        <label>Category</label></li>
+                    <li class="width-90 ">
+                        @* <select  id="DDlCategory" ></select>*@
+                        @Html.DropDownListFor(m => m.CategoryId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName())
+                    </li>
+                </ul>
+            </div>
+            <div class="purchase-order-row">
+                <ul>
+                    <li>
+                        <label class="init-lable">Colour</label></li>
+                    <li class="width-90 color-drop-down-wrap" style="width: 280px;">
+                        @* <select id="DDlcolour"></select>*@
+                        @Html.DropDownListFor(m => m.ColourId, MMS.Web.ExtensionMethod.HtmlHelper.ColourName())
+                    </li>
+
+                    <li class="width-150">
+                        <label>Group</label></li>
+                    <li class="width-90">
+                        @*<select  id="DDlGroup" ></select>*@
+                        @Html.DropDownListFor(m => m.GroupId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName())
+                    </li>
+                </ul>
+            </div>
+            <div class="purchase-order-row">
+                <ul>
+                    <li class="import-btn-wrap">
+                        <label>I/O No..</label><input type="button" value="Import IO's" />
+                    </li>
+                    <li>
+                        <textarea rows="5" cols="6"></textarea>
+                    </li>
+                    <li class="right-left-arrow-btn-wrap">
+                        <input type="button" value="<<" />
+                        <input type="button" value=">>" />
+                    </li>
+                    <li>
+                        <textarea rows="5" cols="6"></textarea>
+                    </li>
+                    <li class="display-btn-wrap">
+                        <input type="button" value="Display" />
+                    </li>
+                    <li class="width-150">
+                        <label>No. Of Sets / Pairs</label></li>
+                    <li class="width-90">
+                        <input type="text" /></li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

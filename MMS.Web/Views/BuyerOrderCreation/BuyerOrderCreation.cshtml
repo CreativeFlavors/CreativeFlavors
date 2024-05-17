@@ -1,0 +1,235 @@
+﻿
+@model MMS.Web.Models.BuyerOrderCreationModel.BuyerOrderCreationModel
+@{
+    ViewBag.Title = "BuyerOrderCreation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+<script>
+    
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#BuyerId').val() == "") {
+            alert("Please Select Buyer Name.")
+            $('#BuyerId').css('border-color', 'red');
+            $('#BuyerId').focus();
+            return false;
+        }
+        else {
+            $('#BuyerId').css('border-color', '');
+        }
+         
+        if ($('#MaterialCode').val() == "") {
+            alert("Please Enter Material Code.")
+            $('#MaterialCode').css('border-color', 'red');
+            $('#MaterialCode').focus();
+            return false;
+        }
+        else {
+            $('#MaterialCode').css('border-color', '');
+        }
+        if ($('#MaterialName').val() == "") {
+            alert("Please Enter Material Style.")
+            $('#MaterialName').css('border-color', 'red');
+            $('#MaterialName').focus();
+            return false;
+        }
+        else {
+            $('#MaterialName').css('border-color', '');
+        }
+        if ($('#StockUnit').val() == "") {
+            alert("Please select Stock Unit")
+            $('#StockUnit').css('border-color', 'red');
+            $('#StockUnit').focus();
+            return false;
+        }
+        else {
+            $('#StockUnit').css('border-color', '');
+        }
+
+
+        if ($('#SizeRange').val() == "") {
+            alert("Please Enter Size Range.")
+            $('#SizeRange').css('border-color', 'red');
+            $('#SizeRange').focus();
+            return false;
+        }
+        else {
+            $('#SizeRange').css('border-color', '');
+        }
+
+        if ($('#SketchNo').val() == "") {
+            alert("Please Enter Sketch No.")
+            $('#SketchNo').css('border-color', 'red');
+            $('#SketchNo').focus();
+            return false;
+        }
+        else {
+            $('#SketchNo').css('border-color', '');
+        }
+
+        if ($('#LeatherMainRawMaterial').val() == "") {
+            alert("Please Enter Sketch No.")
+            $('#LeatherMainRawMaterial').css('border-color', 'red');
+            $('#LeatherMainRawMaterial').focus();
+            return false;
+        }
+        else {
+            $('#LeatherMainRawMaterial').css('border-color', '');
+        }
+        if ($('#ProductColor').val() == "") {
+            alert("Please Enter Product Color.")
+            $('#ProductColor').css('border-color', 'red');
+            $('#ProductColor').focus();
+            return false;
+        }
+        else {
+            $('#ProductColor').css('border-color', '');
+        }
+        if ($('#BuyerStyleNo').val() == "") {
+            alert("Please Enter Buyer Style No.")
+            $('#BuyerStyleNo').css('border-color', 'red');
+            $('#BuyerStyleNo').focus();
+            return false;
+        }
+        else {
+            $('#BuyerStyleNo').css('border-color', '');
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/BuyerOrderCreation/BuyerOrderCreation',
+            data: {
+                BuyerOrderCreationID: $('#BuyerOrderCreationID').val(),
+             
+                BuyerId: $('#BuyerId').val(),
+                MaterialCode: $('#MaterialCode').val(),
+                MaterialName: $('#MaterialName').val(),
+                StockUnit: $('#StockUnit').val(),
+                SizeRange: $('#SizeRange').val(),
+                StandardPrice: $('#StandardPrice').val(),
+                ComplexitityFactor: $('#ComplexitityFactor').val(),
+                SketchNo: $('#SketchNo').val(),
+                LeatherMainRawMaterial: $('#LeatherMainRawMaterial').val(),
+                ProductColor: $('#ProductColor').val(),
+                BuyerStyleNo: $('#BuyerStyleNo').val()
+            },
+            success: function (data) {
+                if (data.Status == "Saved") {
+                    alert('Saved Successfully.');
+                    location.href = "/BuyerOrderCreation/BuyerOrderCreation";
+                    return false;
+                }
+                else if (data.Status == "Updated") {
+                    alert('Updated Successfully.');
+                    location.href = "/BuyerOrderCreation/BuyerOrderCreation";
+                    return false;
+                }
+                else if (data.Status == "Already Existed") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/BuyerOrderCreation/BuyerOrderCreation";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#ConveyorCode').val() == "") {
+            alert("Please Enter Conveyor Code.")
+            $('#ConveyorCode').css('border-color', 'red');
+            $('#ConveyorCode').focus();
+            return false;
+        }
+        else {
+            $('#ConveyorCode').css('border-color', '');
+        }
+        if ($('#ConveyorName').val() == "") {
+            alert("Please Enter Conveyor Name.")
+            $('#ConveyorName').css('border-color', 'red');
+            $('#ConveyorName').focus();
+            return false;
+        }
+        else {
+            $('#ConveyorName').css('border-color', '');
+        }
+        if ($('#CapacityPerDay').val() == "") {
+            alert("Please Enter Capacity Per Day.")
+            $('#CapacityPerDay').css('border-color', 'red');
+            $('#CapacityPerDay').focus();
+            return false;
+        }
+        else {
+            $('#CapacityPerDay').css('border-color', '');
+        }
+        if ($('#ConveyorType').val() == "") {
+            alert("Please Enter Conveyor Type.")
+            $('#ConveyorType').css('border-color', 'red');
+            $('#ConveyorType').focus();
+            return false;
+        }
+        else {
+            $('#ConveyorType').css('border-color', '');
+        }
+        if ($('#ConveyorType').val() == "Production") {
+            if ($('#CapacityUnits').val() == "") {
+                alert("Please Enter Capacity Units.")
+                $('#CapacityUnits').css('border-color', 'red');
+                $('#CapacityUnits').focus();
+                return false;
+            }
+            else {
+                $('#CapacityUnits').css('border-color', '');
+            }
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/ConveyorMaster/Update',
+            data: {
+                ConveyorCode: $('#ConveyorCode').val(),
+                ConveyorName: $('#ConveyorName').val(),
+                CapacityPerDay: $('#CapacityPerDay').val(),
+                CapacityUnits: $('#CapacityUnits').val(),
+                ConveyorType: $('#ConveyorType').val(),
+                
+                ConveyorMasterId: $('#ConveyorMasterId').val()
+            },
+            success: function (data) {
+                if (data.ConveyorMasterId != "" || data.ConveyorMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/ConveyorMaster/ConveyorMaster";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/ConveyorMaster/ConveyorMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Buyer Order Creation</h2>
+<div style="width: 100%; float: left;">
+    <div id="tabVehicleWatchList">
+        @Html.Action("BuyerOrderCreationGrid", "BuyerOrderCreation")
+    </div>
+</div>
+
+

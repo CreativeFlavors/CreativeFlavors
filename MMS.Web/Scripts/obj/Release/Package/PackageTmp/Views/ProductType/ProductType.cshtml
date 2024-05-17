@@ -1,0 +1,113 @@
+﻿@model MMS.Web.Models.ProductTypeModel.ProductTypeModels
+@{
+    ViewBag.Title = "ProductType";
+    Layout = "~/Views/Shared/_Layout.cshtml";    
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+
+}
+<style>
+    .color-layout {
+        height: 247px;
+        width: 366px !important;
+    }
+</style>
+
+<script>
+
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+
+
+    function SaveProductType() {
+        if ($('#ProductTypeName').val() == "") {
+            alert("Please Enter the Product Type Name.")
+            $('#ProductTypeName').css('border-color', 'red');
+            $('#ProductTypeName').focus();
+            return false;
+        }
+        else {
+            $('#ProductTypeName').css('border-color', '');
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/ProductType/SaveProductType',
+            data: {
+                ProductTypeName: $('#ProductTypeName').val(),
+                ProductTypeCode: $('#ProductTypeCode').val(),
+                ProductTypeID: $('#ProductTypeID').val()
+            },
+            success: function (data) {
+                if (data.ProductTypeID != "" || data.ProductTypeID != 0) {
+                    alert('Product Type Details Saved Successfully.');
+                    location.href = "/ProductType/ProductType";
+                    return false;
+                }
+                else if (data.ProductTypeID == 0 && data.ProductTypeName != "") {
+                    alert('This Product Type Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/ProductType/ProductType";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('This Product Type Already Exist in the database.');
+            }
+        });
+    }
+
+    function UpdateProductType(arg) {
+        if ($('#ProductTypeName').val() == "") {
+            alert("Please Enter the Product Type Name.")
+            $('#ProductTypeName').css('border-color', 'red');
+            $('#ProductTypeName').focus();
+            return false;
+        }
+        else {
+            $('#ProductTypeName').css('border-color', '');
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/ProductType/UpdateProductType',
+            data: {
+                ProductTypeName: $('#ProductTypeName').val(),
+                ProductTypeCode: $('#ProductTypeCode').val(),
+                ProductTypeID: $('#ProductTypeID').val()
+            },
+            success: function (data) {
+                if (data.ProductTypeID != "" || data.ProductTypeID != 0) {
+                    alert('Product Type Details Updated Successfully.');
+                    location.href = "/ProductType/ProductType";
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/ProductType/ProductType";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('This Product Type Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Product Type</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("ProductTypeGrid", "ProductType")
+    </div>
+</div>
+

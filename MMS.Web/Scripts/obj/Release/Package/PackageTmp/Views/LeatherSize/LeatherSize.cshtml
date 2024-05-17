@@ -1,0 +1,134 @@
+﻿@{
+    ViewBag.Title = "Leather Size";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#Width').val() == "") {
+            $('#Width').css('border-color', 'red');
+            $('#Width').focus();
+            alert("Please Enter Width.");
+            return false;           
+        }
+        else {
+            $('#Width').css('border-color', '');
+        }
+        if ($('#Length').val() == "") {
+            $('#Length').css('border-color', 'red');
+            $('#Length').focus();
+            alert("Please Enter Length.")
+            return false;                      
+        }
+        else {
+            $('#Length').css('border-color', '');
+        }
+       
+        if ($('#Average').val() == "") {
+            $('#Average').css('border-color', 'red');
+            $('#Average').focus();
+            alert("Please Enter Average.")
+            return false;                      
+        }
+        else {
+            $('#Average').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/LeatherSize/LeatherSize',
+            data: {
+                Length: $('#Length').val(),
+                Width: $('#Width').val(),
+                Average: $('#Average').val()
+            },
+            success: function (data) {
+                if (data.LeatherSizeMasterId != "" || data.LeatherSizeMasterId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/LeatherSize/LeatherSize";
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/LeatherSize/LeatherSize";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#Width').val() == "") {
+            $('#Width').css('border-color', 'red');
+            $('#Width').focus();
+            alert("Please Enter Width.")
+            return false;           
+        }
+        else {
+            $('#Width').css('border-color', '');
+        }
+        if ($('#Length').val() == "") {
+            $('#Length').css('border-color', 'red');
+            $('#Length').focus();
+            alert("Please Enter Length.")
+            return false;            
+        }
+        else {
+            $('#Length').css('border-color', '');
+        }
+
+        if ($('#Average').val() == "") {
+            $('#Average').css('border-color', 'red');
+            $('#Average').focus();
+            alert("Please Enter Average.")
+            return false;            
+        }
+        else {
+            $('#Average').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/LeatherSize/Update',
+            data: {
+                Length: $('#Length').val(),
+                Width: $('#Width').val(),
+                Average: $('#Average').val(), 
+                LeatherSizeMasterId: $('#LeatherSizeMasterId').val()
+            },
+            success: function (data) {
+                if (data.LeatherSizeMasterId != "" || data.LeatherSizeMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/LeatherSize/LeatherSize";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/LeatherSize/LeatherSize";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Leather Size Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("LeatherSizeGrid", "LeatherSize")
+    </div>
+</div>

@@ -1,0 +1,123 @@
+﻿@{
+    ViewBag.Title = "Size Rangedetail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+}
+<style>
+
+</style>
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#SizeNo').val() == "" || $('#SizeNo').val() == "0") {
+            alert("Please Enter SizeNo.")
+            $('#SizeNo').css('border-color', 'red');
+            $('#SizeNo').focus();
+            return false;
+        }
+        else {
+            $('#SizeNo').css('border-color', '');
+        }
+
+        if ($('#SizenRangeName').val() == "") {
+            alert("Please Enter Size Range Name.")
+            $('#SizenRangeName').css('border-color', 'red');
+            $('#SizenRangeName').focus();
+            return false;
+        }
+        else {
+            $('#SizenRangeName').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/SizeRangedetail/SizeRangedetail',
+            data: {
+                SizeNo: $('#SizeNo').val(),
+                Size: $('#Size').val(),
+                SizenRangeName: $('#SizenRangeName').val(),
+                //OriginMasterId: $('#OriginMasterId').val()
+            },
+            success: function (data) {
+                if (data.SizeRangeDetailsId != "" || data.SizeRangeDetailsId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/SizeRangedetail/SizeRangedetail";
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/SizeRangedetail/SizeRangedetail";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#SizeNo').val() == "" || $('#SizeNo').val() == "0") {
+            alert("Please Enter SizeNo.")
+            $('#SizeNo').css('border-color', 'red');
+            $('#SizeNo').focus();
+            return false;
+        }
+        else {
+            $('#SizeNo').css('border-color', '');
+        }
+
+        if ($('#SizenRangeName').val() == "") {
+            alert("Please Enter Size Range Name.")
+            $('#SizenRangeName').css('border-color', 'red');
+            $('#SizenRangeName').focus();
+            return false;
+        }
+        else {
+            $('#SizenRangeName').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/SizeRangedetail/Update',
+            data: {
+                SizeNo: $('#SizeNo').val(),
+                Size: $('#Size').val(),
+                SizenRangeName: $('#SizenRangeName').val(),
+                SizeRangeDetailsId: $('#SizeRangeDetailsId').val()
+            },
+            success: function (data) {
+                if (data.SizeRangeDetailsId != "" || data.SizeRangeDetailsId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/SizeRangedetail/SizeRangedetail";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/SizeRangedetail/SizeRangedetail";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Size RangeDetails  Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("SizeRangeDetailsGrid", "SizeRangedetail")
+    </div>
+</div>
+
+

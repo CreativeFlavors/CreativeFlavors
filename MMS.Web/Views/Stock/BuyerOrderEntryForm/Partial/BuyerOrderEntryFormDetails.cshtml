@@ -1,0 +1,2154 @@
+﻿@model MMS.Web.Models.StockModel.OrderEntryModel
+@using MMS.Repository.Managers.StockManager
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+@{
+    int count = 1;
+    int scheduleCount = 1;
+    int parkingTypeCount = 1;
+}
+@{
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("BuyerOrderEntryForm", PermissionSettingModel.PermissionID);
+
+    bool AddMultiSchedule = false; bool PackageTypeAdd = false; bool ExcelforPL = false; bool NotifyMsgMSS = false;
+    bool Save = false; bool Add = false; bool Update = false; bool Display = false; bool Edit = false; bool Delete = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Excel for P/L")
+        {
+            ExcelforPL = true;
+        }
+        if (item.PermissionDesc == "Notify Msg / MSS")
+        {
+            NotifyMsgMSS = true;
+        }
+        if (item.PermissionDesc == "BOEPackageTypeAdd")
+        {
+            PackageTypeAdd = true;
+        }
+        if (item.PermissionDesc == "Add Multi Schedule")
+        {
+            AddMultiSchedule = true;
+        }
+        if (item.PermissionDesc == "Save")
+        {
+            Save = true;
+        }
+        if (item.PermissionDesc == "Display")
+        {
+            Display = true;
+        }
+        if (item.PermissionDesc == "Add")
+        {
+            Add = true;
+        }
+        if (item.PermissionDesc == "Update")
+        {
+            Update = true;
+        }
+        if (item.PermissionDesc == "Edit")
+        {
+            Edit = true;
+        }
+        if (item.PermissionDesc == "Delete")
+        {
+            Delete = true;
+        }
+    }
+}
+<script src="~/Scripts/jquery-1.8.2.js"></script>
+<style>
+    [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: static !important;
+    }
+
+    .right-form-section {
+        width: 98% !important;
+    }
+
+    .Buyserwidht {
+        width: 98.333%;
+    }
+</style>
+<div class="right-form-section clearfix">
+    <form id="buyer-form" class="form-inline" role="form">
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#step1">Buyer Details</a></li>
+
+            <li><a data-toggle="tab" href="#step3">BOE Packing Details</a></li>
+            <li><a data-toggle="tab" href="#step4">BOE Shipment Details</a></li>
+            <li><a data-toggle="tab" href="#step5">Other Details</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="step1" class="tab-pane fade in active">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 pull-right no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 ">
+                                        <label for="text" class="form-label"><span class="orange-lable">Amendment No</span></label>
+                                        @Html.TextBoxFor(x => x.AmendmentNoWithDate, new { @class = "orange-text-field" })
+                                        <label for="text" class="form-label"><span class="orange-lable">with date</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 col-xs-12 no-padding">
+                            <div class="col-xs-12">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Buyer order SI.No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div class="col-md-3 col-sm-3 Buyserwidht col-xs-12 pull-left no-padding">
+                                                @Html.TextBoxFor(m => m.BuyerOrderSlNo, new { @class = "form-control text-field frm-edit" })
+
+                                            </div>
+                                            <div class="col-xs-12  pull-right no-padding">
+                                                <button type="submit" class="btn btn-default btn-style display-buyer-order">Display IO No. with Style </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Date</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @if (Model != null && Model.OrderEntryId != 0)
+                                            {
+                                                var from = Model.Date;
+                                                @Html.TextBoxFor(m => m.Date, new { @Value = from, @class = "form-control text-field" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.Date, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field" })
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Buyer Season</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.BuyerSeason, MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "select-style text-field" })
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Buyer Name</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.BuyerName, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Order Projection No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.OrderProjectionNo, new { @class = "form-control text-field frm-edit" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Buyer PO No/Buyer Order</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.BuyerPoNo, new { @class = "form-control text-field frm-edit" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Our Style</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12" id="OurStyleFocus">
+                                            @Html.DropDownListFor(m => m.OurStyle, MMS.Web.ExtensionMethod.HtmlHelper.BuyerOrderCreationOurStyle(), new { @class = "select-style text-field ourStyleChange" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <p class="section-title des-buyer-title des-width des-change">Description :</p>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Leather</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.LeatherDescription, MMS.Web.ExtensionMethod.HtmlHelper.GetLeather(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <p class="section-title des-buyer-title des-width des-change">Description :</p>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Discount %</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.DiscountPer, new { @class = " form-control text-field frm-edit", @onkeypress = "return isNumberKey(event)" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Quote No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.QuoteNo, new { @class = "form-control text-field frm-edit", @onkeypress = "return isNumberKey(event)" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Country Stamp</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.CountryStamp, MMS.Web.ExtensionMethod.HtmlHelper.CountryName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Customer Plan</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.CustomerPlan, new SelectList(
+                  new List<Object>{
+                       new { value = 0 , text = "AsPlanned"  },
+                       new { value = 1 , text = "test" }
+
+                    },
+                  "value",
+                  "text",
+                   2), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Date</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @if (Model != null && Model.OrderEntryId != 0)
+                                            {
+                                                var from = Model.CustomerDate;
+                                                @Html.TextBoxFor(m => m.CustomerDate, new { @Value = from, @class = "form-control text-field" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.CustomerDate, new { @Value = System.DateTime.Now.ToString("dd/MM/yyyy"), @class = "form-control text-field frm-edit" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Agent</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.AgentMasterId, MMS.Web.ExtensionMethod.HtmlHelper.AgentName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Comm.%</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.CommPer, new { @class = "form-control text-field frm-edit", @onkeypress = "return isNumberKey(event)" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">EX.Factory Date</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @if (Model != null && Model.OrderEntryId != 0)
+                                            {
+                                                var from = Model.ExFactoryDate;
+                                                @Html.TextBoxFor(m => m.ExFactoryDate, new { @Value = from, @class = "form-control text-field" })
+
+                                            }
+                                            else
+                                            {
+                                                @Html.Partial("~/Views/Stock/BuyerOrderEntryForm/Partial/DatePickerView.cshtml")
+
+                                            }
+
+
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Shipment Mode</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.ShipmentMode, new SelectList(
+                  new List<Object>{
+                      new { value = 0 , text = "Please Select"  },
+                       new { value = 1 , text = "Air"  },
+                       new { value = 2 , text = "Sea" }
+
+                    },
+                  "value",
+                  "text",
+                   0), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">SEASON</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.SEASON, new { @class = "form-control frm-edit text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Purchase</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.Purchase, new { @class = "form-control frm-edit text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-sm-8 col-xs-12 pull-right no-padding">
+
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Lot No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.LotNo, new { @class = "form-control text-field frm-edit" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Count</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.Count, new { @class = "form-control text-field frm-edit", @onkeypress = "return isNumberKey(event)" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Week No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.WeekNo, new { @class = "form-control text-field frm-edit", @readonly = true })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Sample Req No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.SampleReqNo, new { @class = "form-control text-field frm-edit" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Brand</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.Brand, new { @class = "form-control text-field frm-edit" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Buyer Style No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.BuyerStyleNo, new { @class = "form-control text-field frm-edit" })
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Barcode No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.BarCodeNo, new { @class = "form-control text-field frm-edit" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">BOM No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.BomNo, MMS.Web.ExtensionMethod.HtmlHelper.Bom(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Last</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.Last, new { @class = "form-control text-field frm-edit" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Color</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.ColorMasterId, new { @class = "form-control text-field frm-edit" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Finished Prod.Type</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @{
+                                                List<SelectListItem> listItems = new List<SelectListItem>();
+                                                listItems.Add(new SelectListItem
+                                                {
+                                                    Text = "Full Shoes",
+                                                    Value = "Full Shoes"
+                                                });
+                                                listItems.Add(new SelectListItem
+                                                {
+                                                    Text = "Upper",
+                                                    Value = "Upper"
+                                                });
+                                            }
+                                            @Html.DropDownListFor(model => model.FinishedProdType, listItems, "Please Select", new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Product Type</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.ProductTypeId, MMS.Web.ExtensionMethod.HtmlHelper.BuyerProductType(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-12 col-xs-12">
+                                            <label for="text" class="form-label">Multiple Schedule</label>
+                                            @if (AddMultiSchedule == true)
+                                            {
+                                                <input type="button" value="Add Multi Schedule" onclick="AddTextBoxForMultipleSchedule()" class="btn btn-default btn-style" />
+                                            }
+                                            else
+                                            {
+                                                <input type="button" value="Add Multi Schedule" onclick="alert('No Permission To access !')" class="btn btn-default btn-style" />
+                                            }
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-12 col-xs-12">
+                                            <div class="table-responsive table-td-padding parent-table-height padding-lr-6px table-row-bg table-change">
+                                                @Html.HiddenFor(x => x.MultipleSchedule)
+                                                <table class="table" id="multipleScheduleTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>IO</td>
+                                                            <td>Size</td>
+                                                            <td>Qty</td>
+                                                            <td>Ex.f.Dt</td>
+                                                            <td></td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @if (Model.MultipleScheduleDetailsList != null)
+                                                        {
+                                                            foreach (var item in Model.MultipleScheduleDetailsList)
+                                                            {
+                                                                <tr>
+                                                                    <td>@item.Io</td>
+                                                                    <td><input type="text" id="sizeId@(scheduleCount)" value="@item.Size" style='width:50px;' /></td>
+                                                                    <td><input type="text" id="qtyId@(scheduleCount)" value="@item.Qty" style='width:50px;' /></td>
+                                                                    <td><input type="text" id="factoryDateId@(scheduleCount)" value="@item.ExFDt" style='width:75px;' /></td>
+                                                                    <td></td>
+                                                                </tr>
+                                                                scheduleCount++;
+                                                            }
+                                                        }
+
+                                                    </tbody>
+                                                    <tfoot class="footer-bg-gray">
+                                                        <tr>
+                                                            <td>Total</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section margin-field margin-field-change">
+                                    <div class="form-group">
+                                        <div class="col-xs-12">
+                                            <label for="text" class="form-label">Corton Detail</label>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <div class="table-responsive table-td-padding parent-table-height padding-lr-6px table-row-bg">
+                                                <table class="table" id="CortonDetailTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>Pack Type</td>
+                                                            <td>No. Of Carton</td>
+                                                            <td></td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>@Html.TextBoxFor(x => x.packType, new { @style = "width:50px;" })</td>
+                                                            <td>@Html.TextBoxFor(x => x.noOfCarton, new { @style = "width:50px;" })</td>
+                                                            <td></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Total Order for the week</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.TotalOrderForWeek, new { @class = "form-control text-field frm-edit", @onkeypress = "return isNumberKey(event)" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            @Html.DropDownListFor(m => m.OrderType, new SelectList(new List<Object>{
+                                                                                   new { value = 0 , text = "original"  },
+                                                                                   new { value = 1 , text = "test" }}, "value", "text", 2), new { @class = "select-style text-field" })
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                                            @Html.TextBoxFor(x => x.Currency, new { @class = "form-control frm-edit text-field" })
+                                        </div>
+                                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                                            @Html.TextBoxFor(x => x.Rs, new { @class = "form-control text-field frm-edit" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 orange-lable">
+                                            If we get Additional Order on the same style on the same season the Qty shouuld be added
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-3 col-sm-3 col-lg-2 col-xs-12">
+                                            <label for="text" class="form-label">Parties</label>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3 col-lg-2 col-xs-12 margin-btm-change">
+                                            <div style="float:left">
+                                                @Html.TextBoxFor(m => m.Parties, new { @class = "form-control text-field frm-edit frm-change", @onkeypress = "return isNumberKey(event)", @style = "width:100%!important;" })
+
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12 no-padding">
+                                            <div style="float:left;padding-left:0px;margin-top:5px;">
+                                                <span id="Partiesid" value="">  </span> <span>Parties=</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3 col-lg-5 col-xs-12" style="padding-left:0;">
+                                            <div style="float:left;padding-left:0;" class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.PartiesAmount1, new { @class = "form-control text-field frm-edit", @style = "width:100%;" })
+                                            </div>
+                                            <div style="float:left" class="col-xs-6 no-padding">
+                                                @Html.DropDownListFor(m => m.ShortUnitID, MMS.Web.ExtensionMethod.HtmlHelper.ShortUnitName(), new { @class = "select-style text-field", @style = "width:100%;" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Grade</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.GradeMasterId, MMS.Web.ExtensionMethod.HtmlHelper.GetLeatherShoeGrade(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Size Range</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.SizeRangeMasterId, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="table-responsive table-td-padding padding-lr-6px table-row-bg" style="height:250px;overflow:auto;">
+                                            @Html.HiddenFor(x => x.SizeQuantityRate)
+                                            <table class="table" id="sizeRangeTable">
+                                                <thead>
+                                                    <tr>
+                                                        <td>Size</td>
+                                                        <td>Qty</td>
+                                                        <td>Rate</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if (Model.SizeRangeQtyRateList != null && Model.SizeRangeQtyRateList.Count > 0)
+                                                    {
+                                                        Model.SizeRangeQtyRateList = Model.SizeRangeQtyRateList.OrderBy(x => decimal.Parse(x.SizeRange)).ToList();
+                                                        foreach (var item in Model.SizeRangeQtyRateList)
+                                                        {
+                                                            <tr>
+                                                                <td class="sizeVal">@item.SizeRange</td>
+                                                                <td><input type="text" class="qty_Total" id="qtyId@(count)" value="@item.Qty" style='width:50px;' onchange="CalculateTotal(this)" /></td>
+                                                                @Html.HiddenFor(x => x.SizeRangeQtyRateList)
+                                                                <td><input type="text" class="sizeRate" id="Rate@(count)" value="@item.Rate" style='width:50px;' /></td>
+                                                            </tr>
+                                                            count++;
+                                                        }
+                                                    }
+                                                </tbody>
+                                                <tfoot class="footer-bg-gray">
+                                                    <tr>
+                                                        <td>Total</td>
+                                                        @if (Model != null && Model.TotalAmount != 0)
+                                                        {
+                                                            <td id="TotalAmount">@Model.TotalAmount</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td id="TotalAmount">  <input type="hidden" name="TotalAmount" /> </td>
+                                                        }
+
+                                                        <td>Avg.rate</td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (Model.OrderEntryId == 0)
+                                {
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="">
+                                                <label for="text" class="form-label">Line No</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                <label id="lineNo"></label>
+                                            </div>
+                                            <div class="">
+                                                @if (Save == true)
+                                                {
+                                                    <input type="button" id="AddBtn" value="ADD" class="btn btn-default btn-style" />
+                                                }
+                                                else
+                                                {
+                                                    <input type="button" id="" onclick="alert('Permission Access Denied')" value="ADD" class="btn btn-default btn-style" />
+                                                }
+                                                @if (Update == true)
+                                                {
+                                                    <input type="button" id="UpdateBtn" style="display:none;" value="Update" class="btn btn-default btn-style" />
+                                                }
+                                                else
+                                                {
+                                                    <input type="button" id="" onclick="alert('Permission Access denied')" style="display:none;" value="Update" class="btn btn-default btn-style" />
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-4 col-lg-12 col-sm-4 col-xs-12">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+                                            @Html.TextArea("Remarks1", null, new { @class = "form-control frm-edit text-field", @placeholder = "Remarks:" })
+                                        </div>
+                                        <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-pad">
+                                            @Html.TextArea("Remarks2", null, new { @class = "form-control frm-edit text-field", @placeholder = "Other Specifications: Just text as customer Instruction" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad text-desc">
+                                    <p class="text-center" style="color: #f35339;">Tax and Other Change for Retail $ jobwork Order Should be Included</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <hr class="border-adjust">
+                    @if (Model.OrderEntryId == 0)
+                    {
+                        <div class="row clearfix">
+                            <div class="field-section">
+                                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                    <div class="table-responsive table-td-padding">
+                                        <table class="table" id="list-amended-material">
+                                            <thead>
+                                                <tr>
+                                                    <td>Buyer order SI.No</td>
+                                                    <td>Date</td>
+                                                    <td>Buyer Season</td>
+                                                    <td>Buyer Name</td>
+                                                    <td>Order Projection No</td>
+                                                    <td>Buyer PO No</td>
+                                                    <td>Our Style</td>
+                                                    <td>Leather</td>
+                                                    <td>Discount %</td>
+                                                    <td>Quote No</td>
+                                                    <td>Country Stamp</td>
+                                                    <td>Customer Plan</td>
+                                                    <td>Customer Date</td>
+                                                    <td>Agent</td>
+                                                    <td>Comm.%</td>
+                                                    <td>EX.Factory Date</td>
+                                                    <td>Remarks</td>
+                                                    <td>Remarks2</td>
+                                                    <td>Shipment Mode</td>
+                                                    <td>Lot No</td>
+                                                    <td>Count</td>
+                                                    <td>Week No</td>
+                                                    <td>Sample Req No</td>
+                                                    <td>Brand</td>
+                                                    <td>Buyer Style No</td>
+                                                    <td>Barcode No</td>
+                                                    <td>BOM No</td>
+                                                    <td>Last</td>
+                                                    <td>Color</td>
+                                                    <td>Finished Prod.Type</td>
+                                                    <td>Product Type</td>
+                                                    <td>packType</td>
+                                                    <td>noOfCarton</td>
+                                                    <td>Amendment No</td>
+                                                    <td>Total Order</td>
+                                                    <td>OrderType</td>
+                                                    <td>Currency</td>
+                                                    <td>Rs</td>
+                                                    <td>Parties</td>
+
+                                                    <td>PartiesAmount1</td>
+                                                    <td>ShortUnitID</td>
+                                                    <td>PartiesAmount2</td>
+                                                    <td>LongUnitID</td>
+
+                                                    <td>Grade</td>
+                                                    <td>Size Range</td>
+                                                    <td>Country Stamp</td>
+                                                    <td>Shipment From </td>
+                                                    <td>Shipment To</td>
+                                                    <td>Other Instruction</td>
+                                                    <td>Payment Terms</td>
+                                                    <td>Delivary Terms </td>
+                                                    <td>Insurance</td>
+                                                    <td>Delivary To</td>
+                                                    <td>Special Instructions</td>
+                                                    <td>Packing/Labeling</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div id="step3" class="tab-pane fade">
+                <div class="container-fluid">
+
+                    <div class="row">
+                        <div class="field-section">
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12" style="margin-top: 15px;">
+                                <p class="section-title">Packing Type and Size Details </p>
+                                <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 pad">
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                    <label for="text" class="form-label">Packing Type</label>
+                                                </div>
+                                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                    @Html.TextBoxFor(m => m.PackingType, new { @class = "form-control frm-edit text-field" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                    <label for="text" class="form-label">Size Range</label>
+                                                </div>
+                                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                    @Html.DropDownListFor(m => m.PackageSizeRangeMasterId, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "select-style text-field" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                                                    @{
+
+                                                        if (PackageTypeAdd == true)
+                                                        {
+                                                            <button type="button" class="btn btn-default btn-style width-78" id="packingBtn">Add</button>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="button" value="Add" onclick="alert('No Permission To access !')" class="btn btn-default btn-style" />
+                                                        }
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12 pad">
+                                    <div class="col-md-8 col-sm-8 col-lg-8 col-xs-12 no-padding padding-right-20 visbile-hide-show-sec">
+                                        <p class="section-title">Number of Cartons</p>
+                                        <div class="table-responsive table-td-padding parent-table-height">
+                                            @Html.HiddenFor(x => x.PackingDetail)
+                                            <table class="table" id="packingDetailsTable">
+                                                <thead>
+                                                    <tr>
+                                                        <td>SI. No</td>
+                                                        <td>Pack Type</td>
+                                                        <td>Size Range</td>
+                                                        <td>Total Pairs per cartons</td>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if (Model.PackingDetailsList != null)
+                                                    {
+                                                        foreach (var item in Model.PackingDetailsList)
+                                                        {
+                                                            <tr>
+                                                                <td>@parkingTypeCount</td>
+                                                                <td class="PackingType">@item.PackingType</td>
+                                                                <td class="PackageSizeRangeMasterId">@item.SizeRangeMasterId</td>
+                                                                <td class="Size"><input type="text" value="@item.Size" /></td>
+                                                            </tr>
+                                                            parkingTypeCount++;
+                                                        }
+                                                    }
+
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div id="step4" class="tab-pane fade">
+                <div class="container-fluid">
+
+                    <div class="row">
+
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12" style="margin-top: 15px;">
+                            <p class="section-title">Shipment Details</p>
+
+                            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 pad">
+                                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Country Stamp</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(m => m.ShipmentCountryStamp, new { @class = "form-control frm-edit text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form- ">Shipment From </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextArea("ShipmentFrom", null, new { @class = "form-control frm-edit text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form- ">Shipment To</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextArea("ShipmentTo", null, new { @class = "form-control frm-edit text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section" style="margin-bottom: 20px;">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Any other Instruction from Buyer regarding shipment</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextArea("OtherInstruction", null, new { @class = "form-control frm-edit text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="step5" class="tab-pane fade">
+                <div class="container-fluid">
+                    <div class="row">
+
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12" style="margin-top: 15px;">
+                            <p class="section-title">Other Details</p>
+
+                            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 pad">
+                                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Payment Terms</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(m => m.PaymentTerms, new { @class = "form-control frm-edit text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Delivary Terms </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(m => m.DeliveryTerms, new { @class = "form-control frm-edit text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Insurance</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(m => m.Insurance, new { @class = "form-control frm-edit text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Delivary To</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(m => m.DeliveryTo, new { @class = "form-control frm-edit text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Special Instructions</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextArea("SpecialInstruction", null, new { @class = "form-control frm-edit text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Packing/Labeling</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextArea("PackingLabeling", null, new { @class = "form-control frm-edit text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 pad" style="margin-top: 20px;">
+                                <div class="col-md-8 col-sm-8 col-lg-8 col-xs-12 no-padding">
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                                                <label for="text" class="form-label" style="margin-top: 10px;">Attachment File-1</label>
+                                            </div>
+                                            <div class="col-md-9 col-sm-9 col-lg-9 col-xs-12 pad">
+                                                <input id="uploadFile" placeholder="Choose File"
+                                                       style="border: 2px solid rgb(221, 221, 221); height: 31px; background-color: rgb(255, 255, 255);" disabled="disabled" />
+                                                <div class="fileUpload btn btn-primary">
+                                                    <span>Upload</span>
+                                                    <input id="uploadBtn" type="file" class="upload" />
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                                                <label for="text" class="form-label" style="margin-top: 10px;">Attachment File-2</label>
+                                            </div>
+                                            <div class="col-md-9 col-sm-9 col-lg-9 col-xs-12 pad">
+                                                <input id="uploadFile" placeholder="Choose File"
+                                                       style="border: 2px solid rgb(221, 221, 221); height: 31px; background-color: rgb(255, 255, 255);" disabled="disabled" />
+                                                <div class="fileUpload btn btn-primary">
+                                                    <span>Upload</span>
+                                                    <input id="uploadBtn" type="file" class="upload" />
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                                                <label for="text" class="form-label" style="margin-top: 10px;">Attachment File-3</label>
+                                            </div>
+                                            <div class="col-md-9 col-sm-9 col-lg-9 col-xs-12 pad">
+                                                <input id="uploadFile" placeholder="Choose File"
+                                                       style="border: 2px solid rgb(221, 221, 221); height: 31px; background-color: rgb(255, 255, 255);" disabled="disabled" />
+                                                <div class="fileUpload btn btn-primary">
+                                                    <span>Upload</span>
+                                                    <input id="uploadBtn" type="file" class="upload" />
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="form-footer form-footer-change">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                    @{
+
+
+                        if (ExcelforPL == true)
+                        {
+                            <button type="submit" class="btn btn-default btn-style">Excel for P/L</button>
+                        }
+                        else
+                        {
+                            <input type="button" value="Excel for P/L" onclick="alert('No Permission To access !')" class="btn btn-default btn-style" />
+                        }
+                        <input type="button" class="btn btn-default btn-style" value="Cancel" onclick="Cancel()" />
+
+
+                        if (Model.OrderEntryId == 0)
+                        {
+                            if (Save == true)
+                            {
+                                <input type="button" id="BtnSave" class="btn btn-default btn-style" value="Save" onclick="Save()" />
+                            }
+                            else
+                            {
+                                <input type="button" id="BtnSave" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Save">
+                            }
+                        }
+                        else
+                        {
+                            if (Update == true)
+                            {
+                                @Html.HiddenFor(x => x.OrderEntryId)
+                                <input type="button" id="BtnSave" class="btn btn-default btn-style" value="Update" onclick="Update()" />
+                            }
+                            else
+                            {
+                                <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Update">
+                            }
+                        }
+
+
+                        <button type="submit" class="btn btn-default btn-style">Clear</button>
+                        if (NotifyMsgMSS == true)
+                        {
+                            <button type="submit" class="btn btn-default btn-style">Notify Msg / MSS</button>
+                        }
+                        else
+                        {
+                            <input type="button" value="Notify Msg / MSS" onclick="alert('No Permission To access !')" class="btn btn-default btn-style" />
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </form>
+    <p class="bottom-para bottom-para-change"><b>PS</b> : Import to be incorporated from customer given Excel sheet.</p>
+</div>
+<div class="lefterr_icon">
+    <div class="direction">  &lt;  </div>
+</div>
+<div class="righterr_icon">
+    <div class="direction-right" id="close_btn"><img src="..\\content\images\damage_delete.png" /></div>
+</div>
+<link href="~/Scripts/EasyAutocomplete-1.3.5/comboStyles.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/ComboBox.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        if ("@Model.BuyerOrderSlNo")
+        {
+            var username = @HttpContext.Current.Session["UserType"].ToString();
+            if ((username == 3) ||  (username == 4))
+            {
+                $('#buyer-form input').attr("disabled", true);
+                $('#buyer-form select').attr("disabled", true);
+            }
+        }
+
+    }
+   )
+
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    $(function () {
+        $("#OurStyle").combobox();
+        $(".hasDatepicker2").datepicker({ dateFormat: "dd/mm/yy" });
+    });
+    $(document).on('change', '#BuyerOrderSlNo', function () {     
+     
+        var BuyerOrderSlNo = $('#BuyerOrderSlNo').val();
+        var buyerSeason = $("#BuyerSeason").val();
+        var buyerName = $("#BuyerName").val();
+        if (buyerSeason == "") {
+            $('#BuyerOrderSlNo').val("");
+            $("#AddBtn").hide();
+            alert("Please select the buyer season.");
+            return false;
+        }
+        else if (buyerName == "") {
+            $("#AddBtn").hide();
+            $('#BuyerOrderSlNo').val("");
+            alert("Please select the buyer name.");
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: ' @Url.Action("isExistBuyerOrderSlNO", "BuyerOrderEntryForm")',
+            data: { BuyerOrderSlNo: BuyerOrderSlNo, BuyerSeason: buyerSeason, BuyerName: buyerName },
+            success: function (Message) {
+                if (Message == "Already Existed") {
+                    alert("Already Existed please enter another no.");
+                    return false;
+                }
+                else {
+                    $("#AddBtn").show();
+                }
+            },
+        });
+
+    });
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode != 46 && charCode > 31
+          && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+
+    $(function () {
+        $("#Parties").blur(function () {
+
+            var style = $('#Parties').val();
+            $('#Partiesid').text(style);
+        });
+    });
+    $('#close_btn').click(function () {
+        location.reload();
+    })
+    $("#BuyerSeason").change(function () {
+        $.ajax({
+            type: 'POST',
+            url: ' @Url.Action("GetTotalOredrWeek", "BuyerOrderEntryForm")',
+            data: { BuyerSeasonId: $('#BuyerSeason').val(), currentWeek: $('#WeekNo').val() },
+            success: function (data) {
+                $("#TotalOrderForWeek").val(data);
+            },
+        });
+    });
+    $("#BuyerName").change(function () {
+        $.ajax({
+            type: 'POST',
+            url: ' @Url.Action("GetBuyerNameOrderCnt", "BuyerOrderEntryForm")',
+            data: { BuyerSeasonId: $('#BuyerSeason').val(), currentWeek: $('#WeekNo').val(), buyerName: $('#BuyerName').val() },
+            success: function (data) {
+                $("#TotalOrderForWeek").val(data);
+            },
+        });
+    });
+    $(document).on('change', '#SizeRangeMasterId', function () {
+        $.ajax({
+            type: "GET",
+            dataType: "JSON",
+            url: '@Url.Action("GetSizeRange", "BuyerOrderEntryForm")',
+            data: { SizeRangeMasterId: $(this).val() },
+            success: function (data) {
+                var count = 1;
+                console.log(data);
+                $("#sizeRangeTable tbody").html("");
+                for (var i = 0; i <= data.length - 1; i++) {
+                    $("#sizeRangeTable tbody").append("<tr><td class='sizeVal'>" + data[i].SizeRangeRefValue + "</td><td><input class='qty_Total' type='text'  id='qtyId" + count + "' style='width:50px;' value='0' onchange='CalculateTotal(this)' /></td><td><input type='text' class='sizeRate' id='Rate" + count + "' value='0' style='width:50px;' /></td></tr>");
+                    count++;
+                }
+            }
+        });
+    });
+    function CalculateTotal(agr1) {
+
+        var buyerTotalcnt = 0;
+        var add = 0;
+        $("#sizeRangeTable .qty_Total").each(function () {
+            add += Number($(this).val());
+        });
+        if ($('#TotalOrderForWeek').val() == "") {
+            buyerTotalcnt = 0;
+        }
+        else {
+            buyerTotalcnt = $('#TotalOrderForWeek').val();
+        }
+        $('#TotalAmount').text(add);
+        buyerTotalcnt = parseInt($('#TotalAmount').text().trim()) + parseInt($('#TotalOrderForWeek').val());
+        $('#TotalOrderForWeek').val(buyerTotalcnt);
+    }
+
+    $(function () {
+        $("#OurStyle").combobox({
+            select: function (event, ui) {
+                var BomID = $('#OurStyle option:selected').text();
+                $('#Last').val(BomID.substring(5, 8));
+                $('#ColorMasterId').val(BomID.substring(9, 13));
+                $('#BuyerStyleNo').val(BomID.substring(0, 4));
+                $.ajax({
+                    type: 'POST',
+                    url: ' @Url.Action("GetBuyerOrderCreationID", "BuyerOrderCreation")',
+                    data: { BuyerOrderCreationID: $("#OurStyle").val() },
+                    success: function (data) {
+                        $("#LeatherDescription").val(data.LeatherName_1);
+                        $("#ProductTypeId").val(data.BuyerModel_ProductType);
+                        $("#FinishedProdType").val(data.FinishedProductType);
+                        $("#BomNo option:contains(" + data.BomNo + ")").attr('selected', 'selected');
+                    },
+                });
+            }
+        });
+    });
+
+    function Save() {
+        var rowCount = $('#list-amended-material tr').length - 1;
+        if (rowCount == 0) {
+            if (validation()) {
+
+                var qtyCount = 0;
+                var qtyArr = [];
+                $('#TotalAmount').val($('#TotalAmount').text().trim());
+
+                var qtyCount = 0;
+                var qtyArr = [];
+                $('#sizeRangeTable tbody tr').each(function () {
+
+                    qtyCount++
+                    qtyArr.push(
+                        {
+                            Size: $(this).find('.sizeVal').text(),
+                            quantity: $(this).find('td:nth-child(2) input[type=text]').val(),
+                            Rate: $(this).find('td:nth-child(3) input[type=text]').val()
+                        });
+
+                    console.log(qtyArr)
+
+                });
+
+                $('#SizeQuantityRate').val(JSON.stringify(qtyArr));
+
+
+                var scheduleArr = [];
+
+                $('#multipleScheduleTable tbody tr').each(function () {
+
+                    scheduleArr.push(
+                            {
+                                Io: $(this).find('td:first').html(),
+                                Size: $(this).find('td:nth-child(2) input[type=text]').val(),
+                                quantity: $(this).find('td:nth-child(3) input[type=text]').val(),
+                                Date: $(this).find('td:nth-child(4) input[type=text]').val()
+                            });
+
+                });
+
+                $('#MultipleSchedule').val(JSON.stringify(scheduleArr));
+
+                var packingDetailsArr = [];
+
+                $("#packingDetailsTable tbody tr").each(function () {
+
+                    packingDetailsArr.push(
+                        {
+                            PackingType: $(this).find('.PackingType').html(),
+                            SizeRangeMasterId: $(this).find('.PackageSizeRangeMasterId').html(),
+                            Size: $(this).find('input[type=text]').val()
+                        });
+
+                });
+
+                $("#PackingDetail").val(JSON.stringify(packingDetailsArr));
+                var input = $("<input>")
+            .attr("type", "hidden")
+            .attr("name", "TotalAmount_").val($('#TotalAmount').text().trim());
+                var amount = $('#TotalAmount').text().trim();
+                var forms = $("#buyer-form").serialize() + '&TotalAmount=' + amount + '&ExFactoryDate=' + $("#ExFactoryDate").val();
+
+                if ($("#list-amended-material tbody tr").length == 0) {
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/BuyerOrderEntryForm/BuyerOrderEntryForm',
+                        data: forms,
+                        success: function (data) {
+                            if (data == "Saved") {
+                                alert('Saved Successfully.');
+                                location.href = "/BuyerOrderEntryForm/BuyerOrderEntryFormView";
+                                return false;
+                            }
+                            else if (data == "Updated") {
+                                alert('Updated Successfully.');
+                                location.href = "/BuyerOrderEntryForm/BuyerOrderEntryFormView";
+                                return false;
+                            }
+                            else if (data == "Already Exist") {
+                                alert('Already Existed.');
+                                return false;
+                            }
+                            else {
+                                alert('Save process Failed.');
+                                location.href = "/BuyerOrderEntryForm/BuyerOrderEntryFormView";
+                                return false;
+                            }
+                        }
+                    });
+
+                }
+            }
+        }
+        else {
+
+            var wholeJsonList = [];
+
+            $('#list-amended-material tbody tr').each(function () {
+                alert('Total Amount:' + $(this).find('#TotalAmount').text());
+                wholeJsonList.push(
+                    {
+                        BuyerOrderSlNo: $(this).find('span').html(),
+                        Date: $(this).find('.Date').html(),
+                        BuyerSeason: $(this).find('.BuyerSeason').html(),
+                        BuyerName: $(this).find('.BuyerName').html(),
+                        OrderProjectionNo: $(this).find('.OrderProjectionNo').html(),
+                        BuyerPoNo: $(this).find('.BuyerPoNo').html(),
+                        OurStyle: $(this).find('.OurStyle').html(),
+                        LeatherDescription: $(this).find('.LeatherDescription').html(),
+                        DiscountPer: $(this).find('.DiscountPer').html(),
+                        QuoteNo: $(this).find('.QuoteNo').html(),
+                        CountryStamp: $(this).find('.CountryStamp').html(),
+                        CustomerPlan: $(this).find('.CustomerPlan').html(),
+                        CustomerDate: $(this).find('.CustomerDate').html(),
+                        AgentMasterId: $(this).find('.AgentMasterId').html(),
+                        CommPer: $(this).find('.CommPer').html(),
+                        ExFactoryDate: $(this).find('.ExFactoryDate').html(),
+                        ShipmentMode: $(this).find('.ShipmentMode').html(),
+                        Remarks1: $(this).find('.Remarks1').html(),
+                        Remarks2: $(this).find('.Remarks2').html(),
+                        LotNo: $(this).find('.LotNo').html(),
+                        Count: $(this).find('.Count').html(),
+                        WeekNo: $(this).find('.WeekNo').html(),
+                        SampleReqNo: $(this).find('.SampleReqNo').html(),
+                        Brand: $(this).find('.Brand').html(),
+                        BuyerStyleNo: $(this).find('.BuyerStyleNo').html(),
+                        BarCodeNo: $(this).find('.BarCodeNo').html(),
+                        BomNo: $(this).find('.BomNo').html(),
+                        Last: $(this).find('.Last').html(),
+                        ColorMasterId: $(this).find('.ColorMasterId').html(),
+                        FinishedProdType: $(this).find('.FinishedProdType').html(),
+                        ProductTypeId: $(this).find('.ProductTypeId').html(),
+                        packType: $(this).find('.packType').html(),
+                        noOfCarton: $(this).find('.noOfCarton').html(),
+                        AmendmentNoWithDate: $(this).find('.AmendmentNoWithDate').html(),
+                        TotalOrderForWeek: $(this).find('.TotalOrderForWeek').html(),
+                        OrderType: $(this).find('.OrderType').html(),
+                        Currency: $(this).find('.Currency').html(),
+                        Rs: $(this).find('.Rs').html(),
+                        Parties: $(this).find('.Parties').html(),
+                        PartiesAmount1: $(this).find('.PartiesAmount1').html(),
+                        ShortUnitID: $(this).find('.ShortUnitID').html(),
+                        PartiesAmount2: $(this).find('.PartiesAmount2').html(),
+                        LongUnitID: $(this).find('.LongUnitID').html(),
+                        GradeMasterId: $(this).find('.GradeMasterId').html(),
+                        SizeRangeMasterId: $(this).find('.SizeRangeMasterId').html(),
+                        ShipmentCountryStamp: $(this).find('.ShipmentCountryStamp').html(),
+                        ShipmentFrom: $(this).find('.ShipmentFrom').html(),
+                        ShipmentTo: $(this).find('.ShipmentTo').html(),
+                        OtherInstruction: $(this).find('.OtherInstruction').html(),
+                        PaymentTerms: $(this).find('.PaymentTerms').html(),
+                        DeliveryTerms: $(this).find('.DeliveryTerms').html(),
+                        Insurance: $(this).find('.Insurance').html(),
+                        DeliveryTo: $(this).find('.DeliveryTo').html(),
+                        SpecialInstruction: $(this).find('.SpecialInstruction').html(),
+                        PackingLabeling: $(this).find('.PackingLabeling').html(),
+
+                        SEASON: $(this).find('.SEASON').html(),
+                        Purchase: $(this).find('.Purchase').html(),
+
+                        TotalAmount: $('#TotalAmount').text().trim(),
+
+
+
+                        MultipleSchedule: JSON.stringify(scheduleArr),
+                        SizeQuantityRate: $(this).find('.sizerange').text(),
+                        PackingDetail: JSON.stringify(packingDetailsArr),
+
+                    });
+            });
+
+            var wholeJsonListLength = wholeJsonList.length;
+
+            var i = 0;
+            for (i = 0; i <= wholeJsonListLength - 1; i++) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/BuyerOrderEntryForm/BuyerOrderEntryForm',
+                    data: wholeJsonList[i],
+                    success: function (data) {
+                        if (data == 1 || data == 'Saved') {
+                            alert('Saved Successfully.');
+                            location.href = "/BuyerOrderEntryForm/BuyerOrderEntryFormView";
+                            return false;
+                        }
+                        else if (data == 2 || data == 'Updated') {
+                            alert('Updated Successfully.');
+                            location.href = "/BuyerOrderEntryForm/BuyerOrderEntryFormView";
+                            return false;
+                        }
+                        else if (data == 3 || data == 'Already Exist') {
+                            alert('Already Existed.');
+                            return false;
+                        }
+                        else {
+                            alert('Save process Failed.');
+                            location.href = "/BuyerOrderEntryForm/BuyerOrderEntryFormView";
+                            return false;
+                        }
+                    }
+                });
+            }
+        }
+    }
+    function Update() {
+
+        if (validation()) {
+
+            var qtyCount = 0;
+            var qtyArr = [];
+            $('#sizeRangeTable tbody tr').each(function () {
+                qtyCount++
+                qtyArr.push(
+                    {
+                        Size: $(this).find('td:first').html(),
+                        quantity: $(this).find('td:nth-child(2) input[type=text]').val(),
+                        Rate: $(this).find('td:nth-child(3) input[type=text]').val()
+                    });
+
+            });
+
+            $('#SizeQuantityRate').val(JSON.stringify(qtyArr));
+
+
+            var scheduleArr = [];
+            $('#TotalAmount').val($('#TotalAmount').text().trim());
+
+            $('#multipleScheduleTable tbody tr').each(function () {
+
+                scheduleArr.push(
+                        {
+                            Io: $(this).find('td:first').html(),
+                            Size: $(this).find('td:nth-child(2) input[type=text]').val(),
+                            quantity: $(this).find('td:nth-child(3) input[type=text]').val(),
+                            Date: $(this).find('td:nth-child(4) input[type=text]').val()
+                        });
+
+            });
+
+            $('#MultipleSchedule').val(JSON.stringify(scheduleArr));
+
+            var packingDetailsArr = [];
+
+            $("#packingDetailsTable tbody tr").each(function () {
+
+                packingDetailsArr.push(
+                    {
+                        PackingType: $(this).find('.PackingType').html(),
+                        SizeRangeMasterId: $(this).find('.PackageSizeRangeMasterId').html(),
+                        Size: $(this).find('input[type=text]').val()
+                    });
+            });
+            $("#PackingDetail").val(JSON.stringify(packingDetailsArr));
+            var input = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "TotalAmount_").val($('#TotalAmount').text().trim());
+            var amount = $('#TotalAmount').text().trim();
+            var forms = $("#buyer-form").serialize() + '&TotalAmount=' + amount + '&ExFactoryDate=' + $("#ExFactoryDate").val();
+            setTimeout(function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '/BuyerOrderEntryForm/BuyerOrderEntryForm',
+                    data: forms,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data == 'Saved' || data == 'Updated') {
+                            if ($("#BtnSave").val() == "Save") {
+                                alert('Saved Successfully.');
+                            }
+                            else {
+                                alert('Updated Successfully.');
+                            }
+
+                            location.href = "/BuyerOrderEntryForm/BuyerOrderEntryFormView";
+                            return false;
+                        }
+                        else if (data == 'Already Exist') {
+
+                            alert('Already Exists.');
+                            location.href = "/BuyerOrderEntryForm/BuyerOrderEntryFormView";
+                            return false;
+                        }
+                        else {
+                            alert('Save process Failed.');
+                            location.href = "/BuyerOrderEntryForm/BuyerOrderEntryFormView";
+                            return false;
+                        }
+                    }
+                });
+            }, 500);
+        }
+    }
+    function validation() {
+        if ($('#BuyerOrderSlNo').val() == "") {
+            alert("Please Enter BuyerOrder SlNo.")
+            $('#BuyerOrderSlNo').css('border-color', 'red');
+            $('#BuyerOrderSlNo').focus();
+            return false;
+        }
+        else {
+            $('#BuyerOrderSlNo').css('border-color', '');
+        }
+        if ($('#Date').val() == "") {
+            alert("Please Enter Date.")
+            $('#Date').css('border-color', 'red');
+            $('#Date').focus();
+            return false;
+        }
+        else {
+            $('#Date').css('border-color', '');
+        }
+        if ($('#BuyerSeason').val() == "") {
+            alert("Please Select Buyer Season.")
+            $('#BuyerSeason').css('border-color', 'red');
+            $('#BuyerSeason').focus();
+            return false;
+        }
+        else {
+            $('#BuyerSeason').css('border-color', '');
+        }
+        if ($('#BuyerName').val() == "") {
+            alert("Please select Buyer Name.")
+            $('#BuyerName').css('border-color', 'red');
+            $('#BuyerName').focus();
+            return false;
+        }
+        else {
+            $('#BuyerName').css('border-color', '');
+        }
+
+        if ($('#OurStyle').val() == "") {
+            alert("Please Select Our Style.")
+            $('#OurStyle').css('border-color', 'red');
+            $('#OurStyle').focus();
+            return false;
+        }
+        else {
+            $('#OurStyle').css('border-color', '');
+        }
+
+        if ($('#LotNo').val() == "") {
+            alert("Please Enter LotNo.")
+            $('#LotNo').css('border-color', 'red');
+            $('#LotNo').focus();
+            return false;
+        }
+        else {
+            $('#LotNo').css('border-color', '');
+        }
+
+        if ($('#OrderType').val() == "") {
+            alert("Please Select Order Type.")
+            $('#OrderType').css('border-color', 'red');
+            $('#OrderType').focus();
+            return false;
+        }
+        else {
+            $('#OrderType').css('border-color', '');
+        }
+
+
+        if ($('#BuyerStyleNo').val() == "") {
+            alert("Please Select Buyer Style No.")
+            $('#BuyerStyleNo').css('border-color', 'red');
+            $('#BuyerStyleNo').focus();
+            return false;
+        }
+        else {
+            $('#BuyerStyleNo').css('border-color', '');
+        }
+
+
+
+        if ($('#Last').val() == "") {
+            alert("Please select Last no.")
+            $('#Last').css('border-color', 'red');
+            $('#Last').focus();
+            return false;
+        }
+        else {
+            $('#Last').css('border-color', '');
+        }
+
+        if ($('#ColorMasterId').val() == "") {
+            alert("Please Select Color Master.")
+            $('#ColorMasterId').css('border-color', 'red');
+            $('#ColorMasterId').focus();
+            return false;
+        }
+        else {
+            $('#ColorMasterId').css('border-color', '');
+        }
+
+
+        if ($('#SizeRangeMasterId').val() == "") {
+            alert("Please Select Size Range Master Name.")
+            $('#SizeRangeMasterId').css('border-color', 'red');
+            $('#SizeRangeMasterId').focus();
+            return false;
+        }
+        else {
+            $('#SizeRangeMasterId').css('border-color', '');
+        }
+
+        if ($('#AgentMasterId').val() == "") {
+            alert("Please agent Master.")
+            $('#AgentMasterId').css('border-color', 'red');
+            $('#AgentMasterId').focus();
+            return false;
+        }
+        else {
+            $('#AgentMasterId').css('border-color', '');
+        }
+
+
+
+        if ($('#ExFactoryDate').val() == "") {
+            alert("Please Enter Ex-Factory Date.")
+            $('#ExFactoryDate').css('border-color', 'red');
+            $('#ExFactoryDate').focus();
+            return false;
+        }
+        else {
+            $('#ExFactoryDate').css('border-color', '');
+        }
+
+        if ($('#ShipmentMode').val() == "") {
+            alert("Please select Shipment Mode.")
+            $('#ShipmentMode').css('border-color', 'red');
+            $('#ShipmentMode').focus();
+            return false;
+        }
+        else {
+            $('#ShipmentMode').css('border-color', '');
+            return true;
+        }
+    }
+    function AddTextBoxForMultipleSchedule() {
+        var scheduleCount = $("#multipleScheduleTable tbody tr").length + 1;
+        $("#multipleScheduleTable tbody").append("<tr><td>" + scheduleCount + "</td><td><input type='text' id='sizeId' style='width:50px;' /></td><td><input type='text' id='qtyId' style='width:50px;' /></td><td><input type='text' id='factoryDateId' style='width:75px;' /></td><td><input type='button' value='Remove' class='removeSchedule btn btn-default btn-style' /></td></tr>");
+    }
+    $(document).on('click', '.removeSchedule', function () {
+        $(this).closest("tr").remove();
+    });
+    var sizeRangeArr = [];
+    var multipleScheduleArr = [];
+    var packingDetailList = [];
+    $(document).on('click', '#AddBtn', function () {
+        alert(1);
+        debugger
+        if (validation()) {
+
+            sizeRangeArr = [];
+            multipleScheduleArr = [];
+            packingDetailList = [];
+
+            $('#multipleScheduleTable tbody tr').each(function () {
+
+                multipleScheduleArr.push(
+                        {
+                            Io: $(this).find('td:first').html(),
+                            Size: $(this).find('td:nth-child(2) input[type=text]').val(),
+                            quantity: $(this).find('td:nth-child(3) input[type=text]').val(),
+                            Date: $(this).find('td:nth-child(4) input[type=text]').val()
+                        });
+
+            });
+
+
+            $('#sizeRangeTable tbody tr').each(function () {
+
+                sizeRangeArr.push(
+                        {
+                            Size: $(this).find('td:first').html(),
+                            quantity: $(this).find('td:nth-child(2) input[type=text]').val(),
+                            Rate: $(this).find('td:nth-child(3) input[type=text]').val()
+                        });
+
+            });
+
+
+            $("#packingDetailsTable tbody tr").each(function () {
+
+                packingDetailList.push(
+                    {
+                        PackingType: $(this).find('.PackingType').html(),
+                        SizeRangeMasterId: $(this).find('.PackageSizeRangeMasterId').html(),
+                        Size: $(this).find('input[type=text]').val()
+                    });
+
+            });
+
+
+
+            $('#list-amended-material tbody').append("<tr><td class='BuyerOrderSlNo'><span>" + $('#BuyerOrderSlNo').val() + "</span><input type='hidden' class='orderEntry' value='" + $("#OrderEntryId").val() + "'><input class='multisch' type='hidden' value='" + JSON.stringify(multipleScheduleArr) + "'><input class='sizerange' type='hidden' value='" + JSON.stringify(sizeRangeArr) + "'><input class='packingType' type='hidden' value='" + JSON.stringify(packingDetailList) + "'></td>" +
+                                                        "<td class='Date'>" + $('#Date').val() + "</td>" +
+                                                        "<td class='BuyerSeason'>" + $('#BuyerSeason').val() + "</td>" +
+                                                        "<td class='BuyerName'>" + $('#BuyerName').val() + "</td>" +
+                                                        "<td class='OrderProjectionNo'>" + $('#OrderProjectionNo').val() + "</td>" +
+                                                        "<td class='BuyerPoNo'>" + $('#BuyerPoNo').val() + "</td>" +
+                                                        "<td class='OurStyle'>" + $('#OurStyle').val() + "</td>" +
+                                                        "<td class='LeatherDescription'>" + $('#LeatherDescription').val() + "</td>" +
+                                                        "<td class='DiscountPer'>" + $('#DiscountPer').val() + "</td>" +
+                                                        "<td class='QuoteNo'>" + $('#QuoteNo').val() + "</td>" +
+                                                        "<td class='CountryStamp'>" + $('#CountryStamp').val() + "</td>" +
+                                                        "<td class='CustomerPlan'>" + $('#CustomerPlan').val() + "</td>" +
+                                                        "<td class='CustomerDate'>" + $('#CustomerDate').val() + "</td>" +
+                                                        "<td class='AgentMasterId'>" + $('#AgentMasterId').val() + "</td>" +
+                                                        "<td class='CommPer'>" + $('#CommPer').val() + "</td>" +
+                                                        "<td class='ExFactoryDate'>" + $('#ExFactoryDate').val() + "</td>" +
+                                                        "<td class='ShipmentMode'>" + $('#ShipmentMode').val() + "</td>" +
+                                                        "<td class='Remarks1'>" + $('#Remarks1').val() + "</td>" +
+                                                        "<td class='Remarks2'>" + $('#Remarks2').val() + "</td>" +
+                                                        "<td class='LotNo'>" + $('#LotNo').val() + "</td>" +
+                                                        "<td class='Count'>" + $('#Count').val() + "</td>" +
+                                                        "<td class='WeekNo'>" + $('#WeekNo').val() + "</td>" +
+                                                        "<td class='SampleReqNo'>" + $('#SampleReqNo').val() + "</td>" +
+                                                        "<td class='Brand'>" + $('#Brand').val() + "</td>" +
+                                                        "<td class='BuyerStyleNo'>" + $('#BuyerStyleNo').val() + "</td>" +
+                                                        "<td class='BarCodeNo'>" + $('#BarCodeNo').val() + "</td>" +
+                                                        "<td class='BomNo'>" + $('#BomNo').val() + "</td>" +
+                                                        "<td class='Last'>" + $('#Last').val() + "</td>" +
+                                                        "<td class='ColorMasterId'>" + $('#ColorMasterId').val() + "</td>" +
+                                                        "<td class='FinishedProdType'>" + $('#FinishedProdType').val() + "</td>" +
+                                                        "<td class='ProductTypeId'>" + $('#ProductTypeId').val() + "</td>" +
+                                                        "<td class='packType'>" + $('#packType').val() + "</td>" +
+                                                        "<td class='noOfCarton'>" + $('#noOfCarton').val() + "</td>" +
+                                                        "<td class='AmendmentNoWithDate'>" + $('#AmendmentNoWithDate').val() + "</td>" +
+                                                        "<td class='TotalOrderForWeek'>" + $('#TotalOrderForWeek').val() + "</td>" +
+                                                        "<td class='OrderType'>" + $('#OrderType').val() + "</td>" +
+                                                        "<td class='Currency'>" + $('#Currency').val() + "</td>" +
+                                                        "<td class='Rs'>" + $('#Rs').val() + "</td>" +
+                                                        "<td class='Parties'>" + $('#Parties').val() + "</td>" +
+
+                                                         "<td class='PartiesAmount1'>" + $('#PartiesAmount1').val() + "</td>" +
+                                                         "<td class='ShortUnitID'>" + $('#ShortUnitID').val() + "</td>" +
+                                                         "<td class='PartiesAmount2'>" + $('#PartiesAmount2').val() + "</td>" +
+                                                          "<td class='LongUnitID'>" + $('#LongUnitID').val() + "</td>" +
+
+
+                                                        "<td class='GradeMasterId'>" + $('#GradeMasterId').val() + "</td>" +
+                                                        "<td class='SizeRangeMasterId'>" + $('#SizeRangeMasterId').val() + "</td>" +
+                                                        "<td class='ShipmentCountryStamp'>" + $("#ShipmentCountryStamp").val() + "</td>" +
+                                                        "<td class='ShipmentFrom'>" + $("#ShipmentFrom").val() + "</td>" +
+                                                        "<td class='ShipmentTo'>" + $("#ShipmentTo").val() + "</td>" +
+                                                        "<td class='OtherInstruction'>" + $("#OtherInstruction").val() + "</td>" +
+                                                        "<td class='PaymentTerms'>" + $("#PaymentTerms").val() + "</td>" +
+                                                        "<td class='DeliveryTerms'>" + $("#DeliveryTerms").val() + "</td>" +
+                                                        "<td class='Insurance'>" + $("#Insurance").val() + "</td>" +
+                                                        "<td class='DeliveryTo'>" + $("#DeliveryTo").val() + "</td>" +
+                                                        "<td class='SpecialInstruction'>" + $("#SpecialInstruction").val() + "</td>" +
+
+                                                        "<td class='TotalAmount'>" + $("#TotalAmount").text() + "</td>" +
+                                                        "<td class='sizerange' style='display:none'>" + JSON.stringify(sizeRangeArr) + "</td>" +
+                                                        "<td class='PackingLabeling'>" + $("#PackingLabeling").val() + "</td></tr>");
+
+            setTimeout(function () {
+                $('#list-amended-material tbody tr.curChangeableRow td input').remove();
+                $('#list-amended-material tbody tr.curChangeableRow td:first-child').append("<input type='hidden' class='orderEntry' value='" + $("#OrderEntryId").val() + "'><input class='multisch' type='hidden' value='" + JSON.stringify(multipleScheduleArr) + "'><input class='sizerange' type='hidden' value='" + JSON.stringify(sizeRangeArr) + "'>");
+
+            }, 200);
+            $("input[type='text'],textarea").val("");
+            $("select option:first-child").prop("selected", "selected");
+        }
+    });
+    $(document).on('click', '#list-amended-material tbody tr', function () {
+
+        $(this).addClass("curChangeableRow");
+        $(this).siblings().removeClass("curChangeableRow");
+
+        $("#UpdateBtn").show();
+        $("#AddBtn").hide();
+
+        $('#BuyerOrderSlNo').val($(this).find('span').html());
+        $('#Date').val($(this).find('.Date').html());
+        $('#BuyerSeason').val($(this).find('.BuyerSeason').html());
+        $('#BuyerName').val($(this).find('.BuyerName').html());
+        $('#OrderProjectionNo').val($(this).find('.OrderProjectionNo').html());
+        $('#BuyerPoNo').val($(this).find('.BuyerPoNo').html());
+        $('#OurStyle').val($(this).find('.OurStyle').html());
+        $('#LeatherDescription').val($(this).find('.LeatherDescription').html());
+        $('#DiscountPer').val($(this).find('.DiscountPer').html());
+        $('#QuoteNo').val($(this).find('.QuoteNo').html());
+        $('#CountryStamp').val($(this).find('.CountryStamp').html());
+        $('#CustomerPlan').val($(this).find('.CustomerPlan').html());
+        $('#CustomerDate').val($(this).find('.CustomerDate').html());
+        $('#AgentMasterId').val($(this).find('.AgentMasterId').html());
+        $('#CommPer').val($(this).find('.CommPer').html());
+        $('#ExFactoryDate').val($(this).find('.ExFactoryDate').html());
+        $('#ShipmentMode').val($(this).find('.ShipmentMode').html());
+        $('#Remarks1').val($(this).find('.Remarks1').html());
+        $('#Remarks2').val($(this).find('.Remarks2').html());
+        $('#LotNo').val($(this).find('.LotNo').html());
+        $('#Count').val($(this).find('.Count').html());
+        $('#WeekNo').val($(this).find('.WeekNo').html());
+        $('#SampleReqNo').val($(this).find('.SampleReqNo').html());
+        $('#Brand').val($(this).find('.Brand').html());
+        $('#BuyerStyleNo').val($(this).find('.BuyerStyleNo').html());
+        $('#BarCodeNo').val($(this).find('.BarCodeNo').html());
+        $('#BomNo').val($(this).find('.BomNo').html());
+        $('#Last').val($(this).find('.Last').html());
+        $('#ColorMasterId').val($(this).find('.ColorMasterId').html());
+        $('#FinishedProdType').val($(this).find('.FinishedProdType').html());
+        $('#ProductTypeId').val($(this).find('.ProductTypeId').html());
+        $('#packType').val($(this).find('.packType').html());
+        $('#noOfCarton').val($(this).find('.noOfCarton').html());
+        $('#AmendmentNoWithDate').val($(this).find('.AmendmentNoWithDate').html());
+        $('#TotalOrderForWeek').val($(this).find('.TotalOrderForWeek').html());
+        $('#OrderType').val($(this).find('.OrderType').html());
+        $('#Currency').val($(this).find('.Currency').html());
+        $('#Rs').val($(this).find('.Rs').html());
+        $('#Parties').val($(this).find('.Parties').html());
+
+        $('#PartiesAmount1').val($(this).find('.PartiesAmount1').html());
+        $('#ShortUnitID').val($(this).find('.ShortUnitID').html());
+        $('#PartiesAmount2').val($(this).find('.PartiesAmount2').html());
+        $('#LongUnitID').val($(this).find('.LongUnitID').html());
+
+        $('#GradeMasterId').val($(this).find('.GradeMasterId').html());
+        $('#SizeRangeMasterId').val($(this).find('.SizeRangeMasterId').html());
+        $('#ShipmentCountryStamp').val($(this).find('.ShipmentCountryStamp').html());
+        $('#ShipmentFrom').val($(this).find('.ShipmentFrom').html());
+        $('#ShipmentTo').val($(this).find('.ShipmentTo').html());
+        $('#OtherInstruction').val($(this).find('.OtherInstruction').html());
+        $('#PaymentTerms').val($(this).find('.PaymentTerms').html());
+        $('#DeliveryTerms').val($(this).find('.DeliveryTerms').html());
+        $('#Insurance').val($(this).find('.Insurance').html());
+        $('#DeliveryTo').val($(this).find('.DeliveryTo').html());
+        $('#SpecialInstruction').val($(this).find('.SpecialInstruction').html());
+        $('#PackingLabeling').val($(this).find('.PackingLabeling').html());
+        $('#TotalAmount').text($('#TotalAmount').text().trim());
+
+
+        $("#multipleScheduleTable tbody,#sizeRangeTable tbody,#packingDetailsTable tbody").html("");
+
+        var multiSch = JSON.parse($(this).find("input.multisch").val());
+        var multiLen = multiSch.length;
+        var i;
+        for (i = 0; i < multiLen; i++) {
+            $("#multipleScheduleTable tbody").append("<tr><td>" + multiSch[i].Io + "</td><td><input type='text' value='" + multiSch[i].Size + "'   id='sizeId" + i + "' style='width:50px;' /></td><td><input type='text' value='" + multiSch[i].quantity + "' id='qtyId" + i + "' style='width:50px;' /></td><td><input type='text' value='" + multiSch[i].Date + "' id='factoryDateId" + i + "' style='width:75px;' /></td><td><input type='button' value='Remove' class='removeSchedule btn btn-default btn-style' /></td></tr>");
+        }
+
+        var sizeRange = JSON.parse($(this).find("input.sizerange").val());
+        var sizeLen = sizeRange.length;
+        var j;
+        for (j = 0; j < sizeLen; j++) {
+            $("#sizeRangeTable tbody").append("<tr><td>" + sizeRange[j].Size + "</td><td><input type='text' value='" + sizeRange[j].quantity + "' id='qtyId" + j + "' style='width:50px;' /></td><td><input type='text' value='" + sizeRange[j].Rate + "' id='Rate" + j + "' style='width:50px;' /></td></tr>");
+        }
+
+        var packingType = JSON.parse($(this).find("input.packingType").val());
+        var packingTypeLen = packingType.length;
+        var k;
+        for (k = 0; k < packingTypeLen; k++) {
+            $("#packingDetailsTable tbody").append("<tr><td>" + (k + 1) + "</td><td class='PackingType'>" + packingType[k].PackingType + "</td><td class='SizeRangeMasterId'>" + packingType[k].SizeRangeMasterId + "</td><td><input type='text' value='" + packingType[k].Size + "' /></td></tr>");
+        }
+
+    });
+    $(document).on('click', '#UpdateBtn', function () {
+
+        if (validation()) {
+            debugger
+            var sizeRangeArrU = [];
+            var multipleScheduleArrU = [];
+
+            $("#UpdateBtn").hide();
+            $("#AddBtn").show();
+
+            $('#multipleScheduleTable tbody tr').each(function () {
+
+                multipleScheduleArrU.push(
+                        {
+                            Io: $(this).find('td:first').html(),
+                            Size: $(this).find('td:nth-child(2) input[type=text]').val(),
+                            quantity: $(this).find('td:nth-child(3) input[type=text]').val(),
+                            Date: $(this).find('td:nth-child(4) input[type=text]').val()
+                        });
+
+
+            });
+
+
+            $('#sizeRangeTable tbody tr').each(function () {
+
+                sizeRangeArrU.push(
+                        {
+                            Size: $(this).find('td:first').html(),
+                            quantity: $(this).find('td:nth-child(2) input[type=text]').val(),
+                            Rate: $(this).find('td:nth-child(3) input[type=text]').val()
+                        });
+
+            });
+
+            $('#list-amended-material tbody tr.curChangeableRow').html("");
+
+
+            $('#list-amended-material tbody tr.curChangeableRow').append("<td class='BuyerOrderSlNo'><span>" + $('#BuyerOrderSlNo').val() + "</span></td>" +
+                                                    "<td class='Date'>" + $('#Date').val() + "</td>" +
+                                                    "<td class='BuyerSeason'>" + $('#BuyerSeason').val() + "</td>" +
+                                                    "<td class='BuyerName'>" + $('#BuyerName').val() + "</td>" +
+                                                    "<td class='OrderProjectionNo'>" + $('#OrderProjectionNo').val() + "</td>" +
+                                                    "<td class='BuyerPoNo'>" + $('#BuyerPoNo').val() + "</td>" +
+                                                    "<td class='OurStyle'>" + $('#OurStyle').val() + "</td>" +
+                                                    "<td class='LeatherDescription'>" + $('#LeatherDescription').val() + "</td>" +
+                                                    "<td class='DiscountPer'>" + $('#DiscountPer').val() + "</td>" +
+                                                    "<td class='QuoteNo'>" + $('#QuoteNo').val() + "</td>" +
+                                                    "<td class='CountryStamp'>" + $('#CountryStamp').val() + "</td>" +
+                                                    "<td class='CustomerPlan'>" + $('#CustomerPlan').val() + "</td>" +
+                                                    "<td class='CustomerDate'>" + $('#CustomerDate').val() + "</td>" +
+                                                    "<td class='AgentMasterId'>" + $('#AgentMasterId').val() + "</td>" +
+                                                    "<td class='CommPer'>" + $('#CommPer').val() + "</td>" +
+                                                    "<td class='ExFactoryDate'>" + $('#ExFactoryDate').val() + "</td>" +
+                                                    "<td class='ShipmentMode'>" + $('#ShipmentMode').val() + "</td>" +
+                                                    "<td class='Remarks1'>" + $('#Remarks1').val() + "</td>" +
+                                                    "<td class='Remarks2'>" + $('#Remarks2').val() + "</td>" +
+                                                    "<td class='LotNo'>" + $('#LotNo').val() + "</td>" +
+                                                    "<td class='Count'>" + $('#Count').val() + "</td>" +
+                                                    "<td class='WeekNo'>" + $('#WeekNo').val() + "</td>" +
+                                                    "<td class='SampleReqNo'>" + $('#SampleReqNo').val() + "</td>" +
+                                                    "<td class='Brand'>" + $('#Brand').val() + "</td>" +
+                                                    "<td class='BuyerStyleNo'>" + $('#BuyerStyleNo').val() + "</td>" +
+                                                    "<td class='BarCodeNo'>" + $('#BarCodeNo').val() + "</td>" +
+                                                    "<td class='BomNo'>" + $('#BomNo').val() + "</td>" +
+                                                    "<td class='Last'>" + $('#Last').val() + "</td>" +
+                                                    "<td class='ColorMasterId'>" + $('#ColorMasterId').val() + "</td>" +
+                                                    "<td class='FinishedProdType'>" + $('#FinishedProdType').val() + "</td>" +
+                                                    "<td class='ProductTypeId'>" + $('#ProductTypeId').val() + "</td>" +
+                                                    "<td class='packType'>" + $('#packType').val() + "</td>" +
+                                                    "<td class='noOfCarton'>" + $('#noOfCarton').val() + "</td>" +
+                                                    "<td class='AmendmentNoWithDate'>" + $('#AmendmentNoWithDate').val() + "</td>" +
+                                                    "<td class='TotalOrderForWeek'>" + $('#TotalOrderForWeek').val() + "</td>" +
+                                                    "<td class='OrderType'>" + $('#OrderType').val() + "</td>" +
+                                                    "<td class='Currency'>" + $('#Currency').val() + "</td>" +
+                                                    "<td class='Rs'>" + $('#Rs').val() + "</td>" +
+                                                    "<td class='Parties'>" + $('#Parties').val() + "</td>" +
+                                                    "<td class='GradeMasterId'>" + $('#GradeMasterId').val() + "</td>" +
+                                                    "<td class='SizeRangeMasterId'>" + $('#SizeRangeMasterId').val() + "</td>" +
+                                                    "<td class='ShipmentCountryStamp'>" + $("#ShipmentCountryStamp").val() + "</td>" +
+                                                    "<td class='ShipmentFrom'>" + $("#ShipmentFrom").val() + "</td>" +
+                                                    "<td class='ShipmentTo'>" + $("#ShipmentTo").val() + "</td>" +
+                                                    "<td class='OtherInstruction'>" + $("#OtherInstruction").val() + "</td>" +
+                                                    "<td class='PaymentTerms'>" + $("#PaymentTerms").val() + "</td>" +
+                                                    "<td class='DeliveryTerms'>" + $("#DeliveryTerms").val() + "</td>" +
+                                                    "<td class='Insurance'>" + $("#Insurance").val() + "</td>" +
+                                                    "<td class='DeliveryTo'>" + $("#DeliveryTo").val() + "</td>" +
+                                                    "<td class='SpecialInstruction'>" + $("#SpecialInstruction").val() + "</td>" +
+
+                                                    "<td class='TotalAmount'>" + $("#TotalAmount").text() + "</td>" +
+
+                                                    "<td class='PackingLabeling'>" + $("#PackingLabeling").val() + "</td>");
+
+            setTimeout(function () {
+                debugger
+                $('#list-amended-material tbody tr.curChangeableRow td input').remove();
+                $('#list-amended-material tbody tr.curChangeableRow td:first-child').append("<input type='hidden' class='orderEntry' value='" + $("#OrderEntryId").val() + "'><input class='multisch' type='hidden' value='" + JSON.stringify(multipleScheduleArrU) + "'><input class='sizerange' type='hidden' value='" + JSON.stringify(sizeRangeArrU) + "'>");
+
+            }, 200);
+
+            setTimeout(function () {
+                $("input[type='text'],textarea").val("");
+                $("select option:first-child").prop("selected", "selected");
+                $("#multipleScheduleTable tbody,#sizeRangeTable tbody").html("");
+            }, 500);
+
+        }
+
+    });
+    $(document).on('click', '#packingBtn', function () {
+        var packingCount = $("#packingDetailsTable tbody tr").length + 1;
+        $("#packingDetailsTable tbody").append("<tr><td>" + packingCount + "</td><td class='PackingType'>" + $("#PackingType").val() + "</td><td class='PackageSizeRangeMasterId'>" + $("#PackageSizeRangeMasterId").val() + "</td><td class='totalPairs'><input type='text' id='totalPairs" + packingCount + "'></td></tr>");
+    });
+</script>
+

@@ -1,0 +1,151 @@
+﻿@{
+    ViewBag.Title = "Company";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+<link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+<h2 class="content-title">Company Master</h2>
+<div style="width: 100%; float: left;">
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("CompanyGrid", "Company")
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+
+    $("#EditCompanyPartial").hide();
+
+});
+function Save() {
+    if ($('#SupplierName').val() == "") {
+        alert("Please Enter SupplierName.")
+        $('#SupplierName').css('border-color', 'red');
+        $('#SupplierName').focus();
+        return false;
+    }
+    else {
+        $('#SupplierName').css('border-color', '');
+    }
+    if ($('#City').val() == "") {
+        alert("Please Enter City.")
+        $('#City').css('border-color', 'red');
+        $('#City').focus();
+        return false;
+    }
+    else {
+        $('#City').css('border-color', '');
+    }
+    if ($('#Address').val() == "") {
+        alert("Please Enter Address.")
+        $('#Address').css('border-color', 'red');
+        $('#Address').focus();
+        return false;
+    }
+    else {
+        $('#Address').css('border-color', '');
+    }
+    if ($('#DeliverTerms').val() == "") {
+        alert("Please Enter DeliverTerms.")
+        $('#DeliverTerms').css('border-color', 'red');
+        $('#DeliverTerms').focus();
+        return false;
+    }
+    else {
+        $('#DeliverTerms').css('border-color', '');
+    }
+    if ($('#TermsConditions').val() == "") {
+        alert("Please Enter TermsConditions.")
+        $('#TermsConditions').css('border-color', 'red');
+        $('#TermsConditions').focus();
+        return false;
+    }
+    else {
+        $('#TermsConditions').css('border-color', '');
+    }
+    if ($('#CompanyName').val() == "") {
+        alert("Please Enter CompanyName.")
+        $('#CompanyName').css('border-color', 'red');
+        $('#CompanyName').focus();
+        return false;
+    }
+    else {
+        $('#CompanyName').css('border-color', '');
+    }
+    if ($('#Phone').val() == "") {
+        alert("Please Enter Phone.")
+        $('#Phone').css('border-color', 'red');
+        $('#Phone').focus();
+        return false;
+    }
+    else {
+        $('#Phone').css('border-color', '');
+    }
+    if ($('#PaymentTerms').val() == "") {
+        alert("Please Enter PaymentTerms.")
+        $('#PaymentTerms').css('border-color', 'red');
+        $('#PaymentTerms').focus();
+        return false;
+    }
+    else {
+        $('#PaymentTerms').css('border-color', '');
+    }
+    if ($('#OtherTerms').val() == "") {
+        alert("Please Enter OtherTerms.")
+        $('#OtherTerms').css('border-color', 'red');
+        $('#OtherTerms').focus();
+        return false;
+    }
+    else {
+        $('#OtherTerms').css('border-color', '');
+    }
+    $.ajax({
+        type: 'POST',
+        url: '/Company/Company',
+        data: {
+            SupplierName: $('#SupplierName').val(),
+            City: $('#City').val(),
+            Address: $('#Address').val(),
+            DeliverTerms: $('#DeliverTerms').val(),
+            TermsConditions: $('#TermsConditions').val(),
+            CompanyName: $('#CompanyName').val(),
+            Phone: $('#Phone').val(),
+            PaymentTerms: $('#PaymentTerms').val(),
+            OtherTerms: $('#OtherTerms').val(),
+            CompanyCodePK: $("#CompanyCodePK").val(),
+            StoreName: $("#StoreName").val()
+        },
+        success: function (data) {
+            if (data.CompanyCodePK != "" || data.CompanyCodePK != 0) {
+                alert('Saved Successfully.');
+                location.href = "/Company/Company";
+                return false;
+            }
+            else {
+                alert('Save process Failed.');
+                location.href = "/Company/Company";
+                return false;
+            }
+
+        },
+        error: function (ex) {
+            alert('Already Exist in the database.');
+        }
+    });
+}
+</script>

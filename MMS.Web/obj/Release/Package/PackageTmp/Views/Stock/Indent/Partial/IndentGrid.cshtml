@@ -1,0 +1,315 @@
+﻿@model MMS.Web.Models.StockModel.IndentModel
+@using MMS.Repository.Managers
+@using MMS.Core.Entities
+@{
+    MMS.Repository.Managers.MaterialCategoryManager materialCategorymanager = new MMS.Repository.Managers.MaterialCategoryManager();
+    MaterialCategoryMaster materialCategoryMaster = new MaterialCategoryMaster();
+
+    MMS.Repository.Managers.MaterialGroupManager MaterialGroupManager = new MMS.Repository.Managers.MaterialGroupManager();
+    materialgroupmaster MaterialGroupMaster_ = new materialgroupmaster();
+
+    MMS.Repository.Managers.ColorManager ColorManager = new MMS.Repository.Managers.ColorManager();
+    ColorMaster ColorMaster = new ColorMaster();
+
+    MMS.Repository.Managers.UOMManager UOMManager = new MMS.Repository.Managers.UOMManager();
+    UomMaster UomMaster = new UomMaster();
+
+    MMS.Repository.Managers.MaterialManager materialManager = new MMS.Repository.Managers.MaterialManager();
+    MaterialMaster materialMaster = new MaterialMaster();
+
+    MMS.Repository.Managers.SupplierMasterManager supplierMasterManager = new MMS.Repository.Managers.SupplierMasterManager();
+    SupplierMaster supplierMaster = new SupplierMaster();
+
+
+    tbl_PermissionSetting PermissionSettingModel = new MMS.Core.Entities.tbl_PermissionSetting();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<tbl_Permission> PermissionModel = new List<tbl_Permission>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Indent", PermissionSettingModel.PermissionID);
+    }
+    tbl_materialnamemaster materialNameMaster = new tbl_materialnamemaster();
+    MMS.Repository.Managers.MaterialNameManager materialNameManager = new MMS.Repository.Managers.MaterialNameManager();
+    SimpleMRP simpleMRP = new SimpleMRP();
+    SimpleMRPManager simpleMRPManager = new SimpleMRPManager();
+}
+@{ 
+    bool Edit = false; bool Delete = false; bool Add = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Edit")
+        {
+            Edit = true;
+        }
+        if (item.PermissionDesc == "Delete")
+        {
+            Delete = true;
+        }
+        if (item.PermissionDesc == "Add")
+        {
+            Add = true;
+        }
+    }
+}
+<style>
+    .veh-tablecont1 {
+        margin: 16px -50px 79px !important;
+    }
+</style>
+<div class="veh-tablewrap">
+    <div class="veh-tablecont1">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+        <table class="veh-table" id="empTable">
+            <thead>
+                <tr class="color-code-top-btn">
+                    <td colspan="9">
+                        <input type="text" id="SeaarchID" placeholder="Enter MRPNO or Indent NO.." />
+                        @{   
+                            if (Add == true)
+                            {
+                                <input type="button" value="Add" onclick="Add()">
+                            }
+                            else
+                            {
+                                <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Add">
+                            }
+                        }
+
+                        <input type="button" value="Search" onclick="Search()">
+                    </td>
+                </tr>
+                <tr>
+                    <th class="veh-1">
+                        Si.No
+                    </th>
+                    <th class="veh-1">
+                        MRPNO
+                    </th>
+                    <th class="veh-2">
+                        Indent NO
+                    </th>
+                    
+
+                    
+                    <th class="veh-8">
+                        Edit / Delete
+                    </th>
+                </tr>
+            </thead>
+            @if (Model.IndentList.Count > 0 && Model.IndentList != null)
+            {
+
+               
+
+                int count = 1;
+                <tbody>
+                    @foreach (var Indent in Model.IndentList)
+                    {
+                        materialCategoryMaster = materialCategorymanager.GetMaterialCategoryMaster(Indent.MaterialCatId);
+                        MaterialGroupMaster_ = MaterialGroupManager.GetmaterialgroupmasterId(Indent.MaterialGrpId);
+                        ColorMaster = ColorManager.GetcolorID(Indent.ColourId);
+                        UomMaster = UOMManager.GetUomMasterId(Indent.UOMId);
+                        materialMaster = materialManager.GetMaterialMasterId(Indent.MaterialId);
+                        supplierMaster = supplierMasterManager.GetSupplierMasterId(Indent.SupplierId);
+                        materialNameMaster = materialNameManager.GetMaterialNameMasterId(Indent.MaterialId);
+                        simpleMRP = simpleMRPManager.GetMRPNO(Indent.MRPNO);
+                        string MaterialName = "";
+                        string ColorName = "";
+                        string UOMName = "";
+                        string MRPNO = "";
+                        if (materialNameMaster != null)
+                        {
+                            MaterialName = materialNameMaster.MaterialDescription;
+                        }
+                        if (simpleMRP != null)
+                        {
+                            MRPNO = simpleMRP.MRPNO;
+                        }
+                        if (ColorMaster != null)
+                        {
+                            ColorName = ColorMaster.Color;
+                        }
+                        if (UomMaster != null)
+                        {
+                            UOMName = UomMaster.LongUnitName;
+                        }
+                        <tr>
+                            <td class="veh-1">@count</td>
+                            <td class="veh-1">@MRPNO</td>
+                            <td class="veh-2">@Indent.IndentNo</td>
+                             
+                            <td style="display: none" class="veh-12">@Indent.IndentId</td>
+                            <td class="veh-1 edit-del-wrap">
+                                @if (Edit == true)
+                                {
+                                    <a href="javascript:void(0)" onclick="Edit('@Indent.IndentId')" class="watchlist-edit" title="Edit"></a>
+                                }
+                                else
+                                {
+                                    <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-edit" title="Edit"></a>
+                                }
+                                @if (Delete == true)
+                                {
+                                    <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@Indent.IndentId')" class="watchlist-delete" title="Delete"></a>
+                                }
+                                else
+                                {
+                                    <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-delete" title="Delete"></a>
+                                }
+
+                            </td>
+                        </tr>
+                        count++;
+                    }
+                </tbody>
+                <tfoot class="footer-pager">
+                    <tr>
+                        <td colspan="4">
+                            <div id="pager">
+                                <form>
+                                    <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                    <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                    <input type="text" class="pagedisplay" />
+                                    <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                    <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                    <select class="pagesize">
+                                        <option selected="selected" value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="40">40</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+            }
+        </table>
+        @if (Model.IndentList != null && Model.IndentList.Count == 0)
+        {
+            <div class="noRecordsFound" style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+        }
+    </div>
+    <div id="EditColorPartial" style="display:none;">
+        @Html.Partial("~/Views/Stock/Indent/Partial/IndentDetails.cshtml", Model)
+    </div>
+</div>
+
+<script>
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    function Search() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Search", "Indent")',
+            data: { filter: $('#SeaarchID').val() },
+            success: function (data) {
+              
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                $('#DivShow').hide();
+                $('#EditColorPartial').hide();
+            }
+        });
+    }
+
+    function Cancel() {
+ 
+        location.reload();
+    }
+    function Add() {
+        $('.veh-tablecont1').hide();
+        $('#empTable').hide();
+        $('.noRecordsFound').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("IndentDetailsView", "Indent")',
+            data: { IndentId: 0 },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+               
+
+            }
+        });
+    }
+    function Edit(arg) {
+      
+        $('#empTable').hide();
+        $('.veh-tablecont1').hide();
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("IndentDetailsView", "Indent")',
+            data: { IndentId: arg },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+                $('.custom-combobox').hide();
+                $.getJSON('/Indent/GetSelectedIOVal/', { IndentId: arg }, function (data) {
+                    if (data.SelectedIndentNO == null) {
+                        $.each($('#SelectedIndentNO option'), function (key, value) {
+                            if (!$(this).prop('selected')) {
+                                if ($(this).val() != 0) {
+                                    $("#SelectedIndentNO option[value=" + $(this).val() + "]").remove();
+                                }
+                            }
+                        });
+                    }
+                    else {
+
+                        var Split = data.SelectedIndentNO.split(",");
+
+                        for (i = 0; i < Split.length; i++) {
+                            $("#IoNoLst option[value=" + Split[i] + "]").remove();
+                            $("#SelectedIndentNO option[value='" + Split[i] + "']").attr("selected", "true");
+                        }
+                        $.each($('#SelectedIndentNO option'), function (key, value) {
+                            if (!$(this).prop('selected')) {
+                                if ($(this).val() != 0) {
+                                    $("#SelectedIndentNO option[value=" + $(this).val() + "]").remove();
+                                }
+                            }
+                        });
+                    }
+                });
+
+            }
+        }); 
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "Indent")',
+                data: { IndentId: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/Indent/Indent";
+                        return false;
+                    }
+                    else {
+                        alert('deletion failed.');
+                    }
+
+                },
+
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+
+</script>

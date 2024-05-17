@@ -1,0 +1,355 @@
+﻿@model MMS.Web.Models.StockModel.OrderEntryModel
+@using MMS.Repository.Managers.StockManager
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+@{
+    List<InternalOrderEntryForm>
+    orderEntryEntityModelist = new List<InternalOrderEntryForm>();
+    BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
+    MMS.Web.Models.StockModel.OrderEntryModel model = new MMS.Web.Models.StockModel.OrderEntryModel();
+    MMS.Repository.Managers.SeasonManager seasonManager = new MMS.Repository.Managers.SeasonManager();
+    SeasonMaster seasonMaster = new SeasonMaster();
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("BuyerOrderEntryForm", PermissionSettingModel.PermissionID);
+}
+
+<script>
+
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    $(function () {
+        $("#Date").datepicker({ dateFormat: "dd/mm/yy" });
+        $("#CustomerDate").datepicker({ dateFormat: "dd/mm/yy" });
+        $("#ExFactoryDate").datepicker({ dateFormat: "dd/mm/yy" });
+
+    });
+
+    function Search() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Search", "BuyerOrderEntryForm")',
+            data: { filter: $('#SeaarchID').val() },
+            success: function (data) {
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                $('#DivShow').hide();
+                $('#EditColorPartial').hide();
+            }
+        });
+    }
+
+    function Cancel() {
+        location.reload();
+    }
+    function Add() {
+        $('.veh-tablecont').hide();
+        $('#empTable').hide();
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("EditBuyerOrderEntryForm", "BuyerOrderEntryForm")',
+            data: { OrderEntryId: 0 },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("FindWeekNo", "BuyerOrderEntryForm")',
+            data: {},
+            success: function (data) {
+                $("#EditColorPartial").show();
+                $('#WeekNo').val(data.weekNum);
+                $("#FinishedProdType option:selected").text("Full Shoes");
+            }
+        });
+        $("#EditColorPartial").show();
+    }
+    function Edit(arg) {
+        $('.veh-tablecont').hide();
+        $('#empTable').hide();
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("EditBuyerOrderEntryForm", "BuyerOrderEntryForm")',
+            data: { OrderEntryId: arg },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "BuyerOrderEntryForm")',
+                data: { OrderEntryId: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/BuyerOrderEntryForm/BuyerOrderEntryFormView";
+                        return false;
+                    }
+                    else {
+                        alert('deletion failed.');
+                    }
+
+                },
+
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+</script>
+
+<script type="text/javascript">
+
+    $(function () {
+        $("#dialog").dialog({
+            modal: true,
+            autoOpen: false,
+            title: "Order Fetching",
+            width: 450,
+            top: 127,
+            height: 200
+        });
+    });
+    function order() {
+        debugger
+        $('#dialog').dialog('open');
+        $(".ui-front").removeClass();
+    }
+    function Cancel() {
+        $.ajax({
+            type: 'POST',
+            url: ' @Url.Action("RemoveSession", "BuyerOrderEntryForm")',
+            success: function (data) {
+                location.href = "/BuyerOrderEntryForm/BuyerOrderEntryFormView";
+                return false;
+            },
+
+        });
+    }
+</script>
+@if (Session["BOMerror_"] != null)
+{
+    string[] sketchno = Session["BOMerror_"].ToString().Split(',');
+    int count = 1;
+    <div style="font-size:28px; padding-top:33px;text-align:center;">Please Make Entry on below bom no</div>
+    <div style="clear: both; text-align: center; height: 220px; margin-top: 63px; overflow-y: scroll; width: 268px;   margin-left: auto;
+    margin-right: auto;">
+
+        <table style="clear: both; color: red; font-size: 16px; height: 220px; overflow-y: scroll; text-align: center;">
+            @if (count == 1)
+                {
+                <tr>
+                    <th style="text-align: center;">Sno</th>
+                    <th style="text-align: center;">Sketch No</th>
+                </tr>
+            }
+            @foreach (var item in sketchno)
+            {
+
+                <tr>
+                    <td>@count</td>
+                    <td>@item</td>
+                </tr>
+
+                count++;
+            }
+        </table>
+    </div>
+    <div style="float: right; left: -236px;position: relative;    top: -135px;">
+        <input id="ok_btn" type="button" value="OK" onclick="Cancel()" />
+    </div>
+}
+else
+{
+    <div class="veh-tablewrap">
+
+        <div class="veh-tablecont">
+            <div id="sortMsg" style="text-align: center; color: Red;"></div>
+            <table class="veh-table" id="empTable">
+                <thead>
+                    <tr class="color-code-top-btn">
+                        <td colspan="9">
+
+
+                            <input type="button" id="btnShow" value="Order Fetching" onclick="order()" />
+
+                            <div id="dialog" style="display: none" align="center">
+
+                                @Html.AntiForgeryToken()
+                                @Html.ValidationSummary()
+                                <div class="form-group" style="display:inline-block;">
+                                    @using (Html.BeginForm("Upload", "BuyerOrderEntryForm", null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+                                    {
+                                        <input type="file" id="dataFile" name="upload" style="display:inline-block;float:left;" />
+                                        <input type="submit" value="Upload" id="UploadBtn" name="id=" UploadBtn"" class="btn btn-default" style="display:inline-block;float:left;" />
+                                    }
+                                    @if (Model.UploadError != null)
+                                    {
+                                        <span id="spn_error" style="display:inline-block;float:left;color:red;padding:8px 10px;">@Model.UploadError</span>
+                                    }
+                                </div>
+                                @Html.ValidationMessageFor(x => x.UploadError)
+
+                            </div>
+
+                            <input type="text" id="SeaarchID" placeholder="Search.." />
+                            @{
+                                bool Add = false; bool Edit = false; bool Delete = false;
+                                foreach (var item in PermissionModel)
+                                {
+                                    if (item.PermissionDesc == "Add")
+                                    {
+                                        Add = true;
+                                    }
+                                    if (item.PermissionDesc == "Edit")
+                                    {
+                                        Edit = true;
+                                    }
+                                    if (item.PermissionDesc == "Delete")
+                                    {
+                                        Delete = true;
+                                    }
+                                }
+
+                                if (Add == true)
+                                {
+                                    <input type="button" value="Add" onclick="Add()">
+                                }
+                                else
+                                {
+                                    <input type="button" value="Add" onclick="alert('No Permission To access !')">
+                                }
+
+                            }
+                            <input type="button" value="Search" onclick="Search()">
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="veh-1">
+                            Si.No
+                        </th>
+                        <th class="veh-1">
+                            BuyerOrderSlNo
+                        </th>
+                        <th class="veh-2">
+                            LotNo
+                        </th>
+                        <th class="veh-3">
+                            OrderProjectionNo
+                        </th>
+                        <th class="veh-4">
+                            LeatherDescription
+                        </th>
+                        <th class="veh-5">
+                            Brand
+                        </th>
+                        <th class="veh-12">
+                            Edit / Delete
+                        </th>
+                    </tr>
+                </thead>
+                @if (Model.OrderEntryList.Count > 0 && Model.OrderEntryList != null)
+                {
+                    int count = 1;
+                    <tbody>
+                        @foreach (var item in Model.OrderEntryList)
+                        {
+                            <tr>
+                                <td style="display: none" class="veh-12">@item.OrderEntryId</td>
+                                <td class="veh-1">@count</td>
+                                <td class="veh-1">@item.BuyerOrderSlNo</td>
+                                <td class="veh-2">@item.LotNo</td>
+                                <td class="veh-3">@item.OrderProjectionNo</td>
+                                <td class="veh-4">@item.LeatherDescription</td>
+                                <td class="veh-5">@item.Brand</td>
+                                <td class="veh-1 edit-del-wrap">
+                                    @if (Edit == true)
+                                    {
+                                        <a href="javascript:void(0)" onclick="Edit('@item.OrderEntryId')" class="watchlist-edit" title="Edit"></a>
+                                    }
+                                    else
+                                    {
+                                        <a href="javascript:void(0)" onclick="alert('Permission Access denied')" class="watchlist-edit" title="Edit"></a>
+                                    }
+                                    @if (Delete == true)
+                                    {
+                                        <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.OrderEntryId')" class="watchlist-delete" title="Delete"></a>
+                                    }
+                                    else
+                                    {
+                                        <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="alert('Permission Access denied')" class="watchlist-delete" title="Delete"></a>
+                                    }
+                                </td>
+                            </tr>
+                            count++;
+                        }
+                    </tbody>
+                    <tfoot class="footer-pager">
+                        <tr>
+                            <td colspan="4">
+                                <!-- pager -->
+                                @if (Model.Pager != null && Model.Pager.EndPage > 1)
+                                {
+                                    <ul class="pagination">
+                                        @if (Model.Pager.CurrentPage > 1)
+                                        {
+                                            <li>
+                                                <a href="~/BuyerOrderEntryForm/BuyerOrderEntryFormView">First</a>
+                                            </li>
+                                            <li>
+                                                <a href="~/BuyerOrderEntryForm/BuyerOrderEntryFormView?page=@(Model.Pager.CurrentPage - 1)">Previous</a>
+                                            </li>
+                                        }
+
+                                        @for (var page = Model.Pager.StartPage; page <= Model.Pager.EndPage; page++)
+                                        {
+                                            <li class="@(page == Model.Pager.CurrentPage ? "active" : "")">
+                                                <a href="~/BuyerOrderEntryForm/BuyerOrderEntryFormView?page=@page">@page</a>
+                                            </li>   }
+
+                                        @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
+                                        {
+                                            <li>
+                                                <a href="~/BuyerOrderEntryForm/BuyerOrderEntryFormView?page=@(Model.Pager.CurrentPage + 1)">Next</a>
+                                            </li>
+                                            <li>
+                                                <a href="~/BuyerOrderEntryForm/BuyerOrderEntryFormView?page=@(Model.Pager.TotalPages)">Last</a>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </td>
+                        </tr>
+                    </tfoot>
+                }
+            </table>
+            @if (Model.OrderEntryList != null && Model.OrderEntryList.Count == 0)
+            {
+                <div class="noRecordsFound" style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+            }
+        </div>
+        <div id="EditColorPartial" style="display:none;">
+            @Html.Partial("~/Views/Stock/BuyerOrderEntryForm/Partial/BuyerOrderEntryFormDetails.cshtml", Model)
+        </div>
+    </div>
+                                }

@@ -1,0 +1,260 @@
+﻿@model IEnumerable<MMS.Core.Entities.Users>
+@{
+    ViewBag.Title = "UserGrid";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    <script src="~/Scripts/jquery-1.8.2.min.js"></script>
+    <script src="~/Scripts/jquery-ui-1.8.24.min.js"></script>
+    <link href="~/Content/themes/base/jquery-ui.css" rel="stylesheet" />
+
+}
+
+@{
+
+    var grid = new WebGrid(source: Model,
+                                           defaultSort: "First Name",
+                                           rowsPerPage: 5, fieldNamePrefix: "wg_",
+                                           canPage: true, canSort: true,
+                                           pageFieldName: "pg", sortFieldName: "srt"
+                                           );
+}
+
+<div class="add-btn-wrap">
+    <input type="button" value="Add" class="AddNewUser" title="Add" style="cursor: pointer;" />
+
+</div>
+
+<table cellpadding="0" cellspacing="0" width="100%" id="table">
+
+    <tr>
+
+        <td>
+            <div id="GridDivID">
+                @grid.GetHtml(tableStyle: "listing-border", headerStyle: "gridhead", footerStyle: "paging", rowStyle: "td-dark", alternatingRowStyle: "td-light",
+                            columns:
+                                grid.Columns(
+
+                                 grid.Column("FirstName", format: @<text>@Html.ActionLink((string)item.FirstName, "AddViewUserPopup_", "Accounts",
+                new { @Id = item.UserID }, new { @class = "popupLink" })</text>),
+                                    grid.Column("LastName", "Last Name", style: "colLastName"),
+                                    grid.Column("UserType", "UserType", style: "colPhone"),
+                                    grid.Column("Email", "Email", style: "colEmail"),
+                                    grid.Column("IsActive", "Status",
+                                                    format: (item) => (item.IsActive) ? Html.Raw("<img src='../../Content/images/active.png' />") :
+                                                                                        Html.Raw("<img src='../../Content/images/inactive.png' />"),
+                                                    style: "colOperation"),
+                                    grid.Column(header: "Delete", format: @<text>@Html.ActionLink("Delete", "", "", null, new { onclick = "delMeal(" + item.UserID + ")" })</text>)
+                                                                 // grid.Column(header: "Add", format: @<text>@Html.ActionLink("Add", "", "", null, new { onclick = "AddUser()" })</text>)
+                                                                 ),
+                                                                 mode: WebGridPagerModes.Numeric)
+            </div>
+            <div id="dialog" style="display: none"></div>
+        </td>
+    </tr>
+</table>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+    });
+    $(function () {
+        $(".popupLink").click(function (e) {
+
+            var url = this.href;
+            var dialog = $("#dialog");
+            if ($("#dialog").length == 0) {
+                dialog = $('<div id="dialog" style="display:hidden"></div>').appendTo('body');
+            }
+            dialog.load(
+                url,
+                {}, // omit this param object to issue a GET request instead a POST request, otherwise you may provide post parameters within the object
+                function (responseText, textStatus, XMLHttpRequest) {
+                    dialog.dialog({
+                        close: function (event, ui) {
+                            dialog.remove();
+                        },
+                        modal: true,
+                        width: 460, resizable: false
+                    });
+                }
+            );
+            return false;
+        });
+    });
+
+    function delMeal(arg) {
+        if (confirm("Do you want to delete this User: " + arg)) {
+            $.ajax({
+                type: "POST",
+                url: ' @Url.Action("DeleteUser", "Accounts")',
+                data: { UserID: arg },
+                //dataType: "json",
+                success: function (data) {
+                    if (data.status == "Success") {
+                        alert("User Details Deleted Successfully.")
+                        return false;
+                    }
+                    else {
+                        alert('User Deletion Failed.')
+                        return false;
+                    }
+                }
+
+            });
+
+        }
+        return false; //prevent the link's action
+    }
+    $(function () {
+        $("#dialog").dialog({
+            autoOpen: false,
+            modal: true,
+            title: "Add New User Details",
+
+        });
+        $(".AddNewUser").click(function () {
+            $.ajax({
+                type: "POST",
+                url: ' @Url.Action("UserAdd", "Accounts")',
+                success: function (data) {
+                    $('#GridDivID').show();
+                    $("#dialog").dialog("open");
+                    $("#dialog").html(data);
+                    $('#dialog').show();
+                }
+            });
+        });
+    });
+</script>
+<style>
+    .listing-border {
+        background: #cacaca none repeat scroll 0 0;
+        font-family: NotoSans;
+        margin: 20px auto;
+        table-layout: fixed;
+        width: 96%;
+    }
+
+        .listing-border tfoot .paging td {
+            background: #e8e8e8 none repeat scroll 0 0;
+            padding: 7px;
+        }
+
+    .gridhead {
+        background: #3a3a3a;
+        color: #fff;
+        font: bold 13px/48px Arial,Helvetica,sans-serif;
+        height: 27px;
+        text-align: left;
+        text-decoration: none;
+    }
+
+        .gridhead th a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+    .td-dark {
+        background: #ffffff;
+        height: 20px;
+    }
+
+    .td-light {
+        background: #b7b7b7;
+        height: 20px;
+    }
+
+    .listing-border tbody td {
+        line-height: 30px;
+    }
+
+    .listing-border th, .listing-border td {
+        padding-left: 12px;
+    }
+
+    .add-btn-wrap {
+        margin: 26px auto 0;
+        width: 96%;
+    }
+
+        .add-btn-wrap input {
+            background: #405096 none repeat scroll 0 0;
+            border: 0 none;
+            border-radius: 3px;
+            color: #fff;
+            float: right;
+            font-family: NotoSans;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 8px 30px;
+            text-transform: uppercase;
+        }
+
+    .paging {
+        background: #febeba;
+        text-align: right;
+        color: #000000;
+    }
+
+        .paging span {
+            font: bold 12px Arial, Helvetica, sans-serif;
+            color: #FFFFFF;
+            margin-right: 3px;
+            padding: 1px 3px 1px 3px;
+        }
+
+        .paging a {
+            background: #405096 none repeat scroll 0 0;
+            border: 1px solid #ffffff;
+            color: #fff;
+            margin-right: 3px;
+            padding: 0px 4px;
+            text-decoration: none;
+        }
+
+            .paging a:hover {
+                background: #4a5aa4 none repeat scroll 0 0;
+                border: 1px solid #ffffff;
+                color: #fff;
+                text-decoration: none;
+            }
+
+    .colFirstName {
+        width: 18%;
+        text-align: left;
+    }
+
+    .colLastName {
+        width: 18%;
+        text-align: left;
+    }
+
+    .colPhone {
+        width: 14%;
+        text-align: left;
+    }
+
+    .colEmail {
+        width: 19%;
+        text-align: left;
+    }
+
+    .colContactType {
+        width: 18%;
+        text-align: left;
+    }
+
+    .colOperation {
+        width: 50px;
+        text-align: center;
+    }
+</style>
+

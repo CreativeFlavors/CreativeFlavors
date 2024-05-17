@@ -1,0 +1,291 @@
+﻿@model MMS.Web.Models.StockModel.ApprovedPriceListModel
+@using MMS.Repository.Managers.StockManager
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+@{
+
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("ApprovedPriceList", PermissionSettingModel.PermissionID);
+}
+<style>
+    table td {
+  
+    text-align: left !important;
+}
+</style>
+<div class="veh-tablewrap">
+    <div class="veh-tablecont" id="appPList">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+
+        <table class="veh-table" id="empTable">
+            <thead>
+                <tr class="color-code-top-btn">
+                    <td colspan="11">
+                        <input type="text" id="SeaarchID" placeholder="Search.." />
+                        @{
+                            bool Add = false;
+                            foreach (var item in PermissionModel)
+                            {
+                                if (item.PermissionDesc == "Add")
+                                {
+                                    Add = true;
+                                }
+                            }
+                            if (Add == true)
+                            {
+                                <input type="button" value="Add" onclick="Add()">
+                            }
+                            else
+                            {
+                                <input type="button" value="Add" onclick="alert('No Permission To access !')" />
+                            }
+                        }
+
+                        <input type="button" value="Search" onclick="Search()">
+                    </td>
+                </tr>
+                <tr>
+                    <th class="veh-1">
+                        Si.No
+                    </th>
+                    <th class="veh-2">
+                        Category
+                    </th>
+                    <th class="veh-3">
+                        Group
+                    </th>
+                    <th class="veh-4">
+                        Material Color
+                    </th>
+                    <th class="veh-5">
+                        Price
+                    </th>
+                    <th class="veh-6">
+                        TaxDetails
+                    </th>
+                    <th class="veh-7">
+                        MRPMargin
+                    </th>
+                    <th class="veh-8">
+                        MRPPRice
+                    </th>
+                    <th class="veh-9">
+                        LeadTime
+                    </th>
+                    <th class="veh-9">
+                        Edit/Delete
+                    </th>
+                </tr>
+            </thead>
+            @if (Model.ApprovedPriceList != null && Model.ApprovedPriceList.Count > 0)
+            {
+                int count = 1;
+                <tbody>
+
+                    @foreach (var ApprovedPrice in Model.ApprovedPriceList)
+                    {
+                        <tr>
+                            <td class="veh-1" onclick="">@count</td>
+                            <td class="veh-3">@ApprovedPrice.CategoryID</td>
+                            <td class="veh-3">@ApprovedPrice.GroupID</td>
+                            <td class="veh-3">@ApprovedPrice.ColorID</td>
+                            <td class="veh-3">@ApprovedPrice.PriceRs</td>
+                            <td class="veh-3">@ApprovedPrice.TaxDetails</td>
+                            <td class="veh-3">@ApprovedPrice.MRPMargin</td>
+                            <td class="veh-3">@ApprovedPrice.MRPPrice</td>
+                            <td class="veh-3">@ApprovedPrice.LeadTime</td>
+                            <td class="veh-1 edit-del-wrap">
+                                @{
+                        bool Edit = false;
+                        bool Delete = false;
+                        foreach (var item in PermissionModel)
+                        {
+                            if (item.PermissionDesc == "Edit")
+                            {
+                                Edit = true;
+                            }
+                            else if (item.PermissionDesc == "Delete")
+                            {
+                                Delete = true;
+                            }
+                        }
+                        if (Edit == true)
+                        {
+                            <a href="javascript:void(0)" onclick="Edit('@ApprovedPrice.ApprovedPriceID')" class="watchlist-edit" title="Edit"></a>
+                        }
+                        else
+                        {
+                            <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-edit" title="Edit"></a>
+                        }
+                        if (Delete == true)
+                        {
+                            <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@ApprovedPrice.ApprovedPriceID')" class="watchlist-delete" title="Delete"></a>
+                        }
+                        else
+                        {
+                            <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-delete" title="Delete"></a>
+                        }
+}
+                            </td>
+                        </tr>
+                       count++;
+                    }
+
+
+                </tbody>
+                <tfoot class="footer-pager">
+                    <tr>
+                        <td colspan="4">
+                            <div id="pager">
+                                <form>
+                                    <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                    <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                    <input type="text" class="pagedisplay" />
+                                    <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                    <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                    <select class="pagesize">
+                                        <option selected="selected" value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="40">40</option>
+                                    </select>
+                                </form>
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                </tfoot>
+                
+            }
+            
+        </table>
+        @if (Model.ApprovedPriceList != null && Model.ApprovedPriceList.Count == 0)
+        {
+            <div class="noRecordsFound" style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+        }
+    </div>
+
+    <div id="EditColorPartial">
+        @Html.Partial("~/Views/Stock/ApprovedPriceList/Partial/ApprovedPriceListDetails.cshtml", Model)
+    </div>
+
+
+</div>
+
+
+<script>
+    function Search() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Search", "ApprovedPriceList")',
+            data: { filter: $('#SeaarchID').val() },
+            success: function (data) {
+                //console.log(data);
+                //$('#DivShow').hide();
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                $('#DivShow').hide();
+            }
+        });
+    }
+    
+    function Cancel() {
+        //$('#EditColorPartial').hide()
+        $('#appPList').show();
+    }
+    function Add() {
+        $('#appPList').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("ApprovedPriceListDetails", "ApprovedPriceList")',
+            data: { ApprovedPriceID: 0 },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+
+    }
+    function Edit(arg) {       
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("ApprovedPriceListDetails", "ApprovedPriceList")',
+            data: { ApprovedPriceID: arg },
+            success: function (data) {
+                $("#appPList").html(data);
+                $("#appPList").show();
+                $("#MaterialID").prop("disabled", false);
+                var MaterialCategoryMasterId = $('#MaterialID').val();
+                var row = "";
+                var row1 = "";
+                $.ajax({
+                    url: '/ApprovedPriceList/ListSupplierMaster',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { ListSupplierId: parseInt(MaterialCategoryMasterId) },
+                    success: function (cities) {
+                        $("#listSupplier").append("");                       
+                        $.each(cities, function (i, city) {
+                            row += "<tr><td>" + city.SupplierName + "</td><td>" + city.Price + "</td><td>" + ToDateFormat(city.CreatedDate) + "</td></tr>";
+                        });
+                        $("#listSupplier").append(row);                       
+                        var ApprovePriceId = $('#ApprovedPriceID').val();                      
+                        $.ajax({
+                            url: '/ApprovedPriceList/ListApprovedPriceList',       
+                            type: "GET",                                           
+                            data: { ListSupplierId: parseInt(ApprovePriceId) },    
+                            success: function (cities) {                                                                       
+                                 
+                                $.each(cities, function (i, city) {
+                                    var i = 1;
+                                    row1 += "<tr><td>" + i  + "</td><td> " + city.CategoryID + "</td><td>" + city.GroupID + "</td><td>" + city.MaterialID + "</td><td>" + city.ColorID + "</td><td>" + city.Uom + "</td><td>" + city.PriceRs + "</td><td>" + city.TaxDetails + "</td><td>" + city.LeadTime + "</td><td>" + city.MRPMargin + "</td><td>" + city.MRPPrice + "</td><td>" + city.SupplierDescription + "</td></tr>";
+                                    i += 1;
+                                });
+                                $("#list-amended-material tbody").append(row1);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+      
+      
+    }
+    
+
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "ApprovedPriceList")',
+                data: { ApprovedPriceID: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/ApprovedPriceList/ApprovedPriceList";
+                        return false;
+                    }
+                    else {
+                        alert('Color Details deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+
+</script>

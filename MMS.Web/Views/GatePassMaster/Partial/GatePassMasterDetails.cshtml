@@ -1,0 +1,294 @@
+﻿@model MMS.Web.Models.GatePassModel.GatePassModel
+@using MMS.Repository.Managers
+@using MMS.Core.Entities
+@{
+
+}
+<style>
+    [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: static !important;
+    }
+</style>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+<script src="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.js"></script>
+<link href="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.css" rel="stylesheet" />
+<script>
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    $("#IfReturnable").datepicker({ dateFormat: "dd/mm/yy" });
+    $("#Date").datepicker({ dateFormat: "dd/mm/yy" });
+    $('#MaterialName').combobox();
+</script>
+
+<div class="right-form-section clearfix">
+    <form role="form" class="form-inline">
+        <div class="container-fluid">
+            <div class="field-section">
+                <p class="section-title">Gate Pass DC(Outward)</p>
+                <div style="text-align:center;margin-bottom:20px;" class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+
+                    <label style="margin-right:50px" class="radio-inline">
+                       
+                        @Html.RadioButtonFor(model => model.IsReturnable, "false", new { id = "return" })
+                        @Html.Label("return", "Returnable")
+                    </label>
+                    <label class="radio-inline">
+                     
+                        @Html.RadioButtonFor(model => model.IsReturnable, "true", new { id = "nonReturn" })
+                        @Html.Label("nonReturn", "Non-Returnble")
+                    </label>
+
+                </div>
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Gate Pass No</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                      
+                                        @Html.HiddenFor(x => x.GatePassId)
+                                        @Html.TextBoxFor(x => x.GatePassNo, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Date</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @if (Model != null && Model.GatePassId != 0)
+                                        {
+                                            var Date = Convert.ToDateTime(Model.Date).Date.ToString("dd/MM/yyyy");
+                                            @Html.TextBoxFor(m => m.Date, new { @Value = Date, @class = "form-control text-field" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(m => m.Date, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field" })
+                                        }
+                                                                            
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Party Name</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                       
+                                        @Html.TextBoxFor(m => m.PartyName, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Delivery Address</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                      
+                                        @Html.TextAreaFor(m => m.DeliveryAddress, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <label class="radio-inline">
+                                       
+                                        @Html.RadioButtonFor(m => m.IsSupplier, 1, new { id = "supplier" })
+                                        @Html.Label("supplier", "Supplier")
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="radio-inline">
+                                      
+                                        @Html.RadioButtonFor(m => m.IsSupplier, 2, new { id = "subContract" })
+                                        @Html.Label("subContract", "SubContract")
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="radio-inline">
+                                     
+                                        @Html.RadioButtonFor(m => m.IsSupplier, 3, new { id = "others" })
+                                        @Html.Label("others", "Others")
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Material Name</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                        @Html.DropDownListFor(m => m.MaterialName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialName(), new { @class = "select-style text-field" })
+                                        <button type="button" class="btn btn-info btn-sm but_search_styles" data-toggle="modal" title="Material List" data-target="#auto_search">...</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Quantity</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                       
+                                        @Html.TextBoxFor(m => m.Quantity, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">UOM</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                       
+                                        @Html.DropDownListFor(m => m.UOM, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Rate</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                      
+                                        @Html.TextBoxFor(m => m.Rate, new { @onkeypress = "return isNumberKey(event)" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Amount</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                     
+                                        @Html.TextBoxFor(m => m.Amount, new { @onkeypress = "return isNumberKey(event)" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">If Returnable</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                      @if (Model != null && Model.GatePassId != 0)
+                                      {
+                                          var IfRet = Model.IfReturnable;
+                                        @Html.TextBoxFor(m => m.IfReturnable, new { @Value = IfRet, @class = "form-control text-field" })
+                                      }
+                                      else
+                                      {
+                                        @Html.TextBoxFor(m => m.IfReturnable, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field" })
+                                      }
+
+                                      
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Remark</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                     
+                                        @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 ">
+                                  
+                                    @Html.CheckBoxFor(m => m.IsPrintWithRateValue, new { @checked = "checked", id = "IsPrintWithRateValue" })
+                                    @Html.Label("IsPrintWithRateValue", "Is Print With Rate Value")
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-padding">
+                                  
+                                    @Html.CheckBoxFor(m => m.IsPrintWithoutCompanyAddress, new { @checked = "checked", id = "IsPrintWithoutCompanyAddress" })
+                                    @Html.Label("IsPrintWithoutCompanyAddress", "Is Print Without Company Address")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:20px" class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                      
+                        <input type="button" onclick="Cancel()" class="btn btn-default btn-style" title="Back" value="Back">
+                        @if (Model != null && Model.GatePassId != 0)
+                        {
+                        <input type="button" onclick="Update()" class="btn btn-default btn-style" id="GatePassId" title="Update" value="Update">
+                        }
+                        else
+                        {
+                        <input type="button" onclick="Save()" class="btn btn-default btn-style" title="Save" value="Save">
+                        }
+                        <button type="submit" class="btn btn-default btn-style">Clear</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </form>
+</div>
+ 
+<div class="modal fade" id="auto_search" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header sear_head">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Material Name List</h4>
+            </div>
+            <div class="modal-body sear_body">
+                <ul class="mater_listers">
+                    @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.MaterialName().Where(x => x.Value != ""))
+                    {
+                        <li id="@item.Value">@item.Text</li>
+                    }
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button id="materialOpenId" type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+      
+    
+
+    function isNumberKey(evt) {
+
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode != 46 && charCode > 31
+          && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+   
+</script>

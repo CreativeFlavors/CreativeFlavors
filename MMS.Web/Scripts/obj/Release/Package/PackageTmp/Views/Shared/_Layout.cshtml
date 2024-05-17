@@ -1,0 +1,420 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>MMS</title>
+
+    <!--Font Awsome style -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
+
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/themes/base/css")
+
+    <link href="~/Content/themes/base/jquery-ui.css" rel="stylesheet" />
+
+    <!-- Open sans font Family -->
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+
+    <!--Left side Scrollbar Style -->
+    <link rel="stylesheet" href="~/Content/css/jquery.mCustomScrollbar.css" />
+
+    <!--Side bar ACcordian Style -->
+    <link rel="stylesheet" href="~/Content/css/accordian-style.css">
+
+    <!--Main Style -->
+    <link rel="stylesheet" type="text/css" href="~/Content/css/style.css">
+
+    <!--DatePicker -->
+    <link href="~/Datepicker/css/jquery-ui.css" rel="stylesheet" />
+
+    @Scripts.Render("~/bundles/modernizr")
+
+    <script src="~/Datepicker/js/jquery-1.10.2.js"></script>
+    <script src="~/Scripts/bootstrap-3.3.6.min.js"></script>
+    <script src="~/Scripts/jquery.mCustomScrollbar.concat.min.js"></script>
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+    <style>
+        .drilldown a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            position: relative;
+        }
+
+            .drilldown a:hover {
+                color: #fff;
+                text-decoration: none;
+            }
+
+            .drilldown a span {
+                position: absolute;
+                right: 20px;
+            }
+
+        .drilldown ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .drilldown li {
+            padding: 0px;
+            border-bottom: 1px solid #333;
+        }
+
+        .drilldown {
+            overflow: hidden;
+            width: 100%;
+            padding: 0;
+            margin: 20px auto;
+            background-color: #32549e;
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+        }
+
+        .drilldown-sub {
+            display: none;
+        }
+
+        .drilldown-back {
+            font-weight: bold;
+        }
+
+        .drilldown-root li a i {
+            margin-right: 10px;
+        }
+    </style>
+
+    <script>
+      //  $('.drilldown').drilldown();
+        $(document).ready(function () {
+           // $('.drilldown').drilldown();
+            //Material Name List Popup
+            $(document).on("click", ".mater_listers li", function () {
+                $(this).siblings().removeClass("back_color");
+                $(this).addClass("back_color");
+                var optionText = $(this).html();
+                var optionValue = $(this).attr("id");
+                $(".ui-autocomplete-input").val(optionText);
+                $("#MaterialName").find('option').removeAttr("selected");
+                $("#MaterialName").val(optionValue).find("option[value=" + optionValue + "]").attr('selected', true);
+            });
+            //Toogle click
+            $(document).on("click", ".lefterr_icon", function () {
+                if ($(this).hasClass("collapsed")) {
+                    $(this).removeClass("collapsed");
+                    var _cont_height = $(window).height() - 79;
+                    var _cont_width = $(window).width() - 250;
+                    $(".content-wrapper").css({ "height": _cont_height, "width": _cont_width });
+                    $(".left-side-bar").animate({
+                        width: ["toggle", "swing"]
+                    });
+                    $(".direction").toggleClass("toggle"), 300;
+                }
+                else {
+                    $(this).addClass("collapsed");
+                    var winWid = $(window).width();
+                    var winHt = $(window).height();
+                    $(".content-wrapper").css({ "height": winHt, "width": winWid });
+                    $(".left-side-bar").animate({
+                        width: ["toggle", "swing"]
+                    });
+                    $(".direction").toggleClass("toggle"), 300;
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div class="headers">
+        <div class="logo">
+            <img src="~/Content/Images/logo.png" alt="logo">
+        </div>
+        <div class="top-right">
+            <i class="fa fa-power-off" onclick="fnLogout()"></i>
+        </div>
+    </div>
+    @using (Html.BeginForm("LogOut", "Accounts", FormMethod.Post))
+    {
+        <input type="submit" value="BtnLogout" id="BtnLogout" style="display: none;" />
+        <input type="hidden" name="HdnLogout" value="Logout" />
+    }
+    <div class="left-side-bar">
+        <div class="drilldown">
+            <div class="drilldown-container">
+                <ul class="drilldown-root">
+                    <li>
+                        <a href="#"><i><img src="~/Content/Images/master-user.png" /></i>Master <span>&#9658;</span></a>
+                        <ul class="drilldown-sub">
+                            <li class="drilldown-back"><a href="#"><span>&#9668;</span> Back</a></li>
+                            <li>
+                                <a href="#"><i><img src="~/Content/Images/groom-shoes.png" /></i>Material<span>&#9658;</span></a>
+                                <ul class="drilldown-sub">
+                                    <li class="drilldown-back"><a href="#"><span>&#9668;</span> Back</a></li>
+                                    <li><a href="/Color/Color">Colour Master</a></li>
+                                    <li><a href="/MaterialGroup/MaterialGroup">Material Group</a></li>
+                                    <li><a href="/MaterialMaster/Material">Material Master</a></li>
+                                    <li><a href="/MaterialNameMaster/MaterialNameMaster">Material Name Master</a></li>
+                                    <li><a href="/MaterialCategory/MaterialCategory">Material Category</a></li>
+                                    <li><a href="/SubGroup/SubGroup">Material Sub Group</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#"><i><img src="~/Content/Images/crm.png" /></i>CRM<span>&#9658;</span></a>
+                                <ul class="drilldown-sub">
+                                    <li class="drilldown-back"><a href="#"><span>&#9668;</span> Back</a></li>
+                                    <li><a href="/AgentMaster/AgentMaster">Agent Master</a></li>
+                                    <li><a href="/BuyerMater/BuyerMater">Buyer Master</a></li>
+                                    <li><a href="/CommisionCritiria/CommisionCritiria">Commission Criteria</a></li>
+                                    <li><a href="/ManufactureMaster/ManufactureMaster">Manufacture Master</a></li>
+                                    <li><a href="/OrginMaster/OrginMaster">Origin Master</a></li>
+                                    <li><a href="/SupplierMaster/SupplierMaster">Supplier Master</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#"><i><img src="~/Content/Images/transaction.png" /></i>Transaction<span>&#9658;</span></a>
+                                <ul class="drilldown-sub">
+                                    <li class="drilldown-back"><a href="#"><span>&#9668;</span> Back</a></li>
+                                    <li><a href="/GRNType/GRNType">GRN/Issue Type</a></li>
+                                    <li><a href="/IndentTypeMaster/IndentTypeMaster">Indent Type Master</a></li>
+                                    <li><a href="/LeatherType/LeatherType">Leather Type Master</a></li>
+                                    <li><a href="/OrderType/OrderType">Order Type</a></li>
+                                    <li><a href="/SizeRangedetail/SizeRangedetail">Size Range Details</a></li>
+                                    <li><a href="/SizeScheduleMaster/SizeScheduleMaster">Size Schedule Master</a></li>
+                                    <li><a href="/SizeRangeMaster/SizeRangeMaster">Size Range Master</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#"><i><img src="~/Content/Images/admin.png" /></i>Admin<span>&#9658;</span></a>
+                                <ul class="drilldown-sub">
+                                    <li class="drilldown-back"><a href="#"><span>&#9668;</span> Back</a></li>
+                                    <li><a href="/BasicUnitMaster/BasicUnitMaster">Basic Unit Master</a></li>
+                                    <li><a href="/BuyerMater/BuyerModel">Buyer Model</a></li>
+                                    <li><a href="/Currency/Currency">Currency Master</a></li>
+                                    <li><a href="/Country/Country">Country Master</a></li>
+                                    <li><a href="/CurrencyExchangeMaster/CurrencyExchangeMaster">Currency Exchange Master</a></li>
+                                    <li><a href="/Product_BuyerStyle/ProductBuyerStyle">Product Buyer Style</a></li>
+                                    <li><a href="/ProjectionMaster/ProjectionMaster">Projection Master</a></li>
+                                    <li><a href="/SeasonMaster/SeasonMaster">Season Master</a></li>
+                                    <li><a href="/TaxTypeMaster/TaxTypeMaster">Tax Type</a></li>
+                                    <li><a href="#">Tax Configuration</a></li>
+                                    <li><a href="/UnitConversion/UnitConversion">Unit Conversion</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#"><i><img src="~/Content/Images/others.png" /></i>Others<span>&#9658;</span></a>
+                                <ul class="drilldown-sub">
+                                    <li class="drilldown-back"><a href="#"><span>&#9668;</span> Back</a></li>
+                                    <li><a href="/MachineryMaster/MachineryMaster">Machinery</a></li>
+                                    <li><a href="/NormsMaster/NormsMaster">Norms Master</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#"><i><img src="~/Content/Images/production.png" /></i>Production<span>&#9658;</span></a>
+                                <ul class="drilldown-sub">
+                                    <li class="drilldown-back"><a href="#"><span>&#9668;</span> Back</a></li>
+                                    <li><a href="/ConveyorMaster/ConveyorMaster">Conveyor Master</a></li>
+                                    <li><a href="/Component/Component">Component Master</a></li>
+                                    <li><a href="/GRNType/GRNType">GRN/Issue Type Master</a></li>
+                                    <li><a href="/GroupSystemCalculation/GroupSystemCalculation">Group System Calculation Master</a></li>
+                                    <li><a href="/InspectionTypeMaster/InspectionTypeMaster">Inspection Type Master</a></li>
+                                    <li><a href="/LeatherSize/LeatherSize">Leather Size Master</a></li>
+                                    <li><a href="/LeatherShoeGrade/LeatherShoeGrade">Leather And Shoe Grade Master</a></li>
+                                    <li><a href="/OperationMaster/OperationMaster">Operation Master</a></li>
+                                    <li><a href="/StageMaster/StageMaster">Stage Master</a></li>
+                                    <li><a href="/StoreMaster/StoreMaster">Store Master</a></li>
+                                    <li><a href="/SkillMaster/SkillMaster">Skill Master</a></li>
+                                    <li><a href="/SubstanceMaster/Substance">Substance Master</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#"><i><img src="~/Content/Images/transaction.png" /></i>Transaction<span>&#9658;</span></a>
+                        <ul class="drilldown-sub">
+                            <li class="drilldown-back"><a href="#"><span>&#9668;</span> Back</a></li>
+                            <li>
+                                <a href="#"><i><img src="~/Content/Images/orders.png" /></i>Order Creation<span>&#9658;</span></a>
+                                <ul class="drilldown-sub">
+                                    <li class="drilldown-back"><a href="#"><span>&#9668;</span> Back</a></li>
+                                    <li><a href="/ApprovedPriceList/ApprovedPriceList"> Approved Price List</a></li>
+                                    <li><a href="/BillOfMaterial/BOMMaterialListGrid">BOM</a></li>
+                                    <li><a href="/BuyerOrderEntryForm/BuyerOrderEntryFormView">Buyer Order Entry Form </a></li>
+                                    <li><a href="/InternalOrderForm/BuyerOrderEntryFormView">Internal Order Entry Form</a></li>
+                                    <li><a href="/GRN_Detail/GoodReceipeNote">GRN</a></li>
+                                    <li><a href="/Indent/Indent">Indent</a></li>
+                                    <li><a href="/SImpleMRP/SImpleMRP">MRP Simple</a></li>
+                                    <li><a href="/MaterialOpeningStock/MaterialOpening">Material Opening</a></li>
+                                    <li><a href="/PurchaseOrder/PurchaseOrder">Purchase Order</a></li>
+                                    <li><a href="/IssueSlip_Single/SingleIssueSlip">Single Issue Slip</a></li>
+                                    <li><a href="/MultipleIssue/MuplitpleIssue">Multiple Issue Slip</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#"><i><img src="~/Content/Images/others.png" /></i>Others<span>&#9658;</span></a>
+                                <ul class="drilldown-sub">
+                                    <li class="drilldown-back"><a href="#"><span>&#9668;</span> Back</a></li>
+                                    <li><a href="/Imir/Imir">IMIR</a></li>
+                                    <li><a href="/FloorReturnMaterial/FloorReturnMaterial">Floor Return Materials</a></li>
+                                    <li><a href="/GatePassGRNMaster/GatePassGRNMaster">Gate Pass GRN Inward</a></li>
+                                    <li><a href="/GatePassMaster/GatePassMaster">Gate Pass GRN Outward</a></li>
+                                    <li><a href="/MaterialReservationForm/MaterialReservation">Material Reservation"</a></li>
+                                    <li><a href="/MaterialRequirementPlan/MaterialRequirementPlan">Material Requirement Plan</a></li>
+                                    <li><a href="/ProductionPlan/ProductionPlan">Production Planning</a></li>
+                                    <li><a href="/RejectionReturn/RejectionReturnForm">Rejection Return</a></li>
+                                    <li><a href="/StockConversion/StockConversion">Stock Conversion</a></li>
+                                    <li><a href="/StoreTransferForm/StoreTransfer">Store transfer</a></li>
+                                    <li><a href="/StockTransfer/StockTransfer">Stock transfer</a></li>
+                                </ul>
+                            </li>
+
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#"><i><img src="~/Content/Images/permission.png" /></i>Permission<span>&#9658;</span></a>
+                        <ul class="drilldown-sub">
+                            <li class="drilldown-back"><a href="#"><span>&#9668;</span> Back</a></li>
+                            <li><a href="/Accounts/UserType"><i><img src="~/Content/Images/user.png" /></i> User Type</a></li>
+                            <li><a href="/Accounts/Permission"><i><img src="~/Content/Images/permission.png" /></i>Permission</a></li>
+                            <li><a href="/Accounts/PermissionSetting"><i><img src="~/Content/Images/set-permission.png" /></i>Set Permission</a></li>
+                            <li><a href="/Accounts/ChangePassword"><i><img src="~/Content/Images/change-password.png" /></i>Change Password</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#"><i><img src="~/Content/Images/report.png" /></i>Reports<span>&#9658;</span></a>
+                        <ul class="drilldown-sub">
+                            <li class="drilldown-back"><a href="#"><span>&#9668;</span> Back</a></li>
+                            <li><a href="/AllStoresGRNReport/Index"><i><img src="~/Content/Images/grn-report.png" /></i>All Stores GRN Report</a></li>
+                            <li><a href="/GRNReport/Index"><i><img src="~/Content/Images/grn.png" /></i>GRN</a></li>
+                            <li><a href="/IndentReqReport/Index"><i><img src="~/Content/Images/indent.png" /></i>Indent Requirement</a></li>
+                            <li><a href="/POReport/Index"><i><img src="~/Content/Images/purchase-order.png" /></i>Purchase Order</a></li>
+                            <li><a href="/StockStatementReport/Index"><i><img src="~/Content/Images/stock-management.png" /></i>Stock Statement</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="content-wrapper">
+        @RenderBody()
+    </div>
+
+</body>
+</html>
+<script src="~/Scripts/jquery-1.8.2.js"></script>
+<script src="~/Scripts/jquery.tablesorter.min.js"></script>
+<script src="~/Scripts/jquery.tablesorter.pager.js"></script>
+<script src="~/Scripts/Common.js"></script>
+<script src="~/Datepicker/js/jquery-ui.min.js"></script>
+<script src="~/Scripts/multiselect/js/jquery.multiselect.js" type="text/javascript"></script>
+<script src="~/Scripts/multiselect/js/jquery.multiselect.min.js"></script>
+<script src="~/Scripts/Jquery-1.11.2.min.js"></script>
+@*<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>*@
+<script src="~/Scripts/jquery.drilldown.js"></script>
+<script src="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.js"></script>
+<link href="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.css" rel="stylesheet" />
+<link type="text/css" href="~/Datepicker/css/ui-lightness/jquery-ui-1.8.19.custom.css" rel="stylesheet" />
+<script src="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.js"></script>
+<link href="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.css" rel="stylesheet" />
+@*<link type="text/css" href="~/Datepicker/css/ui-lightness/jquery-ui-1.8.19.custom.css" rel="stylesheet" />*@
+
+<script>
+    $('.drilldown').drilldown();
+    function fnLogout() {
+        $("#BtnLogout").click();
+    }
+
+    var win_height = $(window).height() - 79;
+    $(".left-side-bar").css({ "height": win_height });
+
+    var _cont_height = $(window).height() - 79;
+    var _cont_width = $(window).width() - 250;
+
+    $(".content-wrapper").css({ "height": _cont_height, "width": _cont_width });
+    $(window).load(function () {
+
+
+        var win_height = $(window).height() - 79;
+        $(".left-side-bar").css({ "height": win_height });
+
+        var _cont_height = $(window).height() - 79;
+        var _cont_width = $(window).width() - 285;
+
+        $(".content-wrapper").css({ "height": _cont_height, "width": _cont_width });
+
+    });
+    $('colgroup').hide();
+
+    $("#pager").css({ "position": "relative", "top": "auto" });
+
+
+    $(window).resize(function () {
+
+        var win_height = $(window).height() - 79;
+        $(".left-side-bar").css({ "height": win_height });
+
+        var _cont_height = $(window).height() - 79;
+        var _cont_width = $(window).width() - 250;
+        $(".content-wrapper").css({ "height": _cont_height, "width": _cont_width });
+
+
+    });
+
+
+    var specialKeys = new Array();
+    specialKeys.push(8); //Backspace
+    $(function () {
+       // $('.drilldown').drilldown();
+        $(".numeric").bind("keypress", function (e) {
+            var keyCode = e.which ? e.which : e.keyCode
+            var ret = ((keyCode >= 48 && keyCode <= 57) || specialKeys.indexOf(keyCode) != -1);
+            $(".error").css("display", ret ? "none" : "inline");
+            return ret;
+        });
+        $(".numeric").bind("paste", function (e) {
+            return false;
+        });
+        $(".numeric").bind("drop", function (e) {
+            return false;
+        });
+
+        var winPath = window.location.pathname;
+        $(".left-side-bar ul li a").each(function () {
+            if ($(this).attr("href") == winPath) {
+                console.log($(this).attr("href"));
+                console.log(winPath);
+                $(this).parents("li.has-children").find("input[type='checkbox']").prop("checked", true);
+                $(this).addClass("current-menu");
+            }
+        });
+
+
+        $(".cd-accordion-menu > li").on("click", function () {
+            $(this).siblings().removeClass("active");
+            $(this).addClass("active");
+        });
+    });
+
+
+
+</script>
+
+
+<script>
+  //  $('.drilldown').drilldown();
+    $(window).load(function () {
+        setTimeout(function () {
+            $(".datepick").datepicker(
+                {
+                    changeMonth: true,
+                    changeYear: true
+                });
+        }, 500);
+    });
+</script>
+<script>$.noConflict();</script>

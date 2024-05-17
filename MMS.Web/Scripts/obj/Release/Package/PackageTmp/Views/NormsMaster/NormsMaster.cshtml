@@ -1,0 +1,163 @@
+﻿
+@model MMS.Web.Models.NormsModel.NormsModel
+    @{
+        ViewBag.Title = "NormsMaster";
+        Layout = "~/Views/Shared/_Layout.cshtml";
+
+        <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+    }
+
+    <script>
+        //$(".activity_repoty_table").tablesorter();
+        // A $( document ).ready() block.
+        $(document).ready(function () {
+            $("#EditColorPartial").hide();
+
+        });
+        function Save() {
+            if ($('#BuyerNameid').val() == "") {
+                alert("Please select Buyer Name.")
+                $('#BuyerNameid').css('border-color', 'red');
+                $('#BuyerNameid').focus();
+                return false;
+            }
+            else {
+                $('#BuyerNameid').css('border-color', '');
+            }
+            if ($('#GroupId').val() == "") {
+                alert("Please select Group Name.")
+                $('#GroupId').css('border-color', 'red');
+                $('#GroupId').focus();
+                return false;
+            }
+            else {
+                $('#GroupId').css('border-color', '');
+            }
+
+            if ($('#OurNorms').val() == "") {
+                alert("Please select Our Norms.")
+                $('#OurNorms').css('border-color', 'red');
+                $('#OurNorms').focus();
+                return false;
+            }
+            else {
+                $('#OurNorms').css('border-color', '');
+            }
+            if ($('#NormsPercentage').val() == "") {
+                alert("Please enter ournorms percentage.")
+                $('#NormsPercentage').css('border-color', 'red');
+                $('#NormsPercentage').focus();
+                return false;
+            }
+            else {
+                $('#NormsPercentage').css('border-color', '');
+            }
+            if ($('#PurchaseNormsid').val() == "") {
+                alert("Please select purchase norms.")
+                $('#PurchaseNormsid').css('border-color', 'red');
+                $('#PurchaseNormsid').focus();
+                return false;
+            }
+            else {
+                $('#PurchaseNormsid').css('border-color', '');
+            }
+            if ($('#NormsPercentage1').val() == "") {
+                alert("Please enter purchase norms percentage.")
+                $('#NormsPercentage1').css('border-color', 'red');
+                $('#NormsPercentage1').focus();
+                return false;
+            }
+            else {
+                $('#NormsPercentage1').css('border-color', '');
+            }
+            if ($('#IssueNormsid').val() == "") {
+                alert("Please select Issue Norms.")
+                $('#IssueNormsid').css('border-color', 'red');
+                $('#IssueNormsid').focus();
+                return false;
+            }
+            else {
+                $('#IssueNormsid').css('border-color', '');
+            }
+            if ($('#NormsPercentage2').val() == "") {
+                alert("Please enter issuenorms percentage.")
+                $('#NormsPercentage2').css('border-color', 'red');
+                $('#NormsPercentage2').focus();
+                return false;
+            }
+            else {
+                $('#NormsPercentage2').css('border-color', '');
+            }
+            if ($('#CostingNorms').val() == "") {
+                alert("Please select costing norms.")
+                $('#CostingNorms').css('border-color', 'red');
+                $('#CostingNorms').focus();
+                return false;
+            }
+            else {
+                $('#CostingNorms').css('border-color', '');
+            }
+            if ($('#NormsPercentage3').val() == "") {
+                alert("Please enter Costing Norms Percentage.")
+                $('#NormsPercentage3').css('border-color', 'red');
+                $('#NormsPercentage3').focus();
+                return false;
+            }
+            else {
+                $('#NormsPercentage3').css('border-color', '');
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/NormsMaster/NormsMaster',
+                data: {
+                    Normsid: $("#Normsid").val(),
+                    BuyerNameid: $('#BuyerNameid').val(),
+                    GroupId: $('#GroupId').val(),
+                    OurNorms: $('#OurNorms').val(),
+                    BuyerOption:$('#BuyerOption:checked').val(),
+                    NormsPercentage: $('#NormsPercentage').val(),
+                    PurchaseNormsid: $('#PurchaseNormsid').val(),
+                    NormsPercentage1: $('#NormsPercentage1').val(),
+                    IssueNormsid: $('#IssueNormsid').val(),
+                    NormsPercentage2: $('#NormsPercentage2').val(),
+                    CostingNorms: $('#CostingNorms').val(),
+                    NormsPercentage3: $('#NormsPercentage3').val(),
+                },
+                success: function (data) {
+                    if (data == "Saved Successfully") {
+                        alert('Saved Successfully.');
+                        location.href = "/NormsMaster/NormsMaster";
+                        return false;
+                    }
+                    else if (data == "Updated Successfully") {
+                        alert('Updated Successfully.');
+                        location.href = "/NormsMaster/NormsMaster";
+                        return false;
+                    }
+                    else if (data == "Already Exist") {
+                        alert('Already Exist in the database.');
+                        return false;
+                    }
+                    else {
+                        alert('Save process Failed.');
+                        location.href = "/NormsMaster/NormsMaster";
+                        return false;
+                    }
+
+                },
+                error: function (ex) {
+                    alert('Already Exist in the database.');
+                }
+            });
+        }
+   
+    </script>
+    <h2 class="content-title">Norms Master</h2>
+    <div style="width: 100%; float: left;">
+        <div id="tabVehicleWatchList">
+            @Html.Action("NormsGrid", "NormsMaster")
+        </div>
+    </div>
+

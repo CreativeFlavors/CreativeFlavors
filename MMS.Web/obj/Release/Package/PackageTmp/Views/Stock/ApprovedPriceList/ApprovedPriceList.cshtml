@@ -1,0 +1,381 @@
+﻿@{
+    ViewBag.Title = "ApprovedPriceList";
+    Layout = "~/Views/Shared/_Layout.cshtml";    
+   
+}
+<style>
+   
+</style>
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $('#EditColorPartial').hide();
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+    });
+    $(function () {
+        $('.loader-overlay').ajaxStart(function () {
+            $(this).fadeIn('slow');
+        }).ajaxStop(function () {
+            $(this).stop().fadeOut('fast');
+        });
+    });
+    function Save() {
+        if ($('#SupplierId').val() == "") {
+            alert("Please Enter Supplier.")
+            $('#SupplierId').css('border-color', 'red');
+            $('#SupplierId').focus();
+            return false;
+        }
+        else {
+            $('#SupplierId').css('border-color', '');
+        }
+        if ($('#Date').val() == "") {
+            alert("Please Enter Date.")
+            $('#Date').css('border-color', 'red');
+            $('#Date').focus();
+            return false;
+        }
+        else {
+            $('#Date').css('border-color', '');
+        }
+        
+        if ($('#CategoryID').val() == "") {
+            alert("Please Enter Category.")
+            $('#CategoryID').css('border-color', 'red');
+            $('#CategoryID').focus();
+            return false;
+        }
+        else {
+            $('#CategoryID').css('border-color', '');
+        }
+        if ($('#PriceRs').val() == "") {
+            alert("Please Enter Price.")
+            $('#PriceRs').css('border-color', 'red');
+            $('#PriceRs').focus();
+            return false;
+        }
+        else {
+            $('#PriceRs').css('border-color', '');
+        }
+        if ($('#GroupID').val() == "") {
+            alert("Please Enter Group.")
+            $('#GroupID').css('border-color', 'red');
+            $('#GroupID').focus();
+            return false;
+        }
+        else {
+            $('#GroupID').css('border-color', '');
+        }
+        if ($('#TaxDetails').val() == "") {
+            alert("Please Enter Tax Details.")
+            $('#TaxDetails').css('border-color', 'red');
+            $('#TaxDetails').focus();
+            return false;
+        }
+        else {
+            $('#TaxDetails').css('border-color', '');
+        }
+        if ($('#MaterialID').val() == "") {
+            alert("Please Enter Material.")
+            $('#MaterialID').css('border-color', 'red');
+            $('#MaterialID').focus();
+            return false;
+        }
+        else {
+            $('#MaterialID').css('border-color', '');
+        }
+        if ($('CurrencyID').val == "") {
+            alert("Please Select Currency.")
+            $('#CurrencyID').css('border-color', 'red');
+            $('#CurrencyID').focus();
+            return false;
+        }
+        else {
+            $('#CurrencyID').css('border-color', '');
+        }
+
+
+
+
+        if ($('#LeadTime').val() == "") {
+            alert("Please Enter LeadTime.")
+            $('#LeadTime').css('border-color', 'red');
+            $('#LeadTime').focus();
+            return false;
+        }
+        else {
+            $('#LeadTime').css('border-color', '');
+        }
+        if ($('#ColorID').val() == "") {
+            alert("Please Enter Color.")
+            $('#ColorID').css('border-color', 'red');
+            $('#ColorID').focus();
+            return false;
+        }
+        else {
+            $('#ColorID').css('border-color', '');
+        }
+        
+        if ($('#MRPMargin').val() == "") {
+            alert("Please Enter MRP Margin.")
+            $('#MRPMargin').css('border-color', 'red');
+            $('#MRPMargin').focus();
+            return false;
+        }
+        else {
+            $('#MRPMargin').css('border-color', '');
+        }
+        if ($('#MRPPrice').val() == "") {
+            alert("Please Enter MRP Price.")
+            $('#MRPPrice').css('border-color', 'red');
+            $('#MRPPrice').focus();
+            return false;
+        }
+        else {
+            $('#MRPPrice').css('border-color', '');
+        }
+        if ($('#AccessibleValue').val() == "") {
+            alert("Please Enter Accessible Value.")
+            $('#AccessibleValue').css('border-color', 'red');
+            $('#AccessibleValue').focus();
+            return false;
+        }
+        else {
+            $('#AccessibleValue').css('border-color', '');
+        }
+        if ($('#SupplierDescription').val() == "") {
+            alert("Please Enter Supplier Description.")
+            $('#SupplierDescription').css('border-color', 'red');
+            $('#SupplierDescription').focus();
+            return false;
+        }
+        else {
+            $('#SupplierDescription').css('border-color', '');
+        }
+     
+        $.ajax({
+            type: 'POST',
+            url: '/ApprovedPriceList/ApprovedPriceList',
+            data: {
+                ApprovedPriceID: $('#ApprovedPriceID').val(),
+                SupplierId: $('#SupplierId').val(),
+                Date: $('#Date').val(),
+                PriceRs: $('#PriceRs').val(),
+                CategoryID: $('#CategoryID').val(),
+                IsApproved: $("#IsApproved").is(':checked'),
+                TaxDetails: $('#TaxDetails').val(),
+                GroupID: $('#GroupID').val(),
+                Uom: $('#Uom').val(),
+                MaterialID: $('#MaterialID').val(),
+                CurrencyID: $('#CurrencyID').val(),
+                ColorID: $('#ColorID').val(),
+                POExcessPercentage:$("#POExcessPercentage").val(),
+                LeadTime: $('#LeadTime').val(),
+                MRPMargin: $('#MRPMargin').val(),
+                MRPPrice: $('#MRPPrice').val(),
+                AccessibleValue: $('#AccessibleValue').val(),
+                SupplierDescription: $('#SupplierDescription').val()
+            },
+            success: function (data) {
+                if (data.SizeScheduleMasterId != "" || data.SizeScheduleMasterId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/ApprovedPriceList/ApprovedPriceList";
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/ApprovedPriceList/ApprovedPriceList";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#SupplierId').val() == "") {
+            alert("Please Enter Supplier.")
+            $('#SupplierId').css('border-color', 'red');
+            $('#SupplierId').focus();
+            return false;
+        }
+        else {
+            $('#SupplierId').css('border-color', '');
+        }
+        if ($('#Date').val() == "") {
+            alert("Please Enter Date.")
+            $('#Date').css('border-color', 'red');
+            $('#Date').focus();
+            return false;
+        }
+        else {
+            $('#Date').css('border-color', '');
+        }
+
+        if ($('#CategoryID').val() == "") {
+            alert("Please Enter Category.")
+            $('#CategoryID').css('border-color', 'red');
+            $('#CategoryID').focus();
+            return false;
+        }
+        else {
+            $('#CategoryID').css('border-color', '');
+        }
+        if ($('#PriceRs').val() == "") {
+            alert("Please Enter Price.")
+            $('#PriceRs').css('border-color', 'red');
+            $('#PriceRs').focus();
+            return false;
+        }
+        else {
+            $('#PriceRs').css('border-color', '');
+        }
+        if ($('#GroupID').val() == "") {
+            alert("Please Enter Group.")
+            $('#GroupID').css('border-color', 'red');
+            $('#GroupID').focus();
+            return false;
+        }
+        else {
+            $('#GroupID').css('border-color', '');
+        }
+        if ($('#TaxDetails').val() == "") {
+            alert("Please Enter Tax Details.")
+            $('#TaxDetails').css('border-color', 'red');
+            $('#TaxDetails').focus();
+            return false;
+        }
+        else {
+            $('#TaxDetails').css('border-color', '');
+        }
+        if ($('#MaterialID').val() == "") {
+            alert("Please Enter Material.")
+            $('#MaterialID').css('border-color', 'red');
+            $('#MaterialID').focus();
+            return false;
+        }
+        else {
+            $('#MaterialID').css('border-color', '');
+        }
+        if ($('#LeadTime').val() == "") {
+            alert("Please Enter LeadTime.")
+            $('#LeadTime').css('border-color', 'red');
+            $('#LeadTime').focus();
+            return false;
+        }
+        else {
+            $('#LeadTime').css('border-color', '');
+        }
+        if ($('#ColorID').val() == "") {
+            alert("Please Enter Color.")
+            $('#ColorID').css('border-color', 'red');
+            $('#ColorID').focus();
+            return false;
+        }
+        else {
+            $('#ColorID').css('border-color', '');
+        }
+
+        if ($('#MRPMargin').val() == "") {
+            alert("Please Enter MRP Margin.")
+            $('#MRPMargin').css('border-color', 'red');
+            $('#MRPMargin').focus();
+            return false;
+        }
+        else {
+            $('#MRPMargin').css('border-color', '');
+        }
+        if ($('#MRPPrice').val() == "") {
+            alert("Please Enter MRP Price.")
+            $('#MRPPrice').css('border-color', 'red');
+            $('#MRPPrice').focus();
+            return false;
+        }
+        else {
+            $('#MRPPrice').css('border-color', '');
+        }
+        if ($('#AccessibleValue').val() == "") {
+            alert("Please Enter Accessible Value.")
+            $('#AccessibleValue').css('border-color', 'red');
+            $('#AccessibleValue').focus();
+            return false;
+        }
+        else {
+            $('#AccessibleValue').css('border-color', '');
+        }
+        if ($('#SupplierDescription').val() == "") {
+            alert("Please Enter Supplier Description.")
+            $('#SupplierDescription').css('border-color', 'red');
+            $('#SupplierDescription').focus();
+            return false;
+        }
+        else {
+            $('#SupplierDescription').css('border-color', '');
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/ApprovedPriceList/Update',
+            data: {
+                ApprovedPriceID: $('#ApprovedPriceID').val(),
+                SupplierId: $('#SupplierId').val(),
+                Date: $('#Date').val(),
+                PriceRs: $('#PriceRs').val(),
+                UomId: $('#Uom').val(),
+                CategoryID: $('#CategoryID').val(),
+                TaxDetails: $('#TaxDetails').val(),
+                GroupID: $('#GroupID').val(),
+                IsApproved: $("#IsApproved").is(':checked'),
+                POExcessPercentage: $("#POExcessPercentage").val(),
+                MaterialID: $('#MaterialID').val(),
+                CurrencyID: $('#CurrencyID').val(),
+                ColorID: $('#ColorID').val(),
+                LeadTime: $('#LeadTime').val(),
+                MRPMargin: $('#MRPMargin').val(),
+                MRPPrice: $('#MRPPrice').val(),
+                AccessibleValue: $('#AccessibleValue').val(),
+                SupplierDescription: $('#SupplierDescription').val()
+            },
+            success: function (data) {
+                if (data.SizeScheduleMasterId != "" || data.SizeScheduleMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/ApprovedPriceList/ApprovedPriceList";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/ApprovedPriceList/ApprovedPriceList";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Approved Price List Master</h2>
+<div style="width: 100%; float: left;">
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("ApprovedPriceListGrid", "ApprovedPriceList")
+    </div>
+</div>
+
+
+

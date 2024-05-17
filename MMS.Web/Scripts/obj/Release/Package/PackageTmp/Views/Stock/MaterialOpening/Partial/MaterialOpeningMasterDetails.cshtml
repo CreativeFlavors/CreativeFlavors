@@ -1,0 +1,705 @@
+@model MMS.Web.Models.StockModel.MaterialOpeningModel
+@using MMS.Core.Entities;
+@{
+    int id = Model.MaterialOpeningId;
+    Session["MaterialOpeningId"] = id;
+
+    int count = 1;
+
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("MaterialOpening", PermissionSettingModel.PermissionID);
+}
+@{
+    bool Save = false; bool Update = false; bool Display = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Save")
+        {
+            Save = true;
+        }
+        if (item.PermissionDesc == "Update")
+        {
+            Update = true;
+        }
+        if (item.PermissionDesc == "Display")
+        {
+            Display = true;
+        }
+    }
+
+}
+
+<script>
+
+    $('#Date').datepicker({ dateFormat: "dd/mm/yy" });
+
+</script>
+
+<div class="right-form-section clearfix">
+    <form class="form-inline" role="form">
+        <div class="container-fluid">
+            <div class="row">
+
+                <div class="col-sm-8 col-xs-12 no-padding">
+                    
+                    <div class="col-sm-6 col-xs-12 no-padding">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-4 col-sm-3 col-lg-4 col-xs-12">
+                                    <label class="form-label" for="text">Store</label>
+                                </div>
+                                <div class="col-md-8 col-sm-9 col-lg-8 col-xs-12">
+                                    @Html.HiddenFor(x => x.MaterialOpeningId)
+                                    @Html.DropDownListFor(m => m.Store, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-4 col-sm-3 col-lg-4 col-xs-12">
+                                    <label class="form-label" for="text">Category</label>
+                                </div>
+                                <div class="col-md-8 col-sm-9 col-lg-8 col-xs-12">
+                                    @Html.DropDownListFor(m => m.MaterialCategoryMasterId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-4 col-sm-3 col-lg-4 col-xs-12">
+                                    <label class="form-label" for="text">Group</label>
+                                </div>
+                                <div class="col-md-8 col-sm-9 col-lg-8 col-xs-12">
+                                    @Html.DropDownListFor(m => m.MaterialGroupMasterId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-4 col-sm-3 col-lg-4 col-xs-12">
+                                    <label class="form-label" for="text">Material Code</label>
+                                </div>
+                                <div class="col-md-8 col-sm-9 col-lg-8 col-xs-12">
+                                    @Html.TextBoxFor(m => m.MaterialCode, new { @class = "text-field form-control", @readonly = true })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section" id="pcsHideShow" style="display:none;">
+                            <div class="form-group">
+
+                                <div class="col-md-4 col-sm-3 col-lg-4 col-xs-12">
+                                    <label class="form-label" for="text">PCs</label>
+                                </div>
+                                <div class="col-md-8 col-sm-9 col-lg-8 col-xs-12">
+                                    @Html.TextBoxFor(m => m.MaterialPcs, new { @class = "form-control text-field", style = "" })
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="col-sm-6 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-4 col-sm-3 col-lg-4 col-xs-12">
+                                    <label class="form-label" for="text">Date</label>
+                                </div>
+                                <div class="col-md-8 col-sm-9 col-lg-8 col-xs-12">
+                                    @if (Model != null && Model.MaterialOpeningId != 0)
+                                    {
+                                        var MOdate = Model.Date;
+                                        @Html.TextBoxFor(m => m.Date, new { @Value = MOdate, @readonly = true })
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.Date, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @readonly = true })
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        @*<div class="field-section">
+                <div class="form-group">
+                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                        <label class="form-label" for="text"> </label>
+                    </div>
+                    <div class="col-md-9 col-sm-9 col-lg-9 col-xs-12">
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="field-section">
+                <div class="form-group">
+                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                        <label class="form-label" for="text"> </label>
+                    </div>
+                    <div class="col-md-9 col-sm-9 col-lg-9 col-xs-12">
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="field-section">
+                <div class="form-group">
+                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                        <label class="form-label" for="text"> </label>
+                    </div>
+                    <div class="col-md-9 col-sm-9 col-lg-9 col-xs-12">
+
+                    </div>
+                </div>
+            </div>*@
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-4 col-sm-3 col-lg-4 col-xs-12">
+                                    <label class="form-label" for="text">Color</label>
+                                </div>
+                                <div class="col-md-8 col-sm-9 col-lg-8 col-xs-12">
+                                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 pad">
+                                        @Html.HiddenFor(m => m.ColorMasterId_)
+                                        <div class="col-md-4 col-lg-4 col-xs-12 pad">
+                                            @Html.DropDownListFor(m => m.ColorMasterId, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { @class = "select-style text-field", style = "width:150px;" })
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section" id="sizeRange_HideandShow">
+                            <div class="form-group">
+                                <div class="col-md-4 col-sm-5 col-lg-4 col-xs-12" style="padding-right:0;">
+                                    <label class="form-label" style="float: left; width: 125px;" for="text">Secondary Unit</label>
+                                </div>
+                                <div class="col-md-8 col-sm-7 col-lg-8 col-xs-12">
+                                    @Html.HiddenFor(m => m.SecondaryUomMasterId_)
+                                    @Html.DropDownListFor(m => m.SecondaryUomMasterId, MMS.Web.ExtensionMethod.HtmlHelper.UomUnit(), new { @class = "select-style text-field", style = "width:150px;" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section" id="sizeRange_HideandShow">
+                            <div class="form-group">
+                                <div class="col-md-4 col-sm-5 col-lg-4 col-xs-12">
+                                    <label class="form-label" for="text">Rate</label>
+                                </div>
+                                <div class="col-md-8 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.Rate, new { @class = "form-control text-field", style = "" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-12">
+                        <div class="col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-4 col-sm-3 col-lg-2 col-xs-12" style="padding-left:0;">
+                                        <label class="form-label" for="text">Material</label>
+                                    </div>
+                                    <div class="col-md-8 col-sm-9 col-lg-9 col-xs-12" style="padding-left:6px;">
+                                        @Html.DropDownListFor(m => m.MaterialName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName(), new { @class = "select-style text-field form-control", style = "fv" })
+                                        <button type="button" class="btn btn-info btn-sm but_search_styles" data-toggle="modal" title="Material List" data-target="#auto_search">...</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+
+                </div>
+
+                <div class="col-sm-4 col-xs-12 no-padding">
+                    <div class="col-xs-12">
+                        <div class="field-section" id="sizeRange_HideandShow">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label for="text" class="form-label">Size Range</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.SizeRangeMasterId, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+
+                                <div class="col-md-4 col-sm-3 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">primary Unit</label>
+                                </div>
+                                <div class="col-md-8 col-sm-9 col-lg-7 col-xs-12">
+                                    @Html.HiddenFor(m => m.PrimaryUomMasterId_)
+                                    @Html.DropDownListFor(m => m.PrimaryUomMasterId, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field", style = " " })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+
+                                <div class="col-md-4 col-sm-3 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Quantity</label>
+                                </div>
+                                <div class="col-md-8 col-sm-9 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.Qty, new { @class = "form-control text-field", style = "" })
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="field-section" style="margin-top: 0px;">
+                            <div class="form-group">
+                                <div class="col-xs-12" style="float: left;">
+                                    <label class="form-label" for="text">Remark</label>
+                                </div>
+                                <div class="col-xs-12" style="float: left;">
+                                    @Html.TextAreaFor(x => x.Remarks, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="field-section">
+                <div class="table-responsive size-range-table stage_table_sec1">
+                    @Html.HiddenFor(x => x.SizeQuantityRate)
+                    <table class="table" id="sizetable">
+                        <thead>
+                            <tr>
+                                <td>Size Range</td>
+                                <td>Qty</td>
+                                <td>Rate</td>
+                            </tr>
+                        </thead>
+                        <tbody id="emergency">
+                            @if (Model != null && Model.sizeRangeDetailslist != null && Model.sizeRangeDetailslist.Count > 0)
+                            {
+                                foreach (var material in Model.sizeRangeDetailslist)
+                                {
+                                    <tr id="SizeRange">
+                                        <td>@material.Size</td>
+                                        <td><input type="text" id="SizeQuantity@(count)" value="@material.Quantity" class="form-control text-field" /></td>
+                                        <td></td>
+                                    </tr>
+                                    count++;
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>*@
+
+
+                    </div>
+                </div>
+
+
+                   
+                   
+
+                </div>
+            <table class="table" id="sizeRangeTable" style="width:100%">
+                <tbody>
+                    @if (Model.sizeRangeDetailslist == null)
+                    {
+                        <tr>
+                            <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 39px !important; float: left;">Size</td>
+                        </tr>
+                        <tr>
+                            <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important; float: left;">Qty</td>
+                        </tr>
+                        <tr>
+                            <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important; float: left;">Rate</td>
+                        </tr>
+                    }
+                    @if (Model.sizeRangeDetailslist != null && Model.sizeRangeDetailslist.Count > 0)
+                    {
+                        <tr>
+
+                            @if (Model.sizeRangeDetailslist != null)
+                            {
+                                <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 39px !important; float: left;">Size</td>
+                                foreach (var item in Model.sizeRangeDetailslist)
+                                {
+                                    <td class="SizeRangeRefValue">@item.Size</td>
+                                    count++;
+                                }
+                            }
+                        </tr>
+                        <tr>
+
+                            @if (Model.sizeRangeDetailslist != null)
+                            {
+                                <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;padding-top: 1px; width: 39px !important; float: left;">Qty</td>
+                                foreach (var item in Model.sizeRangeDetailslist)
+                                {
+                                    <td><input type="text" class="quantity" id="qtyId@(count)" value="@item.Quantity" style='width:50px;' onchange="CalculateTotal(this)" /></td>
+                                    count++;
+                                }
+                            }
+                        </tr>
+                        <tr>
+
+                            @if (Model.sizeRangeDetailslist != null)
+                            {
+                                <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important; float: left;">Rate</td>
+                                foreach (var item in Model.sizeRangeDetailslist)
+                                {
+                                    <td><input type="text" class="Rates" id="qtyId@(count)" value="@item.Rate" readonly style='width:50px;' onchange="CalculateTotal(this)" /></td>
+                                    count++;
+                                }
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            
+        </div>
+        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+
+        </div>
+        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding tab_sec">
+
+
+        </div>
+    </form>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="auto_search" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header sear_head">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Material Name List</h4>
+            </div>
+            <div class="modal-body sear_body">
+                <ul class="mater_listers">
+                    @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName().Where(x => x.Value != ""))
+                    {
+                        <li id="@item.Value">@item.Text</li>
+                    }
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button id="materialOpenId" type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center" style="margin: 15px 0px;">
+        @if (Display == true)
+        {
+            <button type="button" class="btn btn-default btn-style width-78">Display</button>
+        }
+        else
+        {
+            <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Display">
+        }
+
+        @if (Model.MaterialOpeningId == 0)
+        {
+            if (Save == true)
+            {
+                <button type="button" class="btn btn-default btn-style width-78" onclick="Save()">Save</button>
+                <input type="hidden" id="HdnCurrencyExchangeID" />
+            }
+            else
+            {
+                <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Save">
+            }
+        }
+        else
+        {
+            if (Update == true)
+            {
+                <button type="button" class="btn btn-default btn-style width-78" onclick="Save()">Update</button>
+            }
+            else
+            {
+                <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Update">
+            }
+        }
+
+        <button type="button" class="btn btn-default btn-style width-78" onclick="Clear()">Clear</button>
+        <button type="button" class="btn btn-default btn-style width-78" onclick="Cancel()">Back</button>
+    </div>
+</div>
+
+@*<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+    <script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+    <script src="~/Scripts/AutoCompleteCommon.js"></script>
+    <script src="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.js"></script>
+    <link href="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.css" rel="stylesheet" />*@
+<script type="text/javascript">
+
+
+    //$("#Date").datepicker('option', 'dateFormat', 'dd/mm/yy');
+
+    //$("#MaterialName").combobox();
+    //$("#toggle").click(function () {
+    //    $("#MaterialName").toggle();
+    //});
+    //$("#MaterialName").combobox();
+    //$("#toggle").click(function () {
+    //    $("#MaterialName").toggle();
+    //});
+    //$("#MaterialName").combobox();
+    //$("#toggle").click(function () {
+    //    $("#MaterialName").toggle();
+    //});
+    $(function () {
+        $("#Store").change(function () {
+            if ($(this).val() == 1) {
+                $("#pcsHideShow").show();
+            } else {
+                $("#pcsHideShow").hide();
+            }
+        });
+    });
+
+    $(document).on('change', '#SizeRangeMasterId', function () {
+
+        //alert($('#SizeRangeMasterId option:selected').text());
+        $.ajax({
+            type: "GET",
+            dataType: "JSON",
+            url: '@Url.Action("GetSizeRange", "BuyerOrderEntryForm")',
+            data: { SizeRangeMasterId: $(this).val() },
+            success: function (data) {
+                var count = 1;
+
+                for (var i = 0; i <= data.length - 1; i++) {
+                    $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + data[i].SizeRangeRefValue + ' </td> ');
+                    $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='Quantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='Quantity' id='Qty' value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                    $('#sizeRangeTable tbody tr:last').append("<td class='Rate' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='Rates' id='Rate' value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                    count++;
+                }
+            }
+        });
+    });
+
+    $("#Store").change(function () {
+        // $('#Store').val('');
+        //  $('#MaterialCategoryMasterId').val('');
+        $('#MaterialCode').val('');
+        $('#MaterialGroupMasterId').val('');
+        // $('.ui-autocomplete-input').val("");
+        $('#ColorMasterId').val('');
+        $('#PrimaryUomMasterId').val('');
+        $('#SecondaryUomMasterId').val('');
+        $('#Qty').val('');
+        $('#Rate').val('');
+        $('#Qty').val('');
+        $('#Remarks').val('');
+        //$('#Date').val('');
+        $('#SizeRangeMasterId').val('');
+        var stateId = $('#Store').val();
+        $.ajax({
+            url: '/MaterialMaster/FillMaterialCateogoryid',
+            type: "GET",
+            dataType: "JSON",
+            data: { StoreMasterId: stateId },
+            success: function (cities) {
+                $("#MaterialCategoryMasterId").html(""); // clear before appending new list
+                $('#MaterialCategoryMasterId').append('<option value="foo" selected="selected">Please Select</option>');
+                // $("#MaterialCategoryMasterId").prepend("<option value='Please Select'></option>").val('Please Select');
+                $.each(cities, function (i, city) {
+                    $("#MaterialCategoryMasterId").append(
+                        $('<option></option>').val(city.MaterialCategoryMasterId).html(city.CategoryName));
+                });
+            }
+        });
+    });
+
+    $("#MaterialCategoryMasterId").change(function () {
+
+        var MaterialCategoryMasterId_ = $('#MaterialCategoryMasterId').val();
+        $.ajax({
+            url: '/MaterialMaster/FillCateogoryid',
+            type: "GET",
+            dataType: "JSON",
+            data: { MaterialCategoryMasterId: MaterialCategoryMasterId_ },
+            success: function (cities) {
+                $("#MaterialGroupMasterId").html(""); // clear before appending new list
+                $.each(cities, function (i, city) {
+                    $("#MaterialGroupMasterId").append(
+                        $('<option></option>').val(city.MaterialGroupMasterId).html(city.GroupName));
+                });
+            }
+        });
+
+    });
+
+    $("#MaterialGroupMasterId").change(function () {
+        // $('#Store').val('');
+        //  $('#MaterialCategoryMasterId').val('');
+        $('#MaterialCode').val('');
+        // $('#MaterialGroupMasterId').val('');
+        $('.ui-autocomplete-input').val("");
+        $('#ColorMasterId').val('');
+        $('#PrimaryUomMasterId').val('');
+        $('#SecondaryUomMasterId').val('');
+        $('#Qty').val('');
+        $('#Rate').val('');
+        $('#Qty').val('');
+        $('#Remarks').val('');
+        // $('#Date').val('');
+        @*$('#sizeRange_HideandShow').show();
+        $('#sizetable').show();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("MaterialGroupCheckboxeails", "MaterialMaster")',
+            data: { MaterialGroupMasterId: $('#MaterialGroupMasterId').val() },
+            success: function (data) {
+                //alert(data.IsColor)
+                console.log(data)
+                if (data.IsSize == true) {
+                    // alert(1)
+                    $('#sizeRange_HideandShow').show();
+                    $('#sizetable').show();
+                }
+                else if (data.IsSize == false) {
+                    //  alert(2);
+                    $('#sizeRange_HideandShow').hide();
+                    $('#sizetable').hide();
+                }
+
+            }
+        });*@
+
+        var MaterialGroupMasterId_ = $('#MaterialGroupMasterId').val();
+        $.ajax({
+            url: '/MaterialMaster/MaterialNameJoinType',
+            type: "GET",
+            dataType: "JSON",
+            data: { MaterialGroupMasterId: MaterialGroupMasterId_ },
+            success: function (cities) {
+                console.log(cities);
+                // $(".ui-autocomplete-input").html("");
+                $("#MaterialName").html("");
+                $('#MaterialName').append('<option value="foo" selected="selected">Please Select</option>');
+                //$("#MaterialMasterId").html(""); // clear before appending new list
+                $.each(cities, function (i, city) {
+                    $("#MaterialName").append(
+                        $('<option></option>').val(city.MaterialMasterId).html(city.MaterialDescription));
+                });
+            }
+        });
+
+
+    });
+
+    $("#MaterialName").change(function () {
+      
+      
+        var MaterialGroupMasterId_ = $('#MaterialName').val();
+        $.ajax({
+            url: '/MaterialMaster/MaterialNameJoinType_',
+            type: "GET",
+            dataType: "JSON",
+            data: { MaterialmasterId: MaterialGroupMasterId_ },
+            success: function (cities) { 
+                $("#MaterialName").html("");
+                // clear before appending new list
+                $.each(cities.Material, function (i, city) {                  
+                    $("#MaterialName").append(
+                    $('<option></option>').val(city.MaterialMasterId).html(city.MaterialDescription));
+                    $('#ColorMasterId_').val(city.ColorMasterId);
+                    $('#PrimaryUomMasterId_').val(city.Uom);
+                    $('#SecondaryUomMasterId_').val(city.UomUnit);
+                    $('#MaterialCode').val(city.MaterialCode)
+                    $("#ColorMasterId").val(city.ColorMasterId);
+                    $("#Rate").val(city.Price);
+                    $("#PrimaryUomMasterId").val(city.Uom);
+                    $("#SecondaryUomMasterId").val(city.UomUnit);
+                    $('#ColorMasterId').attr("disabled", true);
+                    $('#PrimaryUomMasterId').attr("disabled", true);
+                    $('#SecondaryUomMasterId').attr("disabled", true);                     
+                    if (city.SameSizeForAllSize == true && city.SizeRangeMasterId != null) {
+                        $("#Rate").val(city.Price);
+                        $('#sizeRangeTable').show();
+                    }
+                    else if (city.SizeRangeMasterId == null && city.SizeRangeMasterId!=0 && city.SameSizeForAllSize == false) {
+
+                        $("#Rate").val(city.Price);
+                        $("#Qty").removeAttr("disabled");
+                        $('#sizeRangeTable').hide();
+                    }
+                    else if (city.SizeRangeMasterId != null && city.SizeRangeMasterId!=0 && city.SameSizeForAllSize == false) {
+
+                        $("#Rate").val("");
+                        $("#Rate").attr("disabled", "disabled");
+                        $("#Qty").attr("disabled", "disabled");
+                        $("#SizeRangeMasterId").val(city.SizeRangeMasterId);
+                        $("#SizeRangeMasterId").removeAttr("disabled");
+                        $('#sizeRangeTable').show();
+                    }
+                    else if (city.SizeRangeMasterId == 0 && city.SameSizeForAllSize == false)
+                    {
+                        $("#SizeRangeMasterId").attr("disabled", "disabled");
+                        $("#Qty").removeAttr("disabled");
+                    }
+                    //else {
+                    //    $("#Rate").val("");
+                    //}
+                    //if (city.SizeRangeMasterId == null || city.SizeRangeMasterId!=0) {
+                    //    $("#SizeRangeMasterId").attr("disabled", "disabled");
+                    //}
+                    //else {
+                    //    $("#SizeRangeMasterId").val(city.SizeRangeMasterId);
+                    //    $("#SizeRangeMasterId").removeAttr("disabled");
+                    //    $("#Qty").attr("disabled", "disabled");
+                    //}
+
+                });
+                var count = 1;
+                //$('#sizeRangeTable tbody tr').html("");
+               
+                for (var i = 0; i <= cities.SizeRange.length - 1; i++) {
+                    $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + cities.SizeRange[i].SizeRange + ' </td> ');
+                    $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='Quantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='quantity'  value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                    $('#sizeRangeTable tbody tr:last').append("<td class='Rate' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='Rates' id='Rate' value='" + cities.SizeRange[i].Rate + "' style='padding-bottom: 0;padding-top: 0;width: 34px;' readonly/></td>");
+                    count++;
+                }
+            }
+        });
+        //}
+    })
+    //$(".ui-autocomplete-input").change(function () {
+
+    //    mateauto();
+    //});
+    //$(".ui-autocomplete-input").blur(function () {
+
+    //    mateauto();
+    //});
+
+    function Clear() {
+        $('#Store').val('');
+        $('#MaterialCategoryMasterId').val('');
+        $('#MaterialCode').val('');
+        $('#MaterialGroupMasterId').val('');
+        $('.ui-autocomplete-input').val("");
+        $('#ColorMasterId').val('');
+        $('#PrimaryUomMasterId').val('');
+        $('#SecondaryUomMasterId').val('');
+        $('#Qty').val('');
+        $('#Rate').val('');
+        $('#Qty').val('');
+        $('#Remarks').val('');
+        //$('#Date').val('');
+        $('#SizeRangeMasterId').val('');
+    }
+
+</script>

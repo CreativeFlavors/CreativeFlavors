@@ -1,0 +1,131 @@
+﻿@{
+    ViewBag.Title = "BuyerModel";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+}
+
+<script>
+
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#BuyerModelName').val() == "") {
+            alert("Please Enter Buyer Model Name.")
+            $('#BuyerModelName').css('border-color', 'red');
+            $('#BuyerModelName').focus();
+            return false;
+        }
+        else {
+            $('#BuyerModelName').css('border-color', '');
+            $('#BuyerModelName').focus();
+        }
+        if ($('#Remarks').val() == "") {
+            alert("Please EnterBuyer Remarks.")
+            $('#Remarks').css('border-color', 'red');
+            $('#Remarks').focus();
+            return false;
+        }
+        else {
+            $('#Remarks').css('border-color', '');
+            $('#Remarks').focus();
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/BuyerMater/BuyerModel',
+            data: {
+                BuyerModelName: $('#BuyerModelName').val(),
+                Remarks: $('#Remarks').val(),
+                BuyerModelID: $('#BuyerModelID').val(),
+                BuyerModelCode: $('#BuyerModelCode').val()
+
+            },
+            success: function (data) {
+                if (data.BuyerModelID != "" || data.BuyerModelID != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/BuyerMater/BuyerModel";
+                    return false;
+                }
+                else if (data.BuyerModelID == 0 && data.BuyerModelName != "")
+                {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/BuyerMater/BuyerModel";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#BuyerModelName').val() == "") {
+            alert("Please Enter Buyer Model Name.")
+            $('#BuyerModelName').css('border-color', 'red');
+            $('#BuyerModelName').focus();
+            return false;
+        }
+        else {
+            $('#BuyerModelName').css('border-color', '');
+            $('#BuyerModelName').focus();
+        }
+        if ($('#Remarks').val() == "") {
+            alert("Please EnterBuyer Remarks.")
+            $('#Remarks').css('border-color', 'red');
+            $('#Remarks').focus();
+            return false;
+        }
+        else {
+            $('#Remarks').css('border-color', '');
+            $('#Remarks').focus();
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/BuyerMater/BuyerModelUpdate',
+            data: {
+                BuyerModelName: $('#BuyerModelName').val(),
+                Remarks: $('#Remarks').val(),
+                BuyerModelID: $('#BuyerModelID').val(),
+                BuyerModelCode: $('#BuyerModelCode').val()
+            },
+            success: function (data) {
+                if (data.BuyerModelID != "" || data.BuyerModelID != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/BuyerMater/BuyerModel";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/BuyerMater/BuyerModel";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Buyer Model Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("BuyerModelGrid", "BuyerMater")
+    </div>
+</div>
+
+
+

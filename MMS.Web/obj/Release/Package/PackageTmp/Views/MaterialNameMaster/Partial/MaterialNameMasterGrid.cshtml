@@ -1,0 +1,275 @@
+﻿@model MMS.Web.Models.MaterialNameModel
+@using MMS.Core.Entities;
+
+
+
+<div class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+
+        <table class="veh-table" id="empTable">
+            <thead>
+                <tr class="color-code-top-btn">
+                    <td colspan="8">
+                        <input type="text" id="SeaarchID" placeholder="Search.." /><input type="button" value="Add" onclick="Add()">
+                        <input type="button" value="Search" onclick="Search()">
+                    </td>
+                </tr>
+                <tr>
+                    <th class="veh-1">
+                        Si.No
+                    </th>
+                    <th class="veh-1">
+                        Material Name Code
+                    </th>
+                    <th class="veh-1">
+                        Material Description
+                    </th>
+                    <th class="veh-4">
+                        Edit/Delete
+                    </th>
+
+                </tr>
+            </thead>
+            @if (Model.MaterilNameList != null && Model.MaterilNameList.Count > 0)
+            {
+                int count = 1;
+                <tbody>
+
+                    @foreach (var MaterialMaster in Model.MaterilNameList)
+                    {
+                        if (count == 196)
+                        {
+                            var test = 0;
+                        }
+                        <tr>
+                            <td class="veh-1" style="border-right: 1px solid #ddd;" onclick="">@count</td>
+                            <td class="veh-1" style="border-right: 1px solid #ddd;" onclick="">@("MN")@MaterialMaster.MaterialCode</td>
+                            <td class="veh-1" style="border-right: 1px solid #ddd;">@MaterialMaster.MaterialDescription</td>
+                            <td class="veh-1 edit-del-wrap" style="border-right: 1px solid #ddd;">
+                                <a href="javascript:void(0)" onclick="Edit('@MaterialMaster.MaterialMasterID')" class="watchlist-edit" title="Edit"></a>
+                                <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@MaterialMaster.MaterialMasterID')" class="watchlist-delete" title="Delete"></a>
+                            </td>
+                        </tr>
+                        count++;
+                    }
+
+
+                </tbody>
+                <tfoot class="footer-pager">
+                    <tr>
+                        <td colspan="4">
+                            <div id="pager">
+                                <form>
+                                    <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                    <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                    <input type="text" class="pagedisplay" />
+                                    <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                    <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                    <select class="pagesize">
+                                        <option selected="selected" value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="40">40</option>
+                                    </select>
+                                </form>
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                </tfoot>
+
+            }
+
+        </table>
+        @if (Model.MaterilNameList != null && Model.MaterilNameList.Count == 0)
+        {
+            <div style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+        }
+    </div>
+
+    <div id="EditColorPartial">
+        @Html.Partial("Partial/MaterialNameMasterDetails", Model)
+    </div>
+
+
+</div>
+
+
+<script>
+    var msg = "";
+    $("#MaterialGroupMasterId").combobox();
+    $("#toggle").click(function () {
+        $("#MaterialGroupMasterId").toggle();
+    });
+    var timeout;
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    $('#SeaarchID').keyup(function (e) {
+        
+        if (timeout) {
+            clearTimeout(timeout);
+            timeout = null;
+        }
+        timeout = setTimeout(Search, 1000);
+    });
+    function Search()
+        {
+          
+            $.ajax({
+                type: "POST",
+                url: ' @Url.Action("Search", "MaterialNameMaster")',
+                data: { filter: $('#SeaarchID').val() },
+                success: function (data) {
+                    console.log(data)
+                    $(".veh-tablewrap").html(data);
+                    $(".veh-tablewrap").show();
+                    $('#DivShow').hide();
+                    $('#EditColorPartial').hide();
+
+                }
+            });
+        }
+
+        function Cancel() {
+             
+            location.reload();
+        }
+        function Add() {
+            $('.veh-tablecont').hide();
+            $("#MaterialMasterDiv").show();
+            $("#matNameDetails").show();
+            $.ajax({
+                type: "POST",
+                url: ' @Url.Action("GetMaxMaterialCode", "MaterialNameMaster")',
+                data: "",
+                success: function (data) {
+                    $("#MaterialCode").val(data.split('~')[0]);
+                    $("#hdnMaterialId").val(data.split('~')[1]);
+                    $("#MaterialDescription").val("");
+                }
+            });
+        }
+
+        function Save() {
+            if ($('#MaterialGroupMasterId').val() == "") {
+                alert("Please material Group.")
+                $('#MaterialGroupMasterId').css('border-color', 'red');
+                $('#MaterialGroupMasterId').focus();
+                return false;
+
+            }
+            else {
+                $('#MaterialGroupMasterId').css('border-color', '');
+            }
+            var Grpid = $('#MaterialGroupMasterId').parent().find('.ui-autocomplete-input').val();
+          
+            $.ajax({
+                url: '/MaterialNameMaster/GetLeatherTypeName',
+                type: "GET",
+                dataType: "JSON",
+                data: { MaterialGroupMasterId: Grpid },
+                success: function (isleather) {                 
+                  
+                    if (isleather == true) {
+                        $('#MaterialDescription').attr('readonly', true);
+                        if (($('#LeatherMaterialName').val() == "" || $('#LeatherMaterilLastValue').val() == "")) {
+                            alert("Please enter leather material all description.")
+                            $('#LeatherMaterialName').css('border-color', 'red');
+                            $('#LeatherMaterialName').focus();
+                            return false;
+                        }
+                    }
+                    else {
+                        if ($('#MaterialDescription').val() == "" && msg == "" && $('#MaterialDescription').is(':visible') == true) {
+                            alert("Please enter material description.")
+                            $('#MaterialDescription').css('border-color', 'red');
+                            $('#MaterialDescription').focus();
+                            return false;
+                        }
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: ' @Url.Action("MaterialNameMasterDetails", "MaterialNameMaster")',
+                        data: {
+                            MaterialDescription: $("#MaterialDescription").val().trim(),
+                            MaterialCode: $("#MaterialCode").val(),
+                            MaterialMasterID: $("#MaterialMasterID").val(),
+                            MaterialGroup: $('#MaterialGroupMasterId').parent().find('.ui-autocomplete-input').val(),
+                            LeatherMaterilFirstValue: $('#LeatherMaterilFirstValue').val().trim(),
+                            LeatherMaterialName: $('#LeatherMaterialName').val().trim(),
+                            LeatherMaterilLastValue: $('#LeatherMaterilLastValue').val().trim(),
+                        },
+                        success: function (data) {
+                            if (data.MaterialMasterID != "" || data.MaterialMasterID != 0) {
+                                alert('Saved Successfully.');
+                                location.href = "/MaterialNameMaster/MaterialNameMaster";
+                                return false;
+                            }
+                            else if (data.MaterialMasterID == 0 && data.MaterialDescription != "") {
+                                alert("Already Exist in the database.")
+                                return false;
+                            }
+                            else {
+                                alert('Save process Failed.');
+                                location.href = "/MaterialNameMaster/MaterialNameMaster";
+                                return false;
+                            }
+
+                        }
+                    });
+                }
+            });
+
+        }
+        function Edit(arg) {
+            $('.veh-tablecont').hide();
+            $("#MaterialMasterDiv").show();
+            $('#EditColorPartial').show();
+            $.ajax({
+                type: "POST",
+                url: ' @Url.Action("GetMaterialEdit", "MaterialNameMaster")',
+                data: { MaterialMasterID: arg },
+                success: function (data) {
+                    $('#EditColorPartial').html(data)
+                    $('#MaterialMasterDiv').show();
+                    $('#EditColorPartial').show();
+                    
+                }
+            });
+        }
+        function Delete(arg) {
+            var answer = confirm("Are you sure want to delete?");
+            if (answer) {
+                $.ajax({
+                    type: 'POST',
+                    url: ' @Url.Action("Delete", "MaterialNameMaster")',
+                    data: { MaterialMasterID: arg },
+                    success: function (data) {
+                        if (data == true) {
+                            alert('Deleted Successfully.');
+                            location.href = "/MaterialNameMaster/MaterialNameMaster";
+                            return false;
+                        }
+                    }
+                });
+            }
+            else {
+                return false;
+            }
+        }
+
+
+</script>

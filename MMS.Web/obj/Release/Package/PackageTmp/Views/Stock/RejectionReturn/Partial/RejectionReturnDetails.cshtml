@@ -1,0 +1,367 @@
+﻿@model MMS.Web.Models.StockModel.RejectionReturnModel
+@using MMS.Core.Entities
+@{
+    int id = Model.RejectionReturnId;
+    Session["RejectionReturnId"] = id;
+
+    tbl_PermissionSetting PermissionSettingModel = new MMS.Core.Entities.tbl_PermissionSetting();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+
+    List<tbl_Permission> PermissionModel = new List<tbl_Permission>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Rejection Return Form", PermissionSettingModel.PermissionID);
+    }
+    bool Save = false; bool Update = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Save")
+        {
+            Save = true;
+        }
+        if (item.PermissionDesc == "Update")
+        {
+            Update = true;
+        }
+    }
+}
+
+<script>
+    $("#Date").datepicker({dateFormat : "dd/mm/yy"});
+   
+    </script>
+
+<div class="right-form-section clearfix">
+    <form role="form" class="form-inline">
+        <div class="container-fluid">
+            <div class="row">
+                <p class="section-title text-center">Rejection Return Form</p>
+
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Rej Dc NO</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.HiddenFor(x => x.RejectionReturnId)
+                                    @Html.TextBoxFor(m => m.RejectionDcNo, new { @class = "allownumericwithdecimal form-control text-field" })
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Grn No</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.GrnNo, new { @class = "allownumericwithdecimal form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Date</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model != null && Model.RejectionReturnId != 0)
+                                    {
+                                        var rejdate = Model.Date;
+                                        @Html.TextBoxFor(m => m.Date, new { @class = "form-control text-field", @Value = rejdate })
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.Date, new { @class = "form-control text-field", @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy") })
+                                    }
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Po No</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.PoNo, new { @class = "allownumericwithdecimal form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Supplier Name</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.SupplierMasterId, MMS.Web.ExtensionMethod.HtmlHelper.SupplierName(), new { @class="select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Ins Rep No(IMIR)</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.IMIRNo, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Group</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.MaterialGroupId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">UOM</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.Uom, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Material</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.MaterialMasterId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Quantity</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.Quantity, new { @class = "allownumericwithdecimal form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Pcs</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.Pcs, new { @class = "allownumericwithdecimal form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Colour</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.ColourMasterId, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Rate</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.Rate, new { @class = "allownumericwithdecimal form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Total Amount</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.AmountTotal, new { @class = "allownumericwithdecimal"})
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Remarks</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextAreaFor(m => m.Remarks, new { @class="form-control text-field"})
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Gate Pass Dc</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.RadioButtonFor(model => model.GatePassDc, "false", new { id = "returnable", @class = "width-20" })
+                                    @Html.Label("returnable", "Returnable")
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text"></label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.RadioButtonFor(model => model.GatePassDc, "true", new { id = "nonreturnable", @class = "width-20" })
+                                    @Html.Label("nonreturnable", "Non Returnable")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <div class="form-footer">
+            <div class="row">
+                <div style="margin: 15px 0px;" class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                    <input type="button" onclick="Cancel()" class="btn btn-default btn-style width-78" style="cursor: pointer;" title="Back" value="Back">
+                    @if (Model.RejectionReturnId == 0)
+                    {
+                        if (Save == true)
+                        {
+                            <input type="button" onclick="Save()" style="cursor: pointer;" class="btn btn-default btn-style width-78" title="Save" value="Save">
+                        }
+                        else
+                        {
+                            <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style width-78" value="Save">
+                        }
+                    }
+                    else
+                    {
+                        if (Update == true)
+                        {
+                            <input type="button" onclick="Update()" style="cursor: pointer;" class="btn btn-default btn-style width-78" id="RejectionReturnId" title="Update" value="Update">
+                        }
+                        else
+                        {
+                            <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style width-78" value="Update">
+                        }
+                    }
+
+                    <input type="button" onclick="Clear()" class="btn btn-default btn-style width-78" title="Clear" value="Clear">
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+     $(".allownumericwithdecimal").on("keypress keyup blur", function (event) {
+        
+         $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+         if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+             event.preventDefault();
+         }
+     });
+
+     function Clear() {
+         $('#RejectionDcNo').val('');
+         $('#GrnNo').val('');
+         $('#PoNo').val('');
+         $('#SupplierMasterId').val('');
+         $('#MaterialGroupId').val('');
+         $('#IMIRNo').val('');
+         $('#Uom').val('');
+         $('#MaterialMasterId').val('');
+         $('#Pcs').val('');
+         $('#Quantity').val('');
+         $('#ColourMasterId').val('');
+         $('#Rate').val('');
+         $('#Remarks').val('');
+         $('#AmountTotal').val('');
+         $('#returnable').prop("checked", false);
+         $('#nonreturnable').prop("checked", false);
+
+
+     }
+
+     $(".allownumericwithdecimal").on("keypress keyup blur", function (event) {
+         
+         $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+         if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+             event.preventDefault();
+         }
+     });
+</script>

@@ -1,0 +1,516 @@
+﻿@model MMS.Web.Models.SimpleMRPModel.SimpleMRPModel
+@{
+    ViewBag.Title = "SimpleMRPModelWithDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+
+<script>
+    $(function () {
+        $("#MRPDate").datepicker({ dateFormat: "dd/mm/yy" });
+        $("#From").datepicker({ dateFormat: "dd/mm/yy" });
+        $("#TO").datepicker({ dateFormat: "dd/mm/yy" });
+    });
+
+
+    function Cancel() {
+      
+        //$('#EditColorPartial').hide()
+        location.href = "SImpleMRP/SImpleMRP";
+    }
+    
+    function addItem() {
+        $("#SelectedCities option:selected").appendTo("#MoveSelectedIOS");
+        $("#MoveSelectedIOS option").attr("selected", false);
+    }
+    function addallItems() {
+        $("#SelectedCities option").appendTo("#MoveSelectedIOS");
+        $("#MoveSelectedIOS option").attr("selected", false);
+    }
+    function removeItem() {
+        $("#MoveSelectedIOS option:selected").appendTo("#SelectedCities");
+        $("#SelectedCities option").attr("selected", false);
+    }
+    function removeallItems() {
+        $("#MoveSelectedIOS option").appendTo("#SelectedCities");
+        $("#SelectedCities option").attr("selected", false);
+    }
+    function Calculate() {
+        var optionValues = [];
+        $('#MoveSelectedIOS option').each(function () {
+            optionValues.push($(this).text());
+        });
+        var ParseText = JSON.stringify(optionValues);
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("IOSelectList", "SimpleMRP")',
+            data: { SelectText: ParseText, SimpleMRPID: $('#SimpleMRPID').val() },
+            success: function (data) {
+                if (data != null) {
+                    alert(data);
+                    return false;
+                }
+                else {
+                    alert("Error not calculated");
+                    return false;
+                }
+                //$('#DivShow').hide();
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                $('#DivShow').hide();
+                $('#EditColorPartial').hide();
+            }
+        });
+    }
+    function Save() {
+        if ($('#MRPNO').val() == "") {
+            alert("Please Enter MRPNO Name.")
+            $('#MRPNO').css('border-color', 'red');
+            $('#MRPNO').focus();
+            return false;
+        }
+        else {
+            $('#MRPNO').css('border-color', '');
+        }
+        if ($('#MRPDate').val() == "") {
+            alert("Please Enter MRP Date.")
+            $('#MRPDate').css('border-color', 'red');
+            $('#MRPDate').focus();
+            return false;
+        }
+        else {
+            $('#MRPDate').css('border-color', '');
+        }
+        if ($('#MRPType').val() == "") {
+            alert("Please select MRP Type.")
+            $('#MRPType').css('border-color', 'red');
+            $('#MRPType').focus();
+            return false;
+        }
+        else {
+            $('#MRPType').css('border-color', '');
+        }
+        if ($('#BuyerNameid').val() == "") {
+            alert("Please Select Period From.")
+            $('#BuyerNameid').css('border-color', 'red');
+            $('#BuyerNameid').focus();
+            return false;
+        }
+        else {
+            $('#BuyerNameid').css('border-color', '');
+        }
+        if ($('#WeekNO').val() == "") {
+            alert("Please Select Week NO.")
+            $('#WeekNO').css('border-color', 'red');
+            $('#WeekNO').focus();
+            return false;
+        }
+        else {
+            $('#WeekNO').css('border-color', '');
+        }
+        if ($('#SeasonID').val() == "") {
+            alert("Please Select Season name.")
+            $('#SeasonID').css('border-color', 'red');
+            $('#SeasonID').focus();
+            return false;
+        }
+        else {
+            $('#SeasonID').css('border-color', '');
+        }
+        if ($('#LotNO').val() == "") {
+            alert("Please Select Lot NO.")
+            $('#LotNO').css('border-color', 'red');
+            $('#LotNO').focus();
+            return false;
+        }
+        else {
+            $('#LotNO').css('border-color', '');
+        }
+        if ($('#SizeRangeID').val() == "") {
+            alert("Please Select Size Range.")
+            $('#SizeRangeID').css('border-color', 'red');
+            $('#SizeRangeID').focus();
+            return false;
+        }
+        else {
+            $('#SizeRangeID').css('border-color', '');
+        }
+        if ($('#CustomerPlan').val() == "") {
+            alert("Please Select Customer Plan.")
+            $('#CustomerPlan').css('border-color', 'red');
+            $('#CustomerPlan').focus();
+            return false;
+        }
+        else {
+            $('#CustomerPlan').css('border-color', '');
+        }
+        $("#MoveSelectedIOS").each(function (index) {
+            console.log(index + ": " + $(this).text());
+        });
+        if ($('#dataFile').val() == "") {
+            alert("Please Upload Excel file.")
+            $('#dataFile').css('border-color', 'red');
+            $('#dataFile').focus();
+            return false;
+        }
+        else {
+            $('#dataFile').css('border-color', '');
+        }
+        // $('#dataFile').val()
+        $.ajax({
+            type: 'POST',
+            url: '/SimpleMRP/SimpleMRPSave',
+            data: {
+                MRPNO: $('#MRPNO').val(),
+                MRPDate: $('#MRPDate').val(),
+                MRPType: $('#MRPType').val(),
+                BuyerNameid: $('#BuyerNameid').val(),
+                WeekNO: $('#WeekNO').val(),
+                SeasonID: $('#SeasonID').val(),
+                LotNO: $('#LotNO').val(),
+                SizeRangeID: $('#SizeRangeID').val(),
+                From: $('#From').val(),
+                TO: $('#TO').val(),
+                CustomerPlan: $('#CustomerPlan').val(),
+                SimpleMRPID: $('#SimpleMRPID').val(),
+                ProductionPlanBasic: $('#ProductionPlanBasic').is(":checked"),
+                OrderBasic: $('#OrderBasic').is(":checked"),
+                RejectionorReplacement: $('#RejectionorReplacement').is(":checked"),
+                OverConsumption: $('#OverConsumption').is(":checked")
+            },
+            success: function (data) {
+                console.log(data);
+                //alert(data.SeasonMasterId)
+                if (data.UpdatedBy != "" && data.UpdatedBy != null) {
+                    alert('Updated Successfully.');
+                    location.href = "/SimpleMRP/SimpleMRP";
+                    return false;
+                }
+                else if (data.CreatedBy != "") {
+                    alert('Saved Successfully.');
+                    location.href = "/SimpleMRP/SimpleMRP";
+                    return false;
+                }
+                else if (data.SimpleMRPID == 0 && data.SimpleMRPID != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/SimpleMRP/SimpleMRP";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#SeasonName').val() == "") {
+            alert("Please Enter Season Name.")
+            $('#SeasonName').css('border-color', 'red');
+            $('#SeasonName').focus();
+            return false;
+        }
+        else {
+            $('#SeasonName').css('border-color', '');
+        }
+        if ($('#SpringSummerYear').val() == "") {
+            alert("Please Enter Springs Summer Year.")
+            $('#SpringSummerYear').css('border-color', 'red');
+            $('#SpringSummerYear').focus();
+            return false;
+        }
+        else {
+            $('#SpringSummerYear').css('border-color', '');
+        }
+        if ($('#SpringDescription').val() == "") {
+            alert("Please Enter Spring Description.")
+            $('#SpringDescription').css('border-color', 'red');
+            $('#SpringDescription').focus();
+            return false;
+        }
+        else {
+            $('#SpringDescription').css('border-color', '');
+        }
+        if ($('#PeriodFrom').val() == "") {
+            alert("Please Select Period From.")
+            $('#PeriodFrom').css('border-color', 'red');
+            $('#PeriodFrom').focus();
+            return false;
+        }
+        else {
+            $('#PeriodFrom').css('border-color', '');
+        }
+        if ($('#PeriodTo').val() == "") {
+            alert("Please Select Period To.")
+            $('#PeriodTo').css('border-color', 'red');
+            $('#PeriodTo').focus();
+            return false;
+        }
+        else {
+            $('#PeriodTo').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/SeasonMaster/Update',
+            data: {
+                SeasonName: $('#SeasonName').val(),
+                SpringSummerYear: $('#SpringSummerYear').val(),
+                SpringDescription: $('#SpringDescription').val(),
+                PeriodFrom: $('#PeriodFrom').val(),
+                PeriodTo: $('#PeriodTo').val(),
+
+
+                SeasonMasterId: $('#SeasonMasterId').val()
+            },
+            success: function (data) {
+                if (data.SeasonMasterId != "" || data.SeasonMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/SeasonMaster/SeasonMaster";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/SeasonMaster/SeasonMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+@using (Html.BeginForm("Importexcel", "SimpleMRP", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <div style="float:left;width:100%;background-color:#eaf1f7 ">
+        <div class="col-xs-12">
+            <div class="row">
+                <div class="col-xs-3">
+                    <div class="checkbox chk-lbl">
+                        <label>@Html.CheckBoxFor(m => m.ProductionPlanBasic) Production Plan Basis</label>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="checkbox chk-lbl">
+                        <label>@Html.CheckBoxFor(m => m.OrderBasic) Order Basis</label>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="checkbox chk-lbl">
+                        <label>@Html.CheckBoxFor(m => m.RejectionorReplacement) Rejection / Replacement</label>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="checkbox chk-lbl">
+                        <label>@Html.CheckBoxFor(m => m.OverConsumption) Over Consumption</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-xs-12">
+            <div class="col-xs-4 input-block">
+                <div class="col-sm-3 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>MRP No:</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-9 col-xs-12" style="padding-left: 0;">
+                    @Html.HiddenFor(x => x.SimpleMRPID)
+                    @Html.TextBoxFor(m => m.MRPCode, new { @class = "form-control text-field" })
+                </div>
+            </div>
+            <div class="col-xs-4 input-block">
+                <div class="col-sm-3 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>Date</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-9 col-xs-12" style="padding-left: 0;">
+                    @Html.TextBoxFor(m => m.MRPDate, new { @class = "form-control text-field" })
+                </div>
+            </div>
+            <div class="col-xs-4 input-block">
+                <div class="col-sm-3 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>MRP Type</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-9 col-xs-12" style="padding-left: 0;">
+                    @Html.DropDownListFor(m => m.MRPType, new SelectList(
+               new List<Object>{
+                      new { value = 0 , text = "Please Select"  },
+                       new { value = 1 , text = "Purchase"  },
+                       new { value = 2 , text = "Enco" }
+
+                 },
+               "value",
+               "text",
+                0), new { @class = "select-style text-field " })
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-12">
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>Buyer</h2>
+
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.DropDownListFor(m => m.BuyerNameid, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field" })
+                </div>
+            </div>
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>Week No</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.DropDownListFor(m => m.WeekNO, MMS.Web.ExtensionMethod.HtmlHelper.WeekNo(), new { @class = "select-style text-field" })
+                </div>
+            </div>
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>Season</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.DropDownListFor(m => m.SeasonID, MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "select-style text-field" })
+                </div>
+            </div>
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>Lot No</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.DropDownListFor(m => m.LotNO, MMS.Web.ExtensionMethod.HtmlHelper.LOtNo(), new { @class = "select-style text-field" })
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-12">
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>Size Range</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.DropDownListFor(m => m.SizeRangeID, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "select-style text-field" })
+                </div>
+            </div>
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1 form-label2">
+                        <h2 class="text-center">From:</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.TextBoxFor(m => m.From, new { @class = "form-control text-field", @readonly = "true" })
+                </div>
+            </div>
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1 form-label2">
+                        <h2 class="text-center">To</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.TextBoxFor(m => m.TO, new { @class = "form-control text-field", @readonly = "true" })
+                </div>
+            </div>
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>Cust. Plan</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.DropDownListFor(m => m.CustomerPlan, new SelectList(new List<Object>{new { value = 1 , text = "As Planned" },
+                                                                                    new { value = 2 , text = "Scheduled" } }, "value", "text"), "Please Select",
+                                                                                 new { @class = "select-style text-field" })
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-12   col-sm-10  choose-mtp">
+            <div class="col-lg-3 col-sm-3">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="form-label1">
+                            <h2>Display IO's</h2>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="file" id="dataFile" name="upload" />
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" value="Upload" class="btn btn-default btn-style" />
+                    </div>
+                    <div class="col-xs-12">
+                        <button type="button" style="margin-top: 65px;">Import IO's</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-sm-9">
+                <div class="row">
+                    <div class="col-xs-5">
+                        @*@Html.ListBoxFor(m=>m.SelectedCities,Model.IOS,new {size=5 })*@
+                        @if (Model.IOS != null)
+                    {
+                    @Html.ListBoxFor(model => model.SelectedCities, new MultiSelectList(Model.IOS, "Value", "Text"), new { size = "10",@style = "width: 125px;" })
+                    }
+                    </div>
+                    <div class="col-xs-2">
+                        <input id="btnAddAll" type="button" value=">>" onclick="addallItems();" />
+                        <input id="btnAdd" type="button" value=">" onclick="addItem();" />
+                        <input id="btnRemove" type="button" value="<" onclick="removeItem();" />
+                        <input id="btnRemoveAll" type="button" value="<<" onclick="removeallItems();" />
+                    </div>
+                    <div class="col-xs-5" id="SelectedItems">
+                        @Html.ListBoxFor(model => model.MoveSelectedIOS, new MultiSelectList("", "Value", "Text"), new { @class = "SelectedValue", size = "10", @style = "width: 125px;" })
+                    </div>
+                </div>
+            </div>
+            <div class="form-footer">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                        <input type="button" onclick="Cancel()" style="cursor: pointer;" title="Back" value="Back" class="btn btn-default btn-style">
+                        @if (Model != null && Model.SimpleMRPID != 0)
+                {
+                    <input type="button" onclick="Save()" class="btn btn-default btn-style" id="CountryMasterId" title="Update" value="Update">
+                    }
+                    else
+                    {
+                    <input type="button" id="Btnsave" onclick="Save()" class="btn btn-default btn-style" title="Save" value="Save">
+                    }
+                        <button class="btn btn-default btn-style" type="submit">Clear</button>
+                        <input type="button" id="BtnCalculte" onclick="Calculate()" class="btn btn-default btn-style" style="cursor:pointer;" title="Calculate" value="Calculate">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+        </div>
+        }
+
+

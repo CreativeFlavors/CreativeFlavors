@@ -1,0 +1,672 @@
+﻿@model MMS.Web.Models.StockModel.IssueSlip_SingleModel
+
+@using MMS.Repository.Managers.StockManager;
+@using MMS.Core.Entities.Stock;
+@using MMS.Core.Entities;
+
+<link type="text/css" href="~/Datepicker/css/ui-lightness/jquery-ui-1.8.19.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/Datepicker/js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="~/Datepicker/js/jquery-ui-1.8.19.custom.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+
+        $("#txtDate").datepicker();
+        $("#GridDetails").show();
+        $("#div_show1").hide();
+        $("#btnSave").val("Save");
+
+        $("#FnAdd").click(function () {
+            $("#btnSave").val("Save");
+            $("#GridDetails").hide();
+            $("#div_show1").show();
+            $("#IssuesSlipId").val("");
+            $("#ddlIssueType").val("");
+            $("#txtSIssueSlipNo").val("");
+            $("#txtDate").val("");
+            $("#ddlConveyor").val("");
+            $("#InternalOrderId").val("");
+            $("#MachineNameId").val("");
+            $("#txtStyleNo").val("");
+            $("#txtNoOfsetsPairs").val("");
+            $("#StoresId").val("");
+            $("#RateId").val("");
+            $("#CategoryId").val("");
+            $("#SubstanceId").val("");
+            $("#GroupId").val("");
+            $("#txtReqQty").val("");
+            $("#MaterialId").val("");
+            $("#ColourId").val("");
+            $("#txtAlreadyIssued").val("");
+            $("#txtLotNo").val("");
+            $("#txtCurrentIssues").val("");
+            $("#ddlCurrentSharesVal").val("");
+            $("#txtBalanceILOTSQFT").val("");
+            $("#txtBalanceILOTSPCS").val("");
+            $("#txtCurrentStock").val("");
+            $("#txtCurrentStockUOM").val("");
+            $("#txtFreeStock").val("");
+            $("#txtFreeStockUOM").val("");
+            $("#txtReservedStock").val("");
+            $("#txtReservedStockUOM").val("");
+            $("#txtClosingStock").val("");
+            $("#txtClosingStockUOM").val("");
+            $("#txtInTransitStock").val("");
+            $("#txtInTransitStockUOM").val("");
+        });
+        $("#btnViewDet").click(function () {
+            $("#div_show1").hide();
+            $("#GridDetails").show();
+        });
+    });
+
+   
+
+    function Save() {
+        var model = {};
+
+        if ($('#txtSIssueSlipNo').val() == "") {
+            alert("Please Enter Issue Slip No."); $('#txtSIssueSlipNo').css('border-color', 'red'); $('#txtSIssueSlipNo').focus(); return false;
+        }
+        else {
+            $('#txtSIssueSlipNo').css('border-color', '');
+        }
+        if ($('#ddlIssueType').val() == "") {
+            alert("Please Enter Issue Type."); $('#ddlIssueType').css('border-color', 'red'); $('#ddlIssueType').focus(); return false;
+        }
+        else {
+            $('#ddlIssueType').css('border-color', '');
+        }
+        if ($('#txtDate').val() == "") {
+            alert("Please Enter Date."); $('#txtDate').css('border-color', 'red'); $('#txtDate').focus(); return false;
+        }
+        else {
+            $('#txtDate').css('border-color', '');
+        }
+        if ($('#ddlConveyor').val() == "") {
+            alert("Please Enter Conveyor."); $('#ddlConveyor').css('border-color', 'red'); $('#ddlConveyor').focus(); return false;
+        }
+        else {
+            $('#ddlConveyor').css('border-color', '');
+        }
+        if ($('#InternalOrderId').val() == "") {
+            alert("Please Enter Internal Order."); $('#InternalOrderId').css('border-color', 'red'); $('#InternalOrderId').focus(); return false;
+        }
+        else {
+            $('#InternalOrderId').css('border-color', '');
+        }
+
+        if ($('#MachineNameId').val() == "") {
+            alert("Please Enter Machine Name."); $('#MachineNameId').css('border-color', 'red'); $('#MachineNameId').focus(); return false;
+        }
+        else {
+            $('#MachineNameId').css('border-color', '');
+        }
+        if ($('#txtStyleNo').val() == "") {
+            alert("Please Enter Style No."); $('#txtStyleNo').css('border-color', 'red'); $('#txtStyleNo').focus(); return false;
+        }
+        else {
+            $('#txtStyleNo').css('border-color', '');
+        }
+        if ($('#txtNoOfsetsPairs').val() == "") {
+            alert("Please Enter No Of sets Pairs."); $('#txtNoOfsetsPairs').css('border-color', 'red'); $('#txtNoOfsetsPairs').focus(); return false;
+        }
+        else {
+            $('#txtNoOfsetsPairs').css('border-color', '');
+        }
+        if ($('#StoresId').val() == "") {
+            alert("Please Enter Stores."); $('#StoresId').css('border-color', 'red'); $('#StoresId').focus(); return false;
+        }
+        else {
+            $('#StoresId').css('border-color', '');
+        }
+        if ($('#RateId').val() == "") {
+            alert("Please Enter Rate."); $('#RateId').css('border-color', 'red'); $('#RateId').focus(); return false;
+        }
+        else {
+            $('#RateId').css('border-color', '');
+        }
+        if ($('#CategoryId').val() == "") {
+            alert("Please Enter Category."); $('#CategoryId').css('border-color', 'red'); $('#CategoryId').focus(); return false;
+        }
+        else {
+            $('#CategoryId').css('border-color', '');
+        }
+        if ($('#SubstanceId').val() == "") {
+            alert("Please Enter Substance."); $('#SubstanceId').css('border-color', 'red'); $('#SubstanceId').focus(); return false;
+        }
+        else {
+            $('#SubstanceId').css('border-color', '');
+        }
+        if ($('#GroupId').val() == "") {
+            alert("Please Enter Group."); $('#GroupId').css('border-color', 'red'); $('#GroupId').focus(); return false;
+        }
+        else {
+            $('#GroupId').css('border-color', '');
+        }
+        if ($('#txtReqQty').val() == "") {
+            alert("Please Enter Required Qty."); $('#txtReqQty').css('border-color', 'red'); $('#txtReqQty').focus(); return false;
+        }
+        else {
+            $('#txtReqQty').css('border-color', '');
+        }
+        if ($('#MaterialId').val() == "") {
+            alert("Please Enter Material."); $('#MaterialId').css('border-color', 'red'); $('#MaterialId').focus(); return false;
+        }
+        else {
+            $('#MaterialId').css('border-color', '');
+        }
+        if ($('#ColourId').val() == "") {
+            alert("Please Enter Colour."); $('#ColourId').css('border-color', 'red'); $('#ColourId').focus(); return false;
+        }
+        else {
+            $('#ColourId').css('border-color', '');
+        }
+        if ($('#txtAlreadyIssued').val() == "") {
+            alert("Please Enter Already Issued."); $('#txtAlreadyIssued').css('border-color', 'red'); $('#txtAlreadyIssued').focus(); return false;
+        }
+        else {
+            $('#txtAlreadyIssued').css('border-color', '');
+        }
+        if ($('#txtLotNo').val() == "") {
+            alert("Please Enter Lot No."); $('#txtLotNo').css('border-color', 'red'); $('#txtLotNo').focus(); return false;
+        }
+        else {
+            $('#txtLotNo').css('border-color', '');
+        }
+        if ($('#txtCurrentIssues').val() == "") {
+            alert("Please Enter Current Issues."); $('#txtCurrentIssues').css('border-color', 'red'); $('#txtCurrentIssues').focus(); return false;
+        }
+        else {
+            $('#txtCurrentIssues').css('border-color', '');
+        }
+        if ($('#ddlCurrentSharesVal').val() == "") {
+            alert("Please Enter Current Shares Value ."); $('#ddlCurrentSharesVal').css('border-color', 'red'); $('#ddlCurrentSharesVal').focus(); return false;
+        }
+        else {
+            $('#ddlCurrentSharesVal').css('border-color', '');
+        }
+        if ($('#txtBalanceILOTSQFT').val() == "") {
+            alert("Please Enter Balance LOT SQFT."); $('#txtBalanceILOTSQFT').css('border-color', 'red'); $('#txtBalanceILOTSQFT').focus(); return false;
+        }
+        else {
+            $('#txtBalanceILOTSQFT').css('border-color', '');
+        }
+        if ($('#txtBalanceILOTSPCS').val() == "") {
+            alert("Please Enter Balance LOTS PCS."); $('#txtBalanceILOTSPCS').css('border-color', 'red'); $('#txtBalanceILOTSPCS').focus(); return false;
+        }
+        else {
+            $('#txtBalanceILOTSPCS').css('border-color', '');
+        }
+        if ($('#txtCurrentStock').val() == "") {
+            alert("Please Enter Current Stock."); $('#txtCurrentStock').css('border-color', 'red'); $('#txtCurrentStock').focus(); return false;
+        }
+        else {
+            $('#txtCurrentStock').css('border-color', '');
+        }
+        if ($('#txtCurrentStockUOM').val() == "") {
+            alert("Please Enter Current Stock UOM."); $('#txtCurrentStockUOM').css('border-color', 'red'); $('#txtCurrentStockUOM').focus(); return false;
+        }
+        else {
+            $('#txtCurrentStockUOM').css('border-color', '');
+        }
+        if ($('#txtFreeStock').val() == "") {
+            alert("Please Enter Free Stock."); $('#txtFreeStock').css('border-color', 'red'); $('#txtFreeStock').focus(); return false;
+        }
+        else {
+            $('#txtFreeStock').css('border-color', '');
+        }
+        if ($('#txtFreeStockUOM').val() == "") {
+            alert("Please Enter Free Stock UOM."); $('#txtFreeStockUOM').css('border-color', 'red'); $('#txtFreeStockUOM').focus(); return false;
+        }
+        else {
+            $('#txtFreeStockUOM').css('border-color', '');
+        }
+        if ($('#txtReservedStock').val() == "") {
+            alert("Please Enter Reserved Stock."); $('#txtReservedStock').css('border-color', 'red'); $('#txtReservedStock').focus(); return false;
+        }
+        else {
+            $('#txtReservedStock').css('border-color', '');
+        }
+        if ($('#txtReservedStockUOM').val() == "") {
+            alert("Please Enter Reserved Stock UOM."); $('#txtReservedStockUOM').css('border-color', 'red'); $('#txtReservedStockUOM').focus(); return false;
+        }
+        else {
+            $('#txtReservedStockUOM').css('border-color', '');
+        }
+        if ($('#txtClosingStock').val() == "") {
+            alert("Please Enter Closing Stock."); $('#txtClosingStock').css('border-color', 'red'); $('#txtClosingStock').focus(); return false;
+        }
+        else {
+            $('#txtClosingStock').css('border-color', '');
+        }
+        if ($('#txtClosingStockUOM').val() == "") {
+            alert("Please Enter Closing Stock UOM."); $('#txtClosingStockUOM').css('border-color', 'red'); $('#txtClosingStockUOM').focus(); return false;
+        }
+        else {
+            $('#txtClosingStockUOM').css('border-color', '');
+        }
+        if ($('#txtInTransitStock').val() == "") {
+            alert("Please Enter In Transit Stock."); $('#txtInTransitStock').css('border-color', 'red'); $('#txtInTransitStock').focus(); return false;
+        }
+        else {
+            $('#txtInTransitStock').css('border-color', '');
+        }
+        if ($('#txtInTransitStockUOM').val() == "") {
+            alert("Please Enter In Transit Stock UOM."); $('#txtInTransitStockUOM').css('border-color', 'red'); $('#txtInTransitStockUOM').focus(); return false;
+        }
+        else {
+            $('#txtInTransitStockUOM').css('border-color', '');
+        }
+       
+      
+        model.IssuesSlipId = $("#IssuesSlipId").val();
+        model.IssuesTypeId = $("#ddlIssueType").val();
+        model.IssuesSlipNo = $("#txtSIssueSlipNo").val();
+        model.Date = $("#txtDate").val();
+        model.ConveyorId = 1;
+        model.InternalOrderId = 1;//$("#InternalOrderId").val();
+        model.MachineNameId = 2;// $("#MachineNameId").val();
+        model.StyleNo = $("#txtStyleNo").val();
+        model.NoOfSets_Pairs = $("#txtNoOfsetsPairs").val();
+        model.StoresId = $("#StoresId option:selected").val();
+        model.RateId = $("#RateId").val();
+        model.CategoryId = $("#CategoryId option:selected").val();
+        model.SubstanceId = 1; // $("#SubstanceId").val();
+        model.GroupId = $("#GroupId option:selected").val();
+        model.RequiredQty = $("#txtReqQty").val();
+        model.MaterialId = $("#MaterialId option:selected").val();
+        model.ColourId = $("#ColourId option:selected").val();
+        model.AlreadyIssued = $("#txtAlreadyIssued").val();
+        model.LotNo = $("#txtLotNo").val();
+        model.CurrentIssues = $("#txtCurrentIssues").val();
+        model.CurrentIssuesVal = 1; //$("#ddlCurrentSharesVal").val();
+        model.BalanceInThisLot_Sqft = $("#txtBalanceILOTSQFT").val();
+        model.BalanceInThisLot_Pcs = $("#txtBalanceILOTSPCS").val();
+       
+        model.CurrentStock = $("#txtCurrentStock").val();
+        model.CurrentStock_Uom = $("#txtCurrentStockUOM").val();
+        model.FreeStock = $("#txtFreeStock").val();
+        model.FreeStock_Uom = $("#txtFreeStockUOM").val();
+        model.ReservedStock = $("#txtReservedStock").val();
+        model.ReservedStock_Uom = $("#txtReservedStockUOM").val();
+        model.ClosingStockInAllStores = $("#txtClosingStock").val();
+        model.ClosingStockInAllStores_Uom = $("#txtClosingStockUOM").val();
+        model.InTransit = $("#txtInTransitStock").val();
+        model.InTransit_Uom = $("#txtInTransitStockUOM").val();
+
+      
+        $.post('/IssueSlip_Single/SaveDetails/', model, function (data) {
+            if (data == true) {
+                if ($("#btnSave").val() == "Save") {
+                    alert("Saved Successfully");
+                }
+                else {
+                    alert("Update Successfully");
+                }
+         
+                window.location.reload();
+            }
+            else {
+                alert("Save Failed");
+            }
+        });
+    }
+
+    function Edit(IssueId) {
+        $.getJSON('/IssueSlip_Single/GetIssueDetails/', { IssueSlipId: IssueId }, function (data) {
+            $("#btnSave").val("Update");
+            var Date1 = $.datepicker.formatDate('mm/dd/yy', new Date(Date(data.Date)));
+            $("#IssuesSlipId").val(data.IssuesSlipId);
+             $("#ddlIssueType").val(data.IssuesTypeId);
+             $("#txtSIssueSlipNo").val(data.IssuesSlipNo);
+             $("#txtDate").val(Date1);
+             $("#ddlConveyor").val(data.ConveyorId);
+             $("#InternalOrderId").val(data.InternalOrderId);
+             $("#MachineNameId").val(data.MachineNameId);
+             $("#txtStyleNo").val(data.StyleNo);
+             $("#txtNoOfsetsPairs").val(data.NoOfSets_Pairs);
+             $("#StoresId").val(data.StoresId);
+             $("#RateId").val(data.RateId);
+             $("#CategoryId").val(data.CategoryId);
+             $("#SubstanceId").val(data.SubstanceId);
+             $("#GroupId").val(data.GroupId);
+             $("#txtReqQty").val(data.RequiredQty);
+             $("#MaterialId").val(data.MaterialId);
+             $("#ColourId").val(data.ColourId);
+             $("#txtAlreadyIssued").val(data.AlreadyIssued);
+             $("#txtLotNo").val(data.LotNo);
+             $("#txtCurrentIssues").val(data.CurrentIssues);
+             $("#ddlCurrentSharesVal").val(data.CurrentIssuesVal);
+             $("#txtBalanceILOTSQFT").val(data.BalanceInThisLot_Sqft);
+             $("#txtBalanceILOTSPCS").val(data.BalanceInThisLot_Pcs);
+             $("#txtCurrentStock").val(data.CurrentStock);
+             $("#txtCurrentStockUOM").val(data.CurrentStock_Uom);
+             $("#txtFreeStock").val(data.FreeStock);
+             $("#txtFreeStockUOM").val(data.FreeStock_Uom);
+             $("#txtReservedStock").val(data.ReservedStock);
+             $("#txtReservedStockUOM").val(data.ReservedStock_Uom);
+             $("#txtClosingStock").val(data.ClosingStockInAllStores);
+             $("#txtClosingStockUOM").val(data.ClosingStockInAllStores_Uom);
+             $("#txtInTransitStock").val(data.InTransit);
+             $("#txtInTransitStockUOM").val(data.InTransit_Uom);
+             $("#GridDetails").hide();
+             $("#div_show1").show();
+        });
+    }
+
+    function Delete(IssueId) {
+        $.getJSON('/IssueSlip_Single/DeleteIssueDetails/', { IssueSlipId: IssueId }, function (data) {
+            if (data == true) {
+                alert("Deleted Successfully");
+                window.location.reload();
+            }
+            else {
+                alert("Deletion Failed");
+            }
+        });
+    }
+
+    function Search() {
+        window.location = "/IssueSlip_Single/IssueSlipSingle?SearchFilter=" + $("#txtSearch").val();
+    }
+</script>
+
+@using (Html.BeginForm("IssueSlipSingle", "IssueSlip_Single", FormMethod.Post))
+{
+  <div class="veh-tablecont" id="GridDetails">
+            <div id="sortMsg" style="text-align: center; color: Red;"></div>
+            <table class="veh-table" id="empTable">
+                <thead>
+                    <tr class="color-code-top-btn">
+                        <td colspan="13">
+                            <input type="text" id="txtSearch" placeholder="Search.." /><input type="button" value="Add" id="FnAdd">
+                            <input type="button" value="Search" onclick="Search()"></td>
+                    </tr>
+                    <tr>
+                        <th class="veh-1">Issue Slip No
+                        </th>
+                        <th class="veh-2">Issue Type
+                        </th>
+                        <th class="veh-3">No.Sets / Pair
+                        </th>
+                        <th class="veh-4">Group
+                        </th>
+                        <th class="veh-5">Category
+                        </th>
+
+                       
+                      
+                        <th class="veh-7">Colour
+                        </th>
+                          <th class="veh-7">Required Qty
+                        </th>
+                        <th class="veh-7">Already Issued
+                        </th>
+                        <th class="veh-7">Current Issues
+                        </th>
+
+                        <th class="veh-9">Edit / Delete
+                        </th>
+                    </tr>
+                </thead>
+                @if (Model.IssueSlip_SingleModelList != null)
+                {
+                    <tbody>
+                        @foreach (var IssueModel in Model.IssueSlip_SingleModelList)
+                        {
+                             <tr>
+                                <td style="" class="veh-1">@IssueModel.IssuesSlipNo</td>
+                                <td style="" class="veh-2">@IssueModel.IssuesTypeId</td>
+                                <td style="" class="veh-3">@IssueModel.NoOfSets_Pairs</td>
+                                <td style="" class="veh-4">@IssueModel.GroupId</td>
+                                <td style="" class="veh-5">@IssueModel.CategoryId</td>
+                               
+                                <td style="" class="veh-7">@IssueModel.ColourId</td>
+                                <td style="" class="veh-7">@IssueModel.RequiredQty</td>
+                                <td style="" class="veh-7">@IssueModel.AlreadyIssued</td>
+                                <td style="" class="veh-7">@IssueModel.CurrentIssues</td>
+                                <td class="veh-1 edit-del-wrap">
+                                    <a href="Javascript:Void();" onclick="Edit('@IssueModel.IssuesSlipId')"  class="watchlist-edit" title="Edit"></a>
+                                    <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@IssueModel.IssuesSlipId')" class="watchlist-delete" title="Delete"></a>
+                                </td>
+                            </tr>                       
+                        }
+                    </tbody>
+                }
+                <tfoot class="footer-pager">
+                    <tr>
+                        <td colspan="4">
+                            <div id="pager">
+                                <form>
+                                    <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                    <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                    <input type="text" class="pagedisplay" />
+                                    <img src="@Url.Content("~/Content/images/next.png")" class="next"/>
+                                    <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                    <select class="pagesize">
+                                        <option selected="selected" value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="40">40</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+                 }
+        
+            </table>
+        </div>
+    
+     <div  class="content-wrapper" id="div_show1">
+            <h2 class="content-title">Issue Slip (Single I/O)</h2>
+            <span id="SpnMsgId" style="color: red;"></span>
+            <div class="purchase-order-wrapper grn_details_wrap">
+                <div class="purchase-order-row" id="buttonSId">
+                        <ul>
+                            <li class="width-160">
+                                <input type="button" id="btnSave" onclick="Save()" value="Save" />
+                            </li>
+                            <li class="width-160">
+                                <input type="button"  id="btnViewDet" value="View Details" />
+                            </li>
+                           
+
+                        </ul>
+                    </div>
+                <div  class="purchase-order-section" >
+                    
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Issue Slip No.</label></li>
+                            <li>@Html.HiddenFor(m => m.IssuesSlipId)</li>
+                            <li class="width-160" style="width: 280px;">
+                                <input type="text" id="txtSIssueSlipNo" />
+                            </li>
+
+                            <li class="width-150">
+                                <label>Date.</label></li>
+                            <li class="width-90">
+                                 <input type="text" id="txtDate" />
+                            </li>
+
+                            <li class="width-150">
+                                <label>Issue Type.</label></li>
+                            <li class="width-90">
+                                 <select  id="ddlIssueType">
+                                     <option value="0">Please Select</option>
+                                     <option value="1">Regular</option>
+                                 </select>
+                            </li>
+                             <li class="width-150">
+                                <label>Conveyor </label></li>
+                            <li class="width-90">
+                                 <select  id="ddlConveyor"></select>
+                            </li>
+                        </ul>
+                        </div>
+
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Internal Order.</label></li>
+                            <li class="width-160" style="width: 280px;">
+                                 @Html.DropDownListFor(m => m.InternalOrderId, MMS.Web.ExtensionMethod.HtmlHelper.OrderEntry())
+                            </li>
+
+                            <li class="width-150">
+                                <label>Machine Name</label></li>
+                            <li class="width-90">
+                                  @Html.DropDownListFor(m => m.MachineNameId, MMS.Web.ExtensionMethod.HtmlHelper.MachineName())
+                            </li>
+
+                           
+                        </ul>
+                        </div>
+                      <div class="purchase-order-row">
+                        <ul>
+                             <li class="width-150">
+                                <label>Style No</label></li>
+                            <li class="width-90">
+                                 <input   type="text" id="txtStyleNo" />
+                            </li>
+                             <li class="width-150">
+                                <label>No. of Sets/Pairs </label></li>
+                            <li class="width-90">
+                                 <input   type="text" id="txtNoOfsetsPairs" />
+                            </li>
+                            </ul>
+                          </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                             <li class="width-150">
+                                <label>Stores</label></li>
+                            <li class="width-90">
+                                 @Html.DropDownListFor(m => m.StoresId, MMS.Web.ExtensionMethod.HtmlHelper.Store())
+                            </li>
+                             <li class="width-150">
+                                <label>Rate </label></li>
+                            <li class="width-90">
+                                 <input   type="text" id="txtRate" />
+                            </li>
+                            </ul>
+                          </div>
+
+                    <div class="purchase-order-row">
+                        <ul>
+                             <li class="width-150">
+                                <label>Category</label></li>
+                            <li class="width-90">
+                                @Html.DropDownListFor(m => m.CategoryId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName())
+                            </li>
+                             <li class="width-150">
+                                <label>Substance </label></li>
+                            <li class="width-90">
+                                 <select  id="ddlSubstance"></select>
+                            </li>
+                            </ul>
+                          </div>
+
+                     <div class="purchase-order-row">
+                        <ul>
+                             <li class="width-150">
+                                <label>Group</label></li>
+                            <li class="width-90">
+                               @Html.DropDownListFor(m => m.GroupId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName())
+                            </li>
+                             <li class="width-150">
+                                <label>Required Qty. </label></li>
+                            <li class="width-90">
+                                   <input   type="text" id="txtReqQty" />
+                            </li>
+                            </ul>
+                          </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                             <li class="width-150">
+                                <label>Material</label></li>
+                            <li class="width-90">
+                               @Html.DropDownListFor(m => m.MaterialId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialName(), new { Style = "width:160px;"})
+                            </li>
+                             <li class="width-150">
+                                <label>Colour. </label></li>
+                            <li class="width-90">
+                                    @Html.DropDownListFor(m => m.ColourId, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { Style = "width:160px;"})
+                            </li>
+                             <li class="width-150">
+                                <label>Already Issued. </label></li>
+                            <li class="width-90">
+                                    <input   type="text" id="txtAlreadyIssued" />
+                            </li>
+                            </ul>
+                          </div>
+                     <div class="purchase-order-row">
+                        <ul>
+                             <li class="width-150">
+                                <label>Lot No</label></li>
+                            <li class="width-90">
+                                <input   type="text" id="txtLotNo" />
+                            </li>
+                             <li class="width-150">
+                                <label>Current Issues </label></li>
+                            <li class="width-90">
+                                   <input   type="text" id="txtCurrentIssues" />
+                                <select  id="ddlCurrentSharesVal"></select>
+                            </li>
+                            </ul>
+                          </div>
+
+                     <div class="purchase-order-row">
+                        <ul>
+                             <li class="width-150">
+                                <label>Balance In LOT</label></li>
+                            <li class="width-90">
+                                <input   type="text" id="txtBalanceILOTSQFT" /> <input   type="text" id="txtBalanceILOTSPCS" />
+                            </li>
+                             
+                            </ul>
+                          </div>
+
+                     <div class="purchase-order-row">
+                        <ul>
+                             <li class="width-150">
+                                <label>Current Stock</label></li> 
+                            <li class="width-90">
+                                <input   type="text" id="txtCurrentStock" /> <input   type="text" id="txtCurrentStockUOM" />
+                            </li>
+                             <li class="width-150">
+                                <label>Free Stock</label></li>
+                            <li class="width-90">
+                                <input   type="text" id="txtFreeStock" /> <input   type="text" id="txtFreeStockUOM" />
+                            </li>
+                            <li class="width-150">
+                                <label>Reserved Stock</label></li>
+                            <li class="width-90">
+                                <input   type="text" id="txtReservedStock" /> <input   type="text" id="txtReservedStockUOM" />
+                            </li>
+                            <li class="width-150">
+                                <label>Closing Stock</label></li>
+                            <li class="width-90">
+                                <input   type="text" id="txtClosingStock" /> <input   type="text" id="txtClosingStockUOM" />
+                            </li>
+
+                            <li class="width-150">
+                                <label>In Transit</label></li>
+                            <li class="width-90">
+                                <input   type="text" id="txtInTransitStock" /> <input   type="text" id="txtInTransitStockUOM" />
+                            </li>
+                            </ul>
+                          </div>
+
+                    </div>
+                </div>
+         </div>
+      
+}
+
+

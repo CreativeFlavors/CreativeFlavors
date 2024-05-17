@@ -1,0 +1,211 @@
+﻿@model MMS.Web.Models.MaterialNameModel
+@{
+
+}
+ <script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script> 
+<style>
+    .eq-width {
+        width: 33%;
+    }
+</style>
+
+
+ 
+<div class="right-form-section clearfix" id="matNameDetails">
+    <form role="form" class="form-inline">
+        <div class="container-fluid">
+            <div class="field-section">
+                <div class="col-md-12 col-sm-12 col-lg-8 col-xs-12">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding"></div>
+                        <div class="col-md-4 col-sm-4 col-lg-12 col-xs-12 no-padding">
+                            @Html.HiddenFor(x => x.MaterialMasterID)
+                            @*<input type="hidden" id="hdnMaterialId" />*@
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-3 col-xs-12">
+                                        <label class="form-label" for="text">Material Group</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-9 col-xs-12">
+                                        @Html.DropDownListFor(m => m.MaterialGroupMasterId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-3 col-xs-12">
+                                        <label class="form-label" for="text">Material Name Code</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-9 col-xs-12">
+                                        @Html.TextBoxFor(m => m.MaterialCode, new { @class = "form-control text-field", @disabled = true })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section" id="checkIsLeather">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-3 col-xs-12">
+                                        <label class="form-label" for="text">Leather Material Description </label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-9 col-xs-12">
+                                         <table>
+                                             <tr>
+                                                 <td class="col-xs-4" style="padding: 0;border: none;">
+                                                     @Html.TextBoxFor(m => m.LeatherMaterilFirstValue, new { @class = "form-control text-field eq-width" })
+                                                 </td>
+                                                 <td class="col-xs-4" style="padding-left: 0;border: none;">@Html.DropDownListFor(m => m.LeatherMaterialName, MMS.Web.ExtensionMethod.HtmlHelper.leatherTypes(), new { @class = "select-style text-field eq-width" })</td>
+                                                 <td class="col-xs-4" style="padding-right: 0;border: none;">@Html.TextBoxFor(m => m.LeatherMaterilLastValue, new { @class = "form-control text-field eq-width" })</td>
+                                             </tr>
+                                         </table>
+                                       
+                                  
+                                     
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section" id="isNotLealther">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-3 col-xs-12">
+                                        <label class="form-label" for="text">Material Description</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-9 col-xs-12">
+                                        @Html.TextBoxFor(m => m.MaterialDescription, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-footer">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                    <input type="button" onclick="Cancel()" style="cursor: pointer;" title="Back" value="Back" class="btn btn-default btn-style">
+                    @if (Model != null && Model.MaterialMasterID != 0)
+                    {
+                        <input type="button" onclick="Save()" class="btn btn-default btn-style" id="CountryMasterId" title="Update" value="Update">
+                    }
+                    else
+                    {
+                        <input type="button" id="Btnsave" onclick="Save()" class="btn btn-default btn-style" title="Save" value="Save">
+                    }
+                    <button class="btn btn-default btn-style" type="submit">Clear</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+
+    
+
+    $("#LeatherMaterialName").combobox({
+        select: function (event, ui) {             
+            $('#LeatherMaterilLastValue').show();
+           
+        }
+    });
+    $(function () {
+        var Grpid = $('#MaterialGroupMasterId').val();
+        $.ajax({
+            url: '/MaterialNameMaster/GetLeatherType',
+            type: "GET",
+            dataType: "JSON",
+            data: { MaterialGroupMasterId: Grpid },
+            success: function (data) {
+                if (data == true) {
+                    setTimeout(function () {
+                        $('#MaterialDescription').attr('readonly', true)
+                        $('#isNotLealther').show();
+                        $('#LeatherMaterilLastValue').show();
+                        $('#checkIsLeather').show();
+                        $('#MaterialDescription').val("");
+                    }, 20);
+                    
+                }
+                else {
+                    setTimeout(function () {
+                        $('#MaterialDescription').attr('readonly', false)
+                        $('#isNotLealther').show();
+                        // $('#MaterialDescription').val("");
+                        $('#checkIsLeather').hide();
+                        // $('#LeatherMaterialName').hide();
+                    }, 20);
+                   
+                }
+            }
+        });
+    })
+    $("#MaterialGroupMasterId").combobox({
+        select: function (event, ui) {
+            var Grpid = $('#MaterialGroupMasterId').val();
+            $('#LeatherMaterilFirstValue').val("");
+            $('#LeatherMaterialName').val("");
+
+          
+            $.ajax({
+                url: '/MaterialNameMaster/GetLeatherType',
+                type: "GET",
+                dataType: "JSON",
+                data: { MaterialGroupMasterId: Grpid },
+                success: function (data) {
+                    if (data == true) {
+                        $('#MaterialDescription').attr('readonly', true)
+                        $('#isNotLealther').show();
+                        $('#LeatherMaterilLastValue').hide();
+                        $('#checkIsLeather').show();
+                        $('#MaterialDescription').val("");
+                    }
+                    else {
+                        $('#MaterialDescription').attr('readonly', false)
+                        $('#isNotLealther').show();
+                        $('#MaterialDescription').val("");
+                        $('#checkIsLeather').hide();
+                        // $('#LeatherMaterialName').hide();
+                    }
+                }
+            });
+
+        }
+    });
+    //$('#LeatherMaterialName').change(function () {
+    //    $('#LeatherMaterilLastValue').show();
+    //    $('#LeatherMaterilLastValue').val("");
+    //});
+    $('#LeatherMaterilLastValue').on('keypress', function (event) {
+        var regex = new RegExp("^[a-z]|[A-Z]|[0-9]|[ ]$");
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        if (!regex.test(key)) {
+            event.preventDefault();
+            alert("Dont allow special character");
+            return false;
+        }
+    });
+    $('#LeatherMaterilFirstValue').on('keypress', function (event) {
+        var regex = new RegExp("^[a-z]|[A-Z]|[0-9]|[ ]$");
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        if (!regex.test(key)) {
+            event.preventDefault();
+            alert("Dont allow special character");
+            return false;
+        }
+    });
+    $("#LeatherMaterilLastValue").keyup(function () {
+        $('#MaterialDescription').val("");
+
+        var string1 = $('#LeatherMaterialName option:selected').text();
+        var string2 = $('#LeatherMaterilLastValue').val().trim();
+        var string3 = $('#LeatherMaterilFirstValue').val().trim();
+        $('#MaterialDescription').val(string3 + " " + string1.trim() + " " + string2);
+    });
+
+</script> 
+ <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<link href="~/Scripts/EasyAutocomplete-1.3.5/comboStyles.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/ComboBox.js"></script>

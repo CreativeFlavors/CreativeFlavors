@@ -1,0 +1,267 @@
+﻿@using MMS.Core.Entities
+@model MMS.Web.Models.SubAssemblyModel.SubAssemblyModel
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<div class="main-page">
+    <div id="transaction_report" class="reports common_Manage_subMerchant">
+        <nav class="reports_customers_head" aria-label="breadcrumb">
+            <ol class="breadcrumb font-20">
+                <li class="breadcrumb-item " aria-current="page">SUB ASSEMNLY DETAILS</li>
+            </ol>
+        </nav>
+        <div class="table-responsive reports_table_responsive">
+            <div class="d-flex justify-content-evenly">
+                <div class="form-floating">
+                    @Html.DropDownListFor(m => m.ProductName, MMS.Web.ExtensionMethod.HtmlHelper.GetProductName(), new { @class = "form-select" })
+                    <label for="floatingSelectGrid">Buyer</label>
+                </div>
+                <div class="form-floating">
+                    <input type="date" class="form-control" id="DivFromDate">
+                    <label for="floatingInputGrid">From Date</label>
+                </div>
+                <div class="form-floating">
+                    <input type="date" class="form-control" id="DivToDate">
+                    <label for="floatingInputGrid">To Date</label>
+                </div>
+                <div id="transaction_reports_search4_container" style="margin-left: 10px" class="reports_search_container_btn">
+                    <button id="filter" type="button" class="manage_customers_btn font-15">
+                        <a>FILTER</a>
+                    </button>
+                </div>
+            </div>
+            <div class="manage_customers_table_in_responsive" id="DivInvoiceGrid">
+                <table class="table table-striped text-center" id="tblinvoice">
+                    <thead>
+                        <tr class="font-16">
+                            <th scope="col">
+                                <span>Si.No</span>
+                                <span>
+                                    <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                </span>
+                            </th>
+                            <th scope="col">
+                                <span>Product Name</span>
+                                <span>
+                                    <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                </span>
+                            </th>
+                            <th scope="col">
+                                <span>Qty</span>
+                                <span>
+                                    <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                </span>
+                            </th>
+                            <th scope="col">
+                                <span>Transaction Date</span>
+                                <span>
+                                    <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                </span>
+                            </th>
+                            <th scope="col">
+                                <span>Production Date</span>
+                                <span>
+                                    <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                </span>
+                            </th>
+                            <th scope="col">
+                                <span>Production Per Day</span>
+                                <span>
+                                    <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
+
+                    @if (Model.SubAssemblydetailslist != null && Model.SubAssemblydetailslist.Count > 0)
+                    {
+                        int count = 1;
+                        <tbody>
+                            @foreach (var i in Model.SubAssemblydetailslist)
+                            {
+
+                                <tr class="font-14">
+                                    <td class="veh1-5">@count</td>
+                                    <td class="veh1-5" style="width: 12%;">@i.ProductName</td>
+                                    <td class="veh1-5" style="width: 12%;">@i.Qty</td>
+                                    <td class="veh1-5" style="width: 12%;">@i.TransactionDate.ToString("dd/MM/yyyy")</td>
+                                    <td class="veh1-5" style="width: 12%;">@i.ProductionTime</td>
+                                    <td class="veh1-5" style="width: 12%;">@i.ProductionPerDay</td>
+                                </tr>
+                                count++;
+                            }
+
+                        </tbody>
+
+                    }
+                </table>
+            </div>
+            <div class="row manage_customer_show" id="DivPaging">
+                <div class="font-14 manage_customer_show_I col-xl-6">
+                    <div style="display:none;">
+                        <span>Showing </span>
+                        <select class="form-select font-16" name="manage_customer_show_content"
+                                id="list_report_show_no" aria-label="select example">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                        </select>
+                        <span>per page of 120 customers</span>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 manage_customer_show_II">
+                    <nav class="float-xl-end">
+                        <ul class="pagination font-14">
+                            <div id="pagination" style="display: inline-flex; }"></div>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div id="DivInvoiceIndu" style="display:none;">
+            <div class="content-title">
+                <div id="transaction_reports_search4_container" style="margin-left: 40%;" class="reports_search_container_btn">
+                    <button type="button" id="Save" onclick="Save();" class="manage_customers_btn font-15">
+                        <a>Generate Invoice</a>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="alert alert-success alert-dismissible fade show" id="DivSuccess" style="display:none;">
+        <strong>Success!</strong> Saved Successfully.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show col-3" id="DivFailer" style="display:none;">
+        <strong>Error!</strong> <p id="DivError"></p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '/SubAssembly/SubAssemblyDetailsGrid',
+            type: "GET",
+            dataType: "JSON",
+            data: {},
+            success: function (data) {
+                //var tbl = "";
+                //var count = 1;
+                //var pageSize = 10; // Number of items per page
+                //var currentPage = 1;
+                //var startIndex = (currentPage - 1) * pageSize;
+                //var endIndex = startIndex + pageSize;
+
+                //$.each(data.orderheaderList, function (i, dat) {
+                //    if (i >= startIndex && i < endIndex) {
+                //        if (tbl == "") {
+                //            tbl = "<tr><td class='veh-1' style='width:12%;text-align:center'>" + count + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.Id + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.OrderId + "</td><td class='veh-1' style='width:12%;text-align:center'>" + convertUTC(dat.DocDate) + "</td><td class='veh-1' style='width:12%;text-align:center'>" + convertUTC(dat.DocDueDate) + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.DocNetValue + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.DocDiscountValue + "</td></tr>";
+                //        }
+                //        else {
+                //            tbl = tbl + "<tr><td class='veh-1' style='width:12%;text-align:center'>" + count + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.Id + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.OrderId + "</td><td class='veh-1' style='width:12%;text-align:center'>" + convertUTC(dat.DocDate) + "</td><td class='veh-1' style='width:12%;text-align:center'>" + convertUTC(dat.DocDueDate) + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.DocNetValue + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.DocDiscountValue + "</td></tr>";
+                //        }
+                //        count++;
+                //    }
+                //});
+
+                //$("#tblInvoiceGrid").html(tbl);
+
+                // Update pagination after data is loaded
+                //updatePagination(data.orderheaderList.length);
+            }
+        });
+    });
+
+    function updatePagination(totalItems) {
+        var pageSize = 10; // Number of items per page
+        var totalPages = Math.ceil(totalItems / pageSize);
+
+        var pagination = "";
+        for (var i = 1; i <= totalPages; i++) {
+            pagination += "<li class='page-item'><a class='page-link' href='#' onclick='changePage(" + i + ")'>" + i + "</a></li>";
+        }
+
+        $("#pagination").html(pagination);
+    }
+    function changePage(page) {
+        pageSize = 10;
+        currentPage = page;
+        $.ajax({
+            url: '/Invoice/OrderHeaderGridBindList',
+            type: "GET",
+            dataType: "JSON",
+            data: {},
+            success: function (data) {
+                var tbl = "";
+                var count = (currentPage - 1) * pageSize + 1;
+                var startIndex = (currentPage - 1) * pageSize;
+                var endIndex = startIndex + pageSize;
+
+                $.each(data.orderheaderList, function (i, dat) {
+                    if (i >= startIndex && i < endIndex) {
+                        if (tbl == "") {
+                            tbl = "<tr><td class='veh-1' style='width:12%;text-align:center'>" + count + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.Id + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.OrderId + "</td><td class='veh-1' style='width:12%;text-align:center'>" + convertUTC(dat.DocDate) + "</td><td class='veh-1' style='width:12%;text-align:center'>" + convertUTC(dat.DocDueDate) + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.DocNetValue + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.DocDiscountValue + "</td></tr>";
+                        }
+                        else {
+                            tbl = tbl + "<tr><td class='veh-1' style='width:12%;text-align:center'>" + count + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.Id + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.OrderId + "</td><td class='veh-1' style='width:12%;text-align:center'>" + convertUTC(dat.DocDate) + "</td><td class='veh-1' style='width:12%;text-align:center'>" + convertUTC(dat.DocDueDate) + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.DocNetValue + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.DocDiscountValue + "</td></tr>";
+                        }
+                        count++;
+                    }
+                });
+
+                $("#tblInvoiceGrid").html(tbl);
+                updatePagination(data.orderheaderList.length);
+            }
+        });
+    }
+    function convertUTC(dateString) {
+        if (dateString != "" && dateString != null) {
+            const milliseconds = parseInt(dateString.match(/\d+/)[0]); // Extract milliseconds from string
+            const formattedDate = formatDate(milliseconds);
+            return formattedDate;
+        }
+    }
+    function formatDate(milliseconds) {
+        const date = new Date(milliseconds);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+    $("#filter").click(function () {
+        var buyername = parseInt($("#objorderheader_CustmerName").val());
+        var DivFromDate = $("#DivFromDate").val();
+        var DivToDate = $("#DivToDate").val();
+        $.ajax({
+            url: '/Invoice/OrderHeaderGridBindList',
+            type: "GET",
+            dataType: "JSON",
+            data: { buerid: buyername, Process: ProcessStatus, OrderEntryId: OrderSelectID, orderheaderid: orderheaderid, from_date: DivFromDate, to_date: DivToDate },
+            success: function (data) {
+                var tbl = "";
+                var count = 1;
+                var pageSize = 10; // Number of items per page
+                var currentPage = 1;
+                var startIndex = (currentPage - 1) * pageSize;
+                var endIndex = startIndex + pageSize;
+
+                $.each(data.orderheaderList, function (i, dat) {
+                    if (i >= startIndex && i < endIndex) {
+                        if (tbl == "") {
+                            tbl = "<tr><td class='veh-1' style='width:12%;text-align:center'>" + count + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.Id + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.OrderId + "</td><td class='veh-1' style='width:12%;text-align:center'>" + convertUTC(dat.DocDate) + "</td><td class='veh-1' style='width:12%;text-align:center'>" + convertUTC(dat.DocDueDate) + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.DocNetValue + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.DocDiscountValue + "</td></tr>";
+                        }
+                        else {
+                            tbl = tbl + "<tr><td class='veh-1' style='width:12%;text-align:center'>" + count + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.Id + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.OrderId + "</td><td class='veh-1' style='width:12%;text-align:center'>" + convertUTC(dat.DocDate) + "</td><td class='veh-1' style='width:12%;text-align:center'>" + convertUTC(dat.DocDueDate) + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.DocNetValue + "</td><td class='veh-1' style='width:12%;text-align:center'>" + dat.DocDiscountValue + "</td></tr>";
+                        }
+                        count++;
+                    }
+                });
+
+                $("#tblInvoiceGrid").html(tbl);
+
+                // Update pagination after data is loaded
+                updatePagination(data.orderheaderList.length);
+            }
+        });
+    });
+</script>
+

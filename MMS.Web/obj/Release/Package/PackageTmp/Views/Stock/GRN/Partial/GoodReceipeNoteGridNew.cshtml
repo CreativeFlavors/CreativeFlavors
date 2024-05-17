@@ -1,0 +1,275 @@
+﻿@model MMS.Web.Models.StockModel.GRN_Details_ModelNew
+@using MMS.Repository.Managers.StockManager
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+@{
+    List<OrderEntry> orderEntryEntityModelist = new List<OrderEntry>();
+    BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
+    orderEntryEntityModelist = buyerOrderEntryManager.Get();
+    MMS.Web.Models.StockModel.OrderEntryModel model = new MMS.Web.Models.StockModel.OrderEntryModel();
+    MMS.Repository.Managers.SeasonManager seasonManager = new MMS.Repository.Managers.SeasonManager();
+    SeasonMaster seasonMaster = new SeasonMaster();
+    tbl_PermissionSetting PermissionSettingModel = new MMS.Core.Entities.tbl_PermissionSetting();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<tbl_Permission> PermissionModel = new List<tbl_Permission>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("GoodReceipeNote", PermissionSettingModel.PermissionID);
+    }
+}
+<script>
+    function Search() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("GrnDetailSearch", "GRN_DetailNew")',
+            data: { filter: $('#SeaarchID').val() },
+            success: function (data) {
+                $('#DivShow').hide();
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+
+            }
+        });
+    }
+
+    function Cancel() {
+        location.reload();
+    }
+    function Edit(arg) {
+        
+        $('.veh-tablecont').hide();
+        $('#empTable').hide();
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetDetails", "GRN_DetailNew")',
+            data: { GrnID: arg },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "GRN_DetailNew")',
+                data: { GrnID: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/GRN_DetailNew/GoodReceipeNote";
+                        return false;
+                    }
+                    else {
+                        alert('deletion failed.');
+                    }
+
+                },
+
+            });
+        }
+        else {
+            return false;
+        }
+    }
+    function DeleteMaterial(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("DeleteMaterial", "GRN_DetailNew")',
+                data: { GrnID: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/GRN_DetailNew/GoodReceipeNote";
+                        return false;
+                    }
+                    else {
+                        alert('deletion failed.');
+                    }
+
+                },
+
+            });
+        }
+        else {
+            return false;
+        }
+    }
+</script>
+<div class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+        <table class="veh-table" id="empTable">
+            <thead>
+                <tr class="color-code-top-btn">
+                    <td colspan="9">
+                        <input type="text" id="SeaarchID" placeholder="Search.." />
+                        @{
+                            bool Add = false;
+                            foreach (var item in PermissionModel)
+                            {
+                                if (item.PermissionDesc == "Add")
+                                {
+                                    Add = true;
+                                }
+                            }
+                            if (Add == true)
+                            {
+                                <input type="button" value="Add" title="Add" onclick="Add()">
+                            }
+                            else
+                            {
+                                <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" title="Add" value="Add">
+                            }
+                        }
+                        <input type="button" value="Search" onclick="Search()">
+                    </td>
+                </tr>
+                <tr>
+                    <th class="veh-1">
+                        Si.No
+                    </th>
+                    <th class="veh-2">
+                        GrnNo
+                    </th>
+                    <th class="veh-3">
+                        PoNO
+                    </th>
+                    <th class="veh-4">
+                        DC_No
+                    </th>
+                    <th class="veh-5">
+                        GateEntryNo
+                    </th>
+                    <th class="veh-6">
+                        GrnDate
+                    </th>
+                    <th class="veh-7">
+                        INVoiceNo
+                    </th>
+                    <th class="veh-8">
+                        INVoiceDate
+                    </th>
+                    <th class="veh-9">
+                        Edit / Delete
+                    </th>
+                </tr>
+            </thead>
+            @if (Model.GRNDetailsModelList != null && Model.GRNDetailsModelList.Count > 0)
+            {
+                int count = 1;
+                <tbody>
+                    @foreach (var item in Model.GRNDetailsModelList)
+                    {
+
+                        <tr>
+
+                            <td class="veh-1">@count</td>
+                            <td class="veh-2">@item.GrnNo</td>
+                            <td class="veh-3">@item.PoNO</td>
+                            <td class="veh-4">@item.DC_No</td>
+                            <td class="veh-5">@item.GateEntryNo</td>
+                            <td class="veh-6">@item.GrnDate</td>
+                            <td class="veh-7">@item.INVoiceNo</td>
+                            <td class="veh-8">@item.INVoiceDate</td>
+                            <td class="veh-1 edit-del-wrap">
+                                @{
+                                    bool Edit = false; bool Delete = false;
+                                    foreach (var items in PermissionModel)
+                                    {
+                                        if (items.PermissionDesc == "Edit")
+                                        {
+                                            Edit = true;
+                                        }
+                                        if (items.PermissionDesc == "GridDelete")
+                                        {
+                                            Delete = true;
+                                        }
+                                    }
+                                    if (Edit == true)
+                                    {
+                                        <a href="javascript:void(0)" onclick="Edit('@item.GrnID')" class="watchlist-edit" title="Edit"></a>
+                                    }
+                                    else
+                                    {
+                                        <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-edit" title="Edit"></a>
+                                    }
+                                    if (Delete == true)
+                                    {
+                                        <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.GrnID')" class="watchlist-delete" title="Delete"></a>
+                                    }
+                                    else
+                                    {
+                                        <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-delete" title="Delete"></a>
+                                    }
+                                }
+
+                            </td>
+                        </tr>
+                                        count++;
+                                    }
+                </tbody>
+                <tfoot class="footer-pager">
+                    <tr>
+                        <td colspan="4">
+                            <div id="pager">
+                                <form>
+                                    <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                    <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                    <input type="text" class="pagedisplay" />
+                                    <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                    <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                    <select class="pagesize">
+                                        <option selected="selected" value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="40">40</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+                                    }
+        </table>
+        @if (Model.GRNDetailsModelList != null && Model.GRNDetailsModelList.Count == 0)
+        {
+            <div class="noRecordsFound" style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+        }
+    </div>
+    <div id="EditColorPartial" style="display:none;">
+        @Html.Partial("~/Views/Stock/GRN/Partial/GoodReceipeDetailsNew.cshtml", Model)
+    </div>
+
+</div>
+<script>
+
+    function Add() {
+        $('.veh-tablecont').hide();
+        $('#empTable').hide();
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetDetails", "GRN_DetailNew")',
+            data: { GrnID: 0 },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+                if ($('#GrnType option:selected').text() == "Please Select") {
+                    $("#PoNumber").show();
+                    $("#AutomaticPonumber").hide();
+                    $("#AutomaticPONumber").hide();
+                    $("#Pono_").show();
+                    $("#AutomaticPono_").hide();
+                }
+            }
+        });
+    }
+    function Cancel() {
+        location.reload();
+    }
+</script>

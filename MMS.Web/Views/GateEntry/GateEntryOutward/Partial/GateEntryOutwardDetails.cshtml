@@ -1,0 +1,1217 @@
+﻿@model MMS.Web.Models.GateEntryModel.GateEntryOutward
+
+@using MMS.Core.Entities
+@{
+
+}
+<script>
+    $.noConflict();
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $('.groupOfTexbox').keypress(function (event) {
+            return isNumber(event, this)
+        });
+    });
+    $(function () {
+        $("#InvoiceDate").datepicker({ dateFormat: "dd/mm/yy", maxDate: new Date() });
+        $("#DcDate").datepicker({ dateFormat: "dd/mm/yy", maxDate: new Date() });
+        $("#StoresRefDate").datepicker({ dateFormat: "dd/mm/yy", maxDate: new Date() });
+    });
+    function isNumber(evt, element) {
+
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (
+            (charCode != 45 || $(element).val().indexOf('-') != -1) &&      // “-” CHECK MINUS, AND ONLY ONE.
+            (charCode != 46 || $(element).val().indexOf('.') != -1) &&      // “.” CHECK DOT, AND ONLY ONE.
+            (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+</script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<link href="~/Scripts/EasyAutocomplete-1.3.5/comboStyles.css" rel="stylesheet" />
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/ComboBox.js"></script>
+
+<div class="right-form-section clearfix">
+    <form class="form-inline" role="form">
+
+        <div class="tab-content">
+            <div id="step1" class="tab-pane fade in active">
+                <div class="container-fluid">
+                    <div class="row" style="padding-left:30%;">
+                        <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                        @Html.DropDownListFor(m => m.OutwardMaterialType, MMS.Web.ExtensionMethod.HtmlHelper.GateEntryInwardMaterials(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="padding-left:30%;">
+                        <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div id="btnRadio">
+                                        @if (Model.IsNewOutward == true)
+                                        {
+                                            @Html.RadioButtonFor(model => model.IsNewOutward, true, new { id = "IsNewOutward" })
+                                            @Html.Label("IsNewOutward", "New Outward")
+                                        }
+                                        else
+                                        {
+                                            @Html.RadioButtonFor(model => model.IsNewOutward, "", new { id = "IsNewOutward" })
+                                            @Html.Label("IsNewOutward", "New Outward")
+                                        }
+                                        @if (Model.IsJobWork == true)
+                                        {
+                                            @Html.RadioButtonFor(model => model.IsJobWork, true, new { id = "IsJobWork" })
+                                            @Html.Label("IsJobWork", "JobWork")
+                                        }
+                                        else
+                                        {
+                                            @Html.RadioButtonFor(model => model.IsJobWork, "", new { id = "IsJobWork" })
+                                            @Html.Label("IsJobWork", "JobWork")
+                                        }
+                                        @if (Model.IsSales == true)
+                                        {
+                                            @Html.RadioButtonFor(model => model.IsSales, true, new { id = "IsSales" })
+                                            @Html.Label("IsSales", "Sales")
+                                        }
+                                        else
+                                        {
+                                            @Html.RadioButtonFor(model => model.IsSales, "", new { id = "IsSales" })
+                                            @Html.Label("IsSales", "Sales")
+                                        }
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-xs-12">
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12" id="StoresRefNo1">
+                                            <label for="text" class="form-label">Stores Ref No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @if (Model.IsNewOutward == true)
+                                            {
+                                                @Html.TextBoxFor(m => m.StoresRefNo, new { @class = "form-control text-field", @Disabled = "true" })
+                                            }
+                                            else if (Model.IsJobWork == true || Model.IsSales == true)
+                                            {
+                                                @Html.TextBoxFor(m => m.StoresRefNo, new { @class = "form-control text-field" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.StoresRefNo, new { @class = "form-control text-field" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Gate Entry No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.HiddenFor(m => m.GateEntryOutwardId)
+                                            @Html.TextBoxFor(m => m.GateEntryNo, new { @class = "form-control text-field", @readonly = "true" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Store Name</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.StoresName, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Return Type</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @if ((Model.IsJobWork == true))
+                                            {
+                                                @Html.DropDownListFor(m => m.ReturnType, new List<SelectListItem>
+
+                                            {
+                                        new SelectListItem{ Text="Please Select", Value = "0"  },
+                                         new SelectListItem{ Text="Returnable", Value = "1" },
+                                         new SelectListItem{ Text="Non-Returnable", Value = "2" }
+
+                                         }, new { @class = "select-style text-field", @Disabled = "true" })
+                                            }
+                                            else if ((Model.IsNewOutward == true) || (Model.IsSales == true))
+                                            {
+                                                @Html.DropDownListFor(m => m.ReturnType, new List<SelectListItem>
+
+                                            {
+                                        new SelectListItem{ Text="Please Select", Value = "0"  },
+                                         new SelectListItem{ Text="Returnable", Value = "1" },
+                                         new SelectListItem{ Text="Non-Returnable", Value = "2" }
+
+                                         }, new { @class = "select-style text-field", @Disabled = "false" })
+                                            }
+                                            else
+                                            {
+                                                @Html.DropDownListFor(m => m.ReturnType, new List<SelectListItem>
+
+                                            {
+                                        new SelectListItem{ Text="Please Select", Value = "0"  },
+                                         new SelectListItem{ Text="Returnable", Value = "1" },
+                                         new SelectListItem{ Text="Non-Returnable", Value = "2" }
+
+                                         }, new { @class = "select-style text-field" })
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Dc No / date</label>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-6" style="padding-right:3px;">
+
+                                            @Html.TextBoxFor(m => m.DcNo, new { @class = "form-control text-field" })
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6" style="padding-left:0px;">
+                                            @if ((Model != null) && (Model.GateEntryOutwardId != 0) && (Model.DcDate != null))
+                                            {
+                                                var from = !string.IsNullOrEmpty(Model.DcDate) ? Convert.ToDateTime(Model.DcDate).Date.ToString("dd/MM/yyyy") : "";
+                                                @Html.TextBoxFor(m => from, new { @class = "form-control text-field", @id = "DcDate", @value = from })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.DcDate, new { @class = "form-control text-field" })
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Mode of Transport</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @Html.DropDownListFor(m => m.ModeofTransport, MMS.Web.ExtensionMethod.HtmlHelper.ModeofTransportGEDoc(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Vehicle No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @if (Model.ModeofTransport == "3")
+                                            {
+                                                @Html.TextBoxFor(m => m.VehicleNo, new { @class = "form-control text-field", @Disabled = "true" })
+                                            }
+                                            else if ((Model.ModeofTransport == "1") || (Model.ModeofTransport == "2"))
+                                            {
+                                                @Html.TextBoxFor(m => m.VehicleNo, new { @class = "form-control text-field" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.VehicleNo, new { @class = "form-control text-field" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                              
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Supplier Name</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @Html.DropDownListFor(m => m.SupplierId, MMS.Web.ExtensionMethod.HtmlHelper.SupplierName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Date</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @if ((Model != null) && (Model.GateEntryOutwardId != 0) && (Model.StoresRefDate != null))
+                                            {
+                                                var from = Model.StoresRefDate.Value.ToString("dd/MM/yyyy HH:mm:ss");
+                                                @Html.TextBoxFor(m => from, new { @class = "form-control text-field", @id = "StoresRefDate", @value = from })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.StoresRefDate, new { @class = "form-control text-field" })
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Entry Date Time</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @if (Model != null && Model.GateEntryOutwardId != 0 && Model.OutwardEntryDateTime != null)
+                                            {
+                                                var from = Model.OutwardEntryDateTime.Value.ToString("dd/MM/yyyy HH:mm:ss");
+                                                @Html.TextBoxFor(m => from, new { @class = "form-control text-field", @id = "OutwardEntryDateTime", @value = from, @readonly = "true" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.EntryDate, new { @Value = System.DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), @class = "form-control text-field", @readonly = "true" })
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Unit / Division</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @Html.DropDownListFor(m => m.UnitDivision, MMS.Web.ExtensionMethod.HtmlHelper.UnitDivision(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Material Type</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.MaterialType, new List<SelectListItem>
+
+                                            {
+                                        new SelectListItem{ Text="Please Select", Value = "0"  },
+                                         new SelectListItem{ Text="Local Import", Value = "1" },
+                                         new SelectListItem{ Text="Direct Import", Value = "2" },
+                                         new SelectListItem{ Text="Customer Import", Value = "3" },
+
+                                         }, new { @class = "select-style text-field" })
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Our Invoice No / date</label>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-6" style="padding-right:3px;">
+
+                                            @Html.TextBoxFor(m => m.InvoiceNo, new { @class = "form-control text-field" })
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6" style="padding-left:0px;">
+                                            @if ((Model != null) && (Model.GateEntryOutwardId != 0) && (Model.InvoiceDate != null))
+                                            {
+                                                var from = Model.InvoiceDate.Value.ToString("dd/MM/yyyy HH:mm:ss");
+                                                @Html.TextBoxFor(m => from, new { @class = "form-control text-field", @id = "InvoiceDate", @value = from })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.InvoiceDate, new { @class = "form-control text-field" })
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Our Invoice Value</label>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-6" style="padding-right:3px;">
+
+                                            @Html.DropDownListFor(m => m.InvoiceCurrency, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "select-style text-field" })
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6" style="padding-left:0px;">
+
+                                            @Html.TextBoxFor(m => m.InvoiceValue, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Place of supply</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @Html.TextBoxFor(m => m.PlaceOfSupply, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section" id="autoshow">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Person Name</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.PersonName, new { @class = "form-control text-field" })
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label id="Pc" for="text" class="form-label">PCs</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @Html.TextBoxFor(m => m.Pcs, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                              
+                                <div class="field-section">
+
+                                    @if (Model.OutwardMaterialType == 2 || Model.OutwardMaterialType == 1)
+                                    {
+
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <div id="lblMaterialName">
+                                                    <label for="text" class="form-label">Material</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(m => m.MaterialName, new { @class = "form-control text-field" })
+                                            </div>
+
+                                        </div>
+
+                                    }
+                                    else if (Model.OutwardMaterialType == 3 || Model.OutwardMaterialType == 4 || Model.OutwardMaterialType == 5)
+                                    {
+
+                                    }
+                                    else
+                                    {
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <div id="lblMaterialName">
+                                                    <label for="text" class="form-label">Material</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(m => m.MaterialName, new { @class = "form-control text-field" })
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        @if (Model.IsJobWork == true)
+                                        {
+
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Po No / JW Contract</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                <div id="PoNoAutoComplete">
+                                                    @Html.DropDownListFor(m => m.PoNoId, MMS.Web.ExtensionMethod.HtmlHelper.GetPONO(), new { @class = "select-style text-field" })
+                                                </div>
+                                            </div>
+
+                                        }
+                                        else
+                                        {
+                                            <div id="shwPoNoId">
+                                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                    <label for="text" class="form-label">Po No / JW Contract</label>
+                                                </div>
+                                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                    <div id="PoNoAutoComplete">
+                                                        @Html.DropDownListFor(m => m.PoNoId, MMS.Web.ExtensionMethod.HtmlHelper.GetPONO(), new { @class = "select-style text-field" })
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        }
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-xs-8 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                                            <label for="text" class="form-label">Purpose</label>
+                                        </div>
+                                        <div class="col-md-9 col-sm-9 col-lg-9 col-xs-12 no-padding">
+
+                                            @Html.TextBoxFor(m => m.Purpose, new { @class = "form-control text-field",@style= "position: relative;left: -13px; " })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12">
+                            <div class="col-md-8 col-sm-8 col-lg-8 col-xs-12 no-padding">
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                                            <label for="text" class="form-label">Material Name</label>
+                                        </div>
+                                        <div class="col-md-9 col-sm-9 col-lg-9 col-xs-12 material_select no-padding">
+                                            <div id="MaterialNameAutoComplete">
+                                                @Html.DropDownListFor(m => m.MaterialNameId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12"></div>
+
+                        </div>
+
+                        <div class="col-xs-12">
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Size Range</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div id="SizeRangeAutoComplete">
+                                                @Html.DropDownListFor(m => m.SizeRangeId, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">HSN Code</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @Html.TextBoxFor(m => m.HSNCode, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Transport Company</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @Html.TextBoxFor(m => m.TransportCompany, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Vehicle Arranged By</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @Html.TextBoxFor(m => m.VehicleArrangedBy, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Prepared By</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div id="PreparedByAutoComplete">
+                                                @Html.DropDownListFor(m => m.PreparedBy, MMS.Web.ExtensionMethod.HtmlHelper.GateEntryEmpNameWithCode(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Approved By</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div id="ApprovedByAutoComplete">
+                                                @Html.DropDownListFor(m => m.ApprovedBy, MMS.Web.ExtensionMethod.HtmlHelper.GateEntryEmpNameWithCode(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Remarks</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Total</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.Total, new { @class = "form-control text-field", @readonly = "true" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">GST</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.GST, new { @class = "form-control text-field groupOfTexbox" })
+                                        </div>
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">GST Amount</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.GSTAmount, new { @class = "form-control text-field groupOfTexbox" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Pending Quantity</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @Html.TextBoxFor(m => m.PendingQuantity, new { @class = "form-control text-field groupOfTexbox" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">UoM/Quantity</label>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-6">
+                                            <div id="UomAutoComplete">
+                                                @Html.DropDownListFor(m => m.UomId, MMS.Web.ExtensionMethod.HtmlHelper.LongUnitName(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6 uom_qut_sec">
+                                            @Html.TextBoxFor(m => m.TotalQty, new { @class = "form-control text-field groupOfTexbox" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Rate</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.Rate, new { @class = "form-control text-field groupOfTexbox" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Value</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.Value, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Grand Total</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.GrandTotal, new { @class = "form-control text-field groupOfTexbox" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Acknowledged By</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div id="AcknowledgedByAutoComplete">
+                                                @Html.DropDownListFor(m => m.SupplierAcknowledgedBy, MMS.Web.ExtensionMethod.HtmlHelper.GateEntryEmpNameWithCode(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12" style="padding:0;">
+                            <table class="table" id="sizeRangeTable" style="width:100%">
+                                <tbody>
+                                    @if (Model.sizeRangeDetailslist == null)
+                                            {
+                                        <tr>
+                                            <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">Size</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">Qty</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;"></td>
+                                        </tr>
+
+                                    }
+                                    @if (Model.sizeRangeDetailslist != null && Model.sizeRangeDetailslist.Count > 0)
+                                            {
+                                                var count1 = 1;
+                                        <tr>
+                                            @if (Model.sizeRangeDetailslist != null)
+                                            {
+                                                <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 70px !important; float: left;">Size</td>
+                                                foreach (var item in Model.sizeRangeDetailslist)
+                                                    {
+                                                    <td class="SizeRangeRefValue">@item.Size</td>
+                                                    count1++;
+                                                }
+                                            }
+                                        </tr>
+                                        <tr>
+                                            @if (Model.sizeRangeDetailslist != null)
+                                            {
+                                                <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;padding-top: 1px; width: 80px !important; float: left;">Qty</td>
+                                                foreach (var item in Model.sizeRangeDetailslist)
+                                                {
+                                                    <td><input type="text" class="quantity" id="qtyId@(count1)" value="@item.Quantity" style='width:80px;' onchange="changeQty()" /></td>
+                                                    count1++;
+                                                }
+                                            }
+                                        </tr>
+                                        <tr>
+                                            @if (Model.sizeRangeDetailslist != null)
+                                            {
+                                                <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 70px !important; float: left;"></td>
+                                                foreach (var item in Model.sizeRangeDetailslist)
+                                                {
+                                                    <td class="SizeQtyRateId">@item.OutwardMaterialSizeQtyRateId</td>
+                                                    count1++;
+                                                }
+                                            }
+                                        </tr>
+
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12" id="DisplayGridViewEdit" style="text-align:left;margin-top:10px;margin-left: 45%!important;">
+                            <input type="button" class="btn btn-default btn-style" onclick="ADDNew()" style="cursor: pointer;" title="Add" value="Add">
+                            <input type="button" class="btn btn-default btn-style" onclick="Cancel()" style="cursor: pointer;" title="Back" value="Back">
+
+                            @if (Model != null && Model.GateEntryOutwardId != 0)
+                                            {
+
+                                <input type="button" class="btn btn-default btn-style" onclick="Update()" style="cursor: pointer;" id="GateEntryOutwardId" title="Update" value="Update">
+                                @Html.HiddenFor(m => m.GateEntryNo)
+                                <input type="button" class="btn btn-default btn-style" onclick="Print()" style="cursor: pointer;" id="OutwardPrint" title="Print" value="Print">
+                            }
+                            else
+                            {
+                                <input type="button" class="btn btn-default btn-style" onclick="Save()" style="cursor: pointer;" title="Save" value="Save">
+                            }
+
+                        </div>
+
+                        <div class="col-lg-12 col-sm-12 col-xs-12" id="DisplayGridViewEdit_" style="text-align:left;margin-top:10px;margin-left: 45%!important;">
+                            <input type="button" class="btn btn-default btn-style" onclick="Cancel()" style="cursor: pointer;" title="Back" value="Back">
+                            <input type="button" class="btn btn-default btn-style" onclick="Update()" style="cursor: pointer;" id="ApprovedPriceID" title="Update" value="Update">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    @*Load Sub Grid - Multiple Entry*@
+                    <div class="row">
+                        <div class="field-section">
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+
+                                <div class="table-responsive table-td-padding parent-table-height">
+                                    <table class="table" id="Outward-SubGrid">
+                                        <thead>
+                                            <tr>
+                                                <td>MaterialName</td>
+                                                <td>HSNCode </td>
+                                                <td>Uom</td>
+                                                <td>SizeRangeDetails</td>
+                                                <td>PendingQuantity</td>
+                                                <td>Quantity</td>
+                                                <td>Piecies</td>
+                                                <td class="veh-9">
+                                                    Edit/Delete
+                                                </td>
+
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            @{
+                                                if (Model.GEOutwardGrid == null)
+                                                {
+
+                                                }
+                                                else
+                                                {
+                                                    int count = 1;
+                                                    foreach (var materialGRid in Model.GEOutwardGrid)
+                                                    {
+                                                        <tr>
+                                                            <td class="veh-3">@materialGRid.MaterialName</td>
+                                                            <td class="veh-3">@materialGRid.HSNCode</td>
+                                                            <td class="veh-3">@materialGRid.UnitName</td>
+                                                            <td class="veh-3">@materialGRid.SizeRangeDetails</td>
+                                                            <td class="veh-3">@materialGRid.PendingQuantity</td>
+                                                            <td class="veh-3">@materialGRid.TotalQty</td>
+                                                            <td class="veh-3">@materialGRid.Piecies</td>
+
+                                                            <td class="veh-1 edit-del-wrap">
+                                                                @{
+
+                                                                    <a href="javascript:void(0)" onclick="Edit_Material('@materialGRid.GateEntryOutwardId')" class="watchlist-edit" title="Edit"></a>
+                                                                }
+                                                                <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@materialGRid.GateEntryOutwardId')" class="watchlist-delete" title="Delete"></a>
+
+                                                            </td>
+                                                        </tr>
+                                                                            count++;
+                                                                        }
+                                                                    }
+                                            }
+                                        </tbody>
+
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+
+    })
+
+    $('#DisplayGridViewEdit_').hide();
+    $("#SupplierId").combobox();
+    $("#PoNoId").combobox();
+    $("#PersonId").combobox();
+
+    $("#PreparedBy").combobox();
+    $("#ApprovedBy").combobox();
+    $("#UomId").combobox();
+    $("#SupplierAcknowledgedBy").combobox();
+    $("#SizeRangeId").combobox();
+
+    $('#StoresName').change(function () {
+        if (($("#MaterialNameId").val() == "0") || ($("#MaterialNameId").val() == "")) {
+            alert("Please select Material");
+            $('#StoresName').val("");
+            return false;
+        }
+    });
+
+    $("#MaterialNameId").combobox({
+        select: function (event, ui) {
+            var id = $('#MaterialNameId').val();
+            var MaterialTextName = $("#MaterialNameId option:selected").text();
+            $.ajax({
+                url: '/GateEntryOutward/GetDetailsByMaterialName',
+                type: "GET",
+                dataType: "JSON",
+                data: {
+                    MaterialNameId: $('#MaterialNameId').val()
+                },
+                success: function (data) {
+
+                    var len = parseInt(data.SizeRange.length);
+                    if (len != 0) {
+                        var count1 = 1;
+                        for (var i = 0; i <= data.SizeRange.length - 1; i++) {
+                            $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + data.SizeRange[i].SizeRange + ' </td> ');
+                            $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='Quantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeQty()' class='Quantity gridQTy' id='Quantity'  value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                            $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='SizeQtyRateId' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='hidden' class='SizeQTy' value='' style='padding-bottom:0;padding-top: 0;width: 34px;' /></td>");
+                            count1++;
+                        }
+                    }
+                    else {
+                        $('.SizeRangeRefValue').hide();
+                        $('.Quantity').hide();
+                        $('.SizeQtyRateId').hide();
+
+                    }
+                    /* For append Rate*/
+                    var mlen = parseInt(data.Material.length);
+                    console.log(mlen);
+                    if (mlen != 0) {
+                        if (data.Material[0].PriceRs == null) {
+                            data.Material[0].PriceRs = 0;
+                        }
+                        var mnm = data.Material[0].PriceRs;
+                        $('#Rate').val(mnm);
+                        console.log(mnm);
+
+                    }
+                    else {
+                        $('#Rate').val('');
+                    }
+
+                    if (data.Material[0].CategoryName == "Leathers") {
+                        $('#Pcs').show();
+                        $('#Pc').show();
+                    }
+                    else {
+                        $('#Pcs').hide();
+                        $('#Pc').hide();
+                    }
+                    // clear before appending new list
+                    $("#StoresId").html("");
+                    $("#SizeRangeId").html("");
+                    $("#UomId").html("");
+                    var mn = data.Material;
+                    console.log(mn);
+                    $.each(mn, function (i, city) {
+                        $("#SizeRangeId").append(
+                           $('<option></option>').val(city.SizeRangeDetailsId).html(city.SizeRangeName));
+                        $("#UomId").append(
+                          $('<option></option>').val(city.UomMasterId).html(city.LongUnitName));
+                    });
+                    if (data.Material[0].PendingQuantity == null || data.Material[0].PendingQuantity == "") {
+                        $("#PendingQuantity").val("0");
+                    }
+                    else {
+                        $("#PendingQuantity").val(data.Material[0].PendingQuantity);
+                    }
+                    if (data.Material[0].StoreMasterId != 0) {
+                        $("#StoresName").html("");
+                        $('#StoresName').append('<option value="" selected="selected">Please Select</option>');
+                        $.each(mn, function (i, city) {
+                            $("#StoresName").append(
+                     $('<option></option>').val(city.StoreMasterId).html(city.StoreName));
+                        });
+                    }
+                }
+
+            });
+        }
+    });
+
+    function changeQty() {
+
+        var totalQty = 0;
+        $('#sizeRangeTable tbody tr').find('.gridQTy').each(function () {
+            totalQty += parseFloat($(this).val());
+        });
+        $('#Total').val('');
+        $('#Total').val(totalQty);
+
+    }
+
+    $('tbody').on('click', '.watchlist-edit', function () {
+        $(this).closest('td').find('.watchlist-edit').hide();
+        $(this).closest('td').find('.watchlist-delete').hide();
+    });
+
+    function Edit_Material(arg) {
+        var GateEntryNo = parseInt($("#GateEntryNo").val());
+        $('#TotalQty').prop('readonly', false);
+        $('#sizeRangeTable tbody tr').html("");
+
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("GateEntryOutwardDetailsEdit", "GateEntryOutward")',
+            data: { GateEntryOutwardId: arg },
+            success: function (data) {
+                var CategoryName = data.CategoryName;
+                var NewOutward1 = data.NewOutward;
+                if (CategoryName == "Leathers") {
+                    $('#Pcs').show();
+                    $('#Pc').show();
+                }
+                else {
+                    $('#Pcs').hide();
+                    $('#Pc').hide();
+                }
+                $('#DisplayGridViewEdit').hide();
+                $('#DisplayGridViewEdit_').show();
+                $('#GateEntryOutwardId').val(data.ViewModel.GateEntryOutwardId);
+                $('#SupplierId').val(data.ViewModel.SupplierId);
+                $('#SupplierId').combobox('destroy');
+                $('#SupplierId').combobox();
+                $('#PoNoId').val(data.ViewModel.PoNoId);
+                $('#PoNoId').combobox('destroy');
+                $('#PoNoId').combobox();
+                $('#MaterialNameId').val(data.ViewModel.MaterialNameId);
+                $('#MaterialNameId').combobox('destroy');
+                $('#MaterialNameId').combobox();
+                $('#UomId').val(data.ViewModel.UomId);
+                $('#UomId').combobox('destroy');
+                $('#UomId').combobox();
+                $('#SizeRangeId').val(data.ViewModel.SizeRangeId);
+                $('#SizeRangeId').combobox('destroy');
+                $('#SizeRangeId').combobox();
+                $('#HSNCode').val(data.ViewModel.HSNCode),
+                $('#Pcs').val(data.ViewModel.Pcs),
+                $('#PreparedBy').val(data.ViewModel.PreparedBy),
+                $('#ApprovedBy').val(data.ViewModel.ApprovedBy),
+                $('#SupplierAcknowledgedBy').val(data.ViewModel.SupplierAcknowledgedBy),
+                $('#Remarks').val(data.ViewModel.Remarks),
+                $('#GateEntryNo').val(data.ViewModel.GateEntryNo),
+                $('#StoresRefNo').val(data.ViewModel.StoresRefNo),
+                $('#StoresName').val(data.ViewModel.StoresName),
+                $('#DcNo').val(data.ViewModel.DcNo),
+                $('#UnitDivision').val(data.ViewModel.UnitDivision),
+                $('#ReturnType').val(data.ViewModel.ReturnType),
+                $('#InvoiceNo').val(data.ViewModel.InvoiceNo),
+                $('#ModeofTransport').val(data.ViewModel.ModeofTransport),
+                 $('#InvoiceCurrency').val(data.ViewModel.InvoiceCurrency),
+                 $('#InvoiceValue').val(data.ViewModel.InvoiceValue),
+                 $('#VehicleNo').val(data.ViewModel.VehicleNo),
+                 $('#PendingQuantity').val(data.ViewModel.PendingQuantity);
+                $('#ModeofTransport').val(data.ViewModel.ModeofTransport),
+                $('#PersonName').val(data.ViewModel.PersonName),
+                $('#IsEmployee').val(data.ViewModel.IsEmployee),
+                $('#PersonId').val(data.ViewModel.PersonId),
+                $('#MaterialName').val(data.ViewModel.MaterialName),
+                $('#TotalQty').val(data.ViewModel.TotalQty),
+                $('#Rate').val(data.ViewModel.Rate),
+                $('#Value').val(data.ViewModel.Value),
+                $('#Total').val(data.ViewModel.Total),
+                $('#TransportCompany').val(data.ViewModel.TransportCompany),
+                $('#Purpose').val(data.ViewModel.Purpose),
+                $('#VehicleArrangedBy').val(data.ViewModel.VehicleArrangedBy)
+
+                var len = parseInt(data.SizeRange.length);
+
+                if (len != 0) {
+                    var count1 = 1;
+
+                    $('#sizeRangeTable tbody tr:first-child').append('<td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">Size</td>')
+                    $('#sizeRangeTable tbody tr:nth-child(2)').append('  <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">Qty</td>')
+                    $('#sizeRangeTable tbody tr:nth-child(3)').append('<td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;"></td>')
+                    for (var i = 0; i <= data.SizeRange.length - 1; i++) {
+
+                        $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + data.SizeRange[i].Size + ' </td> ');
+                        $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='Quantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeQty()' class='Quantity gridQTy' id='Quantity' style='padding-bottom: 0;padding-top: 0;width: 34px;'value='" + data.SizeRange[i].Quantity + "' /> </td>");
+                        $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='SizeQtyRateId' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='hidden' class='SizeQTy' style='padding-bottom: 0;padding-top: 0;width: 34px;'value='" + data.SizeRange[i].OutwardMaterialSizeQtyRateId + "' /></td>");
+                        count1++;
+                    }
+                }
+                else {
+                    $('.SizeRangeRefValue').hide();
+                    $('.Quantity').hide();
+                    $('.SizeQtyRateId').hide();
+
+                }
+            }
+        });
+    }
+
+
+</script>
+
+<script type="text/javascript">
+
+
+    $('#IsNewOutward').click(function () {
+        $('#StoresRefNo').prop('disabled', true);
+        $('#ReturnType').val('0');
+        $('#IsJobWork').prop('checked', false);
+        $('#IsSales').prop('checked', false);
+        $('#ReturnType').prop('disabled', false);
+        $('#shwPoNoId').hide();
+
+    });
+
+    $('#IsJobWork').click(function () {
+        $('#IsNewOutward').prop('checked', false);
+        $('#IsSales').prop('checked', false);
+        $('#StoresRefNo').prop('disabled', false);
+        $('#ReturnType').val('1');
+        $('#ReturnType').prop('disabled', true);
+        $('#shwPoNoId').show();
+
+    });
+    //$('#IsDocuments').click(function () {
+    //    $('#IsJobWork').prop('checked', false);
+    //    $('#IsNewOutward').prop('checked', false);
+    //    $('#IsSales').prop('checked', false);
+    //    $('#StoresRefNo').prop('disabled', false);
+    //    $('#ReturnType').val('0');
+    //    $('#ReturnType').prop('disabled', false);
+    //    $('#shwPoNoId').hide();
+    //});
+    $('#IsSales').click(function () {
+        $('#IsJobWork').prop('checked', false);
+        $('#IsNewOutward').prop('checked', false);
+        $('#StoresRefNo').prop('disabled', false);
+        $('#ReturnType').val('0');
+        $('#ReturnType').prop('disabled', false);
+        $('#shwPoNoId').hide();
+    });
+    $("#GST").on("change", function () {
+        var gstAmount = 0;
+        var grandTotal = 0;
+        var totalQty = 0;
+        var value = 0;
+        value = $("#Value").val();
+        var gst = $(this).val();
+        totalQty = $("#TotalQty").val();
+        gstAmount = (parseFloat(gst) / 100) * parseFloat(value);
+        $("#GSTAmount").val(gstAmount.toFixed(2));
+        grandTotal = parseFloat(value) + parseFloat(gstAmount);
+        $("#GrandTotal").val(grandTotal.toFixed(2));
+    });
+    $('#ModeofTransport').on("change", function () {
+        var v = $("#ModeofTransport option:selected").text();
+
+        if (v == "In person") {
+            $('#VehicleNo').prop('disabled', true);
+        }
+        else {
+            $('#VehicleNo').prop('disabled', false);
+        }
+    });
+
+    $('input[type="checkbox"]').click(function () {
+
+        if ($(this).is(":checked")) {
+
+            $('#dropperson').show();
+            $('#txtperson').hide();
+        }
+        else {
+            $('#dropperson').hide();
+            $('#txtperson').show();
+        }
+    });
+    var p = $('#IsNewOutward').is(':checked')
+    var r = $('#IsSales').is(':checked')
+    var t = $('#IsJobwork').is(':checked')
+    if (p == false || r == false || t == false) {
+        $('#shwPoNoId').hide();
+
+    }
+    else if (t == true) {
+        $('#shwPoNoId').show();
+    }
+
+
+
+    if ($('#OutwardMaterialType').text()) {
+        var a = ($(this).text == "Please Select");
+        {
+            $('#MaterialName').hide();
+            $('#lblMaterialName').hide();
+        }
+    }
+
+    $('#OutwardMaterialType').click(function () {
+        var s = $('#OutwardMaterialType :selected').text();
+        if (s == "Machinery" || s == "Maintenance") {
+            $('#MaterialName').show();
+            $('#lblMaterialName').show();
+        }
+        else {
+            $('#MaterialName').hide();
+            $('#lblMaterialName').hide();
+        }
+    });
+
+    /*Multiplication of Total Quantity and Rate*/
+    $('#TotalQty, #Rate').change(function () {
+        var rate = parseFloat($('#TotalQty').val()) || 0;
+        var box = parseFloat($('#Rate').val()) || 0;
+        $('#Value').val((rate * box).toFixed(2));
+    });
+
+    function ToJavaScriptDate(Outwardtime) {
+        var pattern = /Date\(([^)]+)\)/;
+        var results = pattern.exec(Outwardtime);
+        var dt = new Date(parseFloat(results[1]));
+        return (dt.getDate() + "/" + dt.getMonth() + 1) + "/" + dt.getFullYear() + " " + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+    }
+</script>

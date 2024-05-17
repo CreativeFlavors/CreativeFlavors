@@ -1,0 +1,324 @@
+﻿@model MMS.Web.Models.StockModel.MaterialOpeningModel
+@using MMS.Core.Entities;
+@{
+    MMS.Repository.Managers.MaterialCategoryManager materialCategoryManager = new MMS.Repository.Managers.MaterialCategoryManager();
+    MaterialCategoryMaster materialCategoryMaster = new MaterialCategoryMaster();
+    MMS.Repository.Managers.MaterialGroupManager materialGroupManager = new MMS.Repository.Managers.MaterialGroupManager();
+    materialgroupmaster materialGroupMaster_ = new materialgroupmaster();
+    MMS.Repository.Managers.ColorManager colorManager = new MMS.Repository.Managers.ColorManager();
+    ColorMaster colorMaster = new ColorMaster();
+    MMS.Repository.Managers.UOMManager uOMManager = new MMS.Repository.Managers.UOMManager();
+    UomMaster uomMaster = new UomMaster();
+    MMS.Repository.Managers.MaterialManager materialManager = new MMS.Repository.Managers.MaterialManager();
+    tbl_materialnamemaster materialMaster = new tbl_materialnamemaster();
+    MMS.Repository.Managers.StoreMasterManager storeManager = new MMS.Repository.Managers.StoreMasterManager();
+    StoreMaster storeMaster = new StoreMaster();
+    tbl_PermissionSetting PermissionSettingModel = new MMS.Core.Entities.tbl_PermissionSetting();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<tbl_Permission> PermissionModel = new List<tbl_Permission>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("MaterialOpening", PermissionSettingModel.PermissionID);
+    }
+    MMS.Repository.Managers.MaterialManager materialManager_ = new MMS.Repository.Managers.MaterialManager();
+    MaterialMaster materialMaster_ = new MaterialMaster();
+}
+
+@{
+    bool Add = false; bool Edit = false; bool Delete = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Add")
+        {
+            Add = true;
+        }
+        if (item.PermissionDesc == "Edit")
+        {
+            Edit = true;
+        }
+        if (item.PermissionDesc == "Delete")
+        {
+            Delete = true;
+        }
+    }
+
+}
+
+<div class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+
+        <table class="veh-table" id="empTable">
+            <thead>
+                <tr class="color-code-top-btn">
+                    <td colspan="12">
+                        <input type="text" id="SeaarchID" placeholder="Search.." />
+                        @if (Add == true)
+                        {
+                            <input type="button" value="Add" onclick="Add()">
+                        }
+                        else
+                        {
+                            <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Add">
+                        }
+                        <input type="button" value="Search" onclick="Search()">
+                    </td>
+                </tr>
+                <tr>
+                    <th class="veh-1">
+                        S No
+                    </th>
+                    <th class="veh-1">
+                        Date
+                    </th>
+                    <th class="veh-2">
+                        Store Name
+                    </th>
+                    <th class="veh-3">
+                        Group Name
+                    </th>
+                    <th class="veh-4">
+                        Material Code
+                    </th>
+                    <th class="veh-5">
+                        Material Name
+                    </th>
+                    <th class="veh-6">
+                        Quantity
+                    </th>
+                    
+                    <th class="veh-8">
+                        UOM
+                    </th>
+                    <th class="veh-9">
+                        Rate
+                    </th>
+                    <th class="veh-10">
+                        Value
+                    </th>
+                    <th class="veh-11">
+                        Edit/Delete
+                    </th>
+
+                </tr>
+            </thead>
+            @if (Model.MaterialOpeningMasterList != null && Model.MaterialOpeningMasterList.Count > 0)
+            {
+                int count = 1;
+                string Description = "";
+                string color = "";
+                string code = "";
+                <tbody>
+
+                    @foreach (var MaterialOpeningMaster in Model.MaterialOpeningMasterList)
+                    {
+
+                        int storeID = Convert.ToInt16(MaterialOpeningMaster.Store);
+                        Description = "";
+                        materialCategoryMaster = materialCategoryManager.GetMaterialCategoryMaster(MaterialOpeningMaster.MaterialCategoryMasterId);
+                        materialGroupMaster_ = materialGroupManager.GetmaterialgroupmasterId(MaterialOpeningMaster.MaterialGroupMasterId);
+
+                        uomMaster = uOMManager.GetUomMasterId(MaterialOpeningMaster.PrimaryUomMasterId);
+                        materialMaster_ = materialManager_.GetMaterialMasterId(MaterialOpeningMaster.MaterialMasterId);
+                        if (materialMaster_ != null)
+                        {
+                            colorMaster = colorManager.GetColorMasterID(materialMaster_.ColorMasterId);
+                        }
+                        if (materialMaster_ != null && materialMaster_.MaterialMasterId != 0)
+                        {
+                            materialMaster = materialManager.GetMaterialNameMasterId(materialMaster_.MaterialName.Value);
+                            code = materialMaster.MaterialCode;
+                        }
+                        storeMaster = storeManager.GetStoreMasterId(storeID);
+
+                        if (materialMaster != null)
+                        {
+                            Description = string.Format("{0} {1} {2}", materialMaster.MaterialDescription, materialMaster_!=null? materialMaster_.OptionMaterialValue:"", colorMaster!=null?colorMaster.Color:string.Empty);
+
+                        }
+                        else
+                        {
+                            Description = Description;
+
+
+                        }
+                        if (colorMaster != null)
+                        {
+                            color = colorMaster.Color;
+                        }
+                        decimal dtTotal = (MaterialOpeningMaster.Qty * MaterialOpeningMaster.Rate);
+
+                        <tr>
+                            <td class="veh-1">@count</td>
+                            <td class="veh-1">@Convert.ToDateTime(MaterialOpeningMaster.Date).Date.ToString("dd/MM/yyyy")</td>
+                            <td class="veh-1">@storeMaster.StoreName</td>
+                            <td class="veh-1">@materialGroupMaster_.GroupName</td>                          
+                            <td class="veh-1">@code</td>                          
+                            <td class="veh-1">@Description</td>
+                            <td class="veh-1">@MaterialOpeningMaster.Qty</td>
+                            <td class="veh-1">@uomMaster.ShortUnitName</td>
+                            <td class="veh-1">@MaterialOpeningMaster.Rate</td>
+                            <td class="veh-1">@String.Format("{0:0.00}", dtTotal)</td>
+
+                            <td class="veh-1 edit-del-wrap">
+                                @if (Edit == true)
+                                {
+                                    <a href="javascript:void(0)" onclick="Edit('@MaterialOpeningMaster.MaterialOpeningId')" class="watchlist-edit" title="Edit"></a>
+                                }
+                                else
+                                {
+                                    <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-edit" title="Edit"></a>
+                                }
+                                @if (Delete == true)
+                                {
+                                    <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@MaterialOpeningMaster.MaterialOpeningId')" class="watchlist-delete" title="Delete"></a>
+                                }
+                                else
+                                {
+                                    <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-delete" title="Delete"></a>
+                                }
+                            </td>
+                        </tr>
+                        count++;
+                    }
+
+
+                </tbody>
+                <tfoot class="footer-pager">
+                    <tr>
+                        <td colspan="4">
+                            <div id="pager">
+                                <form>
+                                    <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                    <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                    <input type="text" class="pagedisplay" />
+                                    <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                    <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                    <select class="pagesize">
+                                        <option selected="selected" value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="40">40</option>
+                                    </select>
+                                </form>
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                </tfoot>
+
+            }
+        </table>
+        @if (Model.MaterialOpeningMasterList != null && Model.MaterialOpeningMasterList.Count == 0)
+        {
+            <div class="noRecordsFound" style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+        }
+    </div>
+
+    <div id="EditColorPartial">
+        @Html.Partial("~/Views/Stock/MaterialOpening/Partial/MaterialOpeningMasterDetails.cshtml", Model)
+    </div>
+
+
+</div>
+
+<script>
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    function Search() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Search", "MaterialOpeningStock")',
+            data: { filter: $('#SeaarchID').val() },
+            success: function (data) {
+
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                $('#EditColorPartial').hide();
+                $('#DivShow').hide();
+            }
+        });
+    }
+
+    function Cancel() {
+
+        location.reload();
+    }
+    function Add() {
+        $('.veh-tablecont').hide();
+        $('.loader-overlay').fadeIn('fast');
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("MaterialOpeningMasterDetails", "MaterialOpeningStock")',
+            data: { MaterialOpeningId: 0 },
+            success: function (data) {
+                $('.loader-overlay').fadeOut('fast');
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+                $('#ColorMasterId').attr("disabled", true);
+                $('#PrimaryUomMasterId').attr("disabled", true);
+                $('#SecondaryUomMasterId').attr("disabled", true);
+            }
+        });
+        $("#EditColorPartial").show();
+    }
+    function Edit(arg) {
+        $('.veh-tablecont').hide();
+        $('.loader-overlay').fadeIn('fast');
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("MaterialOpeningMasterDetails", "MaterialOpeningStock")',
+            data: { MaterialOpeningId: arg },
+            success: function (data) {
+                $('.loader-overlay').fadeOut('fast');
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+                $('#ColorMasterId').attr("disabled", true);
+               $('#PrimaryUomMasterId').attr("disabled", true);
+               $('#SecondaryUomMasterId').attr("disabled", true);
+            }
+        });
+        $("#EditColorPartial").show();
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "MaterialOpeningStock")',
+                data: { MaterialOpeningId: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/MaterialOpeningStock/MaterialOpening";
+                        return false;
+                    }
+                    else {
+                        alert('Material Opening Stock Details deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Material Opening Stock Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+
+</script>
+    

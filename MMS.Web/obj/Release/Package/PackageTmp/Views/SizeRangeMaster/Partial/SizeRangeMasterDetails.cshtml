@@ -1,0 +1,253 @@
+﻿@model MMS.Web.Models.SizeRangeMasterModel.SizeRangeMasterModel
+@{
+
+    int count = 0;
+    int count1 = 0;
+    if (Model != null && Model.SizeRangeMasterList != null&&Model.SizeRangeMasterList.Count>0)
+    {
+        Model.SizeRangeMasterList = Model.SizeRangeMasterList.OrderBy(x => x.SizeRangeRefValue).ToList();
+        Model.SizeRangeRef = Model.SizeRangeMasterList.FirstOrDefault().SizeRangeRef;
+    }
+    if (Model != null && Model.SizeRangeMasterList == null)
+    {
+        count = count;
+    }
+    if (Model != null && Model.SizeRangeMasterList != null)
+    {
+        count = Model.SizeRangeMasterList.Count();
+        count1 = Model.SizeRangeMasterList.Count();
+    }
+}
+
+<div class="right-form-section clearfix">
+    <form class="form-inline" role="form">
+
+        <div class="container-fluid" id="Div_ID">
+            <div class="row">
+                <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-padding">
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                                <label class="form-label" for="text">Size Range Ref</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.HiddenFor(x => x.SizeRangeMasterId)
+                                @Html.DropDownListFor(m => m.SizeRangeRef, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "select-style text-field" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                                <label class="form-label" for="text">Size Range Ref Value</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.TextBoxFor(m => m.SizeRangeRefValue, new { @class = "form-control text-field" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="row clearfix">
+            <div class="field-section">
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                    <div class="table-responsive table-td-padding">
+                        <table class="table" id="list-amended-material" style="background-color: #fff !important;">
+                            <thead>
+                            </thead>
+                            <tbody>
+                                @if (Model != null && Model.SizeRangeMasterList != null)
+                                {
+                                    int countSno = 1;
+
+                                    var query = Model.SizeRangeMasterList.OrderBy(x => decimal.Parse(x.SizeRangeRefValue)).ToList();
+                                    <tr>
+                                        <th style="background-color: #ddd; width: 50px !important; float: left;">Sl.No</th>                                       
+                                        @foreach (var items in query)
+                                        {
+                                            <td style="background-color: #ddd; width: 50px !important; float: left;">@countSno</td>
+                                            countSno++;
+                                        }
+
+                                    </tr>
+                                    <tr>
+
+                                        <th style="background-color: #ddd; width: 50px !important; float: left;">Size</th>
+                                       
+                                        @foreach (var items in query)
+                                        {
+                                            <td style="background-color: #ddd; width: 50px !important; float: left;" class="size_value">@items.SizeRangeRefValue</td>
+                                        }
+
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.SizeRangeMasterId == 0 && Model.SizeRangeMasterList == null)
+        {
+            <div class="row clearfix">
+                <div class="field-section">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                        <div class="table-responsive table-td-padding">
+                            <table class="table" id="list-amended-material" style="background-color: #fff !important;">
+                                <thead>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="background-color: #ddd; width: 50px !important; float: left;">Sl.No</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: #ddd; width: 50px !important; float: left;">Size</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="form-footer">
+            <div class="row">
+                <div style="margin: 15px 0px;" class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                    <input type="button" onclick="Cancel()" class="btn btn-default btn-style width-78" title="Back" value="Back">
+                    <input type="button" id="AddButton" class="btn btn-default btn-style width-78" title="AddValue" value="AddValue">
+                    <button class="btn btn-default btn-style width-78" id="Save_btn" type="button">Save</button>
+                    <button class="btn btn-default btn-style width-78" type="submit">Clear</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    var count_ = 0;
+    
+    $('#SizeRangeRefValue').keyup(function () {
+     
+        $('#list-amended-material tbody tr:nth-child(2) td').each(function () {
+            var RangeValue = $('#SizeRangeRefValue').val().trim();
+          
+            if (RangeValue == $(this).text().trim()) {              
+                $('#AddButton').hide();
+                alert("Already added this size!")
+                return false
+            }
+            else {
+                
+                $('#AddButton').show();
+                
+            }
+        });
+    });
+
+    $("#AddButton").on('click', function (e) {
+
+        if ($('#SizeRangeRef').val() == "") {
+            alert("Please Select SizeRangeRef.")
+            $('#SizeRangeRef').css('border-color', 'red');
+            $('#SizeRangeRef').focus();
+            return false;
+        }
+        else {
+            $('#SizeRangeRef').css('border-color', '');
+            $('#SizeRangeRef').focus();
+        }
+        if ($('#SizeRangeRefValue').val() == "") {
+            alert("Please Enter SizeRangeRefValue.")
+            $('#SizeRangeRefValue').css('border-color', 'red');
+            $('#SizeRangeRefValue').focus();
+            return false;
+        }
+        else {
+            $('#SizeRangeRefValue').css('border-color', '');
+            $('#SizeRangeRefValue').focus();
+        }
+        var count_ = $('#list-amended-material tbody tr:nth-child(2) td').length;
+        if ('@count1' != 0)
+        {
+            count_++;
+        }
+        var selctedVal = $("#SizeRangeRef option:selected").val();
+        $('#list-amended-material tbody tr:first-child').append('<td style="background-color: #ddd; width: 50px !important; float: left;"> ' + count_ + ' </td> ');
+        $('#list-amended-material tbody tr:nth-child(2)').append('<td class="size_value" style="background-color: #ddd; width: 50px !important; float: left;" data-range="' + selctedVal + '"> ' + $('#SizeRangeRefValue').val() + '</td> ');
+        $('#SizeRangeRefValue').val("");
+    });
+    $("#Save_btn").on('click', function () {      
+        var addValJs = [];
+
+     
+        $("#list-amended-material tbody tr:nth-child(2) td.size_value").each(function (index) {
+            addValJs.push({
+                SizeRangeRef_: $(this).text(),
+                SizeRangeRefValue_: $(this).attr("data-range")
+            });
+           
+        });
+        console.log(addValJs);
+        var jsonOfLog = JSON.stringify(addValJs);
+         
+        $.ajax({
+            type: 'POST',
+            dataType: 'text',
+            url: "SizeRangeMaster/SizeRangeMaster",
+            data: "jsonOfLog="+jsonOfLog,SizeRangeMasterId:$('#SizeRangeMasterId').val(),
+            success: function (data) {
+                if (data.SizeRangeMasterId != "" || data.SizeRangeMasterId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/SizeRangeMaster/SizeRangeMaster";
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/SizeRangeMaster/SizeRangeMaster";
+                    return false;
+                }
+            },
+            error: function (ex) {
+                alert('This Color Already Exist in the database.');
+            }
+
+        });
+
+
+
+
+    });
+
+
+
+</script>
+
+ 
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<link href="~/Scripts/EasyAutocomplete-1.3.5/comboStyles.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/ComboBox.js"></script>
+<script>
+       $("#SizeRangeRef").combobox();
+</script>

@@ -1,0 +1,328 @@
+﻿@{
+    ViewBag.Title = "JobWorkSimpleMRP";
+    Layout = "~/Views/Shared/_jobLayout.cshtml";
+}
+
+<div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+    <div class="dashboard-content col-xs-12 no-padding">
+        <div class="dashboard_head dashboard-title congest col-lg-12 col-md-12 col-sm-12  col-xs-12">
+            <div class="dashboard-title  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+                <h2>Job Work Simple MRP</h2>
+            </div>
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("JobSimpleMrpList", "JobSimpleMrp")
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+       
+        $('#example').DataTable();
+        $("#JobWorkSimpleMRPPartial").hide();
+    });
+
+    function Calculate() {
+        
+        $('.loader-overlay').show();
+        $('.loader-overlay').fadeIn('fast');
+        var optionValues = [];
+        $('#MoveSelectedIOS option').each(function () {
+            optionValues.push($(this).text());
+        });
+        if (optionValues == "undefined") {
+            $("#SelectedItems").find('#IOS option').each(function () {
+                optionValues.push($(this).val());
+            });
+        }
+        var ParseText = JSON.stringify(optionValues);
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("IOSelectList", "JobSimpleMrp")',
+            data: { SelectText: ParseText, SimpleMRPID: $('#SimpleMRPID').val() },
+            success: function (data) {
+                $('.loader-overlay').fadeOut('fast');
+                $('.loader-overlay').hide();
+
+                if (data.InternalStatus != null) {
+                    alert(data.InternalStatus);
+                    return false;
+                }
+                if (data.BOMStatus != null) {
+                    alert(data.BOMStatus);
+                    return false;
+                }
+                if (data.BOMStatus != null) {
+                    alert(data.BOMStatus);
+                    return false;
+                }
+                if (data.status != null) {
+                    alert(data.status);
+                    return false;
+                }
+                if (data.orderStatus != null) {
+                    alert(data.orderStatus);
+                    return false;
+                }
+                else {
+                    alert("Error not calculated");
+                    return false;
+                }
+
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                //$('#DivShow').hide();
+                $("JobWorkSimpleMRPPartial").hide();
+                location.href = "/JobSimpleMrp/JobSimpleMrp";
+            }
+        });
+    }
+
+    function Save() {
+        if ($('#MRPCode').val() == "") {
+            alert("Please Enter MRPNO Name.")
+            $('#MRPCode').css('border-color', 'red');
+            $('#MRPCode').focus();
+            return false;
+        }
+        else {
+            $('#MRPCode').css('border-color', '');
+        }
+        if ($('#MRPDate').val() == "") {
+            alert("Please Enter MRP Date.")
+            $('#MRPDate').css('border-color', 'red');
+            $('#MRPDate').focus();
+            return false;
+        }
+        else {
+            $('#MRPDate').css('border-color', '');
+        }
+        if ($('#MRPType').val() == "") {
+            alert("Please select MRP Type.")
+            $('#MRPType').css('border-color', 'red');
+            $('#MRPType').focus();
+            return false;
+        }
+        else {
+            $('#MRPType').css('border-color', '');
+        }
+        if ($('#BuyerNameid').val() == "") {
+            alert("Please Select BuyerName.")
+            $('#BuyerNameid').css('border-color', 'red');
+            $('#BuyerNameid').focus();
+            return false;
+        }
+        else {
+            $('#BuyerNameid').css('border-color', '');
+        }
+        if ($('#WeekNO').val() == "") {
+            alert("Please Select Week NO.")
+            $('#WeekNO').css('border-color', 'red');
+            $('#WeekNO').focus();
+            return false;
+        }
+        else {
+            $('#WeekNO').css('border-color', '');
+        }
+        if ($('#SeasonID').val() == "") {
+            alert("Please Select Season name.")
+            $('#SeasonID').css('border-color', 'red');
+            $('#SeasonID').focus();
+            return false;
+        }
+        else {
+            $('#SeasonID').css('border-color', '');
+        }
+        if ($('#LotNO').val() == "" || $('#LotNO').val() == "Please Select") {
+            alert("Please Select Lot NO.")
+            $('#LotNO').css('border-color', 'red');
+            $('#LotNO').focus();
+            return false;
+        }
+        else {
+            $('#LotNO').css('border-color', '');
+        }
+        if ($('#SizeRangeID').val() == "") {
+            alert("Please Select Size Range.")
+            $('#SizeRangeID').css('border-color', 'red');
+            $('#SizeRangeID').focus();
+            return false;
+        }
+        else {
+            $('#SizeRangeID').css('border-color', '');
+        }
+        if ($('#CustomerPlan').val() == "") {
+            alert("Please Select Customer Plan.")
+            $('#CustomerPlan').css('border-color', 'red');
+            $('#CustomerPlan').focus();
+            return false;
+        }
+        else {
+            $('#CustomerPlan').css('border-color', '');
+        }
+        var selecteditems = "";
+        $("#SelectedItems").find('#IOS').each(function () {
+            selecteditems = ($(this).val());
+        });
+        if ($('#dataFile').val() == "" && selecteditems == "") {
+            alert("Please Upload Excel file.")
+            $('#dataFile').css('border-color', 'red');
+            $('#dataFile').focus();
+            return false;
+        }
+        else {
+            $('#dataFile').css('border-color', '');
+        }
+        $('.loader-overlay').show();
+        $('.loader-overlay').fadeIn('fast');
+        $.ajax({
+            type: 'POST',
+            url: '/JobSimpleMrp/SimpleMRPSave',
+            data: {
+                MRPNO: $('#MRPNO').val(),
+                MRPCode: $("#MRPCode").val(),
+                MRPDate: $('#MRPDate').val(),
+                MRPType: $('#MRPType').val(),
+                BuyerNameid: $('#BuyerNameid').val(),
+                WeekNO: $('#WeekNO').val(),
+                SeasonID: $('#SeasonID').val(),
+                LotNO: $('#LotNO').val(),
+                SizeRangeID: $('#SizeRangeID').val(),
+                From: $('#From').val(),
+                TO: $('#TO').val(),
+                CustomerPlan: $('#CustomerPlan').val(),
+                SimpleMRPID: $('#SimpleMRPID').val(),
+                ProductionPlanBasic: $('#ProductionPlanBasic').is(":checked"),
+                OrderBasic: $('#OrderBasic').is(":checked"),
+                JobWork: $('#JobWork').is(":checked"),
+                RejectionorReplacement: $('#RejectionorReplacement').is(":checked"),
+                OverConsumption: $('#OverConsumption').is(":checked"),
+                TotalOrderCount: $("#TotalOrderCount").val()
+            },
+            success: function (data) {
+
+                $('.loader-overlay').fadeOut('fast');
+                $('.loader-overlay').hide();
+                if (data.Status != null) {
+                    alert('Already existed.');
+                    $("#BtnCalculte").hide();
+                    return false;
+                }
+                if (data.UpdatedBy != "" && data.UpdatedBy != null) {
+                    alert('Updated Successfully.');
+                    $("#BtnCalculte").show();
+                    $('#SimpleMRPID').val(data.SimpleMRPID)
+                    return false;
+                }
+                else if (data.CreatedBy != "") {
+                    alert('Saved Successfully.');
+                    $('#SimpleMRPID').val(data.SimpleMRPID)
+                    $("#BtnCalculte").show();
+                }
+                else if (data.SimpleMRPID == 0 && data.SimpleMRPID != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/JobSimpleMrp/JobSimpleMrp";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#SeasonName').val() == "") {
+            alert("Please Enter Season Name.")
+            $('#SeasonName').css('border-color', 'red');
+            $('#SeasonName').focus();
+            return false;
+        }
+        else {
+            $('#SeasonName').css('border-color', '');
+        }
+        if ($('#SpringSummerYear').val() == "") {
+            alert("Please Enter Springs Summer Year.")
+            $('#SpringSummerYear').css('border-color', 'red');
+            $('#SpringSummerYear').focus();
+            return false;
+        }
+        else {
+            $('#SpringSummerYear').css('border-color', '');
+        }
+        if ($('#SpringDescription').val() == "") {
+            alert("Please Enter Spring Description.")
+            $('#SpringDescription').css('border-color', 'red');
+            $('#SpringDescription').focus();
+            return false;
+        }
+        else {
+            $('#SpringDescription').css('border-color', '');
+        }
+        if ($('#PeriodFrom').val() == "") {
+            alert("Please Select Period From.")
+            $('#PeriodFrom').css('border-color', 'red');
+            $('#PeriodFrom').focus();
+            return false;
+        }
+        else {
+            $('#PeriodFrom').css('border-color', '');
+        }
+        if ($('#PeriodTo').val() == "") {
+            alert("Please Select Period To.")
+            $('#PeriodTo').css('border-color', 'red');
+            $('#PeriodTo').focus();
+            return false;
+        }
+        else {
+            $('#PeriodTo').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/SeasonMaster/Update',
+            data: {
+                SeasonName: $('#SeasonName').val(),
+                SpringSummerYear: $('#SpringSummerYear').val(),
+                SpringDescription: $('#SpringDescription').val(),
+                PeriodFrom: $('#PeriodFrom').val(),
+                PeriodTo: $('#PeriodTo').val(),
+
+
+                SeasonMasterId: $('#SeasonMasterId').val()
+            },
+            success: function (data) {
+                if (data.SeasonMasterId != "" || data.SeasonMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/SeasonMaster/SeasonMaster";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/SeasonMaster/SeasonMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+
+</script>

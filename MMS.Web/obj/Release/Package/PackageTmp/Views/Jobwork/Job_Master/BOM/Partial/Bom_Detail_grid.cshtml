@@ -1,0 +1,249 @@
+﻿@model MMS.Web.Models.StockModel.BillOfMaterialModel
+@using MMS.Core.Entities.Stock
+@using MMS.Repository.Managers.StockManager
+@using MMS.Repository.Managers
+@using MMS.Core.Entities
+@using MMS.Web.Models.StockModel
+@{
+    MMS.Repository.Managers.ColorManager colorManager = new MMS.Repository.Managers.ColorManager();
+    ColorMaster colorMaster = new ColorMaster();
+    MaterialManager materialManager = new MaterialManager();
+    MaterialMaster materialMaster = new MaterialMaster();
+    MMS.Repository.Managers.SubstanceMasterManager substanceMasterManager = new MMS.Repository.Managers.SubstanceMasterManager();
+    SubstanceMaster substanceMaster = new SubstanceMaster();
+    MMS.Repository.Managers.SupplierMasterManager supplierMasterManager = new MMS.Repository.Managers.SupplierMasterManager();
+    SupplierMaster supplierMaster = new SupplierMaster();
+    MaterialManager manager = new MaterialManager();
+    if (Model.bomMaterialGridList != null && Model.bomMaterialGridList.Count > 0)
+    {
+        Model.bomMaterialGridList = Model.bomMaterialGridList.Where(x => x.IsDeleted == false).ToList();
+
+        Model.bomMaterialGridList = (from X in Model.bomMaterialGridList
+                                     join Y in manager.Get() on X.MaterialMasterId equals Y.MaterialMasterId
+                                     where X.IsDeleted == false && Y.IsDeleted == false
+                                     select X).ToList();
+
+    }
+
+    tbl_PermissionSetting PermissionSettingModel = new MMS.Core.Entities.tbl_PermissionSetting();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+
+    List<tbl_Permission>
+        PermissionModel = new List<tbl_Permission>
+            ();
+    PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("BillOfMaterial", PermissionSettingModel.PermissionID);
+
+}
+@{
+    Layout = "";
+}
+<style>
+
+</style>
+
+<div class="process_master col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="col-xs-12 block-section">
+        <div id="no-more-tables" class="col-xs-12 no-padding">
+            <table  id="list-materials" class="bommaterialtable">
+                <thead>
+                    <tr>
+                        <th class="" style="">SNO</th>
+                        <th class="Delete" style="">Action</th>
+                      
+                        <th>Category</th>
+                        <th>MaterialName</th>
+                        <th>Supplier</th>
+                        <th>GroupMaster</th>
+                        <th>ColorMaster</th>
+                        <th>SubstanceMaster</th>
+
+                        <th>SampleNorms</th>
+
+                        <th>WastageQtyUOM</th>
+                        <th>TotalNorms</th>
+
+                    </tr>
+                </thead>
+                <tbody class="common-table-head">
+                    @if (Model != null && Model.bomMaterialGridList != null)
+                    {
+
+                        foreach (var item in Model.bomMaterialGridList)
+                        {
+                            string Category = string.Empty;
+                            string GroupName = string.Empty;
+                            string MaterialName = string.Empty;
+                            string SubstanceName = string.Empty;
+                            string ColorName = string.Empty;
+                            string substanceName = string.Empty;
+                            string Supplyby = string.Empty;
+                            BuyerManager buyerManager = new BuyerManager();
+                            BuyerMaster buyerMaster = new BuyerMaster();
+                            MaterialGroupManager groupManager = new MaterialGroupManager();
+                            MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
+                            MaterialCategoryMaster materialCategoryMaster = new MaterialCategoryMaster();
+                            materialgroupmaster materialGroupMaster = new materialgroupmaster();
+                            materialCategoryMaster = materialCategoryManager.GetMaterialCategoryMaster(item.MaterialCategoryMasterId);
+                            materialGroupMaster = groupManager.GetmaterialgroupmasterId(item.MaterialGroupMasterId);
+                            materialMaster = materialManager.GetMaterialMasterId(item.MaterialMasterId);
+                            if (item.MaterialMasterId == 4771)
+                            {
+                                String a = "";
+                            }
+                            MaterialNameManager nameManager = new MaterialNameManager();
+                            tbl_materialnamemaster nameMaster = new tbl_materialnamemaster();
+                            if (materialMaster != null && materialMaster.MaterialMasterId != 0)
+                            {
+                                nameMaster = nameManager.GetMaterialNameMasterId(materialMaster.MaterialName);
+                            }
+                            colorMaster = colorManager.GetColorMasterID(item.ColorMasterId);
+                            substanceMaster = substanceMasterManager.GetsubstanceMasterId(item.SubstanceMasterId);
+                            buyerMaster = buyerManager.GetBuyerMasterId(item.BuyerMasterId);
+                            if (materialCategoryMaster != null)
+                            {
+                                Category = materialCategoryMaster.CategoryName;
+                            }
+                            if (materialGroupMaster != null)
+                            {
+                                GroupName = materialGroupMaster.GroupName;
+                            }
+                            if (colorMaster != null)
+                            {
+                                ColorName = colorMaster.Color;
+                            }
+                            if (nameMaster != null && nameMaster.MaterialMasterID != 0)
+                            {
+                                MaterialName = nameMaster.MaterialDescription + " " + ColorName;
+                            }
+                            if (substanceMaster != null)
+                            {
+                                substanceName = substanceMaster.SubstanceRange;
+                            }
+                            if (item.SupplierMasterId == 1)
+                            {
+                                Supplyby = "Buyer";
+                            }
+                            else if (item.SupplierMasterId == 2)
+                            {
+                                Supplyby = "Enco";
+                            }
+                            <tr id="rowid_@item.BOMMaterialID">
+                                <td data-title="Si No" class="SNO">@item.SNO</td>
+                                <td data-title="Action">
+                                    <span class="action-icons">
+
+                                        <a><img onclick="RowClick('@item.BOMMaterialID','@item.BomId')"  src="~/Scripts/Jobwork/images/edit.png"></a>
+                                        <img onclick="Deletebtn('@item.BOMMaterialID')" src="~/Scripts/Jobwork/images/delete.png">
+                                    </span>
+                                </td>
+                               
+                                <td data-title="OperationType Code" id="MaterialCategoryMasterId">@Category</td>
+                                <td data-title="OperationType Code" id="MaterialMasterId">@MaterialName</td>
+                                <td data-title="OperationType Code" id="SupplybyID">@Supplyby</td>
+                                <td data-title="OperationType Code" id="MaterialMasterId">@GroupName</td>
+                                <td data-title="OperationType Code" id="ColorMasterId">@ColorName</td>
+                                <td data-title="OperationType Code" id="SubtanceMasterID">@substanceName</td>
+                                <td data-title="OperationType Code" id="SampleNorms">@item.SampleNorms</td>
+                                <td data-title="OperationType Code" id="WastageQtyUOM">@item.WastageqtyUOM</td>
+                                <td data-title="OperationType Code" id="TotalNorms">@item.TotalNorms</td>
+
+                            </tr>
+                        }
+
+                    }
+                  
+                    </>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+
+
+<script>
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    function MaterialSearch() {
+        
+        var row = "";
+        $.ajax({
+            type: 'GET',
+            url: ' @Url.Action("SearchBOMMaterial", "BillOfMaterial")',
+            data: { Materialname: $("#Material_Search").val(), BomNo: $("#BomNo").val(), BOMMaterialID: $('#BOMMaterialID').val() },
+            success: function (data) {
+                if (data.Material != null) {
+                    $("#list-materials tbody").html("");
+                    var row = "";
+                    var rowCount = 0;
+                    
+                    $.each(data.Material, function (i, city) {
+                        if (city.SubstanceRange == null) {
+                            city.SubstanceRange = "";
+                        }
+                        "<tr id=" + rowCount + "><td style='display:none' class='BomNo'><span>" + city.BOMMaterialID + "</span><input type='hidden' class='BomId' value='" + data.BOM.BomId + "'></td>"
+                        row += "<td style='display:none' class='Description' id='Description'>" + city.Description + "</td>"
+                        row += "<td style='display:none' class='BuyerMasterId' id='BuyerMasterId'>" + city.BuyerMasterId + "</td>"
+                        row += "<td style='display:none' class='BuyerModel' id='BuyerModel'>" + city.BuyerModel + "</td>"
+                        row += "<td style='display:none' class='MeanSize' id='MeanSize'>" + city.MeanSize + "</td>"
+                        row += "<td style='display:none' class='Date' id='Date'>" + city.Date + "</td>"
+                        row += "<td style='display:none' class='ParentBomNo' id='ParentBomNo'>" + city.ParentBomNo + "</td>"
+                        row += "<td style='display:none' class='LinkBomNo' id='LinkBomNo'>" + city.LinkBomNo + "</td>"
+                        row += "<td style='display:none' class='CommnBOM1' id='CommnBOM1'>" + city.CommnBOM1 + "</td>"
+                        row += "<td style='display:none' class='CommnBOM1' id='CommnBOM1'>" + city.BOMMaterialID + "</td>"
+                        row += " <td title='Delete'  style='cursor:pointer;' class='Delete' id='Delete'><input type='fton' value='Delete' style='cursor:pointer;' title='Delete' onclick='Deletebtn(" + city.BOMMaterialID + ")' class='change_status change_status_  Delete input Edit input' /></td>"
+                        row += " <td title='Edit'  style='cursor:pointer;' class='Edit' id='Edit'><input type='button' value='Edit' style='cursor:pointer;' title='Edit' onclick='RowClick(" + city.BOMMaterialID + "," + city.BOMID + ")' class='change_status change_status_ Delete input Edit input' /></td>"
+                        row += "<td class='MaterialCategoryMasterId' id='MaterialCategoryMasterId'>" + city.CategoryName + "</td>"
+                        row += "<td class='MaterialName' id='MaterialName'>" + city.MaterialName + "</td>"
+                        row += "<td class='SupplybyID' id='SupplybyID'>" + city.SupplierMasterID + "</td>"
+                        row += "<td class='MaterialGroupMasterId' id='MaterialGroupMasterId'>" + city.GroupName + "</td>"
+                        row += "<td class='ColorMasterId' id='ColorMasterId'>" + city.Color + "</td>"
+                        row += "<td class='SubstanceMasterId' id='SubstanceMasterId'>" + city.SubstanceRange + "</td>"
+                        row += "<td class='SampleNorms' id='SampleNorms'>" + city.SampleNorms + "</td>"
+                        row += "<td style='display:none' class='Wastage' id='Wastage'>" + city.Wastage + "</td>"
+                        row += "<td  style='display:none' class='WastageQty' id='WastageQty'>" + city.WastageQty + "</td>"
+                        row += "<td class='WastageQtyUOM' id='WastageQtyUOM'>" + city.WastageQty + "</td>"
+                        row += "<td class='TotalNorms' id='TotalNorms'>" + city.TotalNorms + "</td>"
+                        row += "<td style='display:none' class='TotalNormsUOM' id='TotalNormsUOM'>" + city.TotalNormsUOM + "</td>"
+                        row += "<td style='display:none' class='SizeScheduleMasterId' id='SizeScheduleMasterId'>" + city.SizeScheduleMasterId + "</td>"
+                        row += "<td style='display:none' class='ComponentName' id='ComponentName'>" + city.ComponentName + "</td>"
+                        row += "<td style='display:none' class='BuyerNorms' id='BuyerNorms'>" + city.BuyerNorms + "</td>"
+                        row += "<td style='display:none' class='NoOfSets' id='NoOfSets'>" + city.NoOfSets + "</td>"
+                        row += "<td style='display:none' class='UomMasterId' id='UomMasterId'>" + city.UomMasterId + "</td>"
+                        row += "<td style='display:none' class='SupplierMasterId' id='SupplierMasterId'>" + city.SupplierMasterID + "</td>"
+                        row += "<td style='display:none' class='SizeRangeMasterId' id='SizeRangeMasterId'>" + city.SizeRangeMasterId + "</td>"
+                        row += "<td style='display:none' class='OurNorms' id='OurNorms'>" + city.OurNorms + "</td>"
+                        row += "<td style='display:none' class='OurNormsPercent' id='OurNormsPercent'>" + city.OurNormsPercent + "</td>"
+                        row += "<td style='display:none' class='PurchaseNorms' id='PurchaseNorms'>" + city.PurchaseNorms + "</td>"
+                        row += "<td style='display:none' class='PurchaseNormsPercent' id='PurchaseNormsPercent'>" + city.PurchaseNormsPercent + "</td>"
+                        row += "<td style='display:none' class='IssueNorms' id='IssueNorms'>" + city.IssueNorms + "</td>"
+                        row += "<td style='display:none' class='IssueNormsPercent' id='IssueNormsPercent'>" + city.IssueNormsPercent + "</td>"
+                        row += "<td style='display:none' class='CostingNorms' id='CostingNorms'>" + city.CostingNorms + "</td>"
+                        row += "<td style='display:none' class='CostingNormsPercent' id='CostingNormsPercent'>" + city.CostingNormsPercent + "</td>"
+                        row += "<td style='display:none' class='PreparedBy' id='PreparedBy'>" + city.PreparedBy + "</td>"
+                        row += "<td style='display:none' class='VerifiedBy' id='VerifiedBy'>" + city.VerifiedBy + "</td>"
+                        row += "<td style='display:none' class='CheckedBy' id='CheckedBy'>" + city.CheckedBy + "</td>"
+                        row += "<td style='display:none' class='AddRowFields'>" + $('#AddRowFields').val() + "</td></tr>"
+                        $('#BOMMaterialID').val(city.BOMMaterialID);
+                        rowCount++;
+                    });
+                    $('#list-materials tbody').append(row);
+
+                    return false;
+                }
+                else {
+
+                }
+            }
+        });
+    }
+</script>

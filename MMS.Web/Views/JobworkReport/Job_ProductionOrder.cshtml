@@ -1,0 +1,145 @@
+﻿@{
+    ViewBag.Title = "Job_ProductionOrder";
+}
+
+
+
+<link type="text/css" href="~/Content/css/jquery-ui-1.8.19.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/Content/themes/base/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="~/Content/themes/base/jquery-ui-1.8.19.custom.min.js"></script>
+
+<div class="indent_report">
+
+</div>
+<div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+    <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+        <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+    </div>
+</div>
+<div class="field-section indent_field">
+    <div class="form-group">
+        
+        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+            <label for="text" class="form-label">To Date :</label>
+        </div>
+        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+
+            <input id="PeriodTo" name="PeriodTo" type="text" class="form-control text-field" />
+        </div>
+        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+            <label for="text" class="form-label">Type</label>
+        </div>
+        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 space_status">
+            @Html.DropDownList("Type", MMS.Web.ExtensionMethod.HtmlHelper.Production_Type(), new { @class = "select-style text-field" })
+        </div>
+        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+            <label for="text" class="form-label">Buyer :</label>
+        </div>
+        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+            @Html.DropDownList("Buyer", MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field" })
+        </div>
+        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+            <label for="text" class="form-label">Season :</label>
+        </div>
+        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+            @Html.DropDownList("Season", MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "select-style text-field" })
+        </div>
+        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+            <label for="text" class="form-label">lot no :</label>
+        </div>
+        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+            @Html.DropDownList("LOtNo", MMS.Web.ExtensionMethod.HtmlHelper.LOtNo(), new { @class = "select-style text-field" })
+        </div>
+        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+            <label for="text" class="form-label">style :</label>
+        </div>
+        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+            @Html.DropDownList("Bom", MMS.Web.ExtensionMethod.HtmlHelper.BomStyle(), new { @class = "select-style text-field" })
+        </div>
+        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+            <label for="text" class="form-label">IO :</label>
+        </div>
+        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+            @Html.DropDownList("Io", MMS.Web.ExtensionMethod.HtmlHelper.Io_Based(), new { @class = "select-style text-field" })
+        </div>
+        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+            <label for="text" class="form-label">stage :</label>
+        </div>
+        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+            @Html.DropDownList("stage", MMS.Web.ExtensionMethod.HtmlHelper.StageName(), new { @class = "select-style text-field" })
+        </div>
+    </div>
+</div>
+<input id="ExportReport" class="indent_report_field" name="ExportReport" type="submit" value="Generate Report" />
+</div>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $("#PeriodFrom").datepicker({ dateFormat: "dd/mm/yy" });
+        $("#PeriodTo").datepicker({ dateFormat: "dd/mm/yy" });
+
+        $("#ExportReport").click(function (event) {
+            var To = $("#PeriodTo").val();
+            var Type = $('#Type').val();
+            var Buyer = $("#Buyer").val();
+            var Season = $("#Season").val();
+            var LOtNo = $("#LOtNo option:selected").text();
+            var Bom = $("#Bom ").val();
+            var Io = $("#Bom option:selected").text();
+            var stage = $("#stage").val();
+
+                
+                if ($('#PeriodTo').val() == "") {
+                    alert("Please select Period To.")
+                    $('#PeriodTo').css('border-color', 'red');
+                    $('#PeriodTo').focus();
+                    return false;
+                }
+                else {
+                    $('#PeriodTo').css('border-color', '');
+                }
+
+
+                debugger;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/JobProduction/RedirectToBinCardAspx',
+                        data: {
+                             To :To,
+                             Type :Type,
+                             Buyer :Buyer,
+                             Season:Season,
+                             LOtNo :LOtNo,
+                             Bom :Bom,
+                             Io :Io,
+                             stage :stage
+                        },
+                        success: function (data) {
+                            debugger;
+                            var url = "@(System.Configuration.ConfigurationManager.AppSettings["ReportURL"].ToString())JobProductionJobwork.aspx?To=" + data.to + "&Type=" + data.type + "&Buyer=" + data.buyer + "&Season=" + data.season + "&LOtNo=" + data.lOtNo + "&Bom=" + data.bom + "&Io=" + data.io + "&stage=" + data.Stage;
+                             window.open(url, '_blank');
+                             return false
+                        },
+                        error:function(data)
+                        {
+                            alert('error');
+                        }
+                    });
+
+            });
+        })
+
+
+</script>

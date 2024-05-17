@@ -1,0 +1,379 @@
+﻿@model MMS.Web.Models.JobworkModel.Jw_ApprovedPriceModel
+@using MMS.Repository.Managers.JobWork
+@using MMS.Core.Entities.JobWork
+
+@{
+    List<MMS.Data.StoredProcedureModel.Jw_Approvedpricelist> Approvedpricelist_ = new List<MMS.Data.StoredProcedureModel.Jw_Approvedpricelist>().ToList();
+
+}
+<script src="~/Scripts/Jobwork/js/datepicker.min.js"></script>
+<script src="~/Scripts/Jobwork/js/custom_script.js"></script>
+<script src="~/Scripts/moment.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#Date").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: "dd/mm/yyyy"
+        }).datepicker('update', new Date());
+        $("#Date").datepicker("destroy");
+    });
+    $("#Process_Name").on("change", function () {
+        $("#Listofjob").html("");
+
+        debugger;
+                $.ajax({
+                    url: '/Jw_ApprovedPrice/View_otherjobwork',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: {
+                        Stage_From: $('#Stage_From').val(),
+                        Stage_To: $('#Stage_To').val(),
+                        JW_Name: $('#JW_Name').val(),
+                        Process_Name: $('#Process_Name').val()
+                    },
+                    success: function (data) {
+                        debugger;
+                        if(data.Count == 0)
+                        {
+                            $("#Listofjob").html("");
+                            var row = "";
+                            $.each(data.items, function (i, item) {
+                                row += "<tr><td data-title='Jobworker Name'>" + item.Jobwork_name + "</td>";
+                                row += "<td data-title='Approved Price'>" + item.Approved_Price + "</td>";
+                                row += "<td data-title='Approved Date' >" + moment(item.Approved_Date).format('DD/MM/YYYY') + "</td></tr>";
+                            });
+                            $('#Listofjob').append(row);
+                        }
+                        else{
+                            alert("Stage From sequence can not be less than stage to");
+                            return false;
+                        }
+                    }
+
+                });
+            
+
+
+        });
+        $("#JW_Name").on("change", function () {
+            var Jw_id = $('#JW_Name').val();
+                $.ajax({
+                    type: "POST",
+                    url: ' @Url.Action("EditJw_ApprovedPriceList", "Jw_ApprovedPrice")',
+                    data: { Jw_ApprovedPriceID: $('#JW_Name').val() },
+                    success: function (data) {
+
+                        $("#EditJob_AprovepricePartial").html(data);
+                        $("#EditJob_AprovepricePartial").show();
+                        $('#Update_edit').hide();
+                        $('#JW_Name').val(Jw_id).trigger('chosen:updated');
+                    }
+                });
+
+        });
+
+    $("#Process_Name__").on("change", function () {
+                $.ajax({
+                    type: "POST",
+                    url: ' @Url.Action("Process_NameCheck", "Jw_ApprovedPrice")',
+                    data: { JW_Name: $('#JW_Name').val(), Process_Name: $('#Process_Name').val() },
+                    success: function (data) {
+                        debugger
+                        if (data != 0) {
+                            alert("Alredy same process name has been saved ");
+                            $('#Process_Name').val(0).trigger('chosen:updated')
+                        }
+                       
+                    }
+                });
+
+        });
+
+    
+    function Edit_Grid(arg)
+    {
+        //debugger;
+     
+     //   alert($("#"+arg).find("td").eq(2).html());
+        $("#" + arg).find("td").hide()
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("EditJw_ApprovedPriceList_jwid", "Jw_ApprovedPrice")',
+            data: { Jw_ApprovedPriceID: arg },
+            success: function (data) {
+               
+                debugger;
+                $('#Update').hide(),
+                $('#Update_edit').show(),
+                $('#Date').val(moment(data.Date).format('DD/MM/YYYY')),
+                $('#JW_Name').val(data.JW_Name).trigger('chosen:updated'),
+                $('#Process_Name').val(data.Process_Name).trigger('chosen:updated'),
+                $('#Stage_From').val(data.Stage_From).trigger('chosen:updated'),
+                $('#Stage_To').val(data.Stage_To).trigger('chosen:updated'),
+                $('#Rate_For_JW_id').val(data.Rate_For_JW_id),
+                $('#Tax_Details').val(data.Tax_Details).trigger('chosen:updated'),
+                $('#Lead_Time_Days').val(data.Lead_Time_Days),
+                $('#Rate_For_JW').val(data.Rate_For_JW),
+                $('#Jw_ApprovedPriceID').val(data.Jw_ApprovedPriceID)
+
+              
+            }
+        });
+    }
+    function Delete_Grid(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("DeleteApprove", "Jw_ApprovedPrice")',
+                data: { Jw_ApprovedPriceID: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        $("#" + arg).find("td").hide()
+                    }
+                    else {
+                        alert('Color Details deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+    
+    $(".chosen-select").chosen();
+   
+</script>
+
+<div class="header_list_tab  col-lg-12 col-md-12 col-sm-12  col-xs-12">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+        <div class="list_tab">
+            <div class="title">
+                Detail
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-12 col-sm-12  col-xs-12">
+        <div class="button_tab  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+
+        </div>
+    </div>
+</div>
+
+<div class="approved_price_edit col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 block-section input_list_group">
+        <div class="input_left col-lg-11 col-md-11 col-sm-12 no-padding">
+            <div class="col-lg-3 col-md-3 col-sm-12">
+
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <label for="usr">Date</label>
+                        <div class="form-group">
+                            <div class="input-group  ">
+
+                                    @Html.TextBoxFor(m => m.Date, new { @class = "form-control filter-cal", @readonly= "readonly" })
+                                    <span class="input-group-addon" style=""><i class="glyphicon glyphicon-calendar"></i></span>
+                                </div>
+                            </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="form-group form_input_group">
+                    <label for="sel1">JW Name</label>
+                    @Html.HiddenFor(x => x.Jw_ApprovedPriceID)
+                    @Html.DropDownListFor(x => x.JW_Name, MMS.Web.ExtensionMethod.HtmlHelper.JobworkName(), new { @class = "form-control input chosen-select" })
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="form-group form_input_group">
+                    <label for="sel1">Process Name</label>
+                    @Html.DropDownListFor(x => x.Process_Name, MMS.Web.ExtensionMethod.HtmlHelper.ProcessName(), new { @class = "form-control input chosen-select" })
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="form-group form_input_group">
+                    <label for="sel1">Stage From</label>
+                    @Html.DropDownListFor(x => x.Stage_From, MMS.Web.ExtensionMethod.HtmlHelper.StageName(), new { @class = "form-control input chosen-select" })
+                </div>
+            </div>
+
+
+
+
+            <div class="d-flex job_work_accord">
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <div class="form-group form_input_group">
+                        <label for="sel1">Stage To</label>
+                        @Html.DropDownListFor(x => x.Stage_To, MMS.Web.ExtensionMethod.HtmlHelper.StageName(), new { @class = "form-control input chosen-select" })
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <div class="form-group form_input_group input_select">
+                        <label for="sel1">Rate For JW</label>
+                        <div class="input_inner">
+                            @Html.TextBoxFor(m => m.Rate_For_JW, new { @class = "form-control text-field" })
+                            @Html.DropDownListFor(x => x.Rate_For_JW_id, MMS.Web.ExtensionMethod.HtmlHelper.UomUnit(), new { @class = "form-control text-field" })
+                        </div>
+                    </div>
+                </div>
+                 @*<div class="form-group form_input_group">
+                        <label for="sel1">Tax Details</label>
+                        @Html.DropDownListFor(x => x.Tax_Details, MMS.Web.ExtensionMethod.HtmlHelper.GetTaxRef(), new { @class = "form-control input chosen-select" })
+                    </div>*@
+
+                    <div class="col-lg-3 col-md-3 col-sm-12">
+                        <div class="form-group form_input_group">
+                            <label for="sel1">GST</label>
+                            @Html.TextBoxFor(m => m.GSt, new { @class = "form-control text-field" })
+                        </div>
+                    </div>
+              
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <div class="form_input_group">
+                        <div class="form-group">
+                            <label for="usr">Lead Time Days</label>
+                            @Html.TextBoxFor(m => m.Lead_Time_Days, new { @class = "form-control text-field" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex job_work_accord">
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <div class="form-group form_input_group">
+                        <label for="sel1">Job ExcessPercentage</label>
+                        @Html.TextBoxFor(m => m.Job_ExcessPercentage, new { @class = "form-control text-field" })
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <div class="form-group form_input_group">
+                        <label for="sel1">Issue Type</label>
+                        @Html.DropDownListFor(x => x.Issue_Type, MMS.Web.ExtensionMethod.HtmlHelper.GetJobWorkGRNType(), new { @class = "form-control input chosen-select" })
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <div class="form-group form_input_group">
+                        <label for="sel1">Finished Material</label>
+                        @Html.DropDownListFor(x => x.Finished_Material, MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName(), new { @class = "form-control input chosen-select" })
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <div class="form-group form_input_group">
+                        <label for="sel1">Product Buyer Style</label>
+                        @Html.DropDownListFor(x => x.Product_BuyerStyle, MMS.Web.ExtensionMethod.HtmlHelper.ProductBuyerStyleNo_Name(), new { @class = "form-control input chosen-select" })
+                    </div>
+                </div>
+              
+            </div>
+            
+            <!--Empty-->
+            <div class="input_empty col-lg-1 col-md-1 col-sm-12">
+
+            </div>
+
+        </div>
+        <div id="Update" class="init_action cntl_btn col-lg-12 col-md-12 col-sm-12">
+            @if (Model != null && Model.Jw_ApprovedPriceID != 0)
+            {
+                <button class="btn green-btn" onclick="UpdateApproved()">Update</button>
+            }
+            else
+            {
+                <button class="btn green-btn " onclick="Save()">Save</button>
+            }
+            <button class="btn green-grey" onclick="Back()">Back</button>
+        </div>
+        <div id="Update_edit" class="init_action cntl_btn col-lg-12 col-md-12 col-sm-12">
+       
+                <button class="btn green-btn" onclick="UpdateApproved()">Update</button>
+        </div>
+    </div>
+    <!--second-->
+    <div class="cent_head"><h3>List Of Other Jobworker</h3></div>
+    <div class="approved_price_edit col-lg-12 col-md-12 col-sm-12 col-xs-12 block-section input_list_group">
+        <div id="no-more-tables" class="col-xs-12 no-padding">
+            <table class="col-md-12 table-striped table-condensed cf table-change home_dahboard">
+                <thead>
+                    <tr>
+                        <th width="50%">Jobworker Name</th>
+                        <th width="35%">Approved Price</th>
+                        <th width="15%">Approved Date</th>
+                    </tr>
+                </thead>
+                <tbody id="Listofjob" class="common-table-head">
+                    @*<tr>
+                        <td data-title="Jobworker Name">Lorem Ipsum is simply dummy & co</td>
+                        <td data-title="Approved Price">$12000</td>
+                        <td data-title="Approved Date">20/02/2019</td>
+                    </tr>
+                    <tr>
+                        <td data-title="Jobworker Name">Lorem Ipsum is simply dummy & co</td>
+                        <td data-title="Approved Price">$15000</td>
+                        <td data-title="Approved Date">28/02/2019</td>
+                    </tr>*@
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!--third-->
+    <!-- <div class="approved_price_edit col-lg-12 col-md-12 col-sm-12 col-xs-12 block-section input_list_group"> -->
+    <div id="no-more-tables" class="col-xs-12 no-padding hole_table">
+        <table id="table_grid" class="col-md-12 table-striped table-condensed cf table-change home_dahboard color_table">
+            <thead>
+                <tr>
+                    <th>Sl.No</th>
+                    <th>JW Name</th>
+                    <th>Process Name</th>
+                    <th>Stage From</th>
+                    <th>Stage To</th>
+                    <th>Date</th>
+                    <th>Rate</th>
+                    <th>Tax Details</th>
+                    @*<th>Action</th>*@
+                </tr>
+            </thead>
+            <tbody ID="table_grid_ROW"class="common-table-head">
+                @if (Model.Job_ApprovedPriceList != null && Model.Job_ApprovedPriceList.Count > 0)
+                {
+                    int count = 1;
+
+                    foreach (var operation in Model.Job_ApprovedPriceList)
+                    {
+                        <tr id="@operation.Jw_ApprovedPriceID">
+                            <td data-title="Si.No">@count</td>
+                            <td data-title="OperationType Code">@operation.Job_Name</td>
+                            <td data-title="OperationType Code">@operation.ProcessName</td>
+                            <td data-title="OperationType Code">@operation.StageFrom</td>
+                            <td data-title="OperationType Code">@operation.StageTo</td>
+                            <td data-title="OperationType Code">@operation.Date</td>
+                            <td data-title="OperationType Code">@operation.Rate_For_JW</td>
+                            <td data-title="OperationType Code">@operation.TaxName</td>
+                           
+
+                           
+                            @*<td data-title="Action">
+                                <span class="action-icons">
+
+                                    <a><img onclick="Edit_Grid('@operation.Jw_ApprovedPriceID')" class="use-address" src="~/Scripts/Jobwork/images/edit.png"></a>
+                                    <img onclick="Delete_Grid('@operation.Jw_ApprovedPriceID')" class="use-address" src="~/Scripts/Jobwork/images/delete.png">
+                                </span>
+                            </td>*@
+                        </tr>
+                        count++;
+                    }
+
+                }
+            </tbody>
+        </table>
+    </div>
+    <!-- </div> -->
+</div>

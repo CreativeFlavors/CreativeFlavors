@@ -1,0 +1,328 @@
+﻿@using MMS.Core.Entities
+@model IEnumerable<MMS.Web.Models.Addressdetails.Addressdetails>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <style>
+        .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
+            padding: 16px;
+        }
+
+        img#paynows {
+            width: 26%;
+        }
+
+        .manage_customers_table_responsive, .reports .reports_table_responsive {
+            padding: 1px 15px 13px;
+            box-sizing: border-box;
+            overflow-x: unset;
+        }
+
+        .sub_merchants .merchant_btn, .manage_customers .manage_customers_btn, .common_Manage_subMerchant .manage_customers_btn {
+            background: #4472C4;
+            border-radius: 5px;
+            padding: 11px 61px;
+            border: 1px solid transparent;
+            font-style: normal;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-page">
+        <div id="transaction_report" class="reports common_Manage_subMerchant">
+            <div class="d-flex justify-content-between align-items-center manage_customers_head">
+                <div class="manage_customers_main_head">
+                    <h6 class="font-20">Customers Details</h6>
+                </div>
+                <div>
+                    <button type="button" class="manage_customers_btn font-15" id="add">
+                        <a href="/AddressDetails/AddressDetails">ADD </a>
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive reports_table_responsive">
+                <div class="customer_manage_search_container">
+                    <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Buyer Name">
+                </div>
+                <div class="manage_customers_table_in_responsive" id="form">
+
+                    <table class="table table-striped text-center">
+                        <thead>
+                            <tr class="font-16">
+                                <th scope="col">
+                                    <span>Si.No</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Buyer Name</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Contact Name</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Country</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>State</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>City</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Zip Code</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Email</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Phone Number</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Status</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        @if (Model != null && Model.Count() > 0)
+                        {
+                            int count = 1;
+                            <tbody>
+
+                                @foreach (var address in Model)
+                                {
+
+                                    <tr>
+                                        <td class="veh-1">@count</td>
+                                        <td class="veh-2" style="width: 12%;">@address.BuyerMaster.BuyerFullName</td>
+                                        <td class="veh-3" style="width: 12%;">@address.ContactName</td>
+                                        <td class="veh-5" style="width: 12%;">@address.countries.Name</td>
+                                        <td class="veh-4" style="width: 12%;">@address.states.Statename</td>
+                                        <td class="veh-4" style="width: 12%;">@address.cities.Cityname</td>
+                                        <td class="veh-3" style="width: 12%;">@address.ZipCode</td>
+                                        <td class="veh-4" style="width: 12%;">@address.Email</td>
+                                        <td class="veh-4" style="width: 12%;">@address.Phone</td>
+                                        <td class="veh-4" style="width:12%;">
+                                            <span class="table_icons">
+                                                <img src="~/Content/assets/images/edit-icon.png" onclick="Edit('@address.AddressId')" />
+                                            </span>
+                                            <span class="table_icons">
+                                                <img src="~/Content/assets/images/delete-icon.png" onclick="Delete('@address.AddressId')" />
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    count++;
+                                }
+                            </tbody>
+
+                        }
+                    </table>
+                </div>
+                <div class="row manage_customer_show">
+                    <div class="col-xl-6 manage_customer_show_II">
+                        <nav class="float-xl-start">
+                            <ul class="pagination font-14">
+                                @if (ViewBag.startpage != null && ViewBag.endpage != null)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" id="left" value="@(ViewBag.currentpage-1)">Previous</a>
+                                    </li>
+                                    for (int i = ViewBag.startpage; i <= ViewBag.endpage; i++)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" id="number" value="@i">@i</a>
+                                        </li>
+
+                                    }
+                                    <li class=" page-item">
+                                        <a class="page-link" id="right" value="@(ViewBag.currentpage+1)">Next</a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <script src="~/Content/js/custom.js"></script>
+    <link href="~/Content/css1/sweetalert.css" rel="stylesheet" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#Address").attr('checked', true);
+
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#customer_manage_search").keyup(function () {
+                var customerearch = $("#customer_manage_search").val();
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/AddressDetails/Search',
+                    data: { filter: customerearch },
+                    contentType: 'application/json',
+                    success: function (values) {
+                        $("tbody").empty();
+                        var count = 1;
+                        $.each(values, function (i, item) {
+                            $("tbody").append(`
+                         <tr class="font-14">
+                         <td class="veh1-5">${count}</td>
+                         <td class="veh1-5" style="width: 12%;">${item.BuyerMaster.BuyerFullName}</td>
+                         <td class="veh1-5" style="width: 12%;">${item.ContactName}</td>
+                         <td class="veh1-5" style="width: 12%;">${item.countries.Name}</td>
+                         <td class="veh1-5" style="width: 12%;">${item.states.Statename}</td>
+                         <td class="veh1-5" style="width: 12%;">${item.cities.Cityname}</td>
+                         <td class="veh1-5" style="width: 12%;">${item.ZipCode}</td>
+                         <td class="veh1-5" style="width: 12%;">${item.Email}</td>
+                         <td class="veh1-5" style="width: 12%;">${item.Phone}</td>
+                         <td class="veh-4" style="width:12%;">
+                         <span class="table_icons">
+                             <img src="/Content/assets/images/edit-icon.png" onclick="Edit('${item.AddressId}')" />
+                         </span>
+                         <span class="table_icons">
+                             <img src="/Content/assets/images/delete-icon.png" onclick="Delete('${item.AddressId}')" />
+                            </span>
+                         </td>
+                         </tr>
+                          `);
+                            count++;
+                        });
+                    }
+                });
+            });
+            $(document).on("click", "#number", function () {
+                var files = $(this).attr('value');
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/AddressDetails/AddressDetailsGrid',
+                    data: { pageno: files },
+                    contentType: 'application/json',
+                    success: function (values) {
+                        $(".main-page").html(values);
+                    }
+                });
+            });
+            $(document).on("click", "#left", function () {
+                var files = $(this).attr('value');
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/AddressDetails/AddressDetailsGrid',
+                    data: { pageno: files },
+                    contentType: 'application/json',
+                    success: function (values) {
+                        $(".main-page").html(values);
+                    }
+                });
+            });
+
+            $(document).on("click", "#right", function () {
+                var files = $(this).attr('value');
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/AddressDetails/AddressDetailsGrid',
+                    data: { pageno: files },
+                    contentType: 'application/json',
+                    success: function (values) {
+                        $(".main-page").html(values);
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+function Delete(arg) {
+     var answer = confirm("Are you sure want to delete?");
+     if (answer) {
+         $.ajax({
+             type: 'POST',
+             url: ' @Url.Action("Delete", "AddressDetails")',
+             data: { AddressId: arg },
+             success: function (data) {
+                 if (data == "Success") {
+                     alert('Deleted Successfully.');
+                     location.href = "/AddressDetails/AddressMaster";
+                     return false;
+                 }
+                 else {
+                     alert('address Details deletion failed.');
+                 }
+
+             },
+             error: function (ex) {
+                 alert('This address Already Exist in the database.');
+             }
+         });
+     }
+     else {
+         return false;
+     }
+ }
+
+
+  function Edit(arg) {
+            $('.main-page').hide();
+       $.ajax({
+           type: "POST",
+           url: ' @Url.Action("EditAddressDetails", "AddressDetails")',
+           data: { AddressId: arg },
+           success: function (data) {
+               $(".main-page").html(data);
+               $(".main-page").show();
+           }
+       });
+   }
+    </script>
+
+
+</body>
+</html>
+
+

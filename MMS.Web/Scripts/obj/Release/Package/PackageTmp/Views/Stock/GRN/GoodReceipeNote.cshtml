@@ -1,0 +1,1488 @@
+﻿@model MMS.Web.Models.StockModel.GRN_Details_Model
+@using MMS.Repository.Managers.StockManager
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+@{
+    ViewBag.Title = "Good Receipe Note";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2 class="content-title">GRN</h2>
+<div style="width: 100%; float: left;">
+    <div id="tabVehicleWatchList">
+        @Html.Action("GoodReceipeNoteGrid", "GRN_Detail")
+    </div>
+</div>
+<script>
+   
+    var CurrentRowID = "";
+
+    //Click Autodiplay button
+    $(document).on('click', '#AutoDisplay', function () {
+
+        validation();
+
+        if (validation() != false) {
+            var grnid = "";
+            if (CurrentRowID == "") {             
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: '/GRN_Detail/SaveDetails',
+                    data: {
+                        BarCodeNo: $('#BarCodeNo').val(),
+                        GrnID: $('#GrnID').val(),
+                        GrnNo: $('#GrnNo').val(),
+                        GrnDate: $('#GrnDate').val(),
+                        GrnRefNo: $('#GrnRefNo').val(),
+                        SupplierNameId: $('#SupplierNameId').val(),
+                        DC_No: $('#DC_No').val(),
+                        DCDate: $('#DCDate').val(),
+                        INVoiceNo: $('#INVoiceNo').val(),
+                        INVoiceDate: $('#INVoiceDate').val(),
+                        GateEntryNo: $('#GateEntryNo').val(),
+                        GEDate: $('#GEDate').val(),
+                        GETime: $('#GETime').val(),
+                        GateRefNo: $('#GateRefNo').val(),
+                        GrnType: $('#GrnType').val(),
+                        ST_VATcreditt: $('#ST_VATcreditt').val(),
+                        ImportClearance: $('#ImportClearance').val(),
+                        BENo: $('#BENo').val(),
+                        ExchangeRate: $('#ExchangeRate').val(),
+                        ShipmentMode: $('#ShipmentMode').val(),
+                        FreightAmount: $('#FreightAmount').val(),
+                        InsuranceAmount: $('#InsuranceAmount').val(),
+                        CustomsDuty: $('#CustomsDuty').val(),
+                        Pack_Forward: $('#Pack_Forward').val(),
+                        ServiceTax: $('#ServiceTax').val(),
+                        OtherCharges: $('#OtherCharges').val(),
+                        Transporter: $('#Transporter').val(),
+                        GeneralRemarks1: $('#GeneralRemarks1').val(),
+                        PoNO: $('#PoNO').val(),
+                        LOTNo: $('#LOTNo').val(),
+                        IndentNo: $('#IndentNo').val(),
+                        IONo: $('#IONo').val(),
+                        Stores: $('#Stores').val(),
+                        MaterialId: $('#MaterialId').val(),
+                        Grade: $('#Grade').val(),
+                        GroupID: $('#GroupID').val(),
+                        CategoryId: $('#CategoryId').val(),
+                        IfGroupIsMaintenance: $('#IfGroupIsMaintenance').val(),
+                        ColourId: $('#ColourId').val(),
+                        UOMId: $('#UOMId').val(),
+                        DOM: $('#DOM').val(),
+                        StoreLocation: $('#StoreLocation').val(),
+                        GeneralRemarks: $('#GeneralRemarks').val(),
+                        Substance: $('#Substance').val(),
+                        Weight: $('#Weight').val(),
+                        QtyAsPerDc: $('#QtyAsPerDc').val(),
+                        QtyAsPerSQFT: $('#QtyAsPerSQFT').val(),
+                        QtyAsPerPCS: $('#QtyAsPerPCS').val(),
+                        QTYType: $('#QTYType').val(),
+                        ReceivedQty: $('#ReceivedQty').val(),
+                        ReceivedSQFT: $('#ReceivedSQFT').val(),
+                        ReceivedPCS: $('#ReceivedPCS').val(),
+                        ReceivedType: $('#ReceivedType').val(),
+                        RejectedQty: $('#RejectedQty').val(),
+                        RejectedSQFT: $('#RejectedSQFT').val(),
+                        RejectedPCS: $('#RejectedPCS').val(),
+                        RejectedType: $('#RejectedType').val(),
+                        AcceptedQty: $('#AcceptedQty').val(),
+                        AcceptedSQFT: $('#AcceptedSQFT').val(),
+                        AcceptedPCS: $('#AcceptedPCS').val(),
+                        AcceptedType: $('#AcceptedType').val(),
+                        QtyExcess: $('#QtyExcess').val(),
+                        PendingQty: $('#PendingQty').val(),
+                        ExcessApproval: $('#ExcessApproval').val(),
+                        GeneralRemarks: $('#GeneralRemarks').val(),
+                        Rate: $('#Rate').val(),
+                        Value: $('#Value').val(),
+                        MRPMargin: $('#MRPMargin').val(),
+                        MRPPrice: $('#MRPPrice').val(),
+                        AccessibleValue: $('#AccessibleValue').val(),
+                        Discount_Per: $('#Discount_Per').val(),
+                        Discount_Val: $('#Discount_Val').val(),
+                        ExciseDuty_Per: $('#ExciseDuty_Per').val(),
+                        ExciseDuty_Val: $('#ExciseDuty_Val').val(),
+                        ST_VAT_CST_Per: $('#ST_VAT_CST_Per').val(),
+                        ST_VAT_CST_Val: $('#ST_VAT_CST_Val').val(),
+                        Ecess_Per: $('#Ecess_Per').val(),
+                        Ecess_Val: $('#Ecess_Val').val(),
+                        SH_Ecess_Per: $('#SH_Ecess_Per').val(),
+                        SH_Ecess_Val: $('#SH_Ecess_Val').val(),
+                        Surcharge_Per: $('#Surcharge_Per').val(),
+                        Surcharge_Val: $('#Surcharge_Val').val(),
+                        ST_VAT_CST_Val: $('#ST_VAT_CST_Val').val(),
+                        TagsPiecesDiscount_Per: $('#TagsPiecesDiscount_Per').val(),
+                        TagsPiecesDiscount_Val: $('#TagsPiecesDiscount_Val').val()
+                    },
+                    success: function (data) {                     
+                        var GrnID = data.Model.GrnID;
+                        var d = new Date(),
+    date1 = (d.getUTCDate() + '/' + (d.getUTCMonth() + 1) + '/' + d.getUTCFullYear());
+                        $('#INVoiceDate').val(date1).find('.datepicker').datepicker();
+                        $('#GrnDate').val(date1).find('.datepicker').datepicker();
+                        $('#GEDate').val(date1).find('.datepicker').datepicker();
+                        $('#DCDate').val(date1).find('.datepicker').datepicker();
+                        $('#DOM').val(date1).find('.datepicker').datepicker();
+                        alert("Saved Successfully.");
+                        return false;
+                    }
+                });
+                var rowCount = $('#list-amended-material tr').length;
+
+                $('#list-amended-material tbody').append("<tr id=" + rowCount + "><td id='BarCodeNo" + rowCount + "' class='BarCodeNo'>" + $('#BarCodeNo').val() + "</td>" +
+                                                            "<td  id='GrnNo" + rowCount + "' class='GrnNo'>" + $('#GrnNo').val() + "</td>" +
+                                                            "<td  id='GrnDate" + rowCount + "' class='GrnDate'>" + $('#GrnDate').val() + "</td>" +
+                                                            "<td  id='GrnRefNo" + rowCount + "' class='GrnRefNo'>" + $('#GrnRefNo').val() + "</td>" +
+                                                            "<td style='display:none'  id='SupplierNameId" + rowCount + "' class='SupplierNameId'>" + $('#SupplierNameId').val() + "</td>" +
+                                                            "<td  id='SupplierNameId" + rowCount + "' class='SupplierNameId_'>" + $('#SupplierNameId option:selected').text() + "</td>" +
+                                                            "<td id='DC_No" + rowCount + "'  class='DC_No'>" + $('#DC_No').val() + "</td>" +
+                                                            "<td id='DCDate" + rowCount + "' class='DCDate'>" + $('#DCDate').val() + "</td>" +
+                                                            "<td id='INVoiceNo" + rowCount + "' class='INVoiceNo'>" + $('#INVoiceNo').val() + "</td>" +
+                                                            "<td id='INVoiceDate" + rowCount + "' class='INVoiceDate'>" + $('#INVoiceDate').val() + "</td>" +
+                                                            "<td id='GateEntryNo" + rowCount + "' class='GateEntryNo'>" + $('#GateEntryNo').val() + "</td>" +
+                                                            "<td id='GEDate" + rowCount + "' class='GEDate'>" + $('#GEDate').val() + "</td>" +
+                                                            "<td id='GETime" + rowCount + "' class='GETime'>" + $('#GETime').val() + "</td>" +
+                                                            "<td id='GateRefNo" + rowCount + "' class='GateRefNo'>" + $('#GateRefNo').val() + "</td>" +
+                                                            "<td style='display:none' id='GrnType" + rowCount + "' class='GrnType'>" + $('#GrnType').val() + "</td>" +
+                                                            "<td id='GrnType" + rowCount + "' class='GrnType_'>" + $('#GrnType option:selected').text() + "</td>" +
+                                                            "<td id='ST_VATcredit" + rowCount + "' class='ST_VATcredit'>" + $('#ST_VATcredit').val() + "</td>" +
+                                                            "<td id='ImportClearance" + rowCount + "' class='ImportClearance'>" + $('#ImportClearance').val() + "</td>" +
+                                                            "<td id='BENo" + rowCount + "' class='BENo'>" + $('#BENo').val() + "</td>" +
+                                                            "<td id='ExchangeRate" + rowCount + "' class='ExchangeRate'>" + $('#ExchangeRate').val() + "</td>" +
+                                                            "<td id='ShipmentMode" + rowCount + "' class='ShipmentMode'>" + $('#ShipmentMode').val() + "</td>" +
+                                                            "<td id='FreightAmount" + rowCount + "' class='FreightAmount'>" + $('#FreightAmount').val() + "</td>" +
+                                                            "<td id='InsuranceAmount" + rowCount + "' class='InsuranceAmount'>" + $('#InsuranceAmount').val() + "</td>" +
+                                                            "<td id='CustomsDuty" + rowCount + "' class='CustomsDuty'>" + $('#CustomsDuty').val() + "</td>" +
+                                                            "<td id='Pack_Forward" + rowCount + "' class='Pack_Forward'>" + $('#Pack_Forward').val() + "</td>" +
+                                                            "<td id='ServiceTax" + rowCount + "' class='ServiceTax'>" + $('#ServiceTax').val() + "</td>" +
+                                                            "<td id='OtherCharges" + rowCount + "' class='OtherCharges'>" + $('#OtherCharges').val() + "</td>" +
+                                                            "<td id='Transporter" + rowCount + "' class='Transporter'>" + $('#Transporter').val() + "</td>" +
+                                                            "<td id='GeneralRemarks1" + rowCount + "' class='GeneralRemarks1'>" + $('#GeneralRemarks1').val() + "</td>" +
+                                                            "<td id='PoNO" + rowCount + "' class='PoNO'>" + $('#PoNO').val() + "</td>" +
+                                                            "<td id='LOTNo" + rowCount + "' class='LOTNo'>" + $('#LOTNo').val() + "</td>" +
+                                                            "<td id='IndentNo" + rowCount + "' class='IndentNo'>" + $('#IndentNo').val() + "</td>" +
+                                                            "<td id='IONo" + rowCount + "' class='IONo'>" + $('#IONo').val() + "</td>" +
+                                                             "<td style='display:none'  id='Stores" + rowCount + "' class='Stores'>" + $('#Stores').val() + "</td>" +
+                                                            "<td id='Stores" + rowCount + "' class='Stores_'>" + $('#Stores option:selected').text() + "</td>" +
+                                                              "<td style='display:none' id='MaterialId" + rowCount + "' class='MaterialId'>" + $('#MaterialId').val() + "</td>" +
+                                                            "<td id='MaterialId" + rowCount + "' class='MaterialId_'>" + $('#MaterialId option:selected').text() + "</td>" +
+
+                                                             "<td   style='display:none' id='Grade" + rowCount + "' class='Grade'>" + $('#Grade').val() + "</td>" +
+                                                             "<td  id='Grade" + rowCount + "' class='Grade_'>" + $('#Grade option:selected').text() + "</td>" +
+                                                             "<td style='display:none' id='GroupID" + rowCount + "' class='GroupID'>" + $('#GroupID').val() + "</td>" +
+                                                            "<td id='GroupID" + rowCount + "' class='GroupID_'>" + $('#GroupID option:selected').text() + "</td>" +
+
+                                                             "<td style='display:none' id='CategoryId" + rowCount + "' class='CategoryId'>" + $('#CategoryId').val() + "</td>" +
+                                                            "<td id='CategoryId" + rowCount + "' class='CategoryId_'>" + $('#CategoryId option:selected').text() + "</td>" +
+                                                            "<td id='IfGroupIsMaintenance" + rowCount + "' class='IfGroupIsMaintenance'>" + $('#IfGroupIsMaintenance').val() + "</td>" +
+                                                            "<td style='display:none' id='ColourId" + rowCount + "' class='ColourId'>" + $('#ColourId').val() + "</td>" +
+                                                            "<td id='ColourId" + rowCount + "' class='ColourId_'>" + $('#ColourId option:selected').text() + "</td>" +
+                                                            "<td  style='display:none' id='UOMId" + rowCount + "' class='UOMId'>" + $('#UOMId').val() + "</td>" +
+                                                            "<td id='UOMId" + rowCount + "' class='UOMId_'>" + $('#UOMId option:selected').text() + "</td>" +
+                                                            "<td id='DOM" + rowCount + "' class='DOM'>" + $('#DOM').val() + "</td>" +
+                                                            "<td style='display:none' id='StoreLocation" + rowCount + "' class='StoreLocation'>" + $('#StoreLocation').val() + "</td>" +
+                                                              "<td  id='StoreLocation" + rowCount + "' class='StoreLocation_'>" + $('#StoreLocation option:selected').text() + "</td>" +
+
+
+                                                           "<td id='GeneralRemarks" + rowCount + "' class='GeneralRemarks'>" + $("#GeneralRemarks").val() + "</td>" +
+
+                                                           "<td  style='display:none' id='Substance" + rowCount + "' class='Substance'>" + $("#Substance").val() + "</td>" +
+                                                            "<td id='Substance" + rowCount + "' class='Substance_'>" + $("#Substance option:selected").text() + "</td>" +
+
+                                                            "<td id='Weight" + rowCount + "' class='Weight'>" + $("#Weight").val() + "</td>" +
+                                                            "<td id='QtyAsPerDc" + rowCount + "' class='QtyAsPerDc'>" + $("#QtyAsPerDc").val() + "</td>" +
+
+
+
+                                                              "<td  style='display:none' id='QtyAsPerSQFT" + rowCount + "' class='QtyAsPerSQFT'>" + $("#QtyAsPerSQFT").val() + "</td>" + 
+                                                            "<td id='QtyAsPerSQFT" + rowCount + "' class='QtyAsPerSQFT_'>" + $("#QtyAsPerSQFT option:selected").text() + "</td>" +
+                                                            "<td id='QtyAsPerPCS" + rowCount + "' class='QtyAsPerPCS'>" + $("#QtyAsPerPCS").val() + "</td>" +
+
+                                                            "<td  style='display:none' id='QTYType" + rowCount + "' class='QTYType'>" + $("#QTYType").text() + "</td>" +
+                                                             "<td id='QTYType" + rowCount + "' class='QTYType_'>" + $("#QTYType option:selected").text() + "</td>" +
+                                                            "<td id='ReceivedQty" + rowCount + "' class='ReceivedQty'>" + $("#ReceivedQty").val() + "</td>" +
+
+
+                                                            "<td  style='display:none' id='ReceivedSQFT" + rowCount + "' class='ReceivedSQFT'>" + $("#ReceivedSQFT").text() + "</td>" +
+                                                             "<td id='ReceivedSQFT" + rowCount + "' class='ReceivedSQFT_'>" + $("#ReceivedSQFT option:selected").text() + "</td>" +
+
+                                                            "<td id='ReceivedPCS" + rowCount + "' class='ReceivedPCS'>" + $("#ReceivedPCS").val() + "</td>" +
+
+
+                                                             "<td  style='display:none' id='ReceivedType" + rowCount + "' class='ReceivedType'>" + $("#ReceivedType").text() + "</td>" +
+                                                             "<td id='ReceivedType" + rowCount + "' class='ReceivedType_'>" + $("#ReceivedType option:selected").text() + "</td>" +
+                                                            "<td id='RejectedQty" + rowCount + "' class='RejectedQty'>" + $("#RejectedQty").val() + "</td>" +
+
+                                                             "<td  style='display:none' id='RejectedSQFT" + rowCount + "' class='RejectedSQFT'>" + $("#RejectedSQFT").val() + "</td>" + 
+                                                            "<td id='RejectedSQFT" + rowCount + "' class='RejectedSQFT_'>" + $("#RejectedSQFT option:selected").text() + "</td>" +
+                                                            "<td id='RejectedPCS" + rowCount + "' class='RejectedPCS'>" + $("#RejectedPCS ").val() + "</td>" +
+
+                                                             "<td  style='display:none' id='RejectedType" + rowCount + "' class='RejectedType'>" + $("#RejectedType").val() + "</td>" +
+                                                            "<td id='RejectedType" + rowCount + "' class='RejectedType_'>" + $("#RejectedType option:selected").text() + "</td>" +
+
+                                                            "<td id='AcceptedQty" + rowCount + "' class='AcceptedQty'>" + $("#AcceptedQty").val() + "</td>" +
+
+                                                              "<td  style='display:none' id='AcceptedSQFT" + rowCount + "' class='AcceptedSQFT'>" + $("#AcceptedSQFT").val() + "</td>" +
+                                                            "<td id='AcceptedSQFT" + rowCount + "' class='AcceptedSQFT_'>" + $("#AcceptedSQFT option:selected").text() + "</td>" +
+
+
+                                                            "<td id='AcceptedPCS" + rowCount + "' class='AcceptedPCS'>" + $("#AcceptedPCS").val() + "</td>" +
+
+                                                             "<td  style='display:none' id='AcceptedType" + rowCount + "' class='AcceptedType'>" + $("#AcceptedType").val() + "</td>" +
+                                                            "<td id='AcceptedType" + rowCount + "' class='AcceptedType_'>" + $("#AcceptedType option:selected").text() + "</td>" +
+
+                                                            "<td id='QtyExcess" + rowCount + "' class='QtyExcess'>" + $("#QtyExcess").val() + "</td>" +
+                                                            "<td id='PendingQty" + rowCount + "' class='PendingQty'>" + $("#PendingQty").val() + "</td>" +
+                                                            "<td id='ExcessApproval" + rowCount + "' class='ExcessApproval'>" + $("#ExcessApproval").val() + "</td>" +
+                                                            "<td id='GeneralRemarks" + rowCount + "' class='GeneralRemarks'>" + $("#GeneralRemarks").val() + "</td>" +
+                                                            "<td id='Rate" + rowCount + "' class='Rate'>" + $("#Rate").val() + "</td>" +
+                                                            "<td id='Value" + rowCount + "' class='Value'>" + $("#Value").val() + "</td>" +
+                                                            "<td id='MRPMargin" + rowCount + "' class='MRPMargin'>" + $("#MRPMargin").val() + "</td>" +
+                                                            "<td id='MRPPrice" + rowCount + "' class='MRPPrice'>" + $("#MRPPrice").val() + "</td>" +
+                                                            "<td id='AccessibleValue" + rowCount + "' class='AccessibleValue'>" + $("#AccessibleValue").val() + "</td>" +
+                                                            "<td id='Discount_Per" + rowCount + "' class='Discount_Per'>" + $("#Discount_Per").val() + "</td>" +
+                                                            "<td id='Discount_Val" + rowCount + "' class='Discount_Val'>" + $("#Discount_Val").val() + "</td>" +
+                                                            "<td id='ExciseDuty_Per" + rowCount + "' class='ExciseDuty_Per'>" + $("#ExciseDuty_Per").val() + "</td>" +
+                                                            "<td id='ExciseDuty_Val" + rowCount + "' class='ExciseDuty_Val'>" + $("#ExciseDuty_Val").val() + "</td>" +
+                                                            "<td id='ST_VAT_CST_Per" + rowCount + "' class='ST_VAT_CST_Per'>" + $("#ST_VAT_CST_Per").val() + "</td>" +
+                                                            "<td id='ST_VAT_CST_Val" + rowCount + "' class='ST_VAT_CST_Val'>" + $("#ST_VAT_CST_Val").val() + "</td>" +
+                                                            "<td id='Ecess_Per" + rowCount + "' class='Ecess_Per'>" + $("#Ecess_Per").val() + "</td>" +
+                                                             "<td id='Ecess_Val" + rowCount + "' class='Ecess_Val'>" + $("#Ecess_Val").val() + "</td>" +
+                                                            "<td id='SH_Ecess_Per" + rowCount + "' class='SH_Ecess_Per'>" + $("#SH_Ecess_Per").val() + "</td>" +
+                                                            "<td id='SH_Ecess_Val" + rowCount + "' class='SH_Ecess_Val'>" + $("#SH_Ecess_Val").val() + "</td>" +
+                                                             "<td  id='GrnID" + rowCount + "'  style='display:none' class='GrnID'>" + GrnID + "</td>" +
+                                                           // "<td class='Ecess_Val'>" + $("#Ecess_Val").val() + "</td>" +
+                                                            "<td id='Surcharge_Per" + rowCount + "' class='Surcharge_Per'>" + $("#Surcharge_Per").val() + "</td>" +
+                                                            "<td id='Surcharge_Val" + rowCount + "' class='Surcharge_Val'>" + $("#Surcharge_Val").val() + "</td>" +
+                                                            "<td id='TagsPiecesDiscount_Per" + rowCount + "' class='TagsPiecesDiscount_Per'>" + $("#TagsPiecesDiscount_Per").val() + "</td>" +
+                                                            "<td id='TagsPiecesDiscount_Val" + rowCount + "' class='TagsPiecesDiscount_Val'>" + $("#TagsPiecesDiscount_Val").val() + "</td>" +
+                                                            "<td id='AmountplusTax" + rowCount + "'class='AmountplusTax'>" + $("#AmountplusTax").val() + "</td></tr>");
+
+
+                $("input[type='text'],textarea").val("");
+             //   $('#IONo').val("");
+             //   $('#MaterialId').val("");
+                $("#MaterialId").val("")
+                $("#MaterialId").combobox('destroy');
+                $("#MaterialId").combobox();
+                $("#IONo").val("")
+                $("#IONo").combobox('destroy');
+                $("#IONo").combobox();
+                $("#IndentNo").val("")
+                $("#IndentNo").combobox('destroy');
+                $("#IndentNo").combobox();
+                $("select option:first-child").prop("selected", "selected");
+             }
+             else if (CurrentRowID != "") { 
+                 $.ajax({
+                     type: 'POST',
+                     dataType: 'json',
+                     url: '/GRN_Detail/SaveDetails',
+                     data: {
+                         BarCodeNo: $('#BarCodeNo').val(),
+                         GrnID: $('#GrnID').val(),
+                         GrnNo: $('#GrnNo').val(),
+                         GrnDate: $('#GrnDate').val(),
+                         GrnRefNo: $('#GrnRefNo').val(),
+                         SupplierNameId: $('#SupplierNameId').val(),
+                         DC_No: $('#DC_No').val(),
+                         DCDate: $('#DCDate').val(),
+                         INVoiceNo: $('#INVoiceNo').val(),
+                         INVoiceDate: $('#INVoiceDate').val(),
+                         GateEntryNo: $('#GateEntryNo').val(),
+                         GEDate: $('#GEDate').val(),
+                         GETime: $('#GETime').val(),
+                         GateRefNo: $('#GateRefNo').val(),
+                         GrnType: $('#GrnType').val(),
+                         ST_VATcreditt: $('#ST_VATcreditt').val(),
+                         ImportClearance: $('#ImportClearance').val(),
+                         BENo: $('#BENo').val(),
+                         ExchangeRate: $('#ExchangeRate').val(),
+                         ShipmentMode: $('#ShipmentMode').val(),
+                         FreightAmount: $('#FreightAmount').val(),
+                         InsuranceAmount: $('#InsuranceAmount').val(),
+                         CustomsDuty: $('#CustomsDuty').val(),
+                         Pack_Forward: $('#Pack_Forward').val(),
+                         ServiceTax: $('#ServiceTax').val(),
+                         OtherCharges: $('#OtherCharges').val(),
+                         Transporter: $('#Transporter').val(),
+                         GeneralRemarks1: $('#GeneralRemarks1').val(),
+                         PoNO: $('#PoNO').val(),
+                         LOTNo: $('#LOTNo').val(),
+                         IndentNo: $('#IndentNo').val(),
+                         IONo: $('#IONo').val(),
+                         Stores: $('#Stores').val(),
+                         MaterialId: $('#MaterialId').val(),
+                         Grade: $('#Grade').val(),
+                         GroupID: $('#GroupID').val(),
+                         CategoryId: $('#CategoryId').val(),
+                         IfGroupIsMaintenance: $('#IfGroupIsMaintenance').val(),
+                         ColourId: $('#ColourId').val(),
+                         UOMId: $('#UOMId').val(),
+                         DOM: $('#DOM').val(),
+                         StoreLocation: $('#StoreLocation').val(),
+                         GeneralRemarks: $('#GeneralRemarks').val(),
+                         Substance: $('#Substance').val(),
+                         Weight: $('#Weight').val(),
+                         QtyAsPerDc: $('#QtyAsPerDc').val(),
+                         QtyAsPerSQFT: $('#QtyAsPerSQFT').val(),
+                         QtyAsPerPCS: $('#QtyAsPerPCS').val(),
+                         QTYType: $('#QTYType').val(),
+                         ReceivedQty: $('#ReceivedQty').val(),
+                         ReceivedSQFT: $('#ReceivedSQFT').val(),
+                         ReceivedPCS: $('#ReceivedPCS').val(),
+                         ReceivedType: $('#ReceivedType').val(),
+                         RejectedQty: $('#RejectedQty').val(),
+                         RejectedSQFT: $('#RejectedSQFT').val(),
+                         RejectedPCS: $('#RejectedPCS').val(),
+                         RejectedType: $('#RejectedType').val(),
+                         AcceptedQty: $('#AcceptedQty').val(),
+                         AcceptedSQFT: $('#AcceptedSQFT').val(),
+                         AcceptedPCS: $('#AcceptedPCS').val(),
+                         AcceptedType: $('#AcceptedType').val(),
+                         QtyExcess: $('#QtyExcess').val(),
+                         PendingQty: $('#PendingQty').val(),
+                         ExcessApproval: $('#ExcessApproval').val(),
+                         GeneralRemarks: $('#GeneralRemarks').val(),
+                         Rate: $('#Rate').val(),
+                         Value: $('#Value').val(),
+                         MRPMargin: $('#MRPMargin').val(),
+                         MRPPrice: $('#MRPPrice').val(),
+                         AccessibleValue: $('#AccessibleValue').val(),
+                         Discount_Per: $('#Discount_Per').val(),
+                         Discount_Val: $('#Discount_Val').val(),
+                         ExciseDuty_Per: $('#ExciseDuty_Per').val(),
+                         ExciseDuty_Val: $('#ExciseDuty_Val').val(),
+                         ST_VAT_CST_Per: $('#ST_VAT_CST_Per').val(),
+                         ST_VAT_CST_Val: $('#ST_VAT_CST_Val').val(),
+                         Ecess_Per: $('#Ecess_Per').val(),
+                         Ecess_Val: $('#Ecess_Val').val(),
+                         SH_Ecess_Per: $('#SH_Ecess_Per').val(),
+                         SH_Ecess_Val: $('#SH_Ecess_Val').val(),
+                         Surcharge_Per: $('#Surcharge_Per').val(),
+                         Surcharge_Val: $('#Surcharge_Val').val(),
+                         ST_VAT_CST_Val: $('#ST_VAT_CST_Val').val(),
+                         TagsPiecesDiscount_Per: $('#TagsPiecesDiscount_Per').val(),
+                         TagsPiecesDiscount_Val: $('#TagsPiecesDiscount_Val').val()
+                     },
+                     success: function (data) {                       
+                         var GrnID = data.GrnID;
+                         alert("Updated Successfully.");
+                         return false;
+                     }
+                 });
+                rowCount = $('#list-amended-material tr').length;
+
+                 $('#list-amended-material tbody').append("<tr id=" + rowCount + "><td id='BarCodeNo" + rowCount + "' class='BarCodeNo'>" + $('#BarCodeNo').val() + "</td>" +
+                                                             "<td  id='GrnNo" + rowCount + "' class='GrnNo'>" + $('#GrnNo').val() + "</td>" +
+                                                             "<td  id='GrnDate" + rowCount + "' class='GrnDate'>" + $('#GrnDate').val() + "</td>" +
+                                                             "<td  id='GrnRefNo" + rowCount + "' class='GrnRefNo'>" + $('#GrnRefNo').val() + "</td>" +
+                                                             "<td style='display:none'  id='SupplierNameId" + rowCount + "' class='SupplierNameId'>" + $('#SupplierNameId').val() + "</td>" +
+                                                             "<td  id='SupplierNameId" + rowCount + "' class='SupplierNameId_'>" + $('#SupplierNameId option:selected').text() + "</td>" +
+                                                             "<td id='DC_No" + rowCount + "'  class='DC_No'>" + $('#DC_No').val() + "</td>" +
+                                                             "<td id='DCDate" + rowCount + "' class='DCDate'>" + $('#DCDate').val() + "</td>" +
+                                                             "<td id='INVoiceNo" + rowCount + "' class='INVoiceNo'>" + $('#INVoiceNo').val() + "</td>" +
+                                                             "<td id='INVoiceDate" + rowCount + "' class='INVoiceDate'>" + $('#INVoiceDate').val() + "</td>" +
+                                                             "<td id='GateEntryNo" + rowCount + "' class='GateEntryNo'>" + $('#GateEntryNo').val() + "</td>" +
+                                                             "<td id='GEDate" + rowCount + "' class='GEDate'>" + $('#GEDate').val() + "</td>" +
+                                                             "<td id='GETime" + rowCount + "' class='GETime'>" + $('#GETime').val() + "</td>" +
+                                                             "<td id='GateRefNo" + rowCount + "' class='GateRefNo'>" + $('#GateRefNo').val() + "</td>" +
+                                                             "<td style='display:none' id='GrnType" + rowCount + "' class='GrnType'>" + $('#GrnType').val() + "</td>" +
+                                                             "<td id='GrnType" + rowCount + "' class='GrnType_'>" + $('#GrnType option:selected').text() + "</td>" +
+                                                             "<td id='ST_VATcredit" + rowCount + "' class='ST_VATcredit'>" + $('#ST_VATcredit').val() + "</td>" +
+                                                             "<td id='ImportClearance" + rowCount + "' class='ImportClearance'>" + $('#ImportClearance').val() + "</td>" +
+                                                             "<td id='BENo" + rowCount + "' class='BENo'>" + $('#BENo').val() + "</td>" +
+                                                             "<td id='ExchangeRate" + rowCount + "' class='ExchangeRate'>" + $('#ExchangeRate').val() + "</td>" +
+                                                             "<td id='ShipmentMode" + rowCount + "' class='ShipmentMode'>" + $('#ShipmentMode').val() + "</td>" +
+                                                             "<td id='FreightAmount" + rowCount + "' class='FreightAmount'>" + $('#FreightAmount').val() + "</td>" +
+                                                             "<td id='InsuranceAmount" + rowCount + "' class='InsuranceAmount'>" + $('#InsuranceAmount').val() + "</td>" +
+                                                             "<td id='CustomsDuty" + rowCount + "' class='CustomsDuty'>" + $('#CustomsDuty').val() + "</td>" +
+                                                             "<td id='Pack_Forward" + rowCount + "' class='Pack_Forward'>" + $('#Pack_Forward').val() + "</td>" +
+                                                             "<td id='ServiceTax" + rowCount + "' class='ServiceTax'>" + $('#ServiceTax').val() + "</td>" +
+                                                             "<td id='OtherCharges" + rowCount + "' class='OtherCharges'>" + $('#OtherCharges').val() + "</td>" +
+                                                             "<td id='Transporter" + rowCount + "' class='Transporter'>" + $('#Transporter').val() + "</td>" +
+                                                             "<td id='GeneralRemarks1" + rowCount + "' class='GeneralRemarks1'>" + $('#GeneralRemarks1').val() + "</td>" +
+                                                             "<td id='PoNO" + rowCount + "' class='PoNO'>" + $('#PoNO').val() + "</td>" +
+                                                             "<td id='LOTNo" + rowCount + "' class='LOTNo'>" + $('#LOTNo').val() + "</td>" +
+                                                             "<td id='IndentNo" + rowCount + "' class='IndentNo'>" + $('#IndentNo').val() + "</td>" +
+                                                             "<td id='IONo" + rowCount + "' class='IONo'>" + $('#IONo').val() + "</td>" +
+                                                              "<td style='display:none'  id='Stores" + rowCount + "' class='Stores'>" + $('#Stores').val() + "</td>" +
+                                                             "<td id='Stores" + rowCount + "' class='Stores_'>" + $('#Stores option:selected').text() + "</td>" +
+                                                               "<td style='display:none' id='MaterialId" + rowCount + "' class='MaterialId'>" + $('#MaterialId').val() + "</td>" +
+                                                             "<td id='MaterialId" + rowCount + "' class='MaterialId_'>" + $('#MaterialId option:selected').text() + "</td>" +
+
+                                                              "<td   style='display:none' id='Grade" + rowCount + "' class='Grade'>" + $('#Grade').val() + "</td>" +
+                                                              "<td  id='Grade" + rowCount + "' class='Grade_'>" + $('#Grade option:selected').text() + "</td>" +
+                                                              "<td style='display:none' id='GroupID" + rowCount + "' class='GroupID'>" + $('#GroupID').val() + "</td>" +
+                                                             "<td id='GroupID" + rowCount + "' class='GroupID_'>" + $('#GroupID option:selected').text() + "</td>" +
+
+                                                              "<td style='display:none' id='CategoryId" + rowCount + "' class='CategoryId'>" + $('#CategoryId').val() + "</td>" +
+                                                             "<td id='CategoryId" + rowCount + "' class='CategoryId_'>" + $('#CategoryId option:selected').text() + "</td>" +
+                                                             "<td id='IfGroupIsMaintenance" + rowCount + "' class='IfGroupIsMaintenance'>" + $('#IfGroupIsMaintenance').val() + "</td>" +
+                                                             "<td style='display:none' id='ColourId" + rowCount + "' class='ColourId'>" + $('#ColourId').val() + "</td>" +
+                                                             "<td id='ColourId" + rowCount + "' class='ColourId_'>" + $('#ColourId option:selected').text() + "</td>" +
+                                                             "<td  style='display:none' id='UOMId" + rowCount + "' class='UOMId'>" + $('#UOMId').val() + "</td>" +
+                                                             "<td id='UOMId" + rowCount + "' class='UOMId_'>" + $('#UOMId option:selected').text() + "</td>" +
+                                                             "<td id='DOM" + rowCount + "' class='DOM'>" + $('#DOM').val() + "</td>" +
+                                                             "<td style='display:none' id='StoreLocation" + rowCount + "' class='StoreLocation'>" + $('#StoreLocation').val() + "</td>" +
+                                                               "<td  id='StoreLocation" + rowCount + "' class='StoreLocation_'>" + $('#StoreLocation option:selected').text() + "</td>" +
+
+
+                                                            "<td id='GeneralRemarks" + rowCount + "' class='GeneralRemarks'>" + $("#GeneralRemarks").val() + "</td>" +
+
+                                                            "<td  style='display:none' id='Substance" + rowCount + "' class='Substance'>" + $("#Substance").val() + "</td>" +
+                                                             "<td id='Substance" + rowCount + "' class='Substance_'>" + $("#Substance option:selected").text() + "</td>" +
+
+                                                             "<td id='Weight" + rowCount + "' class='Weight'>" + $("#Weight").val() + "</td>" +
+                                                             "<td id='QtyAsPerDc" + rowCount + "' class='QtyAsPerDc'>" + $("#QtyAsPerDc").val() + "</td>" +
+
+
+
+                                                               "<td  style='display:none' id='QtyAsPerSQFT" + rowCount + "' class='QtyAsPerSQFT'>" + $("#QtyAsPerSQFT").val() + "</td>" + 
+                                                             "<td id='QtyAsPerSQFT" + rowCount + "' class='QtyAsPerSQFT_'>" + $("#QtyAsPerSQFT option:selected").text() + "</td>" +
+                                                             "<td id='QtyAsPerPCS" + rowCount + "' class='QtyAsPerPCS'>" + $("#QtyAsPerPCS").val() + "</td>" +
+
+                                                             "<td  style='display:none' id='QTYType" + rowCount + "' class='QTYType'>" + $("#QTYType").text() + "</td>" +
+                                                              "<td id='QTYType" + rowCount + "' class='QTYType_'>" + $("#QTYType option:selected").text() + "</td>" +
+                                                             "<td id='ReceivedQty" + rowCount + "' class='ReceivedQty'>" + $("#ReceivedQty").val() + "</td>" +
+
+
+                                                             "<td  style='display:none' id='ReceivedSQFT" + rowCount + "' class='ReceivedSQFT'>" + $("#ReceivedSQFT").text() + "</td>" +
+                                                              "<td id='ReceivedSQFT" + rowCount + "' class='ReceivedSQFT_'>" + $("#ReceivedSQFT option:selected").text() + "</td>" +
+
+                                                             "<td id='ReceivedPCS" + rowCount + "' class='ReceivedPCS'>" + $("#ReceivedPCS").val() + "</td>" +
+
+
+                                                              "<td  style='display:none' id='ReceivedType" + rowCount + "' class='ReceivedType'>" + $("#ReceivedType").text() + "</td>" +
+                                                              "<td id='ReceivedType" + rowCount + "' class='ReceivedType_'>" + $("#ReceivedType option:selected").text() + "</td>" +
+                                                             "<td id='RejectedQty" + rowCount + "' class='RejectedQty'>" + $("#RejectedQty").val() + "</td>" +
+
+                                                              "<td  style='display:none' id='RejectedSQFT" + rowCount + "' class='RejectedSQFT'>" + $("#RejectedSQFT").val() + "</td>" + 
+                                                             "<td id='RejectedSQFT" + rowCount + "' class='RejectedSQFT_'>" + $("#RejectedSQFT option:selected").text() + "</td>" +
+                                                             "<td id='RejectedPCS" + rowCount + "' class='RejectedPCS'>" + $("#RejectedPCS ").val() + "</td>" +
+
+                                                              "<td  style='display:none' id='RejectedType" + rowCount + "' class='RejectedType'>" + $("#RejectedType").val() + "</td>" +
+                                                             "<td id='RejectedType" + rowCount + "' class='RejectedType_'>" + $("#RejectedType option:selected").text() + "</td>" +
+
+                                                             "<td id='AcceptedQty" + rowCount + "' class='AcceptedQty'>" + $("#AcceptedQty").val() + "</td>" +
+
+                                                               "<td  style='display:none' id='AcceptedSQFT" + rowCount + "' class='AcceptedSQFT'>" + $("#AcceptedSQFT").val() + "</td>" +
+                                                             "<td id='AcceptedSQFT" + rowCount + "' class='AcceptedSQFT_'>" + $("#AcceptedSQFT option:selected").text() + "</td>" +
+
+
+                                                             "<td id='AcceptedPCS" + rowCount + "' class='AcceptedPCS'>" + $("#AcceptedPCS").val() + "</td>" +
+
+                                                              "<td  style='display:none' id='AcceptedType" + rowCount + "' class='AcceptedType'>" + $("#AcceptedType").val() + "</td>" +
+                                                             "<td id='AcceptedType" + rowCount + "' class='AcceptedType_'>" + $("#AcceptedType option:selected").text() + "</td>" +
+
+                                                             "<td id='QtyExcess" + rowCount + "' class='QtyExcess'>" + $("#QtyExcess").val() + "</td>" +
+                                                             "<td id='PendingQty" + rowCount + "' class='PendingQty'>" + $("#PendingQty").val() + "</td>" +
+                                                             "<td id='ExcessApproval" + rowCount + "' class='ExcessApproval'>" + $("#ExcessApproval").val() + "</td>" +
+                                                             "<td id='GeneralRemarks" + rowCount + "' class='GeneralRemarks'>" + $("#GeneralRemarks").val() + "</td>" +
+                                                             "<td id='Rate" + rowCount + "' class='Rate'>" + $("#Rate").val() + "</td>" +
+                                                             "<td id='Value" + rowCount + "' class='Value'>" + $("#Value").val() + "</td>" +
+                                                             "<td id='MRPMargin" + rowCount + "' class='MRPMargin'>" + $("#MRPMargin").val() + "</td>" +
+                                                             "<td id='MRPPrice" + rowCount + "' class='MRPPrice'>" + $("#MRPPrice").val() + "</td>" +
+                                                             "<td id='AccessibleValue" + rowCount + "' class='AccessibleValue'>" + $("#AccessibleValue").val() + "</td>" +
+                                                             "<td id='Discount_Per" + rowCount + "' class='Discount_Per'>" + $("#Discount_Per").val() + "</td>" +
+                                                             "<td id='Discount_Val" + rowCount + "' class='Discount_Val'>" + $("#Discount_Val").val() + "</td>" +
+                                                             "<td id='ExciseDuty_Per" + rowCount + "' class='ExciseDuty_Per'>" + $("#ExciseDuty_Per").val() + "</td>" +
+                                                             "<td id='ExciseDuty_Val" + rowCount + "' class='ExciseDuty_Val'>" + $("#ExciseDuty_Val").val() + "</td>" +
+                                                             "<td id='ST_VAT_CST_Per" + rowCount + "' class='ST_VAT_CST_Per'>" + $("#ST_VAT_CST_Per").val() + "</td>" +
+                                                             "<td id='ST_VAT_CST_Val" + rowCount + "' class='ST_VAT_CST_Val'>" + $("#ST_VAT_CST_Val").val() + "</td>" +
+                                                             "<td id='Ecess_Per" + rowCount + "' class='Ecess_Per'>" + $("#Ecess_Per").val() + "</td>" +
+                                                              "<td id='Ecess_Val" + rowCount + "' class='Ecess_Val'>" + $("#Ecess_Val").val() + "</td>" +
+                                                             "<td id='SH_Ecess_Per" + rowCount + "' class='SH_Ecess_Per'>" + $("#SH_Ecess_Per").val() + "</td>" +
+                                                             "<td id='SH_Ecess_Val" + rowCount + "' class='SH_Ecess_Val'>" + $("#SH_Ecess_Val").val() + "</td>" +
+                                                              "<td  id='GrnID" + rowCount + "'  style='display:none' class='GrnID'>" + GrnID + "</td>" +
+                                                            // "<td class='Ecess_Val'>" + $("#Ecess_Val").val() + "</td>" +
+                                                             "<td id='Surcharge_Per" + rowCount + "' class='Surcharge_Per'>" + $("#Surcharge_Per").val() + "</td>" +
+                                                             "<td id='Surcharge_Val" + rowCount + "' class='Surcharge_Val'>" + $("#Surcharge_Val").val() + "</td>" +
+                                                             "<td id='TagsPiecesDiscount_Per" + rowCount + "' class='TagsPiecesDiscount_Per'>" + $("#TagsPiecesDiscount_Per").val() + "</td>" +
+                                                             "<td id='TagsPiecesDiscount_Val" + rowCount + "' class='TagsPiecesDiscount_Val'>" + $("#TagsPiecesDiscount_Val").val() + "</td>" +
+                                                             "<td id='AmountplusTax" + rowCount + "'class='AmountplusTax'>" + $("#AmountplusTax").val() + "</td></tr>");
+
+
+                 $("input[type='text'],textarea").val("");
+                 $("#MaterialId").val("")
+                 $("#MaterialId").combobox('destroy');
+                 $("#MaterialId").combobox();
+                 $("#IONo").val("")
+                 $("#IONo").combobox('destroy');
+                 $("#IONo").combobox();
+                 $("#IndentNo").val("")
+                 $("#IndentNo").combobox('destroy');
+                 $("#IndentNo").combobox();
+                 $("select option:first-child").prop("selected", "selected");
+
+                 }
+
+             else  { 
+                $('#BarCodeNo' + CurrentRowID + '').html($('#BarCodeNo').val());
+                $('#GrnID' + CurrentRowID + '').html($('#GrnID').val());
+                $('#GrnNo' + CurrentRowID + '').html($('#GrnNo').val());
+                $('#GrnDate' + CurrentRowID + '').html($('#GrnDate').val());
+                $('#GrnRefNo' + CurrentRowID + '').html($('#GrnRefNo').val());
+                $('#SupplierNameId' + CurrentRowID + '').html($('#SupplierNameId').val());
+                $('#DC_No' + CurrentRowID + '').html($('#DC_No').val());
+                $('#DCDate' + CurrentRowID + '').html($('#DCDate').val());
+                $('#INVoiceNo' + CurrentRowID + '').html($('#INVoiceNo').val());
+                $('#INVoiceDate' + CurrentRowID + '').html($('#INVoiceDate').val());
+                $('#GateEntryNo' + CurrentRowID + '').html($('#GateEntryNo').val());
+                $('#GEDate' + CurrentRowID + '').html($('#GEDate').val());
+                $('#GETime' + CurrentRowID + '').html($('#GETime').val());
+                $('#GateRefNo' + CurrentRowID + '').html($('#GateRefNo').val());
+                $('#GrnType' + CurrentRowID + '').html($('#GrnType').val());
+                $('#ST_VATcredit' + CurrentRowID + '').html($('#ST_VATcredit').val());
+                $('#ImportClearance' + CurrentRowID + '').html($('#ImportClearance').val());
+                $('#BENo' + CurrentRowID + '').html($('#BENo').val());
+                $('#ExchangeRate' + CurrentRowID + '').html($('#ExchangeRate').val());
+                $('#ShipmentMode' + CurrentRowID + '').html($('#ShipmentMode').val());
+                $('#FreightAmount' + CurrentRowID + '').html($('#FreightAmount').val());
+                $('#InsuranceAmount' + CurrentRowID + '').html($('#InsuranceAmount').val());
+                $('#CustomsDuty' + CurrentRowID + '').html($('#CustomsDuty').val());
+                $('#Pack_Forward' + CurrentRowID + '').html($('#Pack_Forward').val());
+                $('#ServiceTax' + CurrentRowID + '').html($('#ServiceTax').val());
+                $('#OtherCharges' + CurrentRowID + '').html($('#OtherCharges').val());
+                $('#Transporter' + CurrentRowID + '').html($('#Transporter').val());
+                $('#GeneralRemarks1' + CurrentRowID + '').html($('#GeneralRemarks1').val());
+                $('#PoNO' + CurrentRowID + '').html($('#PoNO').val());
+                $('#LOTNo' + CurrentRowID + '').html($('#LOTNo').val());
+                $('#IndentNo' + CurrentRowID + '').html($('#IndentNo').val());
+                $('#IONo' + CurrentRowID + '').html($('#IONo').val());
+                $('#Stores' + CurrentRowID + '').html($('#Stores').val());
+                $('#MaterialId' + CurrentRowID + '').html($('#MaterialId').val());
+                $('#Grade' + CurrentRowID + '').html($('#Grade').val());
+                $('#GroupID' + CurrentRowID + '').html($('#GroupID').val());
+                $('#CategoryId' + CurrentRowID + '').html($('#CategoryId').val());
+                $('#IfGroupIsMaintenance' + CurrentRowID + '').html($('#IfGroupIsMaintenance').val());
+                $('#ColourId' + CurrentRowID + '').html($('#ColourId').val());
+                $('#UOMId' + CurrentRowID + '').html($('#UOMId').val());
+                $('#DOM' + CurrentRowID + '').html($('#DOM').val());
+                $('#StoreLocation' + CurrentRowID + '').html($('#StoreLocation').val());
+                $('#GeneralRemarks' + CurrentRowID + '').html($('#GeneralRemarks').val());
+                $('#Substance' + CurrentRowID + '').html($('#Substance').val());
+                $('#Weight' + CurrentRowID + '').html($('#Weight').val());
+                $('#QtyAsPerDc' + CurrentRowID + '').html($('#QtyAsPerDc').val());
+                $('#QtyAsPerSQFT' + CurrentRowID + '').html($('#QtyAsPerSQFT').val());
+                $('#QtyAsPerPCS' + CurrentRowID + '').html($('#QtyAsPerPCS').val());
+                $('#QTYType' + CurrentRowID + '').html($('#QTYType').val());
+                $('#ReceivedQty' + CurrentRowID + '').html($('#ReceivedQty').val());
+                $('#ReceivedSQFT' + CurrentRowID + '').html($('#ReceivedSQFT').val());
+                $('#ReceivedPCS' + CurrentRowID + '').html($('#ReceivedPCS').val());
+                $('#ReceivedType' + CurrentRowID + '').html($('#ReceivedType').val());
+                $('#RejectedQty' + CurrentRowID + '').html($('#RejectedQty').val());
+                $('#RejectedSQFT' + CurrentRowID + '').html($('#RejectedSQFT').val());
+                $('#RejectedPCS' + CurrentRowID + '').html($('#RejectedPCS').val());
+                $('#RejectedType' + CurrentRowID + '').html($('#RejectedType').val());
+                $('#AcceptedQty' + CurrentRowID + '').html($('#AcceptedQty').val());
+                $('#AcceptedSQFT' + CurrentRowID + '').html($('#AcceptedSQFT').val());
+                $('#AcceptedPCS' + CurrentRowID + '').html($('#AcceptedPCS').val());
+                $('#AcceptedType' + CurrentRowID + '').html($('#AcceptedType').val());
+                $('#QtyExcess' + CurrentRowID + '').html($('#QtyExcess').val());
+                $('#PendingQty' + CurrentRowID + '').html($('#PendingQty').val());
+                $('#ExcessApproval' + CurrentRowID + '').html($('#ExcessApproval').val());
+                $('#GeneralRemarks' + CurrentRowID + '').html($('#GeneralRemarks').val());
+                $('#Rate' + CurrentRowID + '').html($('#Rate').val());
+                $('#Value' + CurrentRowID + '').html($('#Value').val());
+                $('#MRPMargin' + CurrentRowID + '').html($('#MRPMargin').val());
+                $('#MRPPrice' + CurrentRowID + '').html($('#MRPPrice').val());
+                $('#AccessibleValue' + CurrentRowID + '').html($('#AccessibleValue').val());
+                $('#Discount_Per' + CurrentRowID + '').html($('#Discount_Per').val());
+                $('#Discount_Val' + CurrentRowID + '').html($('#Discount_Val').val());
+                $('#ExciseDuty_Per' + CurrentRowID + '').html($('#ExciseDuty_Per').val());
+                $('#ExciseDuty_Val' + CurrentRowID + '').html($('#ExciseDuty_Val').val());
+                $('#ST_VAT_CST_Per' + CurrentRowID + '').html($('#ST_VAT_CST_Per').val());
+                $('#ST_VAT_CST_Val' + CurrentRowID + '').html($('#ST_VAT_CST_Val').val());
+                $('#Ecess_Per' + CurrentRowID + '').html($('#Ecess_Per').val());
+                $('#Ecess_Val' + CurrentRowID + '').html($('#Ecess_Val').val());
+                $('#SH_Ecess_Per' + CurrentRowID + '').html($('#SH_Ecess_Per').val());
+                $('#SH_Ecess_Val' + CurrentRowID + '').html($('#SH_Ecess_Val').val());
+                $('#Surcharge_Per' + CurrentRowID + '').html($('#Surcharge_Per').val());
+                $('#Surcharge_Val' + CurrentRowID + '').html($('#Surcharge_Val').val());
+                $('#ST_VAT_CST_Val' + CurrentRowID + '').html($('#ST_VAT_CST_Val').val());
+                $('#TagsPiecesDiscount_Per' + CurrentRowID + '').html($('#TagsPiecesDiscount_Per').val());
+                $('#TagsPiecesDiscount_Val' + CurrentRowID + '').html($('#TagsPiecesDiscount_Val').val());
+                $("input[type='text'],textarea").val("");
+                $("select option:first-child").prop("selected", "selected");
+
+            }
+        }
+        // }
+    }
+    );
+
+    //Click on grid row
+    $(document).on('click', '#list-amended-material tbody tr', function () {
+      
+        CurrentRowID = $(this).attr('id');      
+        $(this).addClass("curChangeableRow");
+        $(this).siblings().removeClass("curChangeableRow");
+        $(this).parent().parent().remove();
+        $("#UpdateBtn").show();
+        $("#AddBtn").hide();
+
+        $('#BarCodeNo').val($(this).find('.BarCodeNo').html());
+        $('#GrnNo').val($(this).find('.GrnNo').html());
+        $('#GrnDate').val($(this).find('.GrnDate').html());
+        $('#GrnRefNo').val($(this).find('.GrnRefNo').html());
+        $('#SupplierNameId').val($(this).find('.SupplierNameId').html());
+        $('#DC_No').val($(this).find('.DC_No').html());
+        $('#DCDate').val($(this).find('.DCDate').html());
+        $('#INVoiceNo').val($(this).find('.INVoiceNo').html());
+        $('#INVoiceDate').val($(this).find('.INVoiceDate').html());
+        $('#GateEntryNo').val($(this).find('.GateEntryNo').html());
+        $('#GEDate').val($(this).find('.GEDate').html());
+        $('#GETime').val($(this).find('.GETime').html());
+        $('#GateRefNo').val($(this).find('.GateRefNo').html());
+        $('#GrnType').val($(this).find('.GrnType').html());
+        $('#ST_VATcredit').val($(this).find('.ST_VATcredit').html());
+        $('#ImportClearance').val($(this).find('.ImportClearance').html());
+        $('#BENo').val($(this).find('.BENo').html());
+        $('#ExchangeRate').val($(this).find('.ExchangeRate').html());
+        $('#ShipmentMode').val($(this).find('.ShipmentMode').html());
+        $('#FreightAmount').val($(this).find('.FreightAmount').html());
+        $('#InsuranceAmount').val($(this).find('.InsuranceAmount').html());
+        $('#CustomsDuty').val($(this).find('.CustomsDuty').html());
+        $('#Pack_Forward').val($(this).find('.Pack_Forward').html());
+        $('#ServiceTax').val($(this).find('.ServiceTax').html());
+        $('#OtherCharges').val($(this).find('.OtherCharges').html());
+        $('#Transporter').val($(this).find('.Transporter').html());
+        $('#GeneralRemarks1').val($(this).find('.GeneralRemarks1').html());
+        $('#PoNO').val($(this).find('.PoNO').html());
+        $('#LOTNo').val($(this).find('.LOTNo').html());
+        $('#IndentNo').val($(this).find('.IndentNo').html());
+        $('#IONo').val($(this).find('.IONo').html());
+        $('#Stores').val($(this).find('.Stores').html());
+        $('#MaterialId').val($(this).find('.MaterialId').html());
+        $('#Grade').val($(this).find('.Grade').html());
+        $('#GroupID').val($(this).find('.GroupID').html());
+        $('#CategoryId').val($(this).find('.CategoryId').html());
+        $('#IfGroupIsMaintenance').val($(this).find('.IfGroupIsMaintenance').html());
+        $('#ColourId').val($(this).find('.ColourId').html());
+        $('#UOMId').val($(this).find('.UOMId').html());
+        $('#DOM').val($(this).find('.DOM').html());
+        $('#StoreLocation').val($(this).find('.StoreLocation').html());
+        $('#GeneralRemarks').val($(this).find('.GeneralRemarks').html());
+        $('#Substance').val($(this).find('.Substance').html());
+        $('#Weight').val($(this).find('.Weight').html());
+        $('#QtyAsPerDc').val($(this).find('.QtyAsPerDc').html());
+        $('#QtyAsPerSQFT').val($(this).find('.QtyAsPerSQFT').html());
+        $('#QtyAsPerPCS').val($(this).find('.QtyAsPerPCS').html());
+        $('#QTYType').val($(this).find('.QTYType').html());
+        $('#ReceivedQty').val($(this).find('.ReceivedQty').html());
+        $('#ReceivedSQFT').val($(this).find('.ReceivedSQFT').html());
+        $('#ReceivedPCS').val($(this).find('.ReceivedPCS').html());
+        $('#ReceivedType').val($(this).find('.ReceivedType').html());
+        $('#RejectedQty').val($(this).find('.RejectedQty').html());
+        $('#RejectedSQFT').val($(this).find('.RejectedSQFT').html());
+        $('#RejectedPCS').val($(this).find('.RejectedPCS').html());
+        $('#RejectedType').val($(this).find('.RejectedType').html());
+        $('#AcceptedQty').val($(this).find('.AcceptedQty').html());
+        $('#AcceptedSQFT').val($(this).find('.AcceptedSQFT').html());
+        $('#AcceptedPCS').val($(this).find('.AcceptedPCS').html());
+        $('#AcceptedType').val($(this).find('.AcceptedType').html());
+        $('#QtyExcess').val($(this).find('.QtyExcess').html());
+        $('#PendingQty').val($(this).find('.PendingQty').html());
+        $('#ExcessApproval').val($(this).find('.ExcessApproval').html());
+        $('#GeneralRemarks').val($(this).find('.GeneralRemarks').html());
+        $('#Rate').val($(this).find('.Rate').html());
+        $('#Value').val($(this).find('.Value').html());
+        $('#MRPMargin').val($(this).find('.MRPMargin').html());
+        $('#MRPPrice').val($(this).find('.MRPPrice').html());
+        $('#AccessibleValue').val($(this).find('.AccessibleValue').html());
+        $('#Discount_Per').val($(this).find('.Discount_Per').html());
+        $('#Discount_Val').val($(this).find('.Discount_Val').html());
+        $('#ExciseDuty_Per').val($(this).find('.ExciseDuty_Per').html());
+        $('#ExciseDuty_Val').val($(this).find('.ExciseDuty_Val').html());
+        $('#ST_VAT_CST_Per').val($(this).find('.ST_VAT_CST_Per').html());
+        $('#ST_VAT_CST_Val').val($(this).find('.ST_VAT_CST_Val').html());
+        $('#Ecess_Per').val($(this).find('.Ecess_Per').html());
+        $('#Ecess_Val').val($(this).find('.Ecess_Val').html());
+        $('#SH_Ecess_Per').val($(this).find('.SH_Ecess_Per').html());
+        $('#SH_Ecess_Val').val($(this).find('.SH_Ecess_Val').html());
+        $('#Surcharge_Per').val($(this).find('.Surcharge_Per').html());
+        $('#Surcharge_Val').val($(this).find('.Surcharge_Val').html());
+        $('#TagsPiecesDiscount_Per').val($(this).find('.TagsPiecesDiscount_Per').html());
+        $('#TagsPiecesDiscount_Val').val($(this).find('.TagsPiecesDiscount_Val').html());
+        $('#AmountplusTax').val($(this).find('.AmountplusTax').html());
+
+
+    });
+    //PO Change Event
+    $(function () {
+        $("#PoNO").change(function () {
+            var selectedText = $(this).find("option:selected").text();
+            var selectedValue = $(this).val();
+            $.ajax({
+                type: 'POST',
+                url: '/GRN_Detail/GetPoDetails',
+                data: { POID: selectedValue },
+                success: function (data) {
+                    $('#CategoryId').val(data.Category);
+                    $('#IndentNo').val(data.IndentNo);
+                    $('#IONo').val(data.IONo);
+                    $('#MaterialId').val(data.Material);
+                    $('#GroupID').val(data.Groupname);
+                    $('#ColourId').val(data.Color);
+                    $('#UOMId').val(data.UOM);
+                    $('#Remarks').val(data.Remarks);
+                    $('#Substance').val(data.Substance);
+                    $('#Weight').val(data.Weight);
+                    $('#Rate').val(data.Rate);
+                    $('#MRPMargin').val(data.MRPMargin);
+                    $('#MRPPrice').val(data.MRPPrice);
+                    $('#AccessibleValue').val(data.AccessibleValue);
+                    $('#Discount_Per').val(data.Dis);
+                    $('#Discount_Val').val(data.DisAmount);
+                    $('#ExciseDuty_Per').val(data.ExciseDuty);
+                    $('#ExciseDuty_Val').val(data.ExciseDutyAmount);
+                    $('#ST_VAT_CST_Per').val(data.VAT);
+                    $('#ST_VAT_CST_Val').val(data.VATAmt);
+                    $('#Ecess_Per').val(data.Exess);
+                    $('#Ecess_Val').val(data.ExessAmount);
+                    $('#SH_Ecess_Per').val(data.SHExess);
+                    $('#SH_Ecess_Val').val(data.SHExessAmount);
+                    $('#Surcharge_Per').val(data.SurCharge);
+                    $('#Surcharge_Val').val(data.SurChargeAmt);
+                    $('#AmountplusTax').val(data.AmountTax);
+                    $('#FreightAmount').val(data.FreightAmt);
+                    $('#InsuranceAmount').val(data.InsuranceAmount);
+                    $('#CustomsDuty').val(data.CustomsDuty);
+                    $('#Pack_Forward').val(data.PackForward);
+                    $('#ServiceTax').val(data.ServiceTax);
+                    //$('#OtherCharges').val(data.AmountTax);
+                    //$('#AmountplusTax').val(data.AmountTax);
+                    console.log(data);
+                }
+
+            });
+
+        });
+    });
+
+    //Save Process
+
+    function Save() {
+
+        //if (validation()) {
+        validation();
+        if (validation() != false) {
+
+            if ($("#list-amended-material tbody tr").length == 0) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/GRN_Detail/SaveDetails',
+                    data: $("form").serialize(),
+                    success: function (data) {
+                        if (data == true) {
+                            if ($("#BtnSave").val() == "Save") {
+                                alert('Saved Successfully.');
+                            }
+                            else {
+                                alert('Updated Successfully.');
+                            }
+                            //  $("#BtnSave").attr('value', 'Save');
+                            location.href = "/GRN_Detail/GoodReceipeNote";
+                            return false;
+                        }
+                        else {
+                            alert('Save process Failed.');
+                            location.href = "/GRN_Detail/GoodReceipeNote";
+                            return false;
+                        }
+                    }
+                });
+
+            }
+        }
+        else {
+            var wholeJsonList = [];
+
+            $('#list-amended-material tbody tr').each(function () {
+                wholeJsonList.push(
+                    {
+                        // BuyerOrderSlNo: $(this).find('span').html(),
+                        BarCodeNo: $(this).find('.BarCodeNo').html(),
+                        GrnNo: $(this).find('.GrnNo').html(),
+                        GrnDate: $(this).find('.GrnDate').html(),
+                        GrnRefNo: $(this).find('.GrnRefNo').html(),
+                        SupplierNameId: $(this).find('.SupplierNameId').html(),
+                        DC_No: $(this).find('.DC_No').html(),
+                        DCDate: $(this).find('.DCDate').html(),
+                        INVoiceNo: $(this).find('.INVoiceNo').html(),
+                        INVoiceDate: $(this).find('.INVoiceDate').html(),
+                        GateEntryNo: $(this).find('.GateEntryNo').html(),
+                        GEDate: $(this).find('.GEDate').html(),
+                        GETime: $(this).find('.GETime').html(),
+                        GateRefNo: $(this).find('.GateRefNo').html(),
+                        GrnType: $(this).find('.GrnType').html(),
+                        ST_VATcredit: $(this).find('.ST_VATcredit').html(),
+                        ImportClearance: $(this).find('.ImportClearance').html(),
+                        BENo: $(this).find('.BENo').html(),
+                        ExchangeRate: $(this).find('.ExchangeRate').html(),
+                        ShipmentMode: $(this).find('.ShipmentMode').html(),
+                        FreightAmount: $(this).find('.FreightAmount').html(),
+                        InsuranceAmount: $(this).find('.InsuranceAmount').html(),
+                        CustomsDuty: $(this).find('.CustomsDuty').html(),
+                        Pack_Forward: $(this).find('.Pack_Forward').html(),
+                        ServiceTax: $(this).find('.ServiceTax').html(),
+                        OtherCharges: $(this).find('.OtherCharges').html(),
+                        Transporter: $(this).find('.Transporter').html(),
+                        GeneralRemarks1: $(this).find('.GeneralRemarks1').html(),
+                        PoNO: $(this).find('.PoNO').html(),
+                        LOTNo: $(this).find('.LOTNo').html(),
+                        IndentNo: $(this).find('.IndentNo').html(),
+                        IONo: $(this).find('.IONo').html(),
+                        Stores: $(this).find('.Stores').html(),
+                        MaterialId: $(this).find('.MaterialId').html(),
+                        Grade: $(this).find('.Grade').html(),
+                        GroupID: $(this).find('.GroupID').html(),
+                        CategoryId: $(this).find('.CategoryId').html(),
+                        IfGroupIsMaintenance: $(this).find('.IfGroupIsMaintenance').html(),
+                        ColourId: $(this).find('.ColourId').html(),
+                        UOMId: $(this).find('.UOMId').html(),
+                        DOM: $(this).find('.DOM').html(),
+                        StoreLocation: $(this).find('.StoreLocation').html(),
+                        Remarks: $(this).find('.Remarks').html(),
+                        Substance: $(this).find('.Substance').html(),
+                        Weight: $(this).find('.Weight').html(),
+                        QtyAsPerDc: $(this).find('.QtyAsPerDc').html(),
+                        QtyAsPerSQFT: $(this).find('.QtyAsPerSQFT').html(),
+                        QtyAsPerPCS: $(this).find('.QtyAsPerPCS').html(),
+                        QTYType: $(this).find('.QTYType').html(),
+                        ReceivedQty: $(this).find('.ReceivedQty').html(),
+                        ReceivedSQFT: $(this).find('.ReceivedSQFT').html(),
+                        ReceivedPCS: $(this).find('.ReceivedPCS').html(),
+                        ReceivedType: $(this).find('.ReceivedType').html(),
+                        RejectedQty: $(this).find('.RejectedQty').html(),
+                        RejectedSQFT: $(this).find('.RejectedSQFT').html(),
+                        RejectedPCS: $(this).find('.RejectedPCS').html(),
+                        RejectedType: $(this).find('.RejectedType').html(),
+                        AcceptedQty: $(this).find('.AcceptedQty').html(),
+                        AcceptedSQFT: $(this).find('.AcceptedSQFT').html(),
+                        AcceptedPCS: $(this).find('.AcceptedPCS').html(),
+                        AcceptedType: $(this).find('.AcceptedType').html(),
+                        QtyExcess: $(this).find('.QtyExcess').html(),
+                        PendingQty: $(this).find('.PendingQty').html(),
+                        ExcessApproval: $(this).find('.ExcessApproval').html(),
+                        GeneralRemarks: $(this).find('.GeneralRemarks').html(),
+                        Rate: $(this).find('.Rate').html(),
+                        Value: $(this).find('.Value').html(),
+                        MRPMargin: $(this).find('.MRPMargin').html(),
+                        MRPPrice: $(this).find('.MRPPrice').html(),
+                        AccessibleValue: $(this).find('.AccessibleValue').html(),
+                        Discount_Per: $(this).find('.Discount_Per').html(),
+                        Discount_Val: $(this).find('.Discount_Val').html(),
+                        ExciseDuty_Per: $(this).find('.ExciseDuty_Per').html(),
+                        ExciseDuty_Val: $(this).find('.ExciseDuty_Val').html(),
+                        ST_VAT_CST_Per: $(this).find('.ST_VAT_CST_Per').html(),
+                        ST_VAT_CST_Val: $(this).find('.ST_VAT_CST_Val').html(),
+                        Ecess_Per: $(this).find('.Ecess_Per').html(),
+                        Ecess_Val: $(this).find('.Ecess_Val').html(),
+                        SH_Ecess_Per: $(this).find('.SH_Ecess_Per').html(),
+                        SH_Ecess_Val: $(this).find('.SH_Ecess_Val').html(),
+                        Surcharge_Per: $(this).find('.Surcharge_Per').html(),
+                        Surcharge_Val: $(this).find('.Surcharge_Val').html(),
+                        TagsPiecesDiscount_Per: $(this).find('.TagsPiecesDiscount_Per').html(),
+                        TagsPiecesDiscount_Val: $(this).find('.TagsPiecesDiscount_Val').html(),
+                        AmountplusTax: $(this).find('.AmountplusTax').html(),
+                    });
+            });
+
+            var wholeJsonListLength = wholeJsonList.length;
+            //alert(wholeJsonListLength)
+            var i = 0;
+            for (i = 0; i <= wholeJsonListLength - 1; i++) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/GRN_Detail/SaveDetails',
+                    data: wholeJsonList[i],
+                    success: function (data) {
+                        if (data == true) {
+                            if ($("#BtnSave").val() == "Save") {
+                                alert('Saved Successfully.');
+                            }
+                            else {
+                                alert('Updated Successfully.');
+                            }
+                            location.href = "/GRN_Detail/GoodReceipeNote";
+                            return false;
+                        }
+                        else {
+                            alert('Save process Failed.');
+                            location.href = "/GRN_Detail/GoodReceipeNote";
+                            return false;
+                        }
+                    }
+                });
+            }
+        }
+        // }
+    }
+
+    function validation() {
+        if ($('#BarCodeNo').val() == "") {
+            alert("Please Enter Bar Code No."); $('#BarCodeNo').css('border-color', 'red'); $('#BarCodeNo').focus(); return false;
+        }
+        else {
+            $('#BarCodeNo').css('border-color', '');
+        }
+        if ($('#GrnNo').val() == "") {
+            alert("Please Enter Grn No."); $('#GrnNo').css('border-color', 'red'); $('#GrnNo').focus(); return false;
+        }
+        else {
+            $('#GrnNo').css('border-color', '');
+        }
+        if ($('#GrnDate').val() == "") {
+            alert("Please Enter Grn Date."); $('#GrnDate').css('border-color', 'red'); $('#GrnDate').focus(); return false;
+        }
+        else {
+            $('#GrnDate').css('border-color', '');
+        }
+
+        if ($('#GrnRefNo').val() == "") {
+            alert("Please Enter Grn Ref No."); $('#GrnRefNo').css('border-color', 'red'); $('#GrnRefNo').focus(); return false;
+        }
+        else {
+            $('#GrnRefNo').css('border-color', '');
+        }
+
+        if ($('#SupplierNameId  option:selected').val() == "") {
+            alert("Please Select Supplier Name."); $('#SupplierNameId').css('border-color', 'red'); $('#SupplierNameId').focus(); return false;
+        }
+        else {
+            $('#SupplierNameId').css('border-color', '');
+        }
+
+        if ($('#DC_No').val() == "") {
+            alert("Please Enter DC No."); $('#DC_No').css('border-color', 'red'); $('#DC_No').focus(); return false;
+        }
+        else {
+            $('#DC_No').css('border-color', '');
+        }
+
+        if ($('#DCDate').val() == "") {
+            alert("Please Enter DC Date."); $('#DC_No').css('border-color', 'red'); $('#DCDate').focus(); return false;
+        }
+        else {
+            $('#DCDate').css('border-color', '');
+        }
+        //if ($('#INVoiceNo').val() == "") {
+        //    alert("Please Enter INVoiceNo."); $('#INVoiceNo').css('border-color', 'red'); $('#INVoiceNo').focus(); return false;
+        //}
+        //else {
+        //    $('#INVoiceNo').css('border-color', '');
+        //}
+        //if ($('#INVoiceDate').val() == "") {
+        //    alert("Please Enter INVoice Date."); $('#INVoiceDate').css('border-color', 'red'); $('#INVoiceDate').focus(); return false;
+        //}
+        //else {
+        //    $('#INVoiceDate').css('border-color', '');
+        //}
+        if ($('#GateEntryNo').val() == "") {
+            alert("Please Enter Gate Entry No."); $('#GateEntryNo').css('border-color', 'red'); $('#GateEntryNo').focus(); return false;
+        }
+        else {
+            $('#GateEntryNo').css('border-color', '');
+        }
+        if ($('#GEDate').val() == "") {
+            alert("Please Enter GE Date."); $('#GEDate').css('border-color', 'red'); $('#GEDate').focus(); return false;
+        }
+        else {
+            $('#GEDate').css('border-color', '');
+        }
+
+
+        if ($('#GETime').val() == "") {
+            alert("Please Enter GE Time."); $('#GETime').css('border-color', 'red'); $('#GETime').focus(); return false;
+        }
+        else {
+            $('#GETime').css('border-color', '');
+        }
+
+        if ($('#GateRefNo').val() == "") {
+            alert("Please Enter Gate Ref No."); $('#GateRefNo').css('border-color', 'red'); $('#GateRefNo').focus(); return false;
+        }
+        else {
+            $('#GateRefNo').css('border-color', '');
+        }
+        if ($('#GrnType').val() == "") {
+            alert("Please Enter Grn Type."); $('#GrnType').css('border-color', 'red'); $('#GrnType').focus(); return false;
+        }
+        else {
+            $('#GrnType').css('border-color', '');
+        }
+        if ($('#ST_VATcredit').val() == "") {
+            alert("Please Enter ST-VATcredit."); $('#ST_VATcredit').css('border-color', 'red'); $('#ST_VATcredit').focus(); return false;
+        }
+        else {
+            $('#GrnType').css('border-color', '');
+        }
+
+        if ($('#ImportClearance').val() == "") {
+            alert("Please Enter Import Clearance."); $('#ImportClearance').css('border-color', 'red'); $('#ImportClearance').focus(); return false;
+        }
+        else {
+            $('#ImportClearance').css('border-color', '');
+        }
+
+        if ($('#BENo').val() == "") {
+            alert("Please Enter BE No."); $('#BENo').css('border-color', 'red'); $('#BENo').focus(); return false;
+        }
+        else {
+            $('#BENo').css('border-color', '');
+        }
+
+        if ($('#ExchangeRate').val() == "") {
+            alert("Please Enter ExchangeRate."); $('#ExchangeRate').css('border-color', 'red'); $('#ExchangeRate').focus(); return false;
+        }
+        else {
+            $('#ExchangeRate').css('border-color', '');
+        }
+        if ($('#ShipmentMode').val() == "") {
+            alert("Please Enter Shipment Mode."); $('#ShipmentMode').css('border-color', 'red'); $('#ShipmentMode').focus(); return false;
+        }
+        else {
+            $('#ShipmentMode').css('border-color', '');
+        }
+        if ($('#FreightAmount').val() == "") {
+            alert("Please Enter Freight Amount."); $('#FreightAmount').css('border-color', 'red'); $('#FreightAmount').focus(); return false;
+        }
+        else {
+            $('#FreightAmount').css('border-color', '');
+        }
+        //if ($('#InsuranceAmount').val() == "") {
+        //    alert("Please Enter Insurance Amount."); $('#InsuranceAmount').css('border-color', 'red'); $('#InsuranceAmount').focus(); return false;
+        //}
+        //else {
+        //    $('#InsuranceAmount').css('border-color', '');
+        //}
+
+        //if ($('#CustomsDuty').val() == "") {
+        //    alert("Please Enter Customs Duty."); $('#CustomsDuty').css('border-color', 'red'); $('#CustomsDuty').focus(); return false;
+        //}
+        //else {
+        //    $('#CustomsDuty').css('border-color', '');
+        //}
+
+        if ($('#Pack_Forward').val() == "") {
+            alert("Please Enter Pack & Forward."); $('#Pack_Forward').css('border-color', 'red'); $('#Pack_Forward').focus(); return false;
+        }
+        else {
+            $('#Pack_Forward').css('border-color', '');
+        }
+        if ($('#ServiceTax').val() == "") {
+            alert("Please Enter Service Tax."); $('#ServiceTax').css('border-color', 'red'); $('#ServiceTax').focus(); return false;
+        }
+        else {
+            $('#ServiceTax').css('border-color', '');
+        }
+        //if ($('#GrnDCDateType').val() == "") {
+        //    alert("Please Enter Grn Type."); $('#GrnDCDateType').css('border-color', 'red'); $('#GrnDCDateType').focus(); return false;
+        //}
+        //else {
+        //    $('#GrnDCDateType').css('border-color', '');
+        //}
+
+
+
+        //if ($('#OtherCharges').val() == "") {
+        //    alert("Please Enter Other Charges."); $('#OtherCharges').css('border-color', 'red'); $('#OtherCharges').focus(); return false;
+        //}
+        //else {
+        //    $('#OtherCharges').css('border-color', '');
+        //}
+
+
+
+        if ($('#Transporter').val() == "") {
+            alert("Please Enter Transporter."); $('#Transporter').css('border-color', 'red'); $('#Transporter').focus(); return false;
+        }
+        else {
+            $('#Transporter').css('border-color', '');
+        }
+
+
+        //if ($('#GeneralRemarks').val() == "") {
+        //    alert("Please Enter General Remarks."); $('#GeneralRemarks').css('border-color', 'red'); $('#GeneralRemarks').focus(); return false;
+        //}
+        //else {
+        //    $('#GeneralRemarks').css('border-color', '');
+        //}
+
+        if ($('#PoNO').val() == "") {
+            alert("Please Enter PoNO."); $('#PoNO').css('border-color', 'red'); $('#PoNO').focus(); return false;
+        }
+        else {
+            $('#PoNO').css('border-color', '');
+        }
+        if ($('#LOTNo').val() == "") {
+            alert("Please Enter LOT No."); $('#LOTNo').css('border-color', 'red'); $('#LOTNo').focus(); return false;
+        }
+        else {
+            $('#LOTNo').css('border-color', '');
+        }
+        if ($('#IndentNo').val() == "") {
+            alert("Please Enter IndentNo."); $('#IndentNo').css('border-color', 'red'); $('#IndentNo').focus(); return false;
+        }
+        else {
+            $('#IndentNo').css('border-color', '');
+        }
+        if ($('#IONo').val() == "") {
+            alert("Please Enter IO No."); $('#IONo').css('border-color', 'red'); $('#IONo').focus(); return false;
+        }
+        else {
+            $('#IONo').css('border-color', '');
+        }
+        if ($('#Stores').val() == "") {
+            alert("Please Enter Stores."); $('#Stores').css('border-color', 'red'); $('#Stores').focus(); return false;
+        }
+        else {
+            $('#Stores').css('border-color', '');
+        }
+        if ($('#MaterialId').val() == "") {
+            alert("Please Enter MaterialId."); $('#MaterialId').css('border-color', 'red'); $('#MaterialId').focus(); return false;
+        }
+        else {
+            $('#MaterialId').css('border-color', '');
+        }
+        if ($('#Grade').val() == "") {
+            alert("Please Enter Grade."); $('#Grade').css('border-color', 'red'); $('#Grade').focus(); return false;
+        }
+        else {
+            $('#Grade').css('border-color', '');
+        }
+
+        if ($('#GroupID').val() == "") {
+            alert("Please Enter Group ID."); $('#GroupID').css('border-color', 'red'); $('#GroupID').focus(); return false;
+        }
+        else {
+            $('#GroupID').css('border-color', '');
+        }
+        if ($('#CategoryId').val() == "") {
+            alert("Please Enter CategoryId."); $('#CategoryId').css('border-color', 'red'); $('#CategoryId').focus(); return false;
+        }
+        else {
+            $('#CategoryId').css('border-color', '');
+        }
+        //if ($('#IfGroupIsMaintenance').val() == "") {
+        //    alert("Please Enter IfGroupIsMaintenance."); $('#IfGroupIsMaintenance').css('border-color', 'red'); $('#IfGroupIsMaintenance').focus(); return false;
+        //}
+        //else {
+        //    $('#IfGroupIsMaintenance').css('border-color', '');
+        //}
+        if ($('#ColourId').val() == "") {
+            alert("Please Enter Grn Type."); $('#ColourId').css('border-color', 'red'); $('#ColourId').focus(); return false;
+        }
+        else {
+            $('#ColourId').css('border-color', '');
+        }
+
+        if ($('#UOMId').val() == "") {
+            alert("Please Enter UOM Id."); $('#UOMId').css('border-color', 'red'); $('#UOMId').focus(); return false;
+        }
+        else {
+            $('#UOMId').css('border-color', '');
+        }
+        if ($('#StoreLocation').val() == "") {
+            alert("Please Enter Store Location."); $('#StoreLocation').css('border-color', 'red'); $('#StoreLocation').focus(); return false;
+        }
+        else {
+            $('#StoreLocation').css('border-color', '');
+        }
+        if ($('#Substance').val() == "") {
+            alert("Please Enter Substance."); $('#Substance').css('border-color', 'red'); $('#Substance').focus(); return false;
+        }
+        else {
+            $('#Substance').css('border-color', '');
+        }
+        if ($('#Weight').val() == "") {
+            alert("Please Enter Weight."); $('#Weight').css('border-color', 'red'); $('#Weight').focus(); return false;
+        }
+        else {
+            $('#Weight').css('border-color', '');
+        }
+        if ($('#QtyAsPerDc').val() == "") {
+            alert("Please Enter QtyAsPerDc."); $('#QtyAsPerDc').css('border-color', 'red'); $('#QtyAsPerDc').focus(); return false;
+        }
+        else {
+            $('#QtyAsPerDc').css('border-color', '');
+        }
+        if ($('#QtyAsPerSQFT').val() == "") {
+            alert("Please select  Qty type."); $('#QtyAsPerSQFT').css('border-color', 'red'); $('#QtyAsPerSQFT').focus(); return false;
+        }
+        else {
+            $('#QtyAsPerSQFT').css('border-color', '');
+        }
+        if ($('#QtyAsPerPCS').val() == "") {
+            alert("Please enter  PCS."); $('#QtyAsPerPCS').css('border-color', 'red'); $('#QtyAsPerPCS').focus(); return false;
+        }
+        else {
+            $('#QtyAsPerPCS').css('border-color', '');
+        }
+        if ($('#QTYType').val() == "") {
+            alert("Please enter  QTY Type."); $('#QTYType').css('border-color', 'red'); $('#QTYType').focus(); return false;
+        }
+        else {
+            $('#QTYType').css('border-color', '');
+        }
+
+        if ($('#ReceivedQty').val() == "") {
+            alert("Please Enter Received Qty."); $('#ReceivedQty').css('border-color', 'red'); $('#ReceivedQty').focus(); return false;
+        }
+        else {
+            $('#ReceivedQty').css('border-color', '');
+        }
+        if ($('#ReceivedSQFT').val() == "") {
+            alert("Please select  type."); $('#ReceivedSQFT').css('border-color', 'red'); $('#ReceivedSQFT').focus(); return false;
+        }
+        else {
+            $('#ReceivedSQFT').css('border-color', '');
+        }
+        if ($('#ReceivedPCS').val() == "") {
+            alert("Please enter  PCS."); $('#ReceivedPCS').css('border-color', 'red'); $('#ReceivedPCS').focus(); return false;
+        }
+        else {
+            $('#ReceivedPCS').css('border-color', '');
+        }
+        if ($('#ReceivedType').val() == "") {
+            alert("Please enter Type."); $('#ReceivedType').css('border-color', 'red'); $('#ReceivedType').focus(); return false;
+        }
+        else {
+            $('#ReceivedType').css('border-color', '');
+        }
+
+        //if ($('#RejectedQty').val() == "") {
+        //    alert("Please Enter Qty."); $('#RejectedQty').css('border-color', 'red'); $('#RejectedQty').focus(); return false;
+        //}
+        //else {
+        //    $('#RejectedQty').css('border-color', '');
+        //}
+        //if ($('#RejectedSQFT').val() == "") {
+        //    alert("Please select type."); $('#RejectedSQFT').css('border-color', 'red'); $('#RejectedSQFT').focus(); return false;
+        //}
+        //else {
+        //    $('#RejectedSQFT').css('border-color', '');
+        //}
+        //if ($('#RejectedPCS').val() == "") {
+        //    alert("Please enter PCS."); $('#RejectedPCS').css('border-color', 'red'); $('#RejectedPCS').focus(); return false;
+        //}
+        //else {
+        //    $('#RejectedPCS').css('border-color', '');
+        //}
+        //if ($('#RejectedType').val() == "") {
+        //    alert("Please select  Type."); $('#RejectedType').css('border-color', 'red'); $('#RejectedType').focus(); return false;
+        //}
+        //else {
+        //    $('#RejectedType').css('border-color', '');
+        //}
+        ////
+        //if ($('#AcceptedQty').val() == "") {
+        //    alert("Please Enter Qty."); $('#AcceptedQty').css('border-color', 'red'); $('#AcceptedQty').focus(); return false;
+        //}
+        //else {
+        //    $('#AcceptedQty').css('border-color', '');
+        //}
+        //if ($('#AcceptedSQFT').val() == "") {
+        //    alert("Please select type."); $('#AcceptedSQFT').css('border-color', 'red'); $('#AcceptedSQFT').focus(); return false;
+        //}
+        //else {
+        //    $('#AcceptedSQFT').css('border-color', '');
+        //}
+        //if ($('#AcceptedPCS').val() == "") {
+        //    alert("Please enter PCS."); $('#AcceptedPCS').css('border-color', 'red'); $('#AcceptedPCS').focus(); return false;
+        //}
+        //else {
+        //    $('#AcceptedPCS').css('border-color', '');
+        //}
+        //if ($('#AcceptedType').val() == "") {
+        //    alert("Please select  Type."); $('#AcceptedType').css('border-color', 'red'); $('#AcceptedType').focus(); return false;
+        //}
+        //else {
+        //    $('#AcceptedType').css('border-color', '');
+        //}
+        //
+        if ($('#QtyExcess').val() == "") {
+            alert("Please Enter Qty Excess."); $('#QtyExcess').css('border-color', 'red'); $('#QtyExcess').focus(); return false;
+        }
+        else {
+            $('#QtyExcess').css('border-color', '');
+        }
+        if ($('#PendingQty').val() == "") {
+            alert("Please Enter Pending Qty."); $('#PendingQty').css('border-color', 'red'); $('#PendingQty').focus(); return false;
+        }
+        else {
+            $('#PendingQty').css('border-color', '');
+        }
+        if ($('#ExcessApproval').val() == "") {
+            alert("Please Enter ExcessApproval."); $('#ExcessApproval').css('border-color', 'red'); $('#ExcessApproval').focus(); return false;
+        }
+        else {
+            $('#ExcessApproval').css('border-color', '');
+        }
+        //if ($('#GeneralRemarks').val() == "") {
+        //    alert("Please Enter Remarks."); $('#GeneralRemarks').css('border-color', 'red'); $('#GeneralRemarks').focus(); return false;
+        //}
+        //else {
+        //    $('#GeneralRemarks').css('border-color', '');
+        //}
+
+        if ($('#Rate').val() == "") {
+            alert("Please Enter Rate."); $('#Rate').css('border-color', 'red'); $('#Rate').focus(); return false;
+        }
+        else {
+            $('#Rate').css('border-color', '');
+        }
+        if ($('#Value').val() == "") {
+            alert("Please Enter Value."); $('#Value').css('border-color', 'red'); $('#Value').focus(); return false;
+        }
+        else {
+            $('#Value').css('border-color', '');
+        }
+        if ($('#MRPMargin').val() == "") {
+            alert("Please Enter MRPMargin."); $('#MRPMargin').css('border-color', 'red'); $('#MRPMargin').focus(); return false;
+        }
+        else {
+            $('#MRPMargin').css('border-color', '');
+        }
+        if ($('#MRPPrice').val() == "") {
+            alert("Please Enter MRPPrice."); $('#MRPPrice').css('border-color', 'red'); $('#MRPPrice').focus(); return false;
+        }
+        else {
+            $('#MRPPrice').css('border-color', '');
+        }
+        if ($('#AccessibleValue').val() == "") {
+            alert("Please Enter AccessibleValue."); $('#AccessibleValue').css('border-color', 'red'); $('#AccessibleValue').focus(); return false;
+        }
+        else {
+            $('#AccessibleValue').css('border-color', '');
+        }
+
+
+        if ($('#Discount_Per').val() == "") {
+            alert("Please Enter Discount_Per."); $('#Discount_Per').css('border-color', 'red'); $('#Discount_Per').focus(); return false;
+        }
+        else {
+            $('#Discount_Per').css('border-color', '');
+        }
+        if ($('#Discount_Val').val() == "") {
+            alert("Please Enter Discount_Val."); $('#Discount_Val').css('border-color', 'red'); $('#Discount_Val').focus(); return false;
+        }
+        else {
+            $('#Discount_Val').css('border-color', '');
+        }
+
+        if ($('#ExciseDuty_Per').val() == "") {
+            alert("Please Enter Excise Duty_Per."); $('#ExciseDuty_Per').css('border-color', 'red'); $('#ExciseDuty_Per').focus(); return false;
+        }
+        else {
+            $('#ExciseDuty_Per').css('border-color', '');
+        }
+        if ($('#ExciseDuty_Val').val() == "") {
+            alert("Please Enter ExciseDuty_Val."); $('#ExciseDuty_Val').css('border-color', 'red'); $('#ExciseDuty_Val').focus(); return false;
+        }
+        else {
+            $('#ExciseDuty_Val').css('border-color', '');
+        }
+        if ($('#ST_VAT_CST_Per').val() == "") {
+            alert("Please Enter ST_VAT_CST_Per."); $('#ST_VAT_CST_Per').css('border-color', 'red'); $('#ST_VAT_CST_Per').focus(); return false;
+        }
+        else {
+            $('#ST_VAT_CST_Per').css('border-color', '');
+        }
+        if ($('#ST_VAT_CST_Val').val() == "") {
+            alert("Please Enter ST/VAT/CST/Val ."); $('#ST_VAT_CST_Val').css('border-color', 'red'); $('#ST_VAT_CST_Val').focus(); return false;
+        }
+        else {
+            $('#ST_VAT_CST_Val').css('border-color', '');
+        }
+        if ($('#Ecess_Per').val() == "") {
+            alert("Please Enter Grn Type."); $('#Ecess_Per').css('border-color', 'red'); $('#Ecess_Per').focus(); return false;
+        }
+        else {
+            $('#Ecess_Per').css('border-color', '');
+        }
+        if ($('#Ecess_Val').val() == "") {
+            alert("Please Enter Ecess_Val."); $('#Ecess_Val').css('border-color', 'red'); $('#Ecess_Val').focus(); return false;
+        }
+        else {
+            $('#Ecess_Val').css('border-color', '');
+        }
+        if ($('#SH_Ecess_Per').val() == "") {
+            alert("Please Enter Grn Type."); $('#SH_Ecess_Per').css('border-color', 'red'); $('#SH_Ecess_Per').focus(); return false;
+        }
+        else {
+            $('#SH_Ecess_Per').css('border-color', '');
+        }
+        if ($('#SH_Ecess_Val').val() == "") {
+            alert("Please Enter SH_Ecess_Val."); $('#SH_Ecess_Val').css('border-color', 'red'); $('#SH_Ecess_Val').focus(); return false;
+        }
+        else {
+            $('#SH_Ecess_Val').css('border-color', '');
+        }
+
+        if ($('#Surcharge_Per').val() == "") {
+            alert("Please Enter Surcharge_Per."); $('#Surcharge_Per').css('border-color', 'red'); $('#Surcharge_Per').focus(); return false;
+        }
+        else {
+            $('#Surcharge_Per').css('border-color', '');
+        }
+
+        //,,,,,,
+        if ($('#Surcharge_Val').val() == "") {
+            alert("Please Enter Surcharge_Val."); $('#Surcharge_Val').css('border-color', 'red'); $('#Surcharge_Val').focus(); return false;
+        }
+        else {
+            $('#Surcharge_Val').css('border-color', '');
+        }
+
+        if ($('#TagsPiecesDiscount_Val').val() == "") {
+            alert("Please Enter TagsPiecesDiscount_Val."); $('#TagsPiecesDiscount_Val').css('border-color', 'red'); $('#TagsPiecesDiscount_Val').focus(); return false;
+        }
+        else {
+            $('#TagsPiecesDiscount_Val').css('border-color', '');
+        }
+        if ($('#TagsPiecesDiscount_Per').val() == "") {
+            alert("Please Enter TagsPiecesDiscount_Per."); $('#TagsPiecesDiscount_Per').css('border-color', 'red'); $('#TagsPiecesDiscount_Per').focus(); return false;
+        }
+        else {
+            $('#TagsPiecesDiscount_Per').css('border-color', '');
+        }
+    }
+
+    function Update() {
+
+        validation();
+
+        if (validation() != false) {
+            $.ajax({
+                type: 'POST',
+                url: '/GRN_Detail/SaveDetails',
+                data: $("form").serialize(),
+                success: function (data) {
+                    if (data == true) {
+                        if ($("#BtnSave").val() == "Save") {
+                            alert('Saved Successfully.');
+                        }
+                        else {
+                            alert('Updated Successfully.');
+                        }
+                        location.href = "/GRN_Detail/GoodReceipeNote";
+                        return false;
+                    }
+                    else {
+                        alert('Save process Failed.');
+                        location.href = "/GRN_Detail/GoodReceipeNote";
+                        return false;
+                    }
+                }
+            });
+        }
+
+    }
+
+</script>
+
+
