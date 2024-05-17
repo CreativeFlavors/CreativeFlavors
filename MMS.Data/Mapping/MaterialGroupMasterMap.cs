@@ -1,4 +1,5 @@
 ﻿using MMS.Core.Entities;
+using MMS.Core.Entities.Stock;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MMS.Data.Mapping
 {
-    public class MaterialGroupMasterMap : EntityTypeConfiguration<MaterialGroupMaster_>
+    public class MaterialGroupMasterMap : EntityTypeConfiguration<materialgroupmaster>
     {
         public MaterialGroupMasterMap()
         {

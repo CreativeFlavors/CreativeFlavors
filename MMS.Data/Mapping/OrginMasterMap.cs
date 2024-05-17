@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MMS.Data.Mapping
 {
-   public class OrginMasterMap: EntityTypeConfiguration<OrginMaster>
+   public class OrginMasterMap: EntityTypeConfiguration<OriginMaster>
     {
        public OrginMasterMap()
         {

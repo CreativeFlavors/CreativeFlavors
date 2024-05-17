@@ -105,7 +105,7 @@ namespace MMS.Data.Mapping.StockMap
             Property(t => t.MaterialType);
             Property(t => t.ISPO_cancelled);
             Property(t => t.ISPO_cancelled_Reson);
-            ToTable("PurchaseOrder");
+            ToTable("purchaseorder");
         }
     }
 }

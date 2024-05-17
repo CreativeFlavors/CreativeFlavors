@@ -658,7 +658,7 @@ namespace MMS.Web.Controllers.Stock
                     {
                         PurchaseOrderDelierySchedule delieryScheduleObject = new PurchaseOrderDelierySchedule();
                         delieryScheduleObject.Material = item.Material;
-                        delieryScheduleObject.quantity = Convert.ToInt32(item.quantity);
+                        delieryScheduleObject.Quantity = Convert.ToInt32(item.Quantity);
                         delieryScheduleObject.Date = Convert.ToDateTime(item.Date);
                         delieryScheduleObject.PoOrderID = purchaseOrder.PoOrderId;
                         delieryScheduleObject.IO = 0;
@@ -681,7 +681,7 @@ namespace MMS.Web.Controllers.Stock
                     {
                         PurchaseOrderSizeRangeQuantity purchaseOrderSizeRangeQuantity = new PurchaseOrderSizeRangeQuantity();
                         purchaseOrderSizeRangeQuantity.Size = item.Size;
-                        purchaseOrderSizeRangeQuantity.quantity = Convert.ToInt32(item.quantity);
+                        purchaseOrderSizeRangeQuantity.Quantity = Convert.ToInt32(item.Quantity);
                         purchaseOrderSizeRangeQuantity.Rate = item.Rate;
                         purchaseOrderSizeRangeQuantity.PurchaseSizeRangeID = 0;
                         purchaseOrderSizeRangeQuantity.PoOrderID = purchaseOrder.PoOrderId;
@@ -700,7 +700,7 @@ namespace MMS.Web.Controllers.Stock
                 if (Result == true)
                 {
                     MaterialGroupManager materialGroupManager = new MaterialGroupManager();
-                    MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
+                    materialgroupmaster materialGroupMaster = new materialgroupmaster();
                     if (!string.IsNullOrEmpty(collection["OrderType"]))
                     {
                         GRNTypeManager grnTypemanager = new GRNTypeManager();
@@ -710,7 +710,7 @@ namespace MMS.Web.Controllers.Stock
                         {
                             if (indentMaterials_ != null && indentMaterials_.IndentMaterialID != 0)
                             {
-                                materialGroupMaster = materialGroupManager.GetMaterialGroupMaster_Id(indentMaterials_.MaterialGroupMasterId);
+                                materialGroupMaster = materialGroupManager.GetmaterialgroupmasterId(indentMaterials_.MaterialGroupMasterId);
                                 if (materialGroupMaster != null)
                                 {
                                     if (materialGroupMaster.IsSize == true)
@@ -748,7 +748,7 @@ namespace MMS.Web.Controllers.Stock
                             List<SizeItemMaterial> listSizeItemMaterial = new List<SizeItemMaterial>();
                             listSizeItemMaterial = Materialmanager.GetSizeItemMaterial(purchaseOrder.Material.Value);
                             MaterialNameManager materialNameManager = new MaterialNameManager();
-                            MaterialNameMaster materialNameMaster = new MaterialNameMaster();
+                            tbl_materialnamemaster materialNameMaster = new tbl_materialnamemaster();
                             if (materialMaster != null)
                             {
                                 materialNameMaster = materialNameManager.GetMaterialNameMasterId(materialMaster.MaterialName);
@@ -884,7 +884,7 @@ namespace MMS.Web.Controllers.Stock
                 {
                     PurchaseOrderDelierySchedule delieryScheduleObject = new PurchaseOrderDelierySchedule();
                     delieryScheduleObject.Material = item.Material;
-                    delieryScheduleObject.quantity = Convert.ToInt32(item.quantity);
+                    delieryScheduleObject.Quantity = Convert.ToInt32(item.Quantity);
                     delieryScheduleObject.Date = Convert.ToDateTime(item.Date);
                     delieryScheduleObject.PoOrderID = purchaseOrder.PoOrderId;
                     delieryScheduleObject.IO = 0;
@@ -907,7 +907,7 @@ namespace MMS.Web.Controllers.Stock
                 {
                     PurchaseOrderSizeRangeQuantity purchaseOrderSizeRangeQuantity = new PurchaseOrderSizeRangeQuantity();
                     purchaseOrderSizeRangeQuantity.Size = item.Size;
-                    purchaseOrderSizeRangeQuantity.quantity = Convert.ToInt32(item.quantity);
+                    purchaseOrderSizeRangeQuantity.Quantity = Convert.ToInt32(item.Quantity);
                     purchaseOrderSizeRangeQuantity.Rate = item.Rate;
                     purchaseOrderSizeRangeQuantity.PurchaseSizeRangeID = 0;
                     purchaseOrderSizeRangeQuantity.PoOrderID = purchaseOrder.PoOrderId;
@@ -1002,7 +1002,7 @@ namespace MMS.Web.Controllers.Stock
             purchaseOrderList = purchaseOrderManager.GetPoOrderIdList(model.PoOrderId);
             string poOrderId = purchaseOrderList.FirstOrDefault().PoNo;
             var polist = grnManager.GetGRN_PoDelete(model.PoOrderId);
-            if (polist == null || polist.PoNO == 0 || polist.PoNO == null)
+            if (polist == null || polist.PoNO == 0 || polist?.PoNO == null)
             {
                 if (purchaseOrderList != null && purchaseOrderList.Count > 0)
                 {
@@ -1073,7 +1073,7 @@ namespace MMS.Web.Controllers.Stock
             // Initialization.  
             //  DropdownViewModel models = new DropdownViewModel();
             // Settings.  
-            model.drpIndentNo = 0;
+            model.DrpIndentNo = 0;
             // Loading drop down lists.  
             this.ViewBag.CountryList =lstobj;            
           
@@ -1195,7 +1195,7 @@ namespace MMS.Web.Controllers.Stock
                         if (arg.Supplier != 0 && arg.Supplier != null)
                         {
                             indentMaterials = indentMaterialManager.GetEditPOIndentIDWithSupplier(arg.IndentNo, arg.Supplier.Value);
-                            model.listIndentMaterials = indentMaterials;
+                            model.ListIndentMaterials = indentMaterials;
                         }
                     }
                     GRNTypeManager manager = new GRNTypeManager();
@@ -1252,7 +1252,7 @@ namespace MMS.Web.Controllers.Stock
                 string[] IndentArray = arg.IndentNo != null ? arg.IndentNo.Split(',') : null;
                 List<Indent> listIndent = new List<Indent>();
                 listIndent = indentManager.Get();
-                model.listIndent = listIndent;
+                model.ListIndent = listIndent;
                 model.Supplier = arg.Supplier;
                 if (arg != null && arg.PoOrderId != 0)
                 {
@@ -1270,7 +1270,7 @@ namespace MMS.Web.Controllers.Stock
                     if (arg.Supplier != 0 && arg.Supplier != null)
                     {
                         indentMaterials = indentMaterialManager.GetEditPOIndentIDWithSupplier(arg.IndentNo, arg.Supplier.Value);
-                        model.listIndentMaterials = indentMaterials;
+                        model.ListIndentMaterials = indentMaterials;
                     }
                 }
                 GRNTypeManager manager = new GRNTypeManager();
@@ -1416,7 +1416,7 @@ namespace MMS.Web.Controllers.Stock
                     if (arg.Supplier != 0 && arg.Supplier != null)
                     {
                         indentMaterials = indentMaterialManager.GetEditPOIndentIDWithSupplier(arg.IndentNo, arg.Supplier.Value);
-                        model.listIndentMaterials = indentMaterials;
+                        model.ListIndentMaterials = indentMaterials;
                     }
                 }
                 model.PoOrderId = arg.PoOrderId;
@@ -1594,7 +1594,7 @@ namespace MMS.Web.Controllers.Stock
                 List<IndentMaterials> indentMaterials = new List<IndentMaterials>();
                 IndentMaterialManager indentMaterialManager = new IndentMaterialManager();
                 indentMaterials = indentMaterialManager.GetEditPOIndentIDWithSupplier(arg.IndentNo, arg.Supplier.Value);
-                model.listIndentMaterials = indentMaterials;
+                model.ListIndentMaterials = indentMaterials;
                 model.PoOrderId = arg.PoOrderId;
                 model.PoNo = arg.PoNo;
                 model.UnitId = arg.Unit;

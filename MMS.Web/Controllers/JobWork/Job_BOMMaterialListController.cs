@@ -38,7 +38,7 @@ namespace MMS.Web.Controllers.JobWork
         {
             BillOfMaterialManager BillOfMaterialManager = new BillOfMaterialManager();
             List<BillOfMaterialGrid> bomGrid = new List<BillOfMaterialGrid>();
-            List<BillOfMaterial> bOMMaterialList = new List<BillOfMaterial>();
+            List<Bom> bOMMaterialList = new List<Bom>();
             bOMMaterialList = BillOfMaterialManager.Get().Where(x => x.IsDeleted == false).ToList();
             foreach (var items in bOMMaterialList)
             {
@@ -70,7 +70,7 @@ namespace MMS.Web.Controllers.JobWork
             List<BOMMaterilGrid> materilGridList = new List<BOMMaterilGrid>();
             materialList_ = materialListManager.Get();
 
-            BillOfMaterial arg = new BillOfMaterial();
+            Bom arg = new Bom();
             if (BOMID == 0)
             {
                 model.BillOfMaterialList = null;
@@ -162,7 +162,7 @@ namespace MMS.Web.Controllers.JobWork
                     model_.SupplierMasterId = model.SupplierMasterId;
                     model_.UomMasterId = model.UomMasterId;
                     model_.SizeRangeMasterId = model.SizeRangeMasterId;
-                    model_.NoOfSets = model.NoOfSets;
+                    model_.NoOfSets1 = model.NoOfSets;
                     model_.BuyerNorms = model.BuyerNorms;
                     model_.ComponentName = model.ComponentName;
                     model_.OurNorms = model.OurNorms;
@@ -197,11 +197,11 @@ namespace MMS.Web.Controllers.JobWork
             List<BOMMaterilGrid> materilGridList = new List<BOMMaterilGrid>();
             //int BOMID = Convert.ToInt32(Request.QueryString["BOMID"]);
             BillOfMaterialManager BillOfMaterialManager = new BillOfMaterialManager();
-            BillOfMaterial arg = new BillOfMaterial();
+            Bom arg = new Bom();
             BOMMaterialListManager materialListManager = new BOMMaterialListManager();
             List<BOMMaterialList> materialList_ = new List<BOMMaterialList>();
             List<BomGridModel> bomGridModel = new List<BomGridModel>();
-            List<BomGrid> bomGridList = new List<BomGrid>();
+            List<bomgriddetail> bomGridList = new List<bomgriddetail>();
             Product_BuyerStyleManager product_BuyerStyleManager = new Product_BuyerStyleManager();
             List<Product_BuyerStyleMaster> product_BuyerStyleMasterList = new List<Product_BuyerStyleMaster>();
             bomGridList = BillOfMaterialManager.GetBomDetails(BOMID.GetValueOrDefault());
@@ -318,7 +318,7 @@ namespace MMS.Web.Controllers.JobWork
                     model_.SupplierMasterId = Convert.ToInt32(item.SupplierMasterID);
                     model_.UomMasterId = model.UomMasterId;
                     model_.SizeRangeMasterId = model.SizeRangeMasterId;
-                    model_.NoOfSets = model.NoOfSets;
+                    model_.NoOfSets1 = model.NoOfSets;
                     model_.BuyerNorms = model.BuyerNorms;
                     model_.ComponentName = model.ComponentName;
                     model_.OurNorms = model.OurNorms;
@@ -354,21 +354,21 @@ namespace MMS.Web.Controllers.JobWork
             int bomID = 0;
             int id = Convert.ToInt32(Request.QueryString["id"]);
             BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
-            List<BomGrid> listofBOMGrid = new List<BomGrid>();
-            BomGrid bomGrid_ = new BomGrid();
+            List<bomgriddetail> listofBOMGrid = new List<bomgriddetail>();
+            bomgriddetail bomGrid_ = new bomgriddetail();
             GridModel bomGrid = new GridModel();
-            BillOfMaterial billOfMaterial = new BillOfMaterial();
+            Bom billOfMaterial = new Bom();
             BomGridDetailsModel gridModel = new BomGridDetailsModel();
-            BillOfMaterial billOfMaterial_ = new BillOfMaterial();
+            Bom billOfMaterial_ = new Bom();
             BOMAmendmentMaterial bomAmendmentMaterial_ = new BOMAmendmentMaterial();
-            BillOfMaterial billOfMaterialIsExist = new BillOfMaterial();
+            Bom billOfMaterialIsExist = new Bom();
             BOMAmendmentMaterial bomamendmentIsExist = new BOMAmendmentMaterial();
             BOMMaterial bomMaterial = new BOMMaterial();
             BOMAmendmentMaterial bomAmendmentMaterial = new BOMAmendmentMaterial();
             BOMMaterial bomMaterials = new BOMMaterial();
             MaterialManager materialManager = new MaterialManager();
             MaterialMaster materialMaster = new MaterialMaster();
-            MaterialGroupMaster_ groupMaster = new MaterialGroupMaster_();
+            materialgroupmaster groupMaster = new materialgroupmaster();
             MaterialCategoryMaster categoryMaster = new MaterialCategoryMaster();
             ColorMaster colorMaster = new ColorMaster();
             ColorManager colorManager = new ColorManager();
@@ -379,7 +379,7 @@ namespace MMS.Web.Controllers.JobWork
             MaterialCategoryManager categoryManager = new MaterialCategoryManager();
             MaterialGroupManager GroupManager = new MaterialGroupManager();
             MaterialNameManager materialNameManager = new MaterialNameManager();
-            MaterialNameMaster materialNameMaste = new MaterialNameMaster();
+            tbl_materialnamemaster materialNameMaste = new tbl_materialnamemaster();
             string LastBOmNO = string.Empty;
             string CategoryName = string.Empty;
             string GroupName = string.Empty;
@@ -469,7 +469,7 @@ namespace MMS.Web.Controllers.JobWork
                 billOfMaterial_ = billOfMaterialManager.Post(billOfMaterial);
                 AlertMessage = "Updated Successfully";
             }
-            groupMaster = GroupManager.GetMaterialGroupMaster_Id(billOfMaterial.MaterialGroupMasterId);
+            groupMaster = GroupManager.GetmaterialgroupmasterId(billOfMaterial.MaterialGroupMasterId);
             categoryMaster = categoryManager.GetMaterialCategoryMaster(billOfMaterial.MaterialCategoryMasterId);
             substanceMaster = substanceManager.GetsubstanceMasterId(billOfMaterial.SubstanceMasterId);
             colorMaster = colorManager.GetColorMasterID(materialMaster.ColorMasterId);
@@ -754,7 +754,7 @@ namespace MMS.Web.Controllers.JobWork
                 int Snocount = 1;
                 foreach (string obj in strArray)
                 {
-                    BomGrid GridDetails = new BomGrid();
+                    bomgriddetail GridDetails = new bomgriddetail();
                     string[] strRow = obj.Split(',');
                     string[] BOMGridID = GridID.Split(',');
                     if (strRow[0].ToString() != "")
@@ -780,7 +780,7 @@ namespace MMS.Web.Controllers.JobWork
                         bomGrid.WastagePercent = Convert.ToInt32(strRow[5].ToString());
                         bomGrid.WastageQtyGrid = Convert.ToDecimal(strRow[6].ToString());
                         bomGrid.TotalNormsQty = Convert.ToDecimal(strRow[7].ToString());
-                        BomGrid bomGrids = new BomGrid();
+                        bomgriddetail bomGrids = new bomgriddetail();
                         bomGrids.BomGridId = bomGrid.BomGridId;
                         bomGrids.BomId = bomGrid.BomId;
                         bomGrids.Sno = bomGrid.Sno;

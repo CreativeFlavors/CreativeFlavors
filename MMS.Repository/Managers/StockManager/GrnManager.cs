@@ -16,7 +16,7 @@ namespace MMS.Repository.Managers.StockManager
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
         private Repository<GRN_EntityModel> GrnRepository;
-        private Repository<IssueSlip_MaterialDetails> IssueRepository;
+        private Repository<tbl_issueslipdetails> IssueRepository;
         private Repository<GRNSizeQuantityObject> GRNSizeRangeRepository;
         BOMMaterialListManager bomMaterialListManager = new BOMMaterialListManager();
         EmailTemplateManager emailTemplateManager = new EmailTemplateManager();
@@ -91,7 +91,7 @@ namespace MMS.Repository.Managers.StockManager
                     StoreMaster storeMaster = new StoreMaster();
                     listCompany = companyManager.Get();
 
-                    EmailTempate emailTemplate = new EmailTempate();
+                    EmailTemplate emailTemplate = new EmailTemplate();
                     emailTemplate = emailTemplateManager.GetTemplateName("GRN Delete");
                     storeMaster= storeManager.GetStoreMasterId(listGrn.FirstOrDefault().Stores);
                     if (emailTemplate != null)
@@ -420,7 +420,7 @@ namespace MMS.Repository.Managers.StockManager
                     GrnRepository.Update(model);
                     MMS.Data.StoredProcedureModel.ItemMaterial ItesmaterialName = new MMS.Data.StoredProcedureModel.ItemMaterial();
                     ItesmaterialName = bomMaterialListManager.GetMaterial(arg.Grn_MaterialID.Value);
-                    EmailTempate emailTemplate = new EmailTempate();
+                    EmailTemplate emailTemplate = new EmailTemplate();
                     emailTemplate = emailTemplateManager.GetTemplateName("GRN Update");
                     CompanyManager companyManager = new CompanyManager();
                     List<Company> listCompany = new List<Company>();

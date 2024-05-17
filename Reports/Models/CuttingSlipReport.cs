@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Reports.Models {
+namespace Reports.ReportPage {
     using System;
     using System.ComponentModel;
     using CrystalDecisions.Shared;
@@ -41,7 +41,7 @@ namespace Reports.Models {
         
         public override string FullResourceName {
             get {
-                return "Reports.Models.CuttingSlipReport.rpt";
+                return "Reports.ReportPage.CuttingSlipReport.rpt";
             }
             set {
                 // Do nothing

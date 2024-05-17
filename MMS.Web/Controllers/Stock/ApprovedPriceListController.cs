@@ -36,7 +36,7 @@ namespace MMS.Web.Controllers.Stock
 
         public ActionResult FillMaterialName(int MaterialGroupMasterId)
         {
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             MaterialNameManager materialNameManager = new MaterialNameManager();
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
             var items = (from x in materialNameManager.Get().Where(x => x.MaterialGroupMasterId == MaterialGroupMasterId)
@@ -153,7 +153,7 @@ namespace MMS.Web.Controllers.Stock
                 model.CreatedDate = approvedPriceList.CreatedDate;
                 model.UpdatedDate = approvedPriceList.UpdatedDate;
                 model.CreatedBy = approvedPriceList.CreatedBy;
-                model.UpdatedBY = approvedPriceList.UpdatedBY;
+                model.UpdatedBY = approvedPriceList.UpdatedBy;
                 model.ApprovedPriceList = approvedPriceListManager.ApprovedPriceListGridBasedOnSupplierId(SupplierId);
 
                 List<ApprovedPriceListMasterGrid> approvedPriceListGridList = new List<ApprovedPriceListMasterGrid>();
@@ -181,7 +181,7 @@ namespace MMS.Web.Controllers.Stock
                     approvedPriceListGrid.TextDetails = item.TaxDetails.ToString();
                     approvedPriceListGrid.UnitTypeName = uOMManager.GetUomMasterId(Convert.ToInt32(approvedPriceListGrid.Uom)).ShortUnitName;
                     approvedPriceListGrid.CategoryName = materialCategoryManager.GetMaterialCategoryMaster(approvedPriceListGrid.CategoryID).CategoryName;
-                    approvedPriceListGrid.GroupName = materialGroupManager.GetMaterialGroupMaster_Id(approvedPriceListGrid.GroupID).GroupName;
+                    approvedPriceListGrid.GroupName = materialGroupManager.GetmaterialgroupmasterId(approvedPriceListGrid.GroupID).GroupName;
                     var MaterialNameList = materialManager.GetMaterialMasterId(approvedPriceListGrid.MaterialID).MaterialName;
                     approvedPriceListGrid.MaterialName = materialNameManager.GetMaterialNameMaterial(MaterialNameList.Value).MaterialDescription;
                     approvedPriceListGrid.ColourName = colorManager.GetcolorID(approvedPriceListGrid.ColorID).Color;
@@ -238,7 +238,7 @@ namespace MMS.Web.Controllers.Stock
                     approvedPriceListGrid.MRPPrice = item.MRPPrice;
                     approvedPriceListGrid.TextDetails = item.TaxDetails.ToString();
                     approvedPriceListGrid.CategoryName = materialCategoryManager.GetMaterialCategoryMaster(approvedPriceListGrid.CategoryID).CategoryName;
-                    approvedPriceListGrid.GroupName = materialGroupManager.GetMaterialGroupMaster_Id(approvedPriceListGrid.GroupID).GroupName;
+                    approvedPriceListGrid.GroupName = materialGroupManager.GetmaterialgroupmasterId(approvedPriceListGrid.GroupID).GroupName;
                     var MaterialNameList = materialManager.GetMaterialMasterId(approvedPriceListGrid.MaterialID).MaterialName;
                     if (MaterialNameList != null && MaterialNameList != 0)
                     {

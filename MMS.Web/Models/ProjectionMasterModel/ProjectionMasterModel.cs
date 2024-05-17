@@ -23,6 +23,6 @@ namespace MMS.Web.Models.ProjectionMasterModel
         public DateTime? UpdatedDate { get; set; }
         public string CreatedBy { get; set; }
         public string UpdatedBy { get; set; }
-        public List<ProjectionMaster> ProjectionMasterList { get; set; }
+        public List<Projection> ProjectionMasterList { get; set; }
     }
 }

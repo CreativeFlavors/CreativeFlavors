@@ -71,7 +71,7 @@ namespace MMS.Repository.Managers.StockManager
                     //    IndentSizeRangeDetailsPost(indentSizeRange);
                     //}
                     MMS.Data.StoredProcedureModel.ItemMaterial ItesmaterialName = new MMS.Data.StoredProcedureModel.ItemMaterial();
-                    EmailTempate emailTemplate = new EmailTempate();
+                    EmailTemplate emailTemplate = new EmailTemplate();
                     ItesmaterialName = bomMaterialListManager.GetMaterial(model.MaterialMasterID.Value);
                     emailTemplate = emailTemplateManager.GetTemplateName("Indent Upade");
                     Indent indent = new Indent();
@@ -128,7 +128,7 @@ namespace MMS.Repository.Managers.StockManager
                 indent = indentManager.GetIndentID(model.IndentID.Value);
                 indentMaterialsRepository.Delete(model);
                 MMS.Data.StoredProcedureModel.ItemMaterial ItesmaterialName = new MMS.Data.StoredProcedureModel.ItemMaterial();
-                EmailTempate emailTemplate = new EmailTempate();
+                EmailTemplate emailTemplate = new EmailTemplate();
                 ItesmaterialName = bomMaterialListManager.GetMaterial(model.MaterialMasterID.Value);
                 emailTemplate = emailTemplateManager.GetTemplateName("Indent Delete");
                 if (emailTemplate != null)

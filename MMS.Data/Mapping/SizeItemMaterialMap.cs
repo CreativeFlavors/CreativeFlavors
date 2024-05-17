@@ -21,7 +21,7 @@ namespace MMS.Data.Mapping
             Property(t => t.MaterialMasterID).IsRequired();
             Property(t => t.CreatedDate);
             Property(t => t.UpdatedDate);
-            Property(t => t.CreatedBY);
+            Property(t => t.CreatedBy);
             Property(t => t.UpdatedBy);
             Property(t => t.IsDeleted);
             Property(t => t.DeletedBy);

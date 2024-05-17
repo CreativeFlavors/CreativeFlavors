@@ -14,11 +14,11 @@ namespace MMS.Repository.Managers
   public class ProjectionManager:IProjectionService,IDisposable
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-        private Repository<ProjectionMaster> projectMasterRepository;
+        private Repository<Projection> projectMasterRepository;
 
         #region Add/Update/Delete Operation
 
-        public bool Post(ProjectionMaster arg)
+        public bool Post(Projection arg)
         {
             bool result = false;
             try
@@ -37,12 +37,12 @@ namespace MMS.Repository.Managers
             return result;
 
         }
-        public bool Put(ProjectionMaster arg)
+        public bool Put(Projection arg)
         {
             bool result = false;
             try
             {
-                ProjectionMaster model = projectMasterRepository.Table.Where(p => p.ProjectionId == arg.ProjectionId).FirstOrDefault();
+                Projection model = projectMasterRepository.Table.Where(p => p.ProjectionId == arg.ProjectionId).FirstOrDefault();
                 if (model != null)
                 {
                     model.ProjectionId = arg.ProjectionId;
@@ -82,7 +82,7 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                ProjectionMaster model = projectMasterRepository.GetById(id);
+                Projection model = projectMasterRepository.GetById(id);
                 model.IsDeleted = true;
                 model.DeletedBy = HttpContext.Current.Session["UserName"].ToString();
                 model.DeletedDate = DateTime.Now;
@@ -105,12 +105,12 @@ namespace MMS.Repository.Managers
 
         public ProjectionManager()
         {
-            projectMasterRepository = unitOfWork.Repository<ProjectionMaster>();
+            projectMasterRepository = unitOfWork.Repository<Projection>();
         }
 
-        public ProjectionMaster GetOrderIndicationNo(string OrderIndicationNo)
+        public Projection GetOrderIndicationNo(string OrderIndicationNo)
         {
-            ProjectionMaster projectionMaster = new ProjectionMaster();
+            Projection projectionMaster = new Projection();
             if (OrderIndicationNo != "" && OrderIndicationNo != null)
             {
                 projectionMaster = projectMasterRepository.Table.Where(x => x.OrderIndicationNo == OrderIndicationNo).SingleOrDefault();
@@ -118,9 +118,9 @@ namespace MMS.Repository.Managers
             return projectionMaster;
         }
 
-        public ProjectionMaster GetProjectionMasterId(int ProjectionId)
+        public Projection GetProjectionMasterId(int ProjectionId)
         {
-            ProjectionMaster projectionMaster = new ProjectionMaster();
+            Projection projectionMaster = new Projection();
             if (ProjectionId != 0)
             {
                 projectionMaster = projectMasterRepository.Table.Where(x => x.ProjectionId == ProjectionId).SingleOrDefault();
@@ -128,17 +128,17 @@ namespace MMS.Repository.Managers
             return projectionMaster;
         }
 
-        public ProjectionMaster Get(int id)
+        public Projection Get(int id)
         {
             return null;
         }
 
-        public List<ProjectionMaster> Get()
+        public List<Projection> Get()
         {
-            List<ProjectionMaster> projectionMasterlist = new List<ProjectionMaster>();
+            List<Projection> projectionMasterlist = new List<Projection>();
             try
             {
-                projectionMasterlist = projectMasterRepository.Table.Where(X => X.IsDeleted == false || X.IsDeleted == null).ToList<ProjectionMaster>();
+                projectionMasterlist = projectMasterRepository.Table.Where(X => X.IsDeleted == false || X.IsDeleted == null).ToList<Projection>();
             }
             catch (Exception ex)
             {

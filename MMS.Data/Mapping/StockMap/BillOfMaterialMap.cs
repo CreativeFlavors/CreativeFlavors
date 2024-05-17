@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MMS.Data.Mapping.StockMap
 {
-    public class BillOfMaterialMap : EntityTypeConfiguration<BillOfMaterial>
+    public class BillOfMaterialMap : EntityTypeConfiguration<Bom>
     {
         public BillOfMaterialMap()
         {

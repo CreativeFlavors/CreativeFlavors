@@ -14,22 +14,22 @@ namespace MMS.Repository.Managers
     public class OrgingMasterManager : IOrginMasterService, IDisposable
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-        private Repository<OrginMaster> orginMasterRepository;
+        private Repository<OriginMaster> OriginMasterRepository;
 
         #region Add/Update/Delete Operation
 
-        public OrginMaster Post(OrginMaster arg)
+        public OriginMaster Post(OriginMaster arg)
         {
             bool result = false;
-            OrginMaster orginMaster = new OrginMaster();
+            OriginMaster OriginMaster = new OriginMaster();
             try
             {
                 string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.CreatedBy = username;
                // arg.UpdatedBy = username;
 
-                orginMasterRepository.Insert(arg);
-                orginMaster = arg;
+                OriginMasterRepository.Insert(arg);
+                OriginMaster = arg;
                 result = true;
             }
             catch (Exception ex)
@@ -37,15 +37,15 @@ namespace MMS.Repository.Managers
                 Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
                 result = false;
             }
-            return orginMaster;
+            return OriginMaster;
 
         }
-        public bool Put(OrginMaster arg)
+        public bool Put(OriginMaster arg)
         {
             bool result = false;
             try
             {
-                OrginMaster model = orginMasterRepository.Table.Where(p => p.OriginMasterId == arg.OriginMasterId).FirstOrDefault();
+                OriginMaster model = OriginMasterRepository.Table.Where(p => p.OriginMasterId == arg.OriginMasterId).FirstOrDefault();
                 if (model != null)
                 {
                     model.OriginMasterId = arg.OriginMasterId;
@@ -56,7 +56,7 @@ namespace MMS.Repository.Managers
                     //model.CreatedBy = "";
                     string username = HttpContext.Current.Session["UserName"].ToString();                   
                     model.UpdatedBy = username;
-                    orginMasterRepository.Update(model);
+                    OriginMasterRepository.Update(model);
                     result = true;
                 }
                 else
@@ -77,12 +77,12 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                OrginMaster model = orginMasterRepository.GetById(id);
+                OriginMaster model = OriginMasterRepository.GetById(id);
                 model.IsDeleted = true;
                 model.DeletedBy = HttpContext.Current.Session["UserName"].ToString();
                 model.DeletedDate = DateTime.Now;
-                orginMasterRepository.Update(model);
-               // orginMasterRepository.Delete(model);
+                OriginMasterRepository.Update(model);
+               // OriginMasterRepository.Delete(model);
                 result = true;
             }
             catch (Exception ex)
@@ -100,45 +100,45 @@ namespace MMS.Repository.Managers
 
         public OrgingMasterManager()
         {
-            orginMasterRepository = unitOfWork.Repository<OrginMaster>();
+            OriginMasterRepository = unitOfWork.Repository<OriginMaster>();
         }
 
-        public OrginMaster GetOriginName(string OriginName)
+        public OriginMaster GetOriginName(string OriginName)
         {
-            OrginMaster orginMaster = new OrginMaster();
+            OriginMaster OriginMaster = new OriginMaster();
             if (OriginName != "" && OriginName != null)
             {
-                orginMaster = orginMasterRepository.Table.Where(x => x.OriginName == OriginName).SingleOrDefault();
+                OriginMaster = OriginMasterRepository.Table.Where(x => x.OriginName == OriginName).SingleOrDefault();
             }
-            return orginMaster;
+            return OriginMaster;
         }
 
-        public OrginMaster GetOriginMasterId(int OriginMasterId)
+        public OriginMaster GetOriginMasterId(int OriginMasterId)
         {
-            OrginMaster orginMaster = new OrginMaster();
+            OriginMaster OriginMaster = new OriginMaster();
             if (OriginMasterId != 0)
             {
-                orginMaster = orginMasterRepository.Table.Where(x => x.OriginMasterId == OriginMasterId).SingleOrDefault();
+                OriginMaster = OriginMasterRepository.Table.Where(x => x.OriginMasterId == OriginMasterId).SingleOrDefault();
             }
-            return orginMaster;
+            return OriginMaster;
         }
-        public OrginMaster Get(int id)
+        public OriginMaster Get(int id)
         {
             return null;
         }
 
-        public List<OrginMaster> Get()
+        public List<OriginMaster> Get()
         {
-            List<OrginMaster> orginMaster = new List<OrginMaster>();
+            List<OriginMaster> OriginMaster = new List<OriginMaster>();
             try
             {
-                orginMaster = orginMasterRepository.Table.Where(X => X.IsDeleted == false || X.IsDeleted == null).ToList<OrginMaster>();
+                OriginMaster = OriginMasterRepository.Table.Where(X => X.IsDeleted == false || X.IsDeleted == null).ToList<OriginMaster>();
             }
             catch (Exception ex)
             {
                 Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
-            return orginMaster;
+            return OriginMaster;
         }
         public void Dispose()
         {

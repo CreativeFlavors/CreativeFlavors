@@ -58,22 +58,22 @@ namespace MRPCalculationService
         private bool PerformCalculation(CalculateMRP simpleMRP)
         {
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
-            InternalOrderEntryForm order = new InternalOrderEntryForm();
+            InternalOrderForm order = new InternalOrderForm();
             BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
             BOMMaterialListManager bomMaterialListManager = new BOMMaterialListManager();
-            BillOfMaterial billOfMaterial = new BillOfMaterial();
-            List<BomGrid> listMaterial = new List<BomGrid>();
+            Bom billOfMaterial = new Bom();
+            List<bomgriddetail> listMaterial = new List<bomgriddetail>();
             List<BOMMaterial> bomMaterialList = new List<BOMMaterial>();
             BOMMaterial bomMaterial = new BOMMaterial();
             string Message = "";
             string OrderMessage = "";
             string BOMMessage = "";
-            string SaveBOMMessage = "";          
+            string SaveBOMMessage = "";
             SimpleMRPManager simpleMRPManager = new SimpleMRPManager();
             BuyerOrderCreationManager buyerOrderCreationManager = new BuyerOrderCreationManager();
             try
             {
-                var SelectedValues = simpleMRPManager.GetMRPSelectedValuesBy(simpleMRP.MRPIdToCalculate);
+                var SelectedValues = "" + simpleMRPManager.GetMRPSelectedValuesBy(simpleMRP.MRPIdToCalculate);
 
                 foreach (var selectedValue in SelectedValues)
                 {
@@ -107,13 +107,13 @@ namespace MRPCalculationService
                             decimal? Amount = 0;
                             decimal? qty = 0;
                             BOMMaterial bomMaterial_ = new BOMMaterial();
-                            MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
+                            materialgroupmaster materialGroupMaster = new materialgroupmaster();
                             SizeScheduleRange sizeScheduleRange = new SizeScheduleRange();
                             MaterialManager materialManager = new MaterialManager();
                             MaterialMaster materialMaster = new MaterialMaster();
                             materialMaster = materialManager.GetMaterialMasterId(each.MaterialName);
                             SizeRangeQtyRateManager sizeRangeQtyRateManager = new SizeRangeQtyRateManager();
-                            materialGroupMaster = materialGroupManager.GetMaterialGroupMaster_Id(each.MaterialGroupMasterId);
+                            materialGroupMaster = materialGroupManager.GetmaterialgroupmasterId(each.MaterialGroupMasterId);
                             List<SizeRangeQtyRate> sizeRangeQtyRateList = new List<SizeRangeQtyRate>();
 
                             if (materialGroupMaster.IsSize == true)

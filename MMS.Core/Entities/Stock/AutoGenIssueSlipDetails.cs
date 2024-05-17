@@ -1,14 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MMS.Core.Entities
 {
-   public class AutoGenIssueSlipDetails :BaseEntity
+    [Table("tblautogenissueslipdetails", Schema = "public")]
+    public class tblautogenissueslipdetails : BaseEntity
     {
+        [System.ComponentModel.DataAnnotations.Key]
+        [Column("autogenerateid")]
         public int AutoGenerateId { get; set; }
+
+        [Column("issueslipdetailsid")]
         public string IssueSlipDetailsId { get; set; }
+        [Column("createddate")]
+        public DateTime? CreatedDate { get; set; }
+        [Column("updateddate")]
+        public DateTime? UpdatedDate { get; set; }
+
     }
 }

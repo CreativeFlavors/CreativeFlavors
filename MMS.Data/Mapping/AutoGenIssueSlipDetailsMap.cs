@@ -8,7 +8,7 @@ using System.Data.Entity.ModelConfiguration;
 using MMS.Core.Entities;
 namespace MMS.Data.Mapping
 {
-  public  class AutoGenIssueSlipDetailsMap : EntityTypeConfiguration<AutoGenIssueSlipDetails>
+  public  class AutoGenIssueSlipDetailsMap : EntityTypeConfiguration<tblautogenissueslipdetails>
     {
         public AutoGenIssueSlipDetailsMap()
         {

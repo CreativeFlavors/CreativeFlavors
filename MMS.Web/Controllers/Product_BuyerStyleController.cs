@@ -348,7 +348,7 @@ namespace MMS.Web.Controllers
                         MaterialManager materialManager = new MaterialManager();
                         MaterialMaster materialMaster = new MaterialMaster();
                         MaterialNameManager materialNameManager = new MaterialNameManager();
-                        MaterialNameMaster materialNameMaster = new MaterialNameMaster();
+                        tbl_materialnamemaster materialNameMaster = new tbl_materialnamemaster();
                         UOMManager uomManager = new UOMManager();
                         UomMaster uomMaster = new UomMaster();
                         uomMaster = uomManager.GetLongUnitName(dr[4].ToString());

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MMS.Data.Mapping
 {
-    class IndentTypeMasterMap : EntityTypeConfiguration<IndentTypeMaster>
+    class IndentTypeMasterMap : EntityTypeConfiguration<IndentMaster>
     {   
         public IndentTypeMasterMap()
         {

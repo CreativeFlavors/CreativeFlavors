@@ -25,6 +25,6 @@ namespace MMS.Web.Models.StockModel
         public decimal? Rate { get; set; }
         public string CreatedBy { get; set; }
         public string UpdatedBy { get; set; }
-        public List<IssueSlip_MaterialDetails> IssueSlipList { get; set; }
+        public List<tbl_issueslipdetails> IssueSlipList { get; set; }
     }
 }

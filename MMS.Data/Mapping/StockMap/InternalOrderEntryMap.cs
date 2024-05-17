@@ -9,7 +9,7 @@ using MMS.Core.Entities.Stock;
 
 namespace MMS.Data.Mapping.StockMap
 {
-    //public class InternalOrderEntryMap : EntityTypeConfiguration<InternalOrderEntryForm>
+    //public class InternalOrderEntryMap : EntityTypeConfiguration<InternalOrderForm>
     //{
     //    //public InternalOrderEntryMap()
     //    //{

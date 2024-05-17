@@ -1,21 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MMS.Core.Entities
 {
-   public class LeatherType:BaseEntity
+    [Table("leathertype", Schema = "public")]
+    public class LeatherType : BaseEntity
     {
+        [System.ComponentModel.DataAnnotations.Key]
+        [Column("leathertypeid")]
         public int LeatherTypeID { get; set; }
-        public string LeatherTypeCode { get; set; }
-        public string LeatherTypeDescription { get; set; }
-        public bool IsDeleted { get; set; }
-        public string CreatedBy { get; set; }
-        public string UpdatedBy { get; set; }
-        public string DeletedBy { get; set; }
-        public DateTime? DeletedON { get; set; }
 
+        [Column("leathertypecode")]
+        public string LeatherTypeCode { get; set; }
+
+        [Column("leathertypedescription")]
+        public string LeatherTypeDescription { get; set; }
+
+        [Column("isdeleted")]
+        public bool IsDeleted { get; set; }
+        [Column("createddate")]
+        public DateTime? CreatedDate { get; set; }
+        [Column("updateddate")]
+        public DateTime? UpdatedDate { get; set; }
+
+        [Column("createdby")]
+        public string CreatedBy { get; set; }
+
+        [Column("updatedby")]
+        public string UpdatedBy { get; set; }
+
+        [Column("deletedby")]
+        public string DeletedBy { get; set; }
+
+        [Column("deletedon")]
+        public DateTime? DeletedON { get; set; }
     }
 }

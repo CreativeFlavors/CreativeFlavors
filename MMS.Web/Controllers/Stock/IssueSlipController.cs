@@ -41,9 +41,9 @@ namespace MMS.Web.Controllers.Stock
 
         public JsonResult SaveDetails(IssueSlipModel Model)
         {
-            IssueSlip_MaterialDetails EntModel = new IssueSlip_MaterialDetails();
+            tbl_issueslipdetails EntModel = new tbl_issueslipdetails();
             IssueSlipManager ObjManager = new IssueSlipManager();
-            bool Result = false;
+           // bool Result = false;
             EntModel.IssueSlipId = Model.IssueSlipId;
             EntModel.IssueSlipFK = Model.IssueSlipFK;
             EntModel.OrderNo = Model.OrderNo;
@@ -69,7 +69,7 @@ namespace MMS.Web.Controllers.Stock
 
         public JsonResult GetIssueDetails(int IssueSlipId)
         {
-            IssueSlip_MaterialDetails EntModel = new IssueSlip_MaterialDetails();
+            tbl_issueslipdetails EntModel = new tbl_issueslipdetails();
             IssueSlipManager ObjManager = new IssueSlipManager();
 
             EntModel = ObjManager.Get().Where(x => x.IssueSlipId == IssueSlipId).SingleOrDefault();
@@ -79,7 +79,7 @@ namespace MMS.Web.Controllers.Stock
         }
         public JsonResult DeleteIssueDetails(int IssueSlipId)
         {
-            IssueSlip_MaterialDetails EntModel = new IssueSlip_MaterialDetails();
+            tbl_issueslipdetails EntModel = new tbl_issueslipdetails();
             IssueSlipManager ObjManager = new IssueSlipManager();
 
             bool result = false;

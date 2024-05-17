@@ -67,7 +67,7 @@ namespace MMS.Web.Controllers
                 Text = "Please Select"
             };
             items.Insert(0, ShotName);
-            List<InternalOrderEntryForm> BuyerOrderEntryList = new List<InternalOrderEntryForm>();
+            List<InternalOrderForm> BuyerOrderEntryList = new List<InternalOrderForm>();
             List<SelectListItem> seasonList = new List<SelectListItem>();
             var items_ = (from x in uOMManager.GetInternalIO()
                           join y in seasonManager.Get()
@@ -96,7 +96,7 @@ namespace MMS.Web.Controllers
         {
             SeasonManager seasonManager = new SeasonManager();
             BuyerOrderEntryManager uOMManager = new BuyerOrderEntryManager();
-            List<InternalOrderEntryForm> BuyerOrderEntryList = new List<InternalOrderEntryForm>();
+            List<InternalOrderForm> BuyerOrderEntryList = new List<InternalOrderForm>();
             List<SelectListItem> lotNoList = new List<SelectListItem>();
             var items_ = (from x in uOMManager.GetInternalIO()
                           join y in seasonManager.Get()
@@ -125,7 +125,7 @@ namespace MMS.Web.Controllers
         {
             SeasonManager seasonManager = new SeasonManager();
             BuyerOrderEntryManager uOMManager = new BuyerOrderEntryManager();
-            List<InternalOrderEntryForm> BuyerOrderEntryList = new List<InternalOrderEntryForm>();
+            List<InternalOrderForm> BuyerOrderEntryList = new List<InternalOrderForm>();
             List<SelectListItem> orderList = new List<SelectListItem>();
             var items_ = (from x in uOMManager.GetInternalIO()
                           where x.LotNo == LotNo && x.BuyerSeason == Convert.ToInt32(SeasonID) && x.BuyerName == Convert.ToInt32(buyer)
@@ -148,7 +148,7 @@ namespace MMS.Web.Controllers
         {
             SeasonManager seasonManager = new SeasonManager();
             BuyerOrderEntryManager uOMManager = new BuyerOrderEntryManager();
-            List<InternalOrderEntryForm> BuyerOrderEntryList = new List<InternalOrderEntryForm>();
+            List<InternalOrderForm> BuyerOrderEntryList = new List<InternalOrderForm>();
             List<SelectListItem> orderList = new List<SelectListItem>();
             var PackingDetail = JsonConvert.DeserializeObject<List<string>>(LotNo);
             decimal? totalCount = 0;
@@ -197,11 +197,11 @@ namespace MMS.Web.Controllers
         {
 
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
-            InternalOrderEntryForm order = new InternalOrderEntryForm();
+            OrderEntry order = new OrderEntry();
             BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
             BOMMaterialListManager bomMaterialListManager = new BOMMaterialListManager();
-            BillOfMaterial billOfMaterial = new BillOfMaterial();
-            List<BomGrid> listMaterial = new List<BomGrid>();
+            Bom billOfMaterial = new Bom();
+            List<bomgriddetail> listMaterial = new List<bomgriddetail>();
             var SizeQuantityRate_ = JsonConvert.DeserializeObject<List<string>>(SelectText);
             List<BOMMaterial> bomMaterialList = new List<BOMMaterial>();
             BOMMaterial bomMaterial = new BOMMaterial();
@@ -212,11 +212,11 @@ namespace MMS.Web.Controllers
             SimpleMRPModel model = new SimpleMRPModel();
             SimpleMRPManager simpleMRPManager = new SimpleMRPManager();
             BuyerOrderCreationManager buyerOrderCreationManager = new BuyerOrderCreationManager();
-            List<InternalOrderEntryForm> listOfOrders_ = new List<InternalOrderEntryForm>();
-            List<BillOfMaterial> listBillOfMaterial = new List<BillOfMaterial>();
+            List<OrderEntry> listOfOrders_ = new List<OrderEntry>();
+            List<Bom> listBillOfMaterial = new List<Bom>();
             List<MaterialMaster> listOfMaterial = new List<MaterialMaster>();
             MaterialManager materialManager = new MaterialManager();
-            List<MaterialGroupMaster_> listOfMaterialGroupMaster = new List<MaterialGroupMaster_>();
+            List<materialgroupmaster> listOfMaterialGroupMaster = new List<materialgroupmaster>();
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
             List<SizeRangeQtyRate> listOfSizeRange = new List<SizeRangeQtyRate>();
             string orderExited = "";
@@ -277,9 +277,9 @@ namespace MMS.Web.Controllers
                                 decimal? Amount = 0;
                                 decimal? qty = 0;
                                 BOMMaterial bomMaterial_ = new BOMMaterial();
-                                MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
+                                materialgroupmaster materialGroupMaster = new materialgroupmaster();
                                 SizeScheduleRange sizeScheduleRange = new SizeScheduleRange();
-                                MaterialMaster materialMaster = new MaterialMaster();                              
+                                MaterialMaster materialMaster = new MaterialMaster();
                                 materialMaster = listOfMaterial.Where(x => x.MaterialMasterId == each.MaterialName).FirstOrDefault();
                                 SizeRangeQtyRateManager sizeRangeQtyRateManager = new SizeRangeQtyRateManager();
                                 materialGroupMaster = listOfMaterialGroupMaster.Where(x => x.MaterialGroupMasterId == each.MaterialGroupMasterId).FirstOrDefault();
@@ -350,7 +350,7 @@ namespace MMS.Web.Controllers
             catch (Exception ex)
             {
                 Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
-               // Logger.Log(ex.str.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                // Logger.Log(ex.str.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
             return Json(new { InternalStatus = OrderMessage, status = SaveBOMMessage, orderStatus = orderExited, BOMStatus = BOMMessage }, JsonRequestBehavior.AllowGet);
         }
@@ -488,6 +488,10 @@ namespace MMS.Web.Controllers
             {
                 simpleMRP_ = simpleMRPManager.GetMRPNO(Model.MRPNO);
             }
+            else if (Model.MRPNO != null && Model.MRPCode != null && Model.SimpleMRPID != 0)
+            {
+                simpleMRP_.SimpleMRPID = Model.SimpleMRPID;
+            }
             simpleMRP.SimpleMRPID = Model.SimpleMRPID;
             if (Model.MRPNO != null)
             {
@@ -553,7 +557,7 @@ namespace MMS.Web.Controllers
             simpleMRP_ = simpleMRPManager.GetSimpleMRPID(SimpleMRPID);
             if (simpleMRP_ != null)
             {
-                listBOMMaterial = bomMaterialListManager.GetMRPMaterialList(simpleMRP_.SimpleMRPID).ToList();              
+                listBOMMaterial = bomMaterialListManager.GetMRPMaterialList(simpleMRP_.SimpleMRPID).ToList();
                 simpleMRPManager.Delete(SimpleMRPID);
                 Message = "Success";
             }

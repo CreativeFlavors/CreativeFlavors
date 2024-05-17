@@ -301,6 +301,8 @@ namespace MMS.Web.Controllers
                     buyerMasters.CountryStamp = model.CountryStamp;
                     buyerMasters.CreatedDate = DateTime.Now;
                     buyerMasters.CreatedBy = model.CreatedBy;
+                    buyerMasters.CreditExposure = model.CreditExposure;
+                    buyerMasters.CreditDays = model.CreditDays;
 
                     buyerManager.Post(buyerMasters);
                 }
@@ -363,6 +365,8 @@ namespace MMS.Web.Controllers
                     BuyerMasters.CountryStamp = model.CountryStamp;
                     BuyerMasters.CreatedDate = buyerMaster.CreatedDate;
                     BuyerMasters.UpdatedDate = DateTime.Now;
+                    BuyerMasters.CreditExposure = model.CreditExposure;
+                    BuyerMasters.CreditDays = model.CreditDays;
                     buyerManager.Put(BuyerMasters);
                 }
                 else

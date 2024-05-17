@@ -13,7 +13,7 @@ namespace MMS.Repository.Managers.StockManager
     public class InternalOrderFormManager
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-        private Repository<OrderEntryForm> BuyerOrdeEntryrRepository;
+        private Repository<OrderEntry> BuyerOrdeEntryrRepository;
         private Repository<OePackingDetails> OePackingDetailsRepository;
         private Repository<OeShipmentDetails> OeShipmentDetailsRepository;
         private Repository<OeOtherDetails> OeOtherDetailsRepository;
@@ -21,7 +21,7 @@ namespace MMS.Repository.Managers.StockManager
         #region Helper Method
         public InternalOrderFormManager()
         {
-            BuyerOrdeEntryrRepository = unitOfWork.Repository<OrderEntryForm>();
+            BuyerOrdeEntryrRepository = unitOfWork.Repository<OrderEntry>();
             OeOtherDetailsRepository = unitOfWork.Repository<OeOtherDetails>();
             OePackingDetailsRepository = unitOfWork.Repository<OePackingDetails>();
             OeShipmentDetailsRepository = unitOfWork.Repository<OeShipmentDetails>();
@@ -30,12 +30,12 @@ namespace MMS.Repository.Managers.StockManager
         {
             return null;
         }
-        public List<OrderEntryForm> Get()
+        public List<OrderEntry> Get()
         {
-            List<OrderEntryForm> BuyerOrderEntryList = new List<OrderEntryForm>();
+            List<OrderEntry> BuyerOrderEntryList = new List<OrderEntry>();
             try
             {
-                BuyerOrderEntryList = BuyerOrdeEntryrRepository.Table.ToList<OrderEntryForm>();
+                BuyerOrderEntryList = BuyerOrdeEntryrRepository.Table.ToList<OrderEntry>();
             }
             catch (Exception ex)
             {
@@ -44,9 +44,9 @@ namespace MMS.Repository.Managers.StockManager
             return BuyerOrderEntryList;
         }
 
-        public OrderEntryForm GetOrderEntryId(int OrderEntryId)
+        public OrderEntry GetOrderEntryId(int OrderEntryId)
         {
-            OrderEntryForm model = new OrderEntryForm();
+            OrderEntry model = new OrderEntry();
             if (OrderEntryId != 0)
             {
                 model = BuyerOrdeEntryrRepository.Table.Where(x => x.OrderEntryId == OrderEntryId).SingleOrDefault();
@@ -83,9 +83,9 @@ namespace MMS.Repository.Managers.StockManager
             }
             return model;
         }
-        public OrderEntryForm GetBuyerOderPoNo(string BuyerPONo)
+        public OrderEntry GetBuyerOderPoNo(string BuyerPONo)
         {
-            OrderEntryForm model = new OrderEntryForm();
+            OrderEntry model = new OrderEntry();
             if (BuyerPONo != "")
             {
                 model = BuyerOrdeEntryrRepository.Table.Where(x => x.BuyerPoNo == BuyerPONo).SingleOrDefault();
@@ -95,7 +95,7 @@ namespace MMS.Repository.Managers.StockManager
         #endregion
 
         #region Curd Operation
-        public int Post(OrderEntryForm arg)
+        public int Post(OrderEntry arg)
         {
             int result = 0;
             try
@@ -111,7 +111,7 @@ namespace MMS.Repository.Managers.StockManager
                 }
                 else
                 {
-                    OrderEntryForm model = BuyerOrdeEntryrRepository.Table.Where(m => m.OrderEntryId == arg.OrderEntryId).FirstOrDefault();
+                    OrderEntry model = BuyerOrdeEntryrRepository.Table.Where(m => m.OrderEntryId == arg.OrderEntryId).FirstOrDefault();
                     model.OrderEntryId = arg.OrderEntryId;
                     model.BuyerOrderSlNo = arg.BuyerOrderSlNo;
                     model.LotNo = arg.LotNo;
@@ -181,7 +181,7 @@ namespace MMS.Repository.Managers.StockManager
             bool result = false;
             try
             {
-                OrderEntryForm model = BuyerOrdeEntryrRepository.GetById(OrderEntryId);
+                OrderEntry model = BuyerOrdeEntryrRepository.GetById(OrderEntryId);
                 model.IsDeleted = true;
                 BuyerOrdeEntryrRepository.Update(model);
                 result = true;

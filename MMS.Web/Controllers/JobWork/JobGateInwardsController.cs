@@ -356,7 +356,7 @@ namespace MMS.Web.Controllers.JobWork
             GateEntryInwardMaterialsMaster GateEntryInwardMaterialsMaster = new GateEntryInwardMaterialsMaster();
             IssueSlipManager issueSlipManager = new IssueSlipManager();
             List<JobSheet_PairMaster> JobSheet_PairMaster = new List<JobSheet_PairMaster>();
-            List<IssueSlip_MaterialDetails> IssueObj = new List<IssueSlip_MaterialDetails>();
+            List<tbl_issueslipdetails> IssueObj = new List<tbl_issueslipdetails>();
          //   List<IssueSlip_MaterialDetails> IssueObj_ = new List<IssueSlip_MaterialDetails>();
             int[] list_ = IssueID.Split(',').Select(int.Parse).ToArray();
             //var IssueObj_ = "";
@@ -564,7 +564,7 @@ namespace MMS.Web.Controllers.JobWork
                     //    }).ToList();
 
                     BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
-                    List<BillOfMaterial> billOfMaterial = new List<BillOfMaterial>();
+                    List<Bom> billOfMaterial = new List<Bom>();
                     List<SizeRangeQtyRate> sizeRangeQtyRateList = new List<SizeRangeQtyRate>();
                     List<SizeRangeQtyRate> listOfSizeRange = new List<SizeRangeQtyRate>();
                     BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
@@ -713,7 +713,7 @@ namespace MMS.Web.Controllers.JobWork
             GateEntryInwardMaterialsMaster GateEntryInwardMaterialsMaster = new GateEntryInwardMaterialsMaster();
             IssueSlipManager issueSlipManager = new IssueSlipManager();
             List<JobSheet_PairMaster> JobSheet_PairMaster = new List<JobSheet_PairMaster>();
-            List<IssueSlip_MaterialDetails> IssueObj = new List<IssueSlip_MaterialDetails>();
+            List<tbl_issueslipdetails> IssueObj = new List<tbl_issueslipdetails>();
 
             int[] list_ = IssueID.Split(',').Select(int.Parse).ToArray();
             MultipleIssueSlip = Manager.GetMultipleIssueGRNSelectedRow(list_[0]);

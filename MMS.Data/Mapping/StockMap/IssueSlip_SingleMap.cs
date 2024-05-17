@@ -9,7 +9,7 @@ using MMS.Core.Entities.Stock;
 
 namespace MMS.Data.Mapping.StockMap
 {
-    public class IssueSlip_SingleMap : EntityTypeConfiguration<IssueSlip>
+    public class IssueSlip_SingleMap : EntityTypeConfiguration<singleissueslip>
     {
         public IssueSlip_SingleMap()
         {

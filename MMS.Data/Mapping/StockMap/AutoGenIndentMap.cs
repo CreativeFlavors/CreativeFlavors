@@ -8,7 +8,7 @@ using System.Data.Entity.ModelConfiguration;
 using MMS.Core.Entities.Stock;
 namespace MMS.Data.Mapping.StockMap
 {
-   public  class AutoGenIndentMap : EntityTypeConfiguration<AutoGenIndent>
+   public  class AutoGenIndentMap : EntityTypeConfiguration<tblAutoGenIndent>
     {
         public AutoGenIndentMap()
         {

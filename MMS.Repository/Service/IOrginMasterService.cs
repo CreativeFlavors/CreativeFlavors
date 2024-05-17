@@ -9,10 +9,10 @@ namespace MMS.Repository.Service
 {
    public interface IOrginMasterService
     {
-       OrginMaster Post(OrginMaster arg);
-        bool Put(OrginMaster arg);
+       OriginMaster Post(OriginMaster arg);
+        bool Put(OriginMaster arg);
         bool Delete(int id);
-        OrginMaster Get(int id);
-        List<OrginMaster> Get();
+        OriginMaster Get(int id);
+        List<OriginMaster> Get();
     }
 }

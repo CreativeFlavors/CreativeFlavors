@@ -11,16 +11,16 @@ namespace MMS.Repository.Managers.StockManager
        public class AutoGenIndentManager : IDisposable
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-        private Repository<AutoGenIndent> agentMasterRepository;
+        private Repository<tblAutoGenIndent> agentMasterRepository;
 
 
         public AutoGenIndentManager()
         {
-            agentMasterRepository = unitOfWork.Repository<AutoGenIndent>();
+            agentMasterRepository = unitOfWork.Repository<tblAutoGenIndent>();
         }
         #region Add/Update/Delete Operation
 
-        public bool Post(AutoGenIndent arg)
+        public bool Post(tblAutoGenIndent arg)
         {
             bool result = false;
             try
@@ -39,12 +39,12 @@ namespace MMS.Repository.Managers.StockManager
             return result;
 
         }
-        public bool Put(AutoGenIndent arg)
+        public bool Put(tblAutoGenIndent arg)
         {
             bool result = false;
             try
             {
-                AutoGenIndent model = agentMasterRepository.Table.Where(p => p.AutoGenerateId == arg.AutoGenerateId).FirstOrDefault();
+                tblAutoGenIndent model = agentMasterRepository.Table.Where(p => p.AutoGenerateId == arg.AutoGenerateId).FirstOrDefault();
                 if (model != null)
                 {
                     model.AutoGenerateId = arg.AutoGenerateId;
@@ -73,7 +73,7 @@ namespace MMS.Repository.Managers.StockManager
             bool result = false;
             try
             {
-                AutoGenIndent model = agentMasterRepository.GetById(id);
+                tblAutoGenIndent model = agentMasterRepository.GetById(id);
 
                 agentMasterRepository.Delete(model);
 
@@ -94,9 +94,9 @@ namespace MMS.Repository.Managers.StockManager
         #region Helper Method
 
 
-        public AutoGenIndent GetAgentFullName(string IssueSlipDetailsId)
+        public tblAutoGenIndent GetAgentFullName(string IssueSlipDetailsId)
         {
-            AutoGenIndent agentMaster = new AutoGenIndent();
+            tblAutoGenIndent agentMaster = new tblAutoGenIndent();
             if (IssueSlipDetailsId != "" && IssueSlipDetailsId != null)
             {
                 agentMaster = agentMasterRepository.Table.Where(x => x.IndentId == IssueSlipDetailsId).FirstOrDefault();
@@ -104,9 +104,9 @@ namespace MMS.Repository.Managers.StockManager
             return agentMaster;
         }
 
-        public AutoGenIndent GetAgentMasterId(int AutoGenerateId)
+        public tblAutoGenIndent GetAgentMasterId(int AutoGenerateId)
         {
-            AutoGenIndent agentMaster = new AutoGenIndent();
+            tblAutoGenIndent agentMaster = new tblAutoGenIndent();
             if (AutoGenerateId != 0)
             {
                 agentMaster = agentMasterRepository.Table.Where(x => x.AutoGenerateId == AutoGenerateId).SingleOrDefault();
@@ -114,17 +114,17 @@ namespace MMS.Repository.Managers.StockManager
             return agentMaster;
         }
 
-        public AutoGenIndent Get(int id)
+        public tblAutoGenIndent Get(int id)
         {
             return null;
         }
 
-        public List<AutoGenIndent> Get()
+        public List<tblAutoGenIndent> Get()
         {
-            List<AutoGenIndent> agentMasterlist = new List<AutoGenIndent>();
+            List<tblAutoGenIndent> agentMasterlist = new List<tblAutoGenIndent>();
             try
             {
-                agentMasterlist = agentMasterRepository.Table.ToList<AutoGenIndent>();
+                agentMasterlist = agentMasterRepository.Table.ToList<tblAutoGenIndent>();
             }
             catch (Exception ex)
             {

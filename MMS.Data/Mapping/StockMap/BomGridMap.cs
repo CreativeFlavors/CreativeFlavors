@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MMS.Data.Mapping.StockMap
 {
-    public class BomGridMap : EntityTypeConfiguration<BomGrid>
+    public class BomGridMap : EntityTypeConfiguration<bomgriddetail>
     {
         public BomGridMap()
         {

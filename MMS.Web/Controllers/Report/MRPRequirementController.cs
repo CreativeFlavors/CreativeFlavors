@@ -15,12 +15,14 @@ namespace MMS.Web.Controllers.Report
         // GET: /IndentReqReport/
 
         public ActionResult Index()
+
         {
             return View("MrpReqReport");
         }
-        public ActionResult RedirectToAspx(string mrpNo, string indentType, string buyerId, string category, string group, string store)
+        public ActionResult RedirectToAspx(string mrpNo, string indentType, string buyerId, string category, string group, string store)       
         {
 
+          
             string StoreName = HttpUtility.UrlEncode(MMS.Web.ExtensionMethod.HtmlHelper.Encrypt(store.Trim()));
             string CategoryName = HttpUtility.UrlEncode(MMS.Web.ExtensionMethod.HtmlHelper.Encrypt(category.Trim()));
             string GroupName = HttpUtility.UrlEncode(MMS.Web.ExtensionMethod.HtmlHelper.Encrypt(group.Trim()));

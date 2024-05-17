@@ -14,6 +14,6 @@ namespace MMS.Web.Models.Permission
         public string CreatedBy { get; set; }
         public string UpdatedBy { get; set; }
         public int UserTypeID { get; set; }
-        public List<PermissionMaster> PermissionModelList { get; set; }
+        public List<tbl_Permission> PermissionModelList { get; set; }
     }
 }

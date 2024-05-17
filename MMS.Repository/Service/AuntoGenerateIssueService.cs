@@ -10,10 +10,10 @@ namespace MMS.Repository.Service
 {
     public interface  AuntoGenerateIssueService
     {
-        bool Post(AutoGenIssueSlipDetails arg);
-        bool Put(AutoGenIssueSlipDetails arg);
+        bool Post(tblautogenissueslipdetails arg);
+        bool Put(tblautogenissueslipdetails arg);
         bool Delete(int id);
-        AutoGenIssueSlipDetails Get(int id);
-        List<AutoGenIssueSlipDetails> Get();
+        tblautogenissueslipdetails Get(int id);
+        List<tblautogenissueslipdetails> Get();
     }
 }

@@ -168,8 +168,8 @@ namespace MMS.Web.PDFGeneration
 
                         string pathName = "";
                         string pathName_ = "";
-                        string path_ = "";
-                        string docTypeCode = "";
+                       // string path_ = "";
+                       // string docTypeCode = "";
                         String timeStamp = GetTimestamp(new DateTime());
                         pathName = receiptDetailslist.FirstOrDefault().GateEntryNo;
                         pathName_ = pathName.Replace(" ", "").Replace("/", ",");

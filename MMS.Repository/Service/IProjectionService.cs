@@ -9,10 +9,10 @@ namespace MMS.Repository.Service
 {
   public interface IProjectionService
     {
-        bool Post(ProjectionMaster arg);
-        bool Put(ProjectionMaster arg);
+        bool Post(Projection arg);
+        bool Put(Projection arg);
         bool Delete(int id);
-        ProjectionMaster Get(int id);
-        List<ProjectionMaster> Get();
+        Projection Get(int id);
+        List<Projection> Get();
     }
 }

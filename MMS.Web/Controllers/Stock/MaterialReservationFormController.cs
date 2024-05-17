@@ -72,7 +72,7 @@ namespace MMS.Web.Controllers.Stock
         {
             List<Core.Entities.Stock.MaterialReservation> materialReservationList = new List<Core.Entities.Stock.MaterialReservation>();
             MaterialReservationManager materialReservationManager = new MaterialReservationManager();
-            List<MaterialGroupMaster_> materialGroupMasterList = new List<MaterialGroupMaster_>();
+            List<materialgroupmaster> materialGroupMasterList = new List<materialgroupmaster>();
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
             materialGroupMasterList = materialGroupManager.Get();
             materialReservationList = materialReservationManager.Get();

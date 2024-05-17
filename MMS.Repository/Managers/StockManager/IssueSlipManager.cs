@@ -15,14 +15,14 @@ namespace MMS.Repository.Managers.StockManager
     public class IssueSlipManager
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-        private Repository<IssueSlip_MaterialDetails> IssueSlipRepository;
+        private Repository<tbl_issueslipdetails> IssueSlipRepository;
         private Repository<SizeItemsIssueSlip> sizeItemsIssueSlipRepository;
         EmailTemplateManager emailTemplateManager = new EmailTemplateManager();
         #region Helper Method
 
         public IssueSlipManager()
         {
-            IssueSlipRepository = unitOfWork.Repository<IssueSlip_MaterialDetails>();
+            IssueSlipRepository = unitOfWork.Repository<tbl_issueslipdetails>();
             sizeItemsIssueSlipRepository = unitOfWork.Repository<SizeItemsIssueSlip>();
         }
         public List<MMS.Web.Models.PendingQty> MaterialOpeningStock(int MaterialNameID)
@@ -91,12 +91,12 @@ namespace MMS.Repository.Managers.StockManager
             }
             return PendingList;
         }
-        public List<IssueSlip_MaterialDetails> Get()
+        public List<tbl_issueslipdetails> Get()
         {
-            List<IssueSlip_MaterialDetails> IssueObjList = new List<IssueSlip_MaterialDetails>();
+            List<tbl_issueslipdetails> IssueObjList = new List<tbl_issueslipdetails>();
             try
             {
-                IssueObjList = IssueSlipRepository.Table.ToList<IssueSlip_MaterialDetails>();
+                IssueObjList = IssueSlipRepository.Table.ToList<tbl_issueslipdetails>();
             }
             catch (Exception ex)
             {
@@ -105,18 +105,18 @@ namespace MMS.Repository.Managers.StockManager
             return IssueObjList;
         }
 
-        public IssueSlip_MaterialDetails GetGRNSelectedRow(int IssueID)
+        public tbl_issueslipdetails GetGRNSelectedRow(int IssueID)
         {
-            IssueSlip_MaterialDetails IssueObj = new IssueSlip_MaterialDetails();
+            tbl_issueslipdetails IssueObj = new tbl_issueslipdetails();
             if (IssueID != 0)
             {
                 IssueObj = IssueSlipRepository.Table.Where(x => x.IssueSlipId == IssueID).FirstOrDefault();
             }
             return IssueObj;
         }
-        public List<IssueSlip_MaterialDetails> GetMultipleIssueid(int IssueID)
+        public List<tbl_issueslipdetails> GetMultipleIssueid(int IssueID)
         {
-            List<IssueSlip_MaterialDetails> IssueObj = new List<IssueSlip_MaterialDetails>();
+            List<tbl_issueslipdetails> IssueObj = new List<tbl_issueslipdetails>();
             try
             {
                 if (IssueID != 0)
@@ -131,9 +131,9 @@ namespace MMS.Repository.Managers.StockManager
          
             return IssueObj;
         }
-        public List<IssueSlip_MaterialDetails> GetMultipleIssueid_list(int[] list)
+        public List<tbl_issueslipdetails> GetMultipleIssueid_list(int[] list)
         {
-            List<IssueSlip_MaterialDetails> IssueObj = new List<IssueSlip_MaterialDetails>();
+            List<tbl_issueslipdetails> IssueObj = new List<tbl_issueslipdetails>();
             try
             {
 
@@ -153,9 +153,9 @@ namespace MMS.Repository.Managers.StockManager
 
             return IssueObj;
         }
-        public List<IssueSlip_MaterialDetails> GetMultipleIssueid_list_Jobworktype_Id(int[] list)
+        public List<tbl_issueslipdetails> GetMultipleIssueid_list_Jobworktype_Id(int[] list)
         {
-            List<IssueSlip_MaterialDetails> IssueObj = new List<IssueSlip_MaterialDetails>();
+            List<tbl_issueslipdetails> IssueObj = new List<tbl_issueslipdetails>();
             try
             {
 
@@ -175,27 +175,27 @@ namespace MMS.Repository.Managers.StockManager
 
             return IssueObj;
         }
-        public IssueSlip_MaterialDetails GetMultipleIssueWithMaterialID(int materialID)
+        public tbl_issueslipdetails GetMultipleIssueWithMaterialID(int materialID)
         {
-            IssueSlip_MaterialDetails IssueObj = new IssueSlip_MaterialDetails();
+            tbl_issueslipdetails IssueObj = new tbl_issueslipdetails();
             if (materialID != 0)
             {
                 IssueObj = IssueSlipRepository.Table.Where(x => x.MaterialMasterId == materialID).OrderByDescending(x => x.IssueDate).FirstOrDefault();
             }
             return IssueObj;
         }
-        public IssueSlip_MaterialDetails GetIssueSlipMaterial(string orderNo, string MaterialName)
+        public tbl_issueslipdetails GetIssueSlipMaterial(string orderNo, string MaterialName)
         {
-            IssueSlip_MaterialDetails IssueObj = new IssueSlip_MaterialDetails();
+            tbl_issueslipdetails IssueObj = new tbl_issueslipdetails();
             if (orderNo != "" && MaterialName != "")
             {
                 IssueObj = IssueSlipRepository.Table.Where(x => x.OrderNo == orderNo && x.MaterialName == MaterialName).FirstOrDefault();
             }
             return IssueObj;
         }
-        public List<IssueSlip_MaterialDetails> GetOrderNo(string OrderNo)
+        public List<tbl_issueslipdetails> GetOrderNo(string OrderNo)
         {
-            List<IssueSlip_MaterialDetails> issueSlip_MaterialDetailsList = new List<IssueSlip_MaterialDetails>();
+            List<tbl_issueslipdetails> issueSlip_MaterialDetailsList = new List<tbl_issueslipdetails>();
             if (OrderNo != "")
             {
                 issueSlip_MaterialDetailsList = IssueSlipRepository.Table.Where(x => x.OrderNo == OrderNo).ToList();
@@ -213,14 +213,14 @@ namespace MMS.Repository.Managers.StockManager
         }
         #endregion
 
-        public IssueSlip_MaterialDetails Post(IssueSlip_MaterialDetails arg)
+        public tbl_issueslipdetails Post(tbl_issueslipdetails arg)
         {
             bool result = false;
             List<SizeRangeQtyRate> sizeRangeQtyRateList = new List<SizeRangeQtyRate>();
             SizeRangeQtyRateManager sizeRangeQtyRateMgr = new SizeRangeQtyRateManager();
-            InternalOrderEntryForm orderEntry = new InternalOrderEntryForm();
+            OrderEntry orderEntry = new OrderEntry();
             BuyerOrderEntryManager buyerOrderManager = new BuyerOrderEntryManager();
-            IssueSlip_MaterialDetails issueSlip_MaterialDetails = new IssueSlip_MaterialDetails();
+            tbl_issueslipdetails issueSlip_MaterialDetails = new tbl_issueslipdetails();
             BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
 
             BOMMaterialListManager bomMaterialListManager = new BOMMaterialListManager();
@@ -246,7 +246,7 @@ namespace MMS.Repository.Managers.StockManager
                     grnTypeMaster = grnTypeManager.GetIssueTypeMasterId(Convert.ToInt32(arg.IssueType));
                     materialMaster = materialManager.GetMaterialMasterId(arg.MaterialMasterId);
                     orderEntry = buyerOrderManager.GetBuyerOderSlNo(arg.InternalValue);
-                    BillOfMaterial billOfMaterial = new BillOfMaterial();
+                    Bom billOfMaterial = new Bom();
                     BOMMaterial bomMaterial = new BOMMaterial();
                     billOfMaterial = billOfMaterialManager.getLinkBomNumber(orderEntry.OurStyle);
                     bomMaterial = billOfMaterialManager.getBOMIDWithMaterial(billOfMaterial.BomId, arg.MaterialMasterId);
@@ -355,7 +355,7 @@ namespace MMS.Repository.Managers.StockManager
                 }
                 else
                 {
-                    IssueSlip_MaterialDetails model = IssueSlipRepository.Table.Where(m => m.IssueSlipId == arg.IssueSlipId).FirstOrDefault();
+                    tbl_issueslipdetails model = IssueSlipRepository.Table.Where(m => m.IssueSlipId == arg.IssueSlipId).FirstOrDefault();
 
                     model.UpdatedDate = DateTime.Now;
                     model.IsChecked = arg.IsChecked;
@@ -514,10 +514,10 @@ namespace MMS.Repository.Managers.StockManager
                 StoreMaster storeMaster = new StoreMaster();
                 List<Company> listCompany = new List<Company>();
                 listCompany = companyManager.Get();
-               
-                IssueSlip_MaterialDetails model = IssueSlipRepository.GetById(id);
+
+                tbl_issueslipdetails model = IssueSlipRepository.GetById(id);
                 IssueSlipRepository.Delete(model);
-                EmailTempate emailTemplate = new EmailTempate();
+                EmailTemplate emailTemplate = new EmailTemplate();
                 emailTemplate = emailTemplateManager.GetTemplateName("Multiple Issue Mateial Delete");
                 if (emailTemplate != null)
                 {

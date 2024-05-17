@@ -34,7 +34,7 @@ namespace MMS.Data.Mapping.StockMap
             Property(t => t.CreatedDate);
             Property(t => t.UpdatedDate);
             Property(t => t.CreatedBy);
-            Property(t => t.UpdatedBY);
+            Property(t => t.UpdatedBy);
             Property(t => t.IsApproved);
             Property(t => t.ApprovedBy);
             ToTable("ApprovedPriceList");

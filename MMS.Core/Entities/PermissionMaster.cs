@@ -1,17 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MMS.Core.Entities
 {
-  public  class PermissionMaster : BaseEntity
+    [Table("tbl_Permission", Schema = "public")]
+    public class tbl_Permission : BaseEntity
     {
-      public int PermissionID { get; set; }
-      public string PermissionName { get; set; }
-      public string PermissionDesc { get; set; }
-      public string CreatedBy { get; set; }
-      public string UpdatedBy { get; set; }
+        [System.ComponentModel.DataAnnotations.Key]
+        [Column("permissionid")]
+        public int PermissionID { get; set; }
+        [Column("permissionname")]
+        public string PermissionName { get; set; }
+        [Column("permissiondesc")]
+        public string PermissionDesc { get; set; }
+        [Column("createddate")]
+        public DateTime? CreatedDate { get; set; }
+        [Column("createdby")]
+        public string CreatedBy { get; set; }
+        [Column("updatedby")]
+        public string UpdatedBy { get; set; }
+        [Column("updateddate")]
+        public DateTime? UpdatedDate { get; set; }
     }
 }

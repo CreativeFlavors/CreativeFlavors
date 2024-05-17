@@ -13,8 +13,8 @@ namespace MMS.Data.Mapping
     {
         public BomSizeMatchingMap()
         {
-            HasKey(t => t.BOMSizeMatchingID);
-            Property(t => t.BOMSizeMatchingID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            HasKey(t => t.BomSizeMatchingID);
+            Property(t => t.BomSizeMatchingID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             Property(t => t.BomMaterialID).IsRequired();
             Property(t => t.Frame);
             Property(t => t.Size);

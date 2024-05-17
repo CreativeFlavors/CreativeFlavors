@@ -81,8 +81,8 @@ namespace MMS.Web.Controllers.Stock
             MMS.Core.Entities.Indent indent = new Core.Entities.Indent();
 
             indent = indentManager.GetIndentMasterId(IndentId);
-            AutoGenIndent autoIndent = new AutoGenIndent();
-            AutoGenIndent autoIndentNo = new AutoGenIndent();
+            tblAutoGenIndent autoIndent = new tblAutoGenIndent();
+            tblAutoGenIndent autoIndentNo = new tblAutoGenIndent();
             AutoGenIndentManager autoManager = new AutoGenIndentManager();
             SimpleMRP simpleMRP = new SimpleMRP();
             SimpleMRPManager simpleMRPManager = new SimpleMRPManager();
@@ -128,11 +128,11 @@ namespace MMS.Web.Controllers.Stock
                 {
                     autoIndentNo.IndentId = "1";
                     autoManager.Post(autoIndentNo);
-                    model.IndentNo =autoIndentNo.AutoGenerateId.ToString();
+                    model.IndentNo = autoIndentNo.AutoGenerateId.ToString();
                 }
             }
 
-           
+
             int ID = Convert.ToInt32(autoIndentNo.IndentId);
             if (indent != null && indent.IndentId != 0)
             {
@@ -240,7 +240,7 @@ namespace MMS.Web.Controllers.Stock
                     List<Indent> indentList = new List<Core.Entities.Indent>();
                     indentList = indentManager.Get().Where(x => x.IndentNo == indent.IndentNo).ToList();
                     model.IndentMateriallist = indentList;
-                   
+
                 }
 
             }
@@ -279,7 +279,7 @@ namespace MMS.Web.Controllers.Stock
                 indent.IndentType = model.IndentType;
                 indent.IndentNo = model.IndentNo;
                 indent.IoNo = model.IoNo;
-                
+
                 if (model.MRPSelectedValues != null)
                 {
                     string[] MRPArray = model.MRPSelectedValues.Split(',');
@@ -339,7 +339,7 @@ namespace MMS.Web.Controllers.Stock
                 indent = Manager.GetIndentMasterId(model.IndentId);
                 indent.IndentId = model.IndentId;
                 indent.AmmendmentNo = model.AmmendmentNo;
-          
+
                 if (indent.MRPNO != null)
                 {
                     indent.MRPNO = indent.MRPNO.TrimEnd(',');
@@ -418,9 +418,9 @@ namespace MMS.Web.Controllers.Stock
             StoreMaster storeMaster = new StoreMaster();
             List<Company> listCompany = new List<Company>();
             listCompany = companyManager.Get();
-           
+
             MMS.Core.Entities.Indent IndentMaster = IndentManager.GetIndentMasterId(model.IndentId);
-     //       storeMaster = storeManager.GetStoreMasterId(IndentMaster.StoreId.Value);
+            //       storeMaster = storeManager.GetStoreMasterId(IndentMaster.StoreId.Value);
             if (IndentMaster != null)
             {
                 status = "Success";
@@ -428,7 +428,7 @@ namespace MMS.Web.Controllers.Stock
                 IndentManager.Delete(IndentMaster.IndentId);
                 EmailTemplateManager emailTemplateManager = new EmailTemplateManager();
                 MMS.Data.StoredProcedureModel.ItemMaterial ItesmaterialName = new MMS.Data.StoredProcedureModel.ItemMaterial();
-                EmailTempate emailTemplate = new EmailTempate();
+                EmailTemplate emailTemplate = new EmailTemplate();
                 emailTemplate = emailTemplateManager.GetTemplateName("Indent Delete");
                 if (emailTemplate != null)
                 {
@@ -455,12 +455,12 @@ namespace MMS.Web.Controllers.Stock
 
         public ActionResult FillMaterialName(int MaterialGroupMasterId)
         {
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             MaterialNameManager materialNameManager = new MaterialNameManager();
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
             MaterialManager materialManager = new MaterialManager();
             ColorManager colorManager = new ColorManager();
-  
+
             var items = (from x in materialManager.Get()
                          join y in materialNameManager.Get()
                           on x.MaterialName equals y.MaterialMasterID
@@ -504,11 +504,21 @@ namespace MMS.Web.Controllers.Stock
             return jsonResult;
         }
         [HttpGet]
+        public ActionResult subGETMRPMaterialList(string MRPNO)
+        {
+            IndentManager indentManager = new IndentManager();
+            List<MMS.Web.Models.subspbommateriallist> spBOMMaterialList = new List<Models.subspbommateriallist>();
+            spBOMMaterialList = indentManager.subGetBOMMaterial(MRPNO).ToList();
+            var jsonResult = Json(spBOMMaterialList, JsonRequestBehavior.AllowGet);
+            jsonResult.MaxJsonLength = int.MaxValue;
+            return jsonResult;
+        }
+        [HttpGet]
         public ActionResult ShowMaterialList(string MRPNO, int? MaterialCategoryID, int? SeasonId, int? MaterialGroupMasterId, int? MaterialType, int? StoreId)
         {
             IndentManager indentManager = new IndentManager();
             SimpleMRPManager simpleMRPManager = new SimpleMRPManager();
-           
+
             string[] MRPArray = MRPNO.Split(',');
             MRPNO = "";
             decimal? TotalIndentPairs = 0;
@@ -521,15 +531,15 @@ namespace MMS.Web.Controllers.Stock
                 }
                 else
                 {
-                    simpleMRP= simpleMRPManager.GetMRPNO(item);
+                    simpleMRP = simpleMRPManager.GetMRPNO(item);
                     TotalIndentPairs += simpleMRP != null ? simpleMRP.TotalOrderCount : 0;
                     MRPNO += item + ",";
                 }
             }
             MRPNO = MRPNO.TrimEnd(',');
-            List<MMS.Web.Models.SPBomMaterialList> spBOMMaterialList = new List<Models.SPBomMaterialList>();
-          
-            spBOMMaterialList = indentManager.GetBOMMaterial(MRPNO).ToList();
+            List<MMS.Web.Models.subspbommateriallist> spBOMMaterialList = new List<Models.subspbommateriallist>();
+
+            spBOMMaterialList = indentManager.subGetBOMMaterial(MRPNO).ToList();
             List<IndentMaterials> indentMaterials = new List<IndentMaterials>();
             IndentMaterialManager indentMaterialManager = new IndentMaterialManager();
             indentMaterials = indentMaterialManager.IndentRaise(MRPNO);
@@ -550,52 +560,68 @@ namespace MMS.Web.Controllers.Stock
                 dt.Columns.Add("UpdatedDate", typeof(System.DateTime));
                 dt.Columns.Add("Value", typeof(System.Decimal));
                 dt.Columns.Add("IndentQTY", typeof(System.Decimal));
+                dt.Columns.Add("bomid", typeof(System.Int32)); 
+                dt.Columns.Add("orderentryid", typeof(System.Int32)); 
+                dt.Columns.Add("uommasterid", typeof(System.Int32)); 
+                dt.Columns.Add("supplierid", typeof(System.Int32)); 
+                dt.Columns.Add("buyerpono", typeof(System.String)); 
+                dt.Columns.Add("suppliermastername", typeof(System.String));
                 List<IndentMaterialsList> BOMMaterialList = new List<IndentMaterialsList>();
+
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
+                    DataRow row = dt.Rows[i];
+
                     List<MMS.Web.Models.PendingQty> pendingList = new List<PendingQty>();
                     IndentMaterialsList spBomMaterialList = new IndentMaterialsList();
                     MaterialMaster materialMaster = new MaterialMaster();
                     MaterialManager materialManager = new MaterialManager();
-                    materialMaster = materialManager.GetMaterialMasterId(Convert.ToInt32(dt.Rows[i].ItemArray[13].ToString()));
-                    pendingList = materialManager.MaterialOpeningStock(materialMaster.MaterialMasterId);
-                   
-                    spBomMaterialList.CategoryName = dt.Rows[i].ItemArray[0].ToString();
-                    spBomMaterialList.GroupName = dt.Rows[i].ItemArray[2].ToString();
-                    spBomMaterialList.MaterialDescription = dt.Rows[i].ItemArray[14].ToString();
-                    spBomMaterialList.Color = dt.Rows[i].ItemArray[3].ToString();
-                    spBomMaterialList.WastageName = dt.Rows[i].ItemArray[19].ToString();
-                    spBomMaterialList.TotalNormsName = dt.Rows[i].ItemArray[20].ToString();
-                    spBomMaterialList.TotalIndentPairs = TotalIndentPairs.ToString();
-                    if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[5].ToString()))
+
+                    materialMaster = materialManager.GetMaterialMasterId(Convert.ToInt32(row["materialmasterid"].ToString())); // Replace "YourColumnName" with the actual column name
+                    if (materialMaster != null)
                     {
-                        spBomMaterialList.SampleNorms = Convert.ToDecimal(dt.Rows[i].ItemArray[5].ToString());
+                        pendingList = materialManager.MaterialOpeningStock(materialMaster.MaterialMasterId);
+                    }
+                    spBomMaterialList.CategoryName = row["categoryname"].ToString();
+                    spBomMaterialList.GroupName = row["groupname"].ToString();
+                    spBomMaterialList.MaterialDescription = row["materialdescription"].ToString();
+                    spBomMaterialList.Color = row["color"].ToString();
+                    spBomMaterialList.WastageName = row["wastagename"].ToString();
+                    spBomMaterialList.TotalNormsName = row["totalnorms"].ToString();
+                    spBomMaterialList.TotalIndentPairs = TotalIndentPairs.ToString();
+
+                    if (!string.IsNullOrEmpty(row["freestock"].ToString()))
+                    {
+                        spBomMaterialList.SampleNorms = Convert.ToDecimal(row["freestock"].ToString());
                     }
                     else
                     {
                         spBomMaterialList.SampleNorms = 0;
                     }
-                    if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[6].ToString()))
+
+                    if (!string.IsNullOrEmpty(row["wastage"].ToString()))
                     {
-                        spBomMaterialList.Wastage = Convert.ToDecimal(dt.Rows[i].ItemArray[6].ToString());
+                        spBomMaterialList.Wastage = Convert.ToDecimal(row["wastage"].ToString());
                     }
                     else
                     {
                         spBomMaterialList.Wastage = 0;
                     }
-                    if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[7].ToString()))
+
+                    if (!string.IsNullOrEmpty(row["wastageqty"].ToString()))
                     {
-                        spBomMaterialList.WastageQty = Convert.ToDecimal(dt.Rows[i].ItemArray[7].ToString());
+                        spBomMaterialList.WastageQty = Convert.ToDecimal(row["wastageqty"].ToString());
                     }
                     else
                     {
                         spBomMaterialList.WastageQty = 0;
                     }
 
-                    spBomMaterialList.WastageQtyUOM = Convert.ToInt32(dt.Rows[i].ItemArray[10].ToString());
-                    if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[8].ToString()))
+                    spBomMaterialList.WastageQtyUOM = Convert.ToInt32(row["wastageqtyuom"].ToString());
+
+                    if (!string.IsNullOrEmpty(row["totalnorms"].ToString()))
                     {
-                        spBomMaterialList.TotalNorms = Convert.ToDecimal(dt.Rows[i].ItemArray[8].ToString());
+                        spBomMaterialList.TotalNorms = Convert.ToDecimal(row["totalnorms"].ToString());
                     }
                     else
                     {
@@ -603,57 +629,63 @@ namespace MMS.Web.Controllers.Stock
                     }
 
                     spBomMaterialList.MRPNO = MRPNO;
-                    spBomMaterialList.MaterialCategoryMasterId = Convert.ToInt32(dt.Rows[i].ItemArray[11].ToString());
-                    spBomMaterialList.MaterialGroupMasterId = Convert.ToInt32(dt.Rows[i].ItemArray[12].ToString());
-                    spBomMaterialList.MaterialMasterID = Convert.ToInt32(dt.Rows[i].ItemArray[13].ToString());
-                    spBomMaterialList.SubstanceRange = dt.Rows[i].ItemArray[4].ToString();
-                    spBomMaterialList.SubstanceMasterId = Convert.ToInt32(dt.Rows[i].ItemArray[16].ToString());
-                    spBomMaterialList.BOMMaterialID =!string.IsNullOrEmpty(dt.Rows[i].ItemArray[17].ToString())? Convert.ToInt32(dt.Rows[i].ItemArray[17].ToString()):0;
-                    spBomMaterialList.BOMID =!string.IsNullOrEmpty(dt.Rows[i].ItemArray[18].ToString())? Convert.ToInt32(dt.Rows[i].ItemArray[18].ToString()):0;
-                    spBomMaterialList.ColorMasterID = Convert.ToInt32(dt.Rows[i].ItemArray[15].ToString());
-                    spBomMaterialList.BuyerSeason = !string.IsNullOrEmpty(dt.Rows[i].ItemArray[21].ToString()) ? Convert.ToInt32(dt.Rows[i].ItemArray[21].ToString()) : 0;
-                    spBomMaterialList.SeasonName = dt.Rows[i].ItemArray[22].ToString();
+                    spBomMaterialList.MaterialCategoryMasterId = Convert.ToInt32(row["materialcategorymasterid"].ToString());
+                    spBomMaterialList.MaterialGroupMasterId = Convert.ToInt32(row["materialgroupmasterid"].ToString());
+                    spBomMaterialList.MaterialMasterID = Convert.ToInt32(row["materialmasterid"].ToString());
+                    spBomMaterialList.SubstanceRange = row["substancerange"].ToString();
+                    spBomMaterialList.SubstanceMasterId = !string.IsNullOrEmpty(row["substancemasterid"].ToString()) ? Convert.ToInt32(row["substancemasterid"].ToString()) : 0; //Convert.ToInt32(row["substancemasterid"].ToString());
+                    spBomMaterialList.BOMMaterialID = !string.IsNullOrEmpty(row["bommaterialid"].ToString()) ? Convert.ToInt32(row["bommaterialid"].ToString()) : 0;
+                    spBomMaterialList.BOMID = !string.IsNullOrEmpty(row["bomid"].ToString()) ? Convert.ToInt32(row["bomid"].ToString()) : 0;
+                    spBomMaterialList.ColorMasterID = Convert.ToInt32(row["colormasterid"].ToString());
+                    spBomMaterialList.BuyerSeason = !string.IsNullOrEmpty(row["buyerseason"].ToString()) ? Convert.ToInt32(row["buyerseason"].ToString()) : 0;
+                    spBomMaterialList.SeasonName = row["seasonname"].ToString();
                     spBomMaterialList.RequiredQty = 0;
-                    spBomMaterialList.RequiredQty = Math.Round(Convert.ToDecimal(dt.Rows[i].ItemArray[24].ToString()), 0, MidpointRounding.AwayFromZero);
+                    spBomMaterialList.RequiredQty = Math.Round(Convert.ToDecimal(row["requiredqty"].ToString()), 0, MidpointRounding.AwayFromZero);
+
                     if (spBomMaterialList.MaterialMasterID == 548)
                     {
                         string Message = "";
                     }
+
                     spBomMaterialList.IndentQTY = spBomMaterialList.RequiredQty;
-                    spBomMaterialList.OrderEntryId =!string.IsNullOrEmpty(dt.Rows[i].ItemArray[25].ToString())? Convert.ToInt32(dt.Rows[i].ItemArray[25].ToString()):0;
-                    spBomMaterialList.UomMasterId = !string.IsNullOrEmpty(dt.Rows[i].ItemArray[29].ToString()) ? Convert.ToInt32(dt.Rows[i].ItemArray[29].ToString()) : 0;
-                    spBomMaterialList.BuyerFullName = dt.Rows[i].ItemArray[27].ToString();
-                    spBomMaterialList.TotalPairs = dt.Rows[i].ItemArray[45].ToString();
-                    if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[40].ToString()))
+                    spBomMaterialList.OrderEntryId = !string.IsNullOrEmpty(row["orderentryid"].ToString()) ? Convert.ToInt32(row["orderentryid"].ToString()) : 0;
+                    spBomMaterialList.UomMasterId = !string.IsNullOrEmpty(row["uommasterid"].ToString()) ? Convert.ToInt32(row["uommasterid"].ToString()) : 0;
+                    spBomMaterialList.BuyerFullName = row["buyerfullname"].ToString();
+                    spBomMaterialList.TotalPairs = row["totalpairs"].ToString();
+
+                    if (!string.IsNullOrEmpty(row["StoreMasterId"].ToString()))
                     {
-                        spBomMaterialList.StoreId = Convert.ToInt32(dt.Rows[i].ItemArray[40].ToString());
+                        spBomMaterialList.StoreId = Convert.ToInt32(row["StoreMasterId"].ToString());
                     }
-                    if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[30].ToString()))
+
+                    if (!string.IsNullOrEmpty(row["supplierid"].ToString()))
                     {
-                        spBomMaterialList.SupplierId = Convert.ToInt32(dt.Rows[i].ItemArray[30]);
+                        spBomMaterialList.SupplierId = Convert.ToInt32(row["supplierid"].ToString());
                     }
                     else
                     {
                         spBomMaterialList.SupplierId = null;
                     }
-                    spBomMaterialList.BuyerPoNo = dt.Rows[i].ItemArray[41].ToString();
-                    spBomMaterialList.Price = dt.Rows[i].ItemArray[37].ToString();
-                    spBomMaterialList.SupplierMasterName = dt.Rows[i].ItemArray[31].ToString();
-                    if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[32].ToString()))
+
+                    spBomMaterialList.BuyerPoNo = !string.IsNullOrEmpty(row["buyerpono"].ToString()) ? row["buyerpono"].ToString() : "0"; 
+                    spBomMaterialList.Price = row["rate"].ToString();
+                    spBomMaterialList.SupplierMasterName = row["suppliermastername"].ToString();
+
+                    if (!string.IsNullOrEmpty(row["materialmasterid"].ToString()))
                     {
                         if (materialMaster != null && (materialMaster.PurchasePacket == null || materialMaster.PurchasePacket == 0))
                         {
-                            spBomMaterialList.Value = (Convert.ToDecimal(dt.Rows[i].ItemArray[24].ToString()) * Convert.ToDecimal(dt.Rows[i].ItemArray[37].ToString()));
+                            spBomMaterialList.Value = (Convert.ToDecimal(row["requiredqty"].ToString()) * Convert.ToDecimal(row["rate"].ToString()));
                         }
                         else
                         {
-                            if (string.IsNullOrEmpty(dt.Rows[i].ItemArray[37].ToString()))
+                            if (string.IsNullOrEmpty(row["rate"].ToString()))
                             {
                                 spBomMaterialList.Value = (spBomMaterialList.RequiredQty * 0);
                             }
                             else
                             {
-                                spBomMaterialList.Value = (spBomMaterialList.RequiredQty * Convert.ToDecimal(dt.Rows[i].ItemArray[37].ToString()));
+                                spBomMaterialList.Value = (spBomMaterialList.RequiredQty * Convert.ToDecimal(row["rate"].ToString()));
                             }
                         }
                     }
@@ -661,10 +693,16 @@ namespace MMS.Web.Controllers.Stock
                     {
                         spBomMaterialList.Value = 0;
                     }
-                    spBomMaterialList.StoreStock = pendingList.FirstOrDefault().BalanceStock;
-                    spBomMaterialList.BuyerMasterId = Convert.ToInt32(dt.Rows[i].ItemArray[28].ToString());
+
+                    if (pendingList.Count > 0)
+                    {
+                        spBomMaterialList.StoreStock = pendingList.FirstOrDefault().BalanceStock;
+                    }
+                    spBomMaterialList.BuyerMasterId = Convert.ToInt32(row["buyermasterid"].ToString());
+
                     BOMMaterialList.Add(spBomMaterialList);
                 }
+
 
                 if (MaterialCategoryID != null)
                 {
@@ -1019,7 +1057,7 @@ namespace MMS.Web.Controllers.Stock
             SimpleMRP simpleMRP = new SimpleMRP();
             SimpleMRPModel model = new SimpleMRPModel();
             SimpleMRP ischeck = new SimpleMRP();
-            string Message = "";
+            //string Message = "";
 
             SimpleMRP simmplemrp = new SimpleMRP();
             simmplemrp.MRPType = 1;
@@ -1076,7 +1114,7 @@ namespace MMS.Web.Controllers.Stock
             }
             else if (materials.IndentID != null && materials.IndentID != 0)
             {
-              
+
             }
             if (((indent_ != null && indent.IndentId != 0) || materials.IndentID != 0))
             {
@@ -1130,8 +1168,8 @@ namespace MMS.Web.Controllers.Stock
             listIndentMaterials = indentMaterialManager.GetIndentID(materials.IndentID.Value);
             decimal? totalAmount = listIndentMaterials.Sum(x => x.IndentQTY);
             //amar
-         //   indentMaterials = indentMaterialManager.Get(materials.MRPNO);
-            indentMaterials= indentMaterialManager.GetIndentID(materials.IndentID.Value);
+            //   indentMaterials = indentMaterialManager.Get(materials.MRPNO);
+            indentMaterials = indentMaterialManager.GetIndentID(materials.IndentID.Value);
             GRNTypeManager GRNManager = new GRNTypeManager();
             GrnTypeMaster grnTypeMaster = new GrnTypeMaster();
             grnTypeMaster = GRNManager.GetIssueTypeMasterId(OrderTypeID);
@@ -1139,7 +1177,7 @@ namespace MMS.Web.Controllers.Stock
             {
                 StatusMessage = "Saved Successfully";
             }
-          
+
             return Json(new { IndentMaterial = indentMaterials, OrderType = grnTypeMaster.IssueType, totalAmount = totalAmount, StatusMessage = StatusMessage }, JsonRequestBehavior.AllowGet);
         }
         //[HttpPost]
@@ -1199,7 +1237,7 @@ namespace MMS.Web.Controllers.Stock
             {
                 indentMaterial.MaterialMasterID = materialmater.MaterialMasterId;
             }
-          
+
             if (materialmater != null)
             {
                 indentMaterial.MaterialMasterID = materialmater.MaterialName;
@@ -1222,7 +1260,7 @@ namespace MMS.Web.Controllers.Stock
             SupplierMasterManager supplierMasterManager = new SupplierMasterManager();
             Company company = new Company();
             CompanyManager companyManager = new CompanyManager();
-            InternalOrderEntryForm internalOrderEntryForm = new InternalOrderEntryForm();
+            OrderEntry internalOrderEntryForm = new OrderEntry();
             BuyerOrderEntryManager buyerorderManager = new BuyerOrderEntryManager();
             if (indentMaterial != null)
             {
@@ -1253,7 +1291,7 @@ namespace MMS.Web.Controllers.Stock
             decimal? stockTotal = 0;
             if (stockCount != null && stockCount.Count > 0)
             {
-                stockTotal = stockCount.FirstOrDefault().Stock;
+                stockTotal = stockCount.FirstOrDefault().BalanceStock;
             }
             else
             {
@@ -1272,7 +1310,7 @@ namespace MMS.Web.Controllers.Stock
             {
                 company = companyManager.GetCompanyCode(storeMaster.StoreMasterId);
             }
-            return Json(new { indent = indentMaterial, InternalOrderEntryForm = internalOrderEntryForm, stockTotal_ = stockTotal, Material = materialmater, store = storeMaster, purchaerOrder = purchaerOrder, company = company, approvedPriceList = supplierItems }, JsonRequestBehavior.AllowGet);
+            return Json(new { indent = indentMaterial, InternalOrderForm = internalOrderEntryForm, stockTotal_ = stockTotal, Material = materialmater, store = storeMaster, purchaerOrder = purchaerOrder, company = company, approvedPriceList = supplierItems }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -1288,11 +1326,11 @@ namespace MMS.Web.Controllers.Stock
             MaterialMaster materialmater = new MaterialMaster();
             BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
             BOMMaterial bommaterial = new BOMMaterial();
-            InternalOrderEntryForm internalOrderEntryForm = new InternalOrderEntryForm();
+            InternalOrderForm internalOrderEntryForm = new InternalOrderForm();
             BuyerOrderEntryManager buyerorderManager = new BuyerOrderEntryManager();
             if (indentMaterial != null)
             {
-               
+
             }
             Company company = new Company();
             CompanyManager companyManager = new CompanyManager();
@@ -1302,8 +1340,8 @@ namespace MMS.Web.Controllers.Stock
             var supplierItems = (from x in approvedPriceListManager.Get()
                                  join y in supplierMasterManager.Get()
                                  on x.SupplierId equals y.SupplierMasterId
-                                 where x.MaterialID == IndentMaterialID && x.CreatedDate!=null
-                                 select new { x.SupplierId, y.SupplierName, x.CreatedDate, PriceRs=x.PriceRs });
+                                 where x.MaterialID == IndentMaterialID && x.CreatedDate != null
+                                 select new { x.SupplierId, y.SupplierName, x.CreatedDate, PriceRs = x.PriceRs });
             if (supplierItems == null || supplierItems.Count() <= 0)
             {
                 string Message = "There is no data on Approved price list for this material";
@@ -1316,7 +1354,7 @@ namespace MMS.Web.Controllers.Stock
             decimal? stockTotal = 0;
             if (stockCount != null && stockCount.Count > 0)
             {
-                stockTotal = stockCount.FirstOrDefault().Stock;
+                stockTotal = stockCount.FirstOrDefault().BalanceStock;
             }
             else
             {
@@ -1345,7 +1383,7 @@ namespace MMS.Web.Controllers.Stock
                 purchaerOrder.Qty = purchaerOrder.Qty - partialQtyTotal;
             }
 
-            return Json(new { indent = indentMaterial, InternalOrderEntryForm = internalOrderEntryForm, stockTotal_ = stockTotal, SizeRange = listIndentSizeRange, Material = materialmater, store = storeMaster, approvedPriceList = supplierItems, purchaerOrder = purchaerOrder, company = company }, JsonRequestBehavior.AllowGet);
+            return Json(new { indent = indentMaterial, InternalOrderForm = internalOrderEntryForm, stockTotal_ = stockTotal, SizeRange = listIndentSizeRange, Material = materialmater, store = storeMaster, approvedPriceList = supplierItems, purchaerOrder = purchaerOrder, company = company }, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
         public ActionResult RowClickMaterialList_(int IndentMaterialID, int BOMID, string MRPNO)
@@ -1364,12 +1402,12 @@ namespace MMS.Web.Controllers.Stock
                 SizeRangeQtyRate sizeRangeQtyRate = new SizeRangeQtyRate();
                 SizeRangeQtyRateManager sizeRangeQtyRateManager = new SizeRangeQtyRateManager();
                 MaterialGroupManager materialGroupManager = new MaterialGroupManager();
-                MaterialGroupMaster_ materialGroupmaster = new MaterialGroupMaster_();
+                materialgroupmaster materialGroupmaster = new materialgroupmaster();
                 materialMaster = materialManager.GetMaterialMasterId(indentMaterial.MaterialMasterID.Value);
 
                 if (materialMaster != null)
                 {
-                    materialGroupmaster = materialGroupManager.GetMaterialGroupMaster_Id(materialMaster.MaterialGroupMasterId);
+                    materialGroupmaster = materialGroupManager.GetmaterialgroupmasterId(materialMaster.MaterialGroupMasterId);
                     if (materialGroupmaster.IsSize == true)
                     {
                         if (materialMaster.SizeRangeMasterId != 0)

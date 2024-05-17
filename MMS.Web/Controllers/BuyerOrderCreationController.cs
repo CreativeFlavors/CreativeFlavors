@@ -142,7 +142,7 @@ namespace MMS.Web.Controllers
             Product_BuyerStyleMaster Master = new Product_BuyerStyleMaster();
             Product_BuyerStyleModel model = new Product_BuyerStyleModel();
             MaterialNameManager materialNameManager = new MaterialNameManager();
-            MaterialNameMaster materialNameMaster = new MaterialNameMaster();
+            tbl_materialnamemaster materialNameMaster = new tbl_materialnamemaster();
             Master = Manager.GetProductOrBuyerStyleId(BuyerOrderCreationID);
             if (Master != null)
             {

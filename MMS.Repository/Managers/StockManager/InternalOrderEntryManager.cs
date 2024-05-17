@@ -14,23 +14,23 @@ namespace MMS.Repository.Managers.StockManager
    //public class InternalOrderEntryManager
    // {
    //    private UnitOfWork unitOfWork = new UnitOfWork();
-   //    private Repository<InternalOrderEntryForm> InternalOrderEntryRepository;
+   //    private Repository<InternalOrderForm> InternalOrderEntryRepository;
 
    //    #region Helper Method
    //    public InternalOrderEntryManager()
    //     {
-   //         InternalOrderEntryRepository = unitOfWork.Repository<InternalOrderEntryForm>();
+   //         InternalOrderEntryRepository = unitOfWork.Repository<InternalOrderForm>();
    //     }
-   //    public InternalOrderEntryForm Get(int id)
+   //    public InternalOrderForm Get(int id)
    //     {
    //         return null;
    //     }
-   //    public List<InternalOrderEntryForm> Get()
+   //    public List<InternalOrderForm> Get()
    //     {
-   //         List<InternalOrderEntryForm> internalOrderEntryForm = new List<InternalOrderEntryForm>();
+   //         List<InternalOrderForm> internalOrderEntryForm = new List<InternalOrderForm>();
    //         try
    //         {
-   //             internalOrderEntryForm = InternalOrderEntryRepository.Table.ToList<InternalOrderEntryForm>();
+   //             internalOrderEntryForm = InternalOrderEntryRepository.Table.ToList<InternalOrderForm>();
    //         }
    //         catch (Exception ex)
    //         {
@@ -38,9 +38,9 @@ namespace MMS.Repository.Managers.StockManager
    //         }
    //         return internalOrderEntryForm;
    //     }
-   //    public InternalOrderEntryForm GetInternalEntryOrderId(int OrderEntryId)
+   //    public InternalOrderForm GetInternalEntryOrderId(int OrderEntryId)
    //     {
-   //         InternalOrderEntryForm internalOrderEntryForm = new InternalOrderEntryForm();
+   //         InternalOrderForm internalOrderEntryForm = new InternalOrderForm();
    //         if (OrderEntryId != 0)
    //         {
    //             internalOrderEntryForm = InternalOrderEntryRepository.Table.Where(x => x.OrderEntryId == OrderEntryId).SingleOrDefault();
@@ -50,7 +50,7 @@ namespace MMS.Repository.Managers.StockManager
    //     #endregion
 
    //    #region Crud Operation
-   //    public bool Post(InternalOrderEntryForm arg)
+   //    public bool Post(InternalOrderForm arg)
    //    {
    //        bool result = false;
    //        try
@@ -65,7 +65,7 @@ namespace MMS.Repository.Managers.StockManager
    //            }
    //            else
    //            {
-   //                InternalOrderEntryForm model = InternalOrderEntryRepository.Table.Where(m => m.OrderEntryId == arg.OrderEntryId).FirstOrDefault();
+   //                InternalOrderForm model = InternalOrderEntryRepository.Table.Where(m => m.OrderEntryId == arg.OrderEntryId).FirstOrDefault();
    //                model.OrderEntryId = arg.OrderEntryId;
    //                model.BuyerOrderSlNo = arg.BuyerOrderSlNo;
    //                model.LotNo = arg.LotNo;
@@ -134,7 +134,7 @@ namespace MMS.Repository.Managers.StockManager
    //        bool result = false;
    //        try
    //        {
-   //            InternalOrderEntryForm model = InternalOrderEntryRepository.GetById(InternalEntryOrderId);
+   //            InternalOrderForm model = InternalOrderEntryRepository.GetById(InternalEntryOrderId);
    //            InternalOrderEntryRepository.Delete(model);
    //            result = true;
    //        }

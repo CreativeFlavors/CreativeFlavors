@@ -1,30 +1,68 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MMS.Core.Entities
 {
-   public class MachineryMaster:BaseEntity
+    [Table("machinerymaster", Schema = "public")]
+    public class MachineryMaster : BaseEntity
     {
-       public int MachineryMasterId { get; set; }
-       public string MachineCode { get; set; }
-       public string MachineName { get; set; }
-       public string Make { get; set; }
-       public string Model { get; set; }
-       public string AssesListNo { get; set; }
-       public string MachineSerialNo { get; set; }
-       public string Kilowatt { get; set; }
-       public string HorsePower { get; set; }
-       public string Volt { get; set; }
-       public string OperationUsedFor { get; set; }
-       public string Specification { get; set; }
-       public string Image { get; set; }
-       public string CreatedBy { get; set; }
-       public string UpdatedBy { get; set; }
-       public bool? IsDeleted { get; set; }
-       public string DeletedBy { get; set; }
-       public DateTime? DeletedDate { get; set; }
+        [System.ComponentModel.DataAnnotations.Key]
+        [Column("machinerymasterid")]
+        public int MachineryMasterId { get; set; }
+
+        [Column("machinecode")]
+        public string MachineCode { get; set; }
+
+        [Column("machinename")]
+        public string MachineName { get; set; }
+
+        [Column("make")]
+        public string Make { get; set; }
+
+        [Column("model")]
+        public string Model { get; set; }
+
+        [Column("asseslistno")]
+        public string AssesListNo { get; set; }
+
+        [Column("machineserialno")]
+        public string MachineSerialNo { get; set; }
+
+        [Column("kilowatt")]
+        public string Kilowatt { get; set; }
+
+        [Column("horsepower")]
+        public string HorsePower { get; set; }
+
+        [Column("volt")]
+        public string Volt { get; set; }
+
+        [Column("operationusedfor")]
+        public string OperationUsedFor { get; set; }
+
+        [Column("specification")]
+        public string Specification { get; set; }
+
+        [Column("image")]
+        public string Image { get; set; }
+        [Column("createddate")]
+        public DateTime? CreatedDate { get; set; }
+        [Column("updateddate")]
+        public DateTime? UpdatedDate { get; set; }
+
+        [Column("createdby")]
+        public string CreatedBy { get; set; }
+
+        [Column("updatedby")]
+        public string UpdatedBy { get; set; }
+
+        [Column("isdeleted")]
+        public bool? IsDeleted { get; set; }
+
+        [Column("deletedby")]
+        public string DeletedBy { get; set; }
+
+        [Column("deleteddate")]
+        public DateTime? DeletedDate { get; set; }
     }
 }

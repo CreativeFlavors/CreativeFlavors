@@ -13,15 +13,15 @@ namespace MMS.Repository.Managers
     public class PermissionSettingManager
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-        private Repository<PermissionSettingMaster> PermissionSettingRepository;
+        private Repository<tbl_PermissionSetting> PermissionSettingRepository;
 
-        public bool Post(PermissionSettingMaster arg)
+        public bool Post(tbl_PermissionSetting arg)
         {
            
             bool result = false;
             try
             {
-                PermissionSettingMaster Model = PermissionSettingRepository.Table.Where(x => x.UserTypeID == arg.UserTypeID).FirstOrDefault();
+                tbl_PermissionSetting Model = PermissionSettingRepository.Table.Where(x => x.UserTypeID == arg.UserTypeID).FirstOrDefault();
                 if (Model == null)
                 {
                     arg.CreatedBy = "Admin";
@@ -48,12 +48,12 @@ namespace MMS.Repository.Managers
 
         public PermissionSettingManager()
         {
-            PermissionSettingRepository = unitOfWork.Repository<PermissionSettingMaster>();
+            PermissionSettingRepository = unitOfWork.Repository<tbl_PermissionSetting>();
         }
 
-        public PermissionSettingMaster GetByID(int UserTypeId)
+        public tbl_PermissionSetting GetByID(int UserTypeId)
         {
-            PermissionSettingMaster PermissionSetList = new PermissionSettingMaster();
+            tbl_PermissionSetting PermissionSetList = new tbl_PermissionSetting();
             try
             {
                 PermissionSetList = PermissionSettingRepository.Table.Where(x => x.UserTypeID == UserTypeId).FirstOrDefault();

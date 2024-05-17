@@ -20,7 +20,7 @@ namespace MMS.Repository.Managers
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
         private Repository<MaterialMaster> MaterialMasterRepository;
-        private Repository<MaterialNameMaster> MaterialNameMasterRepository;
+        private Repository<tbl_materialnamemaster> MaterialNameMasterRepository;
         private Repository<ApprovedPriceList> ApprovedPriceListRepository;
         private Repository<SizeItemMaterial> sizeItemMaterialRepository;
 
@@ -252,7 +252,7 @@ namespace MMS.Repository.Managers
         public MaterialManager()
         {
             MaterialMasterRepository = unitOfWork.Repository<MaterialMaster>();
-            MaterialNameMasterRepository = unitOfWork.Repository<MaterialNameMaster>();
+            MaterialNameMasterRepository = unitOfWork.Repository<tbl_materialnamemaster>();
             sizeItemMaterialRepository = unitOfWork.Repository<SizeItemMaterial>();
         }
         public MaterialMaster GetMaterialExist(int? MaterialName, int ColorMasterId, string OptionMaterialValue)
@@ -312,9 +312,9 @@ namespace MMS.Repository.Managers
             }
             return MaterialList;
         }
-        public MaterialNameMaster GetMaterialNameMasterId(int MaterialMasterID)
+        public tbl_materialnamemaster GetMaterialNameMasterId(int MaterialMasterID)
         {
-            MaterialNameMaster materialMaster = new MaterialNameMaster();
+            tbl_materialnamemaster materialMaster = new tbl_materialnamemaster();
             if (MaterialMasterID != 0)
             {
                 materialMaster = MaterialNameMasterRepository.Table.Where(x => x.MaterialMasterID == MaterialMasterID).FirstOrDefault();
@@ -420,7 +420,7 @@ namespace MMS.Repository.Managers
                 if (arg.SizeMaterialD == 0)
                 {
                     string username = HttpContext.Current.Session["UserName"].ToString();
-                    arg.CreatedBY = username;
+                    arg.CreatedBy = username;
                     sizeItemMaterialRepository.Insert(arg);
                     result = true;
                     sizeItemMaterial = arg;

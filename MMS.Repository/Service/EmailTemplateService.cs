@@ -9,9 +9,9 @@ namespace MMS.Repository.Service
 {
     public interface EmailTemplateService
     {
-        bool Post(EmailTempate arg);
-        bool Put(EmailTempate arg);
+        bool Post(EmailTemplate arg);
+        bool Put(EmailTemplate arg);
         bool Delete(int id);
-        EmailTempate Get(int id);
+        EmailTemplate Get(int id);
     }
 }

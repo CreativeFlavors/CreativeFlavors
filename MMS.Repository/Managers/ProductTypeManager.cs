@@ -12,7 +12,7 @@ using System.Web;
 
 namespace MMS.Repository.Managers
 {
-    public class ProductTypeManager : IProductTypeService,IDisposable
+    public class ProductTypeManager : IProductTypeService, IDisposable
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
         private Repository<ProductType> productTypeRepository;
@@ -54,7 +54,7 @@ namespace MMS.Repository.Managers
             ProductType colorMaster = new ProductType();
             colorMaster = productTypeRepository.Table.Where(x => x.ProductTypeName == ProductTypeName).SingleOrDefault();
             return colorMaster;
-        }       
+        }
         public bool Put(ProductType arg)
         {
             bool result = false;
@@ -88,9 +88,6 @@ namespace MMS.Repository.Managers
             return result;
         }
 
-
-
-
         public bool Delete(int id)
         {
             bool result = false;
@@ -111,12 +108,10 @@ namespace MMS.Repository.Managers
             }
             return result;
         }
-
         public ProductType Get(int id)
         {
             return null;
         }
-
         public List<ProductType> Get()
         {
             List<ProductType> productType = new List<ProductType>();
@@ -130,7 +125,6 @@ namespace MMS.Repository.Managers
             }
             return productType;
         }
-
         public void Dispose()
         {
             using (MMSContext context = new MMSContext())

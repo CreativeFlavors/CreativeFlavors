@@ -40,7 +40,7 @@ namespace MMS.Data.Mapping.StockMap
             Property(t => t.OtherCharges);
             Property(t => t.ExchangeRate);
             Property(t => t.ShipmentMode);
-            Property(t => t.GeneralRemarks1);
+            //Property(t => t.GeneralRemarks1);
             Property(t => t.PoNO);
             Property(t => t.LOTNo);
             Property(t => t.MaterialId);
@@ -169,7 +169,7 @@ namespace MMS.Data.Mapping.StockMap
             Property(t => t.cuttable_per);
             Property(t => t.TCS);
             Property(t => t.TCSValue);
-            ToTable("Tbl_GRNNew");
+            ToTable("grn_entitymodelnew");
         }
     }
 }

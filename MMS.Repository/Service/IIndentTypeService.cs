@@ -8,10 +8,10 @@ namespace MMS.Repository.Service
 {
     public interface IIndentTypeService
     {
-        bool Post(IndentTypeMaster arg);
-        bool Put(IndentTypeMaster arg);
+        bool Post(IndentMaster arg);
+        bool Put(IndentMaster arg);
         bool Delete(int id);
-        IndentTypeMaster Get(int id);
-        List<IndentTypeMaster> Get();
+        IndentMaster Get(int id);
+        List<IndentMaster> Get();
     }
 }

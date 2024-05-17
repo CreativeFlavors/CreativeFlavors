@@ -16,16 +16,16 @@ namespace MMS.Repository.Managers
    public class AutoGenIssueSlipDetailsManager : IDisposable
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-        private Repository<AutoGenIssueSlipDetails> agentMasterRepository;
+        private Repository<tblautogenissueslipdetails> agentMasterRepository;
 
 
         public AutoGenIssueSlipDetailsManager()
         {
-            agentMasterRepository = unitOfWork.Repository<AutoGenIssueSlipDetails>();
+            agentMasterRepository = unitOfWork.Repository<tblautogenissueslipdetails>();
         }
         #region Add/Update/Delete Operation
 
-        public bool Post(AutoGenIssueSlipDetails arg)
+        public bool Post(tblautogenissueslipdetails arg)
         {
             bool result = false;
             try
@@ -44,12 +44,12 @@ namespace MMS.Repository.Managers
             return result;
 
         }
-        public bool Put(AutoGenIssueSlipDetails arg)
+        public bool Put(tblautogenissueslipdetails arg)
         {
             bool result = false;
             try
             {
-                AutoGenIssueSlipDetails model = agentMasterRepository.Table.Where(p => p.AutoGenerateId == arg.AutoGenerateId).FirstOrDefault();
+                tblautogenissueslipdetails model = agentMasterRepository.Table.Where(p => p.AutoGenerateId == arg.AutoGenerateId).FirstOrDefault();
                 if (model != null)
                 {
                     model.AutoGenerateId = arg.AutoGenerateId;
@@ -78,7 +78,7 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                AutoGenIssueSlipDetails model = agentMasterRepository.GetById(id);
+                tblautogenissueslipdetails model = agentMasterRepository.GetById(id);
                  
                 agentMasterRepository.Delete(model);
 
@@ -99,9 +99,9 @@ namespace MMS.Repository.Managers
         #region Helper Method
 
        
-        public AutoGenIssueSlipDetails GetAgentFullName(string IssueSlipDetailsId)
+        public tblautogenissueslipdetails GetAgentFullName(string IssueSlipDetailsId)
         {
-            AutoGenIssueSlipDetails agentMaster = new AutoGenIssueSlipDetails();
+            tblautogenissueslipdetails agentMaster = new tblautogenissueslipdetails();
             if (IssueSlipDetailsId != "" && IssueSlipDetailsId != null)
             {
                 agentMaster = agentMasterRepository.Table.Where(x => x.IssueSlipDetailsId == IssueSlipDetailsId).SingleOrDefault();
@@ -109,9 +109,9 @@ namespace MMS.Repository.Managers
             return agentMaster;
         }
 
-        public AutoGenIssueSlipDetails GetAgentMasterId(int AutoGenerateId)
+        public tblautogenissueslipdetails GetAgentMasterId(int AutoGenerateId)
         {
-            AutoGenIssueSlipDetails agentMaster = new AutoGenIssueSlipDetails();
+            tblautogenissueslipdetails agentMaster = new tblautogenissueslipdetails();
             if (AutoGenerateId != 0)
             {
                 agentMaster = agentMasterRepository.Table.Where(x => x.AutoGenerateId == AutoGenerateId).SingleOrDefault();
@@ -124,12 +124,12 @@ namespace MMS.Repository.Managers
             return null;
         }
 
-        public List<AutoGenIssueSlipDetails> Get()
+        public List<tblautogenissueslipdetails> Get()
         {
-            List<AutoGenIssueSlipDetails> agentMasterlist = new List<AutoGenIssueSlipDetails>();
+            List<tblautogenissueslipdetails> agentMasterlist = new List<tblautogenissueslipdetails>();
             try
             {
-                agentMasterlist = agentMasterRepository.Table.ToList<AutoGenIssueSlipDetails>();
+                agentMasterlist = agentMasterRepository.Table.ToList<tblautogenissueslipdetails>();
             }
             catch (Exception ex)
             {

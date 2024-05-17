@@ -22,7 +22,7 @@ namespace MMS.Data.Mapping
             Property(t => t.CreatedDate);
             Property(t => t.UpdatedDate);
             Property(t => t.CreatedBy);
-            Property(t => t.UpdatedBY);
+            Property(t => t.UpdatedDate);
             ToTable("MaterialOpeningSizeQtyRate");
         }
     }

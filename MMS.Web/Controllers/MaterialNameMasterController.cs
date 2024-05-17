@@ -1,5 +1,6 @@
 ﻿using MMS.Common;
 using MMS.Core.Entities;
+using MMS.Core.Entities.Stock;
 using MMS.Repository.Managers;
 using MMS.Web.Models;
 using System;
@@ -41,8 +42,8 @@ namespace MMS.Web.Controllers
             MaterialCategoryManager categoryManager = new MaterialCategoryManager();
             MaterialCategoryMaster categoryMaster = new MaterialCategoryMaster();
             MaterialGroupManager groupManager = new MaterialGroupManager();
-            MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
-            materialGroupMaster = groupManager.GetMaterialGroupMaster_Id(MaterialGroupMasterId);
+            materialgroupmaster materialGroupMaster = new materialgroupmaster();
+            materialGroupMaster = groupManager.GetmaterialgroupmasterId(MaterialGroupMasterId);
             categoryMaster = categoryManager.GetMaterialCategoryMaster(materialGroupMaster.MaterialCategoryMasterId);
             if (categoryMaster.CategoryName == GetEnumDescription((Categoryname)Categoryname.Leathers))
             {
@@ -57,7 +58,7 @@ namespace MMS.Web.Controllers
             MaterialCategoryManager categoryManager = new MaterialCategoryManager();
             MaterialCategoryMaster categoryMaster = new MaterialCategoryMaster();
             MaterialGroupManager groupManager = new MaterialGroupManager();
-            MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
+            materialgroupmaster materialGroupMaster = new materialgroupmaster();
             materialGroupMaster = groupManager.GetMaterialGroupName(MaterialGroupMasterId);
             categoryMaster = categoryManager.GetMaterialCategoryMaster(materialGroupMaster.MaterialCategoryMasterId);
             if (categoryMaster.CategoryName == GetEnumDescription((Categoryname)Categoryname.Leathers))
@@ -80,7 +81,7 @@ namespace MMS.Web.Controllers
 
         public ActionResult GetMaterialEdit(MaterialNameModel Model)
         {
-            MaterialNameMaster mm = new MaterialNameMaster();
+            tbl_materialnamemaster mm = new tbl_materialnamemaster();
             MaterialNameManager materialManager = new MaterialNameManager();
             mm = materialManager.GetMaterialNameMasterId(Model.MaterialMasterID);
             if (mm != null)
@@ -103,11 +104,11 @@ namespace MMS.Web.Controllers
             bool result = false;
             MaterialNameModel mm = new MaterialNameModel();
             MaterialNameManager materialManager = new MaterialNameManager();
-            MaterialNameMaster MasterObj = new MaterialNameMaster();
-            MaterialNameMaster MasterObj_ = new MaterialNameMaster();
+            tbl_materialnamemaster MasterObj = new tbl_materialnamemaster();
+            tbl_materialnamemaster MasterObj_ = new tbl_materialnamemaster();
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
-            MaterialGroupMaster_ materialGroupMaster_ = new MaterialGroupMaster_();
-            materialGroupMaster_ = materialGroupManager.GetMaterialGroupName(Model.MaterialGroup);
+            materialgroupmaster materialgroupmaster = new materialgroupmaster();
+            materialgroupmaster = materialGroupManager.GetMaterialGroupName(Model.MaterialGroup);
             if (Model.MaterialDescription != null && Model.MaterialMasterID == 0)
             {
                 MasterObj_ = materialManager.GetMaterialName(Model.MaterialDescription);
@@ -118,7 +119,7 @@ namespace MMS.Web.Controllers
             }
             else if (Model.LeatherMaterilFirstValue != null && Model.LeatherMaterilLastValue != null && Model.LeatherMaterialName != null)
             {
-                MasterObj_ = materialManager.GetLeatherMaterialName(Model.LeatherMaterilFirstValue, Model.LeatherMaterilLastValue, Model.LeatherMaterialName, materialGroupMaster_.MaterialGroupMasterId);
+                MasterObj_ = materialManager.GetLeatherMaterialName(Model.LeatherMaterilFirstValue, Model.LeatherMaterilLastValue, Model.LeatherMaterialName, materialgroupmaster.MaterialGroupMasterId);
             }
             else
             {
@@ -137,7 +138,7 @@ namespace MMS.Web.Controllers
                 MasterObj.LeatherMaterilFirstValue = Model.LeatherMaterilFirstValue;
                 MasterObj.LeatherMaterilLastValue = Model.LeatherMaterilLastValue;
 
-                MasterObj.MaterialGroupMasterId = materialGroupMaster_.MaterialGroupMasterId;
+                MasterObj.MaterialGroupMasterId = materialgroupmaster.MaterialGroupMasterId;
 
                 materialManager.Post(MasterObj);
             }
@@ -154,8 +155,8 @@ namespace MMS.Web.Controllers
                 MasterObj.LeatherMaterialName = Model.LeatherMaterialName;
                 MasterObj.LeatherMaterilFirstValue = Model.LeatherMaterilFirstValue;
                 MasterObj.LeatherMaterilLastValue = Model.LeatherMaterilLastValue;
-                materialGroupMaster_ = materialGroupManager.GetMaterialGroupName(Model.MaterialGroup);
-                MasterObj.MaterialGroupMasterId = materialGroupMaster_.MaterialGroupMasterId;
+                materialgroupmaster = materialGroupManager.GetMaterialGroupName(Model.MaterialGroup);
+                MasterObj.MaterialGroupMasterId = materialgroupmaster.MaterialGroupMasterId;
 
                 materialManager.Put(MasterObj);
             }
@@ -168,7 +169,7 @@ namespace MMS.Web.Controllers
             bool result = false;
             MaterialNameModel mm = new MaterialNameModel();
             MaterialNameManager materialManager = new MaterialNameManager();
-            MaterialNameMaster MasterObj = new MaterialNameMaster();
+            tbl_materialnamemaster MasterObj = new tbl_materialnamemaster();
             result = materialManager.Delete(Model.MaterialMasterID);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
@@ -176,7 +177,7 @@ namespace MMS.Web.Controllers
         {
             MaterialNameModel mm = new MaterialNameModel();
             MaterialNameManager materialManager = new MaterialNameManager();
-            List<MaterialNameMaster> listMaterialName = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> listMaterialName = new List<tbl_materialnamemaster>();
             listMaterialName = materialManager.Get().ToList();
             listMaterialName = listMaterialName.Where(x => x.MaterialDescription!=null&& x.MaterialDescription.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
             mm.MaterilNameList = listMaterialName;

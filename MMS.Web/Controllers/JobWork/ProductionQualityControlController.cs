@@ -81,7 +81,7 @@ namespace MMS.Web.Controllers.JobWork
                 ProductionQcManager ProductionQcManager = new ProductionQcManager();
                 Production_QcMaster Production_QcMaster = new Production_QcMaster();
                 Production_QcCodeMaster Production_QcCodeMaster = new Production_QcCodeMaster();
-                InternalOrderEntryForm BuyerEntry = new InternalOrderEntryForm();
+                InternalOrderForm BuyerEntry = new InternalOrderForm();
                 BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
 
                 Production_QcCodeMaster.Production_Code = ProductionQcModel.Production_Code_new;
@@ -175,7 +175,7 @@ namespace MMS.Web.Controllers.JobWork
                 ProductionQcManager ProductionQcManager = new ProductionQcManager();
                 Production_QcMaster Production_QcMaster = new Production_QcMaster();
                 Production_QcCodeMaster Production_QcCodeMaster = new Production_QcCodeMaster();
-                InternalOrderEntryForm BuyerEntry = new InternalOrderEntryForm();
+                InternalOrderForm BuyerEntry = new InternalOrderForm();
                 BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
                 int Qc_id =0 ;
 
@@ -257,7 +257,7 @@ namespace MMS.Web.Controllers.JobWork
         {
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             List<System.Web.Mvc.SelectListItem> items = new List<SelectListItem>();
-            List<InternalOrderEntryForm> BuyerOrderEntryList = new List<InternalOrderEntryForm>();
+            List<OrderEntry> BuyerOrderEntryList = new List<OrderEntry>();
 
             if (stage == 1)
             {
@@ -301,7 +301,7 @@ namespace MMS.Web.Controllers.JobWork
         {
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             List<System.Web.Mvc.SelectListItem> items = new List<SelectListItem>();
-            List<InternalOrderEntryForm> BuyerOrderEntryList = new List<InternalOrderEntryForm>();
+            List<OrderEntry> BuyerOrderEntryList = new List<OrderEntry>();
 
             if (stage == 1)
             {
@@ -345,7 +345,7 @@ namespace MMS.Web.Controllers.JobWork
         {
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             List<System.Web.Mvc.SelectListItem> items = new List<SelectListItem>();
-            List<InternalOrderEntryForm> BuyerOrderEntryList = new List<InternalOrderEntryForm>();
+            List<OrderEntry> BuyerOrderEntryList = new List<OrderEntry>();
 
             if (stage == 1)
             {
@@ -389,7 +389,7 @@ namespace MMS.Web.Controllers.JobWork
         {
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             List<System.Web.Mvc.SelectListItem> items = new List<SelectListItem>();
-            List<InternalOrderEntryForm> BuyerOrderEntryList = new List<InternalOrderEntryForm>();
+            List<InternalOrderForm> BuyerOrderEntryList = new List<InternalOrderForm>();
             List<SizeRangeQtyRate> listOfSizeRange = new List<SizeRangeQtyRate>();
 
             listOfSizeRange = buyerOrderEntryManager.GetAllOrderSize_OrderEntryId(OrderEntryId);

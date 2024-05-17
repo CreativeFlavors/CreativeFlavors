@@ -15,6 +15,8 @@ namespace MMS.Web.Models.StockModel
         public int MaterialCategoryMasterId { get; set; }
         public int MaterialGroupMasterId { get; set; }
         public int? MaterialName { get; set; }
+        public string MaterialNames { get; set; }
+        public string UOMName { get; set; }
         public int? ColorMasterId { get; set; }
         public string Date { get; set; }
         public int ColorMasterId_ { get; set; }
@@ -22,6 +24,7 @@ namespace MMS.Web.Models.StockModel
         public int SecondaryUomMasterId_ { get; set; }
         public int PrimaryUomMasterId { get; set; }
         public int SecondaryUomMasterId { get; set; }
+        public decimal reqQty { get; set; }
         public decimal Qty { get; set; }
         public decimal Rate { get; set; }
         public int? MaterialPcs { get; set; }
@@ -52,6 +55,9 @@ namespace MMS.Web.Models.StockModel
         public string Rates { get; set; }
         public int MaterialMasterId { get; set; }
         public StoreMaster storeMaster { get; set; }
+        public UomMaster UomMaster { get; set; }
+        public MaterialMaster MaterialMaster { get; set; }
+
     }
 
     public class MaterialNamePopupModel

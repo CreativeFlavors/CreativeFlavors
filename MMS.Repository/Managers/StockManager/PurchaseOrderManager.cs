@@ -38,9 +38,9 @@ namespace MMS.Repository.Managers.StockManager
             }
             return IndentMaster;
         }
-        public List<MMS.Web.Models.SPBomMaterialList> MaterialOpeningStockValue(int materialMasterID)
+        public List<MMS.Web.Models.PendingQty> MaterialOpeningStockValue(int materialMasterID)
         {
-            List<MMS.Web.Models.SPBomMaterialList> bomMaterialList = new List<MMS.Web.Models.SPBomMaterialList>();
+            List<MMS.Web.Models.PendingQty> bomMaterialList = new List<MMS.Web.Models.PendingQty>();
             if (materialMasterID != 0)
             {
                 bomMaterialList = PurchaseOrderRepository.MaterialOpeningStockValue(materialMasterID);
@@ -239,7 +239,7 @@ namespace MMS.Repository.Managers.StockManager
                     arg.CreatedDate = DateTime.Now;
                     PurchaseOrderRepository.Insert(arg);
                     MMS.Data.StoredProcedureModel.ItemMaterial ItesmaterialName = new MMS.Data.StoredProcedureModel.ItemMaterial();
-                    EmailTempate emailTemplate = new EmailTempate();
+                    EmailTemplate emailTemplate = new EmailTemplate();
                     emailTemplate = emailTemplateManager.GetTemplateName("Purchase order Update");
                     ItesmaterialName = bomMaterialListManager.GetMaterial(arg.Material.Value);
                     CompanyManager companyManager = new CompanyManager();
@@ -364,7 +364,7 @@ namespace MMS.Repository.Managers.StockManager
                     PurchaseOrderRepository.Update(model);
 
                     MMS.Data.StoredProcedureModel.ItemMaterial ItesmaterialName = new MMS.Data.StoredProcedureModel.ItemMaterial();
-                    EmailTempate emailTemplate = new EmailTempate();
+                    EmailTemplate emailTemplate = new EmailTemplate();
                     emailTemplate = emailTemplateManager.GetTemplateName("Purchase order Update");
                     ItesmaterialName = bomMaterialListManager.GetMaterial(arg.Material.Value);
                     CompanyManager companyManager = new CompanyManager();
@@ -415,7 +415,7 @@ namespace MMS.Repository.Managers.StockManager
                     PurchaseOrderDelierySchedule model = PurchaseOrderDelieryScheduleRepository.Table.Where(m => m.IO == arg.IO).FirstOrDefault();
                     model.PoOrderID = arg.PoOrderID;
                     model.Material = arg.Material;
-                    model.quantity = arg.quantity;
+                    model.Quantity = arg.Quantity;
                     model.Date = arg.Date;
                     model.UpdatedDate = DateTime.Now;
                     string username = HttpContext.Current.Session["UserName"].ToString();
@@ -452,7 +452,7 @@ namespace MMS.Repository.Managers.StockManager
                     PurchaseOrderSizeRangeQuantity model = PurchaseOrderSizeRangeQuantityRepository.Table.Where(m => m.PurchaseSizeRangeID == arg.PurchaseSizeRangeID).FirstOrDefault();
                     model.PoOrderID = arg.PoOrderID;
                     model.Size = arg.Size;
-                    model.quantity = arg.quantity;
+                    model.Quantity = arg.Quantity;
                     model.Rate = arg.Rate;
                     model.UpdatedDate = DateTime.Now;
                     string username = HttpContext.Current.Session["UserName"].ToString();
@@ -477,7 +477,7 @@ namespace MMS.Repository.Managers.StockManager
                 PurchaseOrder model = PurchaseOrderRepository.GetById(id);
                 PurchaseOrderRepository.Delete(model);
                 MMS.Data.StoredProcedureModel.ItemMaterial ItesmaterialName = new MMS.Data.StoredProcedureModel.ItemMaterial();
-                EmailTempate emailTemplate = new EmailTempate();
+                EmailTemplate emailTemplate = new EmailTemplate();
                 emailTemplate = emailTemplateManager.GetTemplateName("Purchase order Delete");
                 ItesmaterialName = bomMaterialListManager.GetMaterial(model.Material.Value);
                 CompanyManager companyManager = new CompanyManager();               

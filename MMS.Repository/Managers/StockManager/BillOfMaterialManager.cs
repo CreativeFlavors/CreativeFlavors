@@ -22,12 +22,12 @@ namespace MMS.Repository.Managers.StockManager
     //:IBomService, IDisposable
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-        private Repository<BillOfMaterial> BillOfMaterialRepository;
+        private Repository<Bom> BillOfMaterialRepository;
         private Repository<BOMAmendmentMaterial> BOMAmendmentMaterialRepository_;
         private Repository<BOMMaterialList> BillOfMaterialListRepository;
         private Repository<BomHistory> BomHistoryRepository;
         private Repository<BOMMaterial> BBOMMaterialRepository;
-        private Repository<BomGrid> BomRepository;
+        private Repository<bomgriddetail> BomRepository;
         private Repository<Product_BuyerStyleMaster> Product_BuyerStyleRepository;
         private Repository<BuyerOrderCreation> buyerOrderCreationRepository;
         private Repository<BomSizeMatching> bomSizeMatchingRepository;
@@ -91,10 +91,10 @@ namespace MMS.Repository.Managers.StockManager
             }
             return bOMMaterialList;
         }
-        public BillOfMaterial Post(BillOfMaterial arg)
+        public Bom Post(Bom arg)
         {
 
-            BillOfMaterial bom = new BillOfMaterial();
+            Bom bom = new Bom();
             try
             {
                 if (arg.BomId == 0)
@@ -110,7 +110,7 @@ namespace MMS.Repository.Managers.StockManager
                 }
                 else
                 {
-                    BillOfMaterial model = BillOfMaterialRepository.Table.Where(p => p.BomId == arg.BomId).FirstOrDefault();
+                    Bom model = BillOfMaterialRepository.Table.Where(p => p.BomId == arg.BomId).FirstOrDefault();
 
                     MMSContext context = new MMSContext();
                     model.BomId = arg.BomId;
@@ -182,17 +182,17 @@ namespace MMS.Repository.Managers.StockManager
         {
             bool result = false;
             BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
-            List<BomGrid> bomGridList = new List<BomGrid>();
+            List<bomgriddetail> bomGridList = new List<bomgriddetail>();
             List<BOMMaterial> bOMMaterialList = new List<BOMMaterial>();
             List<BOMMaterial> bOMMaterialList_email = new List<BOMMaterial>();
-            BomGrid bomGrid = new BomGrid();
+            bomgriddetail bomGrid = new bomgriddetail();
             try
             {
                 bomGridList = BomRepository.Table.Where(p => p.BomId == id).ToList();
 
                 foreach (var item in bomGridList)
                 {
-                    BomGrid bomModel = BomRepository.Table.Where(p => p.BomId == id).FirstOrDefault();
+                    bomgriddetail bomModel = BomRepository.Table.Where(p => p.BomId == id).FirstOrDefault();
                     if (bomModel != null)
                     {
                         bomModel.IsDeleted = true;
@@ -221,7 +221,7 @@ namespace MMS.Repository.Managers.StockManager
                 if (myList.Count > 0)
                 {
                     string Material = string.Join(",", myList.Select(x => x.materialdescription).ToList());
-                    BillOfMaterial billOfmaterial = new BillOfMaterial();
+                    Bom billOfmaterial = new Bom();
                     //EmailTempate emailTemplate = new EmailTempate();
 
                     //emailTemplate = emailTemplateManager.GetTemplateName("BOM  Mateial Delete");
@@ -239,7 +239,7 @@ namespace MMS.Repository.Managers.StockManager
                     //}
                 }
 
-                BillOfMaterial model = BillOfMaterialRepository.GetById(id);
+                Bom model = BillOfMaterialRepository.GetById(id);
                 if (model != null)
                 {
                     model.IsDeleted = true;
@@ -278,7 +278,7 @@ namespace MMS.Repository.Managers.StockManager
             bool result = false;
             try
             {
-                BomGrid model = BomRepository.GetById(id);
+                bomgriddetail model = BomRepository.GetById(id);
                 BomRepository.Delete(model);
                 result = true;
             }
@@ -312,7 +312,7 @@ namespace MMS.Repository.Managers.StockManager
                     model.Deletedon = DateTime.Now;
                     model.DeletedBy = HttpContext.Current.Session["UserName"].ToString();
                     BBOMMaterialRepository.Delete(model);
-                    BillOfMaterial billOfmaterial = new BillOfMaterial();
+                    Bom billOfmaterial = new Bom();
                     //  billOfmaterial = GetbomId(model.BOMID);
                     MMS.Data.StoredProcedureModel.ItemMaterial ItesmaterialName = new MMS.Data.StoredProcedureModel.ItemMaterial();
                     ItesmaterialName = GetMaterial(model.MaterialName);
@@ -421,15 +421,15 @@ namespace MMS.Repository.Managers.StockManager
             return result;
         }
 
-        public BomGrid Post(BomGrid arg)
+        public bomgriddetail Post(bomgriddetail arg)
         {
-            BomGrid BomGrids_ = new BomGrid();
+            bomgriddetail BomGrids_ = new bomgriddetail();
             try
             {
                 if (arg.BomGridId == 0)
                 {
 
-                    BomGrid grid = new BomGrid();
+                    bomgriddetail grid = new bomgriddetail();
                     grid = arg;
                     grid.CreatedDate = DateTime.Now;
                     grid.UpdatedDate = null;
@@ -438,7 +438,7 @@ namespace MMS.Repository.Managers.StockManager
                 }
                 else if (arg.BomId != 0)
                 {
-                    BomGrid model = BomRepository.Table.Where(x => x.BomGridId == arg.BomGridId).FirstOrDefault();
+                    bomgriddetail model = BomRepository.Table.Where(x => x.BomGridId == arg.BomGridId).FirstOrDefault();
                     model.BomGridId = model.BomGridId;
                     model.Component = arg.Component;
                     model.Length = arg.Length;
@@ -481,9 +481,9 @@ namespace MMS.Repository.Managers.StockManager
         }
         public BillOfMaterialManager()
         {
-            BillOfMaterialRepository = unitOfWork.Repository<BillOfMaterial>();
+            BillOfMaterialRepository = unitOfWork.Repository<Bom>();
             BOMAmendmentMaterialRepository_ = unitOfWork.Repository<BOMAmendmentMaterial>();
-            BomRepository = unitOfWork.Repository<BomGrid>();
+            BomRepository = unitOfWork.Repository<bomgriddetail>();
 
             BomHistoryRepository = unitOfWork.Repository<BomHistory>();
             buyerOrderCreationRepository = unitOfWork.Repository<BuyerOrderCreation>();
@@ -512,9 +512,9 @@ namespace MMS.Repository.Managers.StockManager
             //   string msg = "Save data";
             return true;
         }
-        public BillOfMaterial GetbomId(int BomId)
+        public Bom GetbomId(int BomId)
         {
-            BillOfMaterial billOfMaterial = new BillOfMaterial();
+            Bom billOfMaterial = new Bom();
             if (BomId != 0)
             {
                 billOfMaterial = BillOfMaterialRepository.Table.Where(x => x.BomId == BomId && x.IsDeleted == false).FirstOrDefault();
@@ -522,9 +522,9 @@ namespace MMS.Repository.Managers.StockManager
             return billOfMaterial;
         }
 
-        public BillOfMaterial GetBomNO(string BomNO)
+        public Bom GetBomNO(string BomNO)
         {
-            BillOfMaterial billOfMaterial = new BillOfMaterial();
+            Bom billOfMaterial = new Bom();
             if (BomNO != "")
             {
                 billOfMaterial = BillOfMaterialRepository.Table.Where(x => x.BomNo == BomNO && x.IsDeleted == false).FirstOrDefault();
@@ -533,10 +533,10 @@ namespace MMS.Repository.Managers.StockManager
         }
         public string GetLastbomNumber()
         {
-            BillOfMaterial billOfMaterial = new BillOfMaterial();
+            Bom billOfMaterial = new Bom();
             string lastBomNo = "";
-            List<BillOfMaterial> billOfMaterialList = new List<BillOfMaterial>();
-            billOfMaterialList = BillOfMaterialRepository.Table.ToList<BillOfMaterial>();
+            List<Bom> billOfMaterialList = new List<Bom>();
+            billOfMaterialList = BillOfMaterialRepository.Table.ToList<Bom>();
             if (billOfMaterialList.Count > 0)
             {
                 var billOfMaterial_ = (from u in BillOfMaterialRepository.Table
@@ -554,9 +554,9 @@ namespace MMS.Repository.Managers.StockManager
             return result;
         }
 
-        public BillOfMaterial getLinkBomNumber(string CommnBOM)
+        public Bom getLinkBomNumber(string CommnBOM)
         {
-            BillOfMaterial billOfMaterial = new BillOfMaterial();
+            Bom billOfMaterial = new Bom();
             if (CommnBOM != "")
             {
                 billOfMaterial = BillOfMaterialRepository.Table.Where(x => x.LinkBomNo == CommnBOM && x.IsDeleted == false).FirstOrDefault();
@@ -574,18 +574,18 @@ namespace MMS.Repository.Managers.StockManager
         }
 
 
-        public BillOfMaterial getBomNumber(string CommnBOM)
+        public Bom getBomNumber(string CommnBOM)
         {
-            BillOfMaterial billOfMaterial = new BillOfMaterial();
+            Bom billOfMaterial = new Bom();
             if (CommnBOM != "")
             {
                 billOfMaterial = BillOfMaterialRepository.Table.Where(x => x.BomNo == CommnBOM).SingleOrDefault();
             }
             return billOfMaterial;
         }
-        public BomGrid GetById(int BomGridId)
+        public bomgriddetail GetById(int BomGridId)
         {
-            BomGrid bomGrid = new BomGrid();
+            bomgriddetail bomGrid = new bomgriddetail();
             if (BomGridId != 0)
             {
                 bomGrid = BomRepository.Table.Where(x => x.BomGridId == BomGridId).SingleOrDefault();
@@ -593,7 +593,7 @@ namespace MMS.Repository.Managers.StockManager
             return bomGrid;
         }
 
-        public BillOfMaterial Get(int id)
+        public Bom Get(int id)
         {
             return null;
         }
@@ -610,12 +610,12 @@ namespace MMS.Repository.Managers.StockManager
             }
             return nomHistorylist;
         }
-        public List<BomGrid> getBomIDHistoryList(int BOMID, int MaterialBOMID)
+        public List<bomgriddetail> getBomIDHistoryList(int BOMID, int MaterialBOMID)
         {
-            List<BomGrid> nomHistorylist = new List<BomGrid>();
+            List<bomgriddetail> nomHistorylist = new List<bomgriddetail>();
             try
             {
-                nomHistorylist = BomRepository.Table.ToList<BomGrid>().Where(x => x.BomId == BOMID && x.BOMMaterialID == MaterialBOMID).OrderBy(x => x.BOMMaterialID).ToList();
+                nomHistorylist = BomRepository.Table.ToList<bomgriddetail>().Where(x => x.BomId == BOMID && x.BOMMaterialID == MaterialBOMID).OrderBy(x => x.BOMMaterialID).ToList();
             }
             catch (Exception ex)
             {
@@ -651,7 +651,7 @@ namespace MMS.Repository.Managers.StockManager
         }
         public List<BOMMaterial> getBomMaterialID_List(int MaterialBOMID)
         {
-            List < BOMMaterial> bOMMateriallist = new List<BOMMaterial>();
+            List<BOMMaterial> bOMMateriallist = new List<BOMMaterial>();
             try
             {
                 bOMMateriallist = BBOMMaterialRepository.Table.Where(x => x.BOMMaterialID == MaterialBOMID).OrderBy(x => x.BOMMaterialID).ToList();
@@ -662,9 +662,9 @@ namespace MMS.Repository.Managers.StockManager
             }
             return bOMMateriallist;
         }
-        public List<BillOfMaterial> GetBomList(string MaterialDescription)
+        public List<Bom> GetBomList(string MaterialDescription)
         {
-            List<BillOfMaterial> billOfMaterial = new List<BillOfMaterial>();
+            List<Bom> billOfMaterial = new List<Bom>();
             try
             {
                 billOfMaterial = BillOfMaterialRepository.SearchBomMaterialList(MaterialDescription);
@@ -677,13 +677,13 @@ namespace MMS.Repository.Managers.StockManager
         }
 
 
-        public List<BillOfMaterial> Get()
+        public List<Bom> Get()
         {
-            List<BillOfMaterial> billOfMaterial = new List<BillOfMaterial>();
+            List<Bom> billOfMaterial = new List<Bom>();
 
             try
             {
-                billOfMaterial = BillOfMaterialRepository.Table.ToList<BillOfMaterial>().Where(x => x.IsDeleted == false).ToList();
+                billOfMaterial = BillOfMaterialRepository.Table.ToList<Bom>().Where(x => x.IsDeleted == false).ToList();
             }
             catch (Exception ex)
             {
@@ -691,13 +691,13 @@ namespace MMS.Repository.Managers.StockManager
             }
             return billOfMaterial;
         }
-        public List<BillOfMaterial> Get_Arraylist(string[] LinkBomNo)
+        public List<Bom> Get_Arraylist(string[] LinkBomNo)
         {
-            List<BillOfMaterial> billOfMaterial = new List<BillOfMaterial>();
+            List<Bom> billOfMaterial = new List<Bom>();
 
             try
             {
-                billOfMaterial = BillOfMaterialRepository.Table.ToList<BillOfMaterial>().Where(x => LinkBomNo.Contains(x.LinkBomNo)  && x.IsDeleted == false).ToList();
+                billOfMaterial = BillOfMaterialRepository.Table.ToList<Bom>().Where(x => LinkBomNo.Contains(x.LinkBomNo) && x.IsDeleted == false).ToList();
             }
             catch (Exception ex)
             {
@@ -729,13 +729,13 @@ namespace MMS.Repository.Managers.StockManager
             return billOfMaterial;
         }
 
-        public List<BomGrid> GridList()
+        public List<bomgriddetail> GridList()
         {
-            List<BomGrid> bomGrid = new List<BomGrid>();
+            List<bomgriddetail> bomGrid = new List<bomgriddetail>();
 
             try
             {
-                bomGrid = BomRepository.Table.ToList<BomGrid>();
+                bomGrid = BomRepository.Table.ToList<bomgriddetail>();
             }
             catch (Exception ex)
             {
@@ -754,9 +754,9 @@ namespace MMS.Repository.Managers.StockManager
         #endregion
 
 
-        public List<BomGrid> GetBomDetails(int BomGridId)
+        public List<bomgriddetail> GetBomDetails(int BomGridId)
         {
-            List<BomGrid> bomGrid = new List<BomGrid>().ToList();
+            List<bomgriddetail> bomGrid = new List<bomgriddetail>().ToList();
             bomGrid = BomRepository.Table.Where(x => x.BomId == BomGridId).ToList();
             return bomGrid;
         }
@@ -792,7 +792,7 @@ namespace MMS.Repository.Managers.StockManager
                     model.BuyerMasterId = arg.BuyerMasterId;
                     model.BuyerModel = arg.BuyerModel;
                     model.MeanSize = arg.MeanSize;
-                    model.date = arg.date;
+                    model.Date = arg.Date;
                     model.ParentBomNo = arg.ParentBomNo;
                     model.LastBomNoEntered = arg.LastBomNoEntered;
                     model.LinkBomNo = arg.LinkBomNo;
@@ -821,7 +821,7 @@ namespace MMS.Repository.Managers.StockManager
                     model.WastageQtyUOM = arg.WastageQtyUOM;
                     model.TotalNorms = arg.TotalNorms;
                     model.TotalNormsUOM = arg.TotalNormsUOM;
-                    model.NoOfSets = arg.NoOfSets;
+                    model.NoOfSets7 = arg.NoOfSets7;
                     model.BuyerNorms = arg.BuyerNorms;
                     model.OurNorms = arg.OurNorms;
                     model.OurNormsPercent = arg.OurNormsPercent;
@@ -932,7 +932,7 @@ namespace MMS.Repository.Managers.StockManager
                     model.TotalNorms = arg.TotalNorms;
                     model.TotalNormsUOM = arg.TotalNormsUOM;
                     model.ComponentName = arg.ComponentName;
-                    model.NoOfSets = arg.NoOfSets;
+                    model.NoOfSets5 = arg.NoOfSets5;
                     model.BuyerNorms = arg.BuyerNorms;
                     model.OurNormsPercent = arg.OurNormsPercent;
                     model.PurchaseNormsPercent = arg.PurchaseNormsPercent;
@@ -1024,9 +1024,9 @@ namespace MMS.Repository.Managers.StockManager
                     bomMeterial = model;
                     MMS.Data.StoredProcedureModel.ItemMaterial ItesmaterialName = new MMS.Data.StoredProcedureModel.ItemMaterial();
                     ItesmaterialName = GetMaterial(model.MaterialName);
-                    BillOfMaterial billofMaterial = new BillOfMaterial();
+                    Bom billofMaterial = new Bom();
                     billofMaterial = GetbomId(model.BOMID);
-                    EmailTempate emailTemplate = new EmailTempate();
+                    EmailTemplate emailTemplate = new EmailTemplate();
                     CompanyManager companyManager = new CompanyManager();
                     StoreMasterManager storeManager = new StoreMasterManager();
                     StoreMaster storeMaster = new StoreMaster();
@@ -1150,6 +1150,19 @@ namespace MMS.Repository.Managers.StockManager
             }
             return bOMMaterial;
         }
+        public List<BOMMaterial> GetBomMaterialBOMIDetails(int BOMID)
+        {
+            List<BOMMaterial> bOMMaterialList = new List<BOMMaterial>();
+            try
+            {
+                bOMMaterialList = BBOMMaterialRepository.Table.ToList<BOMMaterial>().Where(x => x.BOMID == BOMID).Where(x => x.IsDeleted == false).ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return bOMMaterialList;
+        }
         #endregion
 
         #region bomSizeMatching
@@ -1158,7 +1171,7 @@ namespace MMS.Repository.Managers.StockManager
             BomSizeMatching bomSizeMatching = new BomSizeMatching();
             try
             {
-                if (arg.BOMSizeMatchingID == 0)
+                if (arg.BomSizeMatchingID == 0)
                 {
                     string username = HttpContext.Current.Session["UserName"].ToString();
                     BomSizeMatching bomSizeMatching_ = new BomSizeMatching();
@@ -1170,10 +1183,10 @@ namespace MMS.Repository.Managers.StockManager
                     bomSizeMatchingRepository.Insert(bomSizeMatching_);
                     bomSizeMatching = bomSizeMatching_;
                 }
-                else if (arg.BOMSizeMatchingID != 0)
+                else if (arg.BomSizeMatchingID != 0)
                 {
-                    BomSizeMatching model = bomSizeMatchingRepository.Table.Where(x => x.BOMSizeMatchingID == arg.BOMSizeMatchingID).FirstOrDefault();
-                    model.BOMSizeMatchingID = model.BOMSizeMatchingID;
+                    BomSizeMatching model = bomSizeMatchingRepository.Table.Where(x => x.BomSizeMatchingID == arg.BomSizeMatchingID).FirstOrDefault();
+                    model.BomSizeMatchingID = model.BomSizeMatchingID;
                     model.BomMaterialID = arg.BomMaterialID;
                     model.Frame = arg.Frame;
                     model.Size = arg.Size;

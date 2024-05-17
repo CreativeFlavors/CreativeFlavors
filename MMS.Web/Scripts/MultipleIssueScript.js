@@ -55,7 +55,7 @@ $(document).ready(function () {
                     dataType: "JSON",
                     data: { MaterialID: $(".MaterialGeneral_").val(), MaterialType: $("#MaterialType").val() },
                     success: function (data) {
-                        debugger;
+                        
                         if (data.BalanceStock != null) {
                             if (parseFloat(data.BalanceStock) > 0) {
                                 $("#Add").show();
@@ -97,7 +97,7 @@ $(document).ready(function () {
     $(function () {
         $(".MaterialGeneral_").combobox({
             select: function (event, ui) {
-                debugger;
+                
                 var internalOrderNo = "";
                 if ($("#IssueType option:selected").text() == "Direct Issue" || $("#IssueType option:selected").text() == "Other Issue") {
                     var MaterialId = $('.MaterialGeneral_').val();
@@ -121,7 +121,7 @@ $(document).ready(function () {
                             dataType: "JSON",
                             data: { MaterialNameID: MaterialId, IssueSlipNo: issueNo, InternalOrderNo: internalOrderNo, IssueDate: issueDate },
                             success: function (data) {
-                                debugger;
+                                
                                 if (data.Message == "Already existed") {
                                     alert("This Material name already existed this issue slip no");
                                     return false;
@@ -322,7 +322,7 @@ $(document).ready(function () {
         }
     });
     $("#BtnSave").click(function () {
-        debugger;
+        
         if ($('#txtSIssueSlipNo').val() == "") {
             alert("Please Enter Issue Slip No."); $('#txtSIssueSlipNo').css('border-color', 'red'); $('#txtSIssueSlipNo').focus(); return false;
         }
@@ -702,7 +702,7 @@ $(document).ready(function () {
         });
     });
     $(".storeGeneral_direct").change(function () {
-        debugger;
+        
         var store = $(".storeGeneral_direct").val();
 
         if (($(".storeGeneral_direct option:selected").text().trim() == "Leather Store-Local" || $(".storeGeneral_ option:selected").text().trim() == "Leather Stores-Import" || $(".storeGeneral_ option:selected").text().trim() == "Leather Store")) {
@@ -767,7 +767,7 @@ $(document).ready(function () {
         });
     });
     $('#CurrentIssue').change(function () {
-        debugger;
+        
        // alert("1");
         var requiredQTy = $('#RequiredQTY').val();
         var CurrentIssues = $('#CurrentIssue').val();
@@ -824,7 +824,7 @@ $(document).ready(function () {
             $(this).removeClass('ColorError_issue');
         })
         $("#list-amended-material tbody > tr").each(function () {
-            debugger;
+            
             var stock = 0;
             var CurrentIssuestock = 0;
             stock = $(this).find('.BalanceStock').text().trim();
@@ -947,7 +947,7 @@ $(document).ready(function () {
     });
     $("#Add").click(function () {
         //validation();
-        debugger;
+        
         if (validation() != false) {
             var qtyCount = 0;
             var qtyArr = [];
@@ -990,7 +990,7 @@ $(document).ready(function () {
             var store = "";
 
             if (($("#IssueType option:selected").text() == "Direct Issue" || $("#IssueType option:selected").text() == "Other Issue" || ($("#StoreName option:selected").text() == "Leather Store" || $("#StoreName option:selected").text() == "Leather Store-Local" || $("#StoreName option:selected").text() == "Leather Stores-Import"))) {
-                debugger;
+                
                 CurrentIssue_ = 0;
                 CurrentIssue_ = $(".CurrentIssueGeneral_cls").val();
                 MaterialTypes_ = $(".MaterialTypes").val();
@@ -1557,7 +1557,7 @@ function RowClick(arg) {
         data: { IssueSlipID: arg },
         success: function (cities) {
             //disabled and enabled
-            debugger;
+            
             if (cities.materialCategoryMaster != null) {
                 if (cities.materialCategoryMaster.CategoryName != null && cities.materialCategoryMaster.CategoryName.trim() == "Leathers") {
                     $("#divPiecesIssue").css("display", "block");
@@ -1606,7 +1606,7 @@ function RowClick(arg) {
             $('.substance_color').val(cities.issueSlipeDetails.StoreMasterId);
             $('#RequiredQty').val(cities.issueSlipeDetails.RequiredQty);
             $('#AlredayIssued').val(cities.issueSlipeDetails.AlredayIssued);
-            debugger;
+            
             if (cities.materialCategoryMaster.CategoryName.trim() == "Leathers") {
                 $('.CurrentIssueGeneral_cls').val(cities.issueSlipeDetails.CurrentIssue);
             }
@@ -1659,7 +1659,7 @@ function RowClick(arg) {
 
 }
 function EditClick(arg) {
-    debugger;
+    
     $('#list-amended-material_ >tbody').find('tr#' + arg + '').remove();
     $.ajax({
         url: '/MultipleIssue/getIssueID',
@@ -1667,7 +1667,7 @@ function EditClick(arg) {
         dataType: "JSON",
         data: { IssueSlipID: arg },
         success: function (cities) {                //disabled and enabled
-            debugger;
+            
             if (cities.materialCategoryMaster != null) {
                 if (cities.materialCategoryMaster.CategoryName != null &&  cities.materialCategoryMaster.CategoryName.trim() == "Leathers") {
                     $("#divPiecesIssue").css("display", "block");
@@ -1941,7 +1941,7 @@ function GetLotNO() {
     });
 }
 function CalculateTotal(agr1, arg2) {
-    debugger;
+    
     var CurrentIssue_ = $("#CurrentIssue").val();
     if ($("#CurrentIssue").val() != "") {
 
@@ -1985,7 +1985,7 @@ function CalculateTotal(agr1, arg2) {
 }
 function validation() {
 
-    debugger;
+    
     if ($('#IssueDate').val() == "") {
         alert("Please select issue date."); $('#IssueDate').css('border-color', 'red'); $('#IssueDate').focus(); return false;
     }

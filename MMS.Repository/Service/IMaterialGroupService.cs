@@ -9,10 +9,10 @@ namespace MMS.Repository.Service
 {
     public interface IMaterialGroupService
     {
-        bool Post(MaterialGroupMaster_ arg);
-        bool Put(MaterialGroupMaster_ arg);
+        bool Post(materialgroupmaster arg);
+        bool Put(materialgroupmaster arg);
         bool Delete(int id);
-        MaterialGroupMaster_ Get(int id);
-        List<MaterialGroupMaster_> Get();
+        materialgroupmaster Get(int id);
+        List<materialgroupmaster> Get();
     }
 }

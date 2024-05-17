@@ -42,7 +42,7 @@ namespace MMS.Common
             smtp.Send(Msg);
             return true;
         }
-        public static bool SendEmail(EmailTempate emailTemplate)
+        public static bool SendEmail(EmailTemplate emailTemplate)
         {
             string SMTPHost = ConfigurationManager.AppSettings["SMTPHost"];
             string SMTPPort = ConfigurationManager.AppSettings["SMTPPort"];

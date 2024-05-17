@@ -18,7 +18,7 @@ namespace MMS.Web.Models
        
         public string CreatedBy { get; set; }
         public string UpdatedBy { get; set; }
-        public List<MaterialNameMaster> MaterilNameList { get; set; }
+        public List<tbl_materialnamemaster> MaterilNameList { get; set; }
 
         public string MaterialGroup { get; set; }
     }

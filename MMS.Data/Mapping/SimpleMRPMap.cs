@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MMS.Data.Mapping
+namespace MMS.Data.Mapping 
 {
     public class SimpleMRPMap : EntityTypeConfiguration<SimpleMRP>
     {

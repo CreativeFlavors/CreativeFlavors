@@ -1,5 +1,6 @@
 ﻿using MMS.Common;
 using MMS.Core.Entities;
+using MMS.Core.Entities.Stock;
 using MMS.Repository.Managers;
 using MMS.Web.Models.UnitConversion;
 using System;
@@ -130,7 +131,7 @@ namespace MMS.Web.Controllers
         {
             List<UnitConversation> unitConversationlist = new List<UnitConversation>();
             UnitConversionManager unitConversionManager = new UnitConversionManager();
-            List<MaterialGroupMaster_> materialGroupMasterList = new List<MaterialGroupMaster_>();
+            List<materialgroupmaster> materialGroupMasterList = new List<materialgroupmaster>();
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
             materialGroupMasterList = materialGroupManager.Get();
             List<MaterialCategoryMaster> materialCatogoryMasterList = new List<MaterialCategoryMaster>();

@@ -18,7 +18,7 @@ namespace MMS.Web.Controllers.Stock
             Property(t => t.PoId);
             Property(t => t.CreatedDate);
             Property(t => t.UpdatedDate);
-            ToTable("tblAutoGenPo");
+            ToTable("autogenpo");
         }
     }
 }

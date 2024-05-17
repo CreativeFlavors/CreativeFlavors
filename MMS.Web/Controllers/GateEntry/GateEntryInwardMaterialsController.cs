@@ -926,7 +926,7 @@ namespace MMS.Web.Controllers
 
 
 
-                    return Json(new { Material = InwardData, SizeRange = listSizeItemMaterial, PoQuantity = listQty, PendingQuantity = listPendingQty, Message = Message, purchaseOrder = purchaseOrder, withPoTotal = listQty.Sum(x => x.quantity) }, JsonRequestBehavior.AllowGet);
+                    return Json(new { Material = InwardData, SizeRange = listSizeItemMaterial, PoQuantity = listQty, PendingQuantity = listPendingQty, Message = Message, purchaseOrder = purchaseOrder, withPoTotal = listQty.Sum(x => x.Quantity) }, JsonRequestBehavior.AllowGet);
                 }
                 else
                 {

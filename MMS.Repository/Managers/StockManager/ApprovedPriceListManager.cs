@@ -81,7 +81,7 @@ namespace MMS.Repository.Managers.StockManager
                     string username = HttpContext.Current.Session["UserName"].ToString();
                     model.ApprovedBy = username;
                     //model.CreatedBy = username;
-                    model.UpdatedBY = username;
+                    model.UpdatedBy = username;
                     ApprovedPriceListRepository.Update(model);
                     result = true;
                 }

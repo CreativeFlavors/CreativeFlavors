@@ -341,7 +341,7 @@ namespace MMS.Web.Controllers.JobWork
         {
             string Message = "";
             BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
-            List<BillOfMaterial> billOfMaterial = new List<BillOfMaterial>();
+            List<Bom> billOfMaterial = new List<Bom>();
             List<SizeRangeQtyRate> sizeRangeQtyRateList = new List<SizeRangeQtyRate>();
             List<SizeRangeQtyRate> listOfSizeRange = new List<SizeRangeQtyRate>();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
@@ -366,7 +366,7 @@ namespace MMS.Web.Controllers.JobWork
         {
             string Message = "";
             BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
-           List< BillOfMaterial> billOfMaterial = new List<BillOfMaterial>();
+           List<Bom> billOfMaterial = new List<Bom>();
             List<SizeRangeQtyRate> sizeRangeQtyRateList = new List<SizeRangeQtyRate>();
             List<SizeRangeQtyRate> listOfSizeRange = new List<SizeRangeQtyRate>();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
@@ -403,7 +403,7 @@ namespace MMS.Web.Controllers.JobWork
         {
             //GetBomDetails_Arraylist
             BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
-            List<BillOfMaterial> billOfMaterial = new List<BillOfMaterial>();
+            List<Bom> billOfMaterial = new List<Bom>();
             List<BOMMaterial> bomGrid = new List<BOMMaterial>();
             MaterialManager MaterialManager = new MaterialManager();
             MaterialNameManager MaterialNameManager = new MaterialNameManager();
@@ -431,8 +431,8 @@ namespace MMS.Web.Controllers.JobWork
         {
             //GetBomDetails_Arraylist
             BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
-            List<BillOfMaterial> billOfMaterial = new List<BillOfMaterial>();
-            BillOfMaterial bomGrid = new BillOfMaterial();
+            List<Bom> billOfMaterial = new List<Bom>();
+            Bom bomGrid = new Bom();
             MaterialManager MaterialManager = new MaterialManager();
             MaterialNameManager MaterialNameManager = new MaterialNameManager();
             List<BOMMaterial> bOMMateriallist = new List<BOMMaterial>();
@@ -485,9 +485,9 @@ namespace MMS.Web.Controllers.JobWork
             materaildesc = ProductionJobworkMasterManager_.GetproductionMaster_id(Convert.ToInt32(Production_Order_id));
             if (materaildesc != null)
             {
-                Balance_stock = Convert.ToDecimal(issueSlipManager.Get().Where(x => x.jobsheet_pair_Code_id == Production_Order_id.ToString() && x.IssueType == "17").Sum(x => x.CurrentIssue));
+                Balance_stock = Convert.ToDecimal(issueSlipManager.Get().Where(x => x.Jobsheet_pair_Code_id == Production_Order_id.ToString() && x.IssueType == "17").Sum(x => x.CurrentIssue));
 
-                count = issueSlipManager.Get().Where(x => x.jobsheet_pair_Code_id == Production_Order_id.ToString()).Count();
+                count = issueSlipManager.Get().Where(x => x.Jobsheet_pair_Code_id == Production_Order_id.ToString()).Count();
 
                 var ProductionJobworkMaster_ = ProductionJobworkMasterManager_.GetproductionMaster_id(Production_Order_id);
 
@@ -504,11 +504,11 @@ namespace MMS.Web.Controllers.JobWork
         {
 
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
-            InternalOrderEntryForm order = new InternalOrderEntryForm();
+            OrderEntry order = new OrderEntry();
             BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
             BOMMaterialListManager bomMaterialListManager = new BOMMaterialListManager();
-            BillOfMaterial billOfMaterial = new BillOfMaterial();
-            List<BomGrid> listMaterial = new List<BomGrid>();
+            Bom billOfMaterial = new Bom();
+            List<bomgriddetail> listMaterial = new List<bomgriddetail>();
             var SizeQuantityRate_ = SelectText.Split(',');
             List<BOMMaterial> bomMaterialList = new List<BOMMaterial>();
             BOMMaterial bomMaterial = new BOMMaterial();
@@ -519,11 +519,11 @@ namespace MMS.Web.Controllers.JobWork
         //    SimpleMRPModel model = new SimpleMRPModel();
             SimpleMRPManager simpleMRPManager = new SimpleMRPManager();
             BuyerOrderCreationManager buyerOrderCreationManager = new BuyerOrderCreationManager();
-            List<InternalOrderEntryForm> listOfOrders_ = new List<InternalOrderEntryForm>();
-            List<BillOfMaterial> listBillOfMaterial = new List<BillOfMaterial>();
+            List<OrderEntry> listOfOrders_ = new List<OrderEntry>();
+            List<Bom> listBillOfMaterial = new List<Bom>();
             List<MaterialMaster> listOfMaterial = new List<MaterialMaster>();
             MaterialManager materialManager = new MaterialManager();
-            List<MaterialGroupMaster_> listOfMaterialGroupMaster = new List<MaterialGroupMaster_>();
+            List<materialgroupmaster> listOfMaterialGroupMaster = new List<materialgroupmaster>();
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
             List<SizeRangeQtyRate> listOfSizeRange = new List<SizeRangeQtyRate>();
             string orderExited = "";
@@ -587,7 +587,7 @@ namespace MMS.Web.Controllers.JobWork
                                 decimal? Amount = 0;
                                 decimal? qty = 0;
                                 BOMMaterial bomMaterial_ = new BOMMaterial();
-                                MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
+                                materialgroupmaster materialGroupMaster = new materialgroupmaster();
                                 SizeScheduleRange sizeScheduleRange = new SizeScheduleRange();
                                 MaterialMaster materialMaster = new MaterialMaster();
                                 materialMaster = listOfMaterial.Where(x => x.MaterialMasterId == each.MaterialName).FirstOrDefault();
