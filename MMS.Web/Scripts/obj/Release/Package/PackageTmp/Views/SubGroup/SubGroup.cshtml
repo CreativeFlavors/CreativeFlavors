@@ -1,0 +1,122 @@
+﻿@{
+    ViewBag.Title = "SubGroup";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*@{
+    ViewBag.Title = "Country";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}*@
+
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#SubGroupCode').val() == "") {
+            alert("Please Enter Sub Group Code.")
+            $('#SubGroupCode').css('border-color', 'red');
+            $('#SubGroupCode').focus();
+            return false;
+        }
+        else {
+            $('#SubGroupCode').css('border-color', '');
+        }
+        if ($('#SubGroupDescription').val() == "") {
+            alert("Please Enter Sub Group Description.")
+            $('#SubGroupDescription').css('border-color', 'red');
+            $('#SubGroupDescription').focus();
+            return false;
+        }
+        else {
+            $('#SubGroupDescription').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/SubGroup/Save',
+            data: {
+                SubGroupCode: $('#SubGroupCode').val(),
+                SubGroupDescription: $('#SubGroupDescription').val(),
+                SubGroupID: $('#SubGroupID').val()
+            },
+            success: function (data) {
+                if (data.SubGroupID != "" || data.SubGroupID != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/SubGroup/SubGroup";
+                    return false;
+                }
+                else if (data.SubGroupID == 0 && data.SubGroupDescription != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/SubGroup/SubGroup";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#SubGroupCode').val() == "") {
+            alert("Please Enter Sub Group Code.")
+            $('#SubGroupCode').css('border-color', 'red');
+            $('#SubGroupCode').focus();
+            return false;
+        }
+        else {
+            $('#SubGroupCode').css('border-color', '');
+        }
+        if ($('#SubGroupDescription').val() == "") {
+            alert("Please Enter Sub Group Description.")
+            $('#SubGroupDescription').css('border-color', 'red');
+            $('#SubGroupDescription').focus();
+            return false;
+        }
+        else {
+            $('#SubGroupDescription').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/SubGroup/Update',
+            data: {
+                SubGroupCode: $('#SubGroupCode').val(),
+                SubGroupDescription: $('#SubGroupDescription').val(),
+                SubGroupID: $('#SubGroupID').val()
+            },
+            success: function (data) {
+                if (data.SubGroupID != "" || data.SubGroupID != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/SubGroup/SubGroup";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/SubGroup/SubGroup";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Sub Group  Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("SubGroupGrid", "SubGrouP")
+    </div>
+</div>

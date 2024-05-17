@@ -1,0 +1,229 @@
+﻿@model MMS.Web.Models.Product.Product
+@using MMS.Repository.Managers
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <style>
+        #alert {
+            margin-left: 24%;
+        }
+        .alert {
+            position: relative;
+            padding: 5px 1rem;
+        }
+        strong#close {
+            margin-left: 18%;
+            cursor: pointer;
+        }
+        .alert-danger {
+            color: #842029;
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+            width: 43%;
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="edit-section">
+        <div class="d-flex justify-content-end">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <h1 class="modal-title fs-5 text-center" id="exampleModalLabel">Add New products</h1>
+
+
+    </div>
+
+    <div class="row">
+        <div id="alert">
+
+        </div>
+        <div class="col-lg-6">
+            @Html.DropDownListFor(m => m.MaterialCategoryMasterId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "sel-dropdown form-control" })
+        </div>
+        <div class="col-lg-6">
+            @Html.DropDownListFor(m => m.TaxMasterId, MMS.Web.ExtensionMethod.HtmlHelper.GetTaxRef(), new { @class = "sel-dropdown form-control" })
+        </div>
+    </div>
+    <br />
+    <br />
+    <div class="row mt-4">
+        <div class="col-lg-6 ">
+            @Html.DropDownListFor(m => m.UomMasterId, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "sel-dropdown form-control" })
+        </div>
+        <div class="col-lg-6">
+            @Html.DropDownListFor(m => m.BomNo, MMS.Web.ExtensionMethod.HtmlHelper.GetBomNo(), new { @class = "sel-dropdown form-control" })
+        </div>
+    </div>
+    <br />
+    <br />
+    <div class="row mt-4">
+        <div class="col-lg-6">
+            @Html.DropDownListFor(m => m.ProductType, MMS.Web.ExtensionMethod.HtmlHelper.ProductType(), new { @class = "sel-dropdown form-control" })
+        </div>
+        <div class="col-lg-6">
+            @Html.DropDownListFor(m => m.StoreId, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "sel-dropdown form-control" })
+        </div>
+    </div>
+    <br />
+    <br />
+    <div class="row mt-4">
+        <div class="col-lg-6">
+            @Html.TextBoxFor(m => m.productiontime, new { @class = "form-control", @type = "time", placeholder = "Enter HH:MM", style = "width:100%;" })
+        </div>
+        <div class="col-lg-6">
+            @Html.TextBoxFor(m => m.ProductCode, new
+            {
+                @class = "form-control text-field",
+                placeholder = "Enter Product Code",
+           style = "width:100%;"
+            })
+        </div>
+    </div>
+    <br />
+    <br />
+    <div class="row mt-4">
+        <div class="col-lg-6">
+            @Html.TextBoxFor(m => m.ProductName, new { @class = "form-control text-field", placeholder = "Enter Product Name", style = "width:100%;" })
+        </div>
+        <div class="col-lg-6">
+            @Html.TextAreaFor(m => m.ProductDesc, new { @class = "form-control text-field", placeholder = "Enter Product Desc" })
+        </div>
+    </div>
+    <br />
+    <br />
+    <div class="row mt-4">
+        <div class="col-lg-6">
+            @Html.TextBoxFor(m => m.Price, new { @class = "form-control text-field", placeholder = "Enter Price", style = "width:100%;" })
+        </div>
+        <div class="col-lg-6">
+            @Html.TextBoxFor(m => m.productionperday, new { @class = "form-control text-field", placeholder = "Enter Production Per Day", style = "width:100%;" })
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-lg-6">
+            @Html.TextBoxFor(m => m.MaxStock, new { @class = "form-control text-field", placeholder = "Enter Maxium Stock", style = "width:100%;" })
+        </div>
+        <div class="col-lg-6">
+            @Html.TextBoxFor(m => m.MinStock, new { @class = "form-control text-field", placeholder = "Enter Minium Stock", style = "width:100%;" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="d-flex justify-content-center mt-4 mb-2">
+            @*<button class="btn btn-success" id="Addproducts" onclick="Save()">Submit</button>*@
+            <button class="btn btn-success" id="Addproducts" onclick="Save('@(Model != null ? Model.ProductId.ToString() : "")')">Submit</button>
+        </div>
+    </div>
+
+    <script>
+        function Save(productId) {
+@{
+    var ProductId = Model != null ? Model.ProductId.ToString() : ""; // Check if Model is not null before accessing its properties
+}
+            
+            var ProductCode = $("#ProductCode").val();
+            var ProductName = $("#ProductName").val();
+            var ProductDesc = $("#ProductDesc").val();
+            var TaxMasterId = $("#TaxMasterId").val();
+            var UomMasterId = $("#UomMasterId").val();
+            var Price = $("#Price").val();
+            var BomNo = $("#BomNo").val();
+            //var ImageName = $("#ImageName").val();
+            //var ImagePath = $("#ImagePath").val();
+            var IsActive = $("#IsActive").val();
+            var MaterialCategoryMasterId = $("#MaterialCategoryMasterId").val();
+
+            var ProductType = $("#ProductType").val();
+            var StoreId = $("#StoreId").val();
+            var ProductInTime = $("#ProductInTime").val();
+            var ProductOutTime = $("#ProductOutTime").val();
+            $(".alert-danger").hide();
+            if (ProductCode != "" && ProductName != "" && ProductDesc != "" && TaxMasterId != "" && UomMasterId != "" && BomNo != "" && MaterialCategoryMasterId != "") {
+                var formdata = new FormData();
+                if (productId !== "") {
+                    formdata.append("ProductId", productId);
+                }
+                formdata.append("ProductCode", ProductCode);
+                formdata.append("ProductName", ProductName);
+                formdata.append("ProductDesc", ProductDesc);
+                formdata.append("TaxMasterId", TaxMasterId);
+                formdata.append("UomMasterId", UomMasterId);
+                formdata.append("Price", Price);
+                formdata.append("BomNo", BomNo);
+                //formdata.append("ImageName", ImageName);
+                //formdata.append("ImagePath", ImagePath);
+                formdata.append("IsActive", IsActive);
+                formdata.append("MaterialCategoryMasterId", MaterialCategoryMasterId);
+                formdata.append("ProductType", ProductType);
+                formdata.append("StoreId", StoreId);
+                formdata.append("productiontime", productiontime);
+                formdata.append("productionperday", productionperday);
+                $.ajax({
+                    type: 'POST',
+                    url: '/Product/ProductDataInsert',
+                    contentType: false,
+                    processData: false,
+                    dataType: 'html',
+                    data: formdata,
+                    success: function (data) {
+                        debugger;
+                        console.log(data);
+                        if (data.includes("Inserted")) {
+                            alert("Product Saved successfully");
+                            location.reload();
+                        } else if (data.includes("Updated")) {
+                            alert("Product Updated successfully");
+                            location.reload();
+                        } else {
+                            alert('Operation failed. Please try again.');
+                        }
+                    },
+                    error: function (ex) {
+                        alert('Already Exist in the database.');
+                    }
+                });
+            }
+            else {
+                $("#alert").append(
+                    '<div class="alert alert-danger">' +
+                    '<strong>Alert!</strong>Product details not added ' +
+                    '<strong id="close">x</strong>' +
+                    '</div>'
+                );
+                $(document).on('click', '#close', function () {
+                    $(".alert-danger").hide();
+                });
+            }
+            
+
+        }
+    </script>
+
+
+
+
+
+
+    <script src="~/Content/js/custom.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

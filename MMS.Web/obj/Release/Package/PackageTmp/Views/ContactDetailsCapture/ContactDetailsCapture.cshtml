@@ -1,0 +1,379 @@
+﻿@{
+    ViewBag.Title = "ContactDetailsCapture";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+
+<h2 class="content-title">Contact Details Capture</h2>
+<div style="width: 100%; float: left;">
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("ContactDetailsCaptureGrid", "ContactDetailsCapture")
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $("#EditColorPartial").hide();
+    });
+
+
+    function ValidateEmail(email) {
+        var expr = /^([\w-\.]+)@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+        return expr.test(email);
+    };
+
+
+
+    function Save() {
+
+        if ($('#Mobile').val().trim() == "") {
+            alert("Please Enter Mobile Number");
+            $('#Mobile').css('border-color', 'red');
+            $('#Mobile').focus();
+            return false;
+        }
+        else {
+            var a = PhoneValidation($('#Mobile').val());
+
+            if (a == true) {
+                $('#Mobile').css('border-color', ' ');
+                true;
+            }
+            else {
+                alert("Please Enter Valid Mobile number");
+                $('#Mobile').css('border-color', 'red');
+                $('#Mobile').focus();
+                return false;
+            }
+        }
+
+
+        if ($("#LandlineNumber1").val() == "0" || $("#LandlineNumber1").val() == "") {
+            alert("Please enter Landline Number 1");
+            $('#LandlineNumber1').css('border-color', 'red');
+            $('#LandlineNumber1').focus();
+            return false;
+        }
+        else {
+            var a = PhoneValidation($('#LandlineNumber1').val());
+
+            if (a == true) {
+                $('#LandlineNumber1').css('border-color', ' ');
+                true;
+            }
+            else {
+                alert("Please Enter Valid Landline Number 1");
+                $('#LandlineNumber1').css('border-color', 'red');
+                $('#LandlineNumber1').focus();
+                return false;
+            }
+        }
+
+        function PhoneValidation(Phone) {
+
+            var PhoneReg = new RegExp(/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/);
+            return PhoneReg.test(Phone);
+
+
+        }
+        if ($('#EmailId').val().trim() == "") {
+            alert("Please Enter Email Address")
+            $('#EmailId').css('border-color', 'red');
+            $('#EmailId').focus();
+            return false;
+        }
+        else {
+            var a = ValidateEmail($('#EmailId').val());
+
+            if (a == true) {
+                $('#EmailId').css('border-color', ' ');
+                true;
+            }
+            else {
+                alert("Please Enter Valid Email Address");
+                $('#EmailId').css('border-color', 'red');
+                $('#EmailId').focus();
+                return false;
+            }
+        }
+        var UpdateimageGuid = "";
+
+
+
+
+
+
+        var fileUpload = $("#UploadImg").get(0);
+        var files = fileUpload.files;
+
+        // Create FormData object
+        var data = new FormData();
+
+        // Looping over all files and add it to FormData object
+        for (var i = 0; i < files.length; i++) {
+            var size = (files[i].size / 1024 / 1024).toFixed(2);
+
+            alert(size + " MB.");
+            if (size > 4) {
+                alert("File size is greater than 4MB, please add image with less than 4MB size");
+
+                return false;
+            }
+            data.append(files[i].name, files[i]);
+        }
+        var companyname = $("#CompanyName").val();
+        // Adding one more key to FormData object
+        data.append('companyID', companyname);
+
+
+        $.ajax({
+
+            url: "/ContactDetailsCapture/UploadFile",
+            type: "POST",
+            processData: false,
+            contentType: false,
+            data: data,
+            success: function (response) {
+                if (response || !response) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/ContactDetailsCapture/ContactDetailsCapture',
+                        data: {
+                            ContactDetailsCode: $('#ContactDetailsCode').val(),
+                            CompanyName: $('#CompanyName').val(),
+                            ContactPerson: $('#ContactPerson').val(),
+                            LandlineNumber1: $('#LandlineNumber1').val(),
+                            LandlineNumber2: $('#LandlineNumber2').val(),
+                            ExtensionNumber: $('#ExtensionNumber').val(),
+                            FaxNumber: $('#FaxNumber').val(),
+                            EmailId: $('#EmailId').val(),
+                            Mobile: $('#Mobile').val(),
+                            WebsiteAddress: $('#WebsiteAddress').val(),
+                            Industry: $('#Industry').val(),
+                            Business: $('#Business').val(),
+                            OtherDetails: $('#OtherDetails').val(),
+                            Remarks: $('#Remarks').val(),
+                            Address: $('#Address').val(),
+
+                        },
+                        success: function (data) {
+                            if (data.ContactDetailsCode != "" || data.ContactDetailsCode != 0) {
+                                alert('Saved Successfully.');
+                                location.href = "/ContactDetailsCapture/ContactDetailsCapture";
+                                return false;
+                            }
+                            else {
+                                alert('Already Exist in the database.');
+                                location.href = "/ContactDetailsCapture/ContactDetailsCapture";
+                                return false;
+                            }
+
+                        },
+                        error: function (ex) {
+                            alert('Already Exist in the database.');
+                        }
+                    });
+
+                }
+                else {
+                    alert("No file selected and Save Failed");
+                }
+            },
+            error: function (er) {
+                alert(er);
+            }
+        });
+
+
+
+
+
+
+    }
+
+
+    function Update(arg) {
+
+
+
+        var UpdateimageGuid = "";
+
+        if ($('#Mobile').val().trim() == "") {
+            alert("Please Enter Mobile Number");
+            $('#Mobile').css('border-color', 'red');
+            $('#Mobile').focus();
+            return false;
+        }
+        else {
+            var a = PhoneValidation($('#Mobile').val());
+
+            if (a == true) {
+                $('#Mobile').css('border-color', ' ');
+                true;
+            }
+            else {
+                alert("Please Enter Valid Mobile number");
+                $('#Mobile').css('border-color', 'red');
+                $('#Mobile').focus();
+                return false;
+            }
+        }
+
+
+        if ($("#LandlineNumber1").val() == "0" || $("#LandlineNumber1").val() == "") {
+            alert("Please enter Landline Number 1");
+            $('#LandlineNumber1').css('border-color', 'red');
+            $('#LandlineNumber1').focus();
+            return false;
+        }
+        else {
+            var a = PhoneValidation($('#LandlineNumber1').val());
+
+            if (a == true) {
+                $('#LandlineNumber1').css('border-color', ' ');
+                true;
+            }
+            else {
+                alert("Please Enter Valid Landline Number 1");
+                $('#LandlineNumber1').css('border-color', 'red');
+                $('#LandlineNumber1').focus();
+                return false;
+            }
+        }
+
+        function PhoneValidation(Phone) {
+
+            var PhoneReg = new RegExp(/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/);
+            return valid = PhoneReg.test(Phone);
+
+
+        }
+        if ($('#EmailId').val().trim() == "") {
+            alert("Please Enter Email Address")
+            $('#EmailId').css('border-color', 'red');
+            $('#EmailId').focus();
+            return false;
+        }
+        else {
+            var a = ValidateEmail($('#EmailId').val());
+
+            if (a == true) {
+                $('#EmailId').css('border-color', ' ');
+                true;
+            }
+            else {
+                alert("Please Enter Valid Email Address");
+                $('#EmailId').css('border-color', 'red');
+                $('#EmailId').focus();
+                return false;
+            }
+        }
+
+
+
+
+        var fileUpload = $("#UploadImg").get(0);
+        var files = fileUpload.files;
+
+        // Create FormData object
+        var data = new FormData();
+
+        // Looping over all files and add it to FormData object
+        for (var i = 0; i < files.length; i++) {
+            var size = (files[i].size / 1024 / 1024).toFixed(2);
+
+            alert(size + " MB.");
+            if (size > 4) {
+                alert("File size is greater than 4MB, please add image with less than 4MB size");
+
+                return false;
+            }
+            data.append(files[i].name, files[i]);
+        }
+        var companyname = $("#CompanyName").val();
+        // Adding one more key to FormData object
+        data.append('companyID', companyname);
+
+
+        $.ajax({
+
+            url: "/ContactDetailsCapture/UploadFile",
+            type: "POST",
+            processData: false,
+            contentType: false,
+            data: data,
+            success: function (response) {
+                if (response || !response) {
+
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/ContactDetailsCapture/ContactDetailsCapture',
+                        data: {
+                            ContactDetailsCode: $('#ContactDetailsCode').val(),
+                            CompanyName: $('#CompanyName').val(),
+                            ContactPerson: $('#ContactPerson').val(),
+                            LandlineNumber1: $('#LandlineNumber1').val(),
+                            LandlineNumber2: $('#LandlineNumber2').val(),
+                            ExtensionNumber: $('#ExtensionNumber').val(),
+                            FaxNumber: $('#FaxNumber').val(),
+                            EmailId: $('#EmailId').val(),
+                            Mobile: $('#Mobile').val(),
+                            WebsiteAddress: $('#WebsiteAddress').val(),
+                            Industry: $('#Industry').val(),
+                            Business: $('#Business').val(),
+                            OtherDetails: $('#OtherDetails').val(),
+                            Remarks: $('#Remarks').val(),
+                            Address: $('#Address').val(),
+                            VisitingCardFront: $('#VisitingCardFront').val(),
+                            VisitingCardBack: $('#VisitingCardBack').val(),
+                        },
+                        success: function (data) {
+
+                            if (data.ContactDetailsCode != "" || data.ContactDetailsCode != 0) {
+                                alert('Updated Successfully.');
+                                location.href = "/ContactDetailsCapture/ContactDetailsCapture";
+                                return false;
+                            }
+                            else {
+                                alert('Updation failed.');
+                                location.href = "/ContactDetailsCapture/ContactDetailsCapture";
+                                return false;
+                            }
+
+                        },
+                        error: function (ex) {
+                            alert('Already Exist in the database.');
+                        }
+                    });
+
+                }
+                else {
+                    alert("Updation Failed");
+                }
+            },
+            error: function (er) {
+                alert(er);
+            }
+        });
+
+    }
+
+
+</script>

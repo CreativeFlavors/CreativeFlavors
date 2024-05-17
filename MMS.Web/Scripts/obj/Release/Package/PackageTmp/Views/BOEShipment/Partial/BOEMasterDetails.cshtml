@@ -1,0 +1,113 @@
+﻿@model MMS.Web.Models.BOEShipmentModel.BOEShipmentModel
+@using MMS.Repository.Managers
+@using MMS.Core.Entities
+@{
+   
+}
+
+<div class="right-form-section clearfix">
+    <div>
+        <input class="btn btn-default btn-style" type="button" value="Back" title="Back" id="Back_btn" />
+    </div>
+    <form role="form" class="form-inline">
+        <div class="tab-content">
+            <div class="container-fluid">
+                <p class="section-title">Shipment Details</p>
+                <div style="margin-top: 20px;" class="row">
+                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12 no-padding"></div>
+                    <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-padding">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Country Stamp</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @*<input type="text" placeholder=" " class="form-control text-field">*@
+                                    @Html.HiddenFor(x => x.BOEId)
+                                    @Html.TextBoxFor(m => m.CountryStamp, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Shipment From</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                    @if (Model != null && Model.BOEId != 0)
+                                    {
+                                        var from = Model.ShipmentFrom;
+                                        @Html.TextBoxFor(m => m.ShipmentFrom, new { @Value = from, @class = "form-control text-field" })
+                                    }
+                                    else
+                                    {
+                                    @Html.TextBoxFor(m => m.ShipmentFrom, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field" })
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Shipment To</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @*<input type="text" placeholder=" " class="form-control text-field">*@
+                                    @if (Model != null && Model.BOEId != 0)
+                                    {
+                                        var to = Model.ShipmentTo;
+                                        @Html.TextBoxFor(m => m.ShipmentTo, new { @Value = to, @class = "form-control text-field" })
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.ShipmentTo, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field" })
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Any Other Instruction from Buyer regarding shipment</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @*<input type="text" placeholder="" class="form-control text-field">*@
+                                    @Html.TextBoxFor(m => m.OtherInstructionFromBuyer, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12 no-padding"></div>
+                </div>
+            </div>
+            <div class="form-footer">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                        <input type="button" onclick="Cancel()" class="btn btn-default btn-style" title="Cancel" value="Cancel">
+                        @if (Model != null && Model.BOEId != 0)
+                        {
+
+                            <input type="button" onclick="Update()" class="btn btn-default btn-style" id="BOEId" title="Update" value="Update">
+                        }
+                        else
+                        {
+                            <input type="button" onclick="Save()" class="btn btn-default btn-style" title="Save" value="Save">
+                        }
+                        <button type="submit" class="btn btn-default btn-style">Clear</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $("#ShipmentFrom").datepicker({ dateFormat: "dd/mm/yy" });
+    $("#ShipmentTo").datepicker({ dateFormat: "dd/mm/yy" });
+
+    $('#Back_btn').click(function () {
+        location.href = "../BOEShipment/BOEMaster";
+    });
+
+</script>

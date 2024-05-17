@@ -1,0 +1,124 @@
+﻿@{
+    ViewBag.Title = "BinCardReport";
+}
+
+
+<link type="text/css" href="~/Content/css/jquery-ui-1.8.19.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/Content/themes/base/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="~/Content/themes/base/jquery-ui-1.8.19.custom.min.js"></script>
+
+<div class="indent_report">
+   
+</div>
+<div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+    <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+        <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+    </div>
+</div>
+<div class="field-section indent_field">
+    <div class="form-group">
+      
+        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+            <label for="text" class="form-label">Material Name</label>
+        </div>
+        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 space_status">
+            @Html.DropDownList("MaterialName", MMS.Web.ExtensionMethod.HtmlHelper.MaterialName(), new { @class = "select-style text-field" })
+        </div>
+        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+            <label for="text" class="form-label">Material Code</label>
+        </div>
+        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 space_status">
+            @Html.DropDownList("MaterialCode", MMS.Web.ExtensionMethod.HtmlHelper.MaterialCode(), new { @class = "select-style text-field" })
+        </div>
+        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+            <label for="text" class="form-label">Grade</label>
+        </div>
+        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 space_status">
+            @Html.DropDownList("Grade", MMS.Web.ExtensionMethod.HtmlHelper.GetGrade(), new { @class = "select-style text-field" })
+        </div>
+        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+            <label for="text" class="form-label">Material Type</label>
+        </div>
+        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 space_status">
+            @Html.DropDownList("MaterialType", MMS.Web.ExtensionMethod.HtmlHelper.MaterialType(), new { @class = "select-style text-field" })
+        </div>
+        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+            <label for="text" class="form-label">Color</label>
+        </div>
+
+        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 space_status">
+            @Html.DropDownList("Color", MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { @class = "select-style text-field" })
+        </div>
+        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+            <label for="text" class="form-label">Category</label>
+        </div>
+        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 space_status">
+            @Html.DropDownList("Category", MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+        </div>
+        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+            <label for="text" class="form-label">Code</label>
+        </div>
+        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 space_status">
+            @Html.DropDownList("Code", MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryCode(), new { @class = "select-style text-field" })
+        </div>
+    </div>
+</div>
+<input id="ExportReport" class="indent_report_field" name="ExportReport" type="submit" value="Generate Report" />
+</div>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+
+            $("#ExportReport").click(function (event) {
+                var MaterialName = $("#MaterialName option:selected").val();
+                var MaterialCode = $("#MaterialCode option:selected").val();
+                var Grade = $("#Grade option:selected").val();
+                var MaterialType = $("#MaterialType option:selected").val();
+                var Color = $("#Color option:selected").val();
+                var Category = $("#Category option:selected").val();
+                var Code = $("#Code option:selected").val();
+                //if (bomNo == "Please Select")
+                //    bomNo = "";
+
+                debugger;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/BinCard/RedirectToBinCardAspx',
+                        data: {
+                            MaterialName: MaterialName,
+                            MaterialCode: MaterialCode,
+                            Grade: Grade,
+                            MaterialType: MaterialType,
+                            Color: Color,
+                            Category: Category,
+                            Code: Code,
+                        },
+                        success: function (data) {
+                            debugger;
+                            var url = "@(System.Configuration.ConfigurationManager.AppSettings["ReportURL"].ToString())BinCard.aspx?MaterialName=" + data.MaterialName + "&MaterialCode=" + data.MaterialCode + "&Grade=" + data.Grade + "&MaterialType=" + data.MaterialType + "&Color=" + data.Color + "&Category=" + data.Category + "&Option=" + data.Option + "&From=" + data.From + "&To=" + data.To;
+                             window.open(url, '_blank');
+                             return false
+                        },
+                        error:function(data)
+                        {
+                            alert('error');
+                        }
+                    });
+
+            });
+        })
+
+
+</script>

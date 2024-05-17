@@ -1,0 +1,101 @@
+﻿@{
+    ViewBag.Title = "Purchase Order";
+}  
+<link type="text/css" href="~/Content/css/jquery-ui-1.8.19.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/Content/themes/base/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="~/Content/themes/base/jquery-ui-1.8.19.custom.min.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+<h2>Purchase Order</h2>
+<div>
+
+    <div class="field-section">
+        <div class="form-group">
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">From Date :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+             
+                <input id="PeriodFrom" name="PeriodFrom" type="text" class = "form-control text-field" />
+
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">To Date :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                <input id="PeriodTo" name="PeriodTo" type="text" class="form-control text-field" />
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Supplier :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12"> 
+                @Html.DropDownList("Supplier", MMS.Web.ExtensionMethod.HtmlHelper.SupplierName(), new { @class = "select-style text-field" })
+                           </div>
+            
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Store :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                @Html.DropDownList("Store", MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
+
+            </div> 
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Group :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12"> 
+                @Html.DropDownList("Group", MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+              </div>
+          
+        </div>
+    </div>
+    <input id="ExportReport" name="ExportReport" type="submit" value="Export Report" />
+</div>
+<script>
+   
+    $(document).ready(function () {
+        $("#PeriodFrom").datepicker({ dateFormat: "dd/mm/yy" });
+        $("#PeriodTo").datepicker({ dateFormat: "dd/mm/yy" }); 
+       
+        $("#ExportReport").click(function (event) {
+            var From = $("#PeriodFrom").val();
+            var To = $("#PeriodTo").val();
+            var Store =   $('#Store').val();
+            var Supplier = $('#Supplier').val();
+            var Group = $('#Group').val();
+            event.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '/AllStoresGRNReport/RedirectToAspx',
+                data: {
+                    supplier: Supplier,
+                    group: Group,
+                    store: Store,
+                    from: From,
+                    to : To                     
+                },
+                success: function (data) {                                 
+                    var url = "http://mms.encoshoesapps.com/MMSReport/View/Views/AllStoresGRNReport.aspx?FromDate=" + data.FromDate + "&ToDate=" + data.ToDate + "&Group=" + data.Group + "&Store=" + data.Store + "&Supplier=" + data.Supplier;
+                    //window.location.href = url;
+                    window.open(url, '_blank');
+                    return false
+                }
+            });
+        });
+    })
+
+
+    $("#Supplier").combobox();
+    $("#toggle").click(function () {
+        $("#Supplier").toggle();
+    });
+    $("#Group").combobox();
+    $("#toggle").click(function () {
+        $("#Group").toggle();
+    });
+    $("#Store").combobox();
+    $("#toggle").click(function () {
+        $("#Store").toggle();
+    });
+</script>

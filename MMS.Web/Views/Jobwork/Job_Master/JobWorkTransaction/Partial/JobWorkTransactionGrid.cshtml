@@ -1,0 +1,96 @@
+﻿@model MMS.Web.Models.StockModel.GRN_Details_ModelNew
+@using MMS.Repository.Managers.StockManager
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+@{
+    List<InternalOrderEntryForm> orderEntryEntityModelist = new List<InternalOrderEntryForm>();
+    BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
+    orderEntryEntityModelist = buyerOrderEntryManager.Get();
+    MMS.Web.Models.StockModel.OrderEntryModel model = new MMS.Web.Models.StockModel.OrderEntryModel();
+    MMS.Repository.Managers.SeasonManager seasonManager = new MMS.Repository.Managers.SeasonManager();
+    SeasonMaster seasonMaster = new SeasonMaster();
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("GoodReceipeNote", PermissionSettingModel.PermissionID);
+    }
+}
+<div class="veh-tablecont">
+    <div class="header_list_tab  col-lg-12 col-md-12 col-sm-12  col-xs-12">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+            <div class="list_tab">
+                <div class="title">
+                    List
+                </div>
+                <button class="rt_add" onclick="AddJobWorkTransaction()">Add</button>
+            </div>
+
+        </div>
+        <div class="col-lg-6 col-md-12 col-sm-12  col-xs-12">
+            <div class="button_tab  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+
+            </div>
+        </div>
+    </div>
+
+    <div class="process_master col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="col-xs-12 block-section">
+            <div id="no-more-tables" class="col-xs-12 no-padding">
+                <table id="example" class="col-md-12 table-striped table-condensed cf table-change home_dahboard home_process">
+                    <thead>
+                        <tr>
+                            <th>SI.No</th>
+                            <th>GrnNo</th>
+                            <th>DC_No</th>
+                            <th>GateEntryNo</th>
+                            <th>GrnDate</th>
+                            <th>InvoiceNo</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="common-table-head">
+                        @if (Model.GRNDetailsModelList != null)
+                        {
+                            int count = 1;
+                            if (Model.GRNDetailsModelList != null || Model.GRNDetailsModelList.Count > 0)
+                            {
+                                foreach (var item in Model.GRNDetailsModelList)
+                                {
+                                    <tr>
+                                        <td data-title="Si.No">@count</td>
+                                        <td data-title="GrnNo">@item.GrnNo</td>
+                                        <td data-title="DC_No">@item.DC_No</td>
+                                        <td data-title="GateEntryNo">@item.GateEntryNo</td>
+                                        <td data-title="GrnDate">@item.GrnDate</td>
+                                        <td data-title="INVoiceNo">@item.INVoiceNo</td>
+
+
+                                        <td data-title="Action">
+                                            <span class="action-icons">
+
+                                                <a><img onclick="Edit('@item.GrnID')" src="~/Scripts/Jobwork/images/edit.png"></a>
+                                                <img onclick="Delete('@item.GrnID')" src="~/Scripts/Jobwork/images/delete.png">
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    count++;
+                                }
+                            }
+                        }
+
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div id="JobWorkTransactionPartial">
+
+</div>
+
+
+

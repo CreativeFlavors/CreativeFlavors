@@ -1,0 +1,737 @@
+﻿@{
+    ViewBag.Title = "FloorReturnMaterial";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+}
+@using System.Web.Optimization;
+@Scripts.Render("~/bundles/MultiplIssue")
+@Styles.Render("~/Content/MMS/css")
+<script>
+   
+    $("#MaterialMasterId").combobox();
+    $("#IssueNo").combobox();
+    $(function () {
+        $("#MaterialMasterId").combobox();
+    });
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $('#EditColorPartial').hide();
+    });
+    function Edit_Click(arg) {
+        $('#list-amended-material_ >tbody').find('tr#' + arg + '').remove();
+        $.ajax({
+            url: '/FloorReturnMaterial/GetFloorReturnMaterial/',
+            type: "GET",
+            dataType: "JSON",
+            data: { FloorReturnMaterialDetailsId: arg },
+            success: function (cities) {
+                $('.loader-overlay').fadeOut('fast');
+                if (cities.floormaterials.FloorReturnMaterialDetailsId != 0) {
+                    if (cities.floormaterials.LotNo == null || cities.floormaterials.LotNo == "") {
+                        $('#LotNo').val("0");
+                    }
+                    else {
+                        $('#LotNo').val(cities.floormaterials.LotNo);
+                    }
+                    $('#floormaterialdetailsid_row').val(cities.floormaterials.FloorReturnMaterialDetailsId);
+
+                    $('#MaterialMasterId').val(cities.floormaterials.MaterialMasterId);
+                    $("#MaterialMasterId").combobox('destroy');
+                    $("#MaterialMasterId").combobox();
+
+                    $('#Style').val(cities.floormaterials.Style);
+                    $('#StoreMasterId').val(cities.floormaterials.StoreMasterId);
+                    $('#StoreName').val(cities.floormaterials.StoreName);
+                    $('#GroupMasterId').val(cities.floormaterials.GroupMasterId);
+                    $('#GroupName').val(cities.floormaterials.GroupName);
+                    $('#IoNo').val(cities.floormaterials.IoNo);
+                    $('#Uom').val(cities.floormaterials.Uom);
+                    $('#LongUnitName').val(cities.floormaterials.LongUnitName);
+                    $('#IssuedQuantity').val(cities.floormaterials.IssuedQuantity);
+                    $('#ReturnQuantity').val(cities.floormaterials.ReturnQuantity);
+                    $('#Category').val(cities.floormaterials.Category);
+                    $('#Piecies').val(cities.floormaterials.Piecies);
+                    $('#Rate').val(cities.floormaterials.Rate);
+                    $('#MaterialType').val(cities.floormaterials.MaterialType);
+                    //  var j=Number(Is_IssueNo)
+                    if(cities.floormaterials.Is_IssueNo == true)
+                    {
+                        $('#Is_IssueNo').val(1);
+                        $('#sizeRangeTable').find('tr:nth-child(2)').hide();
+                    }
+                    else
+                    {
+                        $('#Is_IssueNo').val(0);
+                    }
+                    $('#FloorReturnMaterialId').val(cities.floormaterials.FloorReturnMaterialId);
+                    $('#savebtn').hide();
+                    $('#updatebtn').css('display', 'inline-block');
+                    $('#sizeRangeTable tbody tr').each(function () {
+                        $(this).find("td:not(:first)").remove();
+
+                    });
+                    var count = 1;
+
+                    for (var i = 0; i <= cities.SizeRangeList.length - 1; i++) {
+                        $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + cities.SizeRangeList[i].SizeRange + ' </td> ');
+                        $('#sizeRangeTable tbody tr:nth-child(2)').append('<td class="SizeRangeRefQty" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + cities.SizeRangeList[i].Quantity + ' </td> ');
+                        $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='SizeReturnedQty' onchange='CalculateTotal(this," + cities.SizeRangeList[i].Quantity + ")'   id='Qty" + i + "' value='" + cities.SizeRangeList[i].ReturnedQuantity + "' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                        $('#sizeRangeTable tbody tr:last').append('<td class="SizeRangeId" style="visibility:hidden;;background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + cities.SizeRangeList[i].SizeRangeFloorMaterialId + ' </td> ');
+
+
+                        count++;
+                    }
+                }
+
+            }
+        });
+    }
+    function EditClick(arg) {
+        $('#list-amended-material_ >tbody').find('tr#' + arg + '').remove();
+
+        $.ajax({
+            url: '/FloorReturnMaterial/GetFloorReturnMaterial/',
+            type: "GET",
+            dataType: "JSON",
+            data: { FloorReturnMaterialDetailsId: arg },
+            success: function (cities) {
+                $('.loader-overlay').fadeOut('fast');
+                if (cities.floormaterials.FloorReturnMaterialDetailsId != 0) {
+                    if (cities.floormaterials.LotNo == null || cities.floormaterials.LotNo == "") {
+                        $('#LotNo').val("0");
+                    }
+                    else {
+                        $('#LotNo').val(cities.floormaterials.LotNo);
+                    }
+                    $('#floormaterialdetailsid_row').val(cities.floormaterials.FloorReturnMaterialDetailsId);
+
+                    $('#MaterialMasterId').val(cities.floormaterials.MaterialMasterId);
+                    $("#MaterialMasterId").combobox('destroy');
+                    $("#MaterialMasterId").combobox();
+                    $('#Style').val(cities.floormaterials.Style);
+                    $('#StoreMasterId').val(cities.floormaterials.StoreMasterId);
+                    $('#StoreName').val(cities.floormaterials.StoreName);
+                    $('#GroupMasterId').val(cities.floormaterials.GroupMasterId);
+                    $('#GroupName').val(cities.floormaterials.GroupName);
+                    $('#IoNo').val(cities.floormaterials.IoNo);
+                    $('#Uom').val(cities.floormaterials.Uom);
+                    $('#LongUnitName').val(cities.floormaterials.LongUnitName);
+                    $('#IssuedQuantity').val(cities.floormaterials.IssuedQuantity);
+                    $('#ReturnQuantity').val(cities.floormaterials.ReturnQuantity);
+                    $('#Category').val(cities.floormaterials.Category);
+                    $('#Piecies').val(cities.floormaterials.Piecies);
+                    $('#MaterialType').val(cities.floormaterials.MaterialType);
+                    if(cities.floormaterials.Is_IssueNo == true)
+                    {
+                        $('#Is_IssueNo').val(1);
+                        $('#sizeRangeTable').find('tr:nth-child(2)').hide();
+                    }
+                    else
+                    {
+                        $('#Is_IssueNo').val(0);
+                    }
+                    $('#Rate').val(cities.floormaterials.Rate);
+                    $('#FloorReturnMaterialId').val(cities.floormaterials.FloorReturnMaterialId);
+                    $('#savebtn').hide();
+                    $('#updatebtn').css('display', 'inline-block');
+                    $('#sizeRangeTable tbody tr').each(function () {
+                        $(this).find("td:not(:first)").remove();
+
+                    });
+                    var count = 1;
+
+                    for (var i = 0; i <= cities.SizeRangeList.length - 1; i++) {
+                        $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + cities.SizeRangeList[i].SizeRange + ' </td> ');
+                        $('#sizeRangeTable tbody tr:nth-child(2)').append('<td class="SizeRangeRefQty" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + cities.SizeRangeList[i].Quantity + ' </td> ');
+                        $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='SizeReturnedQty'   onchange='CalculateTotal(this," + cities.SizeRangeList[i].Quantity + ")'  id='Qty" + i + "' value='" + cities.SizeRangeList[i].ReturnedQuantity + "' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                        $('#sizeRangeTable tbody tr:last').append('<td class="SizeRangeId" style="visibility:hidden;;background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + cities.SizeRangeList[i].SizeRangeFloorMaterialId + ' </td> ');
+
+
+                        count++;
+                    }
+                }
+
+            }
+        });
+    }
+    function Save() {
+        
+        var size = "";
+        $('#sizeRangeTable tbody tr').find('.SizeRangeRefValue').each(function () {
+            size += $(this).text() + ",";
+        });
+        size = size.slice(0, -1);
+        var Qty_ = "";
+        $('#sizeRangeTable tbody tr').find('.SizeRangeRefQty').each(function () {
+            Qty_ += $(this).text() + ",";
+        });
+        Qty_ = Qty_.slice(0, -1);
+        var ReturnedQty_ = "";
+        var add = 0;
+        $('#sizeRangeTable tbody tr').find('.SizeReturnedQty').each(function () {
+            ReturnedQty_ += $(this).val() + ",";
+            add += Number($(this).val());
+        });
+        if (add != 0) {
+            $('#ReturnQuantity').val(add);
+        }
+        ReturnedQty_ = ReturnedQty_.slice(0, -1);
+        var rq = $('#ReturnQuantity').val();
+        var iq = $('#IssuedQuantity').val();
+        if ($("#Is_IssueNo").val() != 1)
+        {
+            if (parseFloat(rq) > parseFloat(iq)) {
+                alert("Please enter received quantity less than issued");
+                return false;
+            }
+        }
+        if ($('#FrmNo').val() == "") {
+            alert("Please Enter FrmNo.")
+            $('#FrmNo').css('border-color', 'red');
+            $('#FrmNo').focus();
+            return false;
+        }
+        else {
+            $('#FrmNo').css('border-color', '');
+        }
+        if ($('#FloorDate').val() == "") {
+            alert("Please Enter Date.")
+            $('#FloorDate').css('border-color', 'red');
+            $('#FloorDate').focus();
+            return false;
+        }
+        else {
+            $('#FloorDate').css('border-color', '');
+        }
+        if ($('#StoreMasterId').val() == "") {
+            alert("Please Select Store.")
+            $('#StoreMasterId').css('border-color', 'red');
+            $('#StoreMasterId').focus();
+            return false;
+        }
+        else {
+            $('#StoreMasterId').css('border-color', '');
+        }
+        if ($('#GroupMasterId').val() == "") {
+            alert("Please Select Group.")
+            $('#GroupMasterId').css('border-color', 'red');
+            $('#GroupMasterId').focus();
+            return false;
+        }
+        else {
+            $('#GroupMasterId').css('border-color', '');
+        }
+        if ($('#MaterialMasterId').val() == "") {
+            alert("Please Select Material.")
+            $('#MaterialMasterId').css('border-color', 'red');
+            $('#MaterialMasterId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialMasterId').css('border-color', '');
+        }
+        if ($('#IoNo').val() == "") {
+            alert("Please Select IONO.")
+            $('#IoNo').css('border-color', 'red');
+            $('#IoNo').focus();
+            return false;
+        }
+        else {
+            $('#IoNo').css('border-color', '');
+        }
+        if ($('#Uom').val() == "") {
+            alert("Please Select Uom.")
+            $('#Uom').css('border-color', 'red');
+            $('#Uom').focus();
+            return false;
+        }
+        else {
+            $('#Uom').css('border-color', '');
+        }
+ 
+        if ($('#ReturnQuantity').val() == "") {
+            alert("Please Enter Quantity.")
+            $('#ReturnQuantity').css('border-color', 'red');
+            $('#ReturnQuantity').focus();
+            return false;
+        }
+        else {
+            $('#ReturnQuantity').css('border-color', '');
+        }
+        var username = @HttpContext.Current.Session["UserType"].ToString();
+        if ((username == 3) ||  (username == 4))
+        {
+
+            if ($('#Style').val() == "") {
+                alert("Please Enter Style.")
+                $('#Style').css('border-color', 'red');
+                $('#Style').focus();
+                return false;
+            }
+            else {
+                $('#Style').css('border-color', '');
+            }
+            if ($('#Rate').val() == "") {
+                alert("Please Enter Rate.")
+                $('#Rate').css('border-color', 'red');
+                $('#Rate').focus();
+                return false;
+            }
+            else {
+                $('#Rate').css('border-color', '');
+            }
+            if ($('#LotNo').val() == "") {
+                alert("Please Enter LotNo.")
+                $('#LotNo').css('border-color', 'red');
+                $('#LotNo').focus();
+                return false;
+            }
+            else {
+                $('#LotNo').css('border-color', '');
+            }
+            if ($('#MaterialType').val() == "") {
+                alert("Please Enter LotNo.")
+                $('#MaterialType').css('border-color', 'red');
+                $('#MaterialType').focus();
+                return false;
+            }
+            else {
+                $('#MaterialType').css('border-color', '');
+            }
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/FloorReturnMaterial/FloorReturnMaterial/',
+            data: {
+                FloorReturnMaterialId: $('#FloorReturnMaterialId').val(),
+                FrmNo: $('#FrmNo').val(),
+                FloorDate: $('#FloorDate').val(),
+                Remarks: $('#Remarks').val(),
+                StoreMasterId: $('#StoreMasterId').val(),
+                GroupMasterId: $('#GroupMasterId').val(),
+                IssueNo: $('#IssueNo').val(),
+                MaterialMasterId: $('#MaterialMasterId').val(),
+                IoNo: $('#IoNo').val(),
+                Uom: $('#Uom').val(),
+                Style: $('#Style').val(),
+                IssuedQuantity: $('#IssuedQuantity').val(),
+                ReturnQuantity: $('#ReturnQuantity').val(),
+                Category: $('#Category').val(),
+                Piecies: $('#Piecies').val(),
+                Rate: $('#Rate').val(),
+                LotNo: $('#LotNo').val(),
+                Is_IssueNo: $('#Is_IssueNo').val() == 1 ? true : false,
+                Size: size,
+                Quantity: Qty_,
+                ReturnTotalQuantity: ReturnedQty_,
+                MaterialType: $('#MaterialType').val(),
+            },
+            success: function (data) {
+                $('#FloorReturnMaterialId').val('');
+                $('#IoNo').val('');
+                $('#Style').val('');
+                $('#Rate').val('');
+                $('#Quantity').val('');
+                $('#LotNo').val('');
+                $('#IssuedQuantity').val('');
+                $('#ReturnQuantity').val('');
+                $('#Category').val('');
+                $('#Piecies').val('');
+                $('#StoreMasterId').val("");
+                $('#StoreName').val("");
+                $('#GroupMasterId').val("");
+                $("#materialName .custom-combobox input").val('');
+                $('#GroupName').val("");
+                $('#Uom').val("");
+                $('#LongUnitName').val("");
+                $('#MaterialType').val("")
+                rowCount = $('#list-amended-material_ tr').length;
+                $('#sizeRangeTable tbody tr').each(function () {
+                    $(this).find("td:not(:first)").remove();
+
+                });
+                $("#list-amended-material_ tbody").html("");
+                var row = "";
+                $.each(data.floormaterials, function (i, item) {
+                    
+                    row += "<tr id=" + item.FloorReturnMaterialDetailsId + "><td><input type='button'  value='Remove' onclick='Delete(" + item.FloorReturnMaterialDetailsId + ")' class='Delete' />" + "</td>"
+                    row += "<td><input type='button' name='Edit' id='EditRow' value='Edit'  onclick='EditClick(" + item.FloorReturnMaterialDetailsId + ")' class='Edit' />" + "</td>"
+                    row += "<td id='StoreName" + rowCount + "' class='issueTypecls'>" + item.StoreName + "</td>"
+                    row += "<td id='GroupName" + rowCount + "' class='General_IssueSlipNo'>" + item.GroupName + "</td>"
+                    row += "<td id='MStyle" + rowCount + "' class='InternalValue_general'>" + item.Style + "</td>"
+                    row += "<td id='MaterialName" + rowCount + "' class='DirectIssue_Style_general'>" + item.MaterialName + "</td>"
+                    row += "<td id='CategoryName" + rowCount + "' class='DirectIssue_Style_general'>" + item.Category + "</td>"
+                    row += "<td id='RQuantity" + rowCount + "' class='NoOfSets_general'>" + item.ReturnQuantity + "</td>"
+                    row += "<td id='IQuantity" + rowCount + "' class='groupGeneral_'>" + item.IssuedQuantity + "</td>"
+                    row += "<td id='MRate" + rowCount + "'  class='categoryGeneral_'>" + item.Rate + "</td>"
+                    row += "<td id='MaterialType_" + rowCount + "'  class='MaterialType_general'>" + item.MaterialType + "</td>"
+                });
+                $('#list-amended-material_ tbody').append(row);
+                $('#FrmNo').val(data.floordetails.FrmNo);
+                $('#FloorReturnMaterialId').val(data.floordetails.FloorReturnMaterialId);
+                $('#IssueNo').val(data.floordetails.IssueNo);
+                return false;
+            },
+            error: function (ex) {
+                alert('Already Exist in the Database.');
+            }
+        });
+    }
+
+    function ToJavaScriptDate(value) {
+        
+        var pattern = /Date\(([^)]+)\)/;
+        var results = pattern.exec(value);
+        var dt = new Date(parseFloat(results[1]));
+        return (dt.getDate() + "/" + dt.getMonth() + 1) + "/" + dt.getFullYear();
+    }
+    function Update() {
+        
+        var sizeid = "";
+        $('#sizeRangeTable tbody tr').find('.SizeRangeId').each(function () {
+            sizeid += $(this).text() + ",";
+        });
+        sizeid = sizeid.slice(0, -1);
+
+        var size = "";
+        $('#sizeRangeTable tbody tr').find('.SizeRangeRefValue').each(function () {
+
+            size += $(this).text() + ",";
+
+        });
+        size = size.slice(0, -1);
+        var Qty_ = "";
+        $('#sizeRangeTable tbody tr').find('.SizeRangeRefQty').each(function () {
+            Qty_ += $(this).text() + ",";
+
+        });
+        Qty_ = Qty_.slice(0, -1);
+        var ReturnedQty_ = "";
+        var add = 0;
+        $('#sizeRangeTable tbody tr').find('.SizeReturnedQty').each(function () {
+            ReturnedQty_ += $(this).val() + ",";
+            add += Number($(this).val());
+        });
+        if (add != 0) {
+            $('#ReturnQuantity').val(add);
+        }
+
+        ReturnedQty_ = ReturnedQty_.slice(0, -1);
+
+        var rq = $('#ReturnQuantity').val();
+        var iq = $('#IssuedQuantity').val();
+        if ( $('#IssueNo').val() != "")
+        {
+            if (parseFloat(rq) > parseFloat(iq)) {
+                alert("Please enter received quantity less than issued");
+                return false;
+            }
+        }
+        if ($('#FrmNo').val() == "") {
+            alert("Please Enter FrmNo.")
+            $('#FrmNo').css('border-color', 'red');
+            $('#FrmNo').focus();
+            return false;
+        }
+        else {
+            $('#FrmNo').css('border-color', '');
+        }
+        if ($('#FloorDate').val() == "") {
+            alert("Please Enter Date.")
+            $('#FloorDate').css('border-color', 'red');
+            $('#FloorDate').focus();
+            return false;
+        }
+        else {
+            $('#FloorDate').css('border-color', '');
+        }
+        if ($('#StoreMasterId').val() == "") {
+            alert("Please Select Store.")
+            $('#StoreMasterId').css('border-color', 'red');
+            $('#StoreMasterId').focus();
+            return false;
+        }
+        else {
+            $('#StoreMasterId').css('border-color', '');
+        }
+        if ($('#GroupMasterId').val() == "") {
+            alert("Please Select Group.")
+            $('#GroupMasterId').css('border-color', 'red');
+            $('#GroupMasterId').focus();
+            return false;
+        }
+        else {
+            $('#GroupMasterId').css('border-color', '');
+        }
+       
+        if ($('#MaterialMasterId').val() == "") {
+            alert("Please Select Material.")
+            $('#MaterialMasterId').css('border-color', 'red');
+            $('#MaterialMasterId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialMasterId').css('border-color', '');
+        }
+        if ($('#IoNo').val() == "") {
+            alert("Please Select IONO.")
+            $('#IoNo').css('border-color', 'red');
+            $('#IoNo').focus();
+            return false;
+        }
+        else {
+            $('#IoNo').css('border-color', '');
+        }
+        if ($('#Uom').val() == "") {
+            alert("Please Select Uom.")
+            $('#Uom').css('border-color', 'red');
+            $('#Uom').focus();
+            return false;
+        }
+        else {
+            $('#Uom').css('border-color', '');
+        }
+    
+        if ($('#ReturnQuantity').val() == "") {
+            alert("Please Enter Quantity.")
+            $('#ReturnQuantity').css('border-color', 'red');
+            $('#ReturnQuantity').focus();
+            return false;
+        }
+        else {
+            $('#ReturnQuantity').css('border-color', '');
+        }
+   
+        var username = @HttpContext.Current.Session["UserType"].ToString();
+        if ((username == 3) ||  (username == 4))
+        {
+            if ($('#Style').val() == "") {
+                alert("Please Enter Style.")
+                $('#Style').css('border-color', 'red');
+                $('#Style').focus();
+                return false;
+            }
+            else {
+                $('#Style').css('border-color', '');
+            }
+            if ($('#Rate').val() == "") {
+                alert("Please Enter Rate.")
+                $('#Rate').css('border-color', 'red');
+                $('#Rate').focus();
+                return false;
+            }
+            else {
+                $('#Rate').css('border-color', '');
+            }
+            if ($('#LotNo').val() == "") {
+                alert("Please Enter LotNo.")
+                $('#LotNo').css('border-color', 'red');
+                $('#LotNo').focus();
+                return false;
+            }
+            else {
+                $('#LotNo').css('border-color', '');
+            }
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/FloorReturnMaterial/Update/',
+            data: {
+                FloorReturnMaterialDetailsId: $('#floormaterialdetailsid_row').val(),
+                FloorReturnMaterialId: $('#FloorReturnMaterialId').val(),
+                FrmNo: $('#FrmNo').val(),
+                FloorDate: $('#FloorDate').val(),
+                Remarks: $('#Remarks').val(),
+                StoreMasterId: $('#StoreMasterId').val(),
+                GroupMasterId: $('#GroupMasterId').val(),
+                IssueNo: $('#IssueNo').val(),
+                MaterialMasterId: $('#MaterialMasterId').val(),
+                IoNo: $('#IoNo').val(),
+                Uom: $('#Uom').val(),
+                Style: $('#Style').val(),
+                IssuedQuantity: $('#IssuedQuantity').val(),
+                ReturnQuantity: $('#ReturnQuantity').val(),
+                Category: $('#Category').val(),
+                Piecies: $('#Piecies').val(),
+                Rate: $('#Rate').val(),
+                LotNo: $('#LotNo').val(),
+                Size: size,
+                Quantity: Qty_,
+                ReturnTotalQuantity: ReturnedQty_,
+                SizeId: sizeid,
+                MaterialType: $('#MaterialType').val(),
+            },
+            success: function (data) {
+                if (data.result == "Success") {
+                    $('#savebtn').css('display', 'inline-block');
+                    $('#updatebtn').hide();
+                    alert("Updated Successfully");
+                }
+                $('#FloorReturnMaterialId').val('');
+                $('#IoNo').val('');
+                $('#Style').val('');
+                $('#Rate').val('');
+                $('#Quantity').val('');
+                $('#LotNo').val('');
+                $('#IssuedQuantity').val('');
+                $('#ReturnQuantity').val('');
+                $('#Category').val('');
+                $('#Piecies').val('');
+                $('#StoreMasterId').val("");
+                $('#StoreName').val("");
+                $('#GroupMasterId').val("");
+                $("#materialName .custom-combobox input").val('');
+                $('#GroupName').val("");
+                $('#Uom').val("");
+                $('#LongUnitName').val("");
+                $('#MaterialType').val('');
+                rowCount = $('#list-amended-material_ tr').length;
+                $('#sizeRangeTable tbody tr').each(function () {
+                    $(this).find("td:not(:first)").remove();
+
+                });
+                $("#list-amended-material_ tbody").html("");
+                var row = "";
+                $.each(data.floormaterials, function (i, item) {
+                    $("#RemoveHead").css("display", "block");
+                    $("#EditHead").css("display", "block");
+                    row += "<tr id=" + item.FloorReturnMaterialDetailsId + "><td><input type='button' value='Remove' onclick='Delete(" + item.FloorReturnMaterialDetailsId + ")' class='Delete' />" + "</td>"
+                    row += "<td><input type='button' name='Edit' id='EditRow' value='Edit' onclick='EditClick(" + item.FloorReturnMaterialDetailsId + ")' class='Edit' />" + "</td>"
+                    row += "<td id='StoreName" + rowCount + "' class='issueTypecls'>" + item.StoreName + "</td>"
+                    row += "<td id='GroupName" + rowCount + "' class='General_IssueSlipNo'>" + item.GroupName + "</td>"
+                    row += "<td id='MStyle" + rowCount + "' class='InternalValue_general'>" + item.Style + "</td>"
+                    row += "<td id='MaterialName" + rowCount + "' class='DirectIssue_Style_general'>" + item.MaterialName + "</td>"
+                    row += "<td id='CategoryName" + rowCount + "' class='DirectIssue_Style_general'>" + item.Category + "</td>"
+                    row += "<td id='RQuantity" + rowCount + "' class='NoOfSets_general'>" + item.ReturnQuantity + "</td>"
+                    row += "<td id='IQuantity" + rowCount + "' class='groupGeneral_'>" + item.IssuedQuantity + "</td>"
+                    row += "<td id='MRate" + rowCount + "'  class='categoryGeneral_'>" + item.Rate + "</td>"
+                    row += "<td id='MaterialType_" + rowCount + "'  class='MaterialType_general'>" + item.MaterialType + "</td>"
+                });
+                $('#list-amended-material_ tbody').append(row);
+                //var datevalue = ToJavaScriptDate(data.floordetails.FloorDate);
+                $('#FrmNo').val(data.floordetails.FrmNo);
+                //$('#FloorReturnMaterialId').val(data.floordetails.FloorReturnMaterialId);
+                //  $('#FloorDate').val(datevalue);
+                $('#IssueNo').val(data.floordetails.IssueNo);
+                return false;
+            },
+            error: function (ex) {
+                alert('Already Exist in the Database.');
+            }
+
+        })
+
+
+
+    }
+
+    function DeleteMaterial(arg, arg2) {
+        $('#list-amended-material tr#' + arg + '').remove();
+        $.ajax({
+            url: '/FloorReturnMaterial/FloorMaterialDelete/',
+            type: "GET",
+            dataType: "JSON",
+            data: { FloorReturnMaterialDetailsId: arg, FloorReturnMaterialId: arg2 },
+            success: function (data) {
+                if (data.status == true) {
+                    alert("Deleted Successfully");
+                }
+                $('#FrmNo').val('');
+                $('#FloorReturnMaterialId').val('');
+                $('#FloorDate').val('');
+                $('#IssueNo').val('');
+                $('#IoNo').val('');
+
+
+                $('#Style').val('');
+                $('#Rate').val('');
+                $('#Quantity').val('');
+                $('#LotNo').val('');
+
+                $('#IssuedQuantity').val('');
+                $('#ReturnQuantity').val('');
+                $('#Category').val('');
+                $('#Piecies').val('');
+                $('#StoreMasterId').val("");
+                $('#StoreName').val("");
+                $('#GroupMasterId').val("");
+                $('#GroupName').val("");
+                $('#Uom').val("");
+                $('#LongUnitName').val("");
+
+                rowCount = $('#list-amended-material_ tr').length;
+
+                $('#sizeRangeTable tbody tr').each(function () {
+                    $(this).find("td:not(:first)").remove();
+
+                });
+                $("#list-amended-material_ tbody").html("");
+                var row = "";
+                $.each(data.floormaterials, function (i, item) {
+
+
+                    $("#RemoveHead").css("display", "block");
+                    $("#EditHead").css("display", "block");
+
+                    row += "<tr id=" + item.FloorReturnMaterialDetailsId + "><td><input type='button' value='Remove' onclick='Delete(" + item.FloorReturnMaterialDetailsId + ")' class='' />" + "</td>"
+                    row += "<td><input type='button' name='Edit' id='EditRow' value='Edit' onclick='EditClick(" + item.FloorReturnMaterialDetailsId + ")' class='' />" + "</td>"
+                    row += "<td id='StoreName" + rowCount + "' class='issueTypecls'>" + item.StoreName + "</td>"
+                    row += "<td id='GroupName" + rowCount + "' class='General_IssueSlipNo'>" + item.GroupName + "</td>"
+                    row += "<td id='MStyle" + rowCount + "' class='InternalValue_general'>" + item.Style + "</td>"
+                    row += "<td id='MaterialName" + rowCount + "' class='DirectIssue_Style_general'>" + item.MaterialName + "</td>"
+                    row += "<td id='CategoryName" + rowCount + "' class='DirectIssue_Style_general'>" + item.Category + "</td>"
+                    row += "<td id='RQuantity" + rowCount + "' class='NoOfSets_general'>" + item.ReturnQuantity + "</td>"
+                    row += "<td id='IQuantity" + rowCount + "' class='groupGeneral_'>" + item.IssuedQuantity + "</td>"
+                    row += "<td id='MRate" + rowCount + "'  class='categoryGeneral_'>" + item.Rate + "</td>"
+                    row += "<td id='MaterialType_" + rowCount + "'  class='MaterialType_general'>" + item.MaterialType + "</td>"
+
+
+                });
+                $('#list-amended-material_ tbody').append(row);
+
+                //append values
+
+
+                $('#FrmNo').val(data.floordetails.FrmNo);
+                $('#FloorReturnMaterialId').val(data.floordetails.FloorReturnMaterialId);
+                $('#IssueNo').val(data.floordetails.IssueNo);
+                $("#MaterialMasterId").html("");
+                $.each(data.material_list, function (i, city) {
+                    $("#MaterialMasterId").append(
+                        $('<option></option>').val(city.Value).html(city.Text));
+
+                });
+
+                return false;
+
+            }
+
+        });
+    }
+
+</script>
+
+<h2 class="content-title">Floor Return Material</h2>
+<div style="width: 100%; float: left;">
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("FloorReturnMaterialGrid", "FloorReturnMaterial")
+    </div>
+</div>
+

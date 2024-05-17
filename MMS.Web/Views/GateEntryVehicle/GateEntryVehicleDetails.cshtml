@@ -1,0 +1,505 @@
+﻿@model MMS.Web.Models.GateEntryModel.GateEntryVehicle
+@using MMS.Repository.Managers
+@using MMS.Core.Entities
+@{
+    ViewBag.Title = "GateEntryVehicleDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .inwardDcNo {
+        width: 117%;
+    }
+   #purpose_passenger .fs-wrap.multiple.fs-default{
+       width:100% !important;
+   }
+    #InwardDcDate {
+        float: right;
+    }
+    #btn2listbox,#btnlistbox{
+    position: relative;
+    top: -3px;
+    }
+</style>
+<div class="right-form-section clearfix">
+    <form class="form-inline" role="form">
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#step1">Gate Entry Vehicle</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="step1" class="tab-pane fade in active">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label">Gate Entry No</label>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6 ">
+                                        @Html.HiddenFor(x => x.VehicleEntryId)
+                                        @Html.TextBoxFor(m => m.GateEntryNo, new { @class = "form-control text-field", @readonly = "true" })
+                                    </div>
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label">Entry Date and Time</label>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6">
+                                        @if (Model != null && Model.VehicleEntryId != 0 && Model.EntryDateTime != null)
+                                        {
+                                            var from = Model.EntryDateTime.Value.ToString("dd/MM/yyyy HH:mm:ss");
+                                            @Html.TextBoxFor(m => from, new { @class = "form-control text-field", @id = "EntryDateTime", @value = from, @readonly = "true" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(m => m.EntryDate, new { @Value = System.DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), @class = "form-control text-field", @readonly = "true" })
+                                        }
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label">Vehicle Name & No</label>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6 ">
+                                        @Html.DropDownListFor(m => m.VehicleId, MMS.Web.ExtensionMethod.HtmlHelper.GetVehicleName(), new { @class = "select-style text-field" })
+                                    </div>
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label">Driver Name</label>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6">
+                                        @Html.TextBoxFor(m => m.DriverName, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding">
+                            <div class="field-section" id="purpose_passenger">
+                                <div class="form-group">
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label">Purpose</label>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6 ">
+                                        @Html.DropDownListFor(m => m.Purpose, new List<SelectListItem>
+                                            {
+                                        new SelectListItem{ Text="Please Select", Value = "0"  },
+                                         new SelectListItem{ Text="Official", Value = "1" },
+                                         new SelectListItem{ Text="Personal", Value = "2" }
+                                         }, new { @class = "select-style text-field" })
+                                    </div>
+
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label">Passengers</label>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6">
+                                        @if (Model != null && Model.VehicleEntryId != 0)
+                                        {
+                                            @Html.ListBoxFor(m => m.selectedempid, new MultiSelectList(MMS.Web.ExtensionMethod.HtmlHelper.GateEntryEmpNameWithCode(), "value",
+                                  "text"), new { Multiple = "multiple", @class = "multipleOrder_ " })
+                                        }
+                                        else
+                                        {
+                                            @Html.ListBoxFor(m => m.selectedempid, new MultiSelectList(MMS.Web.ExtensionMethod.HtmlHelper.GateEntryEmpNameWithCode(), "value",
+                                  "text"), new { Multiple = "multiple", @class = "multipleOrder_" })
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+
+
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label">Outward DC No</label>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6">
+                                        @if (Model != null && Model.VehicleEntryId != 0)
+                                        {
+                                            @Html.ListBoxFor(m => m.selectedid, new MultiSelectList(MMS.Web.ExtensionMethod.HtmlHelper.GetGateEntryOutwardDCNO(), "value",
+                                "text"), new { Multiple = "multiple", @class = "multipleOrder_" })
+                                        }
+                                        else
+                                        {
+                                            @Html.ListBoxFor(m => m.selectedid, new MultiSelectList(MMS.Web.ExtensionMethod.HtmlHelper.GetGateEntryOutwardDCNO(), "value",
+                                "text"), new { Multiple = "multiple", @class = "multipleOrder_" })
+                                        }
+                                        <input type="button" id="btnlistbox" />
+                                        @*@Html.DropDownListFor(m => m.DCNo, MMS.Web.ExtensionMethod.HtmlHelper.GetGateEntryOutwardDCNO(), new { @class = "select-style text-field" })*@
+                                    </div>
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label">Material Taken</label>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6 ">
+                                        @Html.DropDownListFor(m => m.MaterialTaken, MMS.Web.ExtensionMethod.HtmlHelper.GEMaterialName(), new { @class = "select-style text-field" })
+                                        @*@Html.DropDownListFor(m => m.MaterialTaken, Model.OutwardMaterial, new { @class = "form-control"})*@
+
+                                        @*@if (Model != null && Model.VehicleEntryId != 0)
+                                                  {
+                                                      @Html.ListBoxFor(m => m.selectedid, new MultiSelectList(MMS.Web.ExtensionMethod.HtmlHelper.MaterialName(), "value",
+                                            "text"), new { Multiple = "multiple", @class = "multipleOrder_" })
+                                                  }
+                                                  else
+                                                  {
+                                                      @Html.ListBoxFor(m => m.selectedid, new MultiSelectList(MMS.Web.ExtensionMethod.HtmlHelper.MaterialName(), "value",
+                                            "text"), new { Multiple = "multiple", @class = "multipleOrder_" })
+                                                  }*@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label">Starting Km</label>
+                                    </div>
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        @Html.TextBoxFor(m => m.StartingKm, new { @class = "form-control text-field" })
+                                    </div>
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label">Closing Km</label>
+                                    </div>
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        @if (Model != null && Model.VehicleEntryId != 0)
+                                        {
+                                            @Html.TextBoxFor(m => m.ClosingKm, new { @class = "form-control text-field" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(m => m.ClosingKm, new { @class = "form-control text-field", @readonly = "true" })
+                                        }
+                                    </div>
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label"> Km Used</label>
+                                    </div>
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        @Html.TextBoxFor(m => m.KmUsed, new { @class = "form-control text-field", @readonly = "true" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label">Return Date Time</label>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6 ">
+                                        @Html.TextBoxFor(m => m.ReturnDate, new { @class = "form-control text-field", @readonly = "true" })
+                                    </div>
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label">Destination</label>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6">
+                                        @Html.TextBoxFor(m => m.Destination, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label">Purpose of Travel</label>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6 ">
+                                        @Html.TextBoxFor(m => m.PurposeofTravel, new { @class = "form-control text-field" })
+                                    </div>
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label">Remarks</label>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6">
+                                        @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label">Inward DcNo</label>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6">
+                                        @*@Html.DropDownListFor(m => m.InwardDcNo, MMS.Web.ExtensionMethod.HtmlHelper.GetGateEntryInwardDCNO(), new { @class = "select-style text-field inwardDcNo" })*@
+                                        @if (Model != null && Model.VehicleEntryId != 0)
+                                        {
+                                            @Html.ListBoxFor(m => m.selectedInwardDcid, new MultiSelectList(MMS.Web.ExtensionMethod.HtmlHelper.GetGateEntryInwardDCNO(), "value",
+                                  "text"), new { Multiple = "multiple", @class = "multipleOrder_" })
+                                        }
+                                        else
+                                        {
+                                            @Html.ListBoxFor(m => m.selectedInwardDcid, new MultiSelectList(MMS.Web.ExtensionMethod.HtmlHelper.GetGateEntryInwardDCNO(), "value",
+                                  "text"), new { Multiple = "multiple", @class = "multipleOrder_" })
+                                        }
+                                        <input type="button" id="btn2listbox" />
+                                    </div>
+                                    @*<div class="col-md-2 col-sm-2 col-lg-2 col-xs-3 ">
+                                            @Html.TextBoxFor(m => m.InwardDcDate, new { @class = "form-control text-field inwardDcNo", @readonly = "true" })
+                                        </div>*@
+                                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-6">
+                                        <label for="text" class="form-label">Inward Material</label>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6 ">
+                                        @*@Html.TextBoxFor(m => m.InwardMaterial, new { @class = "form-control text-field", @readonly = "true" })*@
+                                        @Html.DropDownListFor(m => m.InwardMaterial, MMS.Web.ExtensionMethod.HtmlHelper.GEMaterialName(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                    <hr>
+                </div>
+
+            </div>
+        </div>
+        <div class="form-footer">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                    <input type="button" onclick="location.href='@Url.Action("GateEntryVehicleGrid", "GateEntryVehicle")'" class="btn btn-default btn-style" title="Back" value="Back">
+                    @if (Model != null && Model.VehicleEntryId != 0)
+                    {
+                        <input type="button" onclick="Update()" class="btn btn-default btn-style" id="GateEntryId" title="Update" value="Update">
+                    }
+                    else
+                    {
+                        <input type="button" onclick="Save()" class="btn btn-default btn-style" title="Save" value="Save and Notify">
+                    }
+                    <button type="submit" class="btn btn-default btn-style">Clear</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<link href="~/Scripts/MultiSelectCheckBoxWithSearch/fSelect.css" rel="stylesheet" />
+<script src="~/Scripts/MultiSelectCheckBoxWithSearch/Jquery.min.js"></script>
+<script src="~/Scripts/MultiSelectCheckBoxWithSearch/fSelect.js"></script>
+<script>
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    (function ($) {
+        $(function () {
+            $('.multipleOrder_').fSelect();
+
+        });
+    })(jQuery);
+
+</script>
+<script type="text/javascript">
+    $("#ClosingKm").blur(function () {
+
+        var a = parseInt($('#StartingKm').val());
+        var b = parseInt($('#ClosingKm').val());
+        if (a > b) {
+            $('#KmUsed').val('');
+            alert("Plese Enter Equal or Higher than StartingKm");
+            return false;
+        }
+        else if ((a < b)) {
+            $('#KmUsed').val(b - a);
+        }
+        else if ((a == b)) {
+            $('#KmUsed').val(b - a);
+        }
+        else {
+            alert("Invalid Closing Km");
+        }
+
+    });
+
+    $("#btnlistbox").click(function () {
+        var DCNo = "";
+        $('#selectedid option:selected').each(function () {
+            DCNo += $(this).text() + ",";
+        });
+        DCNo = DCNo.slice(0, -1);
+        $.ajax({
+            type: 'GET',
+            url: '/GateEntryVehicle/GetGateEntryOutwardwardDetails',
+            data: {
+                DCNo: DCNo,
+            },
+            success: function (data) {
+                $("#MaterialTaken").html("");
+                $.each(data, function (i, item) {
+                    $("#MaterialTaken").append(
+                      $('<option></option>').val(item.MaterialName).html(item.MaterialDescription));
+                });
+            },
+            error: function (ex) {
+                alert('Wrongly Entered Data.');
+            }
+        });
+    });
+
+    $("#btn2listbox").click(function () {
+        var InwardDCNo = "";
+        $('#selectedInwardDcid option:selected').each(function () {
+            InwardDCNo += $(this).text() + ",";
+        });
+        InwardDCNo = InwardDCNo.slice(0, -1);
+        $.ajax({
+            type: 'GET',
+            url: '/GateEntryVehicle/GetGateEntryInwardDetails',
+            data: {
+                InwardDcNo: InwardDCNo,
+            },
+            success: function (data) {
+
+                $("#InwardMaterial").html("");
+                $.each(data, function (i, item) {
+                    $("#InwardMaterial").append(
+
+                      $('<option></option>').val(item.MaterialName).html(item.MaterialDescription));
+                });
+            },
+            error: function (ex) {
+                alert('Wrongly Entered Data.');
+            }
+        });
+    });
+
+</script>
+
+<script>
+
+    function Save() {
+        if ($('#VehicleId').val() == "") {
+            alert("Please Enter Vehicle Name");
+            $('#VehicleId').css('border-color', 'red');
+            $('#VehicleId').focus();
+            return false;
+        }
+        else {
+            $('#VehicleId').css('border-color', '');
+        }
+        if ($('#DriverName').val() == "") {
+            alert("Please Enter Driver Name");
+            $('#DriverName').css('border-color', 'red');
+            $('#DriverName').focus();
+            return false;
+        }
+        else {
+            $('#DriverName').css('border-color', '');
+        }
+        if ($('#StartingKm').val() == "") {
+            alert("Please Enter Visitor Id");
+            $('#StartingKm').css('border-color', 'red');
+            $('#StartingKm').focus();
+            return false;
+        }
+        else {
+            $('#StartingKm').css('border-color', '');
+        }
+        var DCNo = "";
+        $('#selectedid option:selected').each(function () {
+            DCNo += $(this).val() + ",";
+        });
+        DCNo = DCNo.slice(0, -1);
+        var InwardDCNo = "";
+        $('#selectedInwardDcid option:selected').each(function () {
+            InwardDCNo += $(this).val() + ",";
+        });
+        InwardDCNo = InwardDCNo.slice(0, -1);
+        var Passengers = $("#selectedempid").val();
+
+        if (Passengers != null) {
+            Passengers = Passengers.join();
+        }
+        else {
+            Passengers = "";
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/GateEntryVehicle/GateEntryVehicle',
+            data: {
+                GateEntryNo: $('#GateEntryNo').val(),
+                EntryDate: $('#EntryDate').val(),
+                ReturnDate: $('#ReturnDate').val(),
+                VehicleId: $("#VehicleId").val(),
+                Destination: $('#Destination').val(),
+                VehicleNo: $('#VehicleNo').val(),
+                Purpose: $("#Purpose option:selected").val(),
+                DriverName: $("#DriverName").val(),
+                Passengers: Passengers,
+                ReturnDateTime: $('#ReturnDateTime').val(),
+                MaterialTaken: $("#MaterialTaken option:selected").val(),
+                EntryDateTime: $('#EntryDateTime').val(),
+                DCNo: DCNo,
+                StartingKm: $('#StartingKm').val(),
+                ClosingKm: $('#ClosingKm').val(),
+                KmUsed: $('#KmUsed').val(),
+                PurposeofTravel: $('#PurposeofTravel').val(),
+                Remarks: $('#Remarks').val(),
+                InwardDcNo: InwardDCNo,
+                EntryDateTime: $("#EntryDateTime").val(),
+                InwardDcDate: $('#InwardDcDate').val(),
+                InwardMaterial: $("#InwardMaterial").val(),
+            },
+            success: function (data) {
+                if (data.VehicleEntryId != "" || data.VehicleEntryId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/GateEntryVehicle/GateEntryVehicleGrid";
+                    return false;
+                }
+                else {
+                    alert('Already Exist in the database.');
+                    location.href = "/GateEntryVehicle/GateEntryVehicleGrid";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+
+    }
+</script>
+<script>
+
+    $(document).ready(function () {
+
+    })
+    function ToJavaScriptDate(Inwardtime_) {
+        var pattern = /Date\(([^)]+)\)/;
+        var results = pattern.exec(Inwardtime_);
+        var dt = new Date(parseFloat(results[1]));
+        return (dt.getDate() + "/" + dt.getMonth() + 1) + "/" + dt.getFullYear() + " " + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+    }
+
+</script>
+

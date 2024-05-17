@@ -1,0 +1,663 @@
+﻿@{
+    ViewBag.Title = "Supplier Master";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+}
+
+<script>
+    function isNumberKey(evt) {
+        
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode != 46 && charCode > 31
+          && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+
+    //$(".activity_repoty_table").tablesorter();
+    
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+    });    
+
+    function Save() {
+        if ($('#SupplierCode').val() == "") {
+            alert("Please Enter Supplier Code.")
+            $('#SupplierCode').css('border-color', 'red');
+            $('#SupplierCode').focus();
+            return false;
+        }
+        else {
+            $('#SupplierCode').css('border-color', '');
+        }
+
+        if ($('#SupplierName').val() == "") {
+            alert("Please Enter Supplier Name.")
+            $('#SupplierName').css('border-color', 'red');
+            $('#SupplierName').focus();
+            return false;
+        }
+        else {
+            $('#SupplierName').css('border-color', '');
+        }
+
+        if ($('#Currency').val() == "") {
+            alert("Please Select Currency.")
+            $('#Currency').css('border-color', 'red');
+            $('#Currency').focus();
+            return false;
+        }
+        else {
+            $('#Currency').css('border-color', '');
+        }
+
+        if ($('#AddressLine1').val() == "") {
+            alert("Please Enter AddressLine1.")
+            $('#AddressLine1').css('border-color', 'red');
+            $('#AddressLine1').focus();
+            return false;
+        }
+        else {
+            $('#AddressLine1').css('border-color', '');
+        }
+
+        if ($('#AddressLine2').val() == "") {
+            alert("Please Enter AddressLine2.")
+            $('#AddressLine2').css('border-color', 'red');
+            $('#AddressLine2').focus();
+            return false;
+        }
+        else {
+            $('#AddressLine2').css('border-color', '');
+        }
+
+        if ($('#Country').val() == "") {
+            alert("Please Enter Country.")
+            $('#Country').css('border-color', 'red');
+            $('#Country').focus();
+            return false;
+        }
+        else {
+            $('#Country').css('border-color', '');
+        }
+
+        if ($('#IsDomestic').prop('checked') == false && $('#IsImport').prop('checked') == false) {
+            alert("Please select Domestic / Import.");
+            $('#IsDomestic').css('border-color', 'red');
+            return false;
+        }
+        else {
+            $('#IsDomestic').css('border-color', '');
+        }
+        //if (SaveUpdateValidation()) {
+            $.ajax({
+                type: 'POST',
+                url: '/SupplierMaster/SupplierMaster',
+                data: $("form").serialize(),
+                success: function (data) {
+                    if (data.SupplierMasterId != "" || data.SupplierMasterId != 0) {
+                        alert('Saved Successfully.');
+                        location.href = "/SupplierMaster/SupplierMaster";
+                        return false;
+                    }
+                    else if (data.SupplierMasterId == 0 && data.SupplierName != "") {
+                        alert('Already Exist in the database.');
+                        return false;
+                    }
+                    else {
+                        alert('Save process Failed.');
+                        location.href = "/SupplierMaster/SupplierMaster";
+                        return false;
+                    }
+
+                },
+                error: function (ex) {
+                    alert('Already Exist in the database.');
+                }
+            });
+        //}
+    }
+
+    function Update(arg) {
+        
+        //if (SaveUpdateValidation()) {
+        if ($('#SupplierCode').val() == "") {
+            alert("Please Enter Supplier Code.")
+            $('#SupplierCode').css('border-color', 'red');
+            $('#SupplierCode').focus();
+            return false;
+        }
+        else {
+            $('#SupplierCode').css('border-color', '');
+        }
+
+        if ($('#SupplierName').val() == "") {
+            alert("Please Enter Supplier Name.")
+            $('#SupplierName').css('border-color', 'red');
+            $('#SupplierName').focus();
+            return false;
+        }
+        else {
+            $('#SupplierName').css('border-color', '');
+        }
+
+        if ($('#Currency').val() == "") {
+            alert("Please Select Currency.")
+            $('#Currency').css('border-color', 'red');
+            $('#Currency').focus();
+            return false;
+        }
+        else {
+            $('#Currency').css('border-color', '');
+        }
+
+        if ($('#AddressLine1').val() == "") {
+            alert("Please Enter AddressLine1.")
+            $('#AddressLine1').css('border-color', 'red');
+            $('#AddressLine1').focus();
+            return false;
+        }
+        else {
+            $('#AddressLine1').css('border-color', '');
+        }
+
+        if ($('#AddressLine2').val() == "") {
+            alert("Please Enter AddressLine2.")
+            $('#AddressLine2').css('border-color', 'red');
+            $('#AddressLine2').focus();
+            return false;
+        }
+        else {
+            $('#AddressLine2').css('border-color', '');
+        }
+
+        if ($('#Country').val() == "") {
+            alert("Please Enter Country.")
+            $('#Country').css('border-color', 'red');
+            $('#Country').focus();
+            return false;
+        }
+        else {
+            $('#Country').css('border-color', '');
+        }
+
+        if ($('#IsDomestic').prop('checked') == false && $('#IsImport').prop('checked') == false) {
+            alert("Please select Domestic / Import.");
+            $('#IsDomestic').css('border-color', 'red');
+            return false;
+        }
+        else {
+            $('#IsDomestic').css('border-color', '');
+        }
+
+            $.ajax({
+                type: 'POST',
+                url: '/SupplierMaster/Update',
+                data: $("form").serialize(),
+                success: function (data) {
+                    if (data.SupplierMasterId != "" || data.SupplierMasterId != 0) {
+                        alert('Updated Successfully.');
+                        location.href = "/SupplierMaster/SupplierMaster";
+                        return false;
+                    }
+                    else {
+                        alert('Updation failed.');
+                        location.href = "/SupplierMaster/SupplierMaster";
+                        return false;
+                    }
+
+                },
+                error: function (ex) {
+                    alert('Already Exist in the database.');
+                }
+            });
+        //}
+    }
+
+    function ValidateEmail(email) {
+        var expr = /^([\w-\.]+)@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+        return expr.test(email);
+    };
+
+    function PhoneValidation(Phone) {
+
+        var PhoneReg = new RegExp(/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/);
+        var valid = PhoneReg.test(Phone);
+
+        if (!valid) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    function SaveUpdateValidation()
+    {
+        //Tab 1 Validation
+        if ($('#SupplierCode').val() == "") {
+            alert("Please Enter Supplier Code.")
+            $('#SupplierCode').css('border-color', 'red');
+            $('#SupplierCode').focus();
+            return false;
+        }
+        else {
+            $('#SupplierCode').css('border-color', '');
+        }
+
+        if ($('#SupplierName').val() == "") {
+            alert("Please Enter Supplier Name.")
+            $('#SupplierName').css('border-color', 'red');
+            $('#SupplierName').focus();
+            return false;
+        }
+        else {
+            $('#SupplierName').css('border-color', '');
+        }
+
+        if ($('#Currency').val() == "") {
+            alert("Please Select Currency.")
+            $('#Currency').css('border-color', 'red');
+            $('#Currency').focus();
+            return false;
+        }
+        else {
+            $('#Currency').css('border-color', '');
+        }
+
+        if ($('#AddressLine1').val() == "") {
+            alert("Please Enter AddressLine1.")
+            $('#AddressLine1').css('border-color', 'red');
+            $('#AddressLine1').focus();
+            return false;
+        }
+        else {
+            $('#AddressLine1').css('border-color', '');
+        }
+
+        if ($('#AddressLine2').val() == "") {
+            alert("Please Enter AddressLine2.")
+            $('#AddressLine2').css('border-color', 'red');
+            $('#AddressLine2').focus();
+            return false;
+        }
+        else {
+            $('#AddressLine2').css('border-color', '');
+        }
+
+        if ($('#Country').val() == "") {
+            alert("Please Enter Country.")
+            $('#Country').css('border-color', 'red');
+            $('#Country').focus();
+            return false;
+        }
+        else {
+            $('#Country').css('border-color', '');
+        }
+
+        if ($('#IsDomestic').prop('checked') == false && $('#IsImport').prop('checked') == false) {
+            alert("Please select Domestic / Import.");
+            $('#IsDomestic').css('border-color', 'red');
+            return false;
+        }
+        else {
+            $('#IsDomestic').css('border-color', '');
+        }
+
+
+        ////Tab 2 Validation
+        //$('#step1').removeClass('in active');
+        //$('#step2').addClass('in active');
+        //if ($('#ContactPerson').val() == "") {
+        //    alert("Please Enter Contact Person.")
+        //    $('#ContactPerson').css('border-color', 'red');
+        //    $('#ContactPerson').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#ContactPerson').css('border-color', '');
+        //}
+
+        //if ($('#Designation').val() == "") {
+        //    alert("Please Enter Designation.")
+        //    $('#Designation').css('border-color', 'red');
+        //    $('#Designation').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#Designation').css('border-color', '');
+        //}
+
+        //var phoneText = $("#Mobile").val();
+        //if ($.trim(phoneText).length > 0) {
+        //    $('#Mobile').css('border-color', '');
+        //    if (!PhoneValidation(phoneText)) {
+        //        alert("Invalid Mobile Number");
+        //        $('#Mobile').css('border-color', 'red');
+        //        $('#Mobile').focus();
+        //        return false;
+        //    }
+        //}
+        //else {
+        //    $('#Mobile').css('border-color', 'red');
+        //    $('#Mobile').focus();
+        //    return false;
+        //}
+
+        //var landLine = $("#LandLine").val();
+        //if ($.trim(landLine).length > 0) {
+        //    $('#LandLine').css('border-color', '');
+        //    if (!PhoneValidation(phoneText)) {
+        //        alert("Invalid Mobile Number");
+        //        $('#LandLine').css('border-color', 'red');
+        //        $('#LandLine').focus();
+        //        return false;
+        //    }
+        //}
+        //else {
+        //    $('#LandLine').css('border-color', 'red');
+        //    $('#LandLine').focus();
+        //    return false;
+        //}
+
+        //if ($('#Fax').val() == "") {
+        //    alert("Please Enter Fax.")
+        //    $('#Fax').css('border-color', 'red');
+        //    $('#Fax').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#Fax').css('border-color', '');
+        //}
+
+        //if ($('#Email').val().trim() == "") {
+        //    alert("Please Enter Email Address");
+        //    $('#Email').css('border-color', 'red');
+        //    $('#Email').focus();
+        //    return false;
+        //}
+        //else {
+        //    var a = ValidateEmail($('#Email').val());
+        //    //debugger;
+        //    if (a == true) {
+        //        true;
+        //        $('#Email').css('border-color', '');
+        //    }
+        //    else {
+        //        alert("Please Enter Valid Email Address");
+        //        $('#Email').css('border-color', 'red');
+        //        $('#Email').focus();
+        //        return false;
+        //    }
+        //}
+
+        //if ($('#StNo').val() == "") {
+        //    alert("Please Enter StNo.")
+        //    $('#StNo').css('border-color', 'red');
+        //    $('#StNo').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#StNo').css('border-color', '');
+        //}
+
+        //if ($('#CstNo').val() == "") {
+        //    alert("Please Enter CstNo.")
+        //    $('#CstNo').css('border-color', 'red');
+        //    $('#CstNo').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#CstNo').css('border-color', '');
+        //}
+
+        //if ($('#Range').val() == "") {
+        //    alert("Please Enter Range.")
+        //    $('#Range').css('border-color', 'red');
+        //    $('#Range').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#Range').css('border-color', '');
+        //}
+
+        //if ($('#Division').val() == "") {
+        //    alert("Please Enter Division.")
+        //    $('#Division').css('border-color', 'red');
+        //    $('#Division').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#Division').css('border-color', '');
+        //}
+
+        //if ($('#PLANo').val() == "") {
+        //    alert("Please Enter PLANo.")
+        //    $('#PLANo').css('border-color', 'red');
+        //    $('#PLANo').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#PLANo').css('border-color', '');
+        //}
+
+        //if ($('#EOCNo').val() == "") {
+        //    alert("Please Enter EOCNo.")
+        //    $('#EOCNo').css('border-color', 'red');
+        //    $('#EOCNo').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#EOCNo').css('border-color', '');
+        //}
+
+        //if ($('#RegnNo').val() == "") {
+        //    alert("Please Enter RegnNo.")
+        //    $('#RegnNo').css('border-color', 'red');
+        //    $('#RegnNo').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#RegnNo').css('border-color', '');
+        //}
+
+        ////Tab 3 Validation
+        //$('#step2').removeClass('in active');
+        //$('#step3').addClass('in active');
+        //if ($('#PaymentTerms').val() == "") {
+        //    alert("Please Enter PaymentTerms.")
+        //    $('#PaymentTerms').css('border-color', 'red');
+        //    $('#PaymentTerms').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#PaymentTerms').css('border-color', '');
+        //}
+
+        //if ($('#DeliveryTerms').val() == "") {
+        //    alert("Please Enter DeliveryTerms.")
+        //    $('#DeliveryTerms').css('border-color', 'red');
+        //    $('#DeliveryTerms').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#DeliveryTerms').css('border-color', '');
+        //}
+
+        //if ($('#PackingDetails').val() == "") {
+        //    alert("Please Enter PackingDetails.")
+        //    $('#PackingDetails').css('border-color', 'red');
+        //    $('#PackingDetails').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#PackingDetails').css('border-color', '');
+        //}
+
+        //if ($('#Insurance').val() == "") {
+        //    alert("Please Enter Insurance.")
+        //    $('#Insurance').css('border-color', 'red');
+        //    $('#Insurance').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#Insurance').css('border-color', '');
+        //}
+
+        //if ($('#PortOfLoading').val() == "") {
+        //    alert("Please Enter PortOfLoading.")
+        //    $('#PortOfLoading').css('border-color', 'red');
+        //    $('#PortOfLoading').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#PortOfLoading').css('border-color', '');
+        //}
+
+        //if ($('#DespatchThrough').val() == "") {
+        //    alert("Please Enter DespatchThrough.")
+        //    $('#DespatchThrough').css('border-color', 'red');
+        //    $('#DespatchThrough').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#DespatchThrough').css('border-color', '');
+        //}
+
+        //if ($('#Freight').val() == "") {
+        //    alert("Please Enter Freight.")
+        //    $('#Freight').css('border-color', 'red');
+        //    $('#Freight').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#Freight').css('border-color', '');
+        //}
+
+        //if ($('#FreightName').val() == "") {
+        //    alert("Please Enter FreightName.")
+        //    $('#FreightName').css('border-color', 'red');
+        //    $('#FreightName').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#FreightName').css('border-color', '');
+        //}
+
+        //if ($('#Form1').val() == "") {
+        //    alert("Please Enter Form.")
+        //    $('#Form1').css('border-color', 'red');
+        //    $('#Form1').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#Form1').css('border-color', '');
+        //}
+
+        //if ($('#FormName').val() == "") {
+        //    alert("Please Enter FormName.")
+        //    $('#FormName').css('border-color', 'red');
+        //    $('#FormName').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#FormName').css('border-color', '');
+        //}
+
+        //if ($('#Forwarder').val() == "") {
+        //    alert("Please Enter Forwarder.")
+        //    $('#Forwarder').css('border-color', 'red');
+        //    $('#Forwarder').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#Forwarder').css('border-color', '');
+        //}
+
+        ////Tab 4 Validation
+        //$('#step3').removeClass('in active');
+        //$('#step4').addClass('in active');
+        //if ($('#BankName').val() == "") {
+        //    alert("Please Enter BankName.")
+        //    $('#BankName').css('border-color', 'red');
+        //    $('#BankName').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#BankName').css('border-color', '');
+        //}
+
+        //if ($('#BankAddress').val() == "") {
+        //    alert("Please Enter BankAddress.")
+        //    $('#BankAddress').css('border-color', 'red');
+        //    $('#BankAddress').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#BankAddress').css('border-color', '');
+        //}
+
+        //if ($('#BankCode').val() == "") {
+        //    alert("Please Enter BankCode.")
+        //    $('#BankCode').css('border-color', 'red');
+        //    $('#BankCode').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#BankCode').css('border-color', '');
+        //}
+
+        //if ($('#SwiftCode').val() == "") {
+        //    alert("Please Enter SwiftCode.")
+        //    $('#SwiftCode').css('border-color', 'red');
+        //    $('#SwiftCode').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#SwiftCode').css('border-color', '');
+        //}
+
+        //if ($('#AccountNumber').val() == "") {
+        //    alert("Please Enter AccountNumber.")
+        //    $('#AccountNumber').css('border-color', 'red');
+        //    $('#AccountNumber').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#AccountNumber').css('border-color', '');
+        //}
+
+        //if ($('#IBAN').val() == "") {
+        //    alert("Please Enter IBAN.")
+        //    $('#IBAN').css('border-color', 'red');
+        //    $('#IBAN').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#IBAN').css('border-color', '');
+        //}
+
+        //if ($('#OtherInformation').val() == "") {
+        //    alert("Please Enter OtherInformation.")
+        //    $('#OtherInformation').css('border-color', 'red');
+        //    $('#OtherInformation').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#OtherInformation').css('border-color', '');
+        //    return true;
+        //}
+    }
+
+</script>
+<h2 class="content-title">Supplier Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("SupplierMasterGrid", "SupplierMaster")
+    </div>
+</div>

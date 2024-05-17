@@ -1,0 +1,455 @@
+﻿@model MMS.Web.Models.StockModel.StockAdjustmentModel
+@using MMS.Core.Entities
+@{
+    int id = Model.StockAdjustmentId;
+    Session["StockAdjustmentId"] = id;
+    int adjustmentCount = 1;
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Stock Conversion", PermissionSettingModel.PermissionID);
+    }
+    bool Save = false; bool Update = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Save")
+        {
+            Save = true;
+        }
+        if (item.PermissionDesc == "Update")
+        {
+            Update = true;
+        }
+        
+    }
+}
+<div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+    <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+        <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+    </div>
+</div>
+<div class="right-form-section clearfix">
+    <form class="form-inline" role="form">
+        <div class="tab-content">
+            <div id="step1" class="tab-pane fade in active">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12 col-lg-12 col-xs-12">
+
+                            <div class="col-md-4 col-lg-4 col-xs-12">
+                                <div class="field-section">
+                                    <div class="form-group enco_form">
+
+                                        <label for="text" class="form-label">As On Date</label>
+                                        @Html.HiddenFor(x => x.StockAdjustmentId)
+
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @if (Model != null && Model.StockAdjustmentId != 0)
+                                            {
+                                                var from = Model.AsOnDate;
+                                                @Html.TextBoxFor(m => m.AsOnDate, new { @Value = from, @class = "form-control text-field" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.AsOnDate, new { @class = "form-control text-field" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-4 col-xs-12">
+                                <div class="field-section">
+                                    <div class="form-group enco_form">
+                                        <label for="text" class="form-label"> Store </label>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.StoreId, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-4 col-xs-12">
+                                <div class="field-section">
+                                    <div class="form-group enco_form">
+                                        <label for="text" class="form-label"> Category </label>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.CategoryId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-lg-12 col-xs-12">
+                            </div>
+                            <div class="col-md-4 col-lg-4 col-xs-12">
+                                <div class="field-section">
+                                    <div class="form-group enco_form">
+
+                                        <label for="text" class="form-label">Group</label>
+
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @Html.DropDownListFor(m => m.GroupId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-4 col-xs-12">
+                                <div class="field-section">
+                                    <div class="form-group enco_form">
+
+                                        <label for="text" class="form-label">Sub Group</label>
+
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @Html.DropDownListFor(m => m.SubGroupId, MMS.Web.ExtensionMethod.HtmlHelper.SubGroupName(), new { @class = "select-style text-field" })
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 col-lg-4 col-xs-12">
+                                <div class="field-section">
+                                    <div class="form-group enco_form">
+
+                                        <label for="text" class="form-label">Material Type</label>
+
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @Html.DropDownListFor(m => m.MaterialType, new SelectList(
+                                       new List<object> {
+                                            new { value=0, text="Please select" },
+                                           new { value=1, text="Local" },
+                                           new { value=2, text="Customer Import"},
+                                            new { value=3, text="Direct Import"}
+                                       },
+                                       "value",
+                                       "text", 0), new { @class = "select-style text-field" })
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-4 col-xs-12">
+                                <div class="field-section">
+                                    <div class="form-group enco_form">
+                                        <label for="text" class="form-label">Stock Adjustment No</label>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.StockNo, new { @class = "form-control text-field", @readonly = true })
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 col-lg-12 col-xs-12">
+                            <h3>Stock Adjustment</h3>
+                            <div class="col-md-12 col-lg-12 col-xs-12">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-xs-13">
+                                            @Html.HiddenFor(x => x.SizeQuantityRate)
+                                            <table class="table" id="stockVariation" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <td style="background-color: #ddd;color: #000000">SNo</td>
+                                                        <td style="background-color: #ddd;color: #000000">MaterialName</td>
+                                                        <td style="background-color: #ddd;color: #000000">Size</td>
+                                                        <td style="background-color: #ddd;color: #000000">Qty</td>
+                                                        <td style="background-color: #ddd;color: #000000">UOM</td>
+                                                        <td style="background-color: #ddd;color: #000000">Rate</td>
+                                                        <td style="background-color: #ddd;color: #000000">BookStock</td>
+                                                        <td style="background-color: #ddd;color: #000000">BookStValue</td>
+                                                        <td style="background-color: #ddd;color: #000000">PhysicalStock</td>
+                                                        <td style="background-color: #ddd;color: #000000">PhysicalStValue</td>
+                                                        <td style="background-color: #ddd;color: #000000">Variation</td>
+                                                        <td style="background-color: #ddd;color: #000000">VariationStValue</td>
+                                                        <td style="background-color: #ddd;color: #000000">PlusStock</td>
+                                                        <td style="background-color: #ddd;color: #000000">PlusStValue</td>
+                                                        <td style="background-color: #ddd;color: #000000">MinusStock</td>
+                                                        <td style="background-color: #ddd;color: #000000">MinusStValue</td>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if (Model.SizeRangeQtyRateList != null)
+                                                    {
+                                                        int k = 0;
+                                                        foreach (var item in Model.SizeRangeQtyRateList)
+                                                        {
+                                                            <tr>
+                                                                <td>@adjustmentCount</td>
+                                                                <td class="MaterialName">@item.MaterialDescription</td>
+                                                                <td class="Size_">@item.Size</td>
+                                                                <td class="Qty_">@item.Quantity</td>
+                                                                <td class="ShortUnitName_">@item.ShortUnitName</td>
+                                                                <td class="Rateclass_">@item.Rate</td>
+                                                                <td class="BookStock" id='bookstock_@(k)'>@item.BookStock</td>
+                                                                <td class="BookStockValue" id="bookstockvalue_@(k)">@item.BookStockValue</td>
+                                                                <td class="">
+                                                                    <input type="text" class="gridQTy" id='physicalstock_@(k)' value="@item.PhysicalStock" onchange="changeQtyUpdate(@item.BookStock,this.value, @adjustmentCount, @item.Rate,@k)" />
+                                                                </td>
+                                                                <td class="PhysicalStockValue" id="physicalstockvalue_@(k)">@item.PhysicalStockValue</td>
+                                                                <td class="VariationStock" id="VariationStockid_@(k)">@item.VariationStock </td>
+                                                                <td class="VariationStockValue" id="variationstockvalue_@(k)">@item.VariationStockValue</td>
+                                                                <td class="PlusStock" id='plusstock@(k)'>@item.PlusStock</td>
+                                                                <td class="PlusStockValue" id='plusstockvalue@(k)'>@item.PlusStockValue</td>
+                                                                <td class="MinusStock" id='minusstock@(k)'>@item.MinusStock</td>
+                                                                <td class="MinusStockValue" id='minusstockvalue@(k)'>@item.MinusStockValue</td>
+                                                                <td class="MaterialMasterId" id='MaterialMasterId@(k)'>@item.MaterialMasterId</td>
+                                                            </tr>
+                                                            adjustmentCount++;
+                                                            k++;
+                                                        }
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 col-sm-4 col-lg-12 col-xs-12 no-padding">
+                                <div class="form-footer">
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                                            <input type="button" class="btn btn-default btn-style width-78" onclick="Cancel()" title="Back" value="Back">
+                                            @if (Model.StockAdjustmentId == 0)
+                                            {
+                                                <input type="button" class="btn btn-default btn-style width-78" onclick="Save()" title="Save" value="Save">
+
+                                            }
+                                            else if (@HttpContext.Current.Session["UserType"].ToString() == "2" || @HttpContext.Current.Session["UserType"].ToString() == "2")
+                                            {
+                                                <input type="button" class="btn btn-default btn-style width-78" onclick="Update()" id="StockAdjustmentId" title="Update" value="Update">
+                                                <input type="button" class="btn btn-default btn-style width-100" onclick="Approved(@Model.StockAdjustmentId)" id="StockAdjusted" title="Stock Adjusted" value="Stock Approvel" style="cursor:pointer;">
+
+                                            }
+                                            else
+                                            {
+                                                <input type="button" class="btn btn-default btn-style width-78" onclick="Update()" id="StockAdjustmentId" title="Update" value="Update">
+                                      
+
+
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+<script src="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.js"></script>
+<link href="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.css" rel="stylesheet" />
+<script type="text/javascript">
+    $('.loader-overlay').fadeOut('fast');
+    $('#AsOnDate').datepicker({ dateFormat: "dd/mm/yy" , maxDate: new Date()  });
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode != 46 && charCode > 31
+          && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+    function Approved(arg) {
+        $.ajax({
+            url: '/StockAdjustment/IsApprovedStockAdjustment',
+            type: "GET",
+            dataType: "JSON",
+            data: { StockAdjustmentID: arg },
+            success: function (data) {
+                debugger;
+                if (data != null && data.IsApproved == true ) {
+                    alert("Stock adjusted successfully");
+                    return false;
+                }
+                else if (data != null)
+                {
+                    alert(data.Message);
+                }
+                else {
+                    alert("Error please contact admin");
+                    return false;
+                }
+
+            }
+        });
+    }
+
+
+    $("#StoreId").change(function () {
+        var StoreId = $('#StoreId option:selected').val();
+        $.ajax({
+            url: '/MaterialMaster/FillMaterialCateogoryid',
+            type: "GET",
+            dataType: "JSON",
+            data: { StoreMasterId: StoreId },
+            success: function (cities) {
+                $("#CategoryId").html(""); // clear before appending new list
+                $('#CategoryId').append('<option value="" selected="selected">Please Select</option>');
+                $.each(cities, function (i, city) {
+                    $("#CategoryId").append(
+                        $('<option></option>').val(city.MaterialCategoryMasterId).html(city.CategoryName));
+                });
+            }
+        });
+
+    });
+
+    $("#CategoryId").change(function () {
+        var MaterialCategoryMasterId_ = $('#CategoryId').val();
+
+        $.ajax({
+            url: '/MaterialMaster/FillCateogoryid',
+            type: "GET",
+            dataType: "JSON",
+            data: { MaterialCategoryMasterId: MaterialCategoryMasterId_ },
+            success: function (cities) {
+                $("#GroupId").html(""); // clear before appending new list
+                $('#GroupId').append('<option value="" selected="selected">Please Select</option>');
+                $.each(cities, function (i, city) {
+                    $("#GroupId").append(
+                        $('<option></option>').val(city.MaterialGroupMasterId).html(city.GroupName));
+                });
+            }
+        });
+    });
+
+
+    $("#GroupId").change(function () {
+        var GroupId_ = $('#GroupId').val();
+
+        $.ajax({
+            url: '/MaterialMaster/FillGroupid',
+            type: "GET",
+            dataType: "JSON",
+            data: { MaterialGroupId: GroupId_ },
+            success: function (cities) {
+                $("#SubGroupId").html(""); // clear before appending new list
+                $('#SubGroupId').append('<option value="" selected="selected">Please Select</option>');
+                $.each(cities, function (i, city) {
+                    $("#SubGroupId").append(
+                        $('<option></option>').val(city.SubGroupMasterId).html(city.SubGroup));
+                });
+            }
+        });
+    });
+
+
+    $("#MaterialType").change(function () {
+        var MaterialType = $('#MaterialType').val();
+        $('.loader-overlay').fadeIn('slow');
+
+        $.ajax({
+            url: '/MaterialMaster/StockAdjustmentListDetails',
+            dataType: 'json',
+            type: "POST",
+            data: { Store: $('#StoreId').val(), From: $('#AsOnDate').val(), Category: $('#CategoryId').val(), Group: $('#GroupId').val(), MaterialType: MaterialType },
+            success: function (data) {
+                debugger;
+                var count = 1;
+                var rowcount = 1;
+                $('#stockVariation tbody').html("");
+                $.each(data, function (d, results) {                  
+                    if (results.variationstockvalue == null)
+                        results.variationstockvalue = 0;
+                    if (results.Size == null) {
+                        results.Size = 0;
+                    }
+                    if (results.QTY == null) {
+                        results.QTY = 0;
+                    }
+                    if (results.BookStock == null) {
+                        results.BookStock = 0;
+                    }
+                    if (results.BookStock == null) {
+                        results.BookStock = 0;
+                    }
+                    if (results.BookStockValue == null) {
+                        results.BookStockValue = 0;
+                    }
+                    if (results.Rate == null) {
+                        results.Rate = 0;
+                    }
+
+                    $('#stockVariation tbody').append('<tr><td>' + count + '</td><td id="MaterialName" class="MaterialName">' + results.MaterialDescription + '</td><td id="Size_" class="Size_" >' + results.Size + '</td><td id="Qty_" class="Qty_" >' + results.QTY + '</td><td id="ShortUnitName_" class="ShortUnitName_" >' + results.ShortUnitName + '</td><td id="Rateid_" class="Rateclass_" >' + results.Rate + '</td><td id="BookStock" class="BookStock">' + results.BookStock + '</td><td id="BookStockValue" class="BookStockValue">' + results.BookStockValue + '</td><td class="Quantity" name="Quantity"><input type="text"  DefaultValue=' + results.BookStock + ' onchange="changeQty(' + results.BookStock + ',this.value,' + count + ',' + results.Rate + ')" class="Quantity gridQTy" id="PhysicalStock"  value="" style="padding-bottom: 0;padding-top: 0;width: 80px;" /></td><td class="vary" ><input type="text" class="PhysicalStockValue" id="PhysicalStockValue' + count + '"  style="padding-bottom: 0;padding-top: 0;width: 80px;" readonly/></td><td class="vary" ><input type="text" class="VariationStock" id="VariationStockid' + count + '"  style="padding-bottom: 0;padding-top: 0;width: 80px;" readonly/></td><td class="vary" ><input type="text" class="VariationStockValue" id="VariationStockValue' + count + '"  style="padding-bottom: 0;padding-top: 0;width: 80px;" readonly/></td><td class="Rate"><input type="text" class="PlusStock" id="PlusStock' + count + '"  style="padding-bottom: 0;padding-top: 0;width: 80px;" readonly/></td><td class="Rate"><input type="text" class="PlusStockValue" id="PlusStockValue' + count + '"  style="padding-bottom: 0;padding-top: 0;width: 80px;" readonly/></td><td class="Rate" ><input type="text" class="MinusStock" id="MinusStock' + count + '"  style="padding-bottom: 0;padding-top: 0;width: 80px;" readonly/></td><td class="Rate" ><input type="text" class="MinusStockValue" id="MinusStockValue' + count + '"  style="padding-bottom: 0;padding-top: 0;width: 80px;" readonly/></td> <td style="display:none" class="MaterialMasterId" id="MaterialMasterId">' + results.MaterialMasterId + '</td></tr>');
+                    count++;
+                });
+                $('.loader-overlay').fadeOut('fast');
+            }, error: function (e) {
+                console.log("error msg:" + e)
+            }
+        });
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    $(function () {
+        $('.loader-overlay').ajaxStart(function () {
+            $(this).fadeIn('slow');
+        }).ajaxStop(function () {
+            $(this).stop().fadeOut('fast');
+        });
+    });
+    function changeQty(arg, arg1, arg2, arg3) {
+        debugger
+        var bookstockvalue = arg * arg3;
+        $('#BookStockValue' + arg2).val(bookstockvalue);
+
+        var physicalstockvalue = arg1 * arg3;
+        $('#PhysicalStockValue' + arg2).val(physicalstockvalue);
+
+        var variationstock = arg - arg1;
+        $('#VariationStockid' + arg2).val(variationstock);
+
+        var variationstockvalue = variationstock * arg3;
+        $('#VariationStockValue' + arg2).val(variationstockvalue);
+        var Symbolvariationstock = arg1 - arg;
+        if (Symbolvariationstock > 0) {
+            $('#PlusStock' + arg2).val(Symbolvariationstock);
+            var pl = parseFloat(Symbolvariationstock) * parseFloat(arg3);
+            $('#PlusStockValue' + arg2).val(pl);
+        }
+        else {
+
+            $('#MinusStock' + arg2).val(Symbolvariationstock);
+            var mi = parseFloat(Symbolvariationstock) * parseFloat(arg3);
+            $('#MinusStockValue' + arg2).val(mi);
+        }
+    }
+
+    function changeQtyUpdate(arg, arg1, arg2, arg3, arg4) {
+
+        debugger;
+        var rowCount = arg4;
+        var bookstockvalue = arg * arg3;
+        $("#bookstockvalue_" + rowCount).text(bookstockvalue);
+        var physicalstockvalue = arg1 * arg3;
+        $("#physicalstockvalue_" + rowCount).text(physicalstockvalue);
+        var variationstock = arg - arg1;
+        $("#VariationStockid_" + rowCount).text(variationstock);
+        var variationstockvalue = variationstock * arg3;
+        $("#variationstockvalue_" + rowCount).text(variationstockvalue);
+        var Symbolvariationstock = arg1 - arg;
+        if (Symbolvariationstock > 0) {
+            $("#plusstock" + rowCount).text(Symbolvariationstock);
+            var pl = parseFloat(Symbolvariationstock) * parseFloat(arg3);
+            $("#plusstockvalue" + rowCount).text(pl);
+        }
+        else {
+            $("#minusstock" + rowCount).text(Symbolvariationstock);
+            var mi = parseFloat(Symbolvariationstock) * parseFloat(arg3);
+            $("#minusstockvalue" + rowCount).text(mi);
+        }
+    }
+
+</script>

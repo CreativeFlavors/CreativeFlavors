@@ -1,0 +1,286 @@
+﻿@model MMS.Web.Models.StockModel.BillOfMaterialModel
+@using MMS.Repository.Managers;
+@using MMS.Core.Entities
+@{
+    ViewBag.Title = "BOMMaterialListGrid";
+
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("BillOfMaterial", PermissionSettingModel.PermissionID);
+}
+@{
+    bool Save = false; bool Add = false; bool Update = false; bool Display = false; bool Edit = false; bool Delete = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Save")
+        {
+            Save = true;
+        }
+        if (item.PermissionDesc == "Add")
+        {
+            Add = true;
+        }
+        if (item.PermissionDesc == "Update")
+        {
+            Update = true;
+        }
+        if (item.PermissionDesc == "Display")
+        {
+            Display = true;
+        }
+        if (item.PermissionDesc == "Edit")
+        {
+            Edit = true;
+        }
+        if (item.PermissionDesc == "Delete")
+        {
+            Delete = true;
+        }
+    }
+}
+<div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+    <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+        <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+    </div>
+</div>
+<div class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+
+        <table class="veh-table" id="empTable">
+            <thead>
+                <tr class="color-code-top-btn">
+                    <td colspan="10" style="padding-bottom:0;">
+                        @using (Html.BeginForm("UploadData", "BillOfMaterial", null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary()
+
+                            <div class="form-group" style="display:inline-block;">
+                                <input type="file" id="dataFile" name="upload" style="display:inline-block;float:left;" />
+                                <input type="submit" value="Upload" class="btn btn-default" style="display:inline-block;float:left;" />
+                                @if (Session["BOMerror"] != null)
+                                {
+                                    <span id="spn_error" style="display:inline-block;float:left;color:red;padding:8px 10px;">@Session["BOMerror"].ToString()</span>
+                                    Session["BOMerror"] = null;
+                                }
+                                else if (TempData["successBody"] != null)
+                                {
+                                    <span id="spn_error" style="display:inline-block;float:left;color:red;padding:8px 10px;">@TempData["successBody"].ToString()</span>
+                                    TempData["successBody"] = null;
+                                }
+                                else if (Session["SuccessOrder"] != null)
+                                {
+                                    <span id="spn_error" style="display:inline-block;float:left;color:red;padding:8px 10px;">@Session["SuccessOrder"].ToString()</span>
+                                    Session["SuccessOrder"] = null;
+                                }
+                                <input type="text" id="SeaarchID" placeholder="Search.." />                             
+                                   
+                                    @if (Add == true)
+                                    {
+
+                                        <input type="button" value="Add" onclick="Add()">
+                                    }
+                                    else
+                                    {
+                                        <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" title="Add" value="Add">
+                                    }
+                               
+                                <input type="button" value="Search" onclick="Search()">
+                            </div>
+                            @Html.ValidationMessageFor(x => x.UploadError);
+
+                                    }
+
+                    </td>
+                </tr>
+                <tr>
+
+                    <th class="veh-1">
+                        BOM NO
+                    </th>
+                    <th class="veh-2">
+                        Buyer  Name
+                    </th>
+                    <th class="veh-3">
+                        Buyer Norms
+                    </th>
+                    <th class="veh-4">
+                        Date
+                    </th>
+                    <th class="veh-5">
+                        Edit / Delete
+                    </th>
+
+                </tr>
+            </thead>
+            @if (Model.BOMMaterialLists.Count > 0 && Model.BOMMaterialLists != null)
+            {
+                int count = 1;
+                <tbody>
+
+                    @foreach (var StageMaster in Model.BOMMaterialLists)
+                    {
+                        <tr>
+                            <td class="veh-1">@StageMaster.BomNo</td>
+                            <td class="veh-2">@StageMaster.ParentBomNo</td>
+                            <td class="veh-3">@StageMaster.MaterialMasterId</td>
+                            <td class="veh-4">@Convert.ToDateTime(StageMaster.Date).Date.ToString("dd/MM/yyyy")</td>
+
+                            <td class="veh-1 edit-del-wrap">
+                                @{                                    
+                                    if (Edit == true)
+                                    {
+                                        <a href="javascript:void(0)" onclick="Edit('@StageMaster.BomId')" class="watchlist-edit" title="Edit"></a>
+                                    }
+                                    else
+                                    {
+                                        <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-edit" title="Edit"></a>
+                                    }
+                                    if (Delete == true)
+                                    {
+                                        <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@StageMaster.BomId')" class="watchlist-delete" title="Delete"></a>
+                                    }
+                                    else
+                                    {
+                                        <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-delete" title="Delete"></a>
+                                    }
+                                }
+
+
+                            </td>
+                        </tr>
+                                        count++;
+                                    }
+
+
+                </tbody>
+                <tfoot class="footer-pager">
+                    <tr>
+                        <td colspan="4">
+                            <div id="pager">
+                                <form>
+                                    <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                    <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                    <input type="text" class="pagedisplay" />
+                                    <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                    <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                    <select class="pagesize">
+                                        <option selected="selected" value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="40">40</option>
+                                    </select>
+                                </form>
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                </tfoot>
+
+                                    }
+        </table>
+        @*<div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+                <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+                    <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..."/>
+                </div>
+            </div>*@
+
+
+        @if (Model.BOMMaterialLists != null && Model.BOMMaterialLists.Count == 0)
+        {
+            <div class="noRecordsFound" style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+        }
+    </div>
+
+
+
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $('#spn_error').fadeOut('slow');
+        }, 2500);
+    });
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+
+</script>
+<script>
+
+    function Search() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Search", "BillOfMaterial")',
+            data: { filter: $('#SeaarchID').val() },
+            success: function (data) {
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                $('#DivShow').hide();
+            }
+        });
+    }
+
+
+    function Add() {
+
+        location.href = "BillOfMaterialDetails";
+        $(".custom-combobox input").addClass("form-control text-field");
+    }
+    function Edit(arg) {
+        debugger
+        location.href = "BillOfMaterialDetails?BOMID=" + arg;
+        $(".custom-combobox input").addClass("form-control text-field");
+    }
+    function Delete(arg) {
+        $('.loader-overlay').show();
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "BillOfMaterial")',
+                data: { BomId: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/BillOfMaterial/BOMMaterialListGrid";
+                        return false;
+                        $('.loader-overlay').fadeOut('fast');
+                    }
+                    else {
+                        alert('Color Details deletion failed.');
+                        $('.loader-overlay').fadeOut('fast');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                    $('.loader-overlay').fadeOut('fast');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+       
+    }
+
+
+</script>
+

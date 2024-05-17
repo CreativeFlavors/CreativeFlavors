@@ -1,0 +1,166 @@
+﻿@{
+    ViewBag.Title = "Currency";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+
+<script>
+     
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#Symbol').val() == "") {
+            alert("Please Enter Symbol.")
+            $('#Symbol').css('border-color', 'red');
+            $('#Symbol').focus();
+            return false;
+        }
+        else {
+            $('#Symbol').css('border-color', '');
+        }
+        if ($('#ShortForm').val() == "") {
+            alert("Please Enter Short Form.")
+            $('#ShortForm').css('border-color', 'red');
+            $('#ShortForm').focus();
+            return false;
+        }
+        else {
+            $('#ShortForm').css('border-color', '');
+        }
+        if ($('#LongForm').val() == "") {
+            alert("Please Enter Long Form.")
+            $('#LongForm').css('border-color', 'red');
+            $('#LongForm').focus();
+            return false;
+        }
+        else {
+            $('#LongForm').css('border-color', '');
+        }
+        if ($('#LowerDenomination').val() == "") {
+            alert("Please Enter Lower Denomination.")
+            $('#LowerDenomination').css('border-color', 'red');
+            $('#LowerDenomination').focus();
+            return false;
+        }
+        else {
+            $('#LowerDenomination').css('border-color', '');
+        }
+       
+        $.ajax({
+            type: 'POST',
+            url: '/Currency/Currency',
+            data: {
+                Symbol: $('#Symbol').val(),
+                ShortForm: $('#ShortForm').val(),
+                LongForm: $('#LongForm').val(),
+                LowerDenomination: $('#LowerDenomination').val()                
+            },
+            success: function (data) {
+                if (data.CurrencyMasterId != "" || data.CurrencyMasterId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/Currency/Currency";
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/Currency/Currency";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#Symbol').val() == "") {
+            alert("Please Enter Symbol.")
+            $('#Symbol').css('border-color', 'red');
+            $('#Symbol').focus();
+            return false;
+        }
+        else {
+            $('#Symbol').css('border-color', '');
+        }
+        if ($('#ShortForm').val() == "") {
+            alert("Please Enter Short Form.")
+            $('#ShortForm').css('border-color', 'red');
+            $('#ShortForm').focus();
+            return false;
+        }
+        else {
+            $('#ShortForm').css('border-color', '');
+        }
+        if ($('#LongForm').val() == "") {
+            alert("Please Enter Long Form.")
+            $('#LongForm').css('border-color', 'red');
+            $('#LongForm').focus();
+            return false;
+        }
+        else {
+            $('#LongForm').css('border-color', '');
+        }
+        if ($('#LowerDenomination').val() == "") {
+            alert("Please Enter Lower Denomination.")
+            $('#LowerDenomination').css('border-color', 'red');
+            $('#LowerDenomination').focus();
+            return false;
+        }
+        else {
+            $('#LowerDenomination').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/Currency/Update',
+            data: {
+                Symbol: $('#Symbol').val(),
+                ShortForm: $('#ShortForm').val(),
+                LongForm: $('#LongForm').val(),
+                LowerDenomination: $('#LowerDenomination').val(),
+                CurrencyMasterId: $('#CurrencyMasterId').val()
+            },
+            success: function (data) {
+                if (data.CurrencyMasterId != "" || data.CurrencyMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/Currency/Currency";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/Currency/Currency";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Currency Master</h2>
+<div style="width: 100%; float: left;">
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("CurrencyGrid", "Currency")
+    </div>
+</div>

@@ -1,0 +1,137 @@
+﻿@{
+    ViewBag.Title = "BasicUnitMaster";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+
+        $("#EditColorPartial").hide();
+
+    });
+    
+    function AddUnits() {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("BasicUnitMasterDetails", "BasicUnitMaster")',
+            data: { BasicUnitID: 0 },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+                $("#DivUnitConversion").hide();
+                $("#DivConversion").hide();
+                $("#DivConversionBtns").hide();
+                $("#DivUnits").show();
+            }
+        });
+      
+    }
+    function Save() {
+        if ($('#ShortUnitName').val() == "") {
+            alert("Please Enter ShortUnitName.")
+            $('#ShortUnitName').css('border-color', 'red');
+            $('#ShortUnitName').focus();
+            return false;
+        }
+        else {
+            $('#ShortUnitName').css('border-color', '');
+        }
+        if ($('#LongUnitName').val() == "") {
+            alert("Please Enter LongUnitName.")
+            $('#LongUnitName').css('border-color', 'red');
+            $('#LongUnitName').focus();
+            return false;
+        }
+        else {
+            $('#LongUnitName').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/BasicUnitMaster/CreateUnitDetails',
+            data: {
+                ShortUnitName: $('#ShortUnitName').val(),
+                LongUnitName: $('#LongUnitName').val(),
+                UomMasterId: $('#UomMasterId').val()
+            },
+            success: function (data) {
+                if (data.UomMasterId != "" && data.UomMasterId!=0) {
+                    alert('Saved Successfully.');
+                    location.href = "/BasicUnitMaster/BasicUnitMaster";
+                    return false;
+                }
+                else if (data.UomMasterId == 0 && data.LongUnitName!="")
+                {
+                    alert("Already exist in the database");
+                    return false;
+                }
+            }
+        });
+    }
+
+       
+
+    function Update() {    
+            if ($('#ShortUnitName').val() == "") {
+                alert("Please Enter ShortUnitName.")
+                $('#ShortUnitName').css('border-color', 'red');
+                $('#ShortUnitName').focus();
+                return false;
+            }
+            else {
+                $('#ShortUnitName').css('border-color', '');
+            }
+            if ($('#LongUnitName').val() == "") {
+                alert("Please Enter LongUnitName.")
+                $('#LongUnitName').css('border-color', 'red');
+                $('#LongUnitName').focus();
+                return false;
+            }
+            else {
+                $('#LongUnitName').css('border-color', '');
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/BasicUnitMaster/Update',
+                data: {
+                    ShortUnitName: $('#ShortUnitName').val(),
+                    LongUnitName: $('#LongUnitName').val(),
+                    UomMasterId: $('#UomMasterId').val()
+                },
+                success: function (data) {
+                    if (data.UomMasterId != "" && data.UomMasterId != 0) {
+                        alert('Updated Successfully.');
+                        location.href = "/BasicUnitMaster/BasicUnitMaster";
+                        return false;
+                    }
+                }
+            });
+        }
+</script>
+<h2 class="content-title">Basic Unit Master</h2>
+<div style="width: 100%; float: left;">
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("BasicUnitMasterGrid", "BasicUnitMaster")
+    </div>
+</div>

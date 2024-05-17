@@ -1,0 +1,100 @@
+﻿@{
+    ViewBag.Title = "GRNIssueType";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+}
+
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#IssueType').val() == "") {
+            alert("Please Enter Issue Type.")
+            $('#IssueType').css('border-color', 'red');
+            $('#IssueType').focus();
+            return false;
+        }
+        else {
+            $('#IssueType').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/GRNType/GRNType',
+            data: {
+                IssueType: $('#IssueType').val(),
+                GRNCode: $('#GRNCode').val()
+            },
+            success: function (data) {
+                if (data.GrnTypeMasterId != "" || data.GrnTypeMasterId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/GRNType/GRNType";
+                    return false;
+                }
+                else if (data.GrnTypeMasterId == 0 && data.IssueType != "")
+                {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/GRNType/GRNType";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#IssueType').val() == "") {
+            alert("Please Enter Issue Type.")
+            $('#IssueType').css('border-color', 'red');
+            $('#IssueType').focus();
+            return false;
+        }
+        else {
+            $('#IssueType').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/GRNType/Update',
+            data: {
+                IssueType: $('#IssueType').val(),   
+                GrnTypeMasterId: $('#GrnTypeMasterId').val(),
+                GRNCode: $('#GRNCode').val()
+            },
+            success: function (data) {
+                if (data.GrnTypeMasterId != "" || data.GrnTypeMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/GRNType/GRNType";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/GRNType/GRNType";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">GRN/Issue Type</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("GRNTypeGrid", "GRNType")
+    </div>
+</div>

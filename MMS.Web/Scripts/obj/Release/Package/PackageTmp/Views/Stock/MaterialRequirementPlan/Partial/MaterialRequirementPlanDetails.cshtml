@@ -1,0 +1,853 @@
+﻿@model MMS.Web.Models.StockModel.MaterialRequirementPlanModel
+@using MMS.Core.Entities
+@{
+
+    int id = Model.MaterialRequirementPlanId;
+    Session["MaterialRequirementPlanId"] = id;
+
+    List<int> ioconver = new List<int>();
+    List<int> SelectedValue = new List<int>();
+
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Material Requirement", PermissionSettingModel.PermissionID);
+
+    bool Save = false; bool Update = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Save")
+        {
+            Save = true;
+        }
+        if (item.PermissionDesc == "Update")
+        {
+            Update = true;
+        }
+    }
+}
+<style>
+    [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: static !important;
+    }
+</style>
+
+<script type="text/javascript">
+
+
+    $(function () {
+        $('#MultipleIO option:selected').remove().appendTo('#DisplayIO');
+
+    });
+    function moveAll(MultipleIO, DisplayIO) {
+        $('#' + MultipleIO + ' option').appendTo('#' + DisplayIO);
+    }
+
+    function moveSelected(MultipleIO, DisplayIO) {
+        $('#' + MultipleIO + ' option:selected').appendTo('#' + DisplayIO);
+    }
+    function selectAll() {
+        $("select option").attr("selected", "selected");
+    }
+
+</script>
+
+<script>
+    $("#Date,#FROM,#TO").datepicker({ dateFormat: "dd/mm/yy" });
+    </script>
+
+
+<div class="right-form-section clearfix">
+    <form role="form" class="form-inline">
+        <div class="container-fluid">
+            <div class="row">
+                <p class="section-title text-center">Material Requirement Planning</p>
+
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Production Plan Basis</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.HiddenFor(x => x.MaterialRequirementPlanId)
+                                    @if (Model.IsProductionPlanBasis == true)
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsProductionPlanBasis" checked="checked" />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsProductionPlanBasis" />
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Order Basis</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model.IsOrderBasis == true)
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsOrderBasis" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsOrderBasis" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Rejection/Replacement</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model.IsRejectionOrReplacement == true)
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsRejectionOrReplacement" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsRejectionOrReplacement" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Over Consumption</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model.IsOverConsumption == true)
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsOverConsumption" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsOverConsumption" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">MRP NO.</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.HiddenFor(x => x.MaterialRequirementPlanId)
+                                    @Html.TextBoxFor(m => m.MrpNo, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Date</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model != null && Model.MaterialRequirementPlanId != 0)
+                                    {
+                                        var MRPdate = Model.Date;
+                                    @Html.TextBoxFor(m => m.Date, new { @class = "form-control text-field", @Value = MRPdate })
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.Date, new { @class = "form-control text-field", @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy") })
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">MRP Type</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.MrpType, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Buyer</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.Buyer, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Week No</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.WeekNo, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Season</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.SeasonMasterId, MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Lot No</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.LotNo, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Size Range</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.SizeRangeMasterId, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeValue(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">From</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model != null && Model.MaterialRequirementPlanId != 0)
+                                    {
+                                        var MRPfrom = Model.FROM;
+                                    @Html.TextBoxFor(m => m.FROM, new { @class = "form-control text-field", @Value = MRPfrom })
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.FROM, new { @class = "form-control text-field", @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy") })
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">To</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model != null && Model.MaterialRequirementPlanId != 0)
+                                    {
+                                        var MRPto = Model.TO;
+                                        @Html.TextBoxFor(m => m.TO, new { @class = "form-control text-field", @Value = MRPto })
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.TO, new { @class = "form-control text-field", @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy") })
+                                    }
+                                   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Cust Plan</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.CustPlan, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">ListOfCategory</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.ListOfCategory, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">ListOfGroup</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.ListOfGroup, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Material List</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.MaterialList, MMS.Web.ExtensionMethod.HtmlHelper.MaterialName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Critical</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model.IsCritical == true)
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsCritical" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsCritical" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Customer Supplied</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model.IsCustomerSupplied == true)
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsCustomerSupplied" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsCustomerSupplied" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">General</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model.IsGeneral == true)
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsGeneral" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsGeneral" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Imported</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model.IsImported == true)
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsImported" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsImported" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Re-Order</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model.IsReOrder == true)
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsReOrder" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsReOrder" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Bal.To Order</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model.IsBalToOrder == true)
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsBalToOrder" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsBalToOrder" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">SelectAll</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model.IsSelectAll == true)
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsSelectAll" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsSelectAll" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Total No Of IO's</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.TotalNoOfIos, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Total No Of Prs</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.TotalNoOfPrs, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">ETA</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.ETA, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Weight</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.Weight, new { @class = "allownumericwithdecimal" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Shinkage %</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.ShinkagePercent, new { @class = "allownumericwithdecimal" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text"></label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.RadioButtonFor(model => model.IsConversionInhouse, "true", new { id = "IsConversionInhouse", @class = "width-20" })
+                                    @Html.Label("IsConversionInhouse", "Conversion Inhouse")
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Category</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.Category, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Material</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.Material, MMS.Web.ExtensionMethod.HtmlHelper.MaterialName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Bom Qty</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.BomQty, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Conversion table</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.ConversionTable, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Wastage</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.Wastage, new { @class = "allownumericwithdecimal" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text"></label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.RadioButtonFor(model => model.IsDetailed, "true", new { id = "IsDetailed", @class = "width-20" })
+                                    @Html.Label("IsDetailed", "Detailed")
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text"></label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.RadioButtonFor(model => model.IsConsolidated, "true", new { id = "IsConsolidated", @class = "width-20" })
+                                    @Html.Label("IsConsolidated", "Consolidated")
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-8 col-sm-4 col-lg-8 col-xs-12">
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Shortage %</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.ShortagePercent, new { @class = "allownumericwithdecimal" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Wastage %</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.WastagePercent, new { @class = "allownumericwithdecimal" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-2 col-sm-5 col-lg-2 col-xs-12">
+                                    <label class="form-label" for="text">Multiple IO'S</label>
+                                </div>
+                                <div class="col-md-2 col-sm-7 col-lg-2 col-xs-12">
+                                    @if (Model == null || Model.MaterialRequirementPlanId == 0)
+                                    {
+                                        @Html.ListBoxFor(m => m.MultipleIO, MMS.Web.ExtensionMethod.HtmlHelper.GetInternalOrderIONO(), new { @id = "MultipleIO", @class = "form-control" })
+                                    }
+                                    else
+                                    {
+                                        @Html.ListBoxFor(m => m.FromGrid, MMS.Web.ExtensionMethod.HtmlHelper.GetInternalOrderIONO(), new { @id = "MultipleIO", @class = "form-control" })
+                                    }
+                                </div>
+                                <div class="col-lg-1 col-md-2 col-xs-12">
+                                    <div class="controls">
+
+
+                                        <a class="left_arr" href="javascript:moveSelected('MultipleIO', 'DisplayIO')">&gt;</a>
+                                        <a class="right_arr" href="javascript:moveSelected('DisplayIO', 'MultipleIO')">&lt;</a>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-7 col-lg-4 col-xs-12">
+                                    @if (Model == null || Model.MaterialRequirementPlanId == 0)
+                                    {
+                                        <select multiple id="DisplayIO" class="form-control" size="4" name="topics[]"></select>
+                                    }
+                                    else
+                                    {
+                                        @Html.ListBoxFor(m => m.ToGrid, MMS.Web.ExtensionMethod.HtmlHelper.GetInternalOrderIONO(), new { @id = "DisplayIO", @class = "form-control" })
+                                    }
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="form-footer">
+                    <div class="row">
+                        <div style="margin: 15px 0px;" class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                            <input type="button" onclick="Cancel()" class="btn btn-default btn-style " style="cursor: pointer;" title="Back" value="Back">
+                            @if (Model.MaterialRequirementPlanId == 0)
+                            {
+                                if (Save == true)
+                                {
+                                    <input type="button" onclick="Save()" style="cursor: pointer;" class="btn btn-default btn-style " title="Save" value="Save" id="save">
+                                }
+                                else
+                                {
+                                    <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style " value="Save">
+                                }
+                            }
+                            else
+                            {
+                                if (Update == true)
+                                {
+                                    <input type="button" onclick="Update()" style="cursor: pointer;" class="btn btn-default btn-style " id="MaterialRequirementPlanId" title="Update" value="Update">
+                                }
+                                else
+                                {
+                                    <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style " value="Update">
+                                }
+                            }
+
+                            <input type="button" onclick="Clear()" class="btn btn-default btn-style " title="Clear" value="Clear">
+                        </div>
+                    </div>
+                </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+
+
+    function Back() {
+        //alert()
+        location.href = "../MaterialRequirementPlan/MaterialRequirementPlanGrid";
+    }
+
+   
+    //$("#Date,#FROM,#TO").datepicker('option', 'dateFormat', 'dd/mm/yy');
+
+
+    $(".allownumericwithdecimal").on("keypress keyup blur", function (event) {
+        $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+        if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+            event.preventDefault();
+        }
+    });
+
+    function Clear()
+    {
+        $('#IsProductionPlanBasis').removeAttr('checked', false);
+        $('#IsRejectionOrReplacement').removeAttr('checked', false);
+        $('#IsOrderBasis').removeAttr('checked', false);
+        $('#IsOverConsumption').removeAttr('checked', false);
+        $('#MrpNo').val('');
+        $('#MrpType').val('');
+        $('#Buyer').val('');
+        $('#WeekNo').val('');
+        $('#LotNo').val('');
+        $('#SeasonMasterId').val('');
+        $('#SizeRangeMasterId').val('');
+        $('#CustPlan').val('');
+        $('#ListOfCategory').val('');
+        $('#ListOfGroup').val('');
+        $('#IsCritical').removeAttr('checked', false);
+        $('#MaterialList').val('');
+        $('#IsCustomerSupplied').removeAttr('checked', false);
+        $('#IsGeneral').removeAttr('checked', false);
+        $('#IsReOrder').removeAttr('checked', false);
+        $('#IsImported').removeAttr('checked', false);
+        $('#IsBalToOrder').removeAttr('checked', false);
+        $('#IsSelectAll').removeAttr('checked', false);
+        $('#TotalNoOfPrs').val('');
+        $('#TotalNoOfIos').val('');
+        $('#Weight').val('');
+        $('#IsConversionInhouse').prop('checked', false);
+        $('#ShortagePercent').val('');
+        $('#Category').val('');
+        $('#Material').val('');
+        $('#ConversionTable').val('');
+        $('#BomQty').val('');
+        $('#Wastage').val('');
+        $('#IsDetailed').prop('checked', false);
+        $('#IsConsolidated').prop('checked', false);
+    }
+
+</script>

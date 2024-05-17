@@ -1,0 +1,644 @@
+﻿
+@model MMS.Web.Models.SimpleMRPModel.SimpleMRPModel
+@using MMS.Repository.Managers
+@using MMS.Core.Entities
+
+
+@{
+    <link href="~/Content/chosen/bootstrap-chosen.css" rel="stylesheet" />
+    <script src="~/Scripts/chosen/chosen.jquery.js"></script>
+
+//DateTime? s = new DateTime();
+
+//if (Model.TO==null)
+//{
+//    s = DateTime.Now;
+//}
+//else
+//{
+//    s = Convert.ToDateTime(Model.TO);
+//}
+}
+
+
+<script>
+    $(".chosen-select").chosen();
+</script>
+<style>
+    #MoveSelectedIOS, #IOS {
+        width: 200px !important;
+    }
+
+    .jobwork_mrp_check {
+        background: #f6f6f6;
+        padding: 20px;
+        box-shadow: 0px 0px 10px 1px #d0d0d0;
+    }
+
+        .jobwork_mrp_check > span {
+            display: inline-block;
+        }
+</style>
+
+@*@using (Html.BeginForm("Importexcel", "JobSimpleMrp", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken();*@
+
+    <div class="other_job_service1 home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+        <div class="input_grp_radio col-lg-12 col-md-12 col-sm-12">
+            <div class="dashboard-content checkbox-option col-xs-12">
+                <div class="jobwork_mrp_check">
+                    <form action="#">
+                        <span>
+                            <div class="form-group checkbox_tax">
+                                <input type="checkbox" id="Production" @(Model.ProductionPlanBasic == true ?"checked":"")>
+                                <label for="Production">@Html.CheckBoxFor(m => m.ProductionPlanBasic) Production Plan Basis</label>
+                            </div>
+                        </span>
+                        <span>
+                            <div class="form-group checkbox_tax">
+                                <input type="checkbox" id="Basis" @(Model.OrderBasic ==true ?"checked":"")>
+                                <label for="Basis">@Html.CheckBoxFor(m => m.OrderBasic) Order Basis</label>
+                            </div>
+                        </span>
+                        <span>
+                            <div class="form-group checkbox_tax">
+                                <input type="checkbox" id="JobWork" @(Model.JobWork ==true ?"checked":"")>
+                                <label for="JobWork">@Html.CheckBoxFor(m => m.JobWork) JobWork</label>
+                            </div>
+                        </span>
+                        <span>
+                            <div class="form-group checkbox_tax">
+                                <input type = "checkbox" id="Rejection" @(Model.RejectionorReplacement == true ?"checked":"")>
+                                <label for="Rejection">@Html.CheckBoxFor(m => m.RejectionorReplacement) Rejection / Replacement</label>
+                            </div>
+                        </span>
+                        <span>
+                            <div class="form-group checkbox_tax">
+                                <input type = "checkbox" id="Consumption" @(Model.OverConsumption == true ?"checked":"")>
+                                <label for="Consumption">@Html.CheckBoxFor(m => m.OverConsumption) Over Consumption</label>
+                            </div>
+                        </span>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        <div class="header_list_tab  col-lg-12 col-md-12 col-sm-12  col-xs-12">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+                <div class="list_tab">
+                    <div class="title">
+                        Detail
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-12 col-sm-12  col-xs-12">
+                <div class="button_tab  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="jobwork_mrp_2 col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-xs-12 block-section ordr-sheet-blk">
+                <div class="row">
+                    <div class="col-md-11">
+                        <div class="col-md-12">
+                            <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                <div class="form-group">
+                                    <label>MRP No</label>
+                                    @Html.HiddenFor(x => x.SimpleMRPID)
+                                    @Html.HiddenFor(x => x.MRPNO)
+                                    @Html.TextBoxFor(m => m.MRPCode, new { @class = "form-control text-field" })
+                                    @Html.ValidationMessageFor(m => m.MRPNO)
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                <div class="input-group date my_picker1" data-date-format="MM/dd/yyyy">
+                                    <label>Date</label>
+                                    @if(string.IsNullOrEmpty(Model.MRPDate))
+                                    {
+                                        @Html.TextBoxFor(m => m.MRPDate, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control filter-cal" })
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.MRPDate, new { @class = "form-control filter-cal" })
+                                    }
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                <div class="form-group">
+                                    <label>MRP Type</label>
+                                    @Html.DropDownListFor(m => m.MRPType, new SelectList(new List<Object>{
+                                   new { value = 0 , text = "Please Select"  },
+                                   new { value = 1 , text = "Purchase"  },
+                                   new { value = 2 , text = "Enco" }
+                               }, "value", "text", 0), new { @class = "form-control input chosen-select" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                <div class="form-group">
+                                    <label>Cust plan</label>
+                                    @Html.DropDownListFor(m => m.CustomerPlan, new SelectList(new List<Object>{new { value = 1 , text = "As Planned" },
+                                                                                    new { value = 2 , text = "Scheduled" } }, "value", "text"), "Please Select",
+                           new { @class = "form-control input chosen-select" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                <div class="form-group">
+                                    <label>Buyer</label>
+                                    @Html.DropDownListFor(m => m.BuyerNameid, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "form-control input chosen-select" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                <div class="form-group">
+                                    <label>Week No</label>
+                                    @Html.DropDownListFor(m => m.WeekNO, MMS.Web.ExtensionMethod.HtmlHelper.WeekNo_Internal(), new { @class = "form-control input chosen-select" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                <div class="form-group">
+                                    <label>Season</label>
+                                    @Html.DropDownListFor(m => m.SeasonID, MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "form-control input chosen-select" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                <div class="form-group">
+                                    <label>Lot No</label>
+                                    @Html.DropDownListFor(m => m.LotNO, MMS.Web.ExtensionMethod.HtmlHelper.LOtNowihSeason(), new { @class = "form-control input chosen-select" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                <div class="form-group">
+                                    <label>Size Range</label>
+                                    @Html.DropDownListFor(m => m.SizeRangeID, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "form-control input chosen-select" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                    <div class="input-group date my_picker2" data-date-format="MM/dd/yyyy">
+                                        <label>From</label>
+                                        @if(string.IsNullOrEmpty(Model.From))
+                                        {
+                                            @Html.TextBoxFor(m => m.From, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control filter-cal" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(m => m.From, new { @class = "form-control filter-cal" })
+                                        }
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                    <div class="input-group date my_picker3" data-date-format="MM/dd/yyyy">
+                                        <label>To</label>
+                                        @if(string.IsNullOrEmpty(Model.TO))
+                                        {
+                                            @Html.TextBoxFor(m => m.TO, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control filter-cal" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(m => m.TO, new { @class = "form-control filter-cal" })
+                                        }
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                    </div>
+                                </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                <div class="form-group">
+                                    <label>Total Order Count</label>
+                                    @Html.TextBoxFor(m => m.TotalOrderCount, new { @class = "form-control", @disabled = true })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                <div class="form-group">
+                                    <label>Display IO's</label>
+                                    @*<div class="upload-btn-wrapper mrp_upload">*@
+                                        @*<button class="btn">Choose file</button>*@
+                                        <input type="file" id="dataFile" name="upload" />                                        
+                                        @*<span>No file Choosen</span>*@
+                                    @*</div>*@                                    
+                                    <input type="submit" value="Upload" onclick="return ValidateExtension()" class="btn green-btn upload" />
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12">
+                                <div class="form-group">
+                                    
+                                    @if (Model != null && Model.IOS != null)
+                                    {
+                                        @Html.ListBoxFor(model => model.SelectedCities, new MultiSelectList(Model.IOS, "Value", "Text"), new { size = "10", @style = "width: 125px;" })
+                                    }
+                                    else
+                                    {
+                                        @Html.ListBoxFor(m => m.MoveSelectedIOS, Model.selectlist ?? new List<SelectListItem>())
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12">
+                                <div class="form-group swap-arrow">
+                                    <span>
+                                        <i class="fa fa-angle-double-right" onclick="addallItems();"></i>
+                                    </span>
+                                    <span>
+                                        <i class="fa fa-angle-right" onclick="addItem();"></i>
+                                    </span>
+                                    <span>
+                                        <i class="fa fa-angle-left" onclick="removeItem();"></i>
+                                    </span>
+                                    <span>
+                                        <i class="fa fa-angle-double-left" onclick="removeallItems();"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12">
+                                <div class="form-group" id="SelectedItems">
+                                    @if (Model != null && Model.IOS != null && Model.selectlist != null)
+                                    {
+                                        @Html.ListBoxFor(model => model.MoveSelectedIOS, new MultiSelectList(Model.selectlist, "Value", "Text"), new { size = "10", @style = "width: 125px;" })
+                                    }
+                                    else
+                                    {
+                                        @Html.ListBoxFor(m => m.IOS, Model.selectlist ?? new List<SelectListItem>())
+                                    }
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="md-1"></div>
+                </div>
+                <div class="init_action col-lg-12 col-md-12 col-sm-12">
+                    <button class="btn violet-btn" onclick="Cancel()">Back</button>
+
+                    @if (Model != null && Model.SimpleMRPID != 0)
+                    {
+                        <button class="btn green-btn" onclick="Save()" id="CountryMasterId">Update</button>
+                        <button class="btn violet-btn" id="BtnCalculte" onclick="Calculate()">Calculate</button>
+                    }
+                    else
+                    {
+                        <button class="btn green-btn" id="Btnsave" onclick="Save()">Save</button>
+                    }
+                    <input type="button" id="BtnCalculte" onclick="Calculate()" class="btn btn-default btn-style" style="cursor:pointer;display:none" title="Calculate" value="Calculate">
+                    <button class="btn green-grey" id="BtnDisplay">Display</button>
+
+                </div>
+            </div>
+
+        </div>
+
+        @*<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="text-align:right;margin-top:10px;margin-bottom:10px;">
+            <input type="button" class="rt_add" style="cursor: pointer;" title="Add" value="Add" id="AUtoDisplay" />
+        </div>*@
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 jobwork_mrp_tbl">
+            <div id="no-more-tables" class="col-xs-12 no-padding">
+                <table class="col-md-12 table-striped table-condensed cf table-change home_dahboard" id="list-amended-material">
+                    <thead>
+                        <tr>
+                            <td style="display: none">BOMID</td>
+                            <td style="display: none">BOMMaterialID</td>
+                            <td>Category</td>
+                            <td>MaterialGroup</td>
+                            <td>Substance</td>
+                            <td>Order No</td>
+                            <td>MaterialName</td>
+                            <td>Color</td>
+                            <td>Req Qty</td>
+                            <td>IntendQty</td>
+                            <td>Rate</td>
+                            <td>UOM</td>
+                            <td>Value</td>
+
+                        </tr>
+                    </thead>
+                    <tbody class="common-table-head"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+@*}*@
+
+<script src="~/Scripts/Jobwork/js/datepicker.min.js"></script>
+<script src="~/Scripts/Jobwork/js/custom_script.js"></script>
+<script src="~/Scripts/moment.js"></script>
+
+<script type="text/javascript">
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+
+
+    $("#BtnDisplay").click(function () {
+        var MRPNO = $("#MRPCode").val();
+        $.ajax({
+            url: '/Indent/GETMRPMaterialList',
+            type: 'GET',
+            data: { MRPNO: $("#MRPCode").val() },
+            success: function (data) {
+                $("#BtnCalculte").hide();
+                $("#CountryMasterId").hide();
+                $("#list-amended-material tbody").html("");
+                $.each(data, function (i, item) {
+                    $("#RemoveHead").css("display", "block");
+                    $("#EditHead").css("display", "block");
+                    if (item.SubstanceRange == null) {
+                        item.SubstanceRange = "";
+                    }
+                    if (item.BuyerPoNo == null) {
+                        item.BuyerPoNo = "";
+                    }
+                    if (item.Color == null) {
+                        item.Color = "";
+                    }
+                    if (item.IndentQTY == null) {
+                        item.IndentQTY = "";
+                    }
+                    var qty = parseFloat(item.RequiredQty)
+                    var rate = parseFloat(item.Price);
+                    var value = qty * rate;
+                    value = Math.round(value).toFixed(2);
+                    $("#list-amended-material tbody").append("<tr id=" + item.IndentMaterialID + "> <td id='BOMID' style='display:none' class='BOMID' value=''>" + item.BOMID + "</td>"
+                        //+ "<td><input type='button' value='Remove' onclick='Delete(" + item.IndentMaterialID + ")' class='' />" + "</td>"
+                        // + "<td><input type='button' value='Edit' onclick='RowClick(" + item.IndentMaterialID + "," + item.BOMID + ")' class='' />" + "</td>"
+                                 + "<td id='BOMMaterialID' style='display:none' class='BOMMaterialID' value=''>" + item.BOMMaterialID + "</td>"
+                                 + "<td id='MRPNO' style='display:none' class='MRPNO' value=''>" + item.MRPNO + "</td>"
+                                   + "<td id='CategoryName'  class='CategoryName' value=''>" + item.CategoryName + "</td>"
+                                     + "<td id='GroupName'  class='GroupName' value=''>" + item.GroupName + "</td>"
+                                      + "<td id='SubstanceRange'  class='SubstanceRange' value=''>" + item.SubstanceRange + "</td>"
+                                         + "<td id='BuyerPoNo'  class='BuyerPoNo' value=''>" + item.BuyerPoNo + "</td>"
+                                 + "<td id='MaterialDescription'  class='MaterialDescription' value=''>" + item.MaterialDescription + "</td>"
+                                 + "<td id='Color'  class='Color' value=''>" + item.Color + "</td>"
+                                + "<td id='RequiredQty' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                           + "<td id='IndentQTY'  class='IndentQTY' value=''>" + item.IndentQTY + "</td>"
+                            + "<td id='Price'  class='Price' value=''>" + item.Price + "</td>"
+                            + "<td id='WastageName'  class='WastageName' value=''>" + item.WastageName + "</td>"
+                            + "<td id='Value'  class='Value' value=''>" + value + "</td>"
+                                    + "<td id='TotalNorms' style='display:none' class='TotalNorms' value=''>" + item.TotalNorms + "</td>"
+                                    + "<td id='MaterialCategoryMasterId' style='display:none' class='MaterialCategoryMasterId' value=''>" + item.MaterialCategoryMasterId + "</td>"
+                                    + "<td id='MaterialGroupMasterId' style='display:none' class='MaterialGroupMasterId' value=''>" + item.MaterialGroupMasterId + "</td>"
+                                    + "<td id='ColorMasterId' style='display:none'  class='ColorMasterId' value=''>" + item.ColorMasterId + "</td>"
+                                    + "<td id='SubstanceMasterId' style='display:none' class='SubstanceMasterId' value=''>" + item.SubstanceMasterId + "</td>"
+                                    + "<td id='BuyerSeason' style='display:none' class='BuyerSeason' value=''>" + item.BuyerSeason + "</td>"
+                                    + "<td id='SeasonName' style='display:none' class='SeasonName' value=''>" + item.SeasonName + "</td>"
+                                    + "<td id='RequiredQty' style='display:none' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                      + "<td id='Rate' style='display:none' class='Rate' value=''>" + item.Rate + "</td>"
+                                        + "<td id='UomMasterId' style='display:none' class='UomMasterId' value=''>" + item.WastageQtyUOM + "</td>"
+                                          + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierId + "</td>"
+                                          + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierName + "</td>"
+                                            + "<td id='BuyerFullName' style='display:none' class='BuyerFullName' value=''>" + item.BuyerFullName + "</td>"
+                                              + "<td id='BuyerMasterId' style='display:none' class='BuyerMasterId' value=''>" + item.BuyerMasterId + "</td>"
+                                    + "<td id='OrderEntryId' style='display:none' class='OrderEntryId' value=''>" + item.OrderEntryId + "</td></tr>");
+                });
+            }
+        });
+    });
+
+
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    $(function () {
+        $('.loader-overlay').ajaxStart(function () {
+            $(this).fadeIn('slow');
+        }).ajaxStop(function () {
+            $(this).stop().fadeOut('fast');
+        });
+    });
+
+    function ValidateExtension() {
+        var allowedFiles = [".xls", ".xlsx", ".ods"];
+        var fileUpload = document.getElementById("dataFile");
+        var lblError = document.getElementById("lblError");
+        var regex = new RegExp("([a-zA-Z0-9\s_\\.\-:])+(" + allowedFiles.join('|') + ")$");
+        if (!regex.test(fileUpload.value.toLowerCase())) {
+            lblError.innerHTML = "Please upload files having extensions: <b>" + allowedFiles.join(', ') + "</b> only.";
+            return false;
+        }
+        lblError.innerHTML = "";
+        return true;
+    }
+
+
+    function addItem() {
+        if ($("#IOS option:selected").length > 0) {
+            $("#MoveSelectedIOS option:selected").each(function () {
+                $("#SelectedItems").find('#IOS').append(
+                                     $('<option></option>').val($(this).text()).text($(this).text()));
+            });
+        }
+        else if ($("#SelectedCities option:selected").length > 0) {
+            $("#SelectedCities option").appendTo("#MoveSelectedIOS");
+            $("#MoveSelectedIOS option").attr("selected", false);
+        }
+        else if ($("#MoveSelectedIOS option:selected").length > 0) {
+            $("#MoveSelectedIOS option:selected").each(function () {
+                $("#SelectedItems").find('#IOS').append(
+                                     $('<option></option>').val($(this).text()).text($(this).text()));
+            });
+        }
+        else {
+            $("#SelectedCities option:selected").appendTo("#MoveSelectedIOS");
+            $("#MoveSelectedIOS option").attr("selected", false);
+
+        }
+        var optionValues = [];
+        $('#MoveSelectedIOS option:selected').each(function () {
+            optionValues.push($(this).text());
+        });
+        var ParseText = JSON.stringify(optionValues);
+        $.ajax({
+            url: ' @Url.Action("GetTotalCount", "JobSimpleMrp")',
+            type: "GET",
+            dataType: "JSON",
+            data: { LotNo: ParseText },
+            success: function (cities) {
+                $('#TotalOrderCount').val(cities.Count);
+            }
+        });
+
+    }
+    function addallItems() {
+        if ($("#IOS option:selected").length > 0) {
+            $("#MoveSelectedIOS option").each(function () {
+                $("#SelectedItems").find('#IOS').append(
+                                     $('<option></option>').val($(this).text()).text($(this).text()));
+            });
+        }
+        else if ($("#SelectedCities option").length > 0) {
+            $("#SelectedCities option").each(function () {
+                $("#SelectedItems").find('#IOS').append(
+                                       $('<option></option>').val($(this).text()).text($(this).text()));
+            });
+        }
+        else if ($("#MoveSelectedIOS option").length > 0) {
+            $("#MoveSelectedIOS option").each(function () {
+                $("#SelectedItems").find('#IOS').append(
+                                       $('<option></option>').val($(this).text()).text($(this).text()));
+            });
+        }
+        else {
+            $("#SelectedCities option").appendTo("#MoveSelectedIOS");
+            $("#MoveSelectedIOS option").attr("selected", false);
+
+        }
+    }
+    function removeItem() {
+        if ($("#IOS option:selected").length > 0) {
+            $("#IOS option:selected").each(function () {
+                $(this).remove();
+            });
+        }
+        else if ($("#SelectedCities option:selected").length > 0) {
+            $("#IOS option:selected").each(function () {
+                $(this).remove();
+            });
+        }
+        else {
+            $("#MoveSelectedIOS option:selected").appendTo("#SelectedCities");
+            $("#SelectedCities option").attr("selected", false);
+
+        }
+
+    }
+    function removeallItems() {
+
+        if ($("#IOS option").length > 0) {
+            $("#IOS option").each(function () {
+                $(this).remove();
+            });
+        }
+        else {
+            $("#MoveSelectedIOS option").appendTo("#SelectedCities");
+            $("#SelectedCities option").attr("selected", false);
+        }
+
+    }
+    function Calculate() {
+        $('.loader-overlay').show();
+        $('.loader-overlay').fadeIn('fast');
+        var optionValues = [];
+        $('#IOS option').each(function () {
+            optionValues.push($(this).text());
+        });
+        var ParseText = JSON.stringify(optionValues);
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("IOSelectList", "JobSimpleMrp")',
+            data: { SelectText: ParseText, SimpleMRPID: $('#SimpleMRPID').val() },
+            success: function (data) {
+                $('.loader-overlay').fadeOut('fast');
+                $('.loader-overlay').hide();
+
+                if (data.InternalStatus != null && data.InternalStatus != "") {
+                    alert(data.InternalStatus);
+                }
+                if (data.BOMStatus != null && data.BOMStatus != "") {
+                    alert(data.BOMStatus);
+                }
+                if (data.status != null && data.status != "") {
+                    alert(data.status);
+                }
+                if (data.orderStatus != null && data.orderStatus != "") {
+                    alert("These are the order no already existed" + ":" + data.orderStatus);
+                }
+                return false;
+
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                //$('#DivShow').hide();
+                $('#JobWorkSimpleMRPPartial').hide();
+            }
+        });
+    }
+    $("#WeekNO").change(function () {
+        var week = $("#WeekNO option:selected").text();
+        $.ajax({
+            url: ' @Url.Action("GetLotNo", "JobSimpleMrp")',
+            type: "GET",
+            dataType: "JSON",
+            data: { WeekNo: week },
+            success: function (cities) {
+                $("#LotNO").html("").trigger('chosen:updated');
+                $.each(cities.lotNoList, function (i, item) {
+                    $("#LotNO").append(
+                        $('<option></option>').val(item.Value).html(item.Text)).trigger('chosen:updated');
+                });
+                $("#SeasonID").html("").trigger('chosen:updated');
+                $("#MoveSelectedIOS").html("");
+
+                $.each(cities.seasonList_, function (i, season) {
+                    $("#SeasonID").append(
+                        $('<option></option>').val(season.Value).html(season.Text)).trigger('chosen:updated');
+                });
+            }
+        });
+    });
+
+    $("#BuyerNameid").change(function () {
+        var buyer = $("#BuyerNameid").val();
+        $.ajax({
+            url: ' @Url.Action("GetBuyerWithWeekNO", "JobSimpleMrp")',
+            type: "GET",
+            dataType: "JSON",
+            data: { BuyerName: buyer },
+            success: function (cities) {
+                $("#WeekNO").html("").trigger('chosen:updated');
+                $("#MoveSelectedIOS").html("");
+                $.each(cities, function (i, item) {
+                    $("#WeekNO").append(
+                        $('<option></option>').val(item.Value).html(item.Text)).trigger('chosen:updated');
+                });
+
+            }
+        });
+    });
+    $("#SeasonID").change(function () {
+        var seasonName = $("#SeasonID option:selected").text();
+        $.ajax({
+            url: ' @Url.Action("GetLotNoWithSeason", "JobSimpleMrp")',
+            type: "GET",
+            dataType: "JSON",
+            data: { SeasonName: seasonName },
+            success: function (cities) {
+                $("#LotNO").html("").trigger('chosen:updated');
+                $("#MoveSelectedIOS").html("");
+                $.each(cities.lotNoList_, function (i, item) {
+                    $("#LotNO").append(
+                        $('<option></option>').val(item.Text).html(item.Text)).trigger('chosen:updated');
+                });
+
+            }
+        });
+    });
+    $("#LotNO").change(function () {
+        var lotno = $("#LotNO option:selected").text();
+        var SeasonID = $("#SeasonID").val();
+        var buyer = $("#BuyerNameid").val();
+        $.ajax({
+            url: ' @Url.Action("GetLotWithOrderNO", "JobSimpleMrp")',
+            type: "GET",
+            dataType: "JSON",
+            data: { LotNo: lotno, SeasonID, buyer },
+            success: function (cities) {
+                $('#TotalOrderCount').val(cities.Count);
+                $("#MoveSelectedIOS").html("");
+                $.each(cities.lotNoList_, function (i, item) {
+                    $("#MoveSelectedIOS").append(
+                        $('<option></option>').val(item.Value).html(item.Text));
+                });
+            }
+        });
+    });
+
+
+
+</script>

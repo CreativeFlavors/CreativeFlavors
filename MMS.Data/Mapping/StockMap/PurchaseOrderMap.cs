@@ -1,0 +1,111 @@
+﻿using MMS.Core.Entities.Stock;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity.ModelConfiguration;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MMS.Data.Mapping.StockMap
+{
+    public class PurchaseOrderMap : EntityTypeConfiguration<PurchaseOrder>
+    {
+        public PurchaseOrderMap()
+        {
+            HasKey(t => t.PoOrderId);
+            Property(t => t.PoOrderId).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            Property(t => t.PoNo);
+            Property(t => t.Unit);
+            Property(t => t.FreightAmt);
+            // Property(t => t.FreightAmtCurrency).IsRequired(); 
+            Property(t => t.FreightType);
+            Property(t => t.LastAmendmentNo);
+            Property(t => t.LastAmendmentDate);
+            Property(t => t.PoDate);
+            Property(t => t.PoType);
+            Property(t => t.InsuranceAmount);
+            Property(t => t.InsureanceCurrency);
+            Property(t => t.RefInfo);
+            Property(t => t.Supplier);
+            Property(t => t.CustomsDuty);
+            Property(t => t.CustomsDutyType);
+            Property(t => t.Form);
+            Property(t => t.Currency);
+            Property(t => t.ExRate).HasPrecision(18,4);
+            Property(t => t.PackForwardtype);
+            Property(t => t.PackForward);
+            Property(t => t.FormName);
+            Property(t => t.InsuranceDetails);
+            Property(t => t.ServiceTax);
+            Property(t => t.ServiceTaxType);
+            Property(t => t.ServiceTaxNumbner);
+            Property(t => t.TickToCloseOrder);
+            Property(t => t.TaxType);
+            Property(t => t.OrderClosedOn);
+            Property(t => t.IndentNo);
+            Property(t => t.Category);
+            Property(t => t.Groupname);
+            Property(t => t.Material);
+            Property(t => t.Description);
+            Property(t => t.Machinename);
+            Property(t => t.UOM);
+            Property(t => t.UOMValue);
+            Property(t => t.UOMType);
+            Property(t => t.UOMValue1);
+            Property(t => t.Color);
+            Property(t => t.Qty);
+            Property(t => t.Substance);
+            Property(t => t.Weight);
+            Property(t => t.IONO);
+            Property(t => t.OtherSpecification);
+            Property(t => t.Unit);
+            Property(t => t.ReqdDate);
+            Property(t => t.ETD);
+            Property(t => t.ETA);
+            Property(t => t.Rate);
+            Property(t => t.Dis);
+            Property(t => t.DisAmount);
+            Property(t => t.ExciseDuty);
+            Property(t => t.ExciseDutyAmount);
+            Property(t => t.Exess);
+            Property(t => t.ExessAmount);
+            Property(t => t.SHExess);
+            Property(t => t.SHExessAmount);
+            Property(t => t.VAT);
+            Property(t => t.VATAmt);
+            Property(t => t.SurCharge);
+            Property(t => t.SurChargeAmt);
+            Property(t => t.AmountTax).HasPrecision(18, 4);
+            Property(t => t.Remarks);
+            Property(t => t.MRPMargin);
+            Property(t => t.MRPPrice);
+            Property(t => t.AccessibleValue);
+            Property(t => t.CreatedDate);
+            Property(t => t.UpdatedDate);
+            Property(t => t.CreatedBy);
+            Property(t => t.UpdatedBy);
+            Property(t => t.IndentMaterialID);
+            Property(t => t.StockValue);
+            Property(t => t.FrightType);
+            Property(t => t.IndentValue);
+            Property(t => t.OrderType);
+            Property(t => t.IndentNoDirectPO);
+            Property(t => t.FreightCostTotal);
+            Property(t => t.ServiceTaxPer);
+            Property(t => t.SupplierName);
+            Property(t => t.CompanyName);
+            Property(t => t.Address);
+            Property(t => t.City);
+            Property(t => t.Phone);
+            Property(t => t.PaymentTerms);
+            Property(t => t.DeliverTerms);
+            Property(t => t.OtherTerms); 
+            Property(t => t.TermsConditions);
+            Property(t => t.MaterialType);
+            Property(t => t.ISPO_cancelled);
+            Property(t => t.ISPO_cancelled_Reson);
+            ToTable("PurchaseOrder");
+        }
+    }
+}

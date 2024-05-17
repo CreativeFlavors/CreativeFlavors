@@ -1,0 +1,193 @@
+﻿@model MMS.Web.Models.Permission.PermissionModel
+
+<div id="DivShowUserType" class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+        <div class="table-responsive table-td-padding padding-lr-6px table-row-bg" style="overflow: auto;">
+            <table class="veh-table" id="empTable">
+                <thead>
+                    <tr class="color-code-top-btn">
+                        <td colspan="7">
+                            <input type="text" id="SeaarchID" placeholder="Search.." />
+                            <input type="button" value="Search" onclick="Search()">
+                            <input type="button" value="Add" onclick="Add()">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="veh-1">
+                            S.No
+                        </th>
+                        <th class="veh-1">
+                            Permission
+                        </th>
+                        <th class="veh-3">
+                            Permission Description
+                        </th>
+                        <th class="veh-4">
+                            Edit
+                        </th>
+                    </tr>
+                </thead>
+                @if (Model.PermissionModelList != null && Model.PermissionModelList.Count > 0)
+                {
+                    int count = 1;
+                    <tbody>
+
+                        @foreach (var item in Model.PermissionModelList)
+                        {
+                            <tr>
+                                <td class="veh-3">@count</td>
+                                <td style="display:none;" class="veh-1">@item.PermissionID</td>
+                                <td class="veh-1">@item.PermissionName</td>
+                                <td class="veh-3">@item.PermissionDesc</td>
+                                <td class="veh-1 edit-del-wrap" style=" width: 284px;">
+                                    <a href="javascript:void(0);" class="selected watchlist-edit" title="Edit"></a>
+                                </td>
+                            </tr>
+                            count++;
+                        }
+
+                    </tbody>
+                    <tfoot class="footer-pager">
+                        <tr>
+                            <td colspan="4">
+                                <div id="pager">
+                                    <form>
+                                        <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                        <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                        <input type="text" class="pagedisplay" />
+                                        <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                        <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                        <select class="pagesize">
+                                            <option selected="selected" value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="30">30</option>
+                                            <option value="40">40</option>
+                                        </select>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+
+                }
+
+            </table>
+        </div>
+        @if (Model.PermissionModelList != null && Model.PermissionModelList.Count == 0)
+        {
+            <div style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+        }
+    </div>
+</div>
+<div style="display:none;" id="DivAddUserType" class="right-form-section clearfix">
+    <form id="FromUser" role="form" class="form-inline">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding stage_top_sec">
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                                <label class="form-label" for="text">Permission Name</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.HiddenFor(x => x.PermissionID)
+                                @Html.TextBoxFor(m => m.PermissionName, new { @class = "form-control text-field" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding stage_top_sec">
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                                <label class="form-label" for="text">Permission Description</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.TextBoxFor(m => m.PermissionDesc, new { @class = "form-control text-field" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding stage_top_sec">
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                                <label class="form-label" for="text"></label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                <input type="button" id="btnCancel" onclick="Cancel()" class="btn btn-default btn-style width-78" value="Cancel" name="btnSave" />
+                                <input type="button" id="btnSave" class="btn btn-default btn-style width-78" value="Save" name="btnSave" />
+                                <input type="button" id="btnClear" onclick="Clear()" class="btn btn-default btn-style width-78" value="Clear" name="btnSave" />
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+<script>
+        function Add() {
+            $("#DivAddUserType").show();
+            $("#DivShowUserType").hide();
+            Clear();
+        }
+        function Cancel() {
+            Clear();
+            $("#DivAddUserType").hide();
+            $("#DivShowUserType").show();
+        }
+        function Clear() {
+            $("#PermissionID").val(0);
+            $("#PermissionName").val("");
+            $("#PermissionDesc").val("");
+            $("#btnSave").val("Save");
+        }
+
+
+        $(document).ready(function () {
+            $("#btnSave").val("Save");
+
+            $(".selected").click(function () {
+                $("#btnSave").val("Update");
+                var PermissionID = $(this).closest("tr").find('td:eq(1)').text();              
+                var PermissionName = $(this).closest("tr").find('td:eq(2)').text();
+                var PermissionDesc = $(this).closest("tr").find('td:eq(3)').text();
+
+                $("#PermissionID").val(PermissionID);
+                $("#PermissionName").val(PermissionName);
+                $("#PermissionDesc").val(PermissionDesc);
+                $("#DivAddUserType").show();
+                $("#DivShowUserType").hide();
+            });
+
+            $("#btnSave").click(function () {
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Accounts/Permission',
+                    data: $("form").serialize(),
+
+                    success: function (data) {
+                        if (data == true) {
+                            alert('Saved Successfully.');
+                            location.href = "/Accounts/Permission";
+                            return false;
+                        }
+                    }
+                });
+
+                //$.post("/Accounts/UserType", { data: $("form").serialize() }, function (data) {
+
+                //});
+            });
+        });
+</script>

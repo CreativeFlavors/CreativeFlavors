@@ -1,0 +1,1617 @@
+﻿@model MMS.Data.StoredProcedureModel.IssueSlip_SingleModel
+@using MMS.Core.Entities;
+
+@{
+    bool Order = true;
+    MMS.Repository.Managers.StockManager.SizeRangeQtyRateManager sizerangeManager = new MMS.Repository.Managers.StockManager.SizeRangeQtyRateManager();
+    MMS.Repository.Managers.StockManager.BuyerOrderEntryManager buyerOrderManager = new MMS.Repository.Managers.StockManager.BuyerOrderEntryManager();
+
+    int count = 1;
+    if (Model != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0 && Model.issueSlip_MaterialDetails.FirstOrDefault().IssueType != null && Model.issueSlip_MaterialDetails.FirstOrDefault().IssueType != "" && Model.IssueTypeName == "Order")
+    {
+        Order = true;
+        Model.IssueType_ = Model.IssueType;
+
+    }
+    else if (Model != null && Model.issueSlip_MaterialDetails == null)
+    {
+        Order = true;
+        Model.IssueType_ = Model.IssueType;
+    }
+    else
+    {
+        Order = false;
+    }
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Multiple Issue", PermissionSettingModel.PermissionID);
+    }
+
+}
+
+@{
+    <link href="~/Content/chosen/bootstrap-chosen.css" rel="stylesheet" />
+    <script src="~/Scripts/chosen/chosen.jquery.js"></script>
+}
+
+
+<script>
+    $(".chosen-select").chosen();
+</script>
+
+<style>
+    .chosen-container-single {
+        width: 200px !important;
+    }
+    .chosen-container-multi .chosen-choices {
+        z-index: 999;
+        bottom: 6px;
+    }
+    div#Jobworktype_Id_chosen ul {
+        height: auto;
+        max-height: 87px;
+        overflow-y: auto;
+    }
+
+    div#Jobworktype_Id_chosen {
+        width: 100% !important;
+    }
+
+</style>
+
+<div class="other_job_service1 home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+
+    <div class="header_list_tab  col-lg-12 col-md-12 col-sm-12  col-xs-12">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+            <div class="list_tab">
+                <div class="title">
+                    Detail
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-12 col-sm-12  col-xs-12">
+            <div class="button_tab  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="other_job_service1 mob_padding col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="col-xs-12 block-section ordr-sheet-blk">
+            <div class="row">
+                <div class="col-md-11">
+                    <div class="col-md-12">
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="input-group date my_picker" data-date-format="MM/dd/yyyy">
+                                <label>Issue Date</label>
+
+                                @Html.TextBoxFor(m => m.IssueDate, new { @class = "form-control filter-cal" })
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+
+
+                                @Html.HiddenFor(x => x.IssueSlipFK)
+                                <label>Issue Type</label>
+                                @if (Model != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+                                {
+                                    if (Model != null && Model.IssueType_ != null)
+                                    {
+                                        @Html.DropDownListFor(m => m.IssueType_, MMS.Web.ExtensionMethod.HtmlHelper.GetJobWorkGRNType(), new { @class = "form-control input chosen-select" })
+                                    }
+                                    else
+                                    {
+                                        @Html.DropDownListFor(m => m.IssueType, MMS.Web.ExtensionMethod.HtmlHelper.GetJobWorkGRNType(), new { @class = "form-control input chosen-select" })
+                                    }
+                                }
+                                else
+                                {
+                                    @Html.DropDownListFor(m => m.IssueType, MMS.Web.ExtensionMethod.HtmlHelper.GetJobWorkGRNType(), new { @class = "form-control input chosen-select" })
+                                }
+
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Issue Slip No</label>
+                                @Html.HiddenFor(x => x.IssueSlipID)
+                                @Html.TextBoxFor(m => m.IssueSlipNo, new { @class = "form-control " })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Jobworker Name</label>
+                                @Html.DropDownListFor(x => x.Jw_Name, MMS.Web.ExtensionMethod.HtmlHelper.JobworkName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Job Work No</label>
+                                @Html.DropDownListFor(m => m.Jobworktype_Id, new SelectList(
+                               new List<Object>{
+
+
+                    },
+                                "value", "text", 0
+                  ), new { @class = "form-control input chosen-select", @multiple= "multiple" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Style No</label>
+                                @Html.DropDownListFor(m => m.Style, MMS.Web.ExtensionMethod.HtmlHelper.BomStyleNo(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Stores</label>
+                                @Html.DropDownListFor(m => m.StoreName, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Season</label>
+                                @Html.DropDownListFor(m => m.Season, MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Category</label>
+                                @Html.DropDownListFor(m => m.CategoryName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group" id="text_id">
+                                <label>Internal Order</label>
+                               
+                                @Html.TextBoxFor(m => m.InternalValue, new { @class = "form-control " })
+                               
+                            </div>
+                            <div class="form-group" id="select_id">
+                                <label>Internal Order</label>
+
+                                @Html.DropDownList("Io", MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Group</label>
+                                @Html.DropDownListFor(m => m.GroupName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Stock Type</label>
+                                @Html.DropDownListFor(m => m.MaterialType, new SelectList(
+                                            new List<object>
+                                                {
+                                                new { value=0, text="Please select" },
+                                                new { value=1, text="Local" },
+                                                new { value=2, text="Customer Import"},
+                                                new { value=3, text="Direct Import"}
+                                                },
+                                                "value",
+                                                "text", 0), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Supplier</label>
+                                @Html.DropDownListFor(m => m.SupplierNameId, MMS.Web.ExtensionMethod.HtmlHelper.SupplierName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Supplier Lot no</label>
+                              @Html.DropDownListFor(m => m.SupplierName_Lotno, MMS.Web.ExtensionMethod.HtmlHelper.GET_SupplierName_Lotno(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        @*<div class="col-lg-3 col-md-3 col-sm-12 input-blk quantity-filter">
+                            <label>Pieces</label>
+                            <div class="col-sm-4 no-padding">
+                                <div class="form-group">
+                                    @Html.TextBoxFor(x => x.Piecies, new { @class = "form-control text-field Piecies_genral" })
+                                </div>
+                            </div>
+                            <div class="col-sm-8 mbl-pad-0">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(m => m.PieciesType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "form-control filter-sec" })
+                                </div>
+                            </div>
+                        </div>*@
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Lot NO.</label>
+                                @Html.DropDownListFor(m => m.LotNo, MMS.Web.ExtensionMethod.HtmlHelper.LOtNo(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk quantity-filter">
+                            <label>Balance in this lot</label>
+                            <div class="col-sm-4 no-padding">
+                                <div class="form-group">
+                                    @Html.TextBoxFor(x => x.BalanceInThisListlot, new { @class = "form-control input-field" })
+                                </div>
+                            </div>
+                            <div class="col-sm-8 mbl-pad-0">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(m => m.BalanceInthisListType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "form-control filter-sec" })
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Machine Name</label>
+                                @Html.DropDownListFor(m => m.MachineName, MMS.Web.ExtensionMethod.HtmlHelper.MachineName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>*@
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>No Of Sets/Pairs</label>
+                                @Html.TextBoxFor(x => x.NoOfSets, new { @class = "form-control input-field" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Color</label>
+                                @Html.DropDownListFor(m => m.Color, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Rate</label>
+                                @Html.TextBoxFor(x => x.Rate, new { @class = "form-control input-field" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Substance</label>
+                                @Html.DropDownListFor(m => m.SubtanceID, MMS.Web.ExtensionMethod.HtmlHelper.SubstanceRange(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 no-padding">
+                            <div class="col-lg-6 col-md-6 col-sm-12 input-blk quantity-filter">
+                                <label>Required Qty</label>
+                                <div class="col-sm-4 no-padding">
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(x => x.RequiredQty, new { @class = "form-control input-field" })
+                                    </div>
+                                </div>
+                                <div class="col-sm-8 mbl-pad-0">
+                                    <div class="form-group">
+                                        @Html.DropDownListFor(m => m.RequiredType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "form-control  filter-sec" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 input-blk quantity-filter">
+                                <label>Required Pcs</label>
+                                <div class="col-sm-4 no-padding">
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(x => x.PiecesRequiredQTY, new { @class = "form-control input-field" })
+                                    </div>
+                                </div>
+                                <div class="col-sm-8 mbl-pad-0">
+                                    <div class="form-group">
+                                        @Html.DropDownListFor(m => m.PiecesRequiredQtyType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "form-control  filter-sec" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 input-blk quantity-filter">
+                                <label>Already Issued</label>
+                                <div class="col-sm-4 no-padding">
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(x => x.AlredayIssued, new { @class = "form-control input-field", @Value = "0" })
+                                    </div>
+                                </div>
+                                <div class="col-sm-8 mbl-pad-0">
+                                    <div class="form-group">
+                                        @Html.DropDownListFor(m => m.AlreadyUsedType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "form-control  filter-sec" })
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 input-blk quantity-filter">
+                                <label>Already Issued Pcs</label>
+                                <div class="col-sm-4 no-padding">
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(x => x.PiecesAlreadyIssue, new { @class = "form-control input-field" })
+                                    </div>
+                                </div>
+                                <div class="col-sm-8 mbl-pad-0">
+                                    <div class="form-group">
+                                        @Html.DropDownListFor(m => m.PiecesAlreadyIssueType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "form-control  filter-sec" })
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 input-blk quantity-filter">
+                                <label>Current Issue</label>
+                                <div class="col-sm-4 no-padding">
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(x => x.CurrentIssue, new { @class = "form-control input-field" })
+                                    </div>
+                                </div>
+                                <div class="col-sm-8 mbl-pad-0">
+                                    <div class="form-group">
+                                        @Html.DropDownListFor(m => m.CurrentIssuesType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "form-control  filter-sec" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 input-blk quantity-filter">
+                                <label>Current Issued Pcs</label>
+                                <div class="col-sm-4 no-padding">
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(x => x.PiecesCurrentIssue, new { @class = "form-control input-field" })
+                                    </div>
+                                </div>
+                                <div class="col-sm-8 mbl-pad-0">
+                                    <div class="form-group">
+                                        @Html.DropDownListFor(m => m.PiecesCurrentType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "form-control  filter-sec" })
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Conveyor</label>
+                                @Html.DropDownListFor(m => m.ConveyorID, MMS.Web.ExtensionMethod.HtmlHelper.Conveyor(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Issuing For</label>
+                                @Html.HiddenFor(x => x.MultipleIssueSlipID)
+                                @if (Model != null && Model.InternalOderID != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+                                {
+                                    @Html.DropDownListFor(m => m.InternalOrderingFor, new SelectList(
+                                                new List<object>
+                                                    {
+                                                    new { value=0, text="Please Select" },
+                                                    new { value=1, text="Rework" },
+                                                    new { value=2, text="Recut"},
+                                                    new { value=3, text="Excess Issues"},
+                                                    new { value=4, text="Sample"},
+                                                    new { value=5, text="Order"},
+                                                      new { value=6, text="Sales"},
+                                                    new { value=7, text="Scrap"},
+                                                    new { value=8, text="Conversion"},
+                                                    },
+                                                    "value",
+                                                    "text", 0), new { @class = "form-control input chosen-select" })
+                                }
+                                else
+                                {
+                                    @Html.DropDownListFor(m => m.InternalOrderingFor, new SelectList(
+                                                    new List<object>
+                                                        {
+                                                        new { value=0, text="Please Select" },
+                                                        new { value=1, text="Rework" },
+                                                        new { value=2, text="Recut"},
+                                                        new { value=3, text="Excess Issues"},
+                                                        new { value=4, text="Sample"},
+                                                        new { value=5, text="Order"},
+                                                          new { value=6, text="Sales"},
+                                                    new { value=7, text="Scrap"},
+                                                          new { value=8, text="Conversion"},
+                                                        },
+                                                        "value",
+                                                        "text", 0), new { @class = "form-control input chosen-select" })
+                                }
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Customer Name</label>
+                                @Html.DropDownListFor(x => x.BuyerMasterId, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk" id="complonent">
+                            <div class="form-group">
+                                <label>Component  Name</label>
+                                @Html.DropDownListFor(x => x.Component_Id, MMS.Web.ExtensionMethod.HtmlHelper.ComponentMaster(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="col-lg-12 col-md-12 col-sm-12 input-blk mateial-select full_wth no-padding">
+                                <div class="form-group">
+                                    <label>Material</label>
+                                    @Html.DropDownListFor(m => m.MaterialDescription, MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName(), new { @class = "form-control chosen-select" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="col-lg-12 col-md-12 col-sm-12 input-blk mateial-select full_wth no-padding">
+                                <div class="form-group">
+                                    <label>Finished Material</label>
+                                    @Html.DropDownListFor(m => m.Finished_Material, MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName(), new { @class = "form-control chosen-select" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk quantity-filter">
+                            <label>Current Stock</label>
+                            <div class="col-sm-4 no-padding">
+                                <div class="form-group">
+                                    @Html.TextBoxFor(x => x.CurrentStock, new { @class = "form-control input-field" })
+                                </div>
+                            </div>
+                            <div class="col-sm-8 mbl-pad-0">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(m => m.CurrentStockType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "form-control filter-sec" })
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk quantity-filter">
+                            <label>Free Stock</label>
+                            <div class="col-sm-4 no-padding">
+                                <div class="form-group">
+                                    @Html.TextBoxFor(x => x.FreeStock, new { @class = "form-control input-field" })
+                                </div>
+                            </div>
+                            <div class="col-sm-8 mbl-pad-0">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(m => m.FreeStockType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "form-control filter-sec" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk quantity-filter">
+                            <label>Reserved Stock</label>
+                            <div class="col-sm-4 no-padding">
+                                <div class="form-group">
+                                    @Html.TextBoxFor(m => m.ReserverQty, new { @class = "form-control input-field" })
+                                </div>
+                            </div>
+                            <div class="col-sm-8 mbl-pad-0">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(m => m.ReserverQtyType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "form-control filter-sec" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk quantity-filter">
+                            <label>Closing in all stock stores</label>
+                            <div class="col-sm-4 no-padding">
+                                <div class="form-group">
+                                    @Html.TextBoxFor(x => x.ClosingStockinAllStores, new { @class = "form-control input-field" })
+                                </div>
+                            </div>
+                            <div class="col-sm-8 mbl-pad-0">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(m => m.ClosingStockinAllStoredType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "form-control filter-sec" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk quantity-filter">
+                            <label>In Transit</label>
+                            <div class="col-sm-4 no-padding">
+                                <div class="form-group">
+                                    @Html.TextBoxFor(x => x.InTransitValue, new { @class = "form-control input-field" })
+                                </div>
+                            </div>
+                            <div class="col-sm-8 mbl-pad-0">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(m => m.InTransitType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "form-control filter-sec" })
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk quantity-filter">
+                            <label>Total Qty</label>
+                            <div class="col-sm-4 no-padding">
+                                <div class="form-group">
+                                    @Html.TextBoxFor(x => x.TotalQty, new { @class = "form-control input-field" })
+                                    @Html.HiddenFor(x => x.ExcessApproval, new { @class = "form-control input-field" })
+                                    <input type="text" hidden id="Count" >
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                        <div id="sizeRangeTable" class="col-xs-12 no-padding">
+                            <table class="col-md-12 table-striped table-condensed cf table-change home_dahboard"  id="sizeRangeTables">
+                           
+                                <tbody>
+                                    <tr>
+                                        <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 39px !important;">Size</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important;">Stock</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important;">Issue</td>
+                                    </tr>
+                                </tbody>
+                                </table>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="init_action sheet-pairs col-lg-12 col-md-12 col-sm-12">
+                <div class="init_button">
+                    <button class="btn green-grey" onclick="Back()">Back</button>
+                    <button class="btn green-btn " onclick="SaveIssue()">Save &amp; Send</button>
+                    <button class="btn green-btn " onclick="Print()"> Pint</button>
+                    @*@if (Model.IssueSlipId != null && Model.IssueSlipId == 0)
+        {
+            <button class="btn green-btn " onclick="SaveLether()">Save &amp; Send</button>
+        }
+        else
+        {
+            <button class="btn green-btn " onclick="UpdateLether()">Update</button>
+        }*@
+                </div>
+                <div class="checkbox-option sheet-pairs">
+                    <div class="form-group checkbox_tax">
+                        <input type="checkbox" id="tax">
+                        <label for="tax">SMS</label>
+                    </div>
+                    <div class="form-group checkbox_tax">
+                        <input type="checkbox" id="tax1">
+                        <label for="tax1">Email</label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="EditStagePartial_sequence">
+        @Html.Partial("~/Views/Jobwork/Job_Master/JobWorkIssues/Partial/IssueDetailMaterial.cshtml", Model)
+    </div>
+    @*<div class="jw_issues_2 col-lg-12 col-md-12 col-sm-12 col-xs-12 jobwork_mrp_tbl">
+        <div id="no-more-tables" class="col-xs-12 no-padding">
+            <table class="col-md-12 table-striped table-condensed cf table-change home_dahboard">
+                <thead>
+                    <tr>
+                        <td>Edit</td>
+                        <td>Remove</td>
+                        <td>Issue Slip No</td>
+                        <td>Order No</td>
+                        <td>Style</td>
+                        <td>Issue Type</td>
+                        <td>NoofSets</td>
+                        <td>Group</td>
+                        <td>Category</td>
+                        <td>StoresName</td>
+                        <td>Material</td>
+                        <td>Color</td>
+                        <td>Reqd qty</td>
+                        <td>Alreday issued</td>
+                        <td>Current Issue</td>
+                        <td>Rate</td>
+                    </tr>
+                </thead>
+                @*<tbody class="common-table-head" id="leatherMaterialList">
+
+                    @if (Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+                    {
+                        // int count = 1;
+
+                        foreach (var Jobsheet in Model.issueSlip_MaterialDetails)
+                        {
+
+                            <tr id="@Jobsheet.IssueSlipId">
+                                <td data-title="Action">
+                                    <span class="action-icons">
+
+                                        <a><img onclick="Edit_Grid('@Jobsheet.IssueSlipId')" class="use-address" src="~/Scripts/Jobwork/images/edit.png"></a>
+                                        <img onclick="Delete_Grid('@Jobsheet.IssueSlipId')" class="use-address" src="~/Scripts/Jobwork/images/delete.png">
+                                    </span>
+                                </td>
+                                <td data-title="OperationType Code">@Jobsheet.IssueSlipNo</td>
+                                <td data-title="OperationType Code">@Jobsheet.OrderNo</td>
+                                <td data-title="OperationType Code">@Jobsheet.Style</td>
+                                <td data-title="OperationType Code">@Jobsheet.IssueType</td>
+                                <td data-title="OperationType Code">@Jobsheet.NoOfSets</td>
+                                <td data-title="OperationType Code">@Jobsheet.GroupId</td>
+                                <td data-title="OperationType Code">@Jobsheet.CategoryId</td>
+                                <td data-title="OperationType Code">@Jobsheet.StoreName</td>
+                                <td data-title="OperationType Code">@Jobsheet.MaterialName</td>
+                                <td data-title="OperationType Code">@Jobsheet.ColourId</td>
+                                <td data-title="OperationType Code">@Jobsheet.RequiredQty</td>
+                                <td data-title="OperationType Code">@Jobsheet.AlredayIssued</td>
+                                <td data-title="OperationType Code">@Jobsheet.CurrentIssue</td>
+                                <td data-title="OperationType Code">@Jobsheet.Rate</td>
+
+
+                            </tr>
+                            //  count++;
+                        }
+
+                    }
+                </tbody> 
+    </table>
+</div>
+    </div>*@
+
+    @*<div class="init_action sheet-pairs col-lg-12 col-md-12 col-sm-12">
+            <div class="init_button">
+                <button class="btn green-grey" onclick="Back()">Back</button>
+                @if (Model != null && Model.OtherJobWork_Id != 0)
+                {
+                    <button class="btn green-btn" onclick="Update()">Update</button>
+                }
+                else
+                {
+                    <button class="btn green-btn " onclick="Save()">Save</button>
+                }
+
+            </div>
+            <div class="checkbox-option sheet-pairs">
+                <div class="form-group checkbox_tax">
+                    <input type="checkbox" id="tax">
+                    <label for="tax">SMS</label>
+                </div>
+                <div class="form-group checkbox_tax">
+                    <input type="checkbox" id="tax1">
+                    <label for="tax1">Email</label>
+                </div>
+            </div>
+
+        </div>*@
+</div>
+
+<script src="~/Scripts/Jobwork/js/datepicker.min.js"></script>
+<script src="~/Scripts/Jobwork/js/custom_script.js"></script>
+<script src="~/Scripts/moment.js"></script>
+
+
+<script type="text/javascript">
+    $("#select_id").hide();
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+
+
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    $(function () {
+        $('.loader-overlay').ajaxStart(function () {
+            $(this).fadeIn('slow');
+        }).ajaxStop(function () {
+            $(this).stop().fadeOut('fast');
+        });
+    });
+    $("#IssueType").change(function () {
+        // var issueType = $("#IssueType option:selected").text();
+        $.ajax({
+            url: ' @Url.Action("GetJobWorkList_By_Job_Type", "JobWorkIssues")',
+            type: "GET",
+            dataType: "JSON",
+            data: {
+                InwardMaterialType: $("#IssueType option:selected").text(),
+            },
+            success: function (items) {
+                $("#Jw_Name").html("").trigger('chosen:updated');
+                $.each(items, function (i, item) {
+                    $("#Jw_Name").append(
+                        $('<option></option>').val(item.Value).html(item.Text)).trigger('chosen:updated');
+                });
+            }
+        });
+    });
+    $("#Jw_Name").change(function () {
+        var issueType = $("#IssueType option:selected").text();
+         $.ajax({
+            url: ' @Url.Action("GetJobWorkList_By_Jwname", "JobWorkIssues")',
+            type: "GET",
+            dataType: "JSON",
+             data: {
+                 issueType: issueType,
+                 Jw_Name: $("#Jw_Name").val()
+             },
+             success: function (items) {
+                 debugger;
+                 if ($("#Jobworktype_Id").val() == null) {
+                     $("#Jobworktype_Id").html("").trigger('chosen:updated');
+                     $.each(items, function (i, item) {
+                         $("#Jobworktype_Id").append(
+                             $('<option></option>').val(item.Value).html(item.Text)).trigger('chosen:updated');
+                     });
+                 }
+            }
+        }); 
+    });
+    $("#IssueType").change(function () {
+        IssueTypechange();
+        $("#complonent").hide();
+        var issueType = $("#IssueType option:selected").text();
+        if (issueType == "JobWork Production")
+        {
+            $("#complonent").show();
+        }
+    });
+    function IssueTypechange() {
+
+var issueType = $("#IssueType option:selected").text();
+        $.ajax({
+            url: ' @Url.Action("GetJobWorkList", "JobWorkIssues")',
+            type: "GET",
+            dataType: "JSON",
+            data: { issueType: issueType },
+            success: function (items) {
+                $("#Jobworktype_Id").html("").trigger('chosen:updated');
+                $.each(items, function (i, item) {
+                    $("#Jobworktype_Id").append(
+                        $('<option></option>').val(item.Value).html(item.Text)).trigger('chosen:updated');
+                });
+            }
+        });
+    }
+
+    $("#Jobworktype_Id").change(function () {
+        var jobWorkId_list=0 ;
+        var jobWorkId_text="";
+        jobWorkId_list += $(this).val();
+
+        debugger;
+
+        var jobWorkId = $("#Jobworktype_Id option:selected").val();
+        jobWorkId_text = $('#Jobworktype_Id option:selected').toArray().map(item => item.text).join();
+        if ($("#IssueType option:selected").text() == "JobWork(Leather To Leather)")
+        {
+            debugger;
+                $.ajax({
+                    url: ' @Url.Action("GetMaterialNamebyJobId", "JobWorkIssues")',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: {
+                        jobWorkId: jobWorkId_text,
+                        IssueNo: $("#MultipleIssueSlipID").val()
+                    },
+                    success: function (items) {
+                        debugger;
+                        if( items.StoreName[0].StoreName != "Wetblue Stores")
+                        {
+                            var CurrentIssue = items.Uc_Noms *1000;
+                            $("#MaterialDescription").val(items.materaildesc.Material).trigger('chosen:updated');
+                            $("#MaterialDescription").html("").trigger('chosen:updated');
+                            $.each(items.materaildesc, function (i, item) {
+                                $("#MaterialDescription").append(
+                                    $('<option></option>').val(item.Value).html(item.Text)).trigger('chosen:updated');
+                            });
+                            $("#RequiredQty").val(items.materaildesc.Qty);
+                            $("#RequiredType").val(items.materaildesc.Qty_Uom);
+                            $("#Jw_Name").val(items.materaildesc.Jw_Name).trigger('chosen:updated');
+                            //  $("#MaterialDescription").trigger('change');
+                            $('#leatherMaterialList').html("");
+                            if (items.Message == "Job work name cannot be diffrent") {
+                                alert(items.Message)
+                                return false;
+                            }
+                            var issuedStock = items.Balance_stock;
+                            var Balance_stock = items.materaildesc.Qty - issuedStock;
+                            $("#BalanceInThisListlot").val(Balance_stock);
+                            // Material_val();
+                        }
+                        $("#RequiredQty").val(items.Total_lethervalue);
+                        var Balance_stock = parseFloat(items.Total_lethervalue) - parseFloat(items.Balance_stock);
+                        $("#BalanceInThisListlot").val(Balance_stock);
+                    }
+                });
+           
+        }
+        else if ($("#IssueType option:selected").text() == "JobWork(Sheet to Pairs)")
+        {
+            var MultipleIssueSlipID = $('#MultipleIssueSlipID').val();
+            debugger;
+            $.ajax({
+                url: ' @Url.Action("GetMaterialDetailsbyJobId", "JobWorkIssues")',
+                type: "post",
+                dataType: "JSON",
+                data: {
+                    jobWorkId: jobWorkId_list.substring(1),
+                    IssueSlipNo: $('#IssueSlipNo').val(),
+                    IssueDate: $('#IssueDate').val(),
+                    MultipleIssueSlipID_: $('#MultipleIssueSlipID').val(),
+                    IssueNo: $("#MultipleIssueSlipID").val()
+                },
+                success: function (data) {
+                    debugger;
+                    if (data.Message == "Job work name cannot be diffrent") {
+                        alert(data.Message)
+                        return false;
+                    }
+                    if (data.Message != "") {
+                        alert("Please make a entry on approved price list" + data.Message);
+                    }
+                    $("#EditStagePartial_sequence").html(data.issueSlipMaterialList);
+                    $('#MultipleIssueSlipID').val(data.MultipleIssueSlipID)
+                }
+            });
+        }
+        else if ($("#IssueType option:selected").text() == "JobWork Production") {
+            var MultipleIssueSlipID = $('#MultipleIssueSlipID').val();
+            debugger;
+            $("#select_id").show();
+            $("#text_id").hide();
+            $.ajax({
+                url: ' @Url.Action("GetMaterialDetailsbyJobId_ProductionJobwork", "JobWorkIssues")',
+                type: "post",
+                dataType: "JSON",
+                data: {
+                    jobWorkId: jobWorkId_list.substring(1),
+                    IssueSlipNo: $('#IssueSlipNo').val(),
+                    IssueDate: $('#IssueDate').val(),
+                    MultipleIssueSlipID_: $('#MultipleIssueSlipID').val(),
+                    IssueNo: $("#MultipleIssueSlipID").val()
+                },
+                success: function (data) {
+                    debugger;
+                    if (data.error == "Contain Diffrent type") {
+                        alert("CONTAIN dIFFERENT tYPE")
+                        return false;
+                    }
+                    if (data.Jw_Count != 0 || data.Jw_Count != "0") {
+                        alert("Job Work Name Can't Be different")
+                        return false;
+                    }
+                    if (data.Leather_Pairs_bool == "true") {
+                        $("#MaterialDescription").html("").trigger('chosen:updated');
+                        $.each(data.materaildesc_List, function (i, item) {
+                            $("#MaterialDescription").append(
+                                $('<option></option>').val(item.Value).html(item.Text)).trigger('chosen:updated');
+                        });
+                    }
+                    else {
+                        //     count
+                        $("#Io").html("").trigger('chosen:updated');
+                        $.each(data.Io, function (i, item) {
+                            $("#Io").append(
+                                $('<option></option>').val(item.Value).html(item.Text)).trigger('chosen:updated');
+                        });
+
+
+                        $("#Count").val(data.count);
+                        $("#BalanceInThisListlot").val(data.Balance_stock);
+                        $("#RequiredQty").val(data.Qty);
+                        $("#ExcessApproval").val(data.Excess_pecent);
+                    }
+                }
+            });
+        }
+        else
+        {
+            $("#MaterialDescription").val(0);
+            $("#StoreName").val(0).trigger('chosen:updated');
+            $("#CategoryName").val(0).trigger('chosen:updated');
+            $("#GroupName").val(0).trigger('chosen:updated');
+            $("#Color").val(0).trigger('chosen:updated');
+            $("#RequiredType").val(0).trigger('chosen:updated');
+            $("#AlreadyUsedType").val(0).trigger('chosen:updated');
+            $("#CurrentIssuesType").val(0).trigger('chosen:updated');
+            $("#SubtanceID").val(0).trigger('chosen:updated');
+            $("#Rate").val(0).trigger('chosen:updated');
+            $("#CurrentStock").val("").prop("disabled", true);
+            $("#MaterialType").val(0).trigger('chosen:updated');
+            $('#leatherMaterialList').html("");
+        }
+    });
+    
+    $("#Io").change(function () {
+        
+        $.ajax({
+            url: ' @Url.Action("Get_IoDetailBased", "ProductionJobwork_")',
+            type: "post",
+            dataType: "JSON",
+            data: {
+                Production_Order_id: $('#Io').val()
+            },
+            success: function (data) {
+                debugger;
+                //if (data.error == "Contain Diffrent type") {
+                //    alert("CONTAIN dIFFERENT tYPE")
+                //    return false;
+                //}
+                //if (data.Jw_Count != 0 || data.Jw_Count != "0") {
+                //    alert("Job Work Name Can't Be different")
+                //    return false;
+                //}
+                //if (data.Leather_Pairs_bool == "true") {
+                //    $("#MaterialDescription").html("").trigger('chosen:updated');
+                //    $.each(data.materaildesc_List, function (i, item) {
+                //        $("#MaterialDescription").append(
+                //            $('<option></option>').val(item.Value).html(item.Text)).trigger('chosen:updated');
+                //    });
+                //}
+                //else {
+                //    //     count
+                //    $("#Io").html("").trigger('chosen:updated');
+                //    $.each(data.Io, function (i, item) {
+                //        $("#Io").append(
+                //            $('<option></option>').val(item.Value).html(item.Text)).trigger('chosen:updated');
+                //    });
+
+
+                //    $("#Count").val(data.count);
+                //    $("#BalanceInThisListlot").val(data.Balance_stock);
+                //    $("#RequiredQty").val(data.Qty);
+                //    $("#ExcessApproval").val(data.Excess_pecent);
+                //}
+                var count = 1;
+                for (var i = 0; i <= data.size.length - 1; i++) {
+                    isSizeRangeMaster = true;
+                    $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + data.size[i].Sizerange + ' </td> ');
+                    $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='stockInHand' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' readonly class='currentstock' id='currentstock" + i + "' value=" + data.size[i].Qty + " style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                    $('#sizeRangeTable tbody tr:last').append("<td class='Qty' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='Qty' onchange='CalculateTotal(this," + data.size[i].Qty + ")' id='Qty" + i + "' value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                    count++;
+                }
+                $("#Count").val(data.count);
+                $("#BalanceInThisListlot").val(data.Balance_stock);
+                $("#RequiredQty").val(data.item.Qty);
+                $("#ExcessApproval").val(data.Excess_pecent);
+            }
+        });
+    });
+
+    $("#MaterialDescription").change(function () {
+        debugger
+       
+        var MaterialId = "";
+        var internalOrderNo = "";
+        var jobsheet_pair_Code_id = "";
+        jobsheet_pair_Code_id = $("#Jobworktype_Id option:selected").val();
+         MaterialId = $('#MaterialDescription').val();
+        var splict = MaterialId.split('_');
+        if (splict != null)   
+        {
+            MaterialId = splict[0];
+          //  jobsheet_pair_Code_id = splict[1];
+        }
+        var jobsheet_pair_Code_id;
+        if ($("#IssueType option:selected").text() == "JobWork(Leather To Leather)") {
+            jobsheet_pair_Code_id = $("#Jobworktype_Id option:selected").val();
+        }
+        if ($("#IssueType option:selected").text() == "JobWork Production") {
+            if (splict != null && splict.length > 1) {
+                jobsheet_pair_Code_id = splict[1];
+            }
+        }
+        var issueNo = $("#IssueSlipNo").val();
+        if (issueNo == "") {
+            issueNo = 0;
+        }
+        if ($("#IssueDate").val() == "") {
+            alert("Please select issue date");
+            return false;
+        }
+
+        else {
+            var issueDate = $("#IssueDate").val();
+            $.ajax({
+                url: '/JobWorkIssues/MultipleIssueMaterialName',
+                type: "GET",
+                dataType: "JSON",
+                data: { MaterialNameID: MaterialId, IssueSlipNo: issueNo, InternalOrderNo: internalOrderNo, IssueDate: issueDate, jobsheet_pair_Code_id: jobsheet_pair_Code_id, issueType: $("#IssueType option:selected").text() },
+                success: function (data) {
+                    
+
+                    if (data.Message == "Already existed") {
+                        alert("This Material name already existed this issue slip no");
+                        return false;
+
+                    }
+                    else if (data.Message == "Please make a entry on approved price list") {
+                        alert("Please make a entry on approved price list");
+                        return false;
+                    }
+                    else {
+                        $("#Finished_Material").val(data.Finished_Material).trigger('chosen:updated');
+                        debugger;
+                        if (data.Excess_pecent != "0" || data.Excess_pecent != null)
+                        {
+                        $("#ExcessApproval").val(data.Excess_pecent);
+                       }
+                        if (data.BalanceStock != null) {
+                            var stock = parseFloat(data.BalanceStock);
+
+                            if (parseFloat(data.BalanceStock) > 0) {
+                                var count = 1;
+                                $("#CurrentStock").val(data.BalanceStock).prop("disabled", true);
+                                debugger;
+                                $('#sizeRangeTable tbody tr').each(function () {
+                                    $(this).find("td:not(:first)").remove();
+                                });
+                                for (var i = 0; i <= data.SizeRangelist.length - 1; i++) {
+                                    isSizeRangeMaster = true;
+                                    $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + data.SizeRangelist[i].IssueSize1 + ' </td> ');
+                                    $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='stockInHand' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' readonly class='currentstock' id='currentstock" + i + "' value=" + data.SizeRangelist[i].StockInHand + " style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                                    $('#sizeRangeTable tbody tr:last').append("<td class='Qty' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='Qty' onchange='CalculateTotal(this," + data.SizeRangelist[i].StockInHand + ")' id='Qty" + i + "' value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                                    count++;
+                                }
+                                $.each(data.Material, function (i, city) {
+                              
+                                    $("#StoreName").val(city.StoreMasterId).trigger('chosen:updated');
+                                    $("#CategoryName").val(city.MaterialCategoryMasterId).trigger('chosen:updated');
+                                    $("#GroupName").val(city.MaterialGroupMasterId).trigger('chosen:updated');
+                                    $("#Color").val(city.ColorMasterId).trigger('chosen:updated');
+                                    $("#RequiredType").val(city.Uom).trigger('chosen:updated');
+                                    $("#AlreadyUsedType").val(city.Uom).trigger('chosen:updated');
+                                    $("#CurrentIssuesType").val(city.Uom).trigger('chosen:updated');
+                                    $("#SubtanceID").val(city.SubstanceMasterId).trigger('chosen:updated');
+                                    $("#Rate").val(city.Price).trigger('chosen:updated');
+                                    if (city.isLocal == true && city.isImport == true) {
+                                        var int = 1;
+                                        $("#MaterialType").html("").trigger('chosen:updated');
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+
+                                        for (i = 1; i <= 2; i++) {
+                                            var type = "";
+                                            if (i == 1) {
+                                                type = "Local";
+                                            }
+                                            else if (i == 2) {
+                                                type = "Direct Import";
+                                                i = 3;
+                                            }
+                                            $("#MaterialType").append(
+                                                $('<option></option>').val(i).html(type)).trigger('chosen:updated');
+                                        }
+                                    }
+                                    else if (city.isImportCustomer == true && city.isImport == true) {
+                                        var int = 1;
+                                        $("#MaterialType").html("").trigger('chosen:updated');
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        for (i = 1; i <= 2; i++) {
+                                            var type = "";
+                                            if (i == 1) {
+                                                type = "Customer Import";
+                                                i = 2;
+                                            }
+                                            else if (i == 2) {
+                                                type = "Direct Import";
+                                                i = 3;
+                                            }
+                                            $("#MaterialType").append(
+                                                $('<option></option>').val(i).html(type)).trigger('chosen:updated');
+                                        }
+                                    }
+                                    else if (city.isImportCustomer == true && city.isLocal == true) {
+                                        $("#MaterialType").html("").trigger('chosen:updated');
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        for (i = 1; i <= 2; i++) {
+                                            var types = "";
+                                            if (i == 1) {
+                                                types = "Local";
+                                                i = 1;
+                                            }
+                                            else if (i == 2) {
+                                                types = "Customer Import";
+                                                i = 2;
+                                            }
+                                            $("#MaterialType").append(
+                                                $('<option></option>').val(i).html(types)).trigger('chosen:updated');
+                                        }
+                                    }
+                                    else if (city.isImportCustomer == true) {
+                                        $("#MaterialType").html("").trigger('chosen:updated');
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        $("#MaterialType").append(
+                                            $('<option></option>').val(2).html("Customer Import")).trigger('chosen:updated');
+                                        $("#MaterialType").val(2).trigger('chosen:updated');
+                                    }
+                                    else if (city.isLocal == true) {
+                                        $("#MaterialType").html("");
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        $("#MaterialType").append(
+                                            $('<option></option>').val(1).html("Local")).trigger('chosen:updated');
+                                        $("#MaterialType").val(1).trigger('chosen:updated');
+                                    }
+                                    else if (city.isImport == true) {
+                                        $("#MaterialType").html("").trigger('chosen:updated');
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        $("#MaterialType").append(
+                                            $('<option></option>').val(3).html("Direct Import")).trigger('chosen:updated');
+                                        $("#MaterialType").val(3).trigger('chosen:updated');
+                                    }
+                                    else {
+                                        $("#MaterialType").html("");
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        for (i = 1; i <= 3; i++) {
+                                            var materialType = "";
+                                            if (i == 1) {
+                                                materialType = "Local";
+                                                i = 1;
+                                            }
+                                            else if (i == 2) {
+                                                materialType = "Customer Import";
+                                                i = 2;
+                                            }
+                                            else if (i == 3) {
+                                                materialType = "Direct Import";
+                                                i = 3;
+                                            }
+                                            $("#MaterialType").append(
+                                                $('<option></option>').val(i).html(materialType)).trigger('chosen:updated');
+                                        }
+                                    }
+                                    //if (data.store.StoreName == "Leather Store" || data.store.StoreName == "Leather Store-Local" || data.store.StoreName == "Leather Stores-Import") {
+
+                                    //    $("#divWithoutPieces").hide();
+                                    //    $("#divPiecesIssue").show();
+                                    //    $(".RequiredType_cls").val(city.Uom);
+                                    //    $(".AlreadyUsedType_cls").val(city.Uom);
+                                    //    $(".CurrentIssuesType_cls").val(city.Uom);
+                                    //    $(".PiecesRequiredQtyType_cls").val(city.UomUnit);
+                                    //    $(".PiecesAlreadyIssueType_cls").val(city.UomUnit);
+                                    //    $(".PiecesCurrentType_cls").val(city.UomUnit);
+                                    //    $(".substance_color").val(city.SubstanceMasterId);
+                                    //}
+                                    //else {
+                                    //    $("#divWithoutPieces").show();
+                                    //    $("#divPiecesIssue").hide();
+                                    //    $("#RequiredType").val(city.Uom);
+                                    //    $("#AlreadyUsedType").val(city.Uom);
+                                    //    $("#CurrentIssuesType").val(city.Uom);
+                                    //    $("#PiecesRequiredQtyType").val(city.UomUnit);
+                                    //    $("#PiecesAlreadyIssueType").val(city.UomUnit);
+                                    //    $("#PiecesCurrentType").val(city.UomUnit);
+                                    //    $("#SubtanceID").val(city.SubstanceMasterId);
+                                    //}
+                                });
+                                //$.each(data.approvedPriceList, function (i, PRICE) {
+                                //    $(".rate_general").val(PRICE.MRPPrice);
+                                //});
+                            }
+                            else {
+                                $("#CurrentStock").val("0").prop("disabled", true);
+                                alert("Stock is not avaible Please contact store department");
+                                return false;
+                            }
+                        }
+                        else {
+                            $('#sizeRangeTable tbody tr').each(function () {
+                                $(this).find("td:not(:first)").remove();
+                            });
+                        }
+
+                    }
+                    if ($("#IssueType option:selected").text() == "JobWork(Leather To Leather)") {
+                        if (splict != null) {
+                            Get_LetherDetail(jobsheet_pair_Code_id);
+                        }
+                    }
+                    if ($("#IssueType option:selected").text() == "JobWork Production") {
+                        if (splict != null) {
+                            Get_ProductionDetail($('#MaterialDescription').val());
+                        }
+                    }
+
+                }
+            });
+        }
+
+
+    });
+
+    function Get_ProductionDetail(jobWorkId)
+    {
+        var splict = jobWorkId.split('_');
+        debugger;
+        
+            $.ajax({
+                url: ' @Url.Action("Get_Production_Order_id", "JobWorkIssues")',
+                type: "GET",
+                dataType: "JSON",
+                data: {
+                    jobWorkId: splict[1],
+                    IssueNo: $("#MultipleIssueSlipID").val()
+                },
+                success: function (items) {
+                    debugger;
+                    // var CurrentIssue = items.Uc_Noms *1000;
+                    //    $("#MaterialDescription").val(items.materaildesc.Material).trigger('chosen:updated');
+            
+                
+                    $("#RequiredType").val(items.materaildesc.Qty_Uom);
+                    $("#Jw_Name").val(items.materaildesc.Jw_Name).trigger('chosen:updated');
+                    //  $("#MaterialDescription").trigger('change');
+                    $('#leatherMaterialList').html("");
+                    
+                    var issuedStock = items.Balance_stock;
+                    var Balance_stock = items.materaildesc.Qty - issuedStock;
+                    if ($("#IssueType option:selected").text() == "JobWork Production") {
+                        $("#BalanceInThisListlot").val(Balance_stock);
+                        $("#RequiredQty").val(items.materaildesc.Qty);
+                    }
+                    $("#BalanceInthisListType").val(items.materaildesc.Qty_Uom);
+
+                  Material_val();
+
+                }
+            });
+      
+    }
+    function Get_LetherDetail(jobWorkId) {
+
+        debugger;
+
+        $.ajax({
+            url: ' @Url.Action("GetMaterialNamebyJobId_Selete", "JobWorkIssues")',
+            type: "GET",
+            dataType: "JSON",
+            data: {
+                jobWorkId: jobWorkId,
+                IssueNo: $("#MultipleIssueSlipID").val()
+            },
+            success: function (items) {
+                debugger;
+                // var CurrentIssue = items.Uc_Noms *1000;
+                //    $("#MaterialDescription").val(items.materaildesc.Material).trigger('chosen:updated');
+
+
+                $("#RequiredType").val(items.materaildesc.Qty_Uom);
+                $("#Jw_Name").val(items.materaildesc.Jw_Name).trigger('chosen:updated');
+                //  $("#MaterialDescription").trigger('change');
+                $('#leatherMaterialList').html("");
+                if (items.Message == "Job work name cannot be diffrent") {
+                    alert(items.Message)
+                    return false;
+                }
+                var issuedStock = items.Balance_stock;
+                var Balance_stock = items.materaildesc.Qty - issuedStock;
+                if ($("#IssueType option:selected").text() != "JobWork(Leather To Leather)") {
+                    $("#BalanceInThisListlot").val(Balance_stock);
+                    $("#RequiredQty").val(items.materaildesc.Qty);
+                }
+                $("#BalanceInthisListType").val(items.materaildesc.Qty_Uom);
+
+                Material_val();
+
+            }
+        });
+
+    }
+    function Material_val() {
+        debugger;
+        var jobsheet_pair_Code_id = 0;
+        jobsheet_pair_Code_id += $(Jobworktype_Id).val();
+        var internalOrderNo = "";
+        var MaterialId = $('#MaterialDescription').val();
+        var issueNo = $("#IssueSlipNo").val();
+        var jobsheet_pair_Code_id;
+        if ($("#IssueType option:selected").text() == "JobWork(Leather To Leather)") {
+            jobsheet_pair_Code_id = $("#Jobworktype_Id option:selected").val();
+        }
+        if ($("#IssueType option:selected").text() == "JobWork Production") {
+            if (splict != null && splict.length() > 1  ) {
+                jobsheet_pair_Code_id = splict[1];
+            }
+        }
+        var splict = MaterialId.split('_');
+
+        if (splict != null) {
+            MaterialId = splict[0];
+            jobsheet_pair_Code_id = splict[1];
+        }
+        if (issueNo == "") {
+            issueNo = 0;
+        }
+        if ($("#IssueDate").val() == "") {
+            alert("Please select issue date");
+            return false;
+        }
+        else {
+            var issueDate = $("#IssueDate").val();
+            $.ajax({
+                url: '/JobWorkIssues/MultipleIssueMaterialName',
+                type: "GET",
+                dataType: "JSON",
+                data: { MaterialNameID: MaterialId, IssueSlipNo: issueNo, InternalOrderNo: internalOrderNo, IssueDate: issueDate, jobsheet_pair_Code_id: jobsheet_pair_Code_id, issueType: $("#IssueType option:selected").text() },
+                success: function (data) {
+                    debugger;
+                    if (data.Message == "Already existed") {
+                        alert("This Material name already existed this issue slip no");
+                        return false;
+                        $(".loader-overlay").css("display", "none");
+                    }
+                    else if (data.Message == "Please make a entry on approved price list") {
+                        alert("Please make a entry on approved price list");
+                        return false;
+                        $(".loader-overlay").css("display", "none");
+                    }
+                    else {
+
+                        $(".loader-overlay").css("display", "block");
+                        if (data.BalanceStock != null) {
+                            var stock = parseFloat(data.BalanceStock);
+
+                            if (parseFloat(data.BalanceStock) > 0  || data.store.StoreName == "Wetblue Stores") {
+                                var count = 1;
+                                
+                                if (data.store.StoreName != "Wetblue Stores") {
+                                    $("#CurrentStock").val(data.BalanceStock).prop("disabled", true);
+                                }
+                                $('#sizeRangeTable tbody tr').each(function () {
+                                    $(this).find("td:not(:first)").remove();
+                                });
+                                for (var i = 0; i <= data.SizeRangelist.length - 1; i++) {
+                                    isSizeRangeMaster = true;
+                                    $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + data.SizeRangelist[i].IssueSize1 + ' </td> ');
+                                    $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='stockInHand' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' readonly class='currentstock' id='currentstock" + i + "' value=" + data.SizeRangelist[i].StockInHand + " style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                                    $('#sizeRangeTable tbody tr:last').append("<td class='Qty' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='Qty' onchange='CalculateTotal(this," + data.SizeRangelist[i].StockInHand + ")' id='Qty" + i + "' value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                                    count++;
+                                }
+                                $.each(data.Material, function (i, city) {
+
+                                    $("#StoreName").val(city.StoreMasterId).trigger('chosen:updated');
+                                    $("#CategoryName").val(city.MaterialCategoryMasterId).trigger('chosen:updated');
+                                    $("#GroupName").val(city.MaterialGroupMasterId).trigger('chosen:updated');
+                                    $("#Color").val(city.ColorMasterId).trigger('chosen:updated');
+                                    $("#RequiredType").val(city.Uom).trigger('chosen:updated');
+                                    $("#AlreadyUsedType").val(city.Uom).trigger('chosen:updated');
+                                    $("#CurrentIssuesType").val(city.Uom).trigger('chosen:updated');
+                                    $("#SubtanceID").val(city.SubstanceMasterId).trigger('chosen:updated');
+                                    $("#Rate").val(city.Price);
+                                    if (city.isLocal == true && city.isImport == true) {
+                                        var int = 1;
+                                        $("#MaterialType").html("").trigger('chosen:updated');
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+
+                                        for (i = 1; i <= 2; i++) {
+                                            var type = "";
+                                            if (i == 1) {
+                                                type = "Local";
+                                            }
+                                            else if (i == 2) {
+                                                type = "Direct Import";
+                                                i = 3;
+                                            }
+                                            $("#MaterialType").append(
+                                                $('<option></option>').val(i).html(type)).trigger('chosen:updated');
+                                        }
+                                    }
+                                    else if (city.isImportCustomer == true && city.isImport == true) {
+                                        var int = 1;
+                                        $("#MaterialType").html("").trigger('chosen:updated');
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        for (i = 1; i <= 2; i++) {
+                                            var type = "";
+                                            if (i == 1) {
+                                                type = "Customer Import";
+                                                i = 2;
+                                            }
+                                            else if (i == 2) {
+                                                type = "Direct Import";
+                                                i = 3;
+                                            }
+                                            $("#MaterialType").append(
+                                                $('<option></option>').val(i).html(type)).trigger('chosen:updated');
+                                        }
+                                    }
+                                    else if (city.isImportCustomer == true && city.isLocal == true) {
+                                        $("#MaterialType").html("").trigger('chosen:updated');
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        for (i = 1; i <= 2; i++) {
+                                            var types = "";
+                                            if (i == 1) {
+                                                types = "Local";
+                                                i = 1;
+                                            }
+                                            else if (i == 2) {
+                                                types = "Customer Import";
+                                                i = 2;
+                                            }
+                                            $("#MaterialType").append(
+                                                $('<option></option>').val(i).html(types)).trigger('chosen:updated');
+                                        }
+                                    }
+                                    else if (city.isImportCustomer == true) {
+                                        $("#MaterialType").html("").trigger('chosen:updated');
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        $("#MaterialType").append(
+                                            $('<option></option>').val(2).html("Customer Import")).trigger('chosen:updated');
+                                        $("#MaterialType").val(2).trigger('chosen:updated');
+
+                                    }
+                                    else if (city.isLocal == true) {
+                                        $("#MaterialType").html("");
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        $("#MaterialType").append(
+                                            $('<option></option>').val(1).html("Local")).trigger('chosen:updated');
+                                        $("#MaterialType").val(1).trigger('chosen:updated');
+
+                                    }
+                                    else if (city.isImport == true) {
+                                        $("#MaterialType").html("").trigger('chosen:updated');
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        $("#MaterialType").append(
+                                            $('<option></option>').val(3).html("Direct Import")).trigger('chosen:updated');
+                                        $("#MaterialType").val(3).trigger('chosen:updated');
+
+                                    }
+                                    else {
+                                        $("#MaterialType").html("");
+                                        $("#MaterialType").append($('<option></option>').val(0).html("Please select")).trigger('chosen:updated');
+                                        for (i = 1; i <= 3; i++) {
+                                            var materialType = "";
+                                            if (i == 1) {
+                                                materialType = "Local";
+                                                i = 1;
+                                            }
+                                            else if (i == 2) {
+                                                materialType = "Customer Import";
+                                                i = 2;
+                                            }
+                                            else if (i == 3) {
+                                                materialType = "Direct Import";
+                                                i = 3;
+                                            }
+                                            $("#MaterialType").append(
+                                                $('<option></option>').val(i).html(materialType)).trigger('chosen:updated');
+                                        }
+                                    }
+                                    if (data.store.StoreName == "Leather Store" || data.store.StoreName == "Leather Store-Local" || data.store.StoreName == "Leather Stores-Import" || data.store.StoreName == "Wetblue Stores") {
+
+                                        debugger;
+                                        $("#RequiredType").val(city.Uom);
+                                        $("#AlreadyUsedType").val(city.Uom);
+                                        $("#CurrentIssuesType").val(city.Uom);
+                                        $("#PiecesRequiredQtyType").val(city.UomUnit);
+                                        $("#PiecesAlreadyIssueType").val(city.UomUnit);
+                                        $("#PiecesCurrentType").val(city.UomUnit);
+                                        $("#SubtanceID").val(city.SubstanceMasterId);
+                                    }
+                                    else {
+                                        $("#PiecesRequiredQtyType").attr("disabled", true).trigger('chosen:updated');
+                                        $("#PiecesAlreadyIssueType").attr("disabled", true).trigger('chosen:updated');
+                                        $("#PiecesCurrentType").attr("disabled", true).trigger('chosen:updated');
+
+                                        $("#PiecesRequiredQTY").attr("disabled", true);
+                                        $("#PiecesAlreadyIssue").attr("disabled", true);
+                                        $("#PiecesCurrentIssue").attr("disabled", true);
+
+                                        $("#RequiredType").val(city.Uom);
+                                        $("#AlreadyUsedType").val(city.Uom);
+                                        $("#CurrentIssuesType").val(city.Uom);
+                                        $("#PiecesRequiredQtyType").val(city.UomUnit);
+                                        $("#PiecesAlreadyIssueType").val(city.UomUnit);
+                                        $("#PiecesCurrentType").val(city.UomUnit);
+                                        $("#SubtanceID").val(city.SubstanceMasterId);
+                                    }
+                                });
+                                $.each(data.approvedPriceList, function (i, PRICE) {
+                                    $("#Rate").val(PRICE.MRPPrice);
+                                });
+                            }
+                            else {
+                                $("#CurrentStock").val("0").prop("disabled", true);
+                                alert("Stock is not avaible Please contact store department");
+                                return false;
+
+                            }
+                        }
+                        else {
+                            $('#sizeRangeTable tbody tr').each(function () {
+                                $(this).find("td:not(:first)").remove();
+                            });
+                        }
+                        $(".loader-overlay").css("display", "none");
+                    }
+                }
+            });
+        }
+
+
+   
+    }
+    $("#CurrentIssue").change(function () {
+        debugger;
+        var BalanceInThisListlot = $("#BalanceInThisListlot").val();
+        var type = $("#CurrentIssuesType").val();
+        var RequiredQty = $("#RequiredQty").val();
+        var CurrentIssue = $("#CurrentIssue").val();
+        var Balance = RequiredQty - CurrentIssue;
+        var CurrentStock = $("#CurrentStock").val();
+        var ExcessApproval = $("#ExcessApproval").val();
+        var count = $("#Count").val();
+        var excessqty = 0;
+        debugger;
+        excessqty = ((parseFloat(ExcessApproval) / 100) * parseFloat(RequiredQty));
+        if ($("#IssueType option:selected").text() != "JobWork Production") {
+            if (parseFloat(CurrentIssue) > parseFloat(CurrentStock)) {
+                if (CurrentStock != 0 && $("#IssueType option:selected").text() != "JobWork Production") {
+                    alert("Current issues can't be High");
+                    return false;
+                }
+            }
+            else if (parseFloat(parseFloat(RequiredQty) + parseFloat(excessqty)) < parseFloat(CurrentIssue)) {
+                alert("Current issues can't be High Requried qty");
+                return false;
+            }
+            else if (parseFloat(parseFloat(BalanceInThisListlot) + parseFloat(excessqty)) < parseFloat(CurrentIssue)) {
+                if (count != "0") {
+                    alert("Current issues can't be High in balance in lot");
+                    return false;
+                }
+            }
+            else {
+                $("#BalanceInthisListType").val(type).trigger('chosen:updated');
+            }
+        }
+        else {
+            if (parseFloat(parseFloat(RequiredQty) + parseFloat(excessqty)) < parseFloat(CurrentIssue)) {
+                alert("Current issues can't be High Requried qty");
+                return false;
+            }
+
+        }
+    });
+    function Back() {
+        location.href = "/JobWorkIssues/JobWorkIssues";
+    }
+
+    //SupplierNameId
+    $("#SupplierNameId").change(function () {
+       
+        $.ajax({
+            url: '/JobWorkTransaction/GEt_Supplier_lot_list',
+            type: 'POST',
+            dataType: "JSON",
+            data: {
+                SupplierNameId: $('#SupplierNameId').val()
+            },
+            success: function (items) {
+                debugger;
+                $("#SupplierName_Lotno").html("").trigger('chosen:updated');
+                $.each(items.Get_lot_list, function (i, item) {
+                    $("#SupplierName_Lotno").append(
+                        $('<option></option>').val(item.Value).html(item.Text)).trigger('chosen:updated');
+                });
+            }
+        });
+    });
+    $("#SupplierName_Lotno").change(function () {
+        var issueDate = $("#IssueDate").val();
+        var MaterialId = "";
+
+        MaterialId = $('#MaterialDescription').val();
+        var splict = MaterialId.split('_');
+        if (splict != null) {
+            MaterialId = "";
+            MaterialId = splict[0];
+
+        }
+        $.ajax({
+            url: '/JobWorkIssues/GEt_Wetblue_current_issue',
+            type: 'POST',
+            dataType: "JSON",
+            data: {
+                MaterialNameID: MaterialId,
+                FromDate: issueDate,
+                LOTNo: $("#SupplierName_Lotno :selected").text(),
+                SupplierNameId: $('#SupplierNameId').val()
+            },
+            success: function (data) {
+                debugger;
+                if (data.BalanceStock != null) {
+                    var stock = parseFloat(data.BalanceStock);
+
+                
+                        $("#CurrentStock").val(data.BalanceStock).prop("disabled", true);
+             
+                }
+            }
+        });
+    });
+    function Print() {
+        var gateEntryno = $('#IssueSlipNo ').val();
+        location.href = "PDFGenerate?GateEntryNo=" + gateEntryno;
+    }
+
+</script>

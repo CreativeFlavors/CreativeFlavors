@@ -1,0 +1,676 @@
+﻿@model MMS.Web.Models.StockModel.ApprovedPriceListModel
+@using MMS.Repository.Managers;
+@using MMS.Core.Entities
+@{
+    int id = Model.ApprovedPriceID;
+    Session["ApprovedPriceID"] = id;
+    MMS.Repository.Managers.StockManager.ApprovedPriceListManager approvedPriceListManager = new MMS.Repository.Managers.StockManager.ApprovedPriceListManager();
+    MMS.Core.Entities.Stock.ApprovedPriceList approcedPriceList = new MMS.Core.Entities.Stock.ApprovedPriceList();
+
+    tbl_PermissionSetting PermissionSettingModel = new MMS.Core.Entities.tbl_PermissionSetting();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<tbl_Permission> PermissionModel = new List<tbl_Permission>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("ApprovedPriceList", PermissionSettingModel.PermissionID);
+    }
+
+    bool Save = false; bool Update = false;
+  //  bool Edit = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Save")
+        {
+            Save = true;
+        }
+        if (item.PermissionDesc == "Update")
+        {
+            Update = true;
+        }
+        if (item.PermissionDesc == "Edit")
+        {
+          //  Edit = true;
+        }
+    }
+
+}
+
+<style>
+    button:focus, button:active {
+        outline: 0;
+        border: none;
+        box-shadow: none;
+    }
+
+    #ui-id-1 {
+        height: 300px;
+        overflow-y: scroll;
+    }
+
+    #ui-id-2 {
+        height: 300px;
+        overflow-y: scroll;
+    }
+
+    #ui-id-4 {
+        height: 300px;
+        overflow-y: scroll;
+    }
+
+    span.content {
+        padding-left: 17px;
+    }
+</style>
+@*<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>*@
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/ComboBox.js"></script>
+
+<div class="" id="DivShow">
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div class="right-form-section clearfix approvedpricelist_add">
+        <form class="form-inline" role="form">
+            <div class="tab-content">
+                <div id="step1" class="tab-pane fade in active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12  no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Supplier</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.HiddenFor(x => x.ApprovedPriceID)
+                                            @Html.DropDownListFor(m => m.SupplierId, MMS.Web.ExtensionMethod.HtmlHelper.SupplierName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12   no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Date</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @if (Model != null && Model.ApprovedPriceID != 0)
+                                            {
+                                                var priceDate = Model.Date;
+                                                @Html.TextBoxFor(m => m.Date, new { @Value = priceDate, @class = "form-control text-field" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.Date, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field" })
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Material</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12" id="MaterialId_">
+                                            @Html.DropDownListFor(m => m.MaterialID, MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName() @*MMS.Web.ExtensionMethod.HtmlHelper.DynamicMaterialName(Model.GroupID)*@, new { @class = "select-style form-control text-field", @disabled = "disabled", placeholder = "Please Select" })
+                                            @*<button type="button" class="btn btn-info btn-sm but_search_styles" data-toggle="modal" title="Material List" data-target="#auto_search">...</button>*@
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Category</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.CategoryID, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Group</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.GroupID, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Colour</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.ColorID, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new
+                                       {
+                                           @class = "select-style text-field", @*@disabled = "disabled"*@ })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Excess PO Qty %</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.POExcessPercentage, new {@class = "form-control text-field", @onkeypress = "return isNumberKey(event)" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Approved</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.CheckBoxFor(m => m.IsApproved, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Currency</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.CurrencyID, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "select-style form-control text-field", @disabled = "disabled", placeholder = "Please Select" })
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Price <span>Per UOM </span></label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12 no-padding">
+                                                <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12 no-padding">
+                                                    @Html.TextBoxFor(m => m.PriceRs, new { @class = "form-control text-field", @onkeypress = "return isNumberKey(event)" })
+                                                </div>
+                                                <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12 no-padding">
+                                                    @Html.DropDownListFor(m => m.Uom, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "form-control text-field" })
+                                                </div>                                              
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Tax Details</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.TaxDetails, MMS.Web.ExtensionMethod.HtmlHelper.GetTaxRef(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Lead Time Days</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12 no-padding">
+                                                <div class="col-md-6 col-lg-12 col-sm-12 col-xs-12 no-padding">
+                                                    @Html.TextBoxFor(m => m.LeadTime, new { @class = "form-control text-field" })
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">MRP Margin % </label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.MRPMargin, new { @class = "form-control text-field", @onkeypress = "return isNumberKey(event)" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">MRP Price</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.MRPPrice, new { @class = "form-control text-field", @onkeypress = "return isNumberKey(event)" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Supplier Description(if any)</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.SupplierDescription, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Accessiable value</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12 no-padding">
+                                                <div class="col-md-6 col-lg-12 col-sm-12 col-xs-12 no-padding">
+                                                    @Html.TextBoxFor(m => m.AccessibleValue, new { @class = "form-control text-field", @onkeypress = "return isNumberKey(event)" })
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                @*-------------------------//Show Hide---------------------------*@
+                                <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12" id="DisplayGridViewEdit" style="text-align:right;margin-top:10px;">
+                                    <input type="button" onclick="Refresh()" style="cursor: pointer;" title="Refresh" value="Refresh">
+                                    <input type="button" onclick="Cancel()" style="cursor: pointer;" title="Back" value="Back">
+                                    @if (Model.ApprovedPriceID == 0)
+                                    {
+                                        if (Save == true)
+                                        {
+                                            <input type="button" onclick="Save()" style="cursor: pointer;" title="Save" value="Save">
+                                        }
+                                        else
+                                        {
+                                            <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Save">
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (Update == true)
+                                        {
+                                            <input type="button" onclick="Update()" style="cursor: pointer;" id="ApprovedPriceID" title="Update" value="Update">
+                                        }
+                                        else
+                                        {
+                                            <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Update">
+                                        }
+                                    }
+                                </div>
+
+                                <div class="col-lg-12 col-sm-12 col-xs-12" id="DisplayGridViewEdit_" style="text-align:right;margin-top:10px;">
+                                    <input type="button" onclick="Cancel()" style="cursor: pointer;" title="Back" value="Back">
+                                    <input type="button" onclick="Refresh()" style="cursor: pointer;" title="Refresh" value="Refresh">
+                                    <input type="button" onclick="Update()" style="cursor: pointer;" id="ApprovedPriceID" title="Update" value="Update">
+                                </div>
+                                @*-------------------------//END Show Hide---------------------------*@
+
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <span class="content">List of Other Supplier Supplied the Material </span>
+                                <div class="field-section">
+                                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+
+                                        <div class="table-responsive table-td-padding parent-table-height">
+                                            <table class="table" id="listSupplier">
+                                                <thead>
+                                                    <tr>
+                                                        <td>Supplier Name</td>
+                                                        <td>Approved Price</td>
+                                                        <td>Approved Date</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="field-section">
+                                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+
+                                    <div class="table-responsive table-td-padding parent-table-height">
+                                        <table class="table" id="list-amended-material">
+                                            <thead>
+                                                <tr>
+                                                    <td>SI.No</td>
+                                                    <td>Category</td>
+                                                    <td>Group </td>
+                                                    <td>Material</td>
+                                                    <td>Colour </td>
+                                                    <td>Uom</td>
+                                                    <td>Price</td>
+                                                    <td>Tax Details</td>
+                                                    <td>Lead Time</td>
+                                                    <td>MRP Margin</td>
+                                                    <td>MRP Price</td>
+                                                    <td>Supplier Desc</td>
+                                                    <th class="veh-9">
+                                                        Edit/Delete
+                                                    </th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+                                            <tbody>
+                                                @{ int count = 1; }
+                                                @foreach (var ApprovedPrice in Model.ApprovedPriceListMasterGridList)
+                                                {
+                                                    <tr>
+                                                        <td class="veh-1" onclick="">@count</td>
+                                                        <td class="veh-3">@ApprovedPrice.CategoryName</td>
+                                                        <td class="veh-3">@ApprovedPrice.GroupName</td>
+                                                        <td class="veh-3">@ApprovedPrice.MaterialName</td>
+                                                        <td class="veh-3">@ApprovedPrice.ColourName</td>
+                                                        <td class="veh-3">@ApprovedPrice.Uom</td>
+                                                        <td class="veh-3">@ApprovedPrice.PriceRs</td>
+                                                        <td class="veh-3">@ApprovedPrice.TextDetails</td>
+                                                        <td class="veh-3">@ApprovedPrice.LeadTime</td>
+                                                        <td class="veh-3">@ApprovedPrice.MRPMargin</td>
+                                                        <td class="veh-3">@ApprovedPrice.MRPPrice</td>
+                                                        <td class="veh-3">@ApprovedPrice.SupplierDescription</td>
+                                                        <td class="veh-1 edit-del-wrap">
+                                                            @{
+                                                                bool Edit = false;
+                                                                bool Delete = false;
+                                                                foreach (var item in PermissionModel)
+                                                                {
+                                                                    if (item.PermissionDesc == "Edit")
+                                                                    {
+                                                                        Edit = true;
+                                                                    }
+                                                                    else if (item.PermissionDesc == "Delete")
+                                                                    {
+                                                                        Delete = true;
+                                                                    }
+                                                                }
+                                                                if (Update == true)
+                                                                {                                                                    
+                                                                    <a href="javascript:void(0)" onclick="Edit_Material('@ApprovedPrice.ApprovedPriceID')" class="watchlist-edit" title="Edit"></a>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-edit" title="Edit"></a>
+                                                                }
+                                                                if (Delete == true)
+                                                                {
+                                                                    <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@ApprovedPrice.ApprovedPriceID')" class="watchlist-delete" title="Delete"></a>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-delete" title="Delete"></a>
+                                                                }
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                                    count++;
+                                                                }
+                                            </tbody>
+
+
+
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>           
+        </form>
+    </div>
+
+</div>
+
+
+<script>
+
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+
+
+    function Refresh() {
+        location.reload();
+    }
+
+
+    $(document).ready(function () {
+        $("#Date").datepicker({ dateFormat: "dd/mm/yy", maxDate: new Date()});
+        $('#MRPMargin').val(parseInt(0));
+        $('#DisplayGridViewEdit_').hide();
+    })
+
+
+    $('#MRPMargin').change(function () {
+        var MRPMargin = $('#MRPMargin').val();
+        var PriceRs = $('#PriceRs').val();
+        var MRPPrice = $('#MRPPrice').val();
+        var val = (parseFloat(PriceRs) + parseFloat(MRPMargin))
+        $('#MRPPrice').val(val);
+    })
+
+
+    $(function () {
+        $("#SupplierId").combobox({
+            select: function () {
+                var SupplierId = parseInt($("#SupplierId").val());
+                $.ajax({
+                    type: "POST",
+                    url: ' @Url.Action("ApprovedPriceListDetails", "ApprovedPriceList")',
+                    data: { ApprovedPriceID: 0, SupplierId: SupplierId },
+                    success: function (data) {
+                        $("#EditColorPartial").html(data);
+                        $("#EditColorPartial").show();
+                    }
+                });
+            }
+        });
+
+    });
+
+
+    $("#Date").datepicker({ dateFormat: "dd/mm/yy" });
+    function Back() {
+        location.reload();
+    }
+    $(function () {
+        $("#MaterialID").combobox();
+        $("#CategoryID").combobox();
+        $("#GroupID").combobox();
+        $("#CurrencyID").combobox();
+        $('#Uom').combobox();
+    });   
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode != 46 && charCode > 31
+          && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+
+    var specialKeys = new Array();
+    specialKeys.push(8); //Backspace
+    function Numeric() {
+
+        $("#PriceRs,#MRPMargin,#MRPPrice").bind("keypress", function (e) {
+            var keyCode = e.which ? e.which : e.keyCode
+            var ret = ((keyCode >= 48 && keyCode <= 57) || specialKeys.indexOf(keyCode) != -1);
+
+            $(".error").css("Average", ret ? "none" : "inline");
+            return ret;
+        });
+        $("#PriceRs,#MRPMargin,#MRPPrice").bind("paste", function (e) {
+            return false;
+        });
+        $("#PriceRs,#MRPMargin,#MRPPrice").bind("drop", function (e) {
+            return false;
+        });
+    }
+    $(function () {
+        $("#MaterialID").combobox({
+            select: function (event, ui) {
+                var MaterialColorId = $('#MaterialID').val();
+                var Materialrate = $('#MaterialID').val();
+                var SupplierId = $('#SupplierId').val();
+                var row = "";
+                $("#MaterialID").append("<option value='0'>Please Select </option>");
+                $.ajax({
+
+                    url: '/ApprovedPriceList/FillColorName',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { MaterialmasterId: parseInt(MaterialColorId) },
+                    success: function (cities) {
+                        $.each(cities, function (i, city) {
+                            $("#MaterialID").append('<option value=' + city.MaterialMasterID + '>' + city.MaterialDescription + '</option>');
+                            $('#ColorID').val(city.ColorMasterId);
+                            document.getElementById("ColorID").disabled = true;
+                            $('#PriceRs').val(city.Price);                        
+                            $("#CurrencyID").val(city.CurrencyMasterId);
+                            $('#CurrencyID').combobox('destroy');
+                            $('#CurrencyID').combobox();
+                            $('#Uom').val(city.Uom);
+                            $('#Uom').combobox('destroy');
+                            $('#Uom').combobox();
+
+                            if ($('#MRPMargin').val() == '0') {
+                                $('#MRPPrice').val($('#PriceRs').val());
+                            }
+
+                        });
+                    }
+                });
+
+                $.ajax({
+                    url: '/ApprovedPriceList/ApprovedPriceListMaterialBasedOnCategoryandGroup',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { MaterialmasterId: parseInt(Materialrate) },
+                    success: function (SupplierCategoryIdAndGroupId) {
+
+                        $('#CategoryID').val(SupplierCategoryIdAndGroupId.CategoryId);
+                        $('#CategoryID').combobox('destroy');
+                        $('#CategoryID').combobox();
+
+                        $('#GroupID').val(SupplierCategoryIdAndGroupId.GroupId);
+                        $('#GroupID').combobox('destroy');
+                        $('#GroupID').combobox();
+                    }
+                });
+
+
+                $.ajax({
+                    url: '/ApprovedPriceList/SupplierSuppliedMaterialPrice',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { MaterialmasterId: parseInt(Materialrate), SupplierMasterId: parseInt(SupplierId) },
+                    success: function (SupplierMaterialRate) {
+                        $.each(SupplierMaterialRate, function (i, rate) {
+                            var myObj = $.parseJSON('{"date_created":"1273185387"}'),
+                            myDate = new Date(1000 * myObj.date_created);
+                            row = "<tr><td>" + rate.SupplierName + "</td><td>" + rate.ApprovedPrice + "</td><td>" + myDate.toLocaleString() + "</td></tr>";
+                            $("#listSupplier tbody").append(row);
+                        });
+                    }
+                });
+
+            }
+        });
+    });
+    $('tbody').on('click', '.watchlist-edit', function () {
+        $(this).closest('td').find('.watchlist-edit').hide();
+        $(this).closest('td').find('.watchlist-delete').hide();
+    });
+
+    function Edit_Material(arg) {
+        var SupplierId = parseInt($("#SupplierId").val());
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("ApprovedPriceListDetailsEdit", "ApprovedPriceList")',
+            data: { ApprovedPriceID: arg, SupplierId: SupplierId },
+            success: function (data) {
+                
+                $('#DisplayGridViewEdit').hide();
+                $('#DisplayGridViewEdit_').show();
+                $('#ApprovedPriceID').val(data.ApprovedPriceID);
+                $('#SupplierId').val(data.SupplierId);
+                $('#SupplierId').combobox('destroy');
+                $('#SupplierId').combobox();
+                $('#CategoryID').val(data.CategoryID);
+                $('#CategoryID').combobox('destroy');
+                $('#CategoryID').combobox();
+                $('#GroupID').val(data.GroupID);
+                $('#GroupID').combobox('destroy');
+                $('#GroupID').combobox();
+                $('#MaterialID').val(data.MaterialID);            
+                $("#MaterialID").combobox('destroy');
+                $("#MaterialID").combobox();            
+                $('#CurrencyID').val(data.CurrencyID);
+                $('#CurrencyID').combobox('destroy');
+                $('#CurrencyID').combobox();             
+                $('#Uom').val(data.Uom);
+                $('#Uom').combobox('destroy');
+                $('#Uom').combobox();
+                $('#ColorID').val(data.ColorID);              
+                $('#Date').val(data.Date);                
+                if (data.IsApproved == true)
+                {
+                    $('#IsApproved').prop('checked', true);
+                }
+                else {
+                    $('#IsApproved').prop('checked', false);
+                }
+               
+                $('#PriceRs').val(data.PriceRs);
+                $('#TaxDetails').val(data.TaxDetails);
+                $('#LeadTime').val(data.LeadTime);
+                $('#MRPMargin').val(data.MRPMargin);
+                $('#POExcessPercentage').val(data.POExcessPercentage);                
+                $('#MRPPrice').val(data.MRPPrice);
+                $('#SupplierDescription').val(data.SupplierDescription);
+                $('#AccessibleValue').val(data.AccessibleValue);
+            }
+        });
+    }
+
+
+
+
+    function ToDateFormat(value) {
+        var pattern = /Date\(([^)]+)\)/;
+        var results = pattern.exec(value);
+        var dt = new Date(parseFloat(results[1]));
+        var month = parseInt(dt.getMonth()) + parseInt(1);
+        return (dt.getDate() + "/" + month + "/" + dt.getFullYear());
+    }
+</script>

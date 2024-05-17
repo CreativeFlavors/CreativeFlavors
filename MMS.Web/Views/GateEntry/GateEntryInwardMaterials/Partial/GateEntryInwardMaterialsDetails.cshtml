@@ -1,0 +1,1615 @@
+﻿@model MMS.Web.Models.GateEntryModel.GateEntryInwardMaterials
+@using MMS.Repository.Managers
+@using MMS.Core.Entities
+@{
+
+}
+<script>
+    $.noConflict();
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    $(function () {
+        $("#InvoiceDate").datepicker({ dateFormat: "dd/mm/yy" });
+        $("#DcDate").datepicker({ dateFormat: "dd/mm/yy" });
+        $("#DcRefDate").datepicker({ dateFormat: "dd/mm/yy" });
+    });
+</script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<link href="~/Scripts/EasyAutocomplete-1.3.5/comboStyles.css" rel="stylesheet" />
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/ComboBox.js"></script>
+<style>
+    #PoNumber a {
+        top: 0px;
+        right: -1px;
+    }
+</style>
+<div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;display:none">
+    <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+        <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+    </div>
+</div>
+<div class="right-form-section clearfix">
+    <form class="form-inline" role="form">
+        <div class="tab-content">
+
+            <div id="step1" class="tab-pane fade in active">
+                <div class="container-fluid">
+                    <div class="row" style="padding-left:30%;">
+                        <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+                            <div class="field-section">
+                                <div class="form-group">
+
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.DropDownListFor(m => m.InwardMaterialType, MMS.Web.ExtensionMethod.HtmlHelper.GateEntryInwardMaterials(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.DropDownListFor(m => m.InwardPo, MMS.Web.ExtensionMethod.HtmlHelper.InwardMaterialPO(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="padding-left:30%;">
+                        <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <label class="radio-inline">
+                                        @if (Model.IsNewInward == true)
+                                        {
+                                            @Html.RadioButtonFor(model => model.IsNewInward, true, new { id = "IsNewInward" })
+                                            @Html.Label("NewInward", "New Inward")
+                                        }
+                                        else
+                                        {
+                                            @Html.RadioButtonFor(model => model.IsNewInward, "", new { id = "IsNewInward" })
+                                            @Html.Label("NewInward", "New Inward")
+                                        }
+                                    </label>
+                                    <label class="radio-inline">
+                                        @if (Model.IsReturned == true)
+                                        {
+                                            @Html.RadioButtonFor(model => model.IsReturned, true, new { id = "IsReturned" })
+                                            @Html.Label("IsReturned", "Returned")
+                                        }
+                                        else
+                                        {
+                                            @Html.RadioButtonFor(model => model.IsReturned, "", new { id = "IsReturned" })
+                                            @Html.Label("IsReturned", "Returned")
+
+                                        }
+                                    </label>
+                                    <label class="radio-inline">
+                                        @if (Model.IsJobWork == true)
+                                        {
+                                            @Html.RadioButtonFor(model => model.IsJobWork, true, new { id = "IsJobWork" })
+                                            @Html.Label("IsJobWork", "Job Work")
+                                        }
+                                        else
+                                        {
+                                            @Html.RadioButtonFor(model => model.IsJobWork, "", new { id = "IsJobWork" })
+                                            @Html.Label("IsJobWork", "Job Work")
+                                        }
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-xs-12">
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Our Dc Ref No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @if (Model.IsNewInward == true)
+                                            {
+                                                @Html.TextBoxFor(m => m.DcRefNo, new { @class = "form-control text-field", @Disabled = "true" })
+                                            }
+                                            else if (Model.IsReturned == true || Model.IsJobWork == true)
+                                            {
+                                                @Html.TextBoxFor(m => m.DcRefNo, new { @class = "form-control text-field" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.DcRefNo, new { @class = "form-control text-field" })
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Gate Entry No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.HiddenFor(m => m.GateEntryInwardId)
+                                            @Html.TextBoxFor(m => m.GateEntryNo, new { @class = "form-control text-field", @readonly = "true" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Company</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.Company, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Return Type</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @if (Model.IsReturned == true || Model.IsJobWork == true)
+                                            {
+                                                @Html.DropDownListFor(m => m.ReturnType, new List<SelectListItem>{
+                                        new SelectListItem{ Text="Please Select", Value = "0"  },
+                                        new SelectListItem{ Text="Returnable", Value = "1" },
+                                        new SelectListItem{ Text="Non-Returnable", Value = "2" }}, new { @class = "select-style text-field", @Disabled = "true" })
+                                            }
+                                            else if (Model.IsNewInward == true)
+                                            {
+                                                @Html.DropDownListFor(m => m.ReturnType, new List<SelectListItem>{
+                                        new SelectListItem{ Text="Please Select", Value = "0"  },
+                                        new SelectListItem{ Text="Returnable", Value = "1" },
+                                        new SelectListItem{ Text="Non-Returnable", Value = "2" }}, new { @class = "select-style text-field", @Disabled = "false" })
+                                            }
+                                            else
+                                            {
+                                                @Html.DropDownListFor(m => m.ReturnType, new List<SelectListItem>{
+                                        new SelectListItem{ Text="Please Select", Value = "0"  },
+                                        new SelectListItem{ Text="Returnable", Value = "1" },
+                                        new SelectListItem{ Text="Non-Returnable", Value = "2" }}, new { @class = "select-style text-field" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Dc No / date</label>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-6" style="padding-right:3px;">
+                                            @Html.TextBoxFor(m => m.DcNo, new { @class = "form-control text-field" })
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6" style="padding-left:0px;">
+                                            @if ((Model != null) && (Model.GateEntryInwardId != 0) && (Model.DcDate != null))
+                                            {
+                                                var from = Model.DcDate;
+                                                @Html.TextBoxFor(m => from, new { @class = "form-control text-field", @id = "DcDate", @value = from })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.DcDate, new { @class = "form-control text-field" })
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Mode of Transport</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.ModeofTransport, MMS.Web.ExtensionMethod.HtmlHelper.ModeofTransportGEDoc(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Vehicle No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @if (Model.ModeofTransport == "3")
+                                            {
+                                                @Html.TextBoxFor(m => m.VehicleNo, new { @class = "form-control text-field", @Disabled = "true" })
+                                            }
+                                            else if ((Model.ModeofTransport == "1") || (Model.ModeofTransport == "2"))
+                                            {
+                                                @Html.TextBoxFor(m => m.VehicleNo, new { @class = "form-control text-field" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.VehicleNo, new { @class = "form-control text-field" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Supplier / JW Name</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.SupplierId, MMS.Web.ExtensionMethod.HtmlHelper.SupplierName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Date</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @if ((Model != null) && (Model.GateEntryInwardId != 0) && (Model.DcRefDate != null))
+                                            {
+                                                var from = Model.DcRefDate;
+                                                @Html.TextBoxFor(m => from, new { @class = "form-control text-field", @id = "DcRefDate", @value = from })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.DcRefDate, new { @class = "form-control text-field" })
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Entry Date Time</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @if (Model != null && Model.InwardEntryDateTime != null)
+                                            {
+                                                @Html.TextBoxFor(m => m.InwardEntryDateTime, new { @class = "form-control text-field", @readonly = "true" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.EntryDate, new { @Value = System.DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), @class = "form-control text-field", @readonly = "true" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Unit / Division</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @Html.DropDownListFor(m => m.UnitDivision, MMS.Web.ExtensionMethod.HtmlHelper.UnitDivision(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Material Type</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.MaterialType, new List<SelectListItem>
+
+                                            {
+                                        new SelectListItem{ Text="Please Select", Value = "0"  },
+                                         new SelectListItem{ Text="Local", Value = "1" },
+                                         new SelectListItem{ Text="Import", Value = "2" },
+                                         new SelectListItem{ Text="Customer", Value = "3" },
+
+                                         }, new { @class = "select-style text-field" })
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Invoice No / date</label>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-6" style="padding-right:3px;">
+                                            @Html.TextBoxFor(m => m.InvoiceNo, new { @class = "form-control text-field" })
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6" style="padding-left:0px;">
+                                            @if ((Model != null) && (Model.GateEntryInwardId != 0) && (Model.InvoiceDate != null))
+                                            {
+                                                var from = Model.InvoiceDate;
+                                                @Html.TextBoxFor(m => from, new { @class = "form-control text-field", @id = "InvoiceDate", @value = from })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.InvoiceDate, new { @class = "form-control text-field" })
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Invoice Value</label>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-6" style="padding-right:3px;">
+                                            @Html.DropDownListFor(m => m.InvoiceCurrency, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "select-style text-field" })
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6" style="padding-left:0px;">
+                                            @Html.TextBoxFor(m => m.InvoiceValue, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <div id="lblMaterialName">
+                                                <label for="text" class="form-label">Machinary name</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.MaterialName, new { @class = "form-control text-field" })
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                                <input type="hidden" id="InwardPoViewbag" value="@ViewBag.Name" />
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div id="PoNumber">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Po No / JW Contract</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                <div id="PoNoAutoComplete">
+                                                    @Html.DropDownListFor(m => m.PoNoId, MMS.Web.ExtensionMethod.HtmlHelper.GetPONO(), new { @class = "select-style text-field" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12"></div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="col-md-8 col-sm-8 col-lg-8 col-xs-12 no-padding">
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                                            <label for="text" class="form-label">Material Name</label>
+                                        </div>
+                                        <div class="col-md-9 col-sm-9 col-lg-9 col-xs-12 material_select no-padding">
+                                            <div id="MaterialNameAutoComplete">
+                                                @Html.DropDownListFor(m => m.MaterialNameId, MMS.Web.ExtensionMethod.HtmlHelper.GEMaterialName(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12"></div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Stores</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div id="StoresAutoComplete">
+                                                @Html.DropDownListFor(m => m.StoresId, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Size Range</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div id="SizeRangeAutoComplete">
+                                                @Html.DropDownListFor(m => m.SizeRangeId, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">HSN Code</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.HSNCode, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Received By</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div id="ReceivedByAutoComplete">
+                                                @Html.DropDownListFor(m => m.ReceivedBy, MMS.Web.ExtensionMethod.HtmlHelper.GateEntryEmpNameWithCode(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Remarks</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Po Total</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.PoTotal, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            @Html.Label("PCs", new { id = "Pcslabel" })
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.Pcs, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Pending Quantity</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                            @Html.TextBoxFor(m => m.PendingQuantity, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">UoM/Quantity</label>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-6">
+                                            <div id="UomAutoComplete">
+                                                @Html.DropDownListFor(m => m.UomId, MMS.Web.ExtensionMethod.HtmlHelper.LongUnitName(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6 uom_qut_sec">
+                                            @Html.TextBoxFor(m => m.TotalQty, new { @class = "form-control text-field" })
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Rate</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.Rate, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Value</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.Value, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Acknowledged By</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div id="AcknowledgedByAutoComplete">
+                                                @Html.DropDownListFor(m => m.AcknowledgedBy, MMS.Web.ExtensionMethod.HtmlHelper.GateEntryEmpNameWithCode(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">DcTotal/ArrivedTotal</label>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-6" style='padding-right:3px;'>
+                                            @Html.TextBoxFor(m => m.DcTotal, new { @class = "form-control text-field", @readonly = "true" })
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6" style='padding-left:0px;'>
+                                            @Html.TextBoxFor(m => m.ArrivedTotal, new { @class = "form-control text-field", @readonly = "true" })
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">File Upload</label>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-6" style='padding-right:3px;'>
+                                            @*@Html.TextBoxFor(m => m.DcTotal, new { @class = "form-control text-field", @readonly = "true" })*@
+                                            <input type="file" id="files" name="files" onchange="loadfile(event)" multiple />
+                                            <input type="button" id="clearuploadfile" value="Remove" onclick="cleartheupdatefiledata()" style="margin-top: 5px;" />
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-6" style='padding-left:0px;'>
+                                            @*@Html.TextBoxFor(m => m.ArrivedTotal, new { @class = "form-control text-field", @readonly = "true" })*@
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="ol-md-4 col-sm-4 col-lg-4 col-xs-12"></div>
+                        </div>
+
+
+                        <div class="col-xs-12" style="padding:0;">
+                            <table class="table" id="sizeRangeTable" style="width:100%">
+                                <tbody>
+                                    @if (Model.sizeRangeDetailslist == null)
+                                    {
+                                        <tr>
+                                            <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">Size</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">PoQty</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">DcQty</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">ArrivedQty</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">PendingQty</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td style="padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;display: none;"></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;display: none;"></td>
+                                        </tr>
+
+                                    }
+                                    @if (Model.sizeRangeDetailslist != null && Model.sizeRangeDetailslist.Count > 0)
+                                    {
+                                        var count1 = 1;
+                                        <tr>
+                                            @if (Model.sizeRangeDetailslist != null)
+                                            {
+                                                <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 70px !important; float: left;">Size</td>
+                                                foreach (var item in Model.sizeRangeDetailslist)
+                                                {
+                                                    <td class="SizeRangeRefValue">@item.Size</td>
+                                                    count1++;
+                                                }
+                                            }
+                                        </tr>
+                                        <tr>
+                                            @if (Model.sizeRangeDetailslist != null)
+                                            {
+                                                <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;padding-top: 1px; width: 80px !important; float: left;">PoQty</td>
+                                                foreach (var item in Model.sizeRangeDetailslist)
+                                                {
+                                                    <td><input type="text" class="PoQuantity" id="qtyId@(count1)" value="@item.PoQty" style='width:80px;' /></td>
+                                                    count1++;
+                                                }
+                                            }
+                                        </tr>
+                                        <tr>
+                                            @if (Model.sizeRangeDetailslist != null)
+                                            {
+                                                <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 70px !important; float: left;">DcQty</td>
+                                                foreach (var item in Model.sizeRangeDetailslist)
+                                                {
+                                                    <td><input type="text" class="DcQuantity" id="DcQuantity@(count1)" value="@item.DcQty" style='width:80px;' onchange="changeDcQty()" /></td>
+                                                    count1++;
+
+                                                }
+                                            }
+                                        </tr>
+                                        <tr>
+                                            @if (Model.sizeRangeDetailslist != null)
+                                            {
+                                                <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 70px !important; float: left;">ArrivedQty</td>
+                                                foreach (var item in Model.sizeRangeDetailslist)
+                                                {
+                                                    <td><input type="text" class="ArrivedQuantity" id="ArrivedQuantity@(count1)" value="@item.ArrivedQty" style='width:80px;' onchange="changeArrQty()" /></td>
+                                                    count1++;
+
+
+                                                }
+                                            }
+                                        </tr>
+                                        <tr>
+                                            @if (Model.sizeRangeDetailslist != null)
+                                            {
+                                                <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 70px !important; float: left;">PendingQty</td>
+                                                foreach (var item in Model.sizeRangeDetailslist)
+                                                {
+                                                    <td><input type="text" class="PendingQuantity" id="PendingQuantity@(count1)" value="@item.PendingQty" style='width:80px;' onchange="changeArrQty()" /></td>
+                                                    count1++;
+                                                }
+                                            }
+                                        </tr>
+
+                                        <tr>
+                                            @if (Model.sizeRangeDetailslist != null)
+                                            {
+                                                <td style="display: none;padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 70px !important; float: left;"></td>
+                                                foreach (var item in Model.sizeRangeDetailslist)
+                                                {
+                                                    <td class="SizeQtyRateId">@item.InwardMaterialSizeQtyRateId</td>
+                                                    count1++;
+                                                }
+                                            }
+                                        </tr>
+                                        <tr>
+                                            @if (Model.GateEntryPendingQtyDataList != null)
+                                            {
+                                                <td style="padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 70px !important; float: left;display: none;"></td>
+                                                foreach (var item in Model.GateEntryPendingQtyDataList)
+                                                {
+                                                    <td class="PendingQtyId">@item.PendingQuantityId</td>
+                                                    count1++;
+                                                }
+                                            }
+                                        </tr>
+
+
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12" id="DisplayGridViewEdit" style="text-align:left;margin-top:10px;margin-left: 45%!important;">
+                            <input type="button" class="btn btn-default btn-style" onclick="ADDNew()" style="cursor: pointer;" title="Add" value="Add">
+                            <input type="button" class="btn btn-default btn-style" onclick="Cancel()" style="cursor: pointer;" title="Back" value="Back">
+                            @if (Model.GateEntryInwardId == 0)
+                            {
+                                <input type="button" class="btn btn-default btn-style" onclick="Save()" style="cursor: pointer;" title="Save" value="Save">
+
+                            }
+                            else
+                            {
+                                <input type="button" class="btn btn-default btn-style" onclick="Update()" style="cursor: pointer;" id="GateEntryInwardId" title="Update" value="Update">
+                            }
+                        </div>
+
+                        <div class="col-lg-12 col-sm-12 col-xs-12" id="DisplayGridViewEdit_" style="text-align:left;margin-top:10px;margin-left: 45%!important;">
+                            <input type="button" class="btn btn-default btn-style" onclick="ADDNew()" style="cursor: pointer;" title="Add" value="Add">
+                            <input type="button" class="btn btn-default btn-style" onclick="Cancel()" style="cursor: pointer;" title="Back" value="Back">
+                            <input type="button" class="btn btn-default btn-style" onclick="Update()" style="cursor: pointer;" id="ApprovedPriceID" title="Update" value="Update">
+                        </div>
+
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    @*Load Sub Grid - Multiple Entry*@
+                    <div class="row">
+                        <div class="field-section">
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+
+                                <div class="table-responsive table-td-padding parent-table-height">
+                                    <table class="table" id="Outward-SubGrid">
+                                        <thead>
+                                            <tr>
+                                                <td>MaterialName</td>
+                                                <td>HSNCode </td>
+                                                <td>SizeRangeDetails</td>
+                                                <td>StoreName </td>
+                                                <td>Uom</td>
+                                                <td>PendingQuantity</td>
+                                                <td>Quantity</td>
+                                                <td>Piecies</td>
+
+                                                <td class="veh-9">
+                                                    Edit/Delete
+                                                </td>
+                                            </tr>
+                                        </thead>
+
+
+                                        <tbody>
+                                            @{
+                                                if (Model.GEMaterialsGrid == null)
+                                                {
+
+                                                }
+                                                else
+                                                {
+                                                    int count = 1;
+                                                    foreach (var materialGRid in Model.GEMaterialsGrid)
+                                                    {
+                                                        <tr>
+                                                            <td class="veh-3">@materialGRid.MaterialName</td>
+                                                            <td class="veh-3">@materialGRid.HSNCode</td>
+                                                            <td class="veh-3">@materialGRid.SizeRangeDetails</td>
+                                                            <td class="veh-3">@materialGRid.StoreName</td>
+                                                            <td class="veh-3">@materialGRid.UnitName</td>
+                                                            <td class="veh-3">@materialGRid.PendingQuantity</td>
+                                                            <td class="veh-3">@materialGRid.TotalQty</td>
+                                                            <td class="veh-3">@materialGRid.Piecies</td>
+
+                                                            <td class="veh-1 edit-del-wrap">
+                                                                @{
+
+                                                                    <a href="javascript:void(0)" onclick="Edit_Material('@materialGRid.GateEntryInwardId')" class="watchlist-edit" title="Edit"></a>
+                                                                    <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@materialGRid.GateEntryInwardId')" class="watchlist-delete" title="Delete"></a>
+                                                                }
+
+                                                            </td>
+                                                        </tr>
+                                                                            count++;
+                                                                        }
+                                                                    }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<div id="formcontrol">
+    @if (Model != null && Model.GateEntryInwardMaterialsUploadlist != null)
+    {
+        foreach (var list in Model.GateEntryInwardMaterialsUploadlist)
+        {
+            // event.target.files [i].name.substring(event.target.files [i].name.lastIndexOf('.') + 1)
+            if (list.UploadPath.Substring(list.UploadPath.LastIndexOf('.') + 1) == "pdf")
+            {
+                <embed src="~/DateDocumentupload/@list.UploadPath" class='dynamicimg' style='width: 100%; height: 1000px;' /> <br>
+            }
+            else
+            {
+
+                <img src="~/DateDocumentupload/@list.UploadPath" class="dynamicimg" style="width: 100%;" /> <br>
+            }
+        }
+
+
+    }
+
+
+
+</div>
+
+
+
+
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<link href="~/Scripts/EasyAutocomplete-1.3.5/comboStyles.css" rel="stylesheet" />
+<script src="~/Scripts/EasyAutocomplete-1.3.5/ComboBox.js"></script>
+<script>
+    //$(window).load(function () {
+    //    $('.loader-overlay').fadeOut('fast');
+    //});
+    $(function () {
+        $('.loader-overlay').ajaxStart(function () {
+            $(this).fadeIn('slow');
+        }).ajaxStop(function () {
+            $(this).stop().fadeOut('fast');
+        });
+    });
+
+    $('#DisplayGridViewEdit_').hide();
+    $("#SupplierId").combobox();
+    $("#PoNoId").combobox();
+    $("#StoresId").combobox();
+    $("#MaterialNameId").combobox();
+    $("#AcknowledgedBy").combobox();
+    $("#ReceivedBy").combobox();
+    $("#SizeRangeId").combobox();
+    $("#UomId").combobox();
+    $(function () {
+        $('#SupplierId').combobox({
+            select: function (event, ui) {
+                $('.loader-overlay').fadeIn('slow');
+                var id = $('#InwardPo').val();
+                if (id == 0) {
+                    alert('Please Select InwardPo');
+                    $('#InwardPo').css('border-color', 'red');
+                    $('#InwardPo').focus();
+                    return false;
+                }
+                if ($('#InwardPo option:selected').text() == "With Po") {
+                    $("#PoNumber").show();
+                    var id = $('#SupplierId').val();
+                    $.ajax({
+                        url: '/GateEntryInwardMaterials/GetPoNo',
+                        type: "GET",
+                        dataType: "JSON",
+                        data: { SupplierId: $('#SupplierId').val() },
+                        success: function (data) {
+                            $('.loader-overlay').fadeOut('fast');
+                            $("#PoNoId").html(""); // clear before appending new list
+                            $.each(data, function (i, city) {
+                                $("#PoNoId").append(
+                                    $('<option></option>').val(city.PorderId).html(city.PoNo));
+                            });
+
+                        }
+                    });
+                }
+                else if ($('#InwardPo option:selected').text() == "WithOut Po") {
+                    $("#PoNumber").hide();
+                    var id = $('#SupplierId').val();
+                    $.ajax({
+                        url: '/GateEntryInwardMaterials/GetSupplierBasedMaterial',
+                        type: "GET",
+                        dataType: "JSON",
+                        data: { SupplierId: $('#SupplierId').val() },
+                        success: function (data) {
+                            $('.loader-overlay').fadeOut('fast');
+                            $("#MaterialNameId").html(""); // clear before appending new list
+                            $.each(data, function (i, city) {
+                                $("#MaterialNameId").append(
+                                    $('<option></option>').val(city.MaterialID).html(city.MaterialDescription));
+                            });
+                        }
+                    });
+                }
+
+            }
+
+        });
+    });
+    $("#PoNoId").combobox({
+        select: function (event, ui) {
+            $('.loader-overlay').show();
+            $('.loader-overlay').fadeIn('fast');
+            var id = $('#PoNoId').val();
+            var id1 = $('#SupplierId').val();
+            if (id1 == 0) {
+
+                alert('Please Select Supplier1');
+            }
+            $.ajax({
+                url: '/GateEntryInwardMaterials/GetMaterialByPoNo',
+                type: "GET",
+                dataType: "JSON",
+                data: { PoNoId: $('#PoNoId option:selected').text() },
+                success: function (data) {
+                    $("#MaterialNameId").html("");
+                    $.each(data, function (i, item) {
+                        $("#MaterialNameId").append(
+                          $('<option></option>').val(item.MaterialMasterId).html(item.MaterialDescription));
+
+                    });
+                    $('.loader-overlay').fadeOut('fast');
+                    $('.loader-overlay').hide();
+                }
+            });
+        }
+    });
+    if ($('#InwardPoViewbag').val() == 2) {
+        $("#PoNumber").hide();
+    }
+    else {
+        $("#PoNumber").show();
+    }
+    //$('#InwardPo').on("change", function () {
+    //    if ($('#InwardPo option:selected').text() == "With Po") {
+    //        $("#PoNumber").show();
+    //        var id = $('#SupplierId').val();
+    //        $.ajax({
+    //            url: '/GateEntryInwardMaterials/GetPoNo',
+    //            type: "GET",
+    //            dataType: "JSON",
+    //            data: { SupplierId: $('#SupplierId').val() },
+    //            success: function (data) {
+    //                $("#PoNoId").html(""); // clear before appending new list
+    //                $.each(data, function (i, city) {
+    //                    $("#PoNoId").append(
+    //                        $('<option></option>').val(city.PorderId).html(city.PoNo));
+    //                });
+    //            }
+    //        });
+
+    //        $("#PoNoId").combobox({
+    //            select: function (event, ui) {
+    //                var id = $('#PoNoId').val();
+    //                var id1 = $('#SupplierId').val();
+    //                if (id1 == 0) {
+
+    //                    alert('Please Select Supplier1');
+    //                }
+    //                $.ajax({
+    //                    url: '/GateEntryInwardMaterials/GetMaterialByPoNo',
+    //                    type: "GET",
+    //                    dataType: "JSON",
+    //                    data: { PoNoId: $('#PoNoId option:selected').text() },
+    //                    success: function (data) {
+    //                        $("#MaterialNameId").html("");
+    //                        $.each(data, function (i, item) {
+    //                            $("#MaterialNameId").append(
+    //                              $('<option></option>').val(item.MaterialMasterId).html(item.MaterialDescription));
+
+    //                        });
+    //                    }
+    //                });
+    //            }
+    //        });
+    //    }
+    //    else if ($('#InwardPo option:selected').text() == "WithOut Po") {
+    //        $("#PoNumber").hide();
+    //        var id = $('#SupplierId').val();
+    //        $.ajax({
+    //            url: '/GateEntryInwardMaterials/GetSupplierBasedMaterial',
+    //            type: "GET",
+    //            dataType: "JSON",
+    //            data: { SupplierId: $('#SupplierId').val() },
+    //            success: function (data) {
+    //                $("#MaterialNameId").html(""); // clear before appending new list
+    //                $.each(data, function (i, city) {
+    //                    $("#MaterialNameId").append(
+    //                        $('<option></option>').val(city.MaterialID).html(city.MaterialDescription));
+    //                });
+    //            }
+    //        });
+
+    //    }
+    //});
+
+    $(function () {
+        $("#MaterialNameId").combobox({
+            select: function (event, ui) {
+                $('.loader-overlay').show();
+                $('.loader-overlay').fadeIn('fast');
+                var id = $('#MaterialNameId').val();
+                var MaterialTextName = $("#MaterialNameId option:selected").text();
+                $('#sizeRangeTable tbody tr').html("");
+                var pono = $('#PoNoId option:selected').text();
+                if (pono == "Please Select") {
+                    pono = "";
+                }
+
+                $("#GateEntryInwardId").val(0);
+                $.ajax({
+                    url: '/GateEntryInwardMaterials/GetDetailsByMaterialName',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { MaterialNameId: $('#MaterialNameId').val(), SupplierId: $('#SupplierId').val(), PoNo: pono },
+                    success: function (data) {
+                        var PoTotal = 0;
+                        debugger;
+                        if (data != null && data == "There is no data") {
+                            alert("This Material is not available in ApprovedList");
+                            $('.loader-overlay').fadeOut('fast');
+                            return false;
+                        }
+                        else if (data != null && data == "Already Exists") {
+                            alert("Purchase order pending quantity is zero");
+                            $('.loader-overlay').fadeOut('fast');
+                            return false;
+                        }
+
+                        else {
+                            $("#sizeRangeTable tbody >tr ").each(function () { $(this).find("td:gt(0)").remove() });
+                            var len = parseInt(data.SizeRange.length);
+                            if (len != 0) {
+                                $("#sizeRangeTable").show();
+                                var count1 = 1;
+                                $('#sizeRangeTable tbody tr:first-child').append('<td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;   width: 80px !important; float: left;">Size</td>')
+                                $('#sizeRangeTable tbody tr:nth-child(2)').append('  <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;   width: 80px !important; float: left;">PoQty</td>')
+                                $('#sizeRangeTable tbody tr:nth-child(3)').append('  <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;   width: 80px !important; float: left;">DcQty</td>')
+                                $('#sizeRangeTable tbody tr:nth-child(4)').append('  <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;   width: 80px !important; float: left;">ArrivedQty</td>')
+                                $('#sizeRangeTable tbody tr:nth-child(5)').append('  <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;    width: 80px !important; float: left;">PendingQty</td>')
+                                $('#sizeRangeTable tbody tr:nth-child(6)').append('<td style="display: none;padding-bottom: 3px;  padding-left: 0; width: 80px !important; float: left;"></td>')
+                                $('#sizeRangeTable tbody tr:nth-child(7)').append('<td style="padding-bottom: 3px;  padding-left: 0;  width: 80px !important; float: left;display: none;"></td>')
+                                for (var i = 0; i <= data.SizeRange.length - 1; i++) {
+                                    $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + data.SizeRange[i].SizeRange + ' </td> ');
+
+                                    if ($("#InwardPo option:selected").text() == "WithOut Po") {
+                                        $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='PoQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'> <input type='text'  class='gridPoQuantity' onchange='changePOQty(" + i + "," + 0 + ")' id='PoQuantity" + i + "' value='0'  style='padding-bottom: 0;padding-top: 0;width: 34px;' /> </td> ");
+                                        $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='DcQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeDcQty(" + i + "," + 0 + ")' class='gridDcQuantity' id='DcQuantity' value='0'  style='padding-bottom: 0;padding-top: 0;width: 34px;' /></td>");
+                                        $('#sizeRangeTable tbody tr:nth-child(4)').append("<td class='ArrivedQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeArrQty(" + i + "," + 0 + ")' class='gridArrivedQuantity' id='ArrivedQuantity' value='0'  style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+
+                                    }
+                                    else {
+                                        //if (ll != 0 && data.PoQuantity.length>0) {
+
+                                        //    $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='PoQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'> '" + data.PoQuantity[i].quantity + "'</td> ");
+                                        //    var asd = data.PendingQuantity[i].PendingQty;
+                                        //    PoTotal += parseFloat(data.PendingQuantity[i].quantity);
+                                        //    if (asd == 0) {
+                                        //        $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='DcQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeDcQty(" + i + "," + data.PendingQuantity[i].PendingQty + ")' class='gridDcQuantity' id='DcQuantity' value='0'  style='padding-bottom: 0;padding-top: 0;width: 34px;' /></td>");
+
+                                        //        $('#sizeRangeTable tbody tr:nth-child(4)').append("<td class='ArrivedQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeArrQty(" + i + "," + data.PendingQuantity[i].PendingQty + ")' class='gridArrivedQuantity' id='ArrivedQuantity' value='0'  style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                                        //    }
+                                        //    else {
+                                        //        $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='DcQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' id='DcQuantity' onchange='changeDcQty(" + i + "," + data.PendingQuantity[i].PendingQty + ")' class='gridDcQuantity'  value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /></td>");
+
+                                        //        $('#sizeRangeTable tbody tr:nth-child(4)').append("<td class='ArrivedQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeArrQty(" + i + "," + data.PendingQuantity[i].PendingQty + ")' class='gridArrivedQuantity' id='ArrivedQuantity' value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                                        //    }
+                                        //}
+                                        //  else {
+                                        if (data.PendingQuantity.length != 0) {
+                                            $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='PoQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important'> <input type='text'  class='gridPoQuantity' readonly  onchange='changePOQty(" + i + "," + 0 + ")' id='PoQuantity" + i + "' value='" + data.PendingQuantity[i].PendingQty + "'  style='padding-bottom: 0;padding-top: 0;width: 34px;' />  </td> ");
+                                            var asd = data.PendingQuantity[i].PendingQty;
+                                            PoTotal += parseFloat(data.PendingQuantity[i].PendingQty);
+                                            if (asd == 0) {
+                                                $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='DcQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeDcQty(" + i + "," + data.PendingQuantity[i].PendingQty + ")' class='gridDcQuantity' id='DcQuantity' value='0' readonly style='padding-bottom: 0;padding-top: 0;width: 34px;' /></td>");
+
+                                                $('#sizeRangeTable tbody tr:nth-child(4)').append("<td class='ArrivedQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeArrQty(" + i + "," + data.PendingQuantity[i].PendingQty + ")' class='gridArrivedQuantity' id='ArrivedQuantity' value='0' readonly style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                                            }
+                                            else {
+                                                $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='DcQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' id='DcQuantity' onchange='changeDcQty(" + i + "," + data.PendingQuantity[i].PendingQty + ")' class='gridDcQuantity'  value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /></td>");
+
+                                                $('#sizeRangeTable tbody tr:nth-child(4)').append("<td class='ArrivedQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeArrQty(" + i + "," + data.PendingQuantity[i].PendingQty + ")' class='gridArrivedQuantity' id='ArrivedQuantity' value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                                            }
+                                        }
+                                        else {
+                                            PoTotal += parseFloat(data.PoQuantity[i].quantity);
+                                            $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='PoQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text'  class='gridPoQuantity' readonly  onchange='changePOQty(" + i + "," + 0 + ")' id='PoQuantity" + i + "' value='" + data.PoQuantity[i].quantity + "'  style='padding-bottom: 0;padding-top: 0;width: 34px;' /></td> ");
+                                            $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='DcQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' id='DcQuantity' onchange='changeDcQty(" + i + ")' class='gridDcQuantity'  value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /></td>");
+                                            $('#sizeRangeTable tbody tr:nth-child(4)').append("<td class='ArrivedQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeArrQty(" + i + ")' class='gridArrivedQuantity' id='ArrivedQuantity' value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                                        }
+
+                                        //}
+                                    }
+
+                                    $('#sizeRangeTable tbody tr:nth-child(5)').append("<td class='PendingQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='gridPendingQuantity' id='PendingQuantity' value='0' readonly style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                                    $('#sizeRangeTable tbody tr:nth-child(6)').append("<td class='SizeQtyRateId' style='display: none;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='hidden' class='SizeQTy' value='' style='padding-bottom:0;padding-top: 0;width: 34px;' /></td>");
+                                    $('#sizeRangeTable tbody tr:nth-child(7)').append("<td class='PendingQtyId' style='display: none;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='hidden' class='PendingQty' value='' style='padding-bottom:0;padding-top: 0;width: 34px;' /></td>");
+
+                                    count1++;
+                                }
+                                $("#PoTotal").val(PoTotal);
+
+                            }
+                            else {
+                                var sizr = $('#SizeRangeId').val();
+                                $('#sizeRangeTable tbody tr:first-child').append('<td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">Size</td>')
+                                $('#sizeRangeTable tbody tr:nth-child(2)').append('  <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">PoQty</td>')
+                                $('#sizeRangeTable tbody tr:nth-child(3)').append('  <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">DcQty</td>')
+                                $('#sizeRangeTable tbody tr:nth-child(4)').append('  <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">ArrivedQty</td>')
+                                $('#sizeRangeTable tbody tr:nth-child(5)').append('  <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">PendingQty</td>')
+                                $('#sizeRangeTable tbody tr:nth-child(6)').append('<td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;"></td>')
+                                $('.SizeRangeRefValue').hide();
+                                $("#sizeRangeTable").hide();
+                                $('.Quantity').hide();
+                                $('.SizeQtyRateId').hide();
+                                if (data.purchaseOrder != null) {
+                                    $("#PoTotal").val(data.purchaseOrder.PoQty);
+
+                                }
+
+                                // $("#TotalQty").val(data.purchaseOrder.PoQty);
+
+                            }
+                            $("#HSNCode").val(data.Material[0].HSNCode);
+                            //  var mn = data.Material[0];
+                            var mn = data.Material;
+                            console.log(mn);
+                            var mlen = parseInt(data.Material.length);
+                            console.log(mlen);
+                            if (mlen != 0) {
+                                var mnm = data.Material[0].PriceRs;
+                                $('#Rate').val(mnm);
+                                console.log(mnm);
+
+                            }
+                            else {
+                                $('#Rate').val('');
+                            }
+
+                            /*Pcs label and Textbox only showing MaterialName is Leathers Else hide the label and textbox */
+                            if (data.Material[0].CategoryName == "Leathers") {
+                                $('#Pcs').show();
+                                $('#Pcslabel').show();
+                            }
+                            else {
+                                $('#Pcs').hide();
+                                $('#Pcslabel').hide();
+                            }
+
+                            // clear before appending new list
+                            $("#StoresId").html("");
+                            $("#SizeRangeId").html("");
+                            $("#UomId").html("");
+
+                            $.each(mn, function (i, city) {
+                                $("#StoresId").append(
+                                    $('<option></option>').val(city.StoreMasterId).html(city.StoreName));
+                                $("#SizeRangeId").append(
+                                   $('<option></option>').val(city.SizeRangeDetailsId).html(city.SizeRangeName));
+                                $("#UomId").append(
+                                  $('<option></option>').val(city.Uom).html(city.LongUnitName));
+                            });
+                        }
+                        $('.loader-overlay').fadeOut('fast');
+                        $('.loader-overlay').hide();
+                    }
+                });
+            }
+        });
+    })
+
+
+    $(function () {
+        $("#PoTotal").blur(function () {
+            var poTotal_ = 0;
+            if ($("#InwardPo option:selected").text() != "WithOut Po") {
+                if ($('#PoNoId').val() != 0 && $('#PoNoId').val() != null && $('#PoNoId').val() != "") {
+                    $('#sizeRangeTable tbody tr ').find('.PoQuantity').each(function () {
+                        poTotal_ += +$(this).text() || 0;
+                    });
+                }
+                else {
+                    //$('#sizeRangeTable tbody tr ').find('.gridPoQuantity').each(function () {
+                    //    poTotal_ += +$(this).val() || 0;
+                    //});
+                }
+                $('#PoTotal').val(poTotal_);
+                var pTotal_ = parseInt($('#PoTotal').val());
+                var aTotal_ = parseInt($('#TotalQty').val());
+                var pendTotal_ = parseInt((pTotal_) - (aTotal_));
+                $('#PendingQuantity').val(pendTotal_);
+            }
+
+        });
+
+        $("#TotalQty").blur(function () {
+            var aTotal_ = 0;
+            debugger;
+            if ($("#InwardPo option:selected").text() != "WithOut Po") {
+
+                if ($('#sizeRangeTable tbody tr ').find('.gridArrivedQuantity').length > 0) {
+                    $('#sizeRangeTable tbody tr ').find('.gridArrivedQuantity').each(function () {
+                        aTotal_ += +$(this).val() || 0;
+                    });
+                    $('#TotalQty').val(aTotal_);
+                    var pTotal_ = parseInt($('#PoTotal').val());
+                    var aTotal_ = parseInt($('#TotalQty').val());
+                    var pendTotal_ = parseInt((pTotal_) - (aTotal_));
+                }
+                else {
+                    // $('#TotalQty').val(aTotal_);
+                    var pTotal_ = parseInt($('#PoTotal').val());
+                    var aTotal_ = parseInt($('#TotalQty').val());
+                    var pendTotal_ = parseInt((pTotal_) - (aTotal_));
+                }
+                $('#PendingQuantity').val(pendTotal_);
+            }
+            else {
+                var pTotal_ = parseInt($('#PoTotal').val());
+                var aTotal_ = parseInt($('#TotalQty').val());
+                var pendTotal_ = parseInt((pTotal_) - (aTotal_));
+                $('#PendingQuantity').val(pendTotal_);
+            }
+        });
+    });
+
+    function changePOQty(arg, arg1) {
+        var totalQty1 = 0;
+        $('#sizeRangeTable tbody >tr').find('.gridPoQuantity').each(function () {
+            totalQty1 += parseFloat($(this).val());
+        })
+        $("#PoTotal").val(totalQty1);
+    }
+    function changeDcQty(arg, arg1) {
+        var totalQty1 = 0;
+        // var pQty_ = parseInt(arg1);
+        var dQty_ = parseInt($('#sizeRangeTable tbody tr ').find('.gridDcQuantity').eq(arg).val());
+        var aQty_ = parseInt($('#sizeRangeTable tbody tr ').find('.gridArrivedQuantity').eq(arg).val());
+        var pQty_ = parseInt($('#sizeRangeTable tbody tr ').find('.gridPoQuantity').eq(arg).val());
+        if (dQty_ > pQty_) {
+            alert("Dc Qty must be Lesser or Equal of Po Qty");
+            $('#sizeRangeTable tbody tr ').find('.gridDcQuantity').eq(arg).val('0');
+            return false;
+        }
+        // else if (dQty_ == aQty_ || dQty_ > aQty_) {
+        var pendQty_ = dQty_ - aQty_;
+        var pendqty_ = pQty_ - dQty_;
+        $('#sizeRangeTable tbody tr ').find('.gridPendingQuantity').eq(arg).val(pendQty_);
+        // }
+
+
+        $('#sizeRangeTable tbody tr').find('.gridDcQuantity').each(function () {
+            totalQty1 += parseFloat($(this).val());
+        });
+        $('#DcTotal').val(totalQty1);
+    }
+    function changeArrQty(arg, arg1) {
+        var totalQty2 = 0;
+        // var pQty_ = parseInt(arg1);
+        var pQty_ = parseInt($('#sizeRangeTable tbody tr ').find('.gridPoQuantity').eq(arg).val());
+        var dQty_ = parseInt($('#sizeRangeTable tbody tr ').find('.gridDcQuantity').eq(arg).val());
+        var aQty_ = parseInt($('#sizeRangeTable tbody tr ').find('.gridArrivedQuantity').eq(arg).val());
+        if (dQty_ < aQty_) {
+            alert("Arrived Qty must be Lesser or Equal of Dc Qty");
+            $('#sizeRangeTable tbody tr ').find('.gridArrivedQuantity').eq(arg).val('0');
+            return false;
+        }
+        // else if (dQty_ == aQty_ || dQty_ > aQty_) {
+        var pendQty_ = pQty_ - aQty_;
+        $('#sizeRangeTable tbody tr ').find('.gridPendingQuantity').eq(arg).val(pendQty_);
+        // }
+        $('#sizeRangeTable tbody tr').find('.gridArrivedQuantity').each(function () {
+            totalQty2 += parseFloat($(this).val());
+        });
+        $('#ArrivedTotal').val(totalQty2);
+        $('#TotalQty').val(totalQty2);
+        var pTotal_ = parseInt($('#PoTotal').val());
+        var aTotal_ = parseInt($('#TotalQty').val());
+        var pendTotal_ = parseInt((pTotal_) - (aTotal_));
+        $('#PendingQuantity').val(pendTotal_);
+
+        var value_ = 0;
+        var rate = 0;
+        rate = $("#Rate").val();
+        $('#sizeRangeTable tbody >tr').find('.gridArrivedQuantity').each(function () {
+            value_ += parseFloat($(this).val()) * parseFloat(rate);
+        })
+        $("#Value").val(value_);
+    }
+
+    function changeWithoutPoDcQty(arg) {
+        var totalQty1 = 0;
+        var PoQty_ = parseInt($('#sizeRangeTable tbody tr ').find('.gridPoQuantity').eq(arg).val());
+        var dQty_ = parseInt($('#sizeRangeTable tbody tr ').find('.gridDcQuantity').eq(arg).val());
+        var aQty_ = parseInt($('#sizeRangeTable tbody tr ').find('.gridArrivedQuantity').eq(arg).val());
+        if (PoQty_ < dQty_) {
+            alert("Dc Qty must be Lesser or Equal of Po Qty");
+            $('#sizeRangeTable tbody tr ').find('.gridDcQuantity').eq(arg).val('0');
+            return false;
+        }
+        else if (dQty_ == aQty_ || dQty_ > aQty_) {
+            var pendQty_ = dQty_ - aQty_;
+            $('#sizeRangeTable tbody tr ').find('.gridPendingQuantity').eq(arg).val(pendQty_);
+        }
+        $('#sizeRangeTable tbody tr').find('.gridDcQuantity').each(function () {
+            totalQty1 += parseFloat($(this).val());
+        });
+        $('#DcTotal').val(totalQty1);
+    }
+    function changeWithoutPoArrQty(arg) {
+        var totalQty1 = 0;
+        var dQty_ = parseInt($('#sizeRangeTable tbody tr ').find('.gridDcQuantity').eq(arg).val());
+        var aQty_ = parseInt($('#sizeRangeTable tbody tr ').find('.gridArrivedQuantity').eq(arg).val());
+        if (dQty_ < aQty_) {
+            alert("Arrived Qty must be Lesser or Equal of Dc Qty");
+            $('#sizeRangeTable tbody tr ').find('.gridArrivedQuantity').eq(arg).val('0');
+            return false;
+        }
+        else if (dQty_ == aQty_ || dQty_ > aQty_) {
+            var pendQty_ = dQty_ - aQty_;
+            $('#sizeRangeTable tbody tr ').find('.gridPendingQuantity').eq(arg).val(pendQty_);
+        }
+        $('#sizeRangeTable tbody tr').find('.gridArrivedQuantity').each(function () {
+            totalQty1 += parseFloat($(this).val());
+        });
+        $('#ArrivedTotal').val(totalQty1);
+        $('#TotalQty').val(totalQty1);
+        var pTotal_ = parseInt($('#PoTotal').val());
+        var aTotal_ = parseInt($('#TotalQty').val());
+        var pendTotal_ = parseInt((pTotal_) - (aTotal_));
+        $('#PendingQuantity').val(pendTotal_);
+    }
+
+    function changeWithoutPoQty(arg) {
+        var totalQty1 = 0;
+        $('#sizeRangeTable tbody tr').find('.gridPoQuantity').each(function () {
+            totalQty1 += parseFloat($(this).val());
+        });
+        $('#PoTotal').val(totalQty1);
+        var pTotal_ = parseInt($('#PoTotal').val());
+        var aTotal_ = parseInt($('#TotalQty').val());
+        var pendTotal_ = parseInt((pTotal_) - (aTotal_));
+        $('#PendingQuantity').val(pendTotal_);
+    }
+
+    $('tbody').on('click', '.watchlist-edit', function () {
+        $(this).closest('td').find('.watchlist-edit').hide();
+        $(this).closest('td').find('.watchlist-delete').hide();
+    });
+    function Edit_Material(arg) {
+        $('.loader-overlay').show();
+        $('.loader-overlay').fadeIn('fast');
+        $('#sizeRangeTable tbody tr').html("");
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("GateEntryInwardMaterialsDetailsEdit", "GateEntryInwardMaterials")',
+            data: { GateEntryInwardId: arg },
+            success: function (data) {
+                debugger;
+                /*Pcs label and Textbox only showing MaterialName is Leathers Else hide the label and textbox */
+                var CategoryName = data.CategoryName;
+                if (CategoryName == "Leathers") {
+                    $('#Pcs').show();
+                    $('#Pcslabel').show();
+                }
+                else {
+                    $('#Pcs').hide();
+                    $('#Pcslabel').hide();
+                }
+                $('#DisplayGridViewEdit').hide();
+                $('#DisplayGridViewEdit_').show();
+                $('#GateEntryInwardId').val(data.ViewModel.GateEntryInwardId);
+                $('#SupplierId').val(data.ViewModel.SupplierId);
+                $('#SupplierId').combobox('destroy');
+                $('#SupplierId').combobox();
+                $('#PoNoId').val(data.ViewModel.PoNoId);
+                $('#PoNoId').combobox('destroy');
+                $('#PoNoId').combobox();
+                $('#MaterialNameId').val(data.ViewModel.MaterialNameId);
+                $('#MaterialNameId').combobox('destroy');
+                $('#MaterialNameId').combobox();
+                $('#UomId').val(data.ViewModel.UomId);
+                $('#UomId').combobox('destroy');
+                $('#UomId').combobox();
+                $('#StoresId').val(data.ViewModel.StoresId);
+                $("#StoresId").combobox('destroy');
+                $("#StoresId").combobox();
+                $('#SizeRangeId').val(data.ViewModel.SizeRangeId);
+                $('#SizeRangeId').combobox('destroy');
+                $('#SizeRangeId').combobox();
+                $('#HSNCode').val(data.ViewModel.HSNCode);
+                $('#Pcs').val(data.ViewModel.Pcs);
+                $('#ReceivedBy').val(data.ViewModel.ReceivedBy);
+                $('#AcknowledgedBy').val(data.ViewModel.AcknowledgedBy);
+                $('#Remarks').val(data.ViewModel.Remarks);
+                $('#GateEntryNo').val(data.ViewModel.GateEntryNo);
+                $('#InwardEntryDateTime').val(data.ViewModel.InwardEntryDateTime);
+                $('#InwardMaterialType').val(data.ViewModel.InwardMaterialType);
+                $('#MaterialType').val(data.ViewModel.MaterialType);
+                $('#DcRefNo').val(data.ViewModel.DcRefNo);
+                $('#Company').val(data.ViewModel.Company);
+                $('#DcNo').val(data.ViewModel.DcNo);
+                $('#UnitDivision').val(data.ViewModel.UnitDivision);
+                $('#ReturnType').val(data.ViewModel.ReturnType);
+                $('#InvoiceNo').val(data.ViewModel.InvoiceNo);
+                $('#ModeofTransport').val(data.ViewModel.ModeofTransport);
+                $('#InvoiceCurrency').val(data.ViewModel.InvoiceCurrency);
+                $('#InvoiceValue').val(data.ViewModel.InvoiceValue);
+                $('#VehicleNo').val(data.ViewModel.VehicleNo);
+                $('#ModeofTransport').val(data.ViewModel.ModeofTransport);
+                $('#PendingQuantity').val(data.ViewModel.PendingQuantity);
+                $('#MaterialName').val(data.ViewModel.MaterialName);
+                $('#Rate').val(data.ViewModel.Rate);
+                $('#TotalQty').val(data.ViewModel.TotalQty);
+                $('#Value').val(data.ViewModel.Value);
+                $('#DcTotal').val(data.ViewModel.DcTotal);
+                $('#ArrivedTotal').val(data.ViewModel.ArrivedTotal);
+                var MyDate_String_Value = data.ViewModel.InwardEntryDateTime;
+                var value = new Date
+                            (
+                                 parseInt(MyDate_String_Value.replace(/(^.*\()|([+-].*$)/g, ''))
+                            );
+                var day = value.getDate();
+                var month = value.getMonth() + 1;
+                var year = value.getFullYear();
+                var hours = value.getHours();
+                var mints = value.getMinutes();
+                var secs = value.getSeconds();
+                day = day < 10 ? "0" + day : day;
+                month = month < 10 ? "0" + month : month;
+                var formattedDate = day + "/" + month + "/" + year + " " + hours + ":" + mints + ":" + secs;
+                $('#InwardEntryDateTime').val(formattedDate);
+                var len = parseInt(data.SizeRange.length);
+                if ($("#InwardPo option:selected").text() == "WithOut Po" && len > 0) {
+                    var count1 = 1;
+                    $('#sizeRangeTable tbody tr:first-child').append('<td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  width: 80px !important; float: left;">Size</td>')
+                    $('#sizeRangeTable tbody tr:nth-child(2)').append('<td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;   width: 80px !important; float: left;">PoQty</td>')
+                    $('#sizeRangeTable tbody tr:nth-child(3)').append('<td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;    width: 80px !important; float: left;">DcQty</td>')
+                    $('#sizeRangeTable tbody tr:nth-child(4)').append('<td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;   width: 80px !important; float: left;">ArrivedQty</td>')
+                    $('#sizeRangeTable tbody tr:nth-child(5)').append('<td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;   width: 80px !important; float: left;">PendingQty</td>')
+                    $('#sizeRangeTable tbody tr:nth-child(6)').append('<td style="display: none;padding-bottom: 3px;  padding-left: 0;  width: 80px !important; float: left;"></td>')
+                    $('#sizeRangeTable tbody tr:nth-child(7)').append('<td style="padding-bottom: 3px;  padding-left: 0;   width: 80px !important; float: left;display: none;"></td>')
+                    for (var i = 0; i <= data.SizeRange.length - 1; i++) {
+                        $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + data.SizeRange[i].Size + ' </td> ');
+                        $('#sizeRangeTable tbody tr:nth-child(2)').append("<td class='PoQuantity' style='background-color:#ddd;padding-bottom:3px;padding-left: 0;padding-top: 1px;width: 39px !important;'> <input type='text'  onchange='changePOQty(" + i + "," + 0 + ")' class='gridPoQuantity' id='PoQuantity'  style='padding-bottom: 0;padding-top: 0;width: 34px;'value='" + data.SizeRange[i].PoQty + "' /></td>");
+                        $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='DcQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text'  onchange='changeDcQty(" + i + "," + 0 + ")' class='gridDcQuantity' id='DcQuantity'  style='padding-bottom: 0;padding-top: 0;width: 34px;'value='" + data.SizeRange[i].DcQty + "' /> </td>");
+                        $('#sizeRangeTable tbody tr:nth-child(4)').append("<td class='ArrivedQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeArrQty(" + i + "," + 0 + ")' class='gridArrivedQuantity' id='ArrivedQuantity'  style='padding-bottom: 0;padding-top: 0;width: 34px;'value='" + data.SizeRange[i].ArrivedQty + "' /> </td>");
+                        $('#sizeRangeTable tbody tr:nth-child(5)').append("<td class='PendingQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='gridPendingQuantity' id='PendingQuantity' value='0' readonly style='padding-bottom: 0;padding-top: 0;width: 34px;'value='" + data.SizeRange[i].PendingQty + "' /</td>");
+                        $('#sizeRangeTable tbody tr:nth-child(6)').append("<td class='SizeQtyRateId' style='display: none;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='hidden' class='SizeQTy' style='padding-bottom: 0;padding-top: 0;width: 34px;'value='" + data.SizeRange[i].InwardMaterialSizeQtyRateId + "' /></td>");
+                        $('#sizeRangeTable tbody tr:nth-child(7)').append("<td class='PendingQtyId' style='padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;display: none;'><input type='hidden' class='PendingQty' style='padding-bottom: 0;padding-top: 0;display: none;width: 34px;'value='" + data.SizeRange[i].InwardMaterialSizeQtyRateId + "' /></td>");
+
+                        count1++;
+                    }
+
+                }
+                else {
+                    if (len != 0) {
+                        var count1 = 1;
+                        $('#sizeRangeTable tbody tr:first-child').append('<td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  width: 80px !important; float: left;">Size</td>')
+                        $('#sizeRangeTable tbody tr:nth-child(2)').append('  <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;   width: 80px !important; float: left;">PoQty</td>')
+                        $('#sizeRangeTable tbody tr:nth-child(3)').append('  <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;    width: 80px !important; float: left;">DcQty</td>')
+                        $('#sizeRangeTable tbody tr:nth-child(4)').append('  <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;   width: 80px !important; float: left;">ArrivedQty</td>')
+                        $('#sizeRangeTable tbody tr:nth-child(5)').append('  <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;   width: 80px !important; float: left;">PendingQty</td>')
+                        $('#sizeRangeTable tbody tr:nth-child(6)').append('<td style="display: none;padding-bottom: 3px;  padding-left: 0;  width: 80px !important; float: left;"></td>')
+                        $('#sizeRangeTable tbody tr:nth-child(7)').append('<td style="padding-bottom: 3px;  padding-left: 0;   width: 80px !important; float: left;display: none;"></td>')
+
+                        for (var i = 0; i <= data.SizeRange.length - 1; i++) {
+                            $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + data.SizeRange[i].Size + ' </td> ');
+                            var ll = parseInt(data.PendingQuantity.length);
+                            if (ll != 0) {
+                                $('#sizeRangeTable tbody tr:nth-child(2)').append('<td class="PoQuantity" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + data.PendingQuantity[i].PoQuantity + ' </td> ');
+                                var asd = data.PendingQuantity[i].PendingQty;
+                                if (asd == 0) {
+                                    $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='DcQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeDcQty()' class='gridDcQuantity' id='DcQuantity' readonly style='padding-bottom: 0;padding-top: 0;width: 34px;'value='" + data.SizeRange[i].DcQty + "' /> </td>");
+                                    $('#sizeRangeTable tbody tr:nth-child(4)').append("<td class='ArrivedQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeArrQty()' class='gridArrivedQuantity' id='ArrivedQuantity' readonly style='padding-bottom: 0;padding-top: 0;width: 34px;'value='" + data.SizeRange[i].ArrivedQty + "' /> </td>");
+                                }
+                                else {
+                                    $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='DcQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeDcQty(" + i + "," + data.PendingQuantity[i].PendingQty + ")' class='gridDcQuantity' id='DcQuantity' style='padding-bottom: 0;padding-top: 0;width: 34px;'value='" + data.SizeRange[i].DcQty + "' /> </td>");
+                                    $('#sizeRangeTable tbody tr:nth-child(4)').append("<td class='ArrivedQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeArrQty(" + i + "," + data.PendingQuantity[i].PendingQty + ")' class='gridArrivedQuantity' id='ArrivedQuantity' style='padding-bottom: 0;padding-top: 0;width: 34px;'value='" + data.SizeRange[i].ArrivedQty + "' /> </td>");
+                                }
+                            }
+                            else {
+                                $('#sizeRangeTable tbody tr:nth-child(2)').append('<td class="PoQuantity" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + data.SizeRange[i].PoQty + ' </td> ');
+                                var asd = data.SizeRange[i].PoQty;
+                                if (asd == 0) {
+                                    $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='DcQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeDcQty()' class='gridDcQuantity' id='DcQuantity' readonly style='padding-bottom: 0;padding-top: 0;width: 34px;'value='" + data.SizeRange[i].DcQty + "' /> </td>");
+                                    $('#sizeRangeTable tbody tr:nth-child(4)').append("<td class='ArrivedQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeArrQty()' class='gridArrivedQuantity' id='ArrivedQuantity' readonly style='padding-bottom: 0;padding-top: 0;width: 34px;'value='" + data.SizeRange[i].ArrivedQty + "' /> </td>");
+                                }
+                                else {
+                                    $('#sizeRangeTable tbody tr:nth-child(3)').append("<td class='DcQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeDcQty(" + i + "," + data.SizeRange[i].PoQty + ")' class='gridDcQuantity' id='DcQuantity' style='padding-bottom: 0;padding-top: 0;width: 34px;'value='" + data.SizeRange[i].DcQty + "' /> </td>");
+
+                                    $('#sizeRangeTable tbody tr:nth-child(4)').append("<td class='ArrivedQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' onchange='changeArrQty(" + i + "," + data.SizeRange[i].PoQty + ")' class='gridArrivedQuantity' id='ArrivedQuantity' style='padding-bottom: 0;padding-top: 0;width: 34px;'value='" + data.SizeRange[i].ArrivedQty + "' /> </td>");
+                                }
+                            }
+                            $('#sizeRangeTable tbody tr:nth-child(5)').append("<td class='PendingQuantity' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='gridPendingQuantity' id='PendingQuantity' value='0' readonly style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                            $('#sizeRangeTable tbody tr:nth-child(6)').append("<td class='SizeQtyRateId' style='display: none;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='hidden' class='SizeQTy' style='padding-bottom: 0;padding-top: 0;width: 34px;'value='" + data.SizeRange[i].InwardMaterialSizeQtyRateId + "' /></td>");
+                            $('#sizeRangeTable tbody tr:nth-child(7)').append("<td class='PendingQtyId' style='padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;display: none;'><input type='hidden' class='PendingQty' style='padding-bottom: 0;padding-top: 0;display: none;width: 34px;'value='" + data.SizeRange[i].GateEntryInwardId + "' /></td>");
+
+                            count1++;
+                        }
+                    }
+                    else {
+                        $('#sizeRangeTable tbody tr:first-child').append('<td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">Size</td>')
+                        $('#sizeRangeTable tbody tr:nth-child(2)').append('<td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">PoQty</td>')
+                        $('#sizeRangeTable tbody tr:nth-child(3)').append('<td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">DcQty</td>')
+                        $('#sizeRangeTable tbody tr:nth-child(4)').append('<td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">ArrivedQty</td>')
+                        $('#sizeRangeTable tbody tr:nth-child(5)').append('<td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;">PendingQty</td>')
+                        $('#sizeRangeTable tbody tr:nth-child(6)').append('<td style="display: none;padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;"></td>')
+                        $('#sizeRangeTable tbody tr:nth-child(7)').append('<td style="padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 80px !important; float: left;display: none;"></td>')
+                        $('.SizeRangeRefValue').hide();
+                        $('.Quantity').hide();
+                        $('.SizeQtyRateId').hide();
+
+                    }
+                }
+                $('.loader-overlay').fadeOut('fast');
+                $('.loader-overlay').hide();
+
+            }
+        });
+    }
+</script>
+<script type="text/javascript">
+    $('#btnRadio').click(function () {
+        var checkedradio = $("input[name=gr]:checked").val();
+    });
+
+
+
+    /*Radio Button Validation*/
+    $('#IsNewInward').click(function () {
+        $('#IsReturned').prop('checked', false);
+        $('#IsJobWork').prop('checked', false);
+        $('#DcRefNo').prop('disabled', true);
+        $('#ReturnType').val('0');
+        $('#ReturnType').prop('disabled', false);
+    });
+    $('#IsReturned').click(function () {
+        $('#IsJobWork').prop('checked', false);
+        $('#IsNewInward').prop('checked', false);
+        $('#DcRefNo').prop('disabled', false);
+        $('#ReturnType').val('1');
+        $('#ReturnType').prop('disabled', true);
+    });
+    $('#IsJobWork').click(function () {
+        $('#IsNewInward').prop('checked', false);
+        $('#IsReturned').prop('checked', false);
+        $('#DcRefNo').prop('disabled', false);
+        $('#ReturnType').val('1');
+        $('#ReturnType').prop('disabled', true);
+    });
+
+    $('#ModeofTransport').on("change", function () {
+        var v = $("#ModeofTransport option:selected").text();
+        if (v == "In person") {
+            $('#VehicleNo').prop('disabled', true);
+        }
+        else {
+            $('#VehicleNo').prop('disabled', false);
+        }
+    });
+    /*Multiplication of Total Quantity and Rate*/
+    $('#TotalQty, #Rate').blur(function () {
+        var rate = parseFloat($('#TotalQty').val()) || 0;
+        var box = parseFloat($('#Rate').val()) || 0;
+        $('#Value').val((rate * box).toFixed(2));
+    });
+
+    /* Hide Show material textbox based on material type*/
+    if ($('#InwardMaterialType').text()) {
+        var a = ($(this).text == "Please Select");
+        {
+            $('#MaterialName').hide();
+            $('#lblMaterialName').hide();
+        }
+    }
+    $('#InwardMaterialType').on("change", function () {
+        var s = $('#InwardMaterialType :selected').text();
+        if (s == "Machinery" || s == "Maintenance") {
+            $('#MaterialName').show();
+            $('#lblMaterialName').show();
+        }
+        else {
+            $('#MaterialName').hide();
+            $('#lblMaterialName').hide();
+        }
+    });
+</script>

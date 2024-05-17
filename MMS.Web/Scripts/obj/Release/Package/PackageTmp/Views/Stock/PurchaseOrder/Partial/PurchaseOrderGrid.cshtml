@@ -1,0 +1,238 @@
+﻿@model MMS.Web.Models.StockModel.PurchaseOrderModel
+@using MMS.Core.Entities;
+@{
+    MMS.Repository.Managers.MaterialCategoryManager materialCategoryManager = new MMS.Repository.Managers.MaterialCategoryManager();
+    MaterialCategoryMaster materialCategoryMaster = new MaterialCategoryMaster();
+    MMS.Repository.Managers.MaterialGroupManager materialGroupManager = new MMS.Repository.Managers.MaterialGroupManager();
+    MaterialGroupMaster_ materialGroupMaster_ = new MaterialGroupMaster_();
+    MMS.Repository.Managers.ColorManager colorManager = new MMS.Repository.Managers.ColorManager();
+    ColorMaster colorMaster = new ColorMaster();
+    MMS.Repository.Managers.UOMManager uOMManager = new MMS.Repository.Managers.UOMManager();
+    UomMaster uomMaster = new UomMaster();
+    MMS.Repository.Managers.MaterialManager materialManager = new MMS.Repository.Managers.MaterialManager();
+    MaterialNameMaster materialMaster = new MaterialNameMaster();
+    MMS.Repository.Managers.StoreMasterManager storeManager = new MMS.Repository.Managers.StoreMasterManager();
+    StoreMaster storeMaster = new StoreMaster();
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Purchase Order", PermissionSettingModel.PermissionID);
+
+    bool Add = false; bool Edit = false; bool Delete = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Add")
+        {
+            Add = true;
+        }
+        if (item.PermissionDesc == "Edit")
+        {
+            Edit = true;
+        }
+        if (item.PermissionDesc == "Delete")
+        {
+            Delete = true;
+        }
+    }
+}
+
+<div class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+        <div class="table-responsive table-td-padding padding-lr-6px table-row-bg">
+            <table class="veh-table" id="empTable">
+                <thead>
+                    <tr class="color-code-top-btn">
+                        <td colspan="12">
+                            <input type="text" id="SeaarchID" placeholder="Enter PONO.." />
+
+                            @if (Add == true)
+                            {
+                                <a href="PurchaseOrderDetails?id=0" onclick="Add('0')" style="cursor:pointer;"  class="watchlist-edit" title="Add"></a>
+                                @*<input type="button" value="Add" onclick="Add()">*@
+                            }
+                            else
+                            {
+                                <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Add">
+                            }
+                            <input type="button" value="Search" onclick="Search()">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="veh-1">Si.No
+                        </th>
+                        <th class="veh-2">Indent
+                        </th>
+                        <th class="veh-3">IO.NO
+                        </th>
+                        <th class="veh-4">PO NO
+                        </th>
+                        @*<th class="veh-5">Material
+                        </th>
+                        <th class="veh-6">Colour
+                        </th>*@
+                        @*<th class="veh-7">Qty
+                        </th>
+                        <th class="veh-8">UOM
+                        </th>*@
+                        @*  <th class="veh-8">Delivery Date
+                        </th>
+                        <th class="veh-9">Delivery Schedule
+                        </th>*@
+                        <th class="veh-9">Edit/Delete
+                        </th>
+
+                    </tr>
+                </thead>
+                @if (Model.PurchaserOrderList != null && Model.PurchaserOrderList.Count > 0)
+                {
+                    int count = 1;
+                    <tbody>
+
+                        @foreach (var PurchaserOrder in Model.PurchaserOrderList)
+                        {
+                            //int storeID = Convert.ToInt16(PurchaserOrder.s);
+
+                            materialCategoryMaster = materialCategoryManager.GetMaterialCategoryMaster(PurchaserOrder.Category);
+                            materialGroupMaster_ = materialGroupManager.GetMaterialGroupMaster_Id(PurchaserOrder.Groupname);
+                            colorMaster = colorManager.GetColorMasterID(PurchaserOrder.Color);
+                            uomMaster = uOMManager.GetUomMasterId(PurchaserOrder.UOM);
+                            materialMaster = materialManager.GetMaterialNameMasterId(PurchaserOrder.Material);
+                            //storeMaster = storeManager.GetStoreMasterId(storeID);
+                            string MaterialName = "";
+                            if(materialMaster!=null)
+                            {
+                                MaterialName = materialMaster.MaterialDescription;
+                            }
+
+                            <tr>
+                                <td class="veh-1" onclick="">@count</td>
+                                <td class="veh-2" onclick="">@PurchaserOrder.IndentNo</td>
+                                <td class="veh-3" onclick="">@PurchaserOrder.IONO</td>
+                                <td class="veh-5" onclick="">@PurchaserOrder.PoNo</td>
+                                @*<td class="veh-4" onclick="">@materialGroupMaster_.GroupName</td>
+                                <td class="veh-5" onclick="">@MaterialName</td>
+                                <td class="veh-6" onclick="">@colorMaster.Color</td>*@
+                                @*<td class="veh-7" onclick="">@PurchaserOrder.Qty</td>
+                                <td class="veh-9" onclick="">@uomMaster.LongUnitName</td>*@
+
+                                <td class="veh-10 edit-del-wrap">
+                                    @if (Edit == true)
+                                    {
+                                        @*<a href="javascript:void(0)" onclick="Edit('@PurchaserOrder.PoNo')" class="watchlist-edit" title="Edit"></a>*@
+                                        <a href="PurchaseOrderDetails?id=@PurchaserOrder.PoOrderId" onclick="Edit('@PurchaserOrder.PoOrderId')" class="watchlist-edit" title="Edit"></a>
+                                    }
+                                    else
+                                    {
+                                        <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-edit" title="Edit"></a>
+                                    }
+                                    @if (Delete == true)
+                                    {
+                                        <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@PurchaserOrder.PoOrderId')" class="watchlist-delete" title="Delete"></a>
+                                    }
+                                    else
+                                    {
+                                        <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-delete" title="Delete"></a>
+                                    }
+                                </td>
+                            </tr>
+                                    count++;
+                        }
+
+
+                    </tbody>
+                    <tfoot class="footer-pager">
+                        <tr>
+                            <td colspan="4">
+                                <div id="pager">
+                                    <form>
+                                        <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                        <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                        <input type="text" class="pagedisplay" />
+                                        <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                        <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                        <select class="pagesize">
+                                            <option selected="selected" value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="30">30</option>
+                                            <option value="40">40</option>
+                                        </select>
+                                    </form>
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    </tfoot>
+
+                }
+            </table>
+            @if (Model.PurchaserOrderList != null && Model.PurchaserOrderList.Count == 0)
+            {
+                <div class="noRecordsFound" style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+            }
+        </div>
+    </div>
+
+    @*<div id="EditColorPartial" style="display:none">
+        @Html.Partial("~/Views/Stock/PurchaseOrder/Partial/PurchaseOrderDetails.cshtml", Model)
+    </div>*@
+
+
+</div>
+
+<script>
+    function Search() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Search", "PurchaseOrder")',
+            data: { filter: $('#SeaarchID').val() },
+            success: function (data) {
+                //console.log(data);
+                //$('#DivShow').hide();
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                $('#DivShow').hide();
+            }
+        });
+    }
+
+    function Cancel() {
+        //$('#EditColorPartial').hide()
+        location.reload();
+    }
+   
+
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "PurchaseOrder")',
+                data: { PoOrderId: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/PurchaseOrder/PurchaseOrder";
+                        return false;
+                    }
+                    else {
+                        alert('Purchase Order Opening Stock Details deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Purchase Order  Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+
+</script>

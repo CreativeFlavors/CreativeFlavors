@@ -1,0 +1,86 @@
+﻿@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/LoginMaster.cshtml";
+}
+
+@model MMS.Web.Models.AccountModel.AccountModel
+@{
+    ViewBag.Title = "Login";
+                // Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script>
+    function Login() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("LoginValidation", "Accounts")',
+            data: { Email: $('#Email').val(), Password: $('#Password').val() },
+            dataType: "json",
+            success: function (userr) {
+                if (userr.EmailExist == false) {
+                    location.href = "/Accounts/Index";
+                }
+                else {
+                    alert('Username and Password is Invalid');
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('This Email Already Exist in the database.');
+            }
+        });
+    }
+    function NewUserRegister() {
+        location.href = "Accounts/Registration";
+    }
+
+    function FnForgotPwd()
+    {
+        $("#LiPassword").css("display", "none");
+        $("#Password").val("resetpwd");
+        $("#BtnSubmit").val("Reset Password");
+    }
+
+    $(document).ready(function () {
+    
+    });
+</script>
+<div class="main-wrapper">
+    <div class="login-wrap">
+        <div class="login-container">
+            <div class="login-container-inner">
+                <div class="login-header">
+                    <img src="/Content/images/logo.png" alt="logo">
+                </div>
+                <div class="login-body">
+                    @using (Html.BeginForm("Login", "Accounts",FormMethod.Post))
+                    {
+                        @Html.Raw(TempData["msg"])
+                        <ul>
+                            <li>
+                                <h2>LOGIN</h2>
+                            </li>
+                            <li class="text-field">
+                                @Html.TextBoxFor(m => m.Email, new { @placeholder = "Enter User Name" })
+                            </li>
+                            <li class="text-field" id="LiPassword" style="display:block;">
+                                @Html.PasswordFor(m => m.Password, new { @placeholder = "Enter password" })
+                            </li>
+                            @*<li class="text-field" id="liConfirmPwd" style="display:none;">
+                                <input type="text" id="txtConfirmPwd" placeholder="Enter Confirm password" />
+                            </li>*@
+                            <li class="forget-pass-wrap"><span onclick="FnForgotPwd()">Forgot Password</span></li>
+                            <li class="submit-button">
+                                <input type="submit" id="BtnSubmit" value="SUBMIT">
+                            </li>
+                            <li class="register-btn"><span onclick="NewUserRegister()">REGISTER</span></li>
+                        </ul>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+

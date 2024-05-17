@@ -1,0 +1,548 @@
+﻿@{
+    ViewBag.Title = "JobGateInwardsMaster";
+    Layout = "~/Views/Shared/_jobLayout.cshtml";
+}
+
+<div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+    <div class="dashboard-content col-xs-12 no-padding">
+        <div class="dashboard_head dashboard-title congest col-lg-12 col-md-12 col-sm-12  col-xs-12">
+            <div class="dashboard-title  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+                <h2>Job Gate Inwards Master</h2>
+            </div>
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("JobGateEntryInwardMaterialsGrid", "JobGateInwards")
+    </div>
+    </div>>
+
+      
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $('#example').DataTable();
+      //$("#tabVehicleWatchList").hide();
+    });
+    function AddJobGateMovement() {
+             $.ajax({
+            type: "POST",
+            url: ' @Url.Action("GateEntryInwardMaterialsDetails", "JobGateInwards")',
+                 data: { GateEntryInwardId: 0 , },
+                 success: function (data) {
+                     debugger;
+                     $('.veh-tablecont').hide();
+                     $("#EditJobGate_Grid").html(data.PartialView);
+                $("#EditJobGate_Grid").show();
+                $("#Sheet_grid").hide();
+                $('#save_Table_Value').hide();
+                
+            }
+        });
+
+    }
+    function Edit(arg,arg1) {
+        $('.veh-tablecont').hide()
+            $.ajax({
+                type: "POST",
+                url: ' @Url.Action("GateEntryInwardMaterialsDetails", "JobGateInwards")',
+                data: { GateEntryInwardId: arg},
+                success: function (data) {
+                    if (data.items == "") {
+                        debugger;
+                        $('.veh-tablecont').hide();
+                        $("#EditJobGate_Grid").html(data.PartialView );
+                        $("#EditJobGate_Grid").show();
+                        $("#Sheet_grid").hide();
+                        $('#save_Table_Value').hide();
+                    }
+                    else {
+                        debugger;
+                        $('.veh-tablecont').hide();
+                        $("#EditJobGate_Grid").html(data.PartialView);
+                        $("#EditJobGate_Grid").show();
+                        $("#Sheet_grid").hide();
+                        $('#save_Table_Value').hide();
+                        $("#Issue_material").val(data.Issue_material);
+                        var row = "";
+                        var rowCount = 0;
+                        $.each(data.items, function (i, item) {
+                            
+
+                            row += "<tr><td id='IssueSlipNo" + rowCount + "' class='General_IssueSlipNo'>" + item.MaterialDescription + "</td>"
+                            row += "<td id='InternalValue" + rowCount + "' class='InternalValue_general'>" + item.TotalQty + "</td>"
+                            row += "<td data-title='Sequence'><input type='number' class='form-control " + item.Issue_Material + '_' + item.IssueSlipId + " Sequence'  id='" + item.GateEntryInwardId + '_' + item.DcRefNo + '_' + item.IssueSlipId + "' onchange='value_chenge(" + item.GateEntryInwardId + ',' + item.TotalQty + ',' + item.MaterialNameId + ',' + item.DcRefNo + ")' value='" + item.Quantity + "' style='width: 76px;'></td>"
+                            row += "<td id='DirectIssue_Style" + rowCount + "' class='DirectIssue_Style_general'>" + item.Rate + "</td>"
+
+                            row += "<td id='IssueType" + rowCount + "' class='issueTypecls'>" + item.Value + "</td>"
+                            row += "<td id='IssueType" + rowCount + "' class='issueTypecls'>" + item.pending_qty + "</td></tr>"
+                            rowCount++;
+                        });
+                        $('#table_grid_ROW').append(row);
+                        $("#Sheet_grid").show();
+                        $("#save").attr("disabled", true);
+                      $('#save_Table_Value').show()
+                    }
+                }
+            });
+
+    }
+    function Save() {
+        debugger;
+        var ComponentId = "";
+        var fromDate = $('#DcDate').val();
+        fromDate = fromDate.split("/");
+        var Date_from = fromDate[2] + "/" + fromDate[1] + "/" + fromDate[0];
+        // InvoiceDate
+        // DcRefDate
+        var fromDate1 = $('#InvoiceDate').val();
+        fromDate1 = fromDate1.split("/");
+        var InvoiceDate = fromDate1[2] + "/" + fromDate1[1] + "/" + fromDate1[0];
+
+       
+
+        var DcRefNo = 0;
+        var IssueSlipId = "";
+        var sum = 0;
+        var num = [];
+        var num_ = [];
+        var dc = [];
+        var size = [];
+        var sorted_arr = [];
+        Material = $('#MaterialNameId').val();
+        var MaterialName = "";
+        var x = "";
+        var jobsheet_pair_Code_id = "";
+        var Process_Name = "";
+        IssueSlipId = $('#Issue_material').val();
+        if ($("#InwardMaterialType option:selected").text() == "JobWork Production") {
+       //     DcRefNo += $("#DcRefNo").val();
+            MaterialName = "";
+            x ="";
+            jobsheet_pair_Code_id = "";
+            Process_Name = "";
+            DcRefNo = $("#DcRefNo  option:selected").map(function () { return this.value }).get().join(',');
+            var Qty_ = 0;
+            var qty = $('#Quantity').val();
+            $('#sizeRangeTable tbody tr').find('.Qty').each(function () {
+                //  $(this).val()
+               
+                num_ += $(this).val() +",";
+                Qty_ += Number($(this).val());
+             
+            });
+
+
+            $('#sizeRangeTable tbody tr').find('.DC_Qty').each(function () {
+                // $(this).val()
+                dc += $(this).val() + ",";
+
+            });
+            $('#sizeRangeTable tbody tr').find('.SizeRangeRefValue').each(function () {
+                //    $(this).val()
+                size += $(this).text() + ",";
+
+            });
+            if (qty != Qty_) {
+                swal("Quantity is not equal!", "", "info");
+                return false;
+            }
+            IssueSlipId = $("#IssueSlipId option:selected").map(function () { return this.value }).get().join(',');
+             ComponentId = $("#ComponentId").val();
+             ComponentId_ = ComponentId.split('_');
+        }
+        else {
+            MaterialName = Material.split(",");
+            x = parseInt(MaterialName[0]);
+            jobsheet_pair_Code_id = parseInt(MaterialName[2]);
+            Process_Name = parseInt(MaterialName[1]);
+            DcRefNo = parseInt(MaterialName[3]);
+        }
+        if ($('#DcRefDate').val() == "") {
+            alert("Please Enter DcRefDate");
+            $('#DcRefDate').css('border-color', 'red');
+            $('#DcRefDate').focus();
+            return false;
+        }
+        else {
+            $('#DcRefDate').css('border-color', '');
+        }
+        if ($('#Quantity').val() == "") {
+            alert("Please Enter Quantity");
+            $('#Quantity').css('border-color', 'red');
+            $('#Quantity').focus();
+            return false;
+        }
+        else {
+            $('#Quantity').css('border-color', '');
+        }
+        if ($('#DcTotal').val() == "") {
+            alert("Please Enter Quantity");
+            $('#DcTotal').css('border-color', 'red');
+            $('#DcTotal').focus();
+            return false;
+        }
+        else {
+            $('#DcTotal').css('border-color', '');
+        }
+        if ($("#InwardMaterialType  option:selected").val() == "JobWork(Leather To Leather)") {
+            if ($('#InwardMaterialType ').val() == "") {
+                alert("Please Enter Psc");
+                $('#InwardMaterialType').css('border-color', 'red');
+                $('#InwardMaterialType').focus();
+                return false;
+            }
+            else {
+                $('#InwardMaterialType').css('border-color', '');
+            }
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/JobGateInwards/GateEntryInwardMaterials_save',
+            data: {
+                GateEntryNo: $('#GateEntryNo').val(),
+                GateEntryInwardId: $('#GateEntryInwardId').val(),
+                IssueSlipId: $('#Issue_material').val(),
+                MaterialName: '0',
+                InwardEntryDateTime: $('#InwardEntryDateTime').val(),
+                InwardMaterialType: $('#InwardMaterialType').val(),
+                IsReturned: "true",
+                IsNewInward: "false",
+                IsJobWork: "true",
+                DcRefNo: DcRefNo,
+                DcRefDate: $('#DcRefDate').val(),
+                Company: $('#Company').val(),
+                UnitDivision: $("#UnitDivision option:selected").val(),
+                ReturnType: $("#ReturnType option:selected").val(),
+                MaterialType: $("#MaterialType option:selected").val(),
+                DcNo: $('#DcNo').val(),
+                DcDate: $('#DcDate').val(),
+                InvoiceNo: $('#InvoiceNo').val(),
+                InvoiceDate: $('#InvoiceDate').val(),
+                ModeofTransport: $("#ModeofTransport option:selected").val(),
+                InvoiceCurrency: $("#InvoiceCurrency option:selected").val(),
+                InvoiceValue: $('#InvoiceValue').val(),
+                VehicleNo: $('#VehicleNo').val(),
+                PoNoId: $("#PoNoId option:selected").val(),
+                SupplierId: $("#SupplierId option:selected").val(),
+                StoresId: $("#StoresId option:selected").val(),
+                MaterialNameId: x,
+                HSNCode: $('#HSNCode').val(),
+                SizeRangeId: $("#SizeRangeId option:selected").val(),
+                UomId: $('#UomId').val(),
+                Pcs: $('#Pcs').val(),
+                ReceivedBy: $('#ReceivedBy').val(),
+                AcknowledgedBy: $('#AcknowledgedBy').val(),
+                Remarks: $('#Remarks').val(),
+                Quantity: $('#Quantity').val(),
+                TotalQty: $('#TotalQty').val(),
+                Rate: $('#Rate').val(),
+                Value: $('#Value').val(),
+                DcTotal: $('#DcTotal').val(),
+                ArrivedTotal: $('#ArrivedTotal').val(),
+                InwardPo: $('#InwardPo option:selected').val(),
+                PoTotal: $('#PoTotal').val(),
+                PendingQuantity: $('#PendingQuantity').val(),
+
+                jobsheet_pair_Code_id: jobsheet_pair_Code_id,
+                Process_Name: Process_Name,
+                PoQty: dc,
+                Size: size,
+                ArrivedQty: num_,
+                ComponentId: ComponentId_[0],
+                Type: $("#InwardMaterialType option:selected").text()
+
+            },
+            success: function (data) {
+                debugger;
+                if (data.Viewmodel.GEMaterialsGrid[0].GateEntryInwardId != "" || data.Viewmodel.GEMaterialsGrid[0].GateEntryInwardId != 0) {
+                    alert('Saved Successfully.');
+                    var row = "";
+                    var rowCount = 0;
+                    Quantity = $('#Quantity').val();
+                    MaterialNameId = $("#MaterialNameId option:selected").text();
+                    Material = $('#MaterialNameId').val();
+                    $("#MaterialNameId option[value='" + Material + "']").remove();
+                    $('#MaterialNameId').val('').trigger('chosen:updated');
+                    row += "<tr><td id='IssueSlipNo" + rowCount + "' class='General_IssueSlipNo'>" + MaterialNameId + "</td>";
+                    row += "<td id='InternalValue" + rowCount + "' class='InternalValue_general'>" + data.Viewmodel.TotalQty + "</td>";
+                    row += "<td data-title='Sequence'><input type='number' class='form-control Sequence' readonly id='" + Quantity + "'  value='" + Quantity + "' style='width: 76px;'></td>";
+                    row += "<td id='DirectIssue_Style" + rowCount + "' class='DirectIssue_Style_general'>" + data.Viewmodel.Rate + "</td>";
+
+                    row += "<td id='IssueType" + rowCount + "' class='issueTypecls'>" + data.Viewmodel.Value + "</td></tr>";
+                 
+                  //  return false;
+                    $('#table_grid_ROW').append(row);
+                    $("#Sheet_grid").show();
+                    $('#Quantity').val(0);
+                }
+
+                else {
+                    alert('Already Exist in the database.');
+                    location.href = "/JobGateInwards/JobGateInwardsMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+
+    }
+    function value_check() {
+        debugger;
+        var sum = 0;
+        var qty = 0;
+        var bool = true;
+        var sheet = $('#InwardMaterialType').val();
+        if (sheet == '15') {
+            var Issue_material = $("#Issue_material").val();
+            var array = Issue_material.split(",");
+            $.each(array, function (i) {
+
+                var Issueid = array[i].split(":");
+
+                $('#table_grid_ROW  tr').find("." + Issueid[0]).each(function () {
+                    //sum += $(this).val();
+
+                    sum += Number($(this).val());
+
+                });
+                $('#table_grid_ROW tr').find('.InternalValue_general').each(function () {
+                    //  $(this).val()
+
+                 
+                    qty += Number($(this).text());
+
+                });
+                debugger;
+                if (parseFloat(qty) < parseFloat(sum)) {
+                    debugger
+                    swal("Quantity is not equal!", "", "info");
+                    bool = false;
+                }
+                sum = 0;
+            });
+
+        }
+        return bool;
+    }
+
+    
+    function Save_SheetMaterial() {
+
+        var Issue_material = $("#Issue_material").val();
+        var array=Issue_material.split(",");
+        var DcRefNo = 0;
+        DcRefNo += $("#DcRefNo").val();
+        debugger;
+        if ($('#DcRefDate').val() == "") {
+            alert("Please Enter DcRefDate");
+            $('#DcRefDate').css('border-color', 'red');
+            $('#DcRefDate').focus();
+            return false;
+        }
+        else {
+            $('#DcRefDate').css('border-color', '');
+        }
+        var sum = 0;
+        var num = [];
+        var num_ = [];
+        var arr = [];
+        var count_ = [];
+        var sorted_arr = [];
+
+        $('#table_grid_ROW  tr').find('.Sequence').each(function () {
+            num += $(this).val() + ";" + $(this).attr('id') + ",";
+            //alert($(this).val());
+            //alert($(this).attr('id'));
+            //num.push(parseInt($(this).val()) + ";"+ $(this).attr('id'))
+          // arr.push(parseInt($(this).val()));
+        });
+        $('#table_grid_ROW  tr').find('.Dc_qty').each(function () {
+            count_ += $(this).val() + ",";
+         
+        });
+        $('#sizeRangeTable tbody tr').find('.Qty').each(function () {
+            $(this).val()
+            num_ += $(this).val() + ";" + $(this).attr('id') + ",";
+
+        });
+
+        var result123 =value_check();
+    
+       // alert(num);
+        if (result123 != false) {
+            debugger;
+            $.ajax({
+                type: 'POST',
+                url: '/JobGateInwards/GateEntryInwardMaterials',
+                data: {
+                    GateEntryNo: $('#GateEntryNo').val(),
+                    ////EntryDate: $('#EntryDate').val(),
+                    Size: num,
+                    ////PoQty: ,
+                    ////DcQty: dcQty_,
+                    ArrivedQty: num_,
+                    ////PendingQty: pendingQty_,
+                    GateEntryInwardId: $('#GateEntryInwardId').val(),
+                    MaterialName:0,
+                    InwardEntryDateTime: $('#InwardEntryDateTime').val(),
+                    InwardMaterialType: $('#InwardMaterialType').val(),
+                    IsReturned: "true",
+                    IsNewInward: "false",
+                    IsJobWork: "true",
+                    DcRefNo: DcRefNo.substring(1),
+                    DcRefDate: $('#DcRefDate').val(),
+                    Company: $('#Company').val(),
+                    UnitDivision: $("#UnitDivision option:selected").val(),
+                    ReturnType: $("#ReturnType option:selected").val(),
+                    MaterialType: $("#MaterialType option:selected").val(),
+                    DcNo: $('#DcNo').val(),
+                    DcDate: $('#DcDate').val(),
+                    InvoiceNo: $('#InvoiceNo').val(),
+                    InvoiceDate: $('#InvoiceDate').val(),
+                    ModeofTransport: $("#ModeofTransport option:selected").val(),
+                    InvoiceCurrency: $("#InvoiceCurrency option:selected").val(),
+                    InvoiceValue: $('#InvoiceValue').val(),
+                    VehicleNo: $('#VehicleNo').val(),
+                    PoNoId: $("#PoNoId option:selected").val(),
+                    SupplierId: $("#SupplierId option:selected").val(),
+                    StoresId: $("#StoresId option:selected").val(),
+                    MaterialNameId: $("#MaterialNameId option:selected").val(),
+                    HSNCode: $('#HSNCode').val(),
+                    SizeRangeId: $("#SizeRangeId option:selected").val(),
+                    UomId: $('#UomId').val(),
+                    Pcs: $('#Pcs').val(),
+                    ReceivedBy: $('#ReceivedBy').val(),
+                    AcknowledgedBy: $('#AcknowledgedBy').val(),
+                    Remarks: $('#Remarks').val(),
+                    Quantity: $('#Quantity').val(),
+                    TotalQty: $('#TotalQty').val(),
+                    Rate: $('#Rate').val(),
+                    Value: $('#Value').val(),
+                    DcTotal_Qty: count_,
+                    ArrivedTotal: $('#ArrivedTotal').val(),
+                    InwardPo: $('#InwardPo option:selected').val(),
+                    PoTotal: $('#PoTotal').val(),
+                    PendingQuantity: $('#PendingQuantity').val()
+                },
+                success: function (data) {
+                    if (data.GateEntryInwardId != "" || data.GateEntryInwardId != 0) {
+                        alert('Saved Successfully.');
+                        location.href = "/JobGateInwards/JobGateInwardsMaster";
+                        return false;
+                    }
+
+                    else {
+                        alert('Already Exist in the database.');
+                        location.href = "/JobGateInwards/JobGateInwardsMaster";
+                        return false;
+                    }
+
+                },
+                error: function (ex) {
+                    alert('Already Exist in the database.');
+                }
+            });
+        }
+    }
+
+    function Save_size() {
+
+        var sum = 0;
+        var num = [];
+        var num_ = [];
+        var dc = [];
+        var size = [];
+        var sorted_arr = [];
+
+       
+        $('#sizeRangeTable tbody tr').find('.Qty').each(function () {
+          //  $(this).val()
+            num_ += $(this).val() + ";" + $(this).attr('id') + ",";
+
+        });
+
+
+        $('#sizeRangeTable tbody tr').find('.DC_Qty').each(function () {
+           // $(this).val()
+            dc += $(this).val() + ",";
+
+        });
+        $('#sizeRangeTable tbody tr').find('.SizeRangeRefValue').each(function () {
+        //    $(this).val()
+            size += $(this).text() + ",";
+
+        });
+            debugger;
+            $.ajax({
+                type: 'POST',
+                url: '/JobGateInwards/GateEntryInwardMaterials_qtytemp',
+                data: {
+                    DC_Qty: dc,
+                    ////EntryDate: $('#EntryDate').val(),
+                    Size: size,
+                    ////PoQty: ,
+                    ////DcQty: dcQty_,
+                    ArrivedQty: num_
+                   
+                },
+                success: function (data) {
+                    if (data.GateEntryInwardId != "" || data.GateEntryInwardId != 0) {
+                        alert('Saved Successfully.');
+                        $("#sizeRangeTable").html("");
+                        return false;
+                    }
+
+                    else {
+                        alert('Already Exist in the database.');
+                        location.href = "/JobGateInwards/JobGateInwardsMaster";
+                        return false;
+                    }
+
+                },
+                error: function (ex) {
+                    alert('Already Exist in the database.');
+                }
+            });
+        
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "JobGateInwards")',
+                data: { GateEntryInwardId: arg },
+                success: function (data) {
+                    if (data.status == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/GateEntryInwardMaterials/GateEntryInwardMaterials";
+                        //  location.href = "/GateEntryInwardMaterials/GateEntryInwardNO?GateEntryNo=" + data.GateEntryNo;;
+                        return false;
+                    }
+                    else {
+                        alert('deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+</script>

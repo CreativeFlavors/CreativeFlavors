@@ -1,0 +1,626 @@
+﻿@model MMS.Web.Models.JobworkModel.ProductionJobworkModel
+
+@{
+   
+}
+<link href="~/Content/chosen/bootstrap-chosen.css" rel="stylesheet" />
+
+<script src="~/Scripts/chosen/chosen.jquery.js"></script>
+<script>
+    $(".chosen-select").chosen();
+    //$('#Material').attr("disabled", true).trigger('chosen:updated');
+    function Size() {
+        
+        var Material_Name = $("#Material_Name").val();
+        var MaterialID = Material_Name.split('_');
+        $("#sizeRangeTable > tbody").html("");
+        $.ajax({
+            type: 'POST',
+            url: '/JobSheet_pair/Material_change',
+            data: { Materialid: MaterialID[0] },
+            success: function (data) {
+                
+                var count = 1;
+                if (data.listSizeItemMaterial.length > 0) {
+                    $("#sizeRangeTable").append("<tbody><tr><td>size</td></tr> <tr><td>Qty</td></tr></tbody>");
+                    for (var i = 0; i <= data.listSizeItemMaterial.length - 1; i++) {
+                        isSizeRangeMaster = true;
+                        $('#sizeRangeTable tbody tr:nth-child(2)').append('<td class="SizeRangeRefValue"  > ' + data.listSizeItemMaterial[i].SizeRange.trim() + ' </td> ');
+                    
+                        $('#sizeRangeTable tbody tr:last').append("<td ><input type='text' class='Qty' onchange='CalculateTotal(this)' id='Qty" + i + "' value='0'  /</td>");
+
+                       
+                        count++;
+                    }
+                }
+                GetVAlue();
+            },
+            error: function (ex) {
+                alert('This Color Already Exist in the database.');
+            }
+        });
+    }
+    $("#Io_based").on("change", function () {
+        $("#sizeRangeTable").html('')
+        var Io_based = "";
+        Io_based += $(this).val();
+        $.ajax({
+            type: 'POST',
+            url: '/ProductionJobwork_/Getbom_id',
+          data: { LinkBomNo: Io_based, BuyerPo: $("#Io_based  option:selected").map(function () { return this.text }).get().join(',') },
+            success: function (data) {
+                
+                var count = 1;
+                if (data.Message != "Style cant be diffrent") {
+                    $("#Style").val(data.Style),
+                    $("#JW_BOM_linked").html("").trigger('chosen:updated');
+                    $("#Qty").val(data.Totalqty);
+                    GetVAlue();
+                    $.each(data.BillOfMaterial, function (i, item) {
+                        $("#JW_BOM_linked").append(
+                            $('<option></option>').val(item.BomId).html(item.BomNo)).trigger('chosen:updated');
+                    });
+                    if (data.listOfSizeRange.length > 0) {
+                        $("#sizeRangeTable").append("<tbody><tr><td>size</td></tr><tr><td>Io Qty</td></tr><tr><td>Qty</td></tr></tbody>");
+                        for (var i = 0; i <= data.listOfSizeRange.length - 1; i++) {
+                            isSizeRangeMaster = true;
+                            $('#sizeRangeTable tbody tr:first-child').append('<td class="Size"  > ' + data.listOfSizeRange[i].SizeRange.trim() + ' </td> ');
+                            $('#sizeRangeTable tbody  tr:nth-child(2)').append('<td class="SizeRangeRefValue"  > ' + data.listOfSizeRange[i].Qty + ' </td> ');
+                            $('#sizeRangeTable tbody tr:last').append("<td><input type='text' class='Qty' onchange='CalculateTotal(this," + data.listOfSizeRange[i].Qty + ")' id='Qty" + i + "' value='0'  /</td>");
+                            count++;
+                        }
+                    }
+
+                 
+                }
+                else {
+                    alert("Style can't be diffrent");
+                }
+            },
+            error: function (ex) {
+                alert('This Select Correct Io.');
+            }
+        });
+    });
+    $("#JW_BOM_linked").on("change", function () {
+        var JW_BOM_linked = "";
+        JW_BOM_linked += $(this).val();
+        $.ajax({
+            type: 'POST',
+            url: '/ProductionJobwork_/GEtBom_Material',
+            data: { JW_BOM_linked: JW_BOM_linked },
+            success: function (data) {
+                
+                $("#Material_Name").html("").trigger('chosen:updated');
+                $.each(data.Material_Desctription, function (i, item) {
+                    $("#Material_Name").append(
+                        $('<option></option>').val(item.Value).html(item.Text)).trigger('chosen:updated');
+                });
+            },
+            error: function (ex) {
+                alert('This Material Name Already Exist in the database.');
+            }
+        });
+    });
+    //$("#Material_Name").on("change", function () {
+    //    
+    //    var Material_Name = $("#Material_Name").val();
+    //    $.ajax({
+    //        type: 'POST',
+    //        url: '/ProductionJobwork_/Material_NameDetail',
+    //        data: { Material_Name: Material_Name },
+    //        success: function (data) {
+    //            
+    //            $("#Qty").val(data.mrpRequirement.RequiredQty);
+    //            $("#Qty_Uom").val(data.mrpRequirement.WastageQtyUOM);
+    //            //  Qty_Uom
+    //            Size();
+    //        },
+    //        error: function (ex) {
+    //            alert('This Material Name Already Exist in the database.');
+    //        }
+    //    });
+    //});
+    $("#Material_Name").on("change", function () {
+        
+       
+        var Material_Name = $("#Material_Name").val();
+        var id = Material_Name.split('_');
+        var Lot_no = $("#Lot_no option:selected").text();
+        var Buyer = $("#Buyer").val();
+        var Season = $("#Season").val();
+        var Group = $("#Group").val();
+        $.ajax({
+            type: 'POST',
+            url: '/ProductionJobwork_/Material_NameDetail_CuttingSlip',
+            data: {
+                Material_Name: id[0],
+                LotNo: Lot_no,
+                BuyerName: Buyer,
+                BuyerSeason: Season,
+                MaterialGroupMasterId: Group,
+                Io: $("#Io_based  option:selected").map(function () { return this.text }).get().join(',')
+            },
+            success: function (data) {
+                
+                $("#Qty").val(data.RequiredQty);
+              //  $("#Qty_Uom").val(data.mrpRequirement.WastageQtyUOM);
+                //  Qty_Uom
+                Size();
+            },
+            error: function (ex) {
+                alert('This Material Name Already Exist in the database.');
+            }
+        });
+    });
+    $("#Style").on("change", function () {
+
+        $.ajax({
+            type: 'POST',
+            url: '/JobSheet_pair/Get_jw_Approvedprice_Production',
+            data: {
+                Process_Name: $("#Process_Name").val(), JW_Name: $("#Jw_Name").val(),
+                Stage_From: $("#Stage_From").val(),
+                Stage_To: $("#Stage_To").val(),
+                Style: $("#Style").val()
+            },
+            success: function (data) {
+
+                
+                if (data.items !== null) {
+                    
+                    $("#Rate").val(data.items.Rate_For_JW);
+                    var date = data.items.Lead_Time_Days;
+                    $("#Delivery_date").attr("value", (addDays(parseInt(date))));
+                    $("#GST").val(data.items.GSt);
+                    Add_Io();
+                }
+                else {
+                    $("#Jw_Rate").val('0');
+                    alert('There is no data in Approved price list.');
+
+                }
+            },
+            error: function (ex) {
+                alert('This Color Already Exist in the database.');
+            }
+        });
+    });
+    function CalculateTotal(agr1, arg2) {
+        
+        var CurrentIssue_ = $("#CurrentIssue").val();
+        if ($("#CurrentIssue").val() != "") {
+
+            if (parseFloat(agr1.value) > parseFloat(arg2)) {
+                $("#Add").hide();
+                alert("Actual size current stock exceed issue quantity");
+                return false;
+            }
+            else if (parseFloat(arg2) == 0 && parseFloat(agr1.value) != 0) {
+                $("#Add").hide();
+                alert("Actual size current stock is zero");
+                return false;
+            }
+            else {
+                $("#Add").show();
+                var add = 0;
+                $("#sizeRangeTable .Qty").each(function () {
+                    add += Number($(this).val());
+                });
+
+                $('#TotalQty').val(add);
+                $('#TotalQty').prop("disabled", true);
+                if (parseFloat(CurrentIssue_) < parseFloat(add)) {
+                    $("#Add").hide();
+                    alert("Current stock exceed issue qty");
+                    return false;
+                }
+                else {
+                    $("#Add").show();
+                }
+            }
+
+        }
+        else {
+            $("#Add").hide();
+            alert("Please add current issue quantity");
+            return false;
+        }
+
+    }
+    function Add_Io()
+    {
+        $.ajax({
+            type: 'POST',
+            url: '/ProductionJobwork_/Get_IoListBystyle',
+            data: {
+                Style: $("#Style").val()
+            },
+            success: function (data) {
+
+                
+
+                $("#Io_based").html("").trigger('chosen:updated');
+                $.each(data.item, function (i, items) {
+                    $("#Io_based").append(
+                        $('<option></option>').val(items.Value).html(items.Text)).trigger('chosen:updated');
+                });
+            },
+            error: function (ex) {
+                alert('This Color Already Exist in the database.');
+            }
+        });
+    }
+    function addDays(n) {
+        
+        var t = new Date();
+        t.setDate(t.getDate() + n);
+        var month = "0" + (t.getMonth() + 1);
+        var date = "0" + t.getDate();
+        month = month.slice(-2);
+        date = date.slice(-2);
+        var date = date + "/" + month + "/" + t.getFullYear();
+        //  alert(date);
+        return date;
+    }
+    $("#Qty").on("change", function () {
+        GetVAlue();
+    });
+    $("#GST").on("change", function () {
+        GST();
+    });
+    $("#GST").keyup(function () {
+        GST();
+    });
+    
+    function GetVAlue() {
+        var rate = $("#Rate").val();
+        var Qty = $("#Qty").val();
+        var value = rate * Qty;
+        $("#Value").val(value);
+    }
+    function GST() {
+        
+        var Qty = $("#Qty").val();
+        var value = $("#Value").val();
+        var gst = $("#GST").val();
+        var gstamt = value * gst / 100;
+        var Total = (parseFloat(value) + parseFloat(gstamt));
+        $("#GST_AMT").val(gstamt)
+        $("#Total_Cost").val(Total)
+    }
+    $("input[type='checkbox'][id='IO']").on("change", function () {
+        
+        var value = $('#IO').is(':checked');
+        if (value == true) {
+            $('#Material_Name').attr("disabled", false).trigger('chosen:updated');
+        }
+        else {
+            $('#Material_Name').attr("disabled", true).trigger('chosen:updated');
+
+        }
+
+    });
+</script>
+
+<div class="production_jobwork1 mob_padding col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="dashboard-content radio-option col-xs-12">
+        <form action="#">
+            <span>
+                @Html.RadioButtonFor(model => model.Leather_Pairs, "0", new { @id = "0", @class = "with-gap"})
+                <label for="0">Leather to Pairs</label>
+            </span>
+            <span>
+             
+                @Html.RadioButtonFor(model => model.Leather_Pairs, "1", new { @id = "1", @class = "with-gap" })
+                <label for="1">Component to Pairs</label>
+            </span>
+            <span>
+                @Html.RadioButtonFor(model => model.Leather_Pairs, "2", new { @id = "2", @class = "with-gap" })
+                <label for="2">Upper Fullshoes</label>
+            </span>
+        </form>
+    </div>
+    <div class="header_list_tab  col-lg-12 col-md-12 col-sm-12  col-xs-12">
+
+        <div class="col-lg-6 col-md-12 col-sm-12  col-xs-12">
+            <div class="button_tab  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12 block-section ordr-sheet-blk">
+        <div class="row">
+            <div class="col-md-11">
+                <div class="col-md-12">
+                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                        <div class="input-group date my_picker" data-date-format="mm/dd/yyyy">
+                            <label>Date</label>
+                            @Html.TextBoxFor(m => m.date, new { @class = "form-control filter-cal" })
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>Jobwork No</label>
+                            @Html.HiddenFor(x => x.Production_Order_id)
+                            @Html.TextBoxFor(m => m.code.ProductionJobwork_Code, new { @class = "form-control" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>Type.</label>
+                            @Html.DropDownListFor(x =>x.Production_Type , MMS.Web.ExtensionMethod.HtmlHelper.Production_Type(), new { @class = "form-control input chosen-select" })
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>Jobwork Name</label>
+                            @Html.DropDownListFor(x => x.Jw_Name, MMS.Web.ExtensionMethod.HtmlHelper.JobworkName(), new { @class = "form-control input chosen-select" })
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>Process </label>
+                            @Html.DropDownListFor(x => x.Process_Name, MMS.Web.ExtensionMethod.HtmlHelper.ProcessName(), new { @class = "form-control input chosen-select" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>Stage - From</label>
+                            @Html.DropDownListFor(x => x.Stage_From, MMS.Web.ExtensionMethod.HtmlHelper.StageName(), new { @class = "form-control input chosen-select" })
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>Stage - To</label>
+                            @Html.DropDownListFor(x => x.Stage_To, MMS.Web.ExtensionMethod.HtmlHelper.StageName(), new { @class = "form-control input chosen-select" })
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>Lot No.</label>
+                            @Html.DropDownListFor(m => m.Lot_no, MMS.Web.ExtensionMethod.HtmlHelper.LOtNowihSeason(), new { @class = "form-control input chosen-select" })
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Buyer</label>
+                                @Html.DropDownListFor(x => x.Buyer, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Season</label>
+                                @Html.DropDownListFor(x => x.Season, MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Style</label>
+                                @*@Html.TextBoxFor(m => m.Style, new { @class = "form-control" })*@
+                                @Html.DropDownListFor(x => x.Style, MMS.Web.ExtensionMethod.HtmlHelper.ProductBuyerStyleNo_Name(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Group</label>
+                                @Html.DropDownList("Group", MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="center_padding_none  col-md-12">
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group checkbox-option">
+                                <div class="form-group checkbox_tax">
+
+                                    <input type="checkbox" id="IO">
+                                    <label for="IO">IO Based</label>
+                                </div>
+                                @Html.DropDownListFor(x => x.Io_based, MMS.Web.ExtensionMethod.HtmlHelper.Io_Based(), new { @class = "form-control input chosen-select", @multiple = "multiple" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>JW BOM to be linked</label>
+                                @Html.DropDownListFor(x => x.JW_BOM_linked, MMS.Web.ExtensionMethod.HtmlHelper.BomStyle_Link(), new { @class = "form-control input chosen-select", @readonly = "True", @multiple = "multiple" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="input-group date my_picker" data-date-format="mm/dd/yyyy">
+                                <label>Delivery Date</label>
+                                @Html.TextBoxFor(m => m.Delivery_date, new { @class = "form-control filter-cal" })
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Size Range if size is required</label>
+                                @Html.DropDownListFor(m => m.Size_range, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="col-lg-9 col-md-9 col-sm-12 input-blk mateial-select">
+                            <div class="form-group">
+                                <label>Material Name</label>
+                                @Html.DropDownListFor(x => x.Material_Name, MMS.Web.ExtensionMethod.HtmlHelper.GEMaterialName(), new { @class = "form-control input chosen-select", @readonly = true })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Component Id</label>
+                             
+
+                                @Html.DropDownListFor(x => x.ComponentId, MMS.Web.ExtensionMethod.HtmlHelper.ComponentMaster(), new { @class = "form-control input chosen-select", @multiple = "multiple" })
+                              
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-9 col-md-9 col-sm-12 input-blk mateial-select">
+                            <div class="form-group">
+                                <label>Fg Material Name</label>
+                                @Html.DropDownListFor(x => x.Fg_Material_Name, MMS.Web.ExtensionMethod.HtmlHelper.GEMaterialName(), new { @class = "form-control input chosen-select", @readonly = true })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Fg Component Id</label>
+                                @Html.DropDownListFor(x => x.Fg_ComponentId, MMS.Web.ExtensionMethod.HtmlHelper.ComponentMaster(), new { @class = "form-control input chosen-select" })
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="col-md-12">
+                            <label>If Multiple IO's then cummulative size quantity</label>
+                            <div class="production_jobwork_tbl">
+                                <table id="sizeRangeTable" cellpadding="0" cellspacing="0" border="1" width="100%">
+                                    @*<tbody>
+                                <tr>
+                                    <td>size</td>
+
+                                </tr>
+                                <tr>
+                                    <td>Qty</td>
+
+                                </tr>
+                            </tbody>*@
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Quantity</label>
+                                @Html.TextBoxFor(m => m.Qty, new { @class = "form-control " })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>UOM</label>
+                                @Html.DropDownListFor(x => x.Qty_Uom, MMS.Web.ExtensionMethod.HtmlHelper.UomUnit(), new { @class = "form-control input" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Jobwork price / UOM in Rs.</label>
+                                @Html.TextBoxFor(m => m.Rate, new { @class = "form-control " })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Jobwork Price Value</label>
+                                @Html.TextBoxFor(m => m.Value, new { @class = "form-control " })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>GST</label>
+                                @Html.TextBoxFor(m => m.GST, new { @class = "form-control " })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>GST AMT</label>
+                                @Html.TextBoxFor(m => m.GST_AMT, new { @class = "form-control " })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Total Cost</label>
+                                @Html.TextBoxFor(m => m.Total_Cost, new { @class = "form-control " })
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+</div>
+<div class="init_action sheet-pairs col-lg-12 col-md-12 col-sm-12">
+    <div id="save" class="init_button">
+        <button class="btn green-grey" onclick="back()">Back</button>
+        @if (Model != null )
+            {
+            <button class="btn green-btn " onclick="Save()">Save & Send</button>
+        }
+        else
+        {
+            <button class="btn green-btn " onclick="Save()">Save & Send</button>
+        }
+    </div>
+    <div id="Update_edit" class="init_button">
+
+        <button class="btn green-btn" onclick="Update()">Update</button>
+    </div>
+    <div class="checkbox-option sheet-pairs">
+        <div class="form-group checkbox_tax">
+            <input type="checkbox" id="tax">
+            <label for="tax">SMS</label>
+        </div>
+        <div class="form-group checkbox_tax">
+            <input type="checkbox" id="tax1">
+            <label for="tax1">Email</label>
+        </div>
+    </div>
+    <div class="sheet_pair_2 mob_padding col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <!-- <div class="col-xs-12 block-section"> -->
+        <div id="no-more-tables" class="col-xs-12 no-padding hole_table">
+            <table id="table_grid" class="col-md-12 table-striped table-condensed cf table-change home_dahboard color_table">
+                <thead>
+                    <tr>
+                        <th>Job work Name</th>
+                        <th>Process Name</th>
+                        <th>Stage From</th>
+                        <th>Stage To</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody ID="table_grid_ROW" class="common-table-head">
+                    @if (Model.JobProductionGrid_list != null && Model.JobProductionGrid_list.Count > 0)
+                    {
+                        int count = 1;
+
+                        foreach (var Jobsheet in Model.JobProductionGrid_list)
+                        {
+                            <tr id="@Jobsheet.Production_Order_id">
+                                <td data-title="OperationType Code">@Jobsheet.Job_Name</td>
+                                <td data-title="OperationType Code">@Jobsheet.ProcessName</td>
+                                <td data-title="OperationType Code">@Jobsheet.StageFrom</td>
+                                <td data-title="OperationType Code">@Jobsheet.StageTo</td>
+
+                                <td data-title="Action">
+                                    <span class="action-icons">
+
+                                        <a><img onclick="Edit_Grid('@Jobsheet.Production_Order_id')" class="use-address" src="~/Scripts/Jobwork/images/edit.png"></a>
+                                        <img onclick="Delete_Grid('@Jobsheet.Production_Order_id')" class="use-address" src="~/Scripts/Jobwork/images/delete.png">
+                                    </span>
+                                </td>
+                            </tr>
+                            count++;
+                        }
+
+                    }
+                </tbody>
+            </table>
+        </div>
+        <!-- </div> -->
+
+    </div>
+</div>
+
+<script src="~/Scripts/Jobwork/js/datepicker.min.js"></script>
+<script src="~/Scripts/Jobwork/js/custom_script.js"></script>
+<script src="~/Scripts/moment.js"></script>

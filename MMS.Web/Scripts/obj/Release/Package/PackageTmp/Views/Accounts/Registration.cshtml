@@ -1,0 +1,114 @@
+﻿@{
+    ViewBag.Title = "Registration";
+    Layout = "~/Views/Shared/LoginMaster.cshtml";
+}
+
+<script type="text/javascript">
+    //function validateEmail(sEmail) {
+    //    alert();
+    //    var filter = /^[\w\-\.\+]+\[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/;
+    //    if (filter.test(sEmail)) {
+    //        alert('24')
+    //        return true;
+    //    }
+    //    else {
+    //        return false;
+    //    }
+    //}
+    function Register() {
+        var serviceURL = "/Accounts/Registration";
+        var sEmail = $('#Email').val();
+        if ($('#FirstName').val() == "") {
+            alert("Enter FirstName.")
+            return false;
+        }
+        //if (validateEmail(sEmail)) {
+        //    alert('Nice!! your Email is valid, now you can continue..');
+        //}
+        //else {
+        //    alert('Invalid Email Address');
+        //    e.preventDefault();
+        //}
+        if ($('#Email').val() == "") {
+            alert("Enter Email Address.");
+            return false;
+        }
+        if ($('#Password').val() == "") {
+            alert("Enter Password.")
+            return false;
+        }
+        if ($('#UserType').val() == "") {
+            alert("Select User Type.")
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Registration", "Accounts")',
+            data: { Email: $('#Email').val(), Password: $('#Password').val(), UserType: $('#UserType').val(), FirstName: $('#FirstName').val(), LastName: $('#LastName').val() },
+            dataType: "json",
+            success: function (user) {
+                if (user.EmailExist == true) {
+                    alert('This Email Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('User details saved successfully.');
+                    location.href = "/Accounts/Login";
+                }
+
+            },
+            error: function (ex) {
+                alert('This Email Already Exist in the database.');
+                return false;
+            }
+        });
+
+    }
+    function Cancel() {
+        location.href = "Login";
+    }
+
+</script>
+<div class="main-wrapper">
+    <div class="login-wrap">
+        <div class="login-container">
+            <div class="login-container-inner">
+                <div class="login-header">
+                    <img src="/Content/images/logo.png" alt="logo">
+                </div>
+                <div class="login-body">
+                    <ul class="mCustomScrollbar">
+                        <li>
+                            <h2>REGISTER</h2>
+                        </li>
+                        <li class="text-field">
+                            <input type="text" id="FirstName" class="first-name" placeholder="First Name">
+                            <input type="text" id="LastName" class="last-name" placeholder="Last Name"></li>
+                        <li class="text-field">
+                            <input type="text" id="Email" placeholder="Enter Email"></li>
+                        <li class="text-field">
+                            <input type="password" id="Password" placeholder="Enter Password"></li>
+                        <li class="select-field">
+                            @Html.DropDownList("UserType", MMS.Web.ExtensionMethod.HtmlHelper.UserTypeName(), new { @class = "select-style text-field" })
+                            @*<select id="UserType">
+                                <option>User type</option>
+                                <option>User 1</option>
+                                <option>User 2</option>
+                                <option>User 3</option>
+                            </select>*@
+                        </li>
+
+                        <li class="submit-button register-footer">
+                            <input class="cancel_btn" type="button" value="CANCEL" onclick="Cancel()">
+                            <input class="submit_btn" type="button" value="REGISTER" onclick="Register()">
+                        </li>
+
+                    </ul>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

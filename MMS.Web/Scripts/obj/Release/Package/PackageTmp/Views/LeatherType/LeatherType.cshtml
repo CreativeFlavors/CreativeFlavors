@@ -1,0 +1,127 @@
+﻿@model MMS.Web.Models.LeatherSize.LeatherTypeModel
+
+@{
+//ViewBag.Title = "LeatherType";
+//Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+}
+
+
+ <script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#LeatherTypeCode').val() == "") {
+            $('#LeatherTypeCode').css('border-color', 'red');
+            $('#LeatherTypeCode').focus();
+            alert("Please Enter LeatherTypeCode.");
+            return false;
+        }
+        else {
+            $('#LeatherTypeCode').css('border-color', '');
+        }
+        if ($('#LeatherTypeDescription').val() == "") {
+            $('#LeatherTypeDescription').css('border-color', 'red');
+            $('#LeatherTypeDescription').focus();
+            alert("Please Enter LeatherTypeDescription.")
+            return false;
+        }
+        else {
+            $('#LeatherTypeDescription').css('border-color', '');
+        }
+
+       
+        $.ajax({
+            type: 'POST',
+            url: '/LeatherType/LeatherType',
+            data: {
+                LeatherTypeCode: $('#LeatherTypeCode').val(),
+                LeatherTypeDescription: $('#LeatherTypeDescription').val(),
+                LeatherTypeID: $('#LeatherTypeID').val()
+            },
+            success: function (data) {
+                if (data.UpdatedDate==null) {
+                    alert('Saved Successfully.');
+                    location.href = "/LeatherType/LeatherType";
+                    //return false;
+                }
+                else if(data.UpdatedDate!=null){
+                    alert('Updated successfully.');
+                    location.href = "/LeatherType/LeatherType";
+                    //return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/LeatherType/LeatherType";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    //function Update(arg) {
+    //    if ($('#LeatherTypeCode').val() == "") {
+    //        $('#LeatherTypeCode').css('border-color', 'red');
+    //        $('#LeatherTypeCode').focus();
+    //        alert("Please Enter LeatherTypeCode.")
+    //        return false;
+    //    }
+    //    else {
+    //        $('#LeatherTypeCode').css('border-color', '');
+    //    }
+    //    if ($('#LeatherTypeDescription').val() == "") {
+    //        $('#LeatherTypeDescription').css('border-color', 'red');
+    //        $('#LeatherTypeDescription').focus();
+    //        alert("Please Enter LeatherTypeDescription.")
+    //        return false;
+    //    }
+    //    else {
+    //        $('#LeatherTypeDescription').css('border-color', '');
+    //    }
+
+        
+    //    $.ajax({
+    //        type: 'POST',
+    //        url: '/LeatherType/Update',
+    //        data: {
+    //            LeatherTypeCode: $('#LeatherTypeCode').val(),
+    //            LeatherTypeDescription: $('#LeatherTypeDescription').val(),
+    //            LeatherTypeID: $('#LeatherTypeID').val()
+    //        },
+    //        success: function (data) {
+    //            if (data.LeatherTypeID != "" || data.LeatherTypeID != 0) {
+    //                alert('Updated Successfully.');
+    //                location.href = "/LeatherType/LeatherType";
+    //                return false;
+    //            }
+    //            else {
+    //                alert('Updation failed.');
+    //                location.href = "/LeatherType/LeatherType";
+    //                return false;
+    //            }
+
+    //        },
+    //        error: function (ex) {
+    //            alert('Already Exist in the database.');
+    //        }
+    //    });
+    //}
+</script>
+<h2 class="content-title">Leather Type Master</h2>
+<div>
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("LeatherTypeGrid", "LeatherType")
+    </div>
+</div>
+

@@ -1,0 +1,350 @@
+﻿@{
+    ViewBag.Title = "Material Category";
+    Layout = "~/Views/Shared/_jobLayout.cshtml";
+
+
+}
+
+<div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+    <div class="dashboard-content col-xs-12 no-padding">
+        <div class="dashboard_head dashboard-title congest col-lg-12 col-md-12 col-sm-12  col-xs-12">
+            <div class="dashboard-title  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+                <h2>Stage Master</h2>
+            </div>
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("StageMaserGrid", "StageMaster_Job")
+    </div>
+
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+
+        $("#EditColorPartial").hide();
+        $('#example').DataTable();
+        $("ul a").on("click", function () {
+            debugger
+            $("a").siblings().removeClass("active");
+            $(this).addClass("active");
+        });
+    });
+
+    function AddStage() {
+        
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "GET",
+            url: ' @Url.Action("StageMasteDetails", "StageMaster_Job")',
+            data: { ProcessCode_: 0, OrderType: 0 },
+            success: function (data) {
+                
+                $("#EditStagePartial").html(data);
+                $("#EditStagePartial").show();
+                $("input[type='hidden'][name='IsInspection']").remove();
+            }
+        });
+
+    }
+    function Edit(arg) {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "GET",
+            url: ' @Url.Action("StageMasteDetails", "StageMaster_Job")',
+            data: { ProcessCode_: arg, OrderType: 0 },
+            success: function (data) {
+                $("#EditStagePartial").html(data);
+                $("#EditStagePartial").show();
+             
+                $("input[type='hidden'][name='IsInspection']").remove();
+            }
+        });
+
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "StageMaster")',
+                data: { StageMasterId: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/StageMaster_Job/StageMaster";
+                        return false;
+                    }
+                    else {
+                        alert('Color Details deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+    function Save() {
+        
+        $("#EditStagePartial_sequence").hide();
+        if ($('#ProcessCode').val() == "") {
+            alert("Please Enter Process Code.")
+            $('#ProcessCode').css('border-color', 'red');
+            $('#ProcessCode').focus();
+            return false;
+        }
+        else {
+            $('#ProcessCode').css('border-color', '');
+        }
+        if ($('#OrderType').val() == "") {
+            alert("Please Enter Order Type.")
+            $('#OrderType').css('border-color', 'red');
+            $('#OrderType').focus();
+            return false;
+        }
+        else {
+            $('#OrderType').css('border-color', '');
+        }
+        if ($('#StageCode').val() == "") {
+            alert("Please Enter Stage Code.")
+            $('#StageCode').css('border-color', 'red');
+            $('#StageCode').focus();
+            return false;
+        }
+        else {
+            $('#StageCode').css('border-color', '');
+        }
+        if ($('#StageName').val() == "") {
+            alert("Please Enter Stage Name.")
+            $('#StageName').css('border-color', 'red');
+            $('#StageName').focus();
+            return false;
+        }
+        else {
+            $('#StageName').css('border-color', '');
+        }
+        if ($('#SubStage').val() == "") {
+            alert("Please Enter SubStage.")
+            $('#SubStage').css('border-color', 'red');
+            $('#SubStage').focus();
+            return false;
+        }
+        else {
+            $('#SubStage').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/StageMaster/StageMaster',
+            data: {
+                StageMasterId: $('#StageMasterId').val(),
+                ProcessCode: $('#ProcessCode').val(),
+                OrderType: $('#OrderType').val(),
+                StageCode: $('#StageCode').val(),
+                StageName: $('#StageName').val(),
+                SubStage: $('#SubStage').val(),
+                Sequence: $('#Sequence').val(),
+                IsInspection: $('#IsInspection').prop('checked')
+            },
+            success: function (data) {
+              
+                if (data.StageMasterId != "" || data.StageMasterId != 0) {
+                    
+                    alert('Saved Successfully.');
+                    var StageCode = $('#StageCode').val().slice(2)
+                    var no = parseInt(StageCode)+1
+                
+
+                    $('#StageCode').val("SM"+no),
+                    $('#StageName').val(''),
+                    $('#SubStage').val(''),
+                    $('#Sequence').val(''),
+                    $("#EditStagePartial_sequence").html(data);
+                    $("#EditStagePartial_sequence").show();
+                    $('#OrderType').attr("disabled", true).trigger('chosen:updated')
+
+                    //row += "<tr><td data-title='OperationType Code'>" + data.items.StageCode + "</td>";
+                    //row += "<td data-title='OperationType Code'>" + data.items.StageName + "</td>";
+                    //row += "<td data-title='Sequence' ><input type='number' class='form-control Sequence' id='" + data.items.StageMasterId + "'  value='" + data.items.Sequence + "' style='width: 76px;'></td></tr>";
+                
+                    //$('#table_grid_ROW').append(row);
+                 // return false;
+                }
+                else if (data.StageMasterId == 0 && data.StageName != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/StageMaster_Job/StageMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                
+                alert(ex.message);
+            }
+        });
+    }
+    function UpdateStage(arg) {
+        $("#EditStagePartial_sequence").hide();
+        if ($('#ProcessCode').val() == "") {
+            alert("Please Enter Process Code.")
+            $('#ProcessCode').css('border-color', 'red');
+            $('#ProcessCode').focus();
+            return false;
+        }
+        else {
+            $('#ProcessCode').css('border-color', '');
+        }
+        if ($('#OrderType').val() == "") {
+            alert("Please Enter Order Type.")
+            $('#OrderType').css('border-color', 'red');
+            $('#OrderType').focus();
+            return false;
+        }
+        else {
+            $('#OrderType').css('border-color', '');
+        }
+        if ($('#StageCode').val() == "") {
+            alert("Please Enter Stage Code.")
+            $('#StageCode').css('border-color', 'red');
+            $('#StageCode').focus();
+            return false;
+        }
+        else {
+            $('#StageCode').css('border-color', '');
+        }
+        if ($('#StageName').val() == "") {
+            alert("Please Enter Stage Name.")
+            $('#StageName').css('border-color', 'red');
+            $('#StageName').focus();
+            return false;
+        }
+        else {
+            $('#StageName').css('border-color', '');
+        }
+        if ($('#SubStage').val() == "") {
+            alert("Please Enter SubStage.")
+            $('#SubStage').css('border-color', 'red');
+            $('#SubStage').focus();
+            return false;
+        }
+        else {
+            $('#SubStage').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/StageMaster/Update',
+            data: {
+                StageMasterId: $('#StageMasterId').val(),
+                ProcessCode: $('#ProcessCode').val(),
+                OrderType: $('#OrderType').val(),
+                StageCode: $('#StageCode').val(),
+                StageName: $('#StageName').val(),
+                SubStage: $('#SubStage').val(),
+                Sequence: $('#Sequence').val(),
+                IsInspection: $('#IsInspection').prop('checked')
+            },
+            success: function (data) {
+                if (data.StageMasterId != "" || data.StageMasterId != 0) {
+                    alert('Updated Successfully.');
+                    $('#StageName').val(''),
+                     $('#SubStage').val(''),
+                    $('#Sequence').val(''),
+                    $("#EditStagePartial_sequence").html(data);
+                    $("#EditStagePartial_sequence").show();
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/StageMaster_Job/StageMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+
+    function save_sequence() {
+        
+        var num = [];
+        var num_ = [];
+        var arr = [];
+        var count_ = [];
+        var sorted_arr = [];
+        $('#table_grid_sequence tbody tr').find('.Sequence').each(function () {
+            num += $(this).val() + ";" + $(this).attr('id') + ",";
+            //alert($(this).val());
+            //alert($(this).attr('id'));
+            //num.push(parseInt($(this).val()) + ";"+ $(this).attr('id'))
+            arr.push(parseInt($(this).val()));
+        });
+        //alert();
+        //
+        //num_ = num.slice(0, -1);
+    //    var sorted_arr = num_.sort();
+        var missing = [];
+        var maxValueInArray = Math.max.apply(Math, arr);
+        for (var i = 1; i <= maxValueInArray; i++)
+        {
+            if (arr.indexOf(i) == -1) {
+                missing.push(i);
+                alert("Missing no is" + i);
+                return false;
+            }
+
+        }
+        count_.push(Array.from(new Set(arr)));
+        if (count_[0].length != arr.length) {
+            alert("No is duplicated");
+            return false;
+
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/StageMaster/Update_stageseq',
+            data: {
+                OrderType: num.slice(0, -1),
+            },
+            success: function (data) {
+                if (data.StageMasterId != "" || data.StageMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/StageMaster_Job/StageMaster";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/StageMaster_Job/StageMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Back() {
+        location.href = "/StageMaster_Job/StageMaster";
+    }
+</script>

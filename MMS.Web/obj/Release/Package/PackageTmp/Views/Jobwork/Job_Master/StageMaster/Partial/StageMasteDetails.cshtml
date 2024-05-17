@@ -1,0 +1,223 @@
+﻿@model MMS.Web.Models.StageMaser.StageMasterModel
+@{
+    @*int id = Model.StageMasterId;
+        Session["StageMasterId"] = id;*@
+
+    <link href="~/Content/chosen/bootstrap-chosen.css" rel="stylesheet" />
+    <script src="~/Scripts/chosen/chosen.jquery.js"></script>
+    //var list = MMS.Web.ExtensionMethod.HtmlHelper.Stage_ordertype();
+    //var data = new SelectList(list, list.Where(x => x.Value == Model.OrderType).FirstOrDefault());
+
+  //  var lstProvince = ViewBag.Provinces;
+}
+<script>
+
+    $(".chosen-select").chosen();
+    function Edit_Grid_seq(arg) {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("StageMasteDetails_sequence", "StageMaster_Job")',
+            data: { StageMasterId: arg },
+            success: function (data) {
+                
+                $('#ProcessCode').val(data.ProcessCode),
+                    $('#StageMasterId').val(data.StageMasterId),
+                    $('#OrderType').val(data.OrderType).trigger('chosen:updated'),
+                    $('#StageCode').val(data.StageCode),
+                    $('#StageName').val(data.StageName),
+                    $('#SubStage').val(data.SubStage),
+                    $('#Sequence').val(data.Sequence)
+
+                if (data.IsInspection == true) {
+                    $('#IsInspection').prop('checked', true);
+                }
+            }
+        });
+
+    }
+    $("#OrderType").on("change", function () {
+      //  var a=$('#ProcessCode').val()
+      
+            $.ajax({
+                type: "POST",
+                url: ' @Url.Action("StageMasteDetails_sequence_ProcessCode", "StageMaster_Job")',
+                data: { ProcessCode: $('#ProcessCode').val() },
+                success: function (data) {
+                    if (data != null) {
+                        $('#OrderType').val(data.OrderType).trigger('chosen:updated'),
+                        $('#OrderType').attr("disabled", true).trigger('chosen:updated')
+
+                    }
+                }
+            });
+       
+
+    });
+    
+</script>
+
+
+<div class="header_list_tab  col-lg-12 col-md-12 col-sm-12  col-xs-12">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+        <div class="list_tab">
+            <div class="title">
+                Detail
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-12 col-sm-12  col-xs-12">
+        <div class="button_tab  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+        </div>
+    </div>
+</div>
+<div class="home_stage_edit col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 block-section input_list_group">
+        <div class="input_left col-lg-11 col-md-11 col-sm-12 no-padding">
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        @Html.HiddenFor(x => x.StageMasterId)
+                        <label for="usr">Process Code</label>
+
+                        @Html.TextBoxFor(x => x.ProcessCode, new { @class = "form-control text-field", @readonly = "readonly" })
+                        @*@Html.DropDownListFor(m => m.Nationality, ((IList<CustomerNationality>)ViewData["dsNationality"]).Select(s => new SelectListItem { Text = s.Name, Value = s.Name }), "Select Nationality", new { @class = "input chosen-select required" })*@
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <label for="usr">Finished Prod.Type</label>
+                        @{
+                            List<SelectListItem> listItems = new List<SelectListItem>();
+                            listItems.Add(new SelectListItem
+                            {
+                                Text = "Full Shoes",
+                                Value = "Full Shoes"
+                            });
+                            listItems.Add(new SelectListItem
+                            {
+                                Text = "Upper",
+                                Value = "Upper"
+                            });
+                        }
+                        @Html.DropDownListFor(model => model.OrderType, listItems, "Please Select", new { @class = "form-control chosen-select" })
+                    
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <label for="sel1">Stage Code</label>
+                        @Html.TextBoxFor(m => m.StageCode, new { @class = "form-control text-field", @readonly = true })
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <label for="usr">Stage Name</label>
+                        @Html.TextBoxFor(m => m.StageName, new { @class = "form-control text-field" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <label for="usr">Sub Stage</label>
+
+                        @Html.TextBoxFor(m => m.SubStage, new { @class = "form-control text-field" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <label for="usr">Sequence</label>
+
+                        @Html.TextBoxFor(m => m.Sequence, new { @class = "form-control text-field" })
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <label for="usr">Inspection QC</label>
+                        <div class="checkbox-option ">
+                            <div class="form-group checkbox_tax">
+
+                                @Html.CheckBoxFor(m => m.IsInspection, true)
+                                <label for="IsInspection">Components</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="input_empty col-lg-1 col-md-1 col-sm-12">
+
+        </div>
+        <div class="init_action cntl_btn col-lg-12 col-md-12 col-sm-12">
+            @if (Model != null && Model.StageMasterId != 0)
+            {
+                <button class="btn green-btn" onclick="UpdateStage()">Update</button>
+            }
+            else
+            {
+                <button class="btn green-btn " onclick="Save()">Save</button>
+            }
+            <button class="btn green-grey" onclick="Back()">Back</button>
+        </div>
+    </div>
+</div>
+<div id="EditStagePartial_sequence">
+    @Html.Partial("~/Views/Jobwork/Job_Master/StageMaster/Partial/Stagegrid_sequence.cshtml", Model)
+</div>
+@*<div id="no-more-tables" class="col-xs-12 no-padding hole_table">
+        <table id="table_grid_sequence" class="col-md-12 table-striped table-condensed cf table-change home_dahboard color_table">
+            <thead>
+                <tr>
+                    <th>Stage Code</th>
+                    <th>Stage Name</th>
+                    <th>Sequence</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody ID="table_grid_ROW" class="common-table-head">
+                @if (Model.StageMasterList != null && Model.StageMasterList.Count > 0)
+                {
+                    int count = 1;
+
+                    foreach (var StageMaster in Model.StageMasterList)
+                    {
+                        <tr id="@StageMaster.StageMasterId">
+                            <td data-title="OperationType Code">@StageMaster.StageCode</td>
+                            <td data-title="OperationType Code">@StageMaster.StageName</td>
+                            <td data-title="Sequence"><input type="number" class="form-control Sequence" id="@StageMaster.StageMasterId"  value="@StageMaster.Sequence" style="width: 76px;"></td>
+
+
+
+                            <td data-title="Action">
+                                <span class="action-icons">
+
+                                    <a><img onclick="Edit_Grid_seq('@StageMaster.StageMasterId')" class="use-address" src="~/Scripts/Jobwork/images/edit.png"></a>
+                                    <img onclick="Delete_Grid_seq('@StageMaster.StageMasterId')" class="use-address" src="~/Scripts/Jobwork/images/delete.png">
+                                </span>
+                            </td>
+                        </tr>
+                        count++;
+                    }
+
+                }
+            </tbody>
+        </table>
+        <div class="init_action cntl_btn col-lg-12 col-md-12 col-sm-12">
+
+            <button class="btn green-btn" onclick="save_sequence()">Save sequence</button>
+        </div>
+    </div>*@
+
+

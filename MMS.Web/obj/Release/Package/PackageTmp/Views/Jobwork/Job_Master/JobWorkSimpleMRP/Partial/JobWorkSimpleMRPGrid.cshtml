@@ -1,0 +1,179 @@
+﻿@model MMS.Web.Models.SimpleMRPModel.SimpleMRPModel
+@{
+
+
+}
+
+<div class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div class="header_list_tab  col-lg-12 col-md-12 col-sm-12  col-xs-12">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+                <div class="list_tab">
+                    <div class="title">
+                        List
+                    </div>
+                    <button class="rt_add" onclick="AddJobWorkSimpleMRP()">Add</button>
+                </div>
+
+            </div>
+            <div class="col-lg-6 col-md-12 col-sm-12  col-xs-12">
+                <div class="button_tab  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="process_master col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-xs-12 block-section">
+                <div id="no-more-tables" class="col-xs-12 no-padding">
+                    <table id="example" class="col-md-12 table-striped table-condensed cf table-change home_dahboard home_process">
+                        <thead>
+                            <tr>
+                                <th>SNO</th>
+                                <th>MRPNO</th>
+                                <th>Date</th>
+                                <th>Buyer</th>
+                                <th>WeekNo</th>
+                                <th>Season</th>
+                                <th>LotNO</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        @if (Model.simpleMRPList != null && Model.simpleMRPList.Count > 0)
+                    {
+                        MMS.Repository.Managers.BuyerManager buyerManager = new MMS.Repository.Managers.BuyerManager();
+                        MMS.Core.Entities.BuyerMaster buyerMaster = new MMS.Core.Entities.BuyerMaster();
+                        MMS.Repository.Managers.SeasonManager seansonManager = new MMS.Repository.Managers.SeasonManager();
+                        MMS.Core.Entities.SeasonMaster seasonMaster = new MMS.Core.Entities.SeasonMaster();
+                        int count = 1;
+                    <tbody class="common-table-head">
+
+                        @foreach (var item in Model.simpleMRPList)
+                            {
+                                if (item.BuyerNameid != null)
+                                {
+                                    buyerMaster = buyerManager.GetBuyerMasterId(item.BuyerNameid.Value);
+                                }
+                                if (item.SeasonID != null)
+                                {
+                                    seasonMaster = seansonManager.GetSeasonMasterId(item.SeasonID.Value);
+                                }
+
+                                string BuyerName = string.Empty;
+                                string SeasonName = string.Empty;
+                                if (buyerMaster != null)
+                                {
+                                    BuyerName = buyerMaster.BuyerFullName;
+                                }
+                                if (seasonMaster != null)
+                                {
+                                    SeasonName = seasonMaster.SpringDescription;
+                                }
+                            <tr>
+                                <td class="veh-1" onclick="">@count</td>
+                                <td class="veh-2">@item.MRPNO</td>
+                                <td class="veh-3">@item.MRPDate</td>
+                                <td class="veh-4">@BuyerName</td>
+                                <td class="veh-5">@item.WeekNO</td>
+                                <td class="veh-6">@SeasonName</td>
+                                <td class="veh-7">@item.LotNO</td>
+
+                                <td data-title="Action">
+                                    <span class="action-icons">
+                                        <a><img onclick="Edit('@item.SimpleMRPID')" src="~/Scripts/Jobwork/images/edit.png"></a>
+                                        <img onclick="Delete('@item.SimpleMRPID')" src="~/Scripts/Jobwork/images/delete.png">
+                                    </span>
+                                </td>
+                            </tr>
+                                count++;
+                            }
+                    </tbody>
+                    }
+
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="JobWorkSimpleMRPPartial">
+        @Html.Partial("~/Views/Jobwork/Job_Master/JobWorkSimpleMRP/Partial/JobWorkSimpleMRPDetails.cshtml", Model)
+    </div>
+</div>
+
+    <script>
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+
+        function AddJobWorkSimpleMRP() {
+            $('.veh-tablecont').hide();
+            $.ajax({
+                type: "POST",
+                url: ' @Url.Action("JobWorkSimpleMRPDetails", "JobSimpleMrp")',
+                data: { SimpleMRPID: 0 },
+                success: function (data) {
+                    $("#JobWorkSimpleMRPPartial").html(data);
+                    $("#JobWorkSimpleMRPPartial").show();
+                }
+            });
+            $("#JobWorkSimpleMRPPartial").show();
+        }
+
+        function Cancel() {
+
+            location.reload();
+        }
+
+        function Edit(arg) {
+            $('.veh-tablecont').hide();
+            $.ajax({
+                type: "POST",
+                url: ' @Url.Action("JobWorkSimpleMRPDetails", "JobSimpleMrp")',
+                data: { SimpleMRPID: arg },
+                success: function (data) {
+                    $("#JobWorkSimpleMRPPartial").html(data);
+                    $("#JobWorkSimpleMRPPartial").show();
+                }
+            });
+            $("#JobWorkSimpleMRPPartial").show();
+        }
+
+        function Delete(arg) {
+            var answer = confirm("Are you sure want to delete?");
+            if (answer) {
+                $.ajax({
+                    type: 'POST',
+                    url: ' @Url.Action("Delete", "JobSimpleMrp")',
+                    data: { SimpleMRPID: arg },
+                    success: function (data) {
+                        if (data == "Success") {
+                            alert('Deleted Successfully.');
+                            location.href = "/JobSimpleMrp/JobSimpleMrp";
+                            return false;
+                        }
+                        else {
+                            alert('deletion failed.');
+                        }
+
+                    },
+                    error: function (ex) {
+                        alert('Already Exist in the database.');
+                    }
+                });
+            }
+            else {
+                return false;
+            }
+        }
+
+
+    </script>
+

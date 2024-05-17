@@ -1,0 +1,451 @@
+﻿@model MMS.Web.Models.JobworkModel.JobLeather_leatherModel
+    @using MMS.Repository.Managers.JobWork
+    @using MMS.Core.Entities.JobWork
+    @{
+        List<MMS.Data.StoredProcedureModel.Job_LetherCode> JobLeather_leatherMaster = new List<MMS.Data.StoredProcedureModel.Job_LetherCode>().ToList();
+        JobLeather_leatherManager JobLeather_leatherManager = new JobLeather_leatherManager();
+    }
+<script>
+    $(".chosen-select").chosen()
+    //$("#Process_Name").on("change", function () {
+   
+    //});
+    function GetRate()
+    {
+
+        $.ajax({
+            type: 'POST',
+            url: '/JobSheet_pair/Get_jw_Approvedprice_Leather',
+            data: { Process_Name: $("#Process_Name").val(), JW_Name: $("#Jw_Name").val(), MaterialNameID: $("#Finished_Material").val() },
+            success: function (data) {
+                if (data.items !== null) {
+                    
+                    $("#Rate").val(data.items.Rate_For_JW);
+                    var date = data.items.Lead_Time_Days;
+                    $("#Delivery_Date").attr("value", (addDays(parseInt(date))));
+                    //  $("#Delivery_Date").val(addDays(parseInt(date)));
+                    $("#GST").val(data.items.GSt);
+                    console.log($("#Delivery_Date").val());
+                }
+                else {
+                    $("#Rate").val('0');
+                    alert('There is no data in Approved price list.');
+
+                }
+            },
+            error: function (ex) {
+                alert('This Color Already Exist in the database.');
+            }
+        });
+
+    }
+    function addDays(n) {
+        
+        var t = new Date();
+        t.setDate(t.getDate() + n);
+        var month = "0" + (t.getMonth() + 1);
+        var date = "0" + t.getDate();
+        month = month.slice(-2);
+        date = date.slice(-2);
+        var date = date + "/" + month + "/" + t.getFullYear();
+        //  alert(date);
+        return date;
+    }
+    $("#Qty").on("change", function () {
+        var rate = $("#Rate").val();
+        var Qty = $("#Qty").val();
+        var value = rate * Qty;
+        $("#Value").val(value);
+    });
+    $("#GST").keyup(function () {
+        GST();
+    });
+    $("#GST").on("change", function () {
+        
+        var Qty = $("#Qty").val();
+        var value = $("#Value").val();
+        var gst = $("#GST").val();
+        var gstamt = value * gst / 100;
+        var Total = (parseFloat(value) +parseFloat(gstamt));
+        $("#Gst_Amt").val(gstamt);
+        $("#Total").val(Total);
+    });
+    function GST() {
+        
+        var Qty = $("#Qty").val();
+        var value = $("#Value").val();
+        var gst = $("#GST").val();
+        var gstamt = value * gst / 100;
+        var Total = (parseFloat(value) + parseFloat(gstamt));
+        $("#GST_AMT").val(gstamt)
+        $("#Total_Cost").val(Total)
+    }
+    $("#Finished_Material").on("change", function () {
+        var value = $("input[name='Encho_Raw_Material']:checked").prop("checked", true).val();
+        if (value == 0) {
+            Material_val();
+          //  return false;
+        }
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Getmaterial_SelectDetail", "UnitConvertion")',
+                data: { MaterialNameID: $("#Finished_Material").val() },
+                success: function (data) {
+
+                    
+                    $("#Stores").val(data[0].StoreMasterId).trigger('chosen:updated'),
+                        $("#Group_").val(data[0].MaterialGroupMasterId).trigger('chosen:updated'),
+                        $("#Category").val(data[0].MaterialCategoryMasterId).trigger('chosen:updated'),
+                    $("#Qty_Uom").val(data[0].Uom);
+                    
+                    GetRate();
+                },
+                error: function (ex) {
+                    alert(JSON.stringify(ex));
+                  
+                }
+            });
+    
+    });
+    $("input[type='radio'][name='Encho_Raw_Material']").on("change", function () {
+        
+        var value = $("input[name='Encho_Raw_Material']:checked").prop("checked", true).val();
+        if (value == 0)
+        {
+            $('#Material').attr("disabled", true).trigger('chosen:updated');
+        }
+        else
+        {
+            $('#Material').attr("disabled", false).trigger('chosen:updated')
+
+        }
+
+    });
+
+
+    function Material_val() {
+        
+        var internalOrderNo = "";
+        var Finished_Material = $('#Finished_Material').val();
+   
+            $.ajax({
+                url: '/JobLeather_leather/MultipleIssueMaterialName_Leather',
+                type: "GET",
+                dataType: "JSON",
+                data: { MaterialNameID: Finished_Material },
+                success: function (data) {
+                    
+                    if (data.Message == "Please make a entry on approved price list") {
+                        alert("Please make a entry on approved price list");
+                        return false;
+                        $(".loader-overlay").css("display", "none");
+                    }
+                    else {
+
+                        $(".loader-overlay").css("display", "block");
+                        if (data.BalanceStock != null) {
+                            var stock = parseFloat(data.BalanceStock);
+
+                            if (parseFloat(data.BalanceStock) > 0) {
+                                var count = 1;
+                             
+                                $.each(data.Material, function (i, city) {
+
+                                    
+                                    $("#Rate").val(city.Price).trigger('chosen:updated');
+                                 
+                                  
+                                });
+                                $.each(data.approvedPriceList, function (i, PRICE) {
+                                    $("#Rate").val(PRICE.MRPPrice);
+                                });
+                            }
+                            else {
+                                alert("Stock is not avaible Please contact store department");
+                                return false;
+                            }
+                        }
+                    
+                    }
+                }
+            });
+
+    }
+</script>
+<div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+
+    <div class="dashboard-content radio-option col-xs-12">
+        <form action="#">
+            @if (Model.Job_Lether_to_lether_id != null && Model.Job_Lether_to_lether_id == 0)
+            {
+                <span>
+                    @Html.RadioButtonFor(model => model.Encho_Raw_Material, "1", new { @id = "1", @class = "with-gap", @checked = "checked" })
+                    <label for="1">Enco Raw Material</label>
+                </span>
+                <span>
+                    @Html.RadioButtonFor(model => model.Encho_Raw_Material, "0", new { @id = "0", @class = "with-gap" })
+                    <label for="0">Jobworker Raw Material</label>
+                </span>
+            }
+            else
+            {
+
+                if (Model.Encho_Raw_Material == true)
+                {
+                    <span>
+                        @Html.RadioButtonFor(model => model.Encho_Raw_Material, "1", new { @id = "1", @class = "with-gap" , @checked = "checked" })
+                        <label for="1">Enco Raw Material</label>
+                    </span>
+                    <span>
+                        @Html.RadioButtonFor(model => model.Encho_Raw_Material, "0", new { @id = "0", @class = "with-gap" })
+                        <label for="0">Jobworker Raw Material</label>
+                    </span>
+                }
+                else if (Model.Jobwork_raw_material == true)
+                {
+                    <span>
+                        @Html.RadioButtonFor(model => model.Encho_Raw_Material, "1", new { @id = "1", @class = "with-gap" })
+                        <label for="1">Enco Raw Material</label>
+                    </span>
+                    <span>
+                        @Html.RadioButtonFor(model => model.Encho_Raw_Material, "0", new { @id = "0", @class = "with-gap", @checked = "checked" })
+                        <label for="0">Jobworker Raw Material</label>
+                    </span>
+                }
+
+
+            }
+        </form>
+    </div>
+    <div class="header_list_tab  col-lg-12 col-md-12 col-sm-12  col-xs-12">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+            <div class="list_tab">
+                <div class="title">
+                    Detail
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-6 col-md-12 col-sm-12  col-xs-12">
+            <div class="button_tab  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="jobwork_leather2 col-lg-12 col-md-12 col-sm-12 col-xs-12 mob_padding">
+        <div class="col-xs-12 block-section ordr-sheet-blk">
+            <div class="row">
+                <div class="col-md-11">
+                    <div class="col-md-12">
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="input-group date my_picker" data-date-format="mm/dd/yyyy">
+                                <label>From</label>
+
+                                @Html.TextBoxFor(m => m.Date_from, new { @class = "form-control filter-cal" })
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                            </div>
+                        </div>
+                        @Html.HiddenFor(x => x.Job_Lether_to_lether_id)
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Jobwork N0</label>
+                                @Html.TextBoxFor(m => m.Job_Lether_to_lether_Code, new { @class = "form-control" ,@readonly=true})
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Jobwork Name</label>
+                                @Html.DropDownListFor(x => x.Jw_Name, MMS.Web.ExtensionMethod.HtmlHelper.JobworkName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Process Material</label>
+                                @Html.DropDownListFor(x => x.Process_Name, MMS.Web.ExtensionMethod.HtmlHelper.ProcessName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Buyer</label>
+                                @Html.DropDownListFor(x => x.Buyer, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Season</label>
+                                @Html.DropDownListFor(x => x.Season, MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Stores</label>
+                                @Html.DropDownListFor(x => x.Stores, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Group</label>
+                                @Html.DropDownListFor(x => x.Group_, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "form-control input chosen-select" })
+
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Cateogory</label>
+                                @Html.DropDownListFor(x => x.Category, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "form-control input chosen-select" })
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 col-md-12 col-sm-12 input-blk mateial-select">
+                            <div class="form-group">
+                                <label>Material Name</label>
+                                @Html.DropDownListFor(x => x.Material, MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 input-blk mateial-select">
+                            <div class="form-group">
+                                <label>Finished Material</label>
+                                @Html.DropDownListFor(x => x.Finished_Material, MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-lg-12 col-sm-12">
+                        <div class="col-lg-4 col-md-6 col-sm-12 input-blk quantity-filter">
+                            <label>Quantity</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="form-group">
+                                    @Html.TextBoxFor(m => m.Qty, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 align-padding-rt">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(x => x.Qty_Uom, MMS.Web.ExtensionMethod.HtmlHelper.UomUnit(), new { @class = "form-control input" })
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-lg-2 col-md-6 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Rate</label>
+                                @Html.TextBoxFor(m => m.Rate, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-6 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>GST</label>
+                                @Html.TextBoxFor(m => m.GST, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-6 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Value</label>
+                                @Html.TextBoxFor(m => m.Value, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-6 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>GST AMT</label>
+                                @Html.TextBoxFor(m => m.Gst_Amt, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-6 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Total</label>
+                                @Html.TextBoxFor(m => m.Total, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Delivery Date</label>
+                                <div class="input-group date my_picker" data-date-format="mm/dd/yyyy">
+                                    @Html.TextBoxFor(m => m.Delivery_Date, new { @class = "form-control filter-cal" })
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-1"></div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="init_action sheet-pairs col-lg-12 col-md-12 col-sm-12">
+            <div class="init_button">
+
+                @if (Model.Job_Lether_to_lether_id != null && Model.Job_Lether_to_lether_id == 0)
+                {
+                    <button class="btn green-btn " onclick="SaveLether()">Save &amp; Send</button>
+                }
+                else
+                {
+                    <button class="btn green-btn " onclick="UpdateLether()">Update</button>
+                }
+                <button class="btn green-grey" onclick="Back()">Back</button>
+            </div>
+            <div class="checkbox-option sheet-pairs">
+                <div class="form-group checkbox_tax">
+                    <input type="checkbox" id="tax">
+                    <label for="tax">SMS</label>
+                </div>
+                <div class="form-group checkbox_tax">
+                    <input type="checkbox" id="tax1">
+                    <label for="tax1">Email</label>
+                </div>
+            </div>
+            <div class="sheet_pair_2 mob_padding col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <!-- <div class="col-xs-12 block-section"> -->
+                <div id="no-more-tables" class="col-xs-12 no-padding hole_table">
+                    <table id="table_grid" class="col-md-12 table-striped table-condensed cf table-change home_dahboard color_table">
+                        <thead>
+                            <tr>
+                                <th>Leather Code</th>
+                                <th>Material</th>
+                                <th>Finished Material</th>
+                                <th>Qty</th>
+                                <th>Value</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody ID="table_grid_ROW" class="common-table-head">
+                            @if (Model.Job_LetherCode != null && Model.Job_LetherCode.Count > 0)
+                            {
+                                int count = 1;
+
+                                foreach (var Jobsheet in Model.Job_LetherCode)
+                                {
+                                    <tr id="@Jobsheet.Job_Lether_to_lether_id">
+
+                                        <td data-title="OperationType Code">@Jobsheet.Job_Lether_to_lether_Code</td>
+                                        <td data-title="OperationType Code">@Jobsheet.MaterialDescription</td>
+                                        <td data-title="OperationType Code">@Jobsheet.Finished_MAterial</td>
+                                        <td data-title="OperationType Code">@Jobsheet.qty</td>
+                                        <td data-title="OperationType Code">@Jobsheet.Value</td>
+                                        <td data-title="Action">
+                                            <span class="action-icons">
+
+                                                <a><img onclick="Edit_Grid('@Jobsheet.Job_Lether_to_lether_id')" class="use-address" src="~/Scripts/Jobwork/images/edit.png"></a>
+                                                <img onclick="Delete_Grid('@Jobsheet.Job_Lether_to_lether_id')" class="use-address" src="~/Scripts/Jobwork/images/delete.png">
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    count++;
+                                }
+
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!-- </div> -->
+
+            </div>
+        </div>
+    </div>
+</div>
+    <script src="~/Scripts/Jobwork/js/datepicker.min.js"></script>
+    <script src="~/Scripts/Jobwork/js/custom_script.js"></script>
+    <script src="~/Scripts/moment.js"></script>

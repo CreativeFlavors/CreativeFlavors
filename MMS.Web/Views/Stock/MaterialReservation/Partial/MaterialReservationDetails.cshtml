@@ -1,0 +1,262 @@
+﻿@model MMS.Web.Models.StockModel.MaterialReservationModel
+@using MMS.Repository.Managers.StockManager
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+
+@{
+    int id = Model.MaterialReservationId;
+    Session["MaterialReservationId"] = id;
+
+    List<int> ioconver = new List<int>();
+    List<int> SelectedValue = new List<int>();
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("MaterialReservation", PermissionSettingModel.PermissionID);
+    }
+    bool Save = false; bool Update = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Save")
+        {
+            Save = true;
+        }
+        if (item.PermissionDesc == "Update")
+        {
+            Update = true;
+        }
+
+    }
+}
+
+<style>
+    [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: static !important;
+    }
+</style>
+
+<script type="text/javascript">
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    $(function () {
+        $('#MultipleIO option:selected').remove().appendTo('#DisplayIO');
+
+    });
+    function moveAll(MultipleIO, DisplayIO) {
+        $('#' + MultipleIO + ' option').appendTo('#' + DisplayIO);
+    }
+
+    function moveSelected(MultipleIO, DisplayIO) {
+        $('#' + MultipleIO + ' option:selected').appendTo('#' + DisplayIO);
+    }
+    function selectAll() {
+        $("select option").attr("selected", "selected");
+    }
+   
+</script>
+
+<div class="veh-tablewrap" id="">
+    
+
+     <div id="EditColorPartial">
+        <div class="content-wrapper">
+         
+            <div class="purchase-order-wrapper">
+                <div id="buyerData" class="purchase-order-section">
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Doc No/SI NO</label>
+                                @Html.HiddenFor(m => m.MaterialReservationId) </li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.DocNo)</li>
+
+                            <li>
+                                <label class="init-lable">Internal Order</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.InternalOrder)</li>
+
+
+                            <li>
+                                <label class="init-lable">Mat category</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.DropDownListFor(m => m.MaterialCategoryId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })</li>
+                            <li class="width-90"></li>
+
+                          
+                        </ul>
+                    </div>
+
+                   
+
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Mat Group</label>
+                            <li class="width-90">@Html.DropDownListFor(m => m.MaterialGroupId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })</li>
+
+                            <li>
+                                <label class="init-lable">Material</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.DropDownListFor(m => m.MaterialMasterId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialName(), new { @class = "select-style text-field" })</li>
+
+
+                            <li>
+                                <label class="init-lable">UOM</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.DropDownListFor(m => m.UomId, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })</li>
+                            
+                          
+                        </ul>
+                    </div>
+
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Colour</label>
+                            <li class="width-90">@Html.DropDownListFor(m => m.ColourMasterId, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { @class = "select-style text-field" })</li>
+
+                            <li>
+                                <label class="init-lable">Quantity</label>
+                            </li>
+                            <li class="width-90">
+                              @Html.TextBoxFor(m => m.Quantity)</li>
+
+
+                            <li>
+                                <label class="init-lable">Free Stock Avl</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.FreeStock)</li>
+                            
+                          
+                        </ul>
+                    </div>
+
+                    <div class="purchase-order-row">
+                        <ul>
+
+                            <li>
+                                <label class="init-lable">Plan Wise</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.PlanWise)</li>
+
+                            <li>
+
+                    @if (Model.MaterialWise == true)
+                    {
+                        <input type="checkbox" class="width-20" id="MaterialWise" checked />
+                    }
+                    else
+                    {
+                        <input type="checkbox" class="width-20" id="MaterialWise" />
+                    }
+                    Material Wise  
+                   </li>
+
+                             <li>
+
+                    @if (Model.Summary == true)
+                    {
+                        <input type="checkbox" class="width-20" id="Summary" checked />
+                    }
+                    else
+                    {
+                        <input type="checkbox" class="width-20" id="Summary" />
+                    }
+                    Summary  
+                   </li>
+
+                 </ul>
+               </div>
+
+                     <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Multiple IO'S</label>
+                            <li class="width-90">
+
+                                @if(Model == null || Model.MaterialReservationId == 0)
+                                {
+                                @Html.ListBoxFor(m => m.MultipleIO, MMS.Web.ExtensionMethod.HtmlHelper.GetInternalOrderIONO(), new { @id = "MultipleIO" })
+                                }
+                                else
+                                {
+                                @Html.ListBoxFor(m => m.From, MMS.Web.ExtensionMethod.HtmlHelper.GetInternalOrderIONO(), new { @id = "MultipleIO" })
+                                }
+                            </li>
+                                   <div class="controls">
+                  
+                 
+                    <a href="javascript:moveSelected('MultipleIO', 'DisplayIO')">&gt;</a>
+                    <a href="javascript:moveSelected('DisplayIO', 'MultipleIO')">&lt;</a>
+                  
+                  
+                </div>
+                             
+                @if (Model == null || Model.MaterialReservationId == 0)
+                {
+                    <select multiple id="DisplayIO" size="4" name="topics[]"></select>
+                }
+                else
+                {
+                     @Html.ListBoxFor(m => m.To, MMS.Web.ExtensionMethod.HtmlHelper.GetInternalOrderIONO(), new { @id = "DisplayIO" })
+                }
+                                    </li>
+                           
+                        </ul>
+                    </div>
+
+        <div class="purchase-order-footer">
+        <input type="button" onclick="Cancel()" style="cursor: pointer;" title="Back" value="Back">
+            @if (Model.MaterialReservationId == 0)
+            {
+                if (Save == true)
+                {
+                    <input type="button" id="BtnSave" onclick="Save()" style="cursor: pointer;" title="Save" value="Save">
+                    <input type="hidden" id="HdnCurrencyExchangeID" />
+                }
+                else
+                {
+                    <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Save">
+                }
+            }
+            else
+            {
+                if (Update == true)
+                {
+                    <input type="button" onclick="Update()" style="cursor: pointer;" id="MaterialReservationId" title="Update" value="Update">
+                }
+                else
+                {
+                    <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Update">
+                }
+            }
+            
+    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+  
+    
+</script>

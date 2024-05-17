@@ -1,0 +1,266 @@
+﻿@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/LoginMaster.cshtml";
+}
+
+@model MMS.Web.Models.AccountModel.AccountModel
+@{
+    ViewBag.Title = "Login";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    function Login() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("LoginValidation", "Accounts")',
+            data: { Email: $('#Email').val(), Password: $('#Password').val() },
+            dataType: "json",
+            success: function (userr) {
+                if (userr.EmailExist == false) {
+                    location.href = "/Accounts/Index";
+                }
+                else {
+                    alert('Username and Password is Invalid');
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('This Email Already Exist in the database.');
+            }
+        });
+    }
+    function NewUserRegister() {
+        location.href = "/Accounts/Registration";
+    }
+    function Cancel() {
+        location.href = "";
+    }
+    function FnForgotPwd()
+    {
+        
+
+        $("#LiPassword").css("display", "none");
+        $("#Password").val("resetpwd");
+        $("#BtnSubmit").val("Reset Password");
+    }
+
+
+
+
+    $(document).ready(function () {
+        $("#forgotpassword").click(function () {
+            $('#myModal').modal('show');
+            $('#Forgotpasswordusername').val('');
+            $('#Forgotpasswordoldpassword').val('');
+            $('#Forgotpasswordnewpassword').val('');
+            $('#Forgotpasswordconformpassword').val('');
+            $("#newpasswordequalstooldpassword").html('');
+        });
+        //$('#myModal').modal({
+        //    backdrop: 'static',
+        //    keyboard: false
+        //})
+        $("#Submitforgotpassword").click(function () {
+            
+            var username =$('#Forgotpasswordusername').val();
+            //var oldpassword = $('#Forgotpasswordoldpassword').val();
+            var newpassword =$('#Forgotpasswordnewpassword').val();
+            var conformpassword =$('#Forgotpasswordconformpassword').val();
+
+            var isactive = true;
+            if (username=="")
+            {
+                $("#erroremail").html("Please Enter The User Name");
+                return false;
+
+            }
+            else {
+                $("#erroremail").html(" ");
+            }
+
+            //if (oldpassword=="")
+            //{
+            //    $("#erroroldpassword").html("Please Enter The Old Password");
+            //    return false;
+            //}
+            if (newpassword == "") {
+                $("#errornewpassword").html("Please Enter The New Password");
+                return false;
+            }
+            else {
+                $("#errornewpassword").html(" ");
+
+            }
+            if (conformpassword == "") {
+                $("#errorconformpassword").html("Please Enter The Conform Password");
+                return false;
+            }
+            else {
+                $("#errorconformpassword").html(" ");
+            }
+            if (newpassword == conformpassword)
+            {
+                $("#newpasswordequalstooldpassword").html(' ');
+                alert("fine");
+
+            }
+            else
+            {
+                $("#newpasswordequalstooldpassword").html("New Password and Conformation Password Not Matched");
+                return false;
+
+            }
+            //if (Title != "") {
+            //    isactive = true;
+
+            //}
+            //else {
+            //    isactive = false;
+            //    $("#editerrorTitle").html("Please Enter The Title").css("color", "red");
+            //    return false;
+            //}
+
+            if(isactive==true)
+            {
+                
+                var data = {
+                    'email': username,
+                    'password': conformpassword
+                }
+
+
+                $.ajax({
+                    type: 'POST',
+                    url: '../Accounts/Login',
+                    data: { Email: username, Password: conformpassword,Forgotpassword: "Forgotpassword" },
+                    // contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (data) {
+                        //alert("People deleted successfully");
+                        //location.reload();
+
+
+
+
+                    },
+                    error: function () {
+                        //alert("People delete has failed");
+                        //console.log(d);
+
+
+                    }
+                });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                @*$.ajax({
+                  type: "POST",
+                  url: '@Url.Action("Forgotpasswordnewformate", "Accounts")',
+                    data: data,
+                  dataType: "json",
+                    success: function (userr) {
+                        if (userr == true) {
+
+                        }
+                        else {
+                           alert('Username and Password is Invalid');
+                           return false;
+                        }
+
+                    },
+                   error: function (ex) {
+                       alert('This Email Already Exist in the database.');
+                   }
+               });*@
+            }
+
+        });
+    });
+
+
+
+
+</script>
+<div class="main-wrapper">
+    <div class="login-wrap">
+        <div class="login-container">
+            <div class="login-container-inner">
+                <div class="login-header">
+                    <img src="~/Content/Images/Logo.png" alt="logo" />
+                </div>
+                <div class="login-body">
+                    @using (Html.BeginForm("Login", "Accounts", FormMethod.Post))
+                    {
+                        @Html.Raw(TempData["msg"])
+                        <ul>
+                            <li>
+                                <h2>LOGIN</h2>
+                            </li>
+                            <li class="text-field">
+                                @Html.TextBoxFor(m => m.Email, new { @placeholder = "Enter User Name" })
+                            </li>
+                            <li class="text-field" id="LiPassword" style="display:block;">
+                                @Html.PasswordFor(m => m.Password, new { @placeholder = "Enter password" })
+                            </li>
+                            @*<li class="text-field" id="liConfirmPwd" style="display:none;">
+                                    <input type="text" id="txtConfirmPwd" placeholder="Enter Confirm password" />
+                                </li>*@
+                            @* <li class="forget-pass-wrap"><span onclick="FnForgotPwd()">Forgot Password</span></li>*@
+                            <li class="forget-pass-wrap" @*data-toggle="modal" data-target="#myModal"*@ id="forgotpassword"><span>Forgot Password</span></li>
+
+                            <li class="submit-button">
+                                <input type="submit" id="BtnSubmit" value="SUBMIT">
+
+                            </li>
+                            <li class="register-btn"><span onclick="NewUserRegister()">REGISTER</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span onclick="Cancel()">Cancel</span></li>
+                            @*<li class="register-btn"><span onclick="Cancel()">Cancel</span></li>*@
+                        </ul>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="myModal" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Forgot Password</h4>
+            </div>
+            <div class="modal-body">
+                User Name: <input type="text" id="Forgotpasswordusername" style="margin-left: 53px;" /><span id="erroremail" style="color:red"></span><br /><br />
+                @*Old Password:<input type="text" id="Forgotpasswordoldpassword" style="margin-left: 39px;" /><span id="erroroldpassword" style="color:red"></span><br /><br />*@
+                New Password:<input type="text" id="Forgotpasswordnewpassword" style="margin-left: 34px;" /><span id="errornewpassword" style="color:red"></span><br /><br />
+                Conform Password:<input type="text" id="Forgotpasswordconformpassword" style="margin-left: 12px;" /><span id="errorconformpassword" style="color:red"></span><br /><br />
+                <span id="newpasswordequalstooldpassword" style="color:red" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="Submitforgotpassword" class="btn btn-success">Submit</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>

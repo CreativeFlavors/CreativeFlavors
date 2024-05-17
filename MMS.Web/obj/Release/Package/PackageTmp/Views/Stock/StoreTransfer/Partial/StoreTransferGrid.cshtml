@@ -1,0 +1,250 @@
+﻿@model MMS.Web.Models.StockModel.StoreTransferModel
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+
+@{
+    MMS.Repository.Managers.MaterialCategoryManager materialCategoryManager = new MMS.Repository.Managers.MaterialCategoryManager();
+    MaterialCategoryMaster materialCategoryMaster = new MaterialCategoryMaster();
+    MMS.Repository.Managers.MaterialGroupManager materialGroupManager = new MMS.Repository.Managers.MaterialGroupManager();
+    materialgroupmaster materialGroupMaster_ = new materialgroupmaster();
+    MMS.Repository.Managers.ColorManager colorManager = new MMS.Repository.Managers.ColorManager();
+    ColorMaster colorMaster = new ColorMaster();
+    tbl_PermissionSetting PermissionSettingModel = new MMS.Core.Entities.tbl_PermissionSetting();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<tbl_Permission> PermissionModel = new List<tbl_Permission>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Store Transfer", PermissionSettingModel.PermissionID);
+    }
+    bool Add = false; bool Edit = false; bool Delete = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Add")
+        {
+            Add = true;
+        }
+        if (item.PermissionDesc == "Edit")
+        {
+            Edit = true;
+        }
+        if (item.PermissionDesc == "Delete")
+        {
+            Delete = true;
+        }
+    }
+}
+
+ <div class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+
+        <table class="veh-table" id="empTable">
+            <thead>
+                <tr class="color-code-top-btn">
+                    <td colspan="9">
+                        <input type="text" id="SeaarchID" placeholder="Search.." />
+                        @if (Add == true)
+                        {
+                            <input type="button" value="Add" onclick="Add()">
+                        }
+                        else
+                        {
+                            <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Add">
+                        }
+                        <input type="button" value="Search" onclick="Search()"></td>
+                </tr>
+                <tr>
+                    <th class="veh-1">Si.NO
+                    </th>
+                    <th class="veh-1">Category
+                    </th>
+                    <th class="veh-1">Group
+                    </th>
+                    <th class="veh-1">Material
+                    </th>
+                    <th class="veh-1">Colour 
+                    </th>
+                    <th class="veh-1">Rate
+                    </th>
+                    <th class="veh-1">Closing Stock All
+                    </th>
+                    <th class="veh-1">Closing Stock Current
+                    </th>
+                    <th class="veh-4">Edit/Delete
+                    </th>
+
+                </tr>
+            </thead>
+            @if (Model.storeTransferList.Count > 0 && Model.storeTransferList != null)
+            {
+                int count = 1;
+                <tbody>
+
+                    @foreach (var storeTransf in Model.storeTransferList)
+                    {
+                        materialCategoryMaster = materialCategoryManager.GetMaterialCategoryMaster(storeTransf.MaterialCategoryId);
+                        materialGroupMaster_ = materialGroupManager.GetmaterialgroupmasterId(storeTransf.MaterialGroupId);
+                        colorMaster = colorManager.GetColorMasterID(storeTransf.ColourMasterId);
+                        <tr>
+                            <td class="veh-1" onclick="">@count</td>
+                            <td class="veh-1" onclick="">@materialCategoryMaster.CategoryName</td>
+                            <td class="veh-1" onclick="">@materialGroupMaster_.GroupName</td>
+                            <td class="veh-1" onclick="">@storeTransf.MaterialMasterId</td>
+                            <td class="veh-1" onclick="">@colorMaster.Color</td>
+                            <td class="veh-1" onclick="">@storeTransf.Rate</td>
+                            <td class="veh-1" onclick="">@storeTransf.ClosingInAllStores</td>
+                            <td class="veh-1" onclick="">@storeTransf.ClosingInCurrentStores</td>
+                           
+                            <td class="veh-1 edit-del-wrap">
+                                @if (Edit == true)
+                                {
+                                    <a href="javascript:void(0)" onclick="Edit('@storeTransf.StoreTransferId')" class="watchlist-edit" title="Edit"></a>
+                                }
+                                else
+                                {
+                                    <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-edit" title="Edit"></a>
+                                }
+                                @if (Delete == true)
+                                {
+                                    <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@storeTransf.StoreTransferId')" class="watchlist-delete" title="Delete"></a>
+                                }
+                                else
+                                {
+                                    <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-delete" title="Delete"></a>
+                                }
+                            </td>
+                        </tr>
+                        count++;
+                    }
+
+
+                </tbody>
+                <tfoot class="footer-pager">
+                    <tr>
+                        <td colspan="4">
+                            <div id="pager">
+                                <form>
+                                    <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                    <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                    <input type="text" class="pagedisplay" />
+                                    <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                    <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                    <select class="pagesize">
+                                        <option selected="selected" value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="40">40</option>
+                                    </select>
+                                </form>
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                </tfoot>
+                
+            }
+            else
+            {
+                <li style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</li>
+            }
+        </table>
+
+    </div>
+
+    <div id="EditColorPartial">
+       @Html.Partial("~/Views/Stock/StoreTransfer/Partial/StoreTransferDetails.cshtml", Model)
+    </div>
+
+
+</div>
+
+ <script>
+     $(document).ajaxStart(function () {
+         $(".loader-overlay").css("display", "block");
+     });
+
+     $(document).ajaxComplete(function () {
+         $(".loader-overlay").css("display", "none");
+     });
+     $(window).load(function () {
+         $('.loader-overlay').fadeOut('fast');
+     });
+
+     function Search() {
+         $.ajax({
+             type: "POST",
+             url: ' @Url.Action("Search", "StoreTransferForm")',
+             data: { filter: $('#SeaarchID').val() },
+             success: function (data) {
+                 $(".veh-tablewrap").html(data);
+                 $(".veh-tablewrap").show();
+                 $('#DivShow').hide();
+                 $('#EditColorPartial').hide();
+             }
+         });
+     }
+     
+     function Cancel() {
+          
+         location.reload();
+     }
+     function Add() {
+         $.ajax({
+             type: "POST",
+             url: ' @Url.Action("StoreTransferDetails", "StoreTransferForm")',
+             data: { StoreTransferId: 0 },
+             success: function (data) {
+                 $('.veh-tablecont').hide();
+                 $("#EditColorPartial").html(data);
+                 $("#EditColorPartial").show();
+             }
+         });
+
+     }
+     function Edit(arg) {
+         $.ajax({
+             type: "POST",
+             url: ' @Url.Action("StoreTransferDetails", "StoreTransferForm")',
+             data: { StoreTransferId: arg },
+             success: function (data) {
+                 $('.veh-tablecont').hide();
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "StoreTransferForm")',
+                data: { StoreTransferId: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/StoreTransferForm/StoreTransfer/";
+                        return false;
+                    }
+                    else {
+                        alert('Color Details deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+
+</script>
+ 

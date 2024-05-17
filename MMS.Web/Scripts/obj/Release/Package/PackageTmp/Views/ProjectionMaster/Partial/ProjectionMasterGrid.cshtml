@@ -1,0 +1,212 @@
+﻿@model MMS.Web.Models.ProjectionMasterModel.ProjectionMasterModel
+@using MMS.Repository.Managers
+@using MMS.Core.Entities
+@{
+    ProjectionManager ProjectionManager = new ProjectionManager();
+    List<ProjectionMaster> projectionMasterlist = new List<ProjectionMaster>();
+    //projectionMasterlist=  ProjectionManager.Get();
+    //Model.ProjectionMasterList=projectionMasterlist;
+}
+<div class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+        <div class="table-responsive table-td-padding padding-lr-6px table-row-bg" style="overflow: auto;">
+            <table class="veh-table" id="empTable">
+                <thead>
+                    <tr class="color-code-top-btn">
+                        <td colspan="13">
+                            <input type="text" id="SeaarchID" placeholder="Search.." /><input type="button" value="Add" onclick="Add()">
+                            <input type="button" value="Search" onclick="    Search()">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="veh-1">
+                            Si. NO
+                        </th>
+                        <th class="veh-2">
+                            Order Indication No
+                        </th>
+                        <th class="veh-3">
+                            Buyer Name
+                        </th>
+                        <th class="veh-4">
+                            Season
+                        </th>
+                        <th class="veh-5">
+                            Style
+                        </th>
+                        <th class="veh-6">
+                            Date
+                        </th>
+                        <th class="veh-7">
+                            Week No
+                        </th>
+                        <th class="veh-8">
+                            Customer Plan
+                        </th>
+                        <th class="veh-9">
+                            Quantity
+                        </th>
+                        <th class="veh-10">
+                            Size Information
+                        </th>
+                        <th class="veh-11">
+                            Size Range
+                        </th>
+                        <th class="veh-12">
+                            Edit/Delete
+                        </th>
+                    </tr>
+                </thead>
+            @if (Model.ProjectionMasterList != null && Model.ProjectionMasterList.Count > 0)
+            {
+                int count = 1;
+            <tbody>
+
+                @foreach (var projection in Model.ProjectionMasterList)
+                    {
+
+                    <tr>
+                        <td class="veh-1" onclick="">@count</td>
+                        <td class="veh-2">@projection.OrderIndicationNo</td>
+                        <td class="veh-3">@projection.BuyerMasterId</td>
+                        <td class="veh-4">@projection.SeasonMasterId</td>
+                        <td class="veh-5">@projection.Style</td>
+                        <td class="veh-6">@Convert.ToDateTime(projection.Date).Date.ToString("dd/MM/yyyy")</td>
+                        <td class="veh-7">@projection.WeekNo</td>
+                        <td class="veh-8">@projection.CustomerPlan</td>
+                        <td class="veh-9">@projection.Quantity</td>
+                        <td class="veh-10">@projection.IsSize</td>
+                        <td class="veh-11">@projection.SizeRangeMasterId</td>
+
+                        <td class="veh-12 edit-del-wrap">
+                            <a href="javascript:void(0)" onclick="Edit('@projection.ProjectionId')" class="watchlist-edit" title="Edit"></a>
+                            <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@projection.ProjectionId')" class="watchlist-delete" title="Delete"></a>
+
+                        </td>
+                    </tr>
+                        count++;
+                    }
+
+
+            </tbody>
+            <tfoot class="footer-pager">
+                <tr>
+                    <td colspan="4">
+                        <div id="pager">
+                            <form>
+                                <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                <input type="text" class="pagedisplay" />
+                                <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                <select class="pagesize">
+                                    <option selected="selected" value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="30">30</option>
+                                    <option value="40">40</option>
+                                </select>
+                            </form>
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            </tfoot>
+
+            }
+            </table>
+            @if (Model.ProjectionMasterList != null && Model.ProjectionMasterList.Count == 0)
+            {
+                <div style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+            }
+        </div>
+        </div>
+
+    <div id="EditColorPartial">
+        @Html.Partial("Partial/ProjectionMasterDetails", Model)
+    </div>
+
+
+</div>
+
+
+<script>
+    function Search() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Search", "ProjectionMaster")',
+            data: { filter: $('#SeaarchID').val() },
+            success: function (data) {
+                //console.log(data);
+                //$('#DivShow').hide();
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                $('#DivShow').hide();
+                $('#EditColorPartial').hide();
+            }
+        });
+    }
+    
+    function Cancel() {
+        //$('#EditColorPartial').hide()
+        location.reload();
+    }
+    function Add() {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("ProjectionMasterDetails", "ProjectionMaster")',
+            data: { ProjectionId: 0 },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+        $("#EditColorPartial").show();
+    }
+    function Edit(arg) {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("ProjectionMasterDetails", "ProjectionMaster")',
+            data: { ProjectionId: arg },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+        $("#EditColorPartial").show();
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "ProjectionMaster")',
+                data: { ProjectionId: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/ProjectionMaster/ProjectionMaster";
+                        return false;
+                    }
+                    else {
+                        alert('deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+
+</script>

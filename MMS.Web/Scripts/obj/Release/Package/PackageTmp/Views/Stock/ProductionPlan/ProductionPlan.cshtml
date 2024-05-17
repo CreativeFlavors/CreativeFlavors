@@ -1,0 +1,381 @@
+﻿@{
+    ViewBag.Title = "ProductionPlan";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+
+<script>
+    $(document).ready(function () {
+        $('#EditColorPartial').hide();
+    })
+
+    function Save()
+    {
+        if ($('#PlanNo').val() == "") {
+            alert("Please Enter PlanNo.")
+            $('#PlanNo').css('border-color', 'red');
+            $('#PlanNo').focus();
+            return false;
+        }
+        else {
+            $('#PlanNo').css('border-color', '');
+        }
+        if ($('#InHouseCapacity').val() == "") {
+            alert("Please Enter In House Capacity.")
+            $('#InHouseCapacity').css('border-color', 'red');
+            $('#InHouseCapacity').focus();
+            return false;
+        }
+        else {
+            $('#InHouseCapacity').css('border-color', '');
+        }
+        if ($('#ShipDate').val() == "") {
+            alert("Please Enter ShipDate.")
+            $('#ShipDate').css('border-color', 'red');
+            $('#ShipDate').focus();
+            return false;
+        }
+        else {
+            $('#ShipDate').css('border-color', '');
+        }
+        if ($('#ShipTo').val() == "") {
+            alert("Please Enter ShipTo.")
+            $('#ShipTo').css('border-color', 'red');
+            $('#ShipTo').focus();
+            return false;
+        }
+        else {
+            $('#ShipTo').css('border-color', '');
+        }
+        if ($('#CustomerName').val() == "") {
+            alert("Please Enter Customer Name.")
+            $('#CustomerName').css('border-color', 'red');
+            $('#CustomerName').focus();
+            return false;
+        }
+        else {
+            $('#CustomerName').css('border-color', '');
+        }
+        if ($('#OrderQty').val() == "") {
+            alert("Please Enter Order Qty.")
+            $('#OrderQty').css('border-color', 'red');
+            $('#OrderQty').focus();
+            return false;
+        }
+        else {
+            $('#OrderQty').css('border-color', '');
+        }
+        if ($('#WeekPlan').val() == "") {
+            alert("Please Enter Week Plan.")
+            $('#WeekPlan').css('border-color', 'red');
+            $('#WeekPlan').focus();
+            return false;
+        }
+        else {
+            $('#WeekPlan').css('border-color', '');
+        }
+        if ($('#PlanQty').val() == "") {
+            alert("Please Enter Plan Qty.")
+            $('#PlanQty').css('border-color', 'red');
+            $('#PlanQty').focus();
+            return false;
+        }
+        else {
+            $('#PlanQty').css('border-color', '');
+        }
+        if ($('#From').val() == "") {
+            alert("Please Enter From.")
+            $('#From').css('border-color', 'red');
+            $('#From').focus();
+            return false;
+        }
+        else {
+            $('#From').css('border-color', '');
+        }
+        if ($('#To').val() == "") {
+            alert("Please Enter To.")
+            $('#To').css('border-color', 'red');
+            $('#To').focus();
+            return false;
+        }
+        else {
+            $('#To').css('border-color', '');
+        }
+        if ($('#DisplayIO').val() == "") {
+            alert('Please Select DisplayIO');
+            $('#DisplayIO').css('border-color', 'red');
+            $('#DisplayIO').focus();
+            return false;
+        }
+        else {
+            $('#DisplayIO').css('border-color', '');
+        }
+        if ($('#PlanQtyInMultiples').val() == "") {
+            alert("Please Select PlanQty In Multiples.")
+            $('#PlanQtyInMultiples').css('border-color', 'red');
+            $('#PlanQtyInMultiples').focus();
+            return false;
+        }
+        else {
+            $('#PlanQtyInMultiples').css('border-color', '');
+        }
+        if ($('#Remarks').val() == "") {
+            alert("Please Select Remarks.")
+            $('#Remarks').css('border-color', 'red');
+            $('#Remarks').focus();
+            return false;
+        }
+        else {
+            $('#Remarks').css('border-color', '');
+        }
+
+        
+
+        var AddSelectedIoNo = "";
+
+        var selectedValues = $.map($('#DisplayIO option:selected'), function (element) {
+
+            AddSelectedIoNo = AddSelectedIoNo + element.value + ",";
+
+        });
+
+        var DisplayIO1 = $('#DisplayIO').val();
+        if (DisplayIO1 == null) {
+            DisplayIO1 = "";
+        }
+        DisplayIO1 = DisplayIO1.toString();
+
+        $.ajax({
+            type: 'POST',
+            url: '/ProductionPlan/ProductionPlan/',
+            data: {
+                ProductionPlanId : $('#ProductionPlanId').val(),
+                PlanNo: $('#PlanNo').val(),
+                InHouseCapacity: $('#InHouseCapacity').val(),
+                ShipDate: $('#ShipDate').val(),
+                ShipTo: $('#ShipTo').val(),
+                CustomerName: $('#CustomerName').val(),
+                OrderQty: $('#OrderQty').val(),
+                WeekPlan: $('#WeekPlan').val(),
+                PlanQty: $('#PlanQty').val(),
+                IsStyleDurea: $('#IsStyleDurea').is(":checked"),
+                IsStyle: $('#IsStyle').is(":checked"),
+                IsSelectAll: $('#IsSelectAll').is(":checked"),
+                From: $('#From').val(),
+                To: $('#To').val(),
+                //IoNo: $('#IoNo').val(),
+                PlanQtyInMultiples: $('#PlanQtyInMultiples').val(),
+                Remarks: $('#Remarks').val(),
+                IsAllocateStyleProp: $('#IsAllocateStyleProp').is(":checked"),
+                IsAllocateSizeProp: $('#IsAllocateSizeProp').is(":checked"),
+                DisplayIO: AddSelectedIoNo,
+            },
+            success: function (data) {
+                if (data.ProductionPlanId != "" || data.ProductionPlanId != 0) {
+                    alert('Saved successfully.');
+                    location.href = "/ProductionPlan/ProductionPlan/";
+                    return false;
+                }
+                else {
+                    alert('Saved Process Failed.');
+                    location.href = "/ProductionPlan/ProductionPlan/"
+                }
+            },
+            error: function (ex) {
+                alert('Already Exist in the Database');
+            }
+        })
+    }
+
+    function Update()
+    {
+        if ($('#PlanNo').val() == "") {
+            alert("Please Enter PlanNo.")
+            $('#PlanNo').css('border-color', 'red');
+            $('#PlanNo').focus();
+            return false;
+        }
+        else {
+            $('#PlanNo').css('border-color', '');
+        }
+        if ($('#InHouseCapacity').val() == "") {
+            alert("Please Enter In House Capacity.")
+            $('#InHouseCapacity').css('border-color', 'red');
+            $('#InHouseCapacity').focus();
+            return false;
+        }
+        else {
+            $('#InHouseCapacity').css('border-color', '');
+        }
+        if ($('#ShipDate').val() == "") {
+            alert("Please Enter ShipDate.")
+            $('#ShipDate').css('border-color', 'red');
+            $('#ShipDate').focus();
+            return false;
+        }
+        else {
+            $('#ShipDate').css('border-color', '');
+        }
+        if ($('#ShipTo').val() == "") {
+            alert("Please Enter ShipTo.")
+            $('#ShipTo').css('border-color', 'red');
+            $('#ShipTo').focus();
+            return false;
+        }
+        else {
+            $('#ShipTo').css('border-color', '');
+        }
+        if ($('#CustomerName').val() == "") {
+            alert("Please Enter Customer Name.")
+            $('#CustomerName').css('border-color', 'red');
+            $('#CustomerName').focus();
+            return false;
+        }
+        else {
+            $('#CustomerName').css('border-color', '');
+        }
+        if ($('#OrderQty').val() == "") {
+            alert("Please Enter Order Qty.")
+            $('#OrderQty').css('border-color', 'red');
+            $('#OrderQty').focus();
+            return false;
+        }
+        else {
+            $('#OrderQty').css('border-color', '');
+        }
+        if ($('#WeekPlan').val() == "") {
+            alert("Please Enter Week Plan.")
+            $('#WeekPlan').css('border-color', 'red');
+            $('#WeekPlan').focus();
+            return false;
+        }
+        else {
+            $('#WeekPlan').css('border-color', '');
+        }
+        if ($('#PlanQty').val() == "") {
+            alert("Please Enter Plan Qty.")
+            $('#PlanQty').css('border-color', 'red');
+            $('#PlanQty').focus();
+            return false;
+        }
+        else {
+            $('#PlanQty').css('border-color', '');
+        }
+        if ($('#From').val() == "") {
+            alert("Please Enter From.")
+            $('#From').css('border-color', 'red');
+            $('#From').focus();
+            return false;
+        }
+        else {
+            $('#From').css('border-color', '');
+        }
+        if ($('#To').val() == "") {
+            alert("Please Enter To.")
+            $('#To').css('border-color', 'red');
+            $('#To').focus();
+            return false;
+        }
+        else {
+            $('#To').css('border-color', '');
+        }
+        if ($('#DisplayIO').val() == "") {
+            alert('Please Select DisplayIO');
+            $('#DisplayIO').css('border-color', 'red');
+            $('#DisplayIO').focus();
+            return false;
+        }
+        else {
+            $('#DisplayIO').css('border-color', '');
+        }
+        if ($('#PlanQtyInMultiples').val() == "") {
+            alert("Please Select PlanQty In Multiples.")
+            $('#PlanQtyInMultiples').css('border-color', 'red');
+            $('#PlanQtyInMultiples').focus();
+            return false;
+        }
+        else {
+            $('#PlanQtyInMultiples').css('border-color', '');
+        }
+        if ($('#Remarks').val() == "") {
+            alert("Please Select Remarks.")
+            $('#Remarks').css('border-color', 'red');
+            $('#Remarks').focus();
+            return false;
+        }
+        else {
+            $('#Remarks').css('border-color', '');
+        }
+
+        var AddSelectedIoNo = "";
+
+        var selectedValues = $.map($('#DisplayIO option:selected'), function (element) {
+
+            AddSelectedIoNo = AddSelectedIoNo + element.value + ",";
+
+        });
+
+        var DisplayIO1 = $('#DisplayIO').val();
+        if (DisplayIO1 == null) {
+            DisplayIO1 = "";
+        }
+        DisplayIO1 = DisplayIO1.toString();
+
+        $.ajax({
+            type: 'POST',
+            url: '/ProductionPlan/Update/',
+            data: {
+                ProductionPlanId: $('#ProductionPlanId').val(),
+                PlanNo: $('#PlanNo').val(),
+                InHouseCapacity: $('#InHouseCapacity').val(),
+                ShipDate: $('#ShipDate').val(),
+                ShipTo: $('#ShipTo').val(),
+                CustomerName: $('#CustomerName').val(),
+                OrderQty: $('#OrderQty').val(),
+                WeekPlan: $('#WeekPlan').val(),
+                PlanQty: $('#PlanQty').val(),
+                IsStyleDurea: $('#IsStyleDurea').is(":checked"),
+                IsStyle: $('#IsStyle').is(":checked"),
+                IsSelectAll: $('#IsSelectAll').is(":checked"),
+                From: $('#From').val(),
+                To: $('#To').val(),
+               // IoNo: $('#IoNo').val(),
+                PlanQtyInMultiples: $('#PlanQtyInMultiples').val(),
+                Remarks: $('#Remarks').val(),
+                IsAllocateStyleProp: $('#IsAllocateStyleProp').is(":checked"),
+                IsAllocateSizeProp: $('#IsAllocateSizeProp').is(":checked"),
+                DisplayIO: AddSelectedIoNo,
+            },
+
+            success: function (data)
+            {
+                if (data.ProductionPlanId != "" || data.ProductionPlanId != 0) {
+                    alert('Updated Successfully');
+                    location.href = "/ProductionPlan/ProductionPlan/";
+                    return false;
+                }
+                else {
+                    alert('Updated Failed');
+                    location.href = "/ProductionPlan/ProductionPlan/";
+                    return false;
+                }
+            },
+            error: function (ex)
+            {
+                alert('Already Exist in the Database');
+            }
+
+        })
+    }
+
+</script>
+
+<h2 class="content-title">Production Planning</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("ProductionPlanGrid", "ProductionPlan")
+    </div>
+</div>

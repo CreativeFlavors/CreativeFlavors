@@ -1,0 +1,866 @@
+﻿@model MMS.Web.Models.StockModel.OrderEntryModel
+@using MMS.Repository.Managers.StockManager
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+@{
+    ViewBag.Title = "Order Entry";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Buyer Order</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+    <script type="text/javascript">
+
+        $(function () {
+            
+
+            $("input:file[id=uploadBtn]").change(function () {
+
+                $("#uploadFile").val($(this).val());
+
+                $("span.uploadBtn").text("upload");
+
+            });
+
+            var lineNoCount = $("#list-amended-material tbody tr").length;
+            $("#lineNo").html(lineNoCount + 1);
+
+        });
+
+    </script>
+</head>
+<body>
+    <h2 class="content-title">Internal Order</h2>
+    <div style="width: 100%; float: left;">
+        <div id="tabVehicleWatchList">
+            @Html.Action("InternalOrderEntryFormGrid", "InternalOrderForm")
+        </div>
+    </div>
+
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+</body>
+</html>
+
+<script type="text/javascript">
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    $(function () {
+        $('.loader-overlay').ajaxStart(function () {
+            $(this).fadeIn('slow');
+        }).ajaxStop(function () {
+            $(this).stop().fadeOut('fast');
+        });
+    });
+    $(document).ready(function () {
+        $(function () {
+            $("#Date").datepicker({ dateFormat: "dd/mm/yy", maxDate: new Date() });
+            $("#CustomerDate").datepicker({ dateFormat: "dd/mm/yy", maxDate: new Date() });
+            $("#ExFactoryDate").datepicker({ dateFormat: "dd/mm/yy", maxDate: new Date() });
+            
+
+        });
+        $("#EditColorPartial").hide();
+    });
+    function Save() {
+        var rowCount = $('#list-amended-material tr').length - 1;
+        if (rowCount == 0) {
+  
+            if (validation()) {
+
+                var qtyCount = 0;
+                var qtyArr = [];
+                $('#TotalAmount').val($('#TotalAmount').text().trim());
+                var qtyCount = 0;
+                var qtyArr = [];
+                $('#sizeRangeTable tbody tr').each(function () {
+                    
+                    qtyCount++
+                    qtyArr.push(
+                        {
+                            Size: $(this).find('.sizeVal').text(),
+                            quantity: $(this).find('.qty_Total').val(),
+                            Rate: $(this).find('.sizeRate').val()
+                        });
+                  
+                    console.log(qtyArr)
+
+                });
+                $('#SizeQuantityRate').val(JSON.stringify(qtyArr));
+         
+
+                var scheduleArr = [];
+
+                $('#multipleScheduleTable tbody tr').each(function () {
+
+                    scheduleArr.push(
+                            {
+                                Io: $(this).find('td:first').html(),
+                                Size: $(this).find('td:nth-child(2) input[type=text]').val(),
+                                quantity: $(this).find('td:nth-child(3) input[type=text]').val(),
+                                Date: $(this).find('td:nth-child(4) input[type=text]').val()
+                            });
+
+                });
+
+                $('#MultipleSchedule').val(JSON.stringify(scheduleArr));
+
+                var packingDetailsArr = [];
+
+                $("#packingDetailsTable tbody tr").each(function () {
+
+                    packingDetailsArr.push(
+                        {
+                            PackingType: $(this).find('.PackingType').html(),
+                            SizeRangeMasterId: $(this).find('.PackageSizeRangeMasterId').html(),
+                            Size: $(this).find('input[type=text]').val()
+                        });
+
+                });
+
+                $("#PackingDetail").val(JSON.stringify(packingDetailsArr));
+                var input = $("<input>")
+            .attr("type", "hidden")
+            .attr("name", "TotalAmount_").val($('#TotalAmount').text().trim());
+                var amount = $('#TotalAmount').text().trim();
+                var forms = $("#buyer-form").serialize() + '&TotalAmount=' + amount;
+
+                if ($("#list-amended-material tbody tr").length == 0) {
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/InternalOrderForm/InternalOrderForm',
+                        data: forms,
+                        success: function (data) {
+                            if (data == 1) {
+                                alert('Saved Successfully.');
+                                location.href = "/InternalOrderForm/BuyerOrderEntryFormView";
+                                return false;
+                            }
+                            else if (data == 2) {
+                                alert('Updated Successfully.');
+                                location.href = "/InternalOrderForm/BuyerOrderEntryFormView";
+                                return false;
+                            }
+                            else if (data == 3) {
+                                alert('Already Existed.');
+                                return false;
+                            }
+                            else {
+                                alert('Save process Failed.');
+                                location.href = "/InternalOrderForm/BuyerOrderEntryFormView";
+                                return false;
+                            }                           
+                        }
+                    });
+
+                }
+            }
+        }
+        else {
+         
+            var wholeJsonList = [];
+
+            $('#list-amended-material tbody tr').each(function () {
+                wholeJsonList.push(
+                    {
+                        BuyerOrderSlNo: $(this).find('span').html(),
+                        Date: $(this).find('.Date').html(),
+                        BuyerSeason: $(this).find('.BuyerSeason').html(),
+                        BuyerName: $(this).find('.BuyerName').html(),
+                        OrderProjectionNo: $(this).find('.OrderProjectionNo').html(),
+                        BuyerPoNo: $(this).find('.BuyerPoNo').html(),
+                        OurStyle: $(this).find('.OurStyle').html(),
+                        LeatherDescription: $(this).find('.LeatherDescription').html(),
+                        DiscountPer: $(this).find('.DiscountPer').html(),
+                        QuoteNo: $(this).find('.QuoteNo').html(),
+                        CountryStamp: $(this).find('.CountryStamp').html(),
+                        CustomerPlan: $(this).find('.CustomerPlan').html(),
+                        CustomerDate: $(this).find('.CustomerDate').html(),
+                        AgentMasterId: $(this).find('.AgentMasterId').html(),
+                        CommPer: $(this).find('.CommPer').html(),
+                        ExFactoryDate: $(this).find('.ExFactoryDate').html(),
+                        ShipmentMode: $(this).find('.ShipmentMode').html(),
+                        Remarks1: $(this).find('.Remarks1').html(),
+                        Remarks2: $(this).find('.Remarks2').html(),
+                        LotNo: $(this).find('.LotNo').html(),
+                        Count: $(this).find('.Count').html(),
+                        WeekNo: $(this).find('.WeekNo').html(),
+                        SampleReqNo: $(this).find('.SampleReqNo').html(),
+                        Brand: $(this).find('.Brand').html(),
+                        BuyerStyleNo: $(this).find('.BuyerStyleNo').html(),
+                        BarCodeNo: $(this).find('.BarCodeNo').html(),
+                        BomNo: $(this).find('.BomNo').html(),
+                        Last: $(this).find('.Last').html(),
+                        ColorMasterId: $(this).find('.ColorMasterId').html(),
+                        FinishedProdType: $(this).find('.FinishedProdType').html(),
+                        ProductTypeId: $(this).find('.ProductTypeId').html(),
+                        packType: $(this).find('.packType').html(),
+                        noOfCarton: $(this).find('.noOfCarton').html(),
+                        AmendmentNoWithDate: $(this).find('.AmendmentNoWithDate').html(),
+                        TotalOrderForWeek: $(this).find('.TotalOrderForWeek').html(),
+                        OrderType: $(this).find('.OrderType').html(),
+                        Currency: $(this).find('.Currency').html(),
+                        Rs: $(this).find('.Rs').html(),
+                        Parties: $(this).find('.Parties').html(),
+                        PartiesAmount1: $(this).find('.PartiesAmount1').html(),
+                        ShortUnitID: $(this).find('.ShortUnitID').html(),
+                        PartiesAmount2: $(this).find('.PartiesAmount2').html(),
+                        LongUnitID: $(this).find('.LongUnitID').html(),
+                        GradeMasterId: $(this).find('.GradeMasterId').html(),
+                        SizeRangeMasterId: $(this).find('.SizeRangeMasterId').html(),
+                        ShipmentCountryStamp: $(this).find('.ShipmentCountryStamp').html(),
+                        ShipmentFrom: $(this).find('.ShipmentFrom').html(),
+                        ShipmentTo: $(this).find('.ShipmentTo').html(),
+                        OtherInstruction: $(this).find('.OtherInstruction').html(),
+                        PaymentTerms: $(this).find('.PaymentTerms').html(),
+                        DeliveryTerms: $(this).find('.DeliveryTerms').html(),
+                        Insurance: $(this).find('.Insurance').html(),
+                        DeliveryTo: $(this).find('.DeliveryTo').html(),
+                        SpecialInstruction: $(this).find('.SpecialInstruction').html(),
+                        PackingLabeling: $(this).find('.PackingLabeling').html(),
+                        SEASON: $(this).find('.SEASON').html(),
+                        Purchase: $(this).find('.Purchase').html(),
+                        TotalAmount: $('#TotalAmount').text().trim(),
+
+                       
+
+                        MultipleSchedule: JSON.stringify(scheduleArr),
+                        SizeQuantityRate: $(this).find('.sizerange').text(),
+                        PackingDetail: JSON.stringify(packingDetailsArr),
+                        
+                    });
+            });
+
+            var wholeJsonListLength = wholeJsonList.length;
+         
+            var i = 0;
+            for (i = 0; i <= wholeJsonListLength - 1; i++) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/InternalOrderForm/InternalOrderForm',
+                    data: wholeJsonList[i],
+                    success: function (data) {
+                        if (data == 1) {
+                            alert('Saved Successfully.');
+                            location.href = "/InternalOrderForm/BuyerOrderEntryFormView";
+                            return false;
+                        }
+                        else if (data == 2) {
+                            alert('Updated Successfully.');
+                            location.href = "/InternalOrderForm/BuyerOrderEntryFormView";
+                            return false;
+                        }
+                        else if (data == 3) {
+                            alert('Already Existed.');
+                            return false;
+                        }
+                        else {
+                            alert('Save process Failed.');
+                            location.href = "/InternalOrderForm/BuyerOrderEntryFormView";
+                            return false;
+                        }
+                    }
+                });
+            }
+        }
+    }
+    function Update() {
+
+        if (validation()) {
+
+            var qtyCount = 0;
+            var qtyArr = [];
+            $('#sizeRangeTable tbody tr').each(function () {
+                //if ($(this).find('input[type=text]').val() != 0) {
+                    qtyCount++
+                    qtyArr.push(
+                        {
+                            Size: $(this).find('td:first').html(),
+                            quantity: $(this).find('input[type=text]').val(),
+                            Rate: $(this).find('input[type=text]').val()
+                        });
+                //}
+
+            });
+           
+            $('#SizeQuantityRate').val(JSON.stringify(qtyArr));
+ 
+
+            var scheduleArr = [];
+            $('#TotalAmount').val($('#TotalAmount').text().trim());
+      
+            $('#multipleScheduleTable tbody tr').each(function () {
+
+                scheduleArr.push(
+                        {
+                            Io: $(this).find('td:first').html(),
+                            Size: $(this).find('td:nth-child(2) input[type=text]').val(),
+                            quantity: $(this).find('td:nth-child(3) input[type=text]').val(),
+                            Date: $(this).find('td:nth-child(4) input[type=text]').val()
+                        });
+
+            });
+
+            $('#MultipleSchedule').val(JSON.stringify(scheduleArr));
+
+            var packingDetailsArr = [];
+
+            $("#packingDetailsTable tbody tr").each(function () {
+
+                packingDetailsArr.push(
+                    {
+                        PackingType: $(this).find('.PackingType').html(),
+                        SizeRangeMasterId: $(this).find('.PackageSizeRangeMasterId').html(),
+                        Size: $(this).find('input[type=text]').val()
+                    });
+            });
+            $("#PackingDetail").val(JSON.stringify(packingDetailsArr));
+            var input = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "TotalAmount_").val($('#TotalAmount').text().trim());
+            var amount = $('#TotalAmount').text().trim();
+            var forms = $("#buyer-form").serialize() + '&TotalAmount=' + amount;
+            setTimeout(function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '/InternalOrderForm/InternalOrderForm',
+                    data: forms,
+                    dataType: 'json',
+                    success: function (data) {
+
+                        if (data == true) {
+                            if ($("#BtnSave").val() == "Save") {
+                                alert('Saved Successfully.');
+                            }
+                            else {
+                                alert('Updated Successfully.');
+                            }
+                      
+                            location.href = "/InternalOrderForm/BuyerOrderEntryFormView";
+                            return false;
+                        }
+                        else {
+                            alert('Save process Failed.');
+                            location.href = "/InternalOrderForm/BuyerOrderEntryFormView";
+                            return false;
+                        }
+                    }
+                });
+            }, 500);
+        }
+    }
+    function validation() {
+        if ($('#BuyerOrderSlNo').val() == "") {
+            alert("Please Enter BuyerOrder SlNo.")
+            $('#BuyerOrderSlNo').css('border-color', 'red');
+            $('#BuyerOrderSlNo').focus();
+            return false;
+        }
+        else {
+            $('#BuyerOrderSlNo').css('border-color', '');
+        }
+        if ($('#Date').val() == "") {
+            alert("Please Enter Date.")
+            $('#Date').css('border-color', 'red');
+            $('#Date').focus();
+            return false;
+        }
+        else {
+            $('#Date').css('border-color', '');
+        }
+        if ($('#BuyerSeason').val() == "") {
+            alert("Please Select Buyer Season.")
+            $('#BuyerSeason').css('border-color', 'red');
+            $('#BuyerSeason').focus();
+            return false;
+        }
+        else {
+            $('#BuyerSeason').css('border-color', '');
+        }
+        if ($('#BuyerName').val() == "") {
+            alert("Please select Buyer Name.")
+            $('#BuyerName').css('border-color', 'red');
+            $('#BuyerName').focus();
+            return false;
+        }
+        else {
+            $('#BuyerName').css('border-color', '');
+        }
+      
+        if ($('#OurStyle').val() == "") {
+            alert("Please Select Our Style.")
+            $('#OurStyle').css('border-color', 'red');
+            $('#OurStyle').focus();
+            return false;
+        }
+        else {
+            $('#OurStyle').css('border-color', '');
+        }
+
+        if ($('#LotNo').val() == "") {
+            alert("Please Enter LotNo.")
+            $('#LotNo').css('border-color', 'red');
+            $('#LotNo').focus();
+            return false;
+        }
+        else {
+            $('#LotNo').css('border-color', '');
+        }
+
+        if ($('#OrderType').val() == "") {
+            alert("Please Select Order Type.")
+            $('#OrderType').css('border-color', 'red');
+            $('#OrderType').focus();
+            return false;
+        }
+        else {
+            $('#OrderType').css('border-color', '');
+        }
+ 
+
+        if ($('#BuyerStyleNo').val() == "") {
+            alert("Please Select Buyer Style No.")
+            $('#BuyerStyleNo').css('border-color', 'red');
+            $('#BuyerStyleNo').focus();
+            return false;
+        }
+        else {
+            $('#BuyerStyleNo').css('border-color', '');
+        }
+
+    
+
+        if ($('#Last').val() == "") {
+            alert("Please select Last no.")
+            $('#Last').css('border-color', 'red');
+            $('#Last').focus();
+            return false;
+        }
+        else {
+            $('#Last').css('border-color', '');
+        }
+
+        if ($('#ColorMasterId').val() == "") {
+            alert("Please Select Color Master.")
+            $('#ColorMasterId').css('border-color', 'red');
+            $('#ColorMasterId').focus();
+            return false;
+        }
+        else {
+            $('#ColorMasterId').css('border-color', '');
+        }
+
+  
+
+        if ($('#SizeRangeMasterId').val() == "") {
+            alert("Please Select Size Range Master Name.")
+            $('#SizeRangeMasterId').css('border-color', 'red');
+            $('#SizeRangeMasterId').focus();
+            return false;
+        }
+        else {
+            $('#SizeRangeMasterId').css('border-color', '');
+        }
+
+
+        if ($('#ExFactoryDate').val() == "") {
+            alert("Please Enter Ex-Factory Date.")
+            $('#ExFactoryDate').css('border-color', 'red');
+            $('#ExFactoryDate').focus();
+            return false;
+        }
+        else {
+            $('#ExFactoryDate').css('border-color', '');
+        }
+
+        if ($('#ShipmentMode').val() == "") {
+            alert("Please select Shipment Mode.")
+            $('#ShipmentMode').css('border-color', 'red');
+            $('#ShipmentMode').focus();
+            return false;
+        }
+        else {
+            $('#ShipmentMode').css('border-color', '');
+            return true;
+        }
+
+       
+    }
+
+
+
+
+
+    function AddTextBoxForMultipleSchedule() {
+        var scheduleCount = $("#multipleScheduleTable tbody tr").length + 1;
+        $("#multipleScheduleTable tbody").append("<tr><td>" + scheduleCount + "</td><td><input type='text' id='sizeId' style='width:50px;' /></td><td><input type='text' id='qtyId' style='width:50px;' /></td><td><input type='text' id='factoryDateId' style='width:75px;' /></td><td><input type='button' value='Remove' class='removeSchedule btn btn-default btn-style' /></td></tr>");
+    }
+
+    $(document).on('click', '.removeSchedule', function () {
+        $(this).closest("tr").remove();
+    });
+
+    var sizeRangeArr = [];
+    var multipleScheduleArr = [];
+    var packingDetailList = [];
+
+    $(document).on('click', '#AddBtn', function () {
+
+        if (validation()) {
+
+            sizeRangeArr = [];
+            multipleScheduleArr = [];
+            packingDetailList = [];
+
+            $('#multipleScheduleTable tbody tr').each(function () {
+
+                multipleScheduleArr.push(
+                        {
+                            Io: $(this).find('td:first').html(),
+                            Size: $(this).find('td:nth-child(2) input[type=text]').val(),
+                            quantity: $(this).find('td:nth-child(3) input[type=text]').val(),
+                            Date: $(this).find('td:nth-child(4) input[type=text]').val()
+                        });
+
+            });
+
+
+            $('#sizeRangeTable tbody tr').each(function () {
+
+                sizeRangeArr.push(
+                        {
+                            Size: $(this).find('td:first').html(),
+                            quantity: $(this).find('input[type=text]').val(),
+                            Rate: $(this).find('input[type=text]').val()
+                        });
+
+            });
+
+
+            $("#packingDetailsTable tbody tr").each(function () {
+
+                packingDetailList.push(
+                    {
+                        PackingType: $(this).find('.PackingType').html(),
+                        SizeRangeMasterId: $(this).find('.PackageSizeRangeMasterId').html(),
+                        Size: $(this).find('input[type=text]').val()
+                    });
+
+            });
+
+             
+
+            $('#list-amended-material tbody').append("<tr><td class='BuyerOrderSlNo'><span>" + $('#BuyerOrderSlNo').val() + "</span><input type='hidden' class='orderEntry' value='" + $("#OrderEntryId").val() + "'><input class='multisch' type='hidden' value='" + JSON.stringify(multipleScheduleArr) + "'><input class='sizerange' type='hidden' value='" + JSON.stringify(sizeRangeArr) + "'><input class='packingType' type='hidden' value='" + JSON.stringify(packingDetailList) + "'></td>" +
+                                                        "<td class='Date'>" + $('#Date').val() + "</td>" +
+                                                        "<td class='BuyerSeason'>" + $('#BuyerSeason').val() + "</td>" +
+                                                        "<td class='BuyerName'>" + $('#BuyerName').val() + "</td>" +
+                                                        "<td class='OrderProjectionNo'>" + $('#OrderProjectionNo').val() + "</td>" +
+                                                        "<td class='BuyerPoNo'>" + $('#BuyerPoNo').val() + "</td>" +
+                                                        "<td class='OurStyle'>" + $('#OurStyle').val() + "</td>" +
+                                                        "<td class='LeatherDescription'>" + $('#LeatherDescription').val() + "</td>" +
+                                                        "<td class='DiscountPer'>" + $('#DiscountPer').val() + "</td>" +
+                                                        "<td class='QuoteNo'>" + $('#QuoteNo').val() + "</td>" +
+                                                        "<td class='CountryStamp'>" + $('#CountryStamp').val() + "</td>" +
+                                                        "<td class='CustomerPlan'>" + $('#CustomerPlan').val() + "</td>" +
+                                                        "<td class='CustomerDate'>" + $('#CustomerDate').val() + "</td>" +
+                                                        "<td class='AgentMasterId'>" + $('#AgentMasterId').val() + "</td>" +
+                                                        "<td class='CommPer'>" + $('#CommPer').val() + "</td>" +
+                                                        "<td class='ExFactoryDate'>" + $('#ExFactoryDate').val() + "</td>" +
+                                                        "<td class='ShipmentMode'>" + $('#ShipmentMode').val() + "</td>" +
+                                                        "<td class='Remarks1'>" + $('#Remarks1').val() + "</td>" +
+                                                        "<td class='Remarks2'>" + $('#Remarks2').val() + "</td>" +
+                                                        "<td class='LotNo'>" + $('#LotNo').val() + "</td>" +
+                                                        "<td class='Count'>" + $('#Count').val() + "</td>" +
+                                                        "<td class='WeekNo'>" + $('#WeekNo').val() + "</td>" +
+                                                        "<td class='SampleReqNo'>" + $('#SampleReqNo').val() + "</td>" +
+                                                        "<td class='Brand'>" + $('#Brand').val() + "</td>" +
+                                                        "<td class='BuyerStyleNo'>" + $('#BuyerStyleNo').val() + "</td>" +
+                                                        "<td class='BarCodeNo'>" + $('#BarCodeNo').val() + "</td>" +
+                                                        "<td class='BomNo'>" + $('#BomNo').val() + "</td>" +
+                                                        "<td class='Last'>" + $('#Last').val() + "</td>" +
+                                                        "<td class='ColorMasterId'>" + $('#ColorMasterId').val() + "</td>" +
+                                                        "<td class='FinishedProdType'>" + $('#FinishedProdType').val() + "</td>" +
+                                                        "<td class='ProductTypeId'>" + $('#ProductTypeId').val() + "</td>" +
+                                                        "<td class='packType'>" + $('#packType').val() + "</td>" +
+                                                        "<td class='noOfCarton'>" + $('#noOfCarton').val() + "</td>" +
+                                                        "<td class='AmendmentNoWithDate'>" + $('#AmendmentNoWithDate').val() + "</td>" +
+                                                        "<td class='TotalOrderForWeek'>" + $('#TotalOrderForWeek').val() + "</td>" +
+                                                        "<td class='OrderType'>" + $('#OrderType').val() + "</td>" +
+                                                        "<td class='Currency'>" + $('#Currency').val() + "</td>" +
+                                                        "<td class='Rs'>" + $('#Rs').val() + "</td>" +
+                                                        "<td class='Parties'>" + $('#Parties').val() + "</td>" +
+
+
+                                                           "<td class='SEASON'>" + $('#SEASON').val() + "</td>" +
+                                                        "<td class='Purchase'>" + $('#Purchase').val() + "</td>" +
+
+                                                         "<td class='PartiesAmount1'>" + $('#PartiesAmount1').val() + "</td>" +
+                                                         "<td class='ShortUnitID'>" + $('#ShortUnitID').val() + "</td>" +
+                                                         "<td class='PartiesAmount2'>" + $('#PartiesAmount2').val() + "</td>" +
+                                                          "<td class='LongUnitID'>" + $('#LongUnitID').val() + "</td>" +
+
+
+                                                        "<td class='GradeMasterId'>" + $('#GradeMasterId').val() + "</td>" +
+                                                        "<td class='SizeRangeMasterId'>" + $('#SizeRangeMasterId').val() + "</td>" +
+                                                        "<td class='ShipmentCountryStamp'>" + $("#ShipmentCountryStamp").val() + "</td>" +
+                                                        "<td class='ShipmentFrom'>" + $("#ShipmentFrom").val() + "</td>" +
+                                                        "<td class='ShipmentTo'>" + $("#ShipmentTo").val() + "</td>" +
+                                                        "<td class='OtherInstruction'>" + $("#OtherInstruction").val() + "</td>" +
+                                                        "<td class='PaymentTerms'>" + $("#PaymentTerms").val() + "</td>" +
+                                                        "<td class='DeliveryTerms'>" + $("#DeliveryTerms").val() + "</td>" +
+                                                        "<td class='Insurance'>" + $("#Insurance").val() + "</td>" +
+                                                        "<td class='DeliveryTo'>" + $("#DeliveryTo").val() + "</td>" +
+                                                        "<td class='SpecialInstruction'>" + $("#SpecialInstruction").val() + "</td>" +
+
+                                                        "<td class='TotalAmount'>" + $("#TotalAmount").text() + "</td>" +
+                                                        "<td class='sizerange' style='display:none'>" + JSON.stringify(sizeRangeArr) + "</td>" +
+                                                        "<td class='PackingLabeling'>" + $("#PackingLabeling").val() + "</td></tr>");
+
+            setTimeout(function () {
+                $('#list-amended-material tbody tr.curChangeableRow td input').remove();
+                $('#list-amended-material tbody tr.curChangeableRow td:first-child').append("<input type='hidden' class='orderEntry' value='" + $("#OrderEntryId").val() + "'><input class='multisch' type='hidden' value='" + JSON.stringify(multipleScheduleArr) + "'><input class='sizerange' type='hidden' value='" + JSON.stringify(sizeRangeArr) + "'>");
+
+            }, 200);
+            $("input[type='text'],textarea").val("");
+            $("select option:first-child").prop("selected", "selected");
+        }
+    });
+
+    $(document).on('click', '#list-amended-material tbody tr', function () {
+
+        $(this).addClass("curChangeableRow");
+        $(this).siblings().removeClass("curChangeableRow");
+
+        $("#UpdateBtn").show();
+        $("#AddBtn").hide();
+
+        $('#BuyerOrderSlNo').val($(this).find('span').html());
+        $('#Date').val($(this).find('.Date').html());
+        $('#BuyerSeason').val($(this).find('.BuyerSeason').html());
+        $('#BuyerName').val($(this).find('.BuyerName').html());
+        $('#OrderProjectionNo').val($(this).find('.OrderProjectionNo').html());
+        $('#BuyerPoNo').val($(this).find('.BuyerPoNo').html());
+        $('#OurStyle').val($(this).find('.OurStyle').html());
+        $('#LeatherDescription').val($(this).find('.LeatherDescription').html());
+        $('#DiscountPer').val($(this).find('.DiscountPer').html());
+        $('#QuoteNo').val($(this).find('.QuoteNo').html());
+        $('#CountryStamp').val($(this).find('.CountryStamp').html());
+        $('#CustomerPlan').val($(this).find('.CustomerPlan').html());
+        $('#CustomerDate').val($(this).find('.CustomerDate').html());
+        $('#AgentMasterId').val($(this).find('.AgentMasterId').html());
+        $('#CommPer').val($(this).find('.CommPer').html());
+        $('#ExFactoryDate').val($(this).find('.ExFactoryDate').html());
+        $('#ShipmentMode').val($(this).find('.ShipmentMode').html());
+        $('#Remarks1').val($(this).find('.Remarks1').html());
+        $('#Remarks2').val($(this).find('.Remarks2').html());
+        $('#LotNo').val($(this).find('.LotNo').html());
+        $('#Count').val($(this).find('.Count').html());
+        $('#WeekNo').val($(this).find('.WeekNo').html());
+        $('#SampleReqNo').val($(this).find('.SampleReqNo').html());
+        $('#Brand').val($(this).find('.Brand').html());
+        $('#BuyerStyleNo').val($(this).find('.BuyerStyleNo').html());
+        $('#BarCodeNo').val($(this).find('.BarCodeNo').html());
+        $('#BomNo').val($(this).find('.BomNo').html());
+        $('#Last').val($(this).find('.Last').html());
+        $('#ColorMasterId').val($(this).find('.ColorMasterId').html());
+        $('#FinishedProdType').val($(this).find('.FinishedProdType').html());
+        $('#ProductTypeId').val($(this).find('.ProductTypeId').html());
+        $('#packType').val($(this).find('.packType').html());
+        $('#noOfCarton').val($(this).find('.noOfCarton').html());
+        $('#AmendmentNoWithDate').val($(this).find('.AmendmentNoWithDate').html());
+        $('#TotalOrderForWeek').val($(this).find('.TotalOrderForWeek').html());
+        $('#OrderType').val($(this).find('.OrderType').html());
+        $('#Currency').val($(this).find('.Currency').html());
+        $('#Rs').val($(this).find('.Rs').html());
+        $('#Parties').val($(this).find('.Parties').html());
+
+        $('#SEASON').val($(this).find('.SEASON').html());
+        $('#Purchase').val($(this).find('.Purchase').html());
+
+
+        $('#PartiesAmount1').val($(this).find('.PartiesAmount1').html());
+        $('#ShortUnitID').val($(this).find('.ShortUnitID').html());
+        $('#PartiesAmount2').val($(this).find('.PartiesAmount2').html());
+        $('#LongUnitID').val($(this).find('.LongUnitID').html());
+
+        $('#GradeMasterId').val($(this).find('.GradeMasterId').html());
+        $('#SizeRangeMasterId').val($(this).find('.SizeRangeMasterId').html());
+        $('#ShipmentCountryStamp').val($(this).find('.ShipmentCountryStamp').html());
+        $('#ShipmentFrom').val($(this).find('.ShipmentFrom').html());
+        $('#ShipmentTo').val($(this).find('.ShipmentTo').html());
+        $('#OtherInstruction').val($(this).find('.OtherInstruction').html());
+        $('#PaymentTerms').val($(this).find('.PaymentTerms').html());
+        $('#DeliveryTerms').val($(this).find('.DeliveryTerms').html());
+        $('#Insurance').val($(this).find('.Insurance').html());
+        $('#DeliveryTo').val($(this).find('.DeliveryTo').html());
+        $('#SpecialInstruction').val($(this).find('.SpecialInstruction').html());
+        $('#PackingLabeling').val($(this).find('.PackingLabeling').html());
+        $('#TotalAmount').text($('#TotalAmount').text().trim());
+
+
+        $("#multipleScheduleTable tbody,#sizeRangeTable tbody,#packingDetailsTable tbody").html("");
+
+        var multiSch = JSON.parse($(this).find("input.multisch").val());
+        var multiLen = multiSch.length;
+        var i;
+        for (i = 0; i < multiLen; i++) {
+            $("#multipleScheduleTable tbody").append("<tr><td>" + multiSch[i].Io + "</td><td><input type='text' value='" + multiSch[i].Size + "'   id='sizeId" + i + "' style='width:50px;' /></td><td><input type='text' value='" + multiSch[i].quantity + "' id='qtyId" + i + "' style='width:50px;' /></td><td><input type='text' value='" + multiSch[i].Date + "' id='factoryDateId" + i + "' style='width:75px;' /></td><td><input type='button' value='Remove' class='removeSchedule btn btn-default btn-style' /></td></tr>");
+        }
+
+        var sizeRange = JSON.parse($(this).find("input.sizerange").val());
+        var sizeLen = sizeRange.length;
+        var j;
+        for (j = 0; j < sizeLen; j++) {
+            $("#sizeRangeTable tbody").append("<tr><td>" + sizeRange[j].Size + "</td><td><input type='text' value='" + sizeRange[j].quantity + "' id='qtyId" + j + "' style='width:50px;' /></td><td><input type='text' value='" + sizeRange[j].Rate + "' id='Rate" + j + "' style='width:50px;' /></td></tr>");
+        }
+
+        var packingType = JSON.parse($(this).find("input.packingType").val());
+        var packingTypeLen = packingType.length;
+        var k;
+        for (k = 0; k < packingTypeLen; k++) {
+            $("#packingDetailsTable tbody").append("<tr><td>" + (k + 1) + "</td><td class='PackingType'>" + packingType[k].PackingType + "</td><td class='SizeRangeMasterId'>" + packingType[k].SizeRangeMasterId + "</td><td><input type='text' value='" + packingType[k].Size + "' /></td></tr>");
+        }
+
+    });
+
+    $(document).on('click', '#UpdateBtn', function () {
+
+        if (validation()) {
+
+            var sizeRangeArrU = [];
+            var multipleScheduleArrU = [];
+
+            $("#UpdateBtn").hide();
+            $("#AddBtn").show();
+
+            $('#multipleScheduleTable tbody tr').each(function () {
+
+                multipleScheduleArrU.push(
+                        {
+                            Io: $(this).find('td:first').html(),
+                            Size: $(this).find('td:nth-child(2) input[type=text]').val(),
+                            quantity: $(this).find('td:nth-child(3) input[type=text]').val(),
+                            Date: $(this).find('td:nth-child(4) input[type=text]').val()
+                        });
+
+
+            });
+
+
+            $('#sizeRangeTable tbody tr').each(function () {
+
+                sizeRangeArrU.push(
+                        {
+                            Size: $(this).find('td:first').html(),
+                            quantity: $(this).find('input[type=text]').val(),
+                            Rate: $(this).find('input[type=text]').val()
+                        });
+
+            });
+
+            $('#list-amended-material tbody tr.curChangeableRow').html("");
+
+
+            $('#list-amended-material tbody tr.curChangeableRow').append("<td class='BuyerOrderSlNo'><span>" + $('#BuyerOrderSlNo').val() + "</span></td>" +
+                                                    "<td class='Date'>" + $('#Date').val() + "</td>" +
+                                                    "<td class='BuyerSeason'>" + $('#BuyerSeason').val() + "</td>" +
+                                                    "<td class='BuyerName'>" + $('#BuyerName').val() + "</td>" +
+                                                    "<td class='OrderProjectionNo'>" + $('#OrderProjectionNo').val() + "</td>" +
+                                                    "<td class='BuyerPoNo'>" + $('#BuyerPoNo').val() + "</td>" +
+                                                    "<td class='OurStyle'>" + $('#OurStyle').val() + "</td>" +
+                                                    "<td class='LeatherDescription'>" + $('#LeatherDescription').val() + "</td>" +
+                                                    "<td class='DiscountPer'>" + $('#DiscountPer').val() + "</td>" +
+                                                    "<td class='QuoteNo'>" + $('#QuoteNo').val() + "</td>" +
+                                                    "<td class='CountryStamp'>" + $('#CountryStamp').val() + "</td>" +
+                                                    "<td class='CustomerPlan'>" + $('#CustomerPlan').val() + "</td>" +
+                                                    "<td class='CustomerDate'>" + $('#CustomerDate').val() + "</td>" +
+                                                    "<td class='AgentMasterId'>" + $('#AgentMasterId').val() + "</td>" +
+                                                    "<td class='CommPer'>" + $('#CommPer').val() + "</td>" +
+                                                    "<td class='ExFactoryDate'>" + $('#ExFactoryDate').val() + "</td>" +
+                                                    "<td class='ShipmentMode'>" + $('#ShipmentMode').val() + "</td>" +
+                                                    "<td class='Remarks1'>" + $('#Remarks1').val() + "</td>" +
+                                                    "<td class='Remarks2'>" + $('#Remarks2').val() + "</td>" +
+                                                    "<td class='LotNo'>" + $('#LotNo').val() + "</td>" +
+                                                    "<td class='Count'>" + $('#Count').val() + "</td>" +
+                                                    "<td class='WeekNo'>" + $('#WeekNo').val() + "</td>" +
+                                                    "<td class='SampleReqNo'>" + $('#SampleReqNo').val() + "</td>" +
+                                                    "<td class='Brand'>" + $('#Brand').val() + "</td>" +
+                                                    "<td class='BuyerStyleNo'>" + $('#BuyerStyleNo').val() + "</td>" +
+                                                    "<td class='BarCodeNo'>" + $('#BarCodeNo').val() + "</td>" +
+                                                    "<td class='BomNo'>" + $('#BomNo').val() + "</td>" +
+                                                    "<td class='Last'>" + $('#Last').val() + "</td>" +
+                                                    "<td class='ColorMasterId'>" + $('#ColorMasterId').val() + "</td>" +
+                                                    "<td class='FinishedProdType'>" + $('#FinishedProdType').val() + "</td>" +
+                                                    "<td class='ProductTypeId'>" + $('#ProductTypeId').val() + "</td>" +
+                                                    "<td class='packType'>" + $('#packType').val() + "</td>" +
+                                                    "<td class='noOfCarton'>" + $('#noOfCarton').val() + "</td>" +
+                                                    "<td class='AmendmentNoWithDate'>" + $('#AmendmentNoWithDate').val() + "</td>" +
+                                                    "<td class='TotalOrderForWeek'>" + $('#TotalOrderForWeek').val() + "</td>" +
+                                                    "<td class='OrderType'>" + $('#OrderType').val() + "</td>" +
+                                                    "<td class='Currency'>" + $('#Currency').val() + "</td>" +
+                                                    "<td class='Rs'>" + $('#Rs').val() + "</td>" +
+                                                    "<td class='Parties'>" + $('#Parties').val() + "</td>" +
+
+                                                                       "<td class='SEASON'>" + $('#SEASON').val() + "</td>" +
+                                                        "<td class='Purchase'>" + $('#Purchase').val() + "</td>" +
+
+                                                    "<td class='GradeMasterId'>" + $('#GradeMasterId').val() + "</td>" +
+                                                    "<td class='SizeRangeMasterId'>" + $('#SizeRangeMasterId').val() + "</td>" +
+                                                    "<td class='ShipmentCountryStamp'>" + $("#ShipmentCountryStamp").val() + "</td>" +
+                                                    "<td class='ShipmentFrom'>" + $("#ShipmentFrom").val() + "</td>" +
+                                                    "<td class='ShipmentTo'>" + $("#ShipmentTo").val() + "</td>" +
+                                                    "<td class='OtherInstruction'>" + $("#OtherInstruction").val() + "</td>" +
+                                                    "<td class='PaymentTerms'>" + $("#PaymentTerms").val() + "</td>" +
+                                                    "<td class='DeliveryTerms'>" + $("#DeliveryTerms").val() + "</td>" +
+                                                    "<td class='Insurance'>" + $("#Insurance").val() + "</td>" +
+                                                    "<td class='DeliveryTo'>" + $("#DeliveryTo").val() + "</td>" +
+                                                    "<td class='SpecialInstruction'>" + $("#SpecialInstruction").val() + "</td>" +
+
+                                                    "<td class='TotalAmount'>" + $("#TotalAmount").text() + "</td>" +
+
+                                                    "<td class='PackingLabeling'>" + $("#PackingLabeling").val() + "</td>");
+
+            setTimeout(function () {
+                $('#list-amended-material tbody tr.curChangeableRow td input').remove();
+                $('#list-amended-material tbody tr.curChangeableRow td:first-child').append("<input type='hidden' class='orderEntry' value='" + $("#OrderEntryId").val() + "'><input class='multisch' type='hidden' value='" + JSON.stringify(multipleScheduleArrU) + "'><input class='sizerange' type='hidden' value='" + JSON.stringify(sizeRangeArrU) + "'>");
+
+            }, 200);
+
+            setTimeout(function () {
+                $("input[type='text'],textarea").val("");
+                $("select option:first-child").prop("selected", "selected");
+                $("#multipleScheduleTable tbody,#sizeRangeTable tbody").html("");
+            }, 500);
+
+        }
+
+    });
+
+    $(document).on('click', '#packingBtn', function () {
+        var packingCount = $("#packingDetailsTable tbody tr").length + 1;
+        $("#packingDetailsTable tbody").append("<tr><td>" + packingCount + "</td><td class='PackingType'>" + $("#PackingType").val() + "</td><td class='PackageSizeRangeMasterId'>" + $("#PackageSizeRangeMasterId").val() + "</td><td class='totalPairs'><input type='text' id='totalPairs" + packingCount + "'></td></tr>");
+    });
+
+
+
+
+
+
+
+</script>
+
+

@@ -1,0 +1,995 @@
+﻿@model MMS.Web.Models.StockModel.OrderEntryModel
+@using MMS.Repository.Managers.StockManager
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+@{
+    ViewBag.Title = "Buyer Order Entry";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<OrderEntryEntityModel> orderEntryEntityModelist = new List<OrderEntryEntityModel>();
+    BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
+    orderEntryEntityModelist = buyerOrderEntryManager.Get();
+    Model.OrderEntryList = orderEntryEntityModelist;
+
+    MMS.Repository.Managers.SeasonManager seasonManager = new MMS.Repository.Managers.SeasonManager();
+    SeasonMaster seasonMaster = new SeasonMaster();
+    
+}
+
+<div class="veh-tablewrap" id="">
+    <div class="veh-tablecont" id="Grid">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+        <table class="veh-table" id="empTable">
+            <thead>
+                <tr class="color-code-top-btn">
+                    <td colspan="13">
+                        <input type="text" id="SeaarchID" placeholder="Search.." /><input type="button" value="Add" onclick="Add()">
+                        <input type="button" value="Search" onclick="Search()"></td>
+                </tr>
+                <tr>
+                    <th class="veh-1">Si.No
+                    </th>
+                    <th class="veh-1">BuyerOrderSlNo
+                    </th>
+                    <th class="veh-2">LotNo
+                    </th>
+                    <th class="veh-2">BuyerSeason
+                    </th>
+                    <th class="veh-4">Edit / Delete
+                    </th>
+                </tr>
+            </thead>
+            @if (Model.OrderEntryList != null)
+            {
+                int count = 1;
+                <tbody>
+                    @foreach (var OrderEntry in Model.OrderEntryList)
+                    {
+                        seasonMaster = seasonManager.GetSeasonMasterId(OrderEntry.BuyerSeason);
+                        <tr>
+                            <td class="veh-1">@count</td>
+                            <td class="veh-3">@OrderEntry.BuyerOrderSlNo</td>
+                            <td class="veh-3">@OrderEntry.LotNo</td>
+                            <td class="veh-1" onclick="">@seasonMaster.SeasonName</td>
+                            <td class="veh-1 edit-del-wrap">
+                                <a href="BuyerOrderEntryForm?id=@OrderEntry.OrderEntryId" onclick="Edit('@OrderEntry.OrderEntryId')" class="watchlist-edit" title="Edit"></a>
+                                @*<a href="javascript:void(0)" onclick="Edit(this)" class="watchlist-edit" title="Edit"></a>*@
+                                <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@OrderEntry.OrderEntryId')" class="watchlist-delete" title="Delete"></a>
+                            </td>
+                        </tr>           
+                        count++;
+                    }
+                </tbody>
+                <tfoot class="footer-pager">
+                    <tr>
+                        <td colspan="4">
+                            <div id="pager">
+                                <form>
+                                    <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                    <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                    <input type="text" class="pagedisplay" />
+                                    <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                    <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                    <select class="pagesize">
+                                        <option selected="selected" value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="40">40</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+            }
+            else
+            {
+                <li style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</li>
+            }
+        </table>
+    </div>
+    <div id="EditColorPartial">
+        <div class="content-wrapper">
+            <h2 class="content-title">Buyer Order Entry Form</h2>
+            <div class="purchase-order-wrapper">
+                <div id="buyerData" class="purchase-order-section">
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Buyer Order Sl.No.</label>
+                                @Html.HiddenFor(m => m.OrderEntryId) </li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.BuyerOrderSlNo)</li>
+
+                            <li class="width-90">
+                                <label>Date</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.Date, new { @Value = DateTime.Now.ToShortDateString() })</li>
+
+
+                            <li class="width-90">
+                                <label>Buyer name</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.DropDownListFor(m => m.BuyerName, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { Style = "width:90px;" })</li>
+                            <li class="width-90"></li>
+
+                            <li class="width-160">
+                                <label>Order Projection No.</label>
+                            </li>
+                            <li class="width-90">
+                                @Html.TextBoxFor(m => m.OrderProjectionNo)</li>
+
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Buyer Po.No/Buyer Order</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.BuyerPoNo)</li>
+
+                            <li class="width-90">
+                                <label>Our Style</label></li>
+                            <li class="width-90">@Html.DropDownListFor(m => m.OurStyle, MMS.Web.ExtensionMethod.HtmlHelper.OurStyle(), new { Style = "width:90px;" })</li>
+
+                            <li class="width-90">
+                                <label>Leather</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.LeatherDescription)</li>
+
+                            <li class="width-160">
+                                <label>Discount %</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.DiscountPer, new { @class = "allownumericwithdecimal" })</li>
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Quote No.</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.QuoteNo)</li>
+
+                            <li class="width-90">
+                                <label>Country Stamp</label></li>
+                            <li class="width-90">@Html.DropDownListFor(m => m.CountryStamp, MMS.Web.ExtensionMethod.HtmlHelper.CountryName(), new { Style = "width:90px;" })</li>
+
+                            <li class="width-90">
+                                <label>Customer Plan</label></li>
+                            <li class="width-90">@Html.DropDownListFor(m => m.CustomerPlan, new SelectList(
+                  new List<Object>{ 
+                       new { value = 0 , text = "AsPlanned"  },
+                       new { value = 1 , text = "test" }
+                      
+                    },
+                  "value",
+                  "text",
+                   2))</li>
+
+                            <li class="width-160">
+                                <label>Date</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.CustomerDate, new { @Value = DateTime.Now.ToShortDateString() })</li>
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Agent</label></li>
+                            <li class="width-90">@Html.DropDownListFor(m => m.AgentMasterId, MMS.Web.ExtensionMethod.HtmlHelper.AgentName(), new { Style = "width:90px;" })</li>
+
+                            <li class="width-90">
+                                <label>Comm.%</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.CommPer)</li>
+
+                            <li class="width-90">
+                                <label>Ex-Factory Date</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.ExFactoryDate, new { @Value = DateTime.Now.ToShortDateString() })</li>
+
+                            <li class="width-160">
+                                <label>Shipment Mode</label></li>
+                            <li class="width-90">@Html.DropDownListFor(m => m.ShipmentMode, new SelectList(
+                  new List<Object>{ 
+                      new { value = 0 , text = "Please Select"  },
+                       new { value = 1 , text = "Air"  },
+                       new { value = 2 , text = "Sea" }
+                      
+                    },
+                  "value",
+                  "text",
+                   0))</li>
+
+                        </ul>
+                    </div>
+
+                    <div class="purchase-order-row">
+                        <ul>
+
+                            <li>
+                                <label class="init-lable">Lot No</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.LotNo)</li>
+
+                            <li class="width-90">
+                                <label class="init-lable">Brand</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.Brand)</li>
+
+                            <li class="width-90">
+                                <label class="init-lable">Buyer Style No.</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.BuyerStyleNo)</li>
+
+                            <li class="width-160">
+                                <label class="init-lable">Barcode No</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.BarCodeNo)</li>
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">BOM No</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.BomNo)</li>
+
+                            <li class="width-90">
+                                <label class="init-lable">Last</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.Last)</li>
+
+                            <li class="width-90">
+                                <label class="init-lable">Color</label></li>
+                            <li class="width-90">@Html.DropDownListFor(m => m.ColorMasterId, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { Style = "width:90px;" })</li>
+
+                            <li class="width-160">
+                                <label>Finished Prod.Type</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.FinishedProdType)</li>
+
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Buyer Model</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.ProductType_BuyerModel)</li>
+                            <li class="width-90">
+                                <label>Count</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.Count)</li>
+
+                            <li class="width-90">
+                                <label>Week No</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.WeekNo)</li>
+
+                            <li class="width-160">
+                                <label>Total Order for the week</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.TotalOrderForWeek)</li>
+
+
+                        </ul>
+                    </div>
+
+                    <div class="purchase-order-row">
+                        <ul>
+
+                            <li>
+                                <label class="init-lable">Parties</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.Parties)</li>
+
+
+                            <li class="width-90">
+                                <label>Grade</label></li>
+                            <li class="width-90">@Html.DropDownListFor(m => m.GradeMasterId, MMS.Web.ExtensionMethod.HtmlHelper.Grade(), new { Style = "width:90px;" })</li>
+
+                            <li class="width-90">
+                                <label>Size Range</label></li>
+                            <li class="width-90">@Html.DropDownListFor(m => m.SizeRangeMasterId, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeValue(), new { Style = "width:90px;" })</li>
+                            <li class="width-160">
+                                <label>Buyer Season</label></li>
+                            <li class="width-90">@Html.DropDownListFor(m => m.BuyerSeason, MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { Style = "width:90px;" })</li>
+
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+
+                            <li>
+                                <label class="init-lable">Sample Req No</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.SampleReqNo)</li>
+                            <li class="width-90">
+                                <label>Currency</label></li>
+                            <li class="width-90">@Html.DropDownListFor(m => m.Currency, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { Style = "width:90px;" })</li>
+                            <li class="width-90">
+                                <label>Order Type</label></li>
+                            <li class="width-90">@Html.DropDownListFor(m => m.OrderType, new SelectList(
+                  new List<Object>{ 
+                       new { value = 0 , text = "original"  },
+                       new { value = 1 , text = "test" }
+                      
+                    },
+                  "value",
+                  "text",
+                   2))</li>
+
+                            <li class="width-160">
+                                <label>Line No</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.LineNo_1)</li>
+
+                        </ul>
+                    </div>
+                    <div class="purchase-order-row">
+                        <ul>
+                            <li>
+                                <label class="init-lable">Amendment No WithDate</label></li>
+                            <li class="width-90">@Html.TextBoxFor(m => m.AmendmentNoWithDate)</li>
+
+                            <li class="width-90">
+                                <label>Remarks</label></li>
+                            <li class="width-90">@Html.TextAreaFor(m => m.Remarks)</li>
+
+                        </ul>
+                    </div>
+
+                    <div class="purchase-order-footer">
+                        <input type="button" onclick="Cancel()" style="cursor: pointer;" title="Cancel" value="Cancel">
+                        @if (Model != null && Model.OrderEntryId != 0)
+                        {
+           
+                            <input type="button" onclick="Save()" style="cursor: pointer;" id="OrderEntryId" title="Update" value="Update">
+                        }
+                        else
+                        {
+                            <input type="button" id="BtnSave" onclick="Save()" style="cursor: pointer;" title="Save" value="Save">
+                            <input type="hidden" id="HdnCurrencyExchangeID" />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#Date").datepicker();
+        $("#ExFactoryDate").datepicker();
+        $("#CustomerDate").datepicker();
+
+    });
+</script>
+
+<script>
+    //$(function () {
+    $("#OurStyle").change(function () {
+        $.ajax({
+            type: 'POST',
+            url: ' @Url.Action("BuyerModelDetail", "BuyerOrderEntryForm")',
+                data: { OurStyle: $('select#OurStyle option:selected').text() },
+                success: function (data) {
+                    $("#BomNo").val(data.BomNo);
+                    $("#FinishedProdType").val(data.FinishedProductType);
+                    $("#BuyerStyleNo").val(data.BuyerStyle);
+                    $("#Last").val(data.Last);
+                    $("#ColorMasterId").val(data.ProductColour);
+                },
+            });
+
+        });
+        //});
+
+</script>
+<script>
+    if ('@Model.Edit' == "True") {
+        $('#EditColorPartial').show();
+        $('#Grid').hide();
+    }
+    else {
+        $('#EditColorPartial').hide();
+        $('#Grid').show();
+    }
+
+
+    var specialKeys = new Array();
+    specialKeys.push(8); //Backspace
+    $(function () {
+        $(".numeric").bind("keypress", function (e) {
+            var keyCode = e.which ? e.which : e.keyCode
+            var ret = ((keyCode >= 48 && keyCode <= 57) || specialKeys.indexOf(keyCode) != -1);
+            $(".error").css("display", ret ? "none" : "inline");
+            return ret;
+        });
+        $(".numeric").bind("paste", function (e) {
+            return false;
+        });
+        $(".numeric").bind("drop", function (e) {
+            return false;
+        });
+    });
+    function Search() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Search", "BuyerOrderEntryForm")',
+            data: { filter: $('#SeaarchID').val() },
+            success: function (data) {
+                //console.log(data);
+                //$('#DivShow').hide();
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                $('#DivShow').hide();
+            }
+        });
+    }
+    $(function () {
+        //$('#EditColorPartial').hide();
+        $("#empTable").tablesorter({ widthFixed: true })
+        .tablesorterPager({ container: $("#pager") });
+        $("#empTable").bind("sortStart", function () {
+            $("#sortMsg").html('Sorting');
+        }).bind("sortEnd", function () {
+            $("#sortMsg").html('');
+        });
+        //Hide/delete row on click.Used live() to apply this click event for all the matching rows.
+        $("#empTable img").live("click", function () {
+            tablesorter_remove($(this).parent().parent(), $('#empTable'));
+        });
+    });
+    //Start of Page Size adjust on Row Delete
+    Array.prototype.remove = function (from, to) {
+        var rest = this.slice((to || from) + 1 || this.length);
+        this.length = from < 0 ? this.length + from : from;
+        return this.push.apply(this, rest);
+    };
+
+    //repopulate table with data from rowCache
+    function repopulateTableBody(tbl) {
+        //aka cleanTableBody from TableSorter code
+        if ($.browser.msie) {
+            function empty() {
+                while (this.firstChild) this.removeChild(this.firstChild);
+            }
+            empty.apply(tbl.tBodies[0]);
+        } else {
+            tbl.tBodies[0].innerHTML = "";
+        }
+        jQuery.each(tbl.config.rowsCopy, function () {
+            tbl.tBodies[0].appendChild(this.get(0));
+        });
+    }
+    //removes the passed in row and updates the tablesorter+pager
+    function tablesorter_remove(tr, table) {
+        //pager modifies actual DOM table to have only #pagesize TR's
+        //thus we need to repopulate from the cache first
+        repopulateTableBody(table.get(0));
+        var index = $("tr", table).index(tr);
+        var c = table.get(0).config;
+        tr.remove();
+
+        //remove row from cache too
+        c.rowsCopy.remove(index);
+        c.totalRows = c.rowsCopy.length;
+        c.totalPages = Math.ceil(c.totalRows / config.size);
+
+        //now update
+        table.trigger("update");
+        table.trigger("appendCache");
+
+        //simulate user switches page to get pager to update too
+        index = c.page < c.totalPages - 1;
+        $(".next").trigger("click");
+        if (index)
+            $(".prev").trigger("click");
+    }
+    //End of Page Size adjust on Row Delete
+    function Cancel() {
+        var answer = confirm("Are you sure want to Cancel?");
+        if (answer) {
+            location.href = "/BuyerOrderEntryForm/BuyerOrderEntryForm";
+            return false;
+        }
+        else {
+            return false;
+        }
+    }
+    function Add() {
+        $('#EditColorPartial').show();
+        $('#Grid').hide();
+    }
+    function Edit(arg) {
+        var arg;
+        $.ajax({
+            type: 'POST',
+            url: ' @Url.Action("BuyerOrderEntryFormView", "BuyerOrderEntryForm")',
+            data: { OrderEntryId: arg },
+            success: function (data) {
+                $('#EditColorPartial').show();
+                $('#Grid').hide();
+            },
+        });
+
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "BuyerOrderEntryForm")',
+                data: { OrderEntryId: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/BuyerOrderEntryForm/BuyerOrderEntryForm";
+                        return false;
+                    }
+                    else {
+                        alert('deletion failed.');
+                    }
+
+                },
+
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+    function Save() {
+
+        if ($('#BuyerOrderSlNo').val() == "") {
+            alert("Please Enter Buyer Order SlNo.")
+            $('#BuyerOrderSlNo').css('border-color', 'red');
+            $('#BuyerOrderSlNo').focus();
+            return false;
+        }
+        else {
+            $('#BuyerOrderSlNo').css('border-color', '');
+        }
+        if ($('#Date').val() == "") {
+            alert("Please Enter Date.")
+            $('#Date').css('border-color', 'red');
+            $('#Date').focus();
+            return false;
+        }
+        else {
+            $('#Date').css('border-color', '');
+        }
+        if ($('#BuyerName').val() == "") {
+            alert("Please Enter BuyerName.")
+            $('#BuyerName').css('border-color', 'red');
+            $('#BuyerName').focus();
+            return false;
+        }
+        else {
+            $('#BuyerName').css('border-color', '');
+        }
+
+        if ($('#OrderProjectionNo').val() == "") {
+            alert("Please Enter Order Projection No.")
+            $('#OrderProjectionNo').css('border-color', 'red');
+            $('#OrderProjectionNo').focus();
+            return false;
+        }
+        else {
+            $('#OrderProjectionNo').css('border-color', '');
+        }
+
+        if ($('#BuyerPoNo').val() == "") {
+            alert("Please Enter BuyerPoNo.")
+            $('#BuyerPoNo').css('border-color', 'red');
+            $('#BuyerPoNo').focus();
+            return false;
+        }
+        else {
+            $('#BuyerPoNo').css('border-color', '');
+        }
+
+        if ($('#OurStyle').val() == "") {
+            alert("Please Enter Our Style.")
+            $('#OurStyle').css('border-color', 'red');
+            $('#OurStyle').focus();
+            return false;
+        }
+        else {
+            $('#OurStyle').css('border-color', '');
+        }
+
+        if ($('#LeatherDescription').val() == "") {
+            alert("Please Enter Leather Description.")
+            $('#LeatherDescription').css('border-color', 'red');
+            $('#LeatherDescription').focus();
+            return false;
+        }
+        else {
+            $('#LeatherDescription').css('border-color', '');
+        }
+
+        if ($('#DiscountPer').val() == "") {
+            alert("Please Enter Discount Per.")
+            $('#DiscountPer').css('border-color', 'red');
+            $('#DiscountPer').focus();
+            return false;
+        }
+        else {
+            $('#DiscountPer').css('border-color', '');
+        }
+
+        if ($('#QuoteNo').val() == "") {
+            alert("Please Enter Quote No.")
+            $('#QuoteNo').css('border-color', 'red');
+            $('#QuoteNo').focus();
+            return false;
+        }
+        else {
+            $('#QuoteNo').css('border-color', '');
+        }
+
+        if ($('#CountryStamp').val() == "") {
+            alert("Please Enter Country Stamp.")
+            $('#CountryStamp').css('border-color', 'red');
+            $('#CountryStamp').focus();
+            return false;
+        }
+        else {
+            $('#CountryStamp').css('border-color', '');
+        }
+
+        if ($('#CustomerPlan').val() == "") {
+            alert("Please Enter Customer Plan.")
+            $('#CustomerPlan').css('border-color', 'red');
+            $('#CustomerPlan').focus();
+            return false;
+        }
+        else {
+            $('#CustomerPlan').css('border-color', '');
+        }
+
+        if ($('#CustomerDate').val() == "") {
+            alert("Please Enter Customer Date.")
+            $('#CustomerDate').css('border-color', 'red');
+            $('#CustomerDate').focus();
+            return false;
+        }
+        else {
+            $('#CustomerDate').css('border-color', '');
+        }
+
+        if ($('#AgentMasterId').val() == "") {
+            alert("Please Enter Agent Master Id.")
+            $('#AgentMasterId').css('border-color', 'red');
+            $('#AgentMasterId').focus();
+            return false;
+        }
+        else {
+            $('#AgentMasterId').css('border-color', '');
+        }
+
+        if ($('#CommPer').val() == "") {
+            alert("Please Enter Comm Per.")
+            $('#CommPer').css('border-color', 'red');
+            $('#CommPer').focus();
+            return false;
+        }
+        else {
+            $('#CommPer').css('border-color', '');
+        }
+
+        if ($('#ExFactoryDate').val() == "") {
+            alert("Please Enter Ex Factory Date.")
+            $('#ExFactoryDate').css('border-color', 'red');
+            $('#ExFactoryDate').focus();
+            return false;
+        }
+        else {
+            $('#ExFactoryDate').css('border-color', '');
+        }
+
+        if ($('#ShipmentMode').val() == "") {
+            alert("Please Enter Shipment Mode.")
+            $('#ShipmentMode').css('border-color', 'red');
+            $('#ShipmentMode').focus();
+            return false;
+        }
+        else {
+            $('#ShipmentMode').css('border-color', '');
+        }
+
+        if ($('#LotNo').val() == "") {
+            alert("Please Enter LotNo.")
+            $('#LotNo').css('border-color', 'red');
+            $('#LotNo').focus();
+            return false;
+        }
+        else {
+            $('#LotNo').css('border-color', '');
+        }
+
+        if ($('#Brand').val() == "") {
+            alert("Please Enter Brand.")
+            $('#Brand').css('border-color', 'red');
+            $('#Brand').focus();
+            return false;
+        }
+        else {
+            $('#Brand').css('border-color', '');
+        }
+
+        if ($('#BuyerStyleNo').val() == "") {
+            alert("Please Enter Buyer Style No.")
+            $('#BuyerStyleNo').css('border-color', 'red');
+            $('#BuyerStyleNo').focus();
+            return false;
+        }
+        else {
+            $('#BuyerStyleNo').css('border-color', '');
+        }
+
+        if ($('#BarCodeNo').val() == "") {
+            alert("Please Enter Bar Code No.")
+            $('#BarCodeNo').css('border-color', 'red');
+            $('#BarCodeNo').focus();
+            return false;
+        }
+        else {
+            $('#BarCodeNo').css('border-color', '');
+        }
+
+        if ($('#BomNo').val() == "") {
+            alert("Please Enter Bom No.")
+            $('#BomNo').css('border-color', 'red');
+            $('#BomNo').focus();
+            return false;
+        }
+        else {
+            $('#BomNo').css('border-color', '');
+        }
+
+        if ($('#Last').val() == "") {
+            alert("Please Enter Last.")
+            $('#Last').css('border-color', 'red');
+            $('#Last').focus();
+            return false;
+        }
+        else {
+            $('#Last').css('border-color', '');
+        }
+
+        if ($('#ColorMasterId').val() == "") {
+            alert("Please Enter Color Master Id.")
+            $('#ColorMasterId').css('border-color', 'red');
+            $('#ColorMasterId').focus();
+            return false;
+        }
+        else {
+            $('#ColorMasterId').css('border-color', '');
+        }
+
+        if ($('#FinishedProdType').val() == "") {
+            alert("Please Enter FinishedProdType.")
+            $('#FinishedProdType').css('border-color', 'red');
+            $('#FinishedProdType').focus();
+            return false;
+        }
+        else {
+            $('#FinishedProdType').css('border-color', '');
+        }
+
+        if ($('#ProductType_BuyerModel').val() == "") {
+            alert("Please Enter Product Type Buyer Model.")
+            $('#ProductType_BuyerModel').css('border-color', 'red');
+            $('#ProductType_BuyerModel').focus();
+            return false;
+        }
+        else {
+            $('#ProductType_BuyerModel').css('border-color', '');
+        }
+
+        if ($('#Count').val() == "") {
+            alert("Please Select Count.")
+            $('#Count').css('border-color', 'red');
+            $('#Count').focus();
+            return false;
+        }
+        else {
+            $('#Count').css('border-color', '');
+        }
+
+        if ($('#WeekNo').val() == "") {
+            alert("Please Enter Last WeekNo.")
+            $('#WeekNo').css('border-color', 'red');
+            $('#WeekNo').focus();
+            return false;
+        }
+        else {
+            $('#WeekNo').css('border-color', '');
+        }
+
+        if ($('#TotalOrderForWeek').val() == "") {
+            alert("Please Enter Total Order For Week.")
+            $('#TotalOrderForWeek').css('border-color', 'red');
+            $('#TotalOrderForWeek').focus();
+            return false;
+        }
+        else {
+            $('#TotalOrderForWeek').css('border-color', '');
+        }
+
+        if ($('#Parties').val() == "") {
+            alert("Please Enter Parties.")
+            $('#Parties').css('border-color', 'red');
+            $('#Parties').focus();
+            return false;
+        }
+        else {
+            $('#Parties').css('border-color', '');
+        }
+
+        if ($('#GradeMasterId').val() == "") {
+            alert("Please Enter Grade Master Id.")
+            $('#GradeMasterId').css('border-color', 'red');
+            $('#GradeMasterId').focus();
+            return false;
+        }
+        else {
+            $('#GradeMasterId').css('border-color', '');
+        }
+
+        if ($('#SizeRangeMasterId').val() == "") {
+            alert("Please Enter Size Range Master Id.")
+            $('#SizeRangeMasterId').css('border-color', 'red');
+            $('#SizeRangeMasterId').focus();
+            return false;
+        }
+        else {
+            $('#SizeRangeMasterId').css('border-color', '');
+        }
+
+
+        if ($('#BuyerSeason').val() == "") {
+            alert("Please Enter Buyer Season.")
+            $('#BuyerSeason').css('border-color', 'red');
+            $('#BuyerSeason').focus();
+            return false;
+        }
+        else {
+            $('#BuyerSeason').css('border-color', '');
+        }
+
+
+        if ($('#SampleReqNo').val() == "") {
+            alert("Please Enter Sample Req No.")
+            $('#SampleReqNo').css('border-color', 'red');
+            $('#SampleReqNo').focus();
+            return false;
+        }
+        else {
+            $('#SampleReqNo').css('border-color', '');
+        }
+
+        if ($('#Currency').val() == "") {
+            alert("Please Enter Currency.")
+            $('#Currency').css('border-color', 'red');
+            $('#Currency').focus();
+            return false;
+        }
+        else {
+            $('#Currency').css('border-color', '');
+        }
+
+        if ($('#OrderType').val() == "") {
+            alert("Please Enter Order Type.")
+            $('#OrderType').css('border-color', 'red');
+            $('#OrderType').focus();
+            return false;
+        }
+        else {
+            $('#OrderType').css('border-color', '');
+        }
+
+        if ($('#LineNo_1').val() == "") {
+            alert("Please Enter LineNo_1.")
+            $('#LineNo_1').css('border-color', 'red');
+            $('#LineNo_1').focus();
+            return false;
+        }
+        else {
+            $('#LineNo_1').css('border-color', '');
+        }
+
+        if ($('#AmendmentNoWithDate').val() == "") {
+            alert("Please Enter Amendment No With Date.")
+            $('#AmendmentNoWithDate').css('border-color', 'red');
+            $('#AmendmentNoWithDate').focus();
+            return false;
+        }
+        else {
+            $('#AmendmentNoWithDate').css('border-color', '');
+        }
+
+        if ($('#Remarks').val() == "") {
+            alert("Please Enter Remarks.")
+            $('#Remarks').css('border-color', 'red');
+            $('#Remarks').focus();
+            return false;
+        }
+        else {
+            $('#Remarks').css('border-color', '');
+        }
+
+
+
+        $.ajax({
+            type: 'POST',
+            url: '/BuyerOrderEntryForm/BuyerOrderEntryForm',
+            data: {
+                OrderEntryId: $('#OrderEntryId').val(),
+                BuyerOrderSlNo: $('#BuyerOrderSlNo').val(),
+                LotNo: $('#LotNo').val(),
+                Count: $('#Count').val(),
+                WeekNo: $("#WeekNo").val(),
+                Date: $("#Date").val(),
+                BuyerSeason: $("#BuyerSeason").val(),
+                BuyerName: $("#BuyerName").val(),
+                OrderProjectionNo: $("#OrderProjectionNo").val(),
+                BuyerPoNo: $("#BuyerPoNo").val(),
+                OurStyle: $("#OurStyle").val(),
+                LeatherDescription: $("#LeatherDescription").val(),
+                DiscountPer: $("#DiscountPer").val(),
+                QuoteNo: $("#QuoteNo").val(),
+                CountryStamp: $("#CountryStamp").val(),
+                CustomerPlan: $("#CustomerPlan").val(),
+                CustomerDate: $("#CustomerDate").val(),
+                AgentMasterId: $("#AgentMasterId").val(),
+                CommPer: $("#CommPer").val(),
+                ExFactoryDate: $("#ExFactoryDate").val(),
+                ShipmentMode: $("#ShipmentMode").val(),
+                SampleReqNo: $("#SampleReqNo").val(),
+                Brand: $("#Brand").val(),
+                BuyerStyleNo: $("#BuyerStyleNo").val(),
+                BarCodeNo: $("#BarCodeNo").val(),
+                BomNo: $("#BomNo").val(),
+                Last: $("#Last").val(),
+                ColorMasterId: $("#ColorMasterId").val(),
+                FinishedProdType: $("#FinishedProdType").val(),
+                AmendmentNoWithDate: $("#AmendmentNoWithDate").val(),
+                TotalOrderForWeek: $("#TotalOrderForWeek").val(),
+                OrderType: $("#OrderType").val(),
+                Parties: $("#Parties").val(),
+                GradeMasterId: $("#GradeMasterId").val(),
+                SizeRangeMasterId: $("#SizeRangeMasterId").val(),
+                Remarks: $("#Remarks").val(),
+                OtherSpecifications: $("#OtherSpecifications").val(),
+                LineNo_1: $("#LineNo_1").val(),
+                ProductType_BuyerModel: $("#ProductType_BuyerModel").val(),
+                Currency: $("#Currency").val(),
+                IsBuyer: true,
+                IsInternal: false
+            },
+            success: function (data) {
+                if (data == true) {
+                    if ($("#BtnSave").val() == "Save") {
+                        alert('Saved Successfully.');
+                        location.href = "/BuyerOrderEntryForm/BuyerOrderEntryForm";
+                        return false;
+
+                    }
+                    else {
+                        alert('Updated Successfully.');
+                        location.href = "/BuyerOrderEntryForm/BuyerOrderEntryForm";
+                        return false;
+
+                    }
+                    //  $("#BtnSave").attr('value', 'Save');
+                    location.href = "/BuyerOrderEntryForm/BuyerOrderEntryForm";
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    // location.href = "/PurchaseOrder/PurchaseOrder";
+                    return false;
+                }
+
+            }
+        });
+    }
+
+    $(".allownumericwithdecimal").on("keypress keyup blur", function (event) {
+        //this.value = this.value.replace(/[^0-9\.]/g,'');
+        $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+        if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+            event.preventDefault();
+        }
+    });
+</script>
+
+

@@ -1,0 +1,83 @@
+﻿@{
+    ViewBag.Title = "CurrencyExchangeMaster";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+
+
+<script>
+    
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+      
+        $("#EditColorPartial").hide();
+    });
+    function Save() {
+        if ($('#Date').val() == "") {
+            alert("Please Enter Date.")
+            $('#Date').css('border-color', 'red');
+            $('#Date').focus();
+            return false;
+        }
+        else {
+            $('#Date').css('border-color', '');
+        }
+        if ($('#Currency').val() == "") {
+            alert("Please Enter Currency.")
+            $('#Currency').css('border-color', 'red');
+            $('#Currency').focus();
+            return false;
+        }
+        else {
+            $('#Currency').css('border-color', '');
+        }
+        if ($('#ValueInRupees').val() == "") {
+            alert("Please Enter Value In Rupees.")
+            $('#ValueInRupees').css('border-color', 'red');
+            $('#ValueInRupees').focus();
+            return false;
+        }
+        else {
+            $('#ValueInRupees').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/CurrencyExchangeMaster/CurrencyExchangeMaster',
+            data: {
+                Date: $('#Date').val(),
+                Currency: $('#Currency').val(),
+                ValueInRupees: $('#ValueInRupees').val(),
+                CurrencyExchangeMasterId: $("#HdnCurrencyExchangeID").val(),
+            },
+            success: function (data) {
+                if (data == true) {
+                    if ($("#BtnSave").val() == "Save") {
+                        alert('Saved Successfully.');
+                    }
+                    else {
+                        alert('Updated Successfully.');
+                    }
+                  //  $("#BtnSave").attr('value', 'Save');
+                    location.href = "/CurrencyExchangeMaster/CurrencyExchangeMaster";
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/CurrencyExchangeMaster/CurrencyExchangeMaster";
+                    return false;
+                }
+
+            }
+        });
+    }
+    
+</script>
+<h2 class="content-title">Currency Exchange Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("CurrencyExchangeGrid", "CurrencyExchangeMaster")
+    </div>
+</div>

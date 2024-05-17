@@ -1,0 +1,363 @@
+﻿@model IEnumerable<MMS.Web.Models.CustomerTransaction.Customertransaction>
+@using MMS.Repository.Managers
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <style>
+        img#paynows {
+            width: 26%;
+        }
+
+        .page-item.active .page-link {
+            z-index: 3;
+            color: #fff;
+            background-color: #4472C4;
+            border-color: #0d6efd;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-page">
+        <div id="transaction_report" class="reports common_Manage_subMerchant">
+            <nav class="reports_customers_head" aria-label="breadcrumb">
+                <ol class="breadcrumb font-20">
+                    <li class="breadcrumb-item " aria-current="page">Account Receivables</li>
+                </ol>
+            </nav>
+
+            <div class="table-responsive reports_table_responsive">
+                <div class="d-flex justify-content-evenly">
+                    <div class="form-floating">
+                        <select id="buyerid" class="form-select">
+                            @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.BuyerName())
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                        <label for="floatingSelectGrid">Customer Name</label>
+                    </div>
+
+                    <div class="form-floating">
+                        <select id="InvRefNumber" class="form-select">
+                            @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.invoisenoListdata())
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                        <label for="floatingSelectGrid">Invoice Number</label>
+                    </div>
+                    <div class="form-floating">
+                        <select id="CreditNoteRef" class="form-select">
+                            <option value="0">Please Select</option>
+                            <option value="1">Open</option>
+                            <option value="2">Partial</option>
+                            <option value="3">Full-Fill</option>
+                        </select>
+
+                        <label for="floatingSelectGrid">Status</label>
+                    </div>
+                    <div class="form-floating">
+                        <input type="date" class="form-control" id="InvDate" />
+                        <label for="InvDate">From Date</label>
+                    </div>
+                    <div class="form-floating">
+                        <input type="date" class="form-control" id="InvDueDate" />
+                        <label for="InvDueDate">To Date</label>
+                    </div>
+
+                    <div id="transaction_reports_search4_container" class="reports_search_container_btn">
+                        <button type="button" id="filter" class="manage_customers_btn font-15" onclick="Search()">
+                            FILTER
+
+                        </button>
+                    </div>
+                </div>
+                <div class="manage_customers_table_in_responsive" id="form">
+                    <table class="table table-striped text-center">
+                        <thead>
+                            <tr class="font-16">
+                                <th scope="col">
+                                    <span>Si.No</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Buyer Name</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Invoice NO</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Invoice Date</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span> Invoice Value</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Amount Paid</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Balance Amount</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                @*<th scope="col">
+                                        <span>Ledger</span>
+                                        <span>
+                                            <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                        </span>
+                                    </th>*@
+                                <th scope="col">
+                                    <span>Invoice Item / Qty</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Payments</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        @if (Model != null && Model.Count() > 0)
+                        {
+                            int count = 1;
+                            <tbody>
+                                @foreach (var i in Model)
+                                {
+
+                                    <tr class="font-14">
+                                        <td class="veh1-5">@count</td>
+                                        <td class="veh1-5" style="width: 12%;">@i.BuyerMaster.BuyerFullName</td>
+                                        <td class="veh1-5" style="width: 12%;">@i.InvRefNumber</td>
+                                        <td class="veh1-5" style="width: 12%;">@i.InvDate.ToString("dd/MM/yyyy")</td>
+                                        <td class="veh1-5" style="width: 12%;">@i.InvAmount</td>
+                                        @if (i.customertransaction == null)
+                                        {
+                                            <td class="veh1-5" style="width: 12%;">0</td>
+                                            <td class="veh1-5" style="width: 12%;">@i.InvAmount</td>
+                                        }
+                                        else if (i.customertransaction != null)
+                                        {
+                                            <td class="veh1-5" style="width: 12%;">@(i.customertransaction.InvPaidAmount ?? 0)</td>
+                                            <td class="veh1-5" style="width: 12%;">@(i.customertransaction.InvBalanceAmount ?? 0)</td>
+                                        }
+                                        @*<td class="veh1-5" style="width: 12%;">@i.RefItems</td>*@
+                                        <td class="veh1-5" style="width: 12%;">@i.RefItems / @i.RefQuantity</td>
+
+                                        <td id="paynow" onclick="booking('@i.Id')">
+                                            <div><img src="~/Content/assets/images/payment-method.png" id="paynows" /></div>
+                                        </td>
+                                        @*<td><button class="btn btn-success" id="paynow" onclick="booking('@i.Id')" title="PayNow">Get Payment</button></td>*@
+                                        @*<td>
+                                                <button class="btn btn-success"
+                                                        onclick="booking('${item.Id}')"
+                                                        title="PayNow">
+                                                    Get Payment
+                                                </button>
+                                            </td>*@
+                                    </tr>
+                                    count++;
+                                }
+
+                            </tbody>
+
+                        }
+                    </table>
+                </div>
+                <div class="row manage_customer_show">
+                    <div class="font-14 manage_customer_show_I col-xl-6">
+                        <span>Showing </span>
+                        <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
+                            <option value="5" @(ViewBag.PageSize == 5 ? "selected" : "")>5</option>
+                            <option value="10" @(ViewBag.PageSize == 10 ? "selected" : "")>10</option>
+                            <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
+                            <option value="20" @(ViewBag.PageSize == 20 ? "selected" : "")>20</option>
+                        </select>
+
+
+                    </div>
+
+                    <div class="col-xl-6 manage_customer_show_II">
+                        <nav class="float-xl-end">
+                            <ul class="pagination font-14">
+                                <li class="page-item">
+                                    <a href="##" id="previousPage" class="page-link">Previous</a>
+                                </li>
+                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                        <a href="@Url.Action("Customermaster", "CustomerTransaction", new { page = i })" class="page-link">@i</a>
+                                    </li>
+                                }
+                                <li class="page-item">
+                                    <a class="page-link" id="nextPage" href="##">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id='myModal' class='modal'>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div id='details' class="myModalContent"></div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="~/Content/js/custom.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script>
+  $(document).ready(function() {
+    // Function to handle changing the number of items per page
+    $('#manage_customer_show_no').change(function() {
+        var pageSize = parseInt($(this).val());
+        window.location.href = "@Url.Action("Customermaster", "CustomerTransaction")?pageSize=" + pageSize;
+    });
+
+    $('#previousPage').click(function(e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        if (currentPage > 1) {
+            var previousPage = currentPage - 1;
+            window.location.href = "@Url.Action("Customermaster", "CustomerTransaction")?page=" + previousPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+        }
+    });
+
+    $('#nextPage').click(function(e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        var totalPages = parseInt('@ViewBag.TotalPages');
+        if (currentPage < totalPages) {
+            var nextPage = currentPage + 1;
+            window.location.href = "@Url.Action("Customermaster", "CustomerTransaction")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+        }
+    });
+});
+
+
+    </script>
+    <script>
+
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#recive").attr('checked', true);
+
+        });
+        function booking(arg) {
+            $.ajax({
+                type: 'GET',
+                url: '/CustomerTransaction/CustomerTransaction',
+                data: { id: arg },
+                success: function (values) {
+                    $('#details').html(values);
+
+                    var options = {
+                        backdrop: 'static',
+                        keyboard: false
+                    };
+
+                    $('#myModal').modal(options);
+                    $('#myModal').modal('show');
+
+                }
+            });
+        }
+        function Search() {
+            var buyerid = $("#buyerid").val();
+            var invRefNumber = $("#InvRefNumber").val();
+            $.ajax({
+                type: 'GET',
+                url: '/CustomerTransaction/CustomerTransactionsearch',
+                data: { Buyerid: buyerid, InvRefNumber: invRefNumber },
+                dataType: 'json',
+                success: function (data) {
+                    $("tbody").empty();
+                    var count = 1;
+                    $.each(data, function (i, item) {
+                        const formattedDate = convertToReadableDate(item.InvDate);
+                        const invPaidAmount = item.customertransaction?.InvPaidAmount ?? 0;
+                        const InvAmount = item.customertransaction?.InvBalanceAmount ?? item.InvAmount ?? 0;
+                        $("tbody").append(`
+                                                      <tr class="font-14">
+                                                          <td class="veh1-5">${count}</td>
+                                                          <td class="veh1-5" style="width: 12%;">${item.BuyerMaster.BuyerFullName}</td>
+                                                          <td class="veh1-5" style="width: 12%;">${item.InvRefNumber}</td>
+                                                          <td class="veh1-5" style="width: 12%;">${formattedDate}</td>
+                                                          <td class="veh1-5" style="width: 12%;">${item.InvAmount}</td>
+                                                          <td class="veh1-5" style="width: 12%;">${invPaidAmount}</td>
+                                                          <td class="veh1-5" style="width: 12%;">${InvAmount}</td>
+                                                          <td class="veh1-5" style="width: 12%;">${item.RefItems} / ${item.RefQuantity}</td>
+                                                          <td id="paynow"  onclick="booking('${item.Id}')">
+                                                          <div><img src="/Content/assets/images/payment-method.png" id="paynows" /></div>
+                                                           </td>
+                                                      </tr>
+                                                  `);
+                        count++;
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error occurred:", status, error);
+                }
+            });
+        }
+
+        function convertToReadableDate(dateString) {
+            const match = dateString.match(/\d+/);
+            if (match) {
+                const timestamp = parseInt(match[0], 10);
+                const date = new Date(timestamp);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+            return "Invalid Date";
+        }
+
+
+    </script>
+
+
+
+</body>
+</html>

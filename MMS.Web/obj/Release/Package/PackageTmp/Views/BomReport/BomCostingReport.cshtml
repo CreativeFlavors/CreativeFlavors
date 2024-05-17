@@ -1,0 +1,306 @@
+﻿@model MMS.Web.Models.StockModel.BillOfMaterialModel
+@{
+    ViewBag.Title = "BomCostingReport";
+}
+
+<div class="indent_report">
+    <h2>Bom Report</h2></div>
+    <script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+    <script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+    <script src="~/Scripts/AutoCompleteCommon.js"></script>
+<style>
+    .ui-multiselect {
+        width: 100% !important;
+        position: relative !important;
+        background: #fff;
+        border-radius: 0px;
+        border: 2px solid #dedede;
+        color: #8a8c8c;
+        font-size: 14px;
+    }
+</style>
+    <div> 
+        <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+            <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+                <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+            </div>
+        </div>
+        <div class="field-section indent_field">
+            <div class="form-group">
+                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                    <label for="text" class="form-label">Buyer :</label>
+                </div>
+                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                    @Html.DropDownList("Buyer", MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field " })
+                </div>
+                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                    <label for="text" class="form-label">Season</label>
+                </div>
+                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                    @Html.DropDownList("Season", MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "select-style text-field" })
+                </div>
+
+                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                    <label for="text" class="form-label"> Lot No :</label>
+                </div>
+                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 space_status">
+                    @Html.DropDownList("LotNo", MMS.Web.ExtensionMethod.HtmlHelper.LOtNo(), new { @class = "select-style text-field" })
+                </div>   
+                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                            <label for="text" class="form-label">Bom NO  : </label>
+                        </div>
+                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12" width="100%">
+                            @*@Html.DropDownList("BomNo", Model.bomStyleList, "Please Select", new { @class = "select-style text-field " })*@
+                            @Html.ListBox("BomNo", new MultiSelectList(MMS.Web.ExtensionMethod.HtmlHelper.BomStyle(), "value",
+                          "text"), new { Multiple = "multiple", @class = "multipleOrder_" })
+                        </div>
+                    
+
+                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                    <label for="text" class="form-label">Store :</label>
+                </div>
+                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                    @Html.DropDownList("Store", MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
+
+                </div>
+                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                    <label for="text" class="form-label">Category :</label>
+                </div>
+                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                    @Html.DropDownList("Category", MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+
+                </div>
+                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                    <label for="text" class="form-label">Group :</label>
+                </div>
+                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                    @Html.DropDownList("Group", MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+                </div> 
+
+                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                    <label for="text" class="form-label">Material :</label>
+                </div>
+                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                    @Html.DropDownList("Material", MMS.Web.ExtensionMethod.HtmlHelper.DynamicMaterialName(), new { @class = "select-style text-field" })
+                </div>                  
+            </div>
+        </div>
+        <input id="ExportReport" class="indent_report_field" name="Generate Report" type="submit" value="Generate Report"/>
+    </div>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+<script src="~/Scripts/MultiSelect_/jquery.multiselect.js"></script>
+<script src="~/Scripts/MultiSelect_/jquery.multiselect.min.js"></script>
+<link href="~/Scripts/MultiSelect_/css/jquery.multiselect.css" rel="stylesheet" /> 
+    <script>
+        $(document).ready(function () {
+            $(document).ajaxStart(function () {
+                $(".loader-overlay").css("display", "block");
+            });
+
+            $(document).ajaxComplete(function () {
+                $(".loader-overlay").css("display", "none");
+            });
+            $(window).load(function () {
+                $('.loader-overlay').fadeOut('fast');
+            });
+            $(".multipleOrder_").multiselect();
+            $("#Buyer").change(function () { 
+                var Buyer = $('#Buyer').val();
+                $.ajax({
+                    url: '/BomReport/GetSeason',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { Buyer: Buyer },
+                    success: function (cities) { 
+                          if (cities != null && cities !="") {  
+                         
+                            $("#LotNo").html(""); // clear before appending new list
+                            $('#LotNo').append('<option value="" selected="selected">Please Select</option>');
+                            $.each(cities.LotNo, function (i, city) {
+                                $("#LotNo").append(
+                                    $('<option></option>').val(city.OrderEntryId).html(city.LotNo));
+                            });
+                        }
+                    }
+                });
+            }); 
+
+            $("#LotNo").change(function () {
+                
+                var LotNo = $('#LotNo option:selected').text();
+                var buyer = $('#Buyer option:selected').val();
+                var season = $('#Season').val();
+
+                $.ajax({
+                    url: '/BomReport/BOMCost',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: {
+                        lotNo: LotNo,Buyer :buyer, SeasonName: season
+                    },
+                    success: function (data) {
+                       // 
+                      
+                        if (data.length > 0) {
+                            $("#BomNo").html('');
+                            $(".multipleOrder_").multiselect("uncheckAll");
+                            $(".multipleOrder_").multiselect('destroy');
+                            $('.multipleOrder_').html("");
+                            for (var i = 0; i < data.length; i++) {
+                                if ($('.multipleOrder_ option[value=' + data[i].Value + ']').length == 0) {
+                                    $('.multipleOrder_').append($('<option></option>').val(data[i].Value).html(data[i].Text));
+                                }
+                            }
+                            $(".multipleOrder_").multiselect({
+                                noneSelectedText: "Please Select",
+                                classes: "selLocCsr"
+                            });
+                        }
+                        
+                        if (data.length == 0) {
+                            $("#BomNo").html('');
+                            $(".multipleOrder_").multiselect("uncheckAll");
+                            $(".multipleOrder_").multiselect('destroy');
+                            $('.multipleOrder_').html("");
+                            for (var i = 0; i < data.length; i++) {
+                                if ($('.multipleOrder_ option[value=' + data[i].Value + ']').length == 0) {
+                                    $('.multipleOrder_').append($('<option></option>').val(data[i].Value).html(data[i].Text));
+                                }
+                            }
+                            $(".multipleOrder_").multiselect({
+                                noneSelectedText: "Please Select",
+                                classes: "selLocCsr"
+                            });
+                        }
+                  
+                    }
+                });
+            });
+
+            $("#Store").change(function () {
+                 
+                var StoreId = $('#Store').val();
+                $.ajax({
+                    url: '/MaterialMaster/FillMaterialCateogoryid',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { StoreMasterId: StoreId },
+                    success: function (cities) {
+                         
+                        $("#Category").html(""); // clear before appending new list
+                        $('#Category').append('<option value="" selected="selected">Please Select</option>');
+                        $.each(cities, function (i, city) {
+                            $("#Category").append(
+                                $('<option></option>').val(city.MaterialCategoryMasterId).html(city.CategoryName));
+                        });
+                    }
+                });
+            });
+            $("#Category").change(function () {              
+                var MaterialCategoryMasterId_ = $('#Category').val();
+                $.ajax({
+                    url: '/MaterialMaster/FillCateogoryid',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { MaterialCategoryMasterId: MaterialCategoryMasterId_ },
+                    success: function (cities) {
+                        $("#Group").html(""); // clear before appending new list
+                        $.each(cities, function (i, city) {
+                            $("#Group").append(
+                                $('<option></option>').val(city.MaterialGroupMasterId).html(city.GroupName));
+                        });
+                    }
+                });
+
+            });
+            $("#Group").change(function () {             
+                var Material = $('#Group').val();
+                $.ajax({
+                    url: '/StockStatementReport/GetMaterial',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { MaterialId: Material },
+                    success: function (cities) {
+                         
+                        $("#Material").html(""); // clear before appending new list
+                        $('#Material').append('<option value="" selected="selected">Please Select</option>');// clear before appending new list
+                        $.each(cities, function (i, city) {
+                            $("#Material").append(
+                                $('<option></option>').val(city.MaterialMasterID).html(city.MaterialDescription));
+                        });
+                    }
+                });
+
+            });
+            $("#ExportReport").click(function (event) {
+              
+                 
+                var Store = $('#Store').val();
+                var Group = $('#Group').val();
+                var Category = $('#Category').val();
+                var buyer = $('#Buyer option:selected').val();
+
+                if (buyer.toLowerCase() == "please select")
+                {
+                    buyer = "";
+                }
+               
+                    var bomNo = $('#BomNo').val();
+                    if (bomNo != null)
+                    {
+                        var BomNumber = bomNo.join();
+                    }
+                    else
+                    {
+                        BomNumber = "";
+                    }
+                  
+
+                    var LotNo = $('#LotNo  option:selected').text();
+                    if (LotNo == "Please Select")
+                    {
+                        LotNo = "";
+                    }
+                    var Season = $('#Season').val();
+                    var Material = $('#Material').val();
+                    $.ajax({
+                        type: 'POST',
+                        url: '/BomReport/BOMCostToAspx',
+                        data: {
+                            Buyer: buyer,
+                            Bom: BomNumber,
+                            group: Group,
+                            store: Store,                           
+                            category: Category,
+                            lotNo: LotNo,
+                            season: Season,
+                            material: Material
+                        },
+                        success: function (data) {
+                            var url = "@(System.Configuration.ConfigurationManager.AppSettings["ReportURL"].ToString())Costing.aspx?Buyer=" + data.Buyer + "&Bom=" + data.Bom + "&Category=" + data.Category + "&Group=" + data.Group + "&Store=" + data.Store + "&Season=" + data.Season + "&Material=" + data.Material + "&LotNo=" + data.LotNo;
+                            window.open(url, '_blank');
+                            return false
+                        }
+                    });
+                
+            });
+        })
+
+ 
+
+        $("#Material").combobox();
+        $("#toggle").click(function () {
+            $("#Material").toggle();
+        });
+
+        //$("#BomNo").combobox();
+        //$("#toggle").click(function () {
+        //    $("#BomNo").toggle();
+        //});
+        //$("#Buyer").combobox();
+        //$("#toggle").click(function () {
+        //    $("#Buyer").toggle();
+        //});
+    </script>

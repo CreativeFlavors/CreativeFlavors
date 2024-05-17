@@ -1,0 +1,587 @@
+﻿@model MMS.Web.Models.StockModel.IssueSlip_SingleModel
+@using MMS.Repository.Managers.StockManager
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+@{
+    ViewBag.Title = "Issue Slip";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2 class="content-title">Single Issue Slip</h2>
+<div style="width: 100%; float: left;">
+    <div id="tabVehicleWatchList">
+        @Html.Action("SingleIssueSlipGrid", "IssueSlip_Single")
+    </div>
+</div>
+
+<script>
+    var CurrentRowID = "";
+    //Click Autodiplay button
+    $(document).on('click', '#AutoDisplay_', function () {
+
+        validation();
+
+        if (validation() != false) {
+            if (CurrentRowID == "") {
+                var rowCount = $('#list-amended-material tr').length;
+
+                $('#list-amended-material tbody').append("<tr id=" + rowCount + "><td id='IssueSlipNo" + rowCount + "' class='IssueSlipNo'>" + $('#IssueSlipNo').val() + "</td>" +
+                                                            "<td  id='InternalOderID" + rowCount + "' class='InternalOderID'>" + $('#InternalOderID').val() + "</td>" +
+                                                            "<td  id='StyleNo" + rowCount + "' class='StyleNo'>" + $('#StyleNo').val() + "</td>" +
+                                                            "<td  id='StoresID" + rowCount + "' class='StoresID'>" + $('#StoresID').val() + "</td>" +
+                                                            "<td  id='CategoryID" + rowCount + "' class='CategoryID'>" + $('#CategoryID').val() + "</td>" +
+                                                            "<td id='GroupID" + rowCount + "'  class='GroupID'>" + $('#GroupID').val() + "</td>" +
+                                                            "<td id='Material" + rowCount + "' class='Material'>" + $('#Material').val() + "</td>" +
+                                                            "<td id='ColorID" + rowCount + "' class='ColorID'>" + $('#ColorID').val() + "</td>" +
+                                                            "<td id='LotNo" + rowCount + "' class='LotNo'>" + $('#LotNo').val() + "</td>" +
+                                                            "<td id='BalanceInThisListlot" + rowCount + "' class='BalanceInThisListlot'>" + $('#BalanceInThisListlot').val() + "</td>" +
+                                                            "<td id='BalanceInthisListType" + rowCount + "' class='BalanceInthisListType'>" + $('#BalanceInthisListType').val() + "</td>" +
+                                                            "<td id='MachineName" + rowCount + "' class='MachineName'>" + $('#MachineName').val() + "</td>" +
+                                                            "<td id='NoOfSetPairs" + rowCount + "' class='NoOfSetPairs'>" + $('#NoOfSetPairs').val() + "</td>" +
+                                                            "<td id='Rate" + rowCount + "' class='Rate'>" + $('#Rate').val() + "</td>" +
+                                                            "<td id='SubtanceID" + rowCount + "' class='SubtanceID'>" + $('#SubtanceID').val() + "</td>" +
+                                                            "<td id='RequiredQTY" + rowCount + "' class='RequiredQTY'>" + $('#RequiredQTY').val() + "</td>" +
+                                                            "<td id='RequiredType" + rowCount + "' class='RequiredType'>" + $('#RequiredType').val() + "</td>" +
+                                                            "<td id='AlreadyUsed" + rowCount + "' class='AlreadyUsed'>" + $('#AlreadyUsed').val() + "</td>" +
+                                                            "<td id='AlreadyUsedType" + rowCount + "' class='AlreadyUsedType'>" + $('#AlreadyUsedType').val() + "</td>" +
+                                                            "<td id='CurrentIssues" + rowCount + "' class='CurrentIssues'>" + $('#CurrentIssues').val() + "</td>" +
+                                                            "<td id='CurrentIssuesType" + rowCount + "' class='CurrentIssuesType'>" + $('#CurrentIssuesType').val() + "</td>" +
+                                                            "<td id='IssueType" + rowCount + "' class='IssueType'>" + $('#IssueType').val() + "</td>" +
+                                                            "<td id='ConveyorID" + rowCount + "' class='ConveyorID'>" + $('#ConveyorID').val() + "</td>" +
+                                                            "<td id='CurrentStock" + rowCount + "' class='CurrentStock'>" + $('#CurrentStock').val() + "</td>" +
+                                                            "<td id='CurrentStockType" + rowCount + "' class='CurrentStockType'>" + $('#CurrentStockType').val() + "</td>" +
+                                                            "<td id='UOMStock" + rowCount + "' class='UOMStock'>" + $('#UOMStock').val() + "</td>" +
+                                                            "<td id='UOMStockID" + rowCount + "' class='UOMStockID'>" + $('#UOMStockID').val() + "</td>" +
+                                                            "<td id='FreeStock" + rowCount + "' class='FreeStock'>" + $('#FreeStock').val() + "</td>" +
+                                                            "<td id='FreeStockType" + rowCount + "' class='FreeStockType'>" + $('#FreeStockType').val() + "</td>" +
+                                                            "<td id='FreeStockUOM" + rowCount + "' class='FreeStockUOM'>" + $('#FreeStockUOM').val() + "</td>" +
+                                                            "<td id='FreeStockUOMType" + rowCount + "' class='FreeStockUOMType'>" + $('#FreeStockUOMType').val() + "</td>" +
+                                                            "<td id='ClosingStockinAllStores" + rowCount + "' class='ClosingStockinAllStores'>" + $('#ClosingStockinAllStores').val() + "</td>" +
+                                                            "<td id='ClosingStockinAllStoredType" + rowCount + "' class='ClosingStockinAllStoredType'>" + $('#ClosingStockinAllStoredType').val() + "</td>" +
+                                                             "<td id='ClosingStockingUOM" + rowCount + "' class='ClosingStockingUOM'>" + $('#ClosingStockingUOM').val() + "</td>" +
+                                                            "<td id='ClosingStockingUOMType" + rowCount + "' class='ClosingStockingUOMType'>" + $('#ClosingStockingUOMType').val() + "</td>" +
+                                                            "<td id='InTransitValue" + rowCount + "' class='InTransitValue'>" + $('#InTransitValue').val() + "</td>" +
+                                                            "<td id='InTransitType" + rowCount + "' class='InTransitType'>" + $('#InTransitType').val() + "</td>" +
+                                                            "<td id='IntransitUOM" + rowCount + "' class='IntransitUOM'>" + $('#IntransitUOM').val() + "</td>" +
+                                                            "<td id='IntransitUOMType" + rowCount + "' class='IntransitUOMType'>" + $('#IntransitUOMType').val() + "</td>" +
+                                                            "<td id='ReserverQty" + rowCount + "' class='ReserverQty'>" + $('#ReserverQty').val() + "</td>" +
+                                                            "<td id='ReserverQtyType" + rowCount + "' class='ReserverQtyType'>" + $('#ReserverQtyType').val() + "</td>" +
+                                                            "<td id='ReserverUom" + rowCount + "' class='ReserverUom'>" + $("#ReserverUom").val() + "</td>" +
+                                                            "<td id='ReservedUOMType" + rowCount + "' class='ReservedUOMType'>" + $("#ReservedUOMType").val() + "</td>");
+
+
+                $("input[type='text'],textarea").val("");
+                $("select option:first-child").prop("selected", "selected");
+            }
+
+            else {
+
+                $('#IssueSlipNo' + CurrentRowID + '').html($('#IssueSlipNo').val());
+                $('#InternalOderID' + CurrentRowID + '').html($('#InternalOderID').val());
+                $('#StyleNo' + CurrentRowID + '').html($('#StyleNo').val());
+                $('#StoresID' + CurrentRowID + '').html($('#StoresID').val());
+                $('#CategoryID' + CurrentRowID + '').html($('#CategoryID').val());
+                $('#GroupID' + CurrentRowID + '').html($('#GroupID').val());
+                $('#Material' + CurrentRowID + '').html($('#Material').val());
+                $('#ColorID' + CurrentRowID + '').html($('#ColorID').val());
+                $('#LotNo' + CurrentRowID + '').html($('#LotNo').val());
+                $('#BalanceInThisListlot' + CurrentRowID + '').html($('#BalanceInThisListlot').val());
+                $('#BalanceInthisListType' + CurrentRowID + '').html($('#BalanceInthisListType').val());
+                $('#MachineName' + CurrentRowID + '').html($('#MachineName').val());
+                $('#NoOfSetPairs' + CurrentRowID + '').html($('#NoOfSetPairs').val());
+                $('#Rate' + CurrentRowID + '').html($('#Rate').val());
+                $('#SubtanceID' + CurrentRowID + '').html($('#SubtanceID').val());
+                $('#RequiredQTY' + CurrentRowID + '').html($('#RequiredQTY').val());
+                $('#RequiredType' + CurrentRowID + '').html($('#RequiredType').val());
+                $('#AlreadyUsed' + CurrentRowID + '').html($('#AlreadyUsed').val());
+                $('#AlreadyUsedType' + CurrentRowID + '').html($('#AlreadyUsedType').val());
+                $('#CurrentIssues' + CurrentRowID + '').html($('#CurrentIssues').val());
+                $('#CurrentIssuesType' + CurrentRowID + '').html($('#CurrentIssuesType').val());
+                $('#IssueType' + CurrentRowID + '').html($('#IssueType').val());
+                $('#ConveyorID' + CurrentRowID + '').html($('#ConveyorID').val());
+                $('#CurrentStock' + CurrentRowID + '').html($('#CurrentStock').val());
+                $('#CurrentStockType' + CurrentRowID + '').html($('#CurrentStockType').val());
+                $('#UOMStock' + CurrentRowID + '').html($('#UOMStock').val());
+                $('#UOMStockID' + CurrentRowID + '').html($('#UOMStockID').val());
+                $('#FreeStock' + CurrentRowID + '').html($('#FreeStock').val());
+                $('#FreeStockType' + CurrentRowID + '').html($('#FreeStockType').val());
+                $('#FreeStockUOM' + CurrentRowID + '').html($('#FreeStockUOM').val());
+                $('#FreeStockUOMType' + CurrentRowID + '').html($('#FreeStockUOMType').val());
+                $('#ClosingStockinAllStores' + CurrentRowID + '').html($('#ClosingStockinAllStores').val());
+                $('#ClosingStockinAllStoredType' + CurrentRowID + '').html($('#ClosingStockinAllStoredType').val());
+                $('#ClosingStockingUOM' + CurrentRowID + '').html($('#ClosingStockingUOM').val());
+                $('#ClosingStockingUOMType' + CurrentRowID + '').html($('#ClosingStockingUOMType').val());
+                $('#InTransitValue' + CurrentRowID + '').html($('#InTransitValue').val());
+                $('#InTransitType' + CurrentRowID + '').html($('#InTransitType').val());
+                $('#IntransitUOM' + CurrentRowID + '').html($('#IntransitUOM').val());
+                $('#IntransitUOMType' + CurrentRowID + '').html($('#IntransitUOMType').val());
+                $('#ReserverQty' + CurrentRowID + '').html($('#ReserverQty').val());
+                $('#ReserverQtyType' + CurrentRowID + '').html($('#ReserverQtyType').val());
+                $('#ReserverUom' + CurrentRowID + '').html($('#ReserverUom').val());
+                $('#ReservedUOMType' + CurrentRowID + '').html($('#ReservedUOMType').val());
+            }
+        }
+
+    });
+
+    function validation() {
+        if ($('#IssueSlipNo').val() == "") {
+            alert("Please Enter Issue Slip No."); $('#IssueSlipNo').css('border-color', 'red'); $('#IssueSlipNo').focus(); return false;
+        }
+        else {
+            $('#IssueSlipNo').css('border-color', '');
+        }
+        if ($('#InternalOderID').val() == "") {
+            alert("Please Enter Internal OderID."); $('#InternalOderID').css('border-color', 'red'); $('#InternalOderID').focus(); return false;
+        }
+        else {
+            $('#InternalOderID').css('border-color', '');
+        }
+        if ($('#StyleNo').val() == "") {
+            alert("Please Enter Style No."); $('#StyleNo').css('border-color', 'red'); $('#StyleNo').focus(); return false;
+        }
+        else {
+            $('#StyleNo').css('border-color', '');
+        }
+        if ($('#StoresID').val() == "") {
+            alert("Please select Store."); $('#StoresID').css('border-color', 'red'); $('#StoresID').focus(); return false;
+        }
+        else {
+            $('#StoresID').css('border-color', '');
+        }
+        if ($('#CategoryID').val() == "") {
+            alert("Please select Category."); $('#CategoryID').css('border-color', 'red'); $('#CategoryID').focus(); return false;
+        }
+        else {
+            $('#CategoryID').css('border-color', '');
+        }
+        if ($('#GroupID').val() == "") {
+            alert("Please select Group."); $('#GroupID').css('border-color', 'red'); $('#GroupID').focus(); return false;
+        }
+        else {
+            $('#GroupID').css('border-color', '');
+        }
+        if ($('#Material').val() == "") {
+            alert("Please select Material."); $('#Material').css('border-color', 'red'); $('#Material').focus(); return false;
+        }
+        else {
+            $('#Material').css('border-color', '');
+        }
+        if ($('#ColorID').val() == "") {
+            alert("Please select Color."); $('#ColorID').css('border-color', 'red'); $('#ColorID').focus(); return false;
+        }
+        else {
+            $('#ColorID').css('border-color', '');
+        }
+        if ($('#LotNo').val() == "") {
+            alert("Please select LotNo."); $('#LotNo').css('border-color', 'red'); $('#LotNo').focus(); return false;
+        }
+        else {
+            $('#LotNo').css('border-color', '');
+        }
+        if ($('#BalanceInThisListlot').val() == "") {
+            alert("Please Enter BalanceIn This Listlot."); $('#BalanceInThisListlot').css('border-color', 'red'); $('#BalanceInThisListlot').focus(); return false;
+        }
+        else {
+            $('#BalanceInThisListlot').css('border-color', '');
+        }
+        if ($('#BalanceInthisListType').val() == "") {
+            alert("Please Enter Balance In this List Type."); $('#BalanceInthisListType').css('border-color', 'red'); $('#BalanceInthisListType').focus(); return false;
+        }
+        else {
+            $('#BalanceInthisListType').css('border-color', '');
+        }
+        if ($('#MachineName').val() == "") {
+            alert("Please select MachineName."); $('#MachineName').css('border-color', 'red'); $('#MachineName').focus(); return false;
+        }
+        else {
+            $('#MachineName').css('border-color', '');
+        }
+        if ($('#NoOfSetPairs').val() == "") {
+            alert("Please Enter NoOfSetPairso."); $('#NoOfSetPairs').css('border-color', 'red'); $('#NoOfSetPairs').focus(); return false;
+        }
+        else {
+            $('#NoOfSetPairs').css('border-color', '');
+        }
+        if ($('#Rate').val() == "") {
+            alert("Please Enter Rate."); $('#Rate').css('border-color', 'red'); $('#Rate').focus(); return false;
+        }
+        else {
+            $('#Rate').css('border-color', '');
+        }
+        if ($('#SubtanceID').val() == "") {
+            alert("Please select subtance."); $('#SubtanceID').css('border-color', 'red'); $('#SubtanceID').focus(); return false;
+        }
+        else {
+            $('#SubtanceID').css('border-color', '');
+        }
+        if ($('#RequiredQTY').val() == "") {
+            alert("Please Enter RequiredQTY."); $('#IssueSlipNo').css('border-color', 'red'); $('#IssueSlipNo').focus(); return false;
+        }
+        else {
+            $('#RequiredQTY').css('border-color', '');
+        }
+        if ($('#RequiredType').val() == "") {
+            alert("Please select Required Type."); $('#RequiredType').css('border-color', 'red'); $('#RequiredType').focus(); return false;
+        }
+        else {
+            $('#RequiredType').css('border-color', '');
+        }
+        if ($('#AlreadyUsed').val() == "") {
+            alert("Please Enter AlreadyUsed."); $('#AlreadyUsed').css('border-color', 'red'); $('#AlreadyUsed').focus(); return false;
+        }
+        else {
+            $('#AlreadyUsed').css('border-color', '');
+        }
+        if ($('#AlreadyUsedType').val() == "") {
+            alert("Please select Already Used Type."); $('#AlreadyUsedType').css('border-color', 'red'); $('#AlreadyUsedType').focus(); return false;
+        }
+        else {
+            $('#AlreadyUsedType').css('border-color', '');
+        }
+        if ($('#CurrentIssues').val() == "") {
+            alert("Please Enter CurrentIssues."); $('#CurrentIssues').css('border-color', 'red'); $('#CurrentIssues').focus(); return false;
+        }
+        else {
+            $('#CurrentIssues').css('border-color', '');
+        }
+        if ($('#CurrentIssuesType').val() == "") {
+            alert("Please select Current Issues Type."); $('#CurrentIssuesType').css('border-color', 'red'); $('#CurrentIssuesType').focus(); return false;
+        }
+        else {
+            $('#CurrentIssuesType').css('border-color', '');
+        }
+        if ($('#IssueType').val() == "") {
+            alert("Please select IssueType."); $('#IssueType').css('border-color', 'red'); $('#IssueType').focus(); return false;
+        }
+        else {
+            $('#IssueType').css('border-color', '');
+        }
+
+        if ($('#ConveyorID').val() == "") {
+            alert("Please select ConveyorID."); $('#ConveyorID').css('border-color', 'red'); $('#ConveyorID').focus(); return false;
+        }
+        else {
+            $('#ConveyorID').css('border-color', '');
+        }
+        if ($('#CurrentStock').val() == "") {
+            alert("Please enter Current Stock."); $('#CurrentStock').css('border-color', 'red'); $('#CurrentStock').focus(); return false;
+        }
+        else {
+            $('#CurrentStock').css('border-color', '');
+        }
+        if ($('#CurrentStockType').val() == "") {
+            alert("Please select Current Stock Type."); $('#CurrentStockType').css('border-color', 'red'); $('#CurrentStockType').focus(); return false;
+        }
+        else {
+            $('#CurrentStockType').css('border-color', '');
+        }
+        if ($('#UOMStock').val() == "") {
+            alert("Please enter UOMStock."); $('#UOMStock').css('border-color', 'red'); $('#UOMStock').focus(); return false;
+        }
+        else {
+            $('#UOMStock').css('border-color', '');
+        }
+        if ($('#UOMStockID').val() == "") {
+            alert("Please select UOMStockID."); $('#UOMStockID').css('border-color', 'red'); $('#UOMStockID').focus(); return false;
+        }
+        else {
+            $('#UOMStockID').css('border-color', '');
+        }
+        if ($('#FreeStock').val() == "") {
+            alert("Please enter FreeStock."); $('#FreeStock').css('border-color', 'red'); $('#FreeStock').focus(); return false;
+        }
+        else {
+            $('#FreeStock').css('border-color', '');
+        }
+        if ($('#FreeStockType').val() == "") {
+            alert("Please select FreeStockType."); $('#FreeStockType').css('border-color', 'red'); $('#FreeStockType').focus(); return false;
+        }
+        else {
+            $('#FreeStockType').css('border-color', '');
+        }
+        if ($('#FreeStockUOM').val() == "") {
+            alert("Please enter FreeStockUOM."); $('#FreeStockUOM').css('border-color', 'red'); $('#FreeStockUOM').focus(); return false;
+        }
+        else {
+            $('#FreeStockUOM').css('border-color', '');
+        }
+        if ($('#FreeStockUOMType').val() == "") {
+            alert("Please enter FreeStockUOMType."); $('#FreeStockUOMType').css('border-color', 'red'); $('#FreeStockUOMType').focus(); return false;
+        }
+        else {
+            $('#FreeStockUOMType').css('border-color', '');
+        }
+        if ($('#ClosingStockinAllStores').val() == "") {
+            alert("Please enter ClosingStockinAllStores."); $('#ClosingStockinAllStores').css('border-color', 'red'); $('#ClosingStockinAllStores').focus(); return false;
+        }
+        else {
+            $('#ClosingStockinAllStores').css('border-color', '');
+        }
+        if ($('#ClosingStockinAllStoredType').val() == "") {
+            alert("Please select ClosingStockinAllStoredType."); $('#ClosingStockinAllStoredType').css('border-color', 'red'); $('#ClosingStockinAllStoredType').focus(); return false;
+        }
+        else {
+            $('#ClosingStockinAllStoredType').css('border-color', '');
+        }
+        if ($('#ClosingStockingUOM').val() == "") {
+            alert("Please enter ClosingStockingUOM."); $('#ClosingStockingUOM').css('border-color', 'red'); $('#ClosingStockingUOM').focus(); return false;
+        }
+        else {
+            $('#ClosingStockingUOM').css('border-color', '');
+        }
+        if ($('#ClosingStockingUOMType').val() == "") {
+            alert("Please enter ClosingStockingUOMType."); $('#ClosingStockingUOMType').css('border-color', 'red'); $('#ClosingStockingUOMType').focus(); return false;
+        }
+        else {
+            $('#ClosingStockingUOMType').css('border-color', '');
+        }
+        if ($('#InTransitValue').val() == "") {
+            alert("Please enter InTransitValue."); $('#InTransitValue').css('border-color', 'red'); $('#InTransitValue').focus(); return false;
+        }
+        else {
+            $('#InTransitValue').css('border-color', '');
+        }
+        if ($('#InTransitType').val() == "") {
+            alert("Please select InTransitType."); $('#InTransitType').css('border-color', 'red'); $('#InTransitType').focus(); return false;
+        }
+        else {
+            $('#InTransitType').css('border-color', '');
+        }
+
+        if ($('#IntransitUOM').val() == "") {
+            alert("Please enter IntransitUOM."); $('#IntransitUOM').css('border-color', 'red'); $('#IntransitUOM').focus(); return false;
+        }
+        else {
+            $('#IntransitUOM').css('border-color', '');
+        }
+        if ($('#IntransitUOMType').val() == "") {
+            alert("Please select IntransitUOMType."); $('#IntransitUOMType').css('border-color', 'red'); $('#IntransitUOMType').focus(); return false;
+        }
+        else {
+            $('#IntransitUOMType').css('border-color', '');
+        }
+        if ($('#ReserverQty').val() == "") {
+            alert("Please enter ReserverQty."); $('#ReserverQty').css('border-color', 'red'); $('#ReserverQty').focus(); return false;
+        }
+        else {
+            $('#ReserverQty').css('border-color', '');
+        }
+        if ($('#ReserverQtyType').val() == "") {
+            alert("Please select ReserverQtyType."); $('#ReserverQtyType').css('border-color', 'red'); $('#ReserverQtyType').focus(); return false;
+        }
+        else {
+            $('#ReserverQtyType').css('border-color', '');
+        }
+        if ($('#ReserverUom').val() == "") {
+            alert("Please enter ReserverUom."); $('#ReserverUom').css('border-color', 'red'); $('#ReserverUom').focus(); return false;
+        }
+        else {
+            $('#ReserverUom').css('border-color', '');
+        }
+        if ($('#ReservedUOMType').val() == "") {
+            alert("Please enter ReservedUOMType."); $('#ReservedUOMType').css('border-color', 'red'); $('#ReservedUOMType').focus(); return false;
+        }
+        else {
+            $('#ReservedUOMType').css('border-color', '');
+        }
+    }
+
+    //Click on grid row
+    $(document).on('click', '#list-amended-material tbody tr', function () {
+         //alert(1);
+        CurrentRowID = $(this).attr('id');
+        $(this).addClass("curChangeableRow");
+        $(this).siblings().removeClass("curChangeableRow");
+
+        $("#UpdateBtn").show();
+        $("#AddBtn").hide();
+
+        $('#IssueSlipNo').val($(this).find('.IssueSlipNo').html());
+        $('#InternalOderID').val($(this).find('.InternalOderID').html());
+        $('#StyleNo').val($(this).find('.StyleNo').html());
+        $('#StoresID').val($(this).find('.StoresID').html());
+        $('#CategoryID').val($(this).find('.CategoryID').html());
+        $('#GroupID').val($(this).find('.GroupID').html());
+        $('#Material').val($(this).find('.Material').html());
+        $('#ColorID').val($(this).find('.ColorID').html());
+        $('#LotNo').val($(this).find('.LotNo').html());
+        $('#BalanceInThisListlot').val($(this).find('.BalanceInThisListlot').html());
+        $('#BalanceInthisListType').val($(this).find('.BalanceInthisListType').html());
+        $('#MachineName').val($(this).find('.MachineName').html());
+        $('#NoOfSetPairs').val($(this).find('.NoOfSetPairs').html());
+        $('#Rate').val($(this).find('.Rate').html());
+        $('#SubtanceID').val($(this).find('.SubtanceID').html());
+        $('#RequiredQTY').val($(this).find('.RequiredQTY').html());
+        $('#RequiredType').val($(this).find('.RequiredType').html());
+        $('#AlreadyUsed').val($(this).find('.AlreadyUsed').html());
+        $('#AlreadyUsedType').val($(this).find('.AlreadyUsedType').html());
+        $('#CurrentIssues').val($(this).find('.CurrentIssues').html());
+        $('#CurrentIssuesType').val($(this).find('.CurrentIssuesType').html());
+        $('#IssueType').val($(this).find('.IssueType').html());
+        $('#ConveyorID').val($(this).find('.ConveyorID').html());
+        $('#CurrentStock').val($(this).find('.CurrentStock').html());
+        $('#CurrentStockType').val($(this).find('.CurrentStockType').html());
+        $('#UOMStock').val($(this).find('.UOMStock').html());
+        $('#UOMStockID').val($(this).find('.UOMStockID').html());
+        $('#FreeStock').val($(this).find('.FreeStock').html());
+        $('#FreeStockType').val($(this).find('.FreeStockType').html());
+        $('#FreeStockUOM').val($(this).find('.FreeStockUOM').html());
+        $('#FreeStockUOMType').val($(this).find('.FreeStockUOMType').html());
+        $('#ClosingStockinAllStores').val($(this).find('.ClosingStockinAllStores').html());
+        $('#ClosingStockinAllStoredType').val($(this).find('.ClosingStockinAllStoredType').html());
+        $('#ClosingStockingUOM').val($(this).find('.ClosingStockingUOM').html());
+        $('#ClosingStockingUOMType').val($(this).find('.ClosingStockingUOMType').html());
+        $('#InTransitValue').val($(this).find('.InTransitValue').html());
+        $('#InTransitType').val($(this).find('.InTransitType').html());
+        $('#IntransitUOM').val($(this).find('.IntransitUOM').html());
+        $('#IntransitUOMType').val($(this).find('.IntransitUOMType').html());
+        $('#ReserverQty').val($(this).find('.ReserverQty').html());
+        $('#ReserverQtyType').val($(this).find('.ReserverQtyType').html());
+        $('#ReserverUom').val($(this).find('.ReserverUom').html());
+        $('#ReservedUOMType').val($(this).find('.ReservedUOMType').html());
+    });
+
+
+    function Save() {
+
+        //if (validation()) {
+        if ($("#list-amended-material tbody tr").length == 0) {
+            $.ajax({
+                type: 'POST',
+                url: '/IssueSlip_Single/SaveDetails',
+                data: $("form").serialize(),
+                success: function (data) {
+                    if (data == true) {
+                        if ($("#BtnSave").val() == "Save") {
+                            alert('Saved Successfully.');
+                        }
+                        else {
+                            alert('Updated Successfully.');
+                        }
+                        //  $("#BtnSave").attr('value', 'Save');
+                        location.href = "/IssueSlip_Single/SingleIssueSlip";
+                        return false;
+                    }
+                    else {
+                        alert('Save process Failed.');
+                        location.href = "/IssueSlip_Single/SingleIssueSlip";
+                        return false;
+                    }
+                }
+            });
+
+        }
+        else {
+            var wholeJsonList = [];
+
+            $('#list-amended-material tbody tr').each(function () {
+                wholeJsonList.push(
+                    {
+                   IssueSlipNo:$(this).find('.IssueSlipNo').html(),
+                InternalOderID:$(this).find('.InternalOderID').html(),
+                StyleNo:$(this).find('.StyleNo').html(),
+                StoresID:$(this).find('.StoresID').html(),
+                CategoryID:$(this).find('.CategoryID').html(),
+                GroupID:$(this).find('.GroupID').html(),
+                Material:$(this).find('.Material').html(),
+                ColorID:$(this).find('.ColorID').html(),
+                LotNo:$(this).find('.LotNo').html(),
+                BalanceInThisListlot:$(this).find('.BalanceInThisListlot').html(),
+                BalanceInthisListType:$(this).find('.BalanceInthisListType').html(),
+                MachineName:$(this).find('.MachineName').html(),
+                NoOfSetPairs:$(this).find('.NoOfSetPairs').html(),
+                Rate:$(this).find('.Rate').html(),
+                SubtanceID:$(this).find('.SubtanceID').html(),
+                RequiredQTY:$(this).find('.RequiredQTY').html(),
+                RequiredType:$(this).find('.RequiredType').html(),
+                AlreadyUsed:$(this).find('.AlreadyUsed').html(),
+                AlreadyUsedType:$(this).find('.AlreadyUsedType').html(),
+                CurrentIssues:$(this).find('.CurrentIssues').html(),
+                CurrentIssuesType:$(this).find('.CurrentIssuesType').html(),
+                IssueType:$(this).find('.IssueType').html(),
+                ConveyorID:$(this).find('.ConveyorID').html(),
+                CurrentStock:$(this).find('.CurrentStock').html(),
+                CurrentStockType:$(this).find('.CurrentStockType').html(),
+                UOMStock:$(this).find('.UOMStock').html(),
+                UOMStockID:$(this).find('.UOMStockID').html(),
+                FreeStock:$(this).find('.FreeStock').html(),
+                FreeStockType:$(this).find('.FreeStockType').html(),
+                FreeStockUOM:$(this).find('.FreeStockUOM').html(),
+                FreeStockUOMType:$(this).find('.FreeStockUOMType').html(),
+                ClosingStockinAllStores:$(this).find('.ClosingStockinAllStores').html(),
+                ClosingStockinAllStoredType:$(this).find('.ClosingStockinAllStoredType').html(),
+                ClosingStockingUOM:$(this).find('.ClosingStockingUOM').html(),
+                ClosingStockingUOMType:$(this).find('.ClosingStockingUOMType').html(),
+                InTransitValue:$(this).find('.InTransitValue').html(),
+                InTransitType:$(this).find('.InTransitType').html(),
+                IntransitUOM:$(this).find('.IntransitUOM').html(),
+                IntransitUOMType:$(this).find('.IntransitUOMType').html(),
+                ReserverQty:$(this).find('.ReserverQty').html(),
+                ReserverQtyType:$(this).find('.ReserverQtyType').html(),
+                ReserverUom:$(this).find('.ReserverUom').html(),
+                ReservedUOMType:$(this).find('.ReservedUOMType').html(),
+                    });
+            });
+
+            var wholeJsonListLength = wholeJsonList.length;
+            //alert(wholeJsonListLength)
+            var i = 0;
+            for (i = 0; i <= wholeJsonListLength - 1; i++) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/IssueSlip_Single/SaveDetails',
+                    data: wholeJsonList[i],
+                    success: function (data) {
+                        if (data == true) {
+                            if ($("#BtnSave").val() == "Save") {
+                                alert('Saved Successfully.');
+                            }
+                            else {
+                                alert('Updated Successfully.');
+                            }
+                            location.href = "/IssueSlip_Single/SingleIssueSlip";
+                            return false;
+                        }
+                        else {
+                            alert('Save process Failed.');
+                            location.href = "/IssueSlip_Single/SingleIssueSlip";
+                            return false;
+                        }
+                    }
+                });
+            }
+        }
+        // }
+    }
+
+    function Update() {
+
+        validation();
+
+        if (validation() != false) {
+            $.ajax({
+                type: 'POST',
+                url: '/IssueSlip_Single/SaveDetails',
+                data: $("form").serialize(),
+                success: function (data) {
+                    if (data == true) {
+                        if ($("#BtnSave").val() == "Save") {
+                            alert('Saved Successfully.');
+                        }
+                        else {
+                            alert('Updated Successfully.');
+                        }
+                        location.href = "/IssueSlip_Single/SingleIssueSlip";
+                        return false;
+                    }
+                    else {
+                        alert('Save process Failed.');
+                        location.href = "/IssueSlip_Single/SingleIssueSlip";
+                        return false;
+                    }
+                }
+            });
+        }
+
+    }
+</script>

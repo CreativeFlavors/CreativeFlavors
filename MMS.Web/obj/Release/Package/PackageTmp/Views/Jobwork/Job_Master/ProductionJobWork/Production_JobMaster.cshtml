@@ -1,0 +1,528 @@
+﻿@{
+    ViewBag.Title = "View1";
+    Layout = "~/Views/Shared/_jobLayout.cshtml";
+}
+<div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+    <div class="dashboard-content col-xs-12 no-padding">
+        <div class="dashboard_head dashboard-title congest col-lg-12 col-md-12 col-sm-12  col-xs-12">
+            <div class="dashboard-title  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+                <h2>Production Jobwork</h2>
+            </div>
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("ProductionJobworkGrid", "ProductionJobwork_")
+    </div>
+
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+
+        $("#EditColorPartial").hide();
+        $('#example').DataTable();
+    });
+     
+    function Add_Production() {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("EditProductionJobworkList", "ProductionJobwork_")',
+            data: { ProductionJobwork_code_id: 0 },
+            success: function (data) {
+                $("#EditProductionPartial").html(data)
+                $("#EditProductionPartial").show();
+                $('#Update_edit').hide();
+                $('#Material').attr("disabled", true).trigger('chosen:updated');
+            }
+        });
+
+    }
+    function Edit(arg) {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("EditProductionJobworkList_Code", "ProductionJobwork_")',
+            data: { ProductionJobwork_code_id: arg },
+            success: function (data) {
+                
+                $("#EditProductionPartial").html(data.PartialView);
+                $("#EditProductionPartial").show();
+               // $("input[type='hidden'][name='IsInspection']").remove();
+                $('#Update_edit').hide();
+                if (data.items.Leather_Pairs == true)
+                {
+                    $('input:radio[name="Leather_Pairs"]').filter('[id=0]').attr('checked', true);
+                }
+                if (data.items.component_Pairs == true) {
+                    $('input:radio[name="Leather_Pairs"]').filter('[id=1]').attr('checked', true);
+                }
+                if (data.items.Upper_Fullshoes == true) {
+                    $('input:radio[name="Leather_Pairs"]').filter('[id=2]').attr('checked', true);
+                }
+                if (data.items.Type == "1")
+                {
+                    $("#Production_Type").val(1).trigger('chosen:updated');
+                }
+                else {
+                    $("#Production_Type").val(0).trigger('chosen:updated');
+                }
+            }
+        });
+
+    }
+    // Edit_Grid
+    function Edit_Grid(arg) {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("EditProductionJobworkList_Code_ID", "ProductionJobwork_")',
+            data: { Production_Order_id: arg },
+            success: function (data) {
+                
+                $('#save').hide();
+                $('#Update_edit').show();
+                var values = data.io_val;
+
+                $("#Io_based").html("").trigger('chosen:updated');
+                $.each(data.list, function (i, item) {
+                    $("#Io_based").append(
+                        $('<option></option>').val(item.Value).html(item.Text)).trigger('chosen:updated');
+                });
+
+                $.each(values.split(","), function (i, e) {
+                    $("#Io_based option[value='" + e + "']").prop("selected", true).trigger('chosen:updated');
+                });
+              //  $("#Io_based").val([multiSelect]).trigger('chosen:updated');
+                $('#Production_Order_id').val(data.ProductionJobworkModel.Production_Order_id),
+                //moment(data.date).format('DD/MM/YYYY')
+                $('#date').val(moment(data.ProductionJobworkModel.date).format('DD/MM/YYYY')),
+                 $('#Jw_Name').val(data.ProductionJobworkModel.Jw_Name).trigger('chosen:updated'),
+                $('#Process_Name').val(data.ProductionJobworkModel.Process_Name).trigger('chosen:updated'),
+                $('#Stage_From').val(data.ProductionJobworkModel.Stage_From).trigger('chosen:updated'),
+                $('#Stage_To').val(data.ProductionJobworkModel.Stage_To).trigger('chosen:updated'),
+              $('#Lot_no').val(data.ProductionJobworkModel.Lot_no),
+           //    $("#Io_based  option:selected").map(function () { return this.value }).get().join(', '),
+               $('#Buyer').val(data.ProductionJobworkModel.Buyer).trigger('chosen:updated'),
+               $('#Season').val(data.ProductionJobworkModel.Season).trigger('chosen:updated'),
+               $('#Style').val(data.ProductionJobworkModel.Style).trigger('chosen:updated'),
+             //  $("#JW_BOM_linked  option:selected").map(function () { return this.value }).get().join(', '),
+                $('#Size_range').val(data.ProductionJobworkModel.Size_range).trigger('chosen:updated'),
+               $('#Material_Name').val(data.ProductionJobworkModel.Material_Name).trigger('chosen:updated'),
+              $('#Delivery_date').val(moment(data.ProductionJobworkModel.Delivery_date).format('DD/MM/YYYY')),
+              $('#Qty').val(data.ProductionJobworkModel.Qty),
+
+               $('#Qty_Uom').val(data.ProductionJobworkModel.Qty_Uom),
+               $('#Rate').val(data.ProductionJobworkModel.Rate),
+              $('#Value').val(data.ProductionJobworkModel.Value),
+              $('#GST').val(data.ProductionJobworkModel.GST),
+                $('#GST_AMT').val(data.ProductionJobworkModel.GST_AMT),
+              $('#Total_Cost').val(data.ProductionJobworkModel.Total_Cost),
+              $('#Io').val(data.ProductionJobworkModel.Io),
+              $('#Fg_Material_Name').val(data.ProductionJobworkModel.Fg_Material_Name),
+              $('#Fg_ComponentId').val(data.ProductionJobworkModel.Fg_ComponentId)
+            }
+        });
+
+    }
+    function Save() {
+        
+        var Qty_ = [];
+        var size = [];
+        var add = 0;
+        $('#sizeRangeTable tbody tr').find('.Qty').each(function () {
+            Qty_ += $(this).val() + ";";
+            add += Number($(this).val());
+        });
+        $('#sizeRangeTable tbody tr').find('.Size').each(function () {
+            size += $(this).text() + ",";
+
+        });
+
+        if ($('#Qty').val() != add) {
+            alert("Quantity is not equal");
+            return false;
+        }
+       
+
+        var fromDate = $('#date').val();
+        fromDate = fromDate.split("/");
+        var Date_from = fromDate[2] + "/" + fromDate[1] + "/" + fromDate[0];
+
+
+        var deliveryDate = $('#Delivery_date').val();
+        deliveryDate = deliveryDate.split("/");
+        var D_date = deliveryDate[2] + "/" + deliveryDate[1] + "/" + deliveryDate[0];
+
+
+        var Material_Name = $("#Material_Name").val();
+        var id = Material_Name.split('_');
+        
+            if (Validation() != false) {
+                var Jobwork_raw_material_bool, Encho_Raw_Material_bool;
+                var Leather_Pairs = "";
+                var component_Pairs = "";
+                var Upper_Fullshoes = "";
+                var IO = "";
+                var bool = $("input[name='Leather_Pairs']:checked").val();
+                if (bool == "0")
+                {
+                    Leather_Pairs=true;
+                    component_Pairs=false;
+                    Upper_Fullshoes = false;
+                }
+                else if (bool == "1")
+                {
+                    Leather_Pairs = false;
+                    component_Pairs = true;
+                    Upper_Fullshoes = false;
+                }
+                else if (bool == "2")
+                {
+                    Leather_Pairs = false;
+                    component_Pairs = false;
+                    Upper_Fullshoes = true;
+                }
+                var value_IO = $('#IO').is(':checked');
+                if (value_IO == true) {
+                    IO = true;
+                }
+                else {
+                    IO = false;
+
+                }
+             
+                var bool = 0;
+                $.ajax({
+                    type: 'POST',
+                    url: '/ProductionJobwork_/saveProductionJobworkModel',
+                    data: {
+
+                        date: Date_from,
+                        Prod_code_id_code: $('#code_ProductionJobwork_Code').val(),
+                        Jw_Name: $('#Jw_Name').val(),
+                        Process_Name: $('#Process_Name').val(),
+                        Stage_From: $('#Stage_From').val(),
+                        Stage_To: $('#Stage_To').val(),
+                        Lot_no: $('#Lot_no').val(),
+                        Io_based: $("#Io_based  option:selected").map(function () { return this.text }).get().join(','),
+                        Buyer: $('#Buyer').val(),
+                        Season: $('#Season').val(),
+                        Style: $('#Style').val(),
+                        JW_BOM_linked: $("#JW_BOM_linked  option:selected").map(function () { return this.value }).get().join(','),
+                        Size_range: $('#Size_range').val(),
+                        Material_Name: id[0],
+                        Delivery_date: D_date,
+                        Qty: $('#Qty').val(),
+                        ComponentId: $("#ComponentId  option:selected").map(function () { return this.value }).get().join(','),
+                        Qty_Uom: $('#Qty_Uom').val(),
+                        Rate: $('#Rate').val(),
+                        Value: $('#Value').val(),
+                        GST: $('#GST').val(),
+                        GST_AMT: $('#GST_AMT').val(),
+                        Total_Cost: $('#Total_Cost').val(),
+                        Io: $('#Io').val(),
+                        Production_Type: $('#Production_Type').val(),
+
+                        Fg_Material_Name: $('#Fg_Material_Name').val(),
+                        Fg_ComponentId: $('#Fg_ComponentId option:selected').map(function () { return this.value }).get().join(','),
+                        Leather_Pairs :   Leather_Pairs ,
+                            component_Pairs:  component_Pairs,
+                            Upper_Fullshoes: Upper_Fullshoes,
+                            Qty_: Qty_,
+                            size: size
+                    },
+
+                    success: function (data) {
+                        if (data.Job_Lether_to_lether_id != "" || data.Job_Lether_to_lether_id != 0) {
+                            alert('Saved Successfully.');
+                           // location.href = "/ProductionJobwork_/ProductionJobworkMaster";
+                            return false
+                        }
+                        else if (data.Job_Lether_to_lether_id == 0 && data.Job_Lether_to_lether_id != "") {
+                            alert('Already Exist in the database.');
+                            return false
+                        }
+                        else {
+                            alert('Save process Failed.');
+                            location.href = "/ProductionJobwork_/ProductionJobworkMaster";
+                            return false;
+                        }
+
+                    },
+                    error: function (ex) {
+                        alert('Already Exist in the database.')
+                    }
+                });
+            }
+        }
+    function Update() {
+        var Material_Name = $("#Material_Name").val();
+        var id = Material_Name.split('_');
+        
+        if (Validation() != false) {
+            var Jobwork_raw_material_bool, Encho_Raw_Material_bool;
+            var Leather_Pairs = "";
+            var component_Pairs = "";
+            var Upper_Fullshoes = "";
+            var IO = "";
+            var bool = $("input[name='Leather_Pairs']:checked").val();
+            if (bool == "0") {
+                Leather_Pairs = true;
+                component_Pairs = false;
+                Upper_Fullshoes = false;
+            }
+            else if (bool == "1") {
+                Leather_Pairs = false;
+                component_Pairs = true;
+                Upper_Fullshoes = false;
+            }
+            else if (bool == "2") {
+                Leather_Pairs = false;
+                component_Pairs = false;
+                Upper_Fullshoes = true;
+            }
+            var value_IO = $('#IO').is(':checked');
+            if (value_IO == true) {
+                IO = true;
+            }
+            else {
+                IO = false;
+
+            }
+
+            var bool = 0;
+            $.ajax({
+                type: 'POST',
+                url: '/ProductionJobwork_/UpdateProductionJobworkModel',
+                data: {
+                    Production_Order_id: $('#Production_Order_id').val(),
+                    Date_from: $('#date').val(),
+                    Prod_code_id_code: $('#code_ProductionJobwork_Code').val(),
+                    Jw_Name: $('#Jw_Name').val(),
+                    Process_Name: $('#Process_Name').val(),
+                    Stage_From: $('#Stage_From').val(),
+                    Stage_To: $('#Stage_To').val(),
+                    Lot_no: $('#Lot_no').val(),
+                    Io_based: $("#Io_based  option:selected").map(function () { return this.text }).get().join(','),
+                    Buyer: $('#Buyer').val(),
+                    Season: $('#Season').val(),
+                    Style: $('#Style').val(),
+                    JW_BOM_linked: $("#JW_BOM_linked  option:selected").map(function () { return this.value }).get().join(','),
+                    Size_range: $('#Size_range').val(),
+                    Material_Name: id[0],
+                    Delivery_date: $('#Delivery_date').val(),
+                    Qty: $('#Qty').val(),
+
+                    Qty_Uom: $('#Qty_Uom').val(),
+                    Rate: $('#Rate').val(),
+                    Value: $('#Value').val(),
+                    GST: $('#GST').val(),
+                    GST_AMT: $('#GST_AMT').val(),
+                    Total_Cost: $('#Total_Cost').val(),
+                    Io: $('#Io').val(),
+                    Fg_Material_Name: $('#Fg_Material_Name').val(),
+                    Fg_ComponentId: $('#Fg_ComponentId').val(),
+                    Leather_Pairs: Leather_Pairs,
+                    component_Pairs: component_Pairs,
+                    Upper_Fullshoes: Upper_Fullshoes
+                },
+
+                success: function (data) {
+                    if (data.Job_Lether_to_lether_id != "" || data.Job_Lether_to_lether_id != 0) {
+                        alert('Saved Successfully.');
+                        location.href = "/ProductionJobwork_/ProductionJobworkMaster";
+                        return false
+                    }
+                    else if (data.Job_Lether_to_lether_id == 0 && data.Job_Lether_to_lether_id != "") {
+                        alert('Already Exist in the database.');
+                        return false
+                    }
+                    else {
+                        alert('Save process Failed.');
+                        location.href = "/ProductionJobwork_/ProductionJobworkMaster";
+                        return false;
+                    }
+
+                },
+                error: function (ex) {
+                    alert('Already Exist in the database.')
+                }
+            });
+        }
+    }
+    function Validation() {
+        debugger
+        if ($("input[name='Leather_Pairs']:checked").val() != "1" && $("input[name='Leather_Pairs']:checked").val() != "2" && $("input[name='Leather_Pairs']:checked").val() != "0")
+        {
+            alert("Please Select Type");
+            return false;
+        }
+        if ($('#date').val() == "") {
+            alert("Please Enter Qty .")
+            $('#date').css('border-color', 'red');
+            $('#date').focus();
+            return false;
+        }
+        else {
+            $('#date').css('border-color', '');
+        }
+        if ($('#ProductionJobwork_Code').val() == "") {
+            alert("Please Enter ProductionJobwork_Code .")
+            $('#ProductionJobwork_Code').css('border-color', 'red');
+            $('#ProductionJobwork_Code').focus();
+            return false;
+        }
+        else {
+            $('#Job_Lether_to_lether_Code').css('border-color', '');
+        }
+        if ($('#Jw_Name').val() == "") {
+            alert("Please Enter Job work Name .")
+            $('#Jw_Name').css('border-color', 'red');
+            $('#Jw_Name').focus();
+            return false;
+        }
+        else {
+            $('#Jw_Name').css('border-color', '');
+        }
+
+        if ($('#Process_Name').val() == "") {
+            alert("Please Enter Process Name .")
+            $('#Process_Name').css('border-color', 'red');
+            $('#Process_Name').focus();
+            return false;
+        }
+        else {
+            $('#Process_Name').css('border-color', '');
+        }
+        if ($('#Buyer').val() == "") {
+            alert("Please Enter Buyer .")
+            $('#Buyer').css('border-color', 'red');
+            $('#Buyer').focus();
+            return false;
+        }
+        else {
+            $('#Buyer').css('border-color', '');
+        }
+        if ($('#Season').val() == "") {
+            alert("Please Enter Season .")
+            $('#Season').css('border-color', 'red');
+            $('#Season').focus();
+            return false;
+        }
+        else {
+            $('#Season').css('border-color', '');
+        }
+       
+        if ($('#Qty').val() == "") {
+            alert("Please Enter Qty .")
+            $('#Qty').css('border-color', 'red');
+            $('#Qty').focus();
+            return false;
+        }
+        else {
+            $('#Qty').css('border-color', '');
+        }
+        if ($('#Qty_Uom').val() == "") {
+            alert("Please Enter Qty_Uom .")
+            $('#Qty_Uom').css('border-color', 'red');
+            $('#Qty_Uom').focus();
+            return false;
+        }
+        else {
+            $('#Qty_Uom').css('border-color', '');
+        }
+        if ($('#Rate').val() == "") {
+            alert("Please Enter Rate .")
+            $('#Rate').css('border-color', 'red');
+            $('#Rate').focus();
+            return false;
+        }
+        else {
+            $('#Rate').css('border-color', '');
+        }
+        if ($('#GST').val() == "") {
+            alert("Please Enter GST .")
+            $('#GST').css('border-color', 'red');
+            $('#GST').focus();
+            return false;
+        }
+        else {
+            $('#GST').css('border-color', '');
+        }
+        if ($('#Value').val() == "") {
+            alert("Please Enter Value .")
+            $('#Value').css('border-color', 'red');
+            $('#Value').focus();
+            return false;
+        }
+        else {
+            $('#Value').css('border-color', '');
+        }
+        if ($('#Gst_Amt').val() == "") {
+            alert("Please Enter Gst_Amt .")
+            $('#Gst_Amt').css('border-color', 'red');
+            $('#Gst_Amt').focus();
+            return false;
+        }
+        else {
+            $('#Gst_Amt').css('border-color', '');
+        }
+        if ($('#Total').val() == "") {
+            alert("Please Enter Total .")
+            $('#Total').css('border-color', 'red');
+            $('#Total').focus();
+            return false;
+        }
+        else {
+            $('#Total').css('border-color', '');
+        }
+        if ($('#Io_based').val() == "") {
+            alert("Please Enter Total .")
+            $('#Io_based').css('border-color', 'red');
+            $('#Io_based').focus();
+            return false;
+        }
+        else {
+            $('#Io_based').css('border-color', '');
+        }
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete_ProductionJobworkModel", "ProductionJobwork_")',
+                data: { Production_Order_id: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Process Details Deleted Successfully.');
+                        location.href = "/ProcessMaster/ProcessMaster";
+                        return false;
+                    }
+                    else {
+                        alert('Process Details deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Process Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+</script>

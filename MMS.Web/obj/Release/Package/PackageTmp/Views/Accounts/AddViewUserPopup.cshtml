@@ -1,0 +1,154 @@
+﻿@model MMS.Core.Entities.Users
+@{
+   
+    int userid = Model != null ? Model.UserID : 0;
+    
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+ 
+    <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+@*<script src="http://code.jquery.com/jquery-latest.min.js">  *@
+}
+<script src="~/Scripts/jquery-1.8.2.min.js"></script>
+
+<script>
+    function ColorUpdate() {
+        var Id = '@userid';
+        if ($('#FirstName').val() == "") {
+            alert("Enter User FirstName.")
+            return false;
+        }
+        if ($('#LastName').val() == "") {
+            alert("Enter User FirstName.")
+            return false;
+        }
+        if ($('#Email').val() == "") {
+            alert("Enter User Email.")
+            return false;
+        }
+        if ($('#Password').val() == "") {
+            alert("Enter User Password.")
+            return false;
+        }
+        if ($('#UserType').val() == "") {
+            alert("Enter User UserType.")
+            return false;
+        }
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("UserUpdate", "Accounts")',
+            data: { Email: $('#Email').val(), Password: $('#Password').val(), UserID: Id, FirstName: $('#FirstName').val(), LastName: $('#LastName').val(), UserType: $('#UserType').val() },
+            dataType: "json",
+            success: function (data) {
+                if (data.EmailExist == false) {
+                    alert('User Details Updation Failed');
+                    return false;
+                }
+                else {
+                    alert('User Details Updated Successfully');
+                    location.href = "/Accounts/UserGrid";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('This Email Already Exist in the database.');
+            }
+        });
+    }
+    function ColorCancel() {
+        if (confirm("Do you want to cancel?")) {
+            location.href = "/Accounts/UserGrid";
+            return false;
+        }
+    }
+    function ColorSave() {
+        if ($('#FirstName').val() == "") {
+            alert("Enter User FirstName.")
+            return false;
+        }
+        if ($('#LastName').val() == "") {
+            alert("Enter User FirstName.")
+            return false;
+        }
+        if ($('#Email').val() == "") {
+            alert("Enter User Email.")
+            return false;
+        }
+        if ($('#Password').val() == "") {
+            alert("Enter User Password.")
+            return false;
+        }
+        if ($('#UserType').val() == "") {
+            alert("Enter User UserType.")
+            return false;
+        }
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Registration", "Accounts")',
+            data: { Email: $('#Email').val(), Password: $('#Password').val(), FirstName: $('#FirstName').val(), LastName: $('#LastName').val(), UserType: $('#UserType').val() },
+            dataType: "json",
+            success: function (data) {
+                if (data.EmailExist == true) {
+                    alert('User Details Save Failed');
+                    return false;
+                }
+                else {
+                    alert('User Details Saved Successfully');
+                    location.href = "/Accounts/UserGrid";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('This Email Already Exist in the database.');
+            }
+        });
+    }
+</script>
+
+<div style="float: left; width: 100%;" id="test">
+    <div style="float: left; width: 100%">
+        <div style="float: left;">First Name</div>
+        @Html.HiddenFor(x => x.UserID)
+        <div style="float: left;">@Html.TextBoxFor(x => x.FirstName)</div>
+    </div>
+    <div style="float: left; width: 100%">
+        <div style="float: left;">last Name</div>
+        <div style="float: left;">@Html.TextBoxFor(x => x.LastName)</div>
+    </div>
+    <div style="float: left; width: 100%">
+        <div style="float: left;">Email</div>
+        <div style="float: left;">@Html.TextBoxFor(x => x.Email)</div>
+    </div>
+    <div style="float: left; width: 100%">
+        <div style="float: left;">Password</div>
+        <div style="float: left;">@Html.TextBoxFor(x => x.Password)</div>
+    </div>
+    <div style="float: left; width: 100%">
+        <div style="float: left;">userType</div>
+        <div style="float: left;">@Html.TextBoxFor(x => x.UserType)</div>
+    </div>
+    <div style="float: left;">
+        @if (Model != null)
+        {
+            <div style="float: left;">
+                <input type="button" value="Update" title="Update" style="cursor: pointer;" onclick="ColorUpdate()" />
+            </div>
+        }
+        else
+        {
+            <div style="float: left;">
+                <input type="button" value="Save" title="Save" style="cursor: pointer;" onclick="ColorSave()" />
+            </div>
+        }
+
+        <div style="float: left;">
+            <input type="button" value="Cancel" title="Cancel" style="cursor: pointer;" onclick="ColorCancel()" />
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="myModal">
+</div>

@@ -1,0 +1,140 @@
+﻿@{
+    ViewBag.Title = "PermissionSetting";
+}
+
+@model MMS.Web.Models.Permission.PermissionModel
+<style>
+    [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: static !important;
+    }
+
+    .select-style {
+        width: 50%;
+    }
+</style>
+
+
+
+<div id="DivShowUserType" class="veh-tablewrap">
+    <div class="veh-tablecont mnlt_margin">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+        <div class="table-responsive table-td-padding padding-lr-6px table-row-bg" style="overflow: auto;">
+            <br />
+            <table class="veh-table" id="empTable">
+                <thead>
+                    <tr class="color-code-top-btn">
+                        <td colspan="7">
+                            @Html.DropDownListFor(m => m.UserTypeID, MMS.Web.ExtensionMethod.HtmlHelper.UserTypeName(), new { @class = "select-style text-field" })
+                            Select/Unselect All : <input type="checkbox" id="ChkSelectAll" />
+                            <input type="text" id="SeaarchID" placeholder="Search.." />
+                            <input type="button" value="Search" onclick="Search()">
+                            <input type="button" value="Add" onclick="Add()">
+                        </td>
+                    </tr>
+                </thead>
+                @if (Model.PermissionModelList != null && Model.PermissionModelList.Count > 0)
+                {
+                    string PermissionName = "";
+                    <tbody>
+                        <tr>
+                            <td>
+                                <table id="tblPermissionSet">
+                                    @foreach (var item in Model.PermissionModelList)
+                                    {
+                                        <tr>
+                                            @if (PermissionName != item.PermissionName)
+                                            {
+                                            PermissionName = item.PermissionName;
+                                                <td class="veh-1">@item.PermissionName</td>
+
+                                                foreach (var PermName in Model.PermissionModelList.Where(x => x.PermissionName == PermissionName))
+                                                {
+                                                  
+                                                    <td class="veh-1"><input type="checkbox" name="ChkPermission" id="ChkPermission@(PermName.PermissionID)" value="@PermName.PermissionID" />@PermName.PermissionDesc </td>
+
+                                                }
+
+                                            }
+                                        </tr>
+                                    }
+                                </table>
+
+                            </td>
+                        </tr>
+
+
+
+                    </tbody>
+
+
+                }
+
+            </table>
+        </div>
+        @if (Model.PermissionModelList != null && Model.PermissionModelList.Count == 0)
+        {
+            <div style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+        }
+    </div>
+</div>
+
+<script>
+    $(document).ajaxStart(function () { 
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    function Add() {
+
+        var PermissionArray = new Array();
+
+        $('input[name="ChkPermission"]:checked').each(function () {
+            PermissionArray.push(this.value);
+        });
+        $.post("/Accounts/PermissionSetting", { PermissionIDs: PermissionArray.toString(), UserTypeId: $('#UserTypeID').val() }, function (data) {
+            if (data == true) {
+                alert("Saved Successfully");
+            }
+        });
+
+    }
+
+
+    $(document).ready(function () {
+        $("#tblPermissionSet").hide();
+        $('#ChkSelectAll').click(function () {
+            if ($(this).prop("checked") == true) {
+                $('input[name="ChkPermission"]').attr("Checked", true);
+            }
+            else {
+                $('input[name="ChkPermission"]').attr("Checked", false);
+            }
+        });
+
+
+
+        $('#UserTypeID').change(function () {
+            if ($('#UserTypeID').val() != "") {
+
+                $('input[name="ChkPermission"]:checked').attr("Checked", false);
+                $.getJSON("/Accounts/GetPermissionSettingIDs", { UserTypeId: $('#UserTypeID').val() }, function (data) {
+                    for (var i = 0; i <= data.split(",").length; i++) {
+                        $('#ChkPermission' + data.split(",")[i] + '').attr("Checked", true);
+                    }
+                    $("#tblPermissionSet").show();
+
+                });
+            }
+            else {
+                $("#tblPermissionSet").hide();
+            }
+        });
+    });
+
+</script>

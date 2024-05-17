@@ -1,0 +1,242 @@
+﻿@{
+    ViewBag.Title = "GateEntryVisitor";
+}
+
+<h2 class="content-title">Visitor's Form</h2>
+<div style="width: 100%; float: left;">
+
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("GateEntryVisitorGrid", "GateEntryVisitor")
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $("#EditColorPartial").hide();
+    });
+
+
+
+    function Save() {
+
+        function PhoneValidation(Phone) {
+
+            var PhoneReg = new RegExp(/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/);
+            return PhoneReg.test(Phone);
+
+
+        };
+        if ($('#CompanyName').val() == "") {
+            alert("Please Enter Company Name");
+            $('#CompanyName').css('border-color', 'red');
+            $('#CompanyName').focus();
+            return false;
+        }
+        else {
+            $('#CompanyName').css('border-color', '');
+        }
+        if ($('#VisitorName').val() == "") {
+            alert("Please Enter Visitor Name");
+            $('#VisitorName').css('border-color', 'red');
+            $('#VisitorName').focus();
+            return false;
+        }
+        else {
+            $('#VisitorName').css('border-color', '');
+        }
+        if ($("#VisitorType option:selected").val() == "") {
+            alert("Please Enter Visitor Type");
+            $('#VisitorType').css('border-color', 'red');
+            $('#VisitorType').focus();
+            return false;
+        }
+        else {
+            $('#VisitorType').css('border-color', '');
+        }
+        if ($("#Purpose option:selected").val() == "") {
+            alert("Please Enter Purpose");
+            $('#Purpose').css('border-color', 'red');
+            $('#Purpose').focus();
+            return false;
+        }
+        else {
+            $('#Purpose').css('border-color', '');
+        }
+
+
+        if ($('#MobileNo').val().trim() == "") {
+            alert("Please Enter Mobile Number");
+            $('#MobileNo').css('border-color', 'red');
+            $('#MobileNo').focus();
+            return false;
+        }
+        else {
+            var a = PhoneValidation($('#MobileNo').val());
+
+            if (a == true) {
+
+                $('#MobileNo').css('border-color', ' ');
+                true;
+            }
+            else {
+
+                alert("Please Enter Valid Mobile number");
+                $('#MobileNo').css('border-color', 'red');
+                $('#MobileNo').focus();
+                return false;
+            }
+        }
+        $("#ReturnDateTime").prop("disabled", false);
+        $("#EntryDateTime").prop("disabled", false)
+
+        $.ajax({
+            type: 'POST',
+            url: '/GateEntryVisitor/GateEntryVisitor',
+            data: {
+                EntryType: $("#EntryType option:selected").val(),
+                GateEntryNo: $('#GateEntryNo').val(),
+                EntryDate: $('#EntryDate').val(),
+                ReturnDate: $('#ReturnDate').val(),
+                VisitorType: $("#VisitorType option:selected").val(),
+                VisitorName: $('#VisitorName').val(),
+                VisitorIdNo: $('#VisitorIdNo').val(),
+                ComeBy: $("#ComeBy option:selected").val(),
+                ToMeet: $("#ToMeet").val(),
+                ReasonForVisit: $("#ReasonForVisit").val(),
+                ReturnDateTime: $("#ReturnDateTime").val(),
+                Remarks: $('#Remarks').val(),
+                Designation: $('#Designation').val(),
+                EntryDateTime: $("#EntryDateTime").val(),
+                Purpose: $("#Purpose option:selected").val(),
+                CompanyName: $('#CompanyName').val(),
+                VisitorId: $('#VisitorId').val(),
+                VehicleNo: $('#VehicleNo').val(),
+                MobileNo: $('#MobileNo').val(),
+                HandCarried: $('#HandCarried').val(),
+                OtherInfo: $('#OtherInfo').val(),
+            },
+            success: function (data) {
+                $("#ReturnDateTime").prop("disabled", true);
+                $("#EntryDateTime").prop("disabled", true)
+                if (data.GateEntryVisitorId != "" || data.GateEntryVisitorId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/GateEntryVisitor/GateEntryVisitor";
+                    return false;
+                }
+
+                else {
+                    location.href = "/GateEntryVisitor/GateEntryVisitor";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Please Check all Entries before Save.');
+            }
+        });
+
+    }
+
+
+    function Update() {
+
+        if ($('#CompanyName').val() == "") {
+            alert("Please Enter Company Name");
+            $('#CompanyName').css('border-color', 'red');
+            $('#CompanyName').focus();
+            return false;
+        }
+        else {
+            $('#CompanyName').css('border-color', '');
+        }
+        if ($('#VisitorName').val() == "") {
+            alert("Please Enter Visitor Name");
+            $('#VisitorName').css('border-color', 'red');
+            $('#VisitorName').focus();
+            return false;
+        }
+        else {
+            $('#VisitorName').css('border-color', '');
+        }
+        if ($("#VisitorType option:selected").val() == "") {
+            alert("Please Enter Visitor Type");
+            $('#VisitorType').css('border-color', 'red');
+            $('#VisitorType').focus();
+            return false;
+        }
+        else {
+            $('#VisitorType').css('border-color', '');
+        }
+        if ($("#Purpose option:selected").val() == "") {
+            alert("Please Enter Purpose");
+            $('#Purpose').css('border-color', 'red');
+            $('#Purpose').focus();
+            return false;
+        }
+        else {
+            $('#Purpose').css('border-color', '');
+        }
+        $("#ReturnDateTime").prop("disabled", false);
+        $("#EntryDateTime").prop("disabled", false)
+        $.ajax({
+            type: 'POST',
+            url: '/GateEntryVisitor/GateEntryVisitor',
+            data: {
+                GateEntryVisitorId: $('#GateEntryVisitorId').val(),
+                EntryType: $("#EntryType option:selected").val(),
+                GateEntryNo: $('#GateEntryNo').val(),
+                EntryDateTime: $('#EntryDateTime').val(),
+                VisitorType: $("#VisitorType option:selected").val(),
+                VisitorName: $('#VisitorName').val(),
+                VisitorIdNo: $('#VisitorIdNo').val(),
+                ComeBy: $("#ComeBy option:selected").val(),
+                ToMeet: $("#ToMeet").val(),
+                ReasonForVisit: $("#ReasonForVisit").val(),
+                ReturnDateTime: $("#ReturnDateTime").val(),
+                Remarks: $('#Remarks').val(),
+                Designation: $('#Designation').val(),
+                EntryDateTime: $("#EntryDateTime").val(),
+                Purpose: $("#Purpose option:selected").val(),
+                CompanyName: $('#CompanyName').val(),
+                VisitorId: $('#VisitorId').val(),
+                VehicleNo: $('#VehicleNo').val(),
+                MobileNo: $('#MobileNo').val(),
+                HandCarried: $('#HandCarried').val(),
+                OtherInfo: $('#OtherInfo').val(),
+            },
+            success: function (data) {
+                $("#ReturnDateTime").prop("disabled", true);
+                $("#EntryDateTime").prop("disabled", true)
+                if (data.GateEntryVisitorId != "" || data.GateEntryVisitorId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/GateEntryVisitor/GateEntryVisitor";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/GateEntryVisitor/GateEntryVisitor";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Please Check all Entries before Update.');
+            }
+        });
+    }
+
+</script>

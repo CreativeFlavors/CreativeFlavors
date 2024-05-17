@@ -1,0 +1,153 @@
+﻿@{
+    ViewBag.Title = "CommisionCriteria";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+}
+
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#CommisionName').val() == "") {
+            alert("Please Enter Commision Name.")
+            $('#CommisionName').css('border-color', 'red');
+            $('#CommisionName').focus();
+            return false;
+        }
+        else {
+            $('#CommisionName').css('border-color', '');
+        }
+        if ($('#Criteria').val() == "") {
+            alert("Please Enter Criteria.")
+            $('#Criteria').css('border-color', 'red');
+            $('#Criteria').focus();
+            return false;
+        }
+        else {
+            $('#Criteria').css('border-color', '');
+        }
+        if ($('#Value').val() == "") {
+            alert("Please Enter Value.")
+            $('#Value').css('border-color', 'red');
+            $('#Value').focus();
+            return false;
+        }
+        else {
+            $('#Value').css('border-color', '');
+        }
+        if ($('#CommisionPercent').val() == "") {
+            alert("Please Enter Commision Percent.")
+            $('#CommisionPercent').css('border-color', 'red');
+            $('#CommisionPercent').focus();
+            return false;
+        }
+        else {
+            $('#CommisionPercent').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/CommisionCritiria/CommisionCritiria',
+            data: {
+                CommisionName: $('#CommisionName').val(),
+                Criteria: $('#Criteria').val(),
+                Value: $('#Value').val(),
+                CommisionPercent: $('#CommisionPercent').val()
+            },
+            success: function (data) {
+                if (data.CommisionCriteriaId != "" || data.CommisionCriteriaId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/CommisionCritiria/CommisionCritiria";
+                    return false;
+                }
+                else {
+                    alert('Already Exist in the database.');
+                    location.href = "/CommisionCritiria/CommisionCritiria";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#CommisionName').val() == "") {
+            alert("Please Enter Commision Name.")
+            $('#CommisionName').css('border-color', 'red');
+            $('#CommisionName').focus();
+            return false;
+        }
+        else {
+            $('#CommisionName').css('border-color', '');
+        }
+        if ($('#Criteria').val() == "") {
+            alert("Please Enter Criteria.")
+            $('#Criteria').css('border-color', 'red');
+            $('#Criteria').focus();
+            return false;
+        }
+        else {
+            $('#Criteria').css('border-color', '');
+        }
+        if ($('#Value').val() == "") {
+            alert("Please Enter Value.")
+            $('#Value').css('border-color', 'red');
+            $('#Value').focus();
+            return false;
+        }
+        else {
+            $('#Value').css('border-color', '');
+        }
+        if ($('#CommisionPercent').val() == "") {
+            alert("Please Enter Commision Percent.")
+            $('#CommisionPercent').css('border-color', 'red');
+            $('#CommisionPercent').focus();
+            return false;
+        }
+        else {
+            $('#CommisionPercent').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/CommisionCritiria/Update',
+            data: {
+                CommisionName: $('#CommisionName').val(),
+                Criteria: $('#Criteria').val(),
+                Value: $('#Value').val(),
+                CommisionPercent: $('#CommisionPercent').val(),
+                CommisionCriteriaId: $('#CommisionCriteriaId').val()
+            },
+            success: function (data) {
+                if (data.CommisionCriteriaId != "" || data.CommisionCriteriaId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/CommisionCritiria/CommisionCritiria";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/CommisionCritiria/CommisionCritiria";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Commision Criteria Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("CommisionCritiriaGrid", "CommisionCritiria")
+    </div>
+</div>

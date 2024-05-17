@@ -1,0 +1,295 @@
+﻿@model MMS.Web.Models.StockModel.StoreTransferModel
+@using MMS.Core.Entities
+@{
+
+    int id = Model.StoreTransferId;
+    Session["StoreTransferId"] = id;
+
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Store Transfer", PermissionSettingModel.PermissionID);
+
+    bool Save = false; bool Update = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Save")
+        {
+            Save = true;
+        }
+        if (item.PermissionDesc == "Update")
+        {
+            Update = true;
+        }
+    }
+}
+
+
+<div class="right-form-section clearfix">
+    <form role="form" class="form-inline">
+        <div class="container-fluid">
+            <div class="row">
+                <p class="section-title text-center">Store Transfer</p>
+
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Trn NO</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.HiddenFor(x => x.StoreTransferId)
+                                    @Html.TextBoxFor(m => m.TrnNo, new { @class = "Numeric" })
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Date</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model != null && Model.StoreTransferId != 0)
+                                    {
+                                        var STdate = Model.Date;
+                                        @Html.TextBoxFor(m => m.Date, new { @class = "form-control text-field", @Value = STdate })
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.Date, new { @class = "form-control text-field", @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy") })
+                                    }
+                                    
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">From Stores</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model != null && Model.StoreTransferId != 0)
+                                    {
+                                        var STfromstores = Model.FromStores;
+                                        @Html.TextBoxFor(m => m.FromStores, new { @class = "form-control text-field", @Value = STfromstores })
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.FromStores, new { @class = "form-control text-field", @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy") })
+                                    }
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">To Stores</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model != null && Model.StoreTransferId != 0)
+                                    {
+                                        var STtostores = Model.ToStores;
+                                        @Html.TextBoxFor(m => m.ToStores, new { @class = "form-control text-field", @Value = STtostores })
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.ToStores, new { @class = "form-control text-field", @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy") })
+                                    }
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Material Category</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.MaterialCategoryId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Material Group</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.MaterialGroupId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Material</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.MaterialMasterId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Colour</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.ColourMasterId, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Rate</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.Rate, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Closing Stock In All Stores</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.ClosingInAllStores, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Closing Stock In Current Stores</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.ClosingInCurrentStores, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Description</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextAreaFor(m => m.Description, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <div class="form-footer">
+            <div class="row">
+                <div style="margin: 15px 0px;" class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                    <input type="button" onclick="Cancel()" class="btn btn-default btn-style width-78" style="cursor: pointer;" title="Back" value="Back">
+
+                    @if (Model.StoreTransferId == 0)
+                    {
+                        if (Save == true)
+                        {
+                            <input type="button" onclick="Save()" class="btn btn-default btn-style width-78" style="cursor: pointer;" title="Save" value="Save">
+                        }
+                        else
+                        {
+                            <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style width-78" value="Save">
+                        }
+                    }
+                    else
+                    {
+                        if (Update == true)
+                        {
+                            <input type="button" onclick="Update()" style="cursor: pointer;" class="btn btn-default btn-style width-78" id="StoreTransferId" title="Update" value="Update">
+                        }
+                        else
+                        {
+                            <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style width-78" value="Update">
+                        }
+                    }
+
+                    <input type="button" onclick="Clear()" class="btn btn-default btn-style width-78" title="Clear" value="Clear">
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+
+    $('#Date,#FromStores,#ToStores').datepicker({dateFormat:"dd/mm/yy"});
+    //$("#Date,#FromStores,#ToStores").datepicker('option', 'dateFormat', 'dd/mm/yy');
+
+    var specialKeys = new Array();
+    specialKeys.push(8); //Backspace
+    //function Numeric() {
+
+    $("#TrnNo").bind("keypress", function (e) {
+        var keyCode = e.which ? e.which : e.keyCode
+        var ret = ((keyCode >= 48 && keyCode <= 57) || specialKeys.indexOf(keyCode) != -1);
+        $(".error").css("display", ret ? "none" : "inline");
+        return ret;
+    });
+    $("#TrnNo").bind("paste", function (e) {
+        return false;
+    });
+    $("#TrnNo").bind("drop", function (e) {
+        return false;
+    });
+    //}
+
+    function Clear()
+    {
+        $('#TrnNo').val('');
+        $('#MaterialCategoryId').val('');
+        $('#MaterialMasterId').val('');
+        $('#MaterialGroupId').val('');
+        $('#ColourMasterId').val('');
+        $('#Rate').val('');
+        $('#ClosingInCurrentStores').val('');
+        $('#ClosingInAllStores').val('');
+        $('#Description').val('');
+    }
+
+</script>

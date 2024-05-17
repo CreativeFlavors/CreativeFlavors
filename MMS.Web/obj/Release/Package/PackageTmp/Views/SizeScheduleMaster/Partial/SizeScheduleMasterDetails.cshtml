@@ -1,0 +1,399 @@
+﻿@model MMS.Web.Models.SizeScheduleMasterModel.SizeScheduleMasterModel
+@{
+    int id = Model.SizeScheduleMasterId;
+    Session["SizeScheduleMasterId"] = id;
+    int count = 0;
+    int count1 = 0;
+}
+
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+<script>
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    $("#MaterialName").combobox();
+    $("#toggle").click(function () {
+        $("#MaterialName").toggle();
+    });
+   
+</script>
+
+<div class="right-form-section clearfix">
+    <form role="form" class="form-inline">
+        <div class="container-fluid">
+            <div class="row">
+                <p class="section-title text-center">Size Schedule Master</p>
+                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                <label class="form-label" for="text">Size Matching No</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.HiddenFor(x => x.SizeScheduleMasterId)
+                                @Html.TextBoxFor(m => m.SizeMatchingNo, new { @class = "form-control text-field" })
+                               
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                <label class="form-label" for="text">Size Range Name</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.DropDownListFor(m => m.SizeRangeName, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "select-style text-field" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                <label class="form-label" for="text">Sketch</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.DropDownListFor(m => m.SketchNo, MMS.Web.ExtensionMethod.HtmlHelper.Bom(), new { @class = "select-style text-field" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                <label class="form-label" for="text">Material Name</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.DropDownListFor(m => m.MaterialName, MMS.Web.ExtensionMethod.HtmlHelper.IsCheckedSizeRangeMaterialName(), new { @class = "select-style text-field" })
+                                <button type="button" class="btn btn-info btn-sm but_search_styles" data-toggle="modal" title="Material List" data-target="#auto_search">...</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10 col-xs-10 no-padding">
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-1 col-sm-1 col-lg-1 col-xs-12">
+                                <label class="form-label" for="text">From</label>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-lg-2 col-xs-12">
+                                @Html.TextBoxFor(m => m.FromValue, new { @class = "allownumericwithdecimal form-control text-field" })
+                            </div>
+                            <div class="col-md-1 col-sm-1 col-lg-1 col-xs-12">
+                                <label class="form-label" for="text">To</label>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-lg-2 col-xs-12">
+                                @Html.TextBoxFor(m => m.ToValue, new { @class = "allownumericwithdecimal form-control text-field" })
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-lg-2 col-xs-12">
+                                <label class="form-label" for="text">=<span class="total-val"></span></label>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-lg-2 col-xs-12">
+                                @Html.TextBoxFor(m => m.Equals, new { @class = "allownumericwithdecimal form-control text-field" })
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-lg-2 col-xs-12">
+                                @Html.DropDownListFor(m => m.ShortUnitID, MMS.Web.ExtensionMethod.HtmlHelper.ShortUnitName(), new { @class = "select-style text-field" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @if (Model.sizeScheduleRangeList != null && Model.sizeScheduleRangeList.Count == 0)
+        {
+            <div class="row clearfix">
+                <div class="field-section">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                        <div class="table-responsive table-td-padding">
+                            <table class="table" id="list-amended-material" style="background-color: #fff !important;">
+                                <thead>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="background-color: #ddd; width: 50px !important; float: left;">Sl.No</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: #ddd; width: 50px !important; float: left;">Size</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (Model.sizeScheduleRangeList != null && Model.sizeScheduleRangeList.Count > 0)
+        {
+            <div class="row clearfix">
+                <div class="field-section">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                        <div class="table-responsive table-td-padding">
+                            <table class="table" id="list-amended-material" style="background-color: #fff !important;">
+                                <thead>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="background-color: #ddd; width: 50px !important; float: left;">Sl.No</td>
+                                        @foreach (var item in Model.sizeScheduleRangeList)
+                                        {
+                                            <td style="background-color: #ddd; width: 50px !important; float: left;" class="size_value">@item.Frame</td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: #ddd; width: 50px !important; float: left;">Size</td>
+                                        @foreach (var item in Model.sizeScheduleRangeList)
+                                        {
+                                            <td style="background-color: #ddd; width: 50px !important; float: left;" data-range="@item.Frame" class="size_value">@item.Size</td>
+                                        }
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="form-footer">
+            <div class="row">
+                <div style="margin: 15px 0px;" class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                    <input type="button" onclick="Cancel()" class="btn btn-default btn-style width-78" title="Back" value="Back">
+                    <input type="button" id="AddButton" class="btn btn-default btn-style width-78" title="AddValue" value="AddValue">
+                    @if (Model != null && Model.SizeScheduleMasterId != 0)
+                    {
+
+                        <input type="button" onclick="Save()" class="btn btn-default btn-style width-78" id="SizeScheduleMasterId" title="Update" value="Update">
+                    }
+                    else
+                    {
+                        <input type="button" onclick="Save()" class="btn btn-default btn-style width-78" title="Save" value="Save">
+                    }
+                    <button class="btn btn-default btn-style width-78" type="submit">Clear</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+ 
+<div class="modal fade" id="auto_search" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header sear_head">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Material Name List</h4>
+            </div>
+            <div class="modal-body sear_body">
+                <ul class="mater_listers">
+                    @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.MaterialName().Where(x => x.Value != ""))
+                    {
+                        <li id="@item.Value">@item.Text</li>
+                    }
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button id="materialOpenId" type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+
+<script>
+ 
+    $(".allownumericwithdecimal").on("keypress keyup blur", function (event) {
+        
+        $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+        if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+            event.preventDefault();
+        }
+    });
+</script>
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<link href="~/Scripts/EasyAutocomplete-1.3.5/comboStyles.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/ComboBox.js"></script>
+<script>
+    $('#ToValue').keyup(function () {
+        var FromValue = parseFloat($("#FromValue").val().trim());
+        var ToValue = parseFloat($("#ToValue").val().trim());
+        if (FromValue > ToValue) {
+            alert("Please enter lesser than To value");
+            return flase;
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/SizeRangeMaster/GetSizeRangeValue',
+            data: {
+                SizeRangeRef: $('#SizeRangeName').val(),
+                SizeRangeRefValue: $('#ToValue').val(),
+            },
+            success: function (data) {
+                if (data != true) {
+                    alert('Please enter valid size Range value');
+                    return false;
+                }
+            }
+        });
+    });
+    $('#FromValue').change(function () {
+        var FromValue = parseFloat($("#FromValue").val().trim());
+        $.ajax({
+            type: 'POST',
+            url: '/SizeRangeMaster/GetSizeRangeValue',
+            data: {
+                SizeRangeRef: $('#SizeRangeName').val(),
+                SizeRangeRefValue: $('#FromValue').val(),
+            },
+            success: function (data) {
+                if (data != true) {
+                    alert('Please enter valid size Range value');
+                    return false;
+                }
+            }
+        });
+    });
+    $('#Equals').keyup(function () {
+        var count_ = 0;
+        var FromValueValue = $("#FromValue").val().trim() + "-" + $("#ToValue").val().trim();
+        var count = $('#list-amended-material tbody tr:nth-child(1) td').length - 1;
+        if (count == 0) {
+            $('#AddButton').show();
+            return false;
+        }
+        else {
+            $('#list-amended-material tbody tr:nth-child(1) td').each(function () {
+                if ($(this).text().trim() != "Sl.No") {
+                    var arr = $(this).text().trim().split('-');
+                    var FromValue = parseFloat($("#FromValue").val().trim());
+                    var ToValue = parseFloat($("#ToValue").val().trim());
+                    if (FromValue > parseFloat(arr[1]) && ToValue > parseFloat(arr[1])) {
+                        count_++;
+                    }
+
+                }
+            });
+            if (count == count_) {
+                $('#AddButton').show();
+                return false;
+            }
+            else {
+                $('#AddButton').hide();
+                alert("Does not allow duplicate size range");
+                return false;
+            }
+        }
+
+
+
+
+    });
+ 
+
+    $("#AddButton").on('click', function (e) {
+        if ($('#SizeMatchingNo').val() == "") {
+            alert("Please Select Size Matching No.")
+            $('#SizeMatchingNo').css('border-color', 'red');
+            $('#SizeMatchingNo').focus();
+            return false;
+        }
+        else {
+            $('#SizeMatchingNo').css('border-color', '');
+            $('#SizeMatchingNo').focus();
+        }
+        if ($('#SketchNo').val() == "") {
+            alert("Please Enter Sketch No.")
+            $('#SketchNo').css('border-color', 'red');
+            $('#SketchNo').focus();
+            return false;
+        }
+        else {
+            $('#SketchNo').css('border-color', '');
+            $('#SketchNo').focus();
+        }
+        if ($('#SizeRangeName').val() == "") {
+            alert("Please select Size Range Name.")
+            $('#SizeRangeName').css('border-color', 'red');
+            $('#SizeRangeName').focus();
+            return false;
+        }
+        else {
+            $('#SizeRangeName').css('border-color', '');
+            $('#SizeRangeName').focus();
+        }
+        if ($('#MaterialName').val() == "") {
+            alert("Please Enter Material Name.")
+            $('#MaterialName').css('border-color', 'red');
+            $('#MaterialName').focus();
+            return false;
+        }
+        else {
+            $('#MaterialName').css('border-color', '');
+            $('#MaterialName').focus();
+        }
+        if ($('#FromValue').val() == "") {
+            alert("Please Enter From Value.")
+            $('#FromValue').css('border-color', 'red');
+            $('#FromValue').focus();
+            return false;
+        }
+        else {
+            $('#FromValue').css('border-color', '');
+            $('#FromValue').focus();
+        }
+        if ($('#ToValue').val() == "") {
+            alert("Please Enter To Value.")
+            $('#ToValue').css('border-color', 'red');
+            $('#ToValue').focus();
+            return false;
+        }
+        else {
+            $('#ToValue').css('border-color', '');
+            $('#ToValue').focus();
+        }
+        if ($('#Equals').val() == "") {
+            alert("Please Enter Equals.")
+            $('#Equals').css('border-color', 'red');
+            $('#Equals').focus();
+            return false;
+        }
+        else {
+            $('#Equals').css('border-color', '');
+            $('#Equals').focus();
+        }
+        var count_ = $('#list-amended-material tbody tr:nth-child(2) td').length;
+        if ('@count1' != 0) {
+            count_++;
+        }
+        var selctedVal = $("#FromValue").val() + "-" + $("#ToValue").val();
+        var equalValue = $("#Equals").val();
+
+        $('#list-amended-material tbody tr:first-child').append('<td style="background-color: #ddd; width: 50px !important; float: left;"> ' + selctedVal + ' </td> ');
+        $('#list-amended-material tbody tr:nth-child(2)').append('<td class="size_value" style="background-color: #ddd; width: 50px !important; float: left;" data-range="' + selctedVal + '"> ' + equalValue + '</td> ');
+        $("#FromValue").val("");
+        $("#ToValue").val("")
+        $("#Equals").val("");
+    });
+    $("#SizeRangeName").combobox();
+  
+    $("#MaterialName").combobox();
+    $("#SketchNo").combobox();
+</script>

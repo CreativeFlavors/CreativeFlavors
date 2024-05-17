@@ -1,0 +1,192 @@
+﻿@model MMS.Web.Models.Component.ComponentModel
+@{
+    ViewBag.Title = "Component";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+    
+}
+<style>
+    .component-layout {
+    height: 251px;
+    width: 359px !important;
+}
+</style>
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    var UpdateimageGuid = "";
+    function Save() {
+        var data = new FormData();
+        var files = $("#UploadImg").get(0).files;
+        console.log(files)
+        if (files.length > 0) {
+            data.append("MyImages", files[0]);
+        }
+
+        $.ajax({
+            url: "/Component/UploadFile",
+            type: "POST",
+            processData: false,
+            contentType: false,
+            data: data,
+            success: function (response) {
+                //code after success
+                UpdateimageGuid = response;
+                //alert("Upload Successfully")
+                //$("#txtImg").val(response);
+                //$("#imgPreview").attr('src', '/Upload/' + response);
+            },
+            error: function (er) {
+                alert(er);
+            }
+        });
+        //alert(UpdateimageGuid);
+        if ($('#ComponentName').val() == "") {
+            alert("Please Enter ComponentName.")
+            $('#ComponentName').css('border-color', 'red');
+            $('#ComponentName').focus();
+            return false;
+        }
+        else {
+            $('#ComponentName').css('border-color', '');
+        } 
+        if ($('#UsedIn').val() == "") {
+            alert("Please Enter UsedIn.")
+            $('#UsedIn').css('border-color', 'red');
+            $('#UsedIn').focus();
+            return false;
+        }
+        else {
+            $('#UsedIn').css('border-color', '');
+        }
+        //if ($('#UploadImg').val() == "") {
+        //    alert("Please Select UploadImage.")
+        //    $('#UploadImg').css('border-color', 'red');
+        //    $('#UploadImg').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#UploadImg').css('border-color', '');
+        //}
+        $.ajax({
+            type: 'POST',
+            url: '/Component/Component',
+            data: {
+                ComponentName: $('#ComponentName').val(),
+                UsedIn: $('#UsedIn').val(),
+                Image: UpdateimageGuid
+            },
+            success: function (data) {
+                if (data.ComponentMasterId != "" || data.ComponentMasterId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/Component/Component";
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/Component/Component";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+
+    var Imageid = "";
+    function Update(arg) {
+        var data = new FormData();
+        var files = $("#UploadImg").get(0).files;
+        console.log(files)
+        if (files.length > 0) {
+            data.append("MyImages", files[0]);
+        }
+
+        $.ajax({
+            url: "/Component/UploadFile",
+            type: "POST",
+            processData: false,
+            contentType: false,
+            data: data,
+            success: function (response) {
+                //code after success
+                Imageid = response;
+               // alert("Upload Successfully")
+                //$("#txtImg").val(response);
+                //$("#imgPreview").attr('src', '/Upload/' + response);
+            },
+            error: function (er) {
+                alert(er);
+            }
+        });
+    
+        if ($('#ComponentName').val() == "") {
+            alert("Please Enter ComponentName.")
+            $('#ComponentName').css('border-color', 'red');
+            $('#ComponentName').focus();
+            return false;
+        }
+        else {
+            $('#ComponentName').css('border-color', '');
+        }
+        if ($('#UsedIn').val() == "") {
+            alert("Please Enter UsedIn.")
+            $('#UsedIn').css('border-color', 'red');
+            $('#UsedIn').focus();
+            return false;
+        }
+        else {
+            $('#UsedIn').css('border-color', '');
+        }
+        //if ($('#UploadImg').val() == "") {
+        //    alert("Please Select UploadImage.")
+        //    $('#UploadImg').css('border-color', 'red');
+        //    $('#UploadImg').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#UploadImg').css('border-color', '');
+        //}
+        $.ajax({
+            type: 'POST',
+            url: '/Component/Update',
+            data: {
+                ComponentName: $('#ComponentName').val(),
+                UsedIn: $('#UsedIn').val(),
+                ComponentMasterId: $('#ComponentMasterId').val(),
+                Image: Imageid
+            },
+            success: function (data) {
+                if (data.ComponentMasterId != "" || data.ComponentMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/Component/Component";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/Component/Component";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Component Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("ComponentGrid", "Component")
+    </div>
+</div>

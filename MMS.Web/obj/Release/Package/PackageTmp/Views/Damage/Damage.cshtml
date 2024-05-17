@@ -1,0 +1,359 @@
+﻿@model MMS.Web.Models.StockModel.OrderEntryModel
+@{
+    ViewBag.Title = "Damage";
+
+}
+
+<div class="indent_report">
+    <h2>Damage Report</h2>
+</div>
+@*<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>*@
+
+
+
+@*<link type="text/css" href="~/Content/css/jquery-ui-1.8.19.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/Content/themes/base/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="~/Content/themes/base/jquery-ui-1.8.19.custom.min.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>*@
+<style>
+    .ui-multiselect {
+        width: 100% !important;
+        position: relative !important;
+        background: #fff;
+        border-radius: 0px;
+        border: 2px solid #dedede;
+        color: #8a8c8c;
+        font-size: 14px;
+    }
+
+
+    .ui-multiselect .ui-widget .ui-state-default .ui-corner-all{
+        display:none !important;
+    }
+    .ui-multiselect-menu .ui-widget .ui-widget-content .ui-corner-all
+    {
+        display:none !important;
+
+    }
+</style>
+<div>
+    <div class="field-section indent_field">
+        <div class="form-group">
+
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">From Date :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                <input id="From" name="From" type="text" class="form-control text-field" />
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">To Date :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                <input id="To" name="To" type="text" class="form-control text-field" />
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Buyer :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                @Html.DropDownList("Buyer", MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field " })
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Season</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                @Html.DropDownList("Season", MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "select-style text-field" })
+            </div>
+
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label"> Lot No :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 space_status">
+                @Html.DropDownList("LotNo", MMS.Web.ExtensionMethod.HtmlHelper.LOtNo(), new { @class = "select-style text-field" })
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Store :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("Store", MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
+
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Category :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("Category", MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Group :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("Group", MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+            </div>
+
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Material :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("Material", new SelectList(
+                                       new List<object> {
+                                           new { value=0, text="Please select" },
+                                           new { value=1, text="Local" },
+                                           new { value=2, text="Customer Import"},
+                                           new { value=3, text="Direct Import"}
+                                       },
+                                       "value",
+                                       "text", 0), new { @class = "select-style text-field" })
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Order No :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                @*@Html.ListBox("InternalOderID_", new SelectList(Model.OrderEntryList, "OrderEntryId", "BuyerPoNo", Model.OrderEntryList), new { multiple = "multiple", placeholder = "Please select filter type", @class = "multipleOrder_", @style = "width:172px;", required = "required" })*@
+                @*@Html.ListBox("InternalOderID_", new SelectList(Model.OrderEntryList, "OrderEntryId", "BuyerPoNo", Model.OrderEntryList), new { multiple = "multiple", placeholder = "Please select filter type", @class = "multipleOrder_", @style = "width:172px;", required = "required" })*@
+                @Html.ListBox("InternalOderID_", new MultiSelectList(Model.OrderEntryList, "OrderEntryId",
+                          "BuyerPoNo"), new { Multiple = "multiple", @class = "multtipleOrder_" })
+            </div>
+           
+
+        </div>
+    </div>
+    <input id="ExportReport" class="Damage_report_field" name="Generate Report" type="submit" value="Generate Report" />
+</div>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+
+
+@*<script src="~/Scripts/MultiSelect_/jquery.multiselect.js"></script>
+<script src="~/Scripts/MultiSelect_/jquery.multiselect.min.js"></script>
+<link href="~/Scripts/MultiSelect_/css/jquery.multiselect.css" rel="stylesheet" />*@
+
+
+
+
+
+<link href="~/Scripts/MultiSelectCheckBoxWithSearch/fSelect.css" rel="stylesheet" />
+<script src="~/Scripts/MultiSelectCheckBoxWithSearch/Jquery.min.js"></script>
+<script src="~/Scripts/MultiSelectCheckBoxWithSearch/fSelect.js"></script>
+
+<script>
+
+    (function ($) {
+        $(function () {
+            $('.multtipleOrder_').fSelect();
+        });
+    })(jQuery);
+    $(document).ready(function () {
+
+       
+
+
+        $("#From").datepicker({ dateFormat: "dd/mm/yy" });
+        $("#To").datepicker({ dateFormat: "dd/mm/yy" });
+        $(".multipleOrder_").multiselect();
+
+
+        $("#Buyer").change(function () {
+            
+            var Buyer = $('#Buyer').val();
+            $.ajax({
+                url: '/Damage/FillSeason',
+                type: "GET",
+                dataType: "JSON",
+                data: { Buyer: Buyer },
+                success: function (cities) {
+                    $("#Season").html(""); // clear before appending new list
+                    $('#Season').append('<option value="" selected="selected">Please Select</option>');
+                    $.each(cities, function (i, city) {
+                        $("#Season").append(
+                            $('<option></option>').val(city.order).html(city.season));
+                    });
+                }
+            });
+        });
+        $("#Season").change(function () {
+            var Season = $('#Season').val();
+            
+            $.ajax({
+                url: '/Damage/FillLotNo',
+                type: "GET",
+                dataType: "JSON",
+                data: { Season: Season },
+                success: function (cities) {
+                    $("#LotNo").html("");
+                    $('#LotNo').append('<option value="" selected="selected">Please Select</option>');// clear before appending new list
+                    $.each(cities, function (i, city) {
+                        $("#LotNo").append(
+                            $('<option></option>').val(city.Lot).html(city.Lot));
+                    });
+                }
+            });
+
+        });
+
+
+        $("#LotNo").change(function () {
+            var LotNo = $('#LotNo option:selected').text();
+            var buyer = $('#Buyer option:selected').val();
+            var season = $('#Season option:selected').val();
+            $.ajax({
+                url: '/Damage/LotBasedOrder',
+                type: "GET",
+                dataType: "JSON",
+                data: {
+                    lotNo: LotNo, Buyer: buyer, SeasonName: season
+                },
+                success: function (data) {
+                    if (data.length > 0) {
+                        $(".multipleOrder_").multiselect("uncheckAll");
+                        $(".multipleOrder_").multiselect('destroy');
+                        $('.multipleOrder_').html("");
+                        for (var i = 0; i < data.length; i++) {
+                            if ($('.multipleOrder_ option[value=' + data[i].Value + ']').length == 0) {
+                                $('.multipleOrder_').append($('<option></option>').val(data[i].Value).html(data[i].Text));
+                            }
+                        }
+                        $(".multipleOrder_").multiselect({
+                            noneSelectedText: "Please Select",
+                            classes: "selLocCsr"
+                        });
+                    }
+                    if (data.length == 0) {
+                        $(".multipleOrder_").multiselect("uncheckAll");
+                        $(".multipleOrder_").multiselect('destroy');
+                        $('.multipleOrder_').html("");
+                        for (var i = 0; i < data.length; i++) {
+                            if ($('.multipleOrder_ option[value=' + data[i].Value + ']').length == 0) {
+                                $('.multipleOrder_').append($('<option></option>').val(data[i].Value).html(data[i].Text));
+                            }
+                        }
+                        $(".multipleOrder_").multiselect({
+                            noneSelectedText: "Please Select",
+                            classes: "selLocCsr"
+                        });
+                    }
+                }
+            });
+        });
+        $("#Store").change(function () {
+            var StoreId = $('#Store').val();
+            $.ajax({
+                url: '/MaterialMaster/FillMaterialCateogoryid',
+                type: "GET",
+                dataType: "JSON",
+                data: { StoreMasterId: StoreId },
+                success: function (cities) {
+                    $("#Category").html(""); // clear before appending new list
+                    $('#Category').append('<option value="" selected="selected">Please Select</option>');
+                    $.each(cities, function (i, city) {
+                        $("#Category").append(
+                            $('<option></option>').val(city.MaterialCategoryMasterId).html(city.CategoryName));
+                    });
+                }
+            });
+        });
+        $("#Category").change(function () {
+            var MaterialCategoryMasterId_ = $('#Category').val();
+            $.ajax({
+                url: '/MaterialMaster/FillCateogoryid',
+                type: "GET",
+                dataType: "JSON",
+                data: { MaterialCategoryMasterId: MaterialCategoryMasterId_ },
+                success: function (cities) {
+                    $("#Group").html(""); // clear before appending new list
+                    $('#Group').append('<option value="" selected="selected">Please Select</option>');
+                    $.each(cities, function (i, city) {
+                        $("#Group").append(
+                            $('<option></option>').val(city.MaterialGroupMasterId).html(city.GroupName));
+                    });
+                }
+            });
+        });
+
+        $("#ExportReport").click(function (event) {
+            if ($('#From').val() == "") {
+                alert("Please select From date.")
+                $('#From').css('border-color', 'red');
+                $('#From').focus();
+                return false;
+            }
+            else {
+                $('#From').css('border-color', '');
+            }
+            if ($('#To').val() == "") {
+                alert("Please select To Date.")
+                $('#To').css('border-color', 'red');
+                $('#To').focus();
+                return false;
+            }
+            else {
+                $('#To').css('border-color', '');
+            }
+            if ($('#LotNo option:selected').text() == "" && $('#LotNo option:selected').text() == "Please Select") {
+                alert("Please select Lot No.")
+                $('#LotNo').css('border-color', 'red');
+                $('#LotNo').focus();
+                return false;
+            }
+            else {
+                $('#LotNo').css('border-color', '');
+            }
+            var Store = $('#Store').val();
+            var Group = $('#Group').val();
+            var Category = $('#Category').val();
+            var buyer = $('#Buyer option:selected').val();
+            if (buyer.toLowerCase() == "please select") {
+                buyer = "";
+            }
+            var bomNo = $('#BomNo').val();
+            if (bomNo != null) {
+                var BomNumber = bomNo.join();
+            }
+            else {
+                BomNumber = "";
+            }
+            var LotNo = $('#LotNo  option:selected').text();
+            var Season = $('#Season').val();
+            var Material = $('#Material').val();
+            var From = $('#From').val();
+            var To = $('#To').val();
+            var orderid = $("#InternalOderID_").val();
+            if (Material == 0) {
+                Material = "";
+            }
+            event.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '/Damage/RedirectToAspx',
+                data: {
+                    From: From,
+                    To: To,
+                    Order: JSON.stringify(orderid),
+                    Buyer: buyer,
+                    group: Group,
+                    store: Store,
+                    category: Category,
+                    lotNo: LotNo,
+                    season: Season,
+                    material: Material
+                },
+                success: function (data) {
+                    var url = "@(System.Configuration.ConfigurationManager.AppSettings["ReportURL"].ToString())DamageReport.aspx?From=" + data.From + "&To=" + data.To + "&Order=" + data.Ordersno + "&Buyer=" + data.Buyer + "&group=" + data.GroupName + "&store=" + data.StoreName + "&category=" + data.CategoryName + "&lotNo=" + data.LotNo + "&season=" + data.SeasonName + "&material=" + data.MaterialType;
+                    window.open(url, '_blank');
+                    return false
+                }
+            });
+
+        });
+
+    });
+
+
+</script>
+

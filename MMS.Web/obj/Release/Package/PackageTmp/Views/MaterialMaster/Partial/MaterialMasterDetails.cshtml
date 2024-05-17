@@ -1,0 +1,1653 @@
+﻿@model MMS.Data.StoredProcedureModel.MaterialSearch
+@{
+    int id = Model.MaterialMasterId;
+    Session["MaterialMasterId"] = id;
+    string path = "/Images/";
+    int count = 1;
+    if (Model != null && Model.ImagePath != "")
+    {
+        path = path + Model.ImagePath;
+    }
+}
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+<script src="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.js"></script>
+<link href="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.css" rel="stylesheet" />
+
+<style>
+    input[type="checkbox"] {
+        -webkit-appearance: checkbox;
+        border-radius: 0;
+    }
+
+    input[type="radio"] {
+        -webkit-appearance: radio;
+        border-radius: 0;
+    }
+
+    #ui-id-4, ui-id-3 {
+        width: 152px;
+        height: 162px !important;
+        overflow: auto !important;
+    }
+
+    #ui-id-1 {
+        width: 500px !important;
+        height: 162px !important;
+        overflow: auto !important;
+    }
+
+    .right-form-section {
+        width: 100% !important;
+    }
+
+    .no_Checkbox {
+        opacity: 0 !important;
+    }
+
+    .span-width .custom-combobox {
+        width: 95% !important;
+    }
+</style>
+<script>
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    $(function () {
+        $("#StoreMasterId").combobox();
+        $("#toggle").click(function () {
+            $("#StoreMasterId").toggle();
+        });
+        $("#MaterialCategoryMasterId").combobox();
+        $("#toggle").click(function () {
+            $("#MaterialCategoryMasterId").toggle();
+        });
+        $("#MaterialGroupMasterId").combobox();
+        $("#toggle").click(function () {
+            $("#MaterialGroupMasterId").toggle();
+        });
+        $("#SubGroup").combobox();
+        $("#toggle").click(function () {
+            $("#SubGroup").toggle();
+        });
+        $("#MaterialName").combobox();
+        $("#toggle").click(function () {
+            $("#MaterialName").toggle();
+        });
+        $("#GradeMasterId").combobox();
+        $("#toggle").click(function () {
+            $("#GradeMasterId").toggle();
+        });
+        $("#SubstanceMasterId").combobox();
+        $("#toggle").click(function () {
+            $("#SubstanceMasterId").toggle();
+        });
+        $("#LeatherSizeMasterId").combobox();
+        $("#toggle").click(function () {
+            $("#LeatherSizeMasterId").toggle();
+        });
+        $("#OriginMasterId").combobox();
+        $("#toggle").click(function () {
+            $("#OriginMasterId").toggle();
+        });
+        $("#Uom").combobox();
+        $("#toggle").click(function () {
+            $("#Uom").toggle();
+        });
+        $("#UomUnit").combobox();
+        $("#toggle").click(function () {
+            $("#UomUnit").toggle();
+        });
+        $("#CurrencyMasterId").combobox();
+        $("#toggle").click(function () {
+            $("#CurrencyMasterId").toggle();
+        });
+        $("#PacketType").combobox();
+        $("#toggle").click(function () {
+            $("#PacketType").toggle();
+        });
+        $("#PacketCurrency").combobox();
+        $("#toggle").click(function () {
+            $("#PacketCurrency").toggle();
+        });
+        $("#PrimaryPackage").combobox();
+        $("#toggle").click(function () {
+            $("#PrimaryPackage").toggle();
+        });
+        $("#SecondaryPackage").combobox();
+        $("#toggle").click(function () {
+            $("#SecondaryPackage").toggle();
+        });
+        $("#PrimaryUnit").combobox();
+        $("#toggle").click(function () {
+            $("#PrimaryUnit").toggle();
+        });
+        $("#PacketUnit").combobox();
+        $("#toggle").click(function () {
+            $("#PacketUnit").toggle();
+        });
+    });
+    @*if ('@Model' != null && '@Model.MaterialMasterId' == 0) {
+        $("#Price").prop('disabled', true);
+        $("#CurrencyMasterId").prop('disabled', true);
+        $("#ManufacturerMasterId").prop('disabled', true);
+        $("#ImportPrice").prop('disabled', true);
+        $("#importCurrency").prop('disabled', true);
+        $("#importManafactureName").prop('disabled', true);
+        $("#CustomerImportPrice").prop('disabled', true);
+        $("#CustomerManafactureName").prop('disabled', true);
+        $("#CuomerImportCurrencyMasterId").prop('disabled', true);
+    }*@
+    $(function () {
+        $("#isLocal").change(function () {
+          
+            if (this.checked) {
+                $("#Price").attr("readonly", false);
+                $("#CurrencyMasterId").prop('disabled', false);
+                $("#ManufacturerMasterId").prop('disabled', false);
+            }
+            else {
+                $("#Price").attr("readonly", true);
+                $("#CurrencyMasterId").prop('disabled', true);
+                $("#ManufacturerMasterId").prop('disabled', true);
+            }
+        });
+    });
+    $(function () {
+        $("#isImport").change(function () {
+            if (this.checked) {
+                $("#ImportPrice").attr("readonly", false);
+                $("#importCurrency").prop('disabled', false);
+                $("#importManafactureName").prop('disabled', false);
+            }
+            else {
+                $("#ImportPrice").prop('readonly', true);
+                $("#importCurrency").prop("disabled", true);
+                $("#importManafactureName").prop("disabled", true);
+            }
+        });
+    });
+    $(function () {
+        $("#isImportCustomer").change(function () {
+            
+            if (this.checked) {
+                //  $("#CustomerImportPrice_id").show();
+                $("#CustomerImportPrice").attr("readonly", false);
+                $("#CustomerManafactureName").prop("disabled", false);
+                $("#CuomerImportCurrencyMasterId").prop("disabled", false);
+            }
+            else {
+                $("#CustomerImportPrice").attr("readonly", true);
+                $("#CustomerManafactureName").prop("disabled", true);
+                $("#CuomerImportCurrencyMasterId").prop("disabled", true);
+            }
+        });
+    });
+    var Store = 0;
+    var Category = 0;
+    var DescriptionDetails = '';
+    $("#MaterialName").combobox({
+        select: function (event, ui) {
+
+            //$('#masterialName_').focusout(function () {
+            DescriptionDetails = $("#MaterialName  option:selected").text().trim();
+            $('#Description').val(DescriptionDetails);
+        }
+    }
+);
+
+    $('#OptionMaterialValue').on('input', function (e) {
+        $('#Description').val($("#MaterialName  option:selected").text().trim() + " " + $('#OptionMaterialValue').val());
+    });
+    $("#ColorMasterId").change(function () {
+        DescriptionDetails = $("#MaterialName  option:selected").text().trim() + " " + $('#OptionMaterialValue').val() + " " + $("#ColorMasterId option:selected").text().trim();
+        $('#Description').val(DescriptionDetails);
+    });
+
+    $("#StoreMasterId").combobox({
+        select: function (event, ui) {
+
+
+
+            if ($('#StoreMasterId option:selected').text().trim() == "Maintenance Store") {
+                $('#MachineryMasterId').removeAttr("disabled");
+            }
+            else {
+
+                $('#MachineryMasterId').attr("disabled", "disabled");
+            }
+
+            var stateId = $('#StoreMasterId').val();
+            $.ajax({
+                url: '/MaterialMaster/FillMaterialCateogoryid',
+                type: "GET",
+                dataType: "JSON",
+                data: { StoreMasterId: stateId },
+                success: function (cities) {
+                    $("#MaterialCategoryMasterId").html("");
+                    $("#materialCategoryId_ .custom-combobox input").val('');
+
+                    // clear before appending new list
+                    $.each(cities, function (i, city) {
+                        $("#MaterialCategoryMasterId").append(
+                            $('<option></option>').val(city.MaterialCategoryMasterId).html(city.CategoryName));
+                    });
+                }
+            });
+        }
+    });
+    $("#MaterialCategoryMasterId").combobox({
+        select: function (event, ui) {
+
+
+            var MaterialCategoryMasterId_ = $('#MaterialCategoryMasterId').val();
+            $.ajax({
+                url: '/MaterialMaster/FillCateogoryid',
+                type: "GET",
+                dataType: "JSON",
+                data: { MaterialCategoryMasterId: MaterialCategoryMasterId_ },
+                success: function (cities) {
+                    $("#MaterialGroupMasterId").html("");
+                    $("#materialGroupID_ .custom-combobox input").val('');
+
+                    $.each(cities, function (i, city) {
+                        $("#MaterialGroupMasterId").append(
+                            $('<option></option>').val(city.MaterialGroupMasterId).html(city.GroupName));
+
+                    });
+                }
+            });
+        }
+    });
+
+
+    $("#MaterialGroupMasterId").combobox({
+        select: function (event, ui) {
+
+            $('#GradeMasterId').attr("disabled", false);
+            $('#SubstanceMasterId').attr("disabled", false);
+            $('#LeatherSizeMasterId').attr("disabled", false);
+            $('#OriginMasterId').attr("disabled", false);
+            $('#SizeRangeMasterId').attr("disabled", false);
+            $('#ColorMasterId').attr("disabled", false);
+            $('#Barcode').attr("disabled", false);
+            $.ajax({
+                type: "POST",
+                url: ' @Url.Action("MaterialGroup", "MaterialMaster")',
+                data: { MaterialGroupMasterId: $('#MaterialGroupMasterId').val() },
+                success: function (data) {
+
+                    if (data.IsColor == true) {
+                        $('#ColorMasterId').attr("disabled", false);
+                    }
+                   else if (data.IsColor == false) {
+                        $('#ColorMasterId').attr("disabled", true);
+                    }
+                    if (data.IsConsumption == true) {
+                        // $('#ColorMasterId').attr("disabled", true);
+                    }
+                    else {
+                    }
+                    if (data.IsSubstance == true) {
+                        $('#GradeMasterId').attr("disabled", false);
+                        $('#SubstanceMasterId').attr("disabled", false);
+                        $('#LeatherSizeMasterId').attr("disabled", false);
+                        $('#OriginMasterId').attr("disabled", false);
+                    }
+                    else if ((data.IsSubstance == false)) {
+                        $('#GradeMasterId').attr("disabled", true);
+                        $('#SubstanceMasterId').attr("disabled", true);
+                        $('#LeatherSizeMasterId').attr("disabled", true);
+                        $('#OriginMasterId').attr("disabled", true);
+                    }
+                    if (data.IsSize == true) {
+                        $('#SizeRangeMasterId').attr("disabled", false);
+                    }
+                    else if (data.IsSize == false) {
+                        $('#SizeRangeMasterId').attr("disabled", true);
+                    }
+                    if (data.IsInspection == true) {
+                        //$('#ColorMasterId').attr("disabled", true);
+                    }
+                    if (data.IsReservation == true) {
+                        // $('#ColorMasterId').attr("disabled", true);
+                    }
+                    if (data.IsDisplay == true) {
+                        //$('#ColorMasterId').attr("disabled", true);
+                    }
+                    if (data.IsBatchcode == true) {
+                        $('#Barcode').attr("disabled", true);
+                    }
+                    else if (data.IsBatchcode == false) {
+                        $('#Barcode').attr("disabled", false);
+                    }
+                    if (data.IsMultipleUnits == true) {
+                        //$('#ColorMasterId').attr("disabled", true);
+                    }
+                }
+            });
+
+            var MaterialGroupMasterId_ = $('#MaterialGroupMasterId').val();
+            $.ajax({
+                url: '/MaterialMaster/FillMaterialMasterName',
+                type: "GET",
+                dataType: "JSON",
+                data: { MaterialGroupMasterId: MaterialGroupMasterId_ },
+                success: function (cities) {
+                    console.log(cities);
+                    $("#MaterialName").html(""); // clear before appending new list
+                    $.each(cities, function (i, city) {
+                        $("#MaterialName").append(
+                            $('<option></option>').val(city.MaterialMasterID).html(city.MaterialDescription));
+
+                    });
+
+
+                }
+            });
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("GetMaterialCode", "MaterialMaster")',
+                data: { MaterialGroupMasterId: $('#MaterialGroupMasterId').val() },
+                success: function (data) {
+                    $('#MaterialCode').val(data)
+                },
+                error: function (ex) {
+                    alert('Error');
+                }
+            });
+        }
+
+    });
+
+    //});
+
+    // A $( document ).ready() block.
+
+    $('#Cancel').hide();
+    $('#First').show();
+    $('#Second').hide();
+    $('#save').hide();
+    $('#MaterialMasterId').hide();
+    $('#btn_Next').show();
+    $('#btn_Back').hide();
+
+    function Next() {
+        $('#Cancel').show();
+        $('#First').hide();
+        $('#Second').show();
+        $('#save').show();
+        $('#MaterialMasterId').show();
+        $('#btn_Next').hide();
+        $('#btn_Back').show();
+    }
+    function Back() {
+        $('#Cancel').hide();
+        $('#First').show();
+        $('#Second').hide();
+        $('#save').hide();
+        $('#MaterialMasterId').hide();
+        $('#btn_Next').show();
+        $('#btn_Back').hide();
+    }
+    $(".allownumericwithdecimal").on("keypress keyup blur", function (event) {
+
+        $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+        if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+            event.preventDefault();
+        }
+    });
+</script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#SameSizeForAllSize").change(function () {
+            if ($("#SameSizeForAllSize").is(':checked') == true) {
+                $('.Qty').attr("disabled", "disabled");
+            }
+
+        });
+        $("#ManufacturerMasterId").change(function () {
+
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("GetManufacturerCode", "MaterialMaster")',
+                data: { ManufacturerMasterId: $('#ManufacturerMasterId').val() },
+                success: function (data) {
+                    console.log(data)
+                    console.log(data.ManufacturerCode)
+                    $('#ManufacturerCode').val(data.ManufacturerCode)
+
+                },
+                error: function (ex) {
+                    alert('Error');
+                }
+            });
+        });
+    });
+    $("#Expiry").datepicker();
+
+
+    $('#Back_btn').click(function () {
+        location.href = "../MaterialMaster/Material";
+    });
+
+    $("#ManufacturerMasterId").change(function () {
+
+        $.ajax({
+            type: 'POST',
+            url: ' @Url.Action("GetManufacturerCode", "MaterialMaster")',
+            data: { ManufacturerMasterId: $('#ManufacturerMasterId').val() },
+            success: function (data) {
+                console.log(data)
+                console.log(data.ManufacturerCode)
+                $('#ManufacturerCode').val(data.ManufacturerCode)
+
+            },
+            error: function (ex) {
+                alert('Error');
+            }
+        });
+    });
+
+
+    $(function () {
+
+        $("#MaterialName").combobox({
+            select: function (event, ui) {
+
+                var materialId = $('#MaterialName').val();
+                $.ajax({
+                    url: '/MaterialMaster/FillMaterialNameBasedonColor',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { MaterialNameID: materialId },
+                    success: function (cities) {
+
+                        $.each(cities, function (i, city) {
+
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+
+</script>
+
+<div class="right-form-section all_form clearfix">
+    <form role="form" class="form-inline">
+        <div class="tab-content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-8 col-sm-12 col-lg-8 col-xs-12 pad">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 pull-right">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding">
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Store Name</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12" id="storeId_">
+                                    @Html.HiddenFor(x => x.MaterialMasterId)
+                                    @Html.DropDownListFor(m => m.StoreMasterId, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Material Category</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12" id="materialCategoryId_">
+                                    @Html.DropDownListFor(m => m.MaterialCategoryMasterId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-IsActive4 col-sm-4 col-lg-4 col-xs-12">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Material Group</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12" id="materialGroupID_">
+                                    @Html.DropDownListFor(m => m.MaterialGroupMasterId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding">
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Material Code</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.MaterialCode, new { @class = "form-control text-field", @readonly = true })
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Mat. Sub Group</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.SubGroup, MMS.Web.ExtensionMethod.HtmlHelper.MaterialSubGroupName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12" style="padding-right:0;">
+                                    <label class="form-label" for="text">Cutting Issue Type</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.CuttingIssueTypeID, new SelectList(
+                                     new List<Object>
+                                         {
+                                                                new { value = 0, text = "Please Select"  },
+                                                                new { value = 1, text = "Cutting"  },
+                                                                new { value = 2, text = "Full Shoes Closing" },
+                                                                 new { value =3, text = "Upper Shoes Closing" }
+
+                                         },
+                                         "value",
+                                         "text",
+                                         0), new { @class = "select-style text-field " })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding">
+                        <div class="col-md-6 col-lg-8">
+                            <div class="form-group">
+                                <label class="form-label col-md-3 col-lg-2" for="text" style="padding-right:0;">Material Name</label>
+                                <div class="col-md-9 col-sm-7 col-lg-10 col-xs-12 span-width" id="masterialName_" style="padding-left: 35px">
+                                    @Html.HiddenFor(m => m.MaterialMasterId)
+                                    @Html.DropDownListFor(m => m.MaterialName, MMS.Web.ExtensionMethod.HtmlHelper.DynamicMaterialName(), new { @class = "select-style form-control text-field MaterialSelect", placeholder = "Please type" })
+                                    <button type="button" class="btn btn-info btn-sm but_search_styles" data-toggle="modal" title="Material List" data-target="#auto_search">...</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6" style="padding-right:0;">
+                            <div class="col-xs-12" style="padding-right:0;">
+                                <div class="form-group">
+                                    @Html.TextBoxFor(m => m.OptionMaterialValue, new { @class = "form-control text-field" })
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding" style="margin: 10px 0px;">
+                        <div class="col-md-6 col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label col-md-3 col-lg-3" for="text">Description</label>
+                                <div class="col-md-9 col-sm-7 col-lg-9 col-xs-12" style="padding-left: 24px">
+                                    @Html.HiddenFor(m => m.MaterialMasterId)
+                                    @Html.TextBoxFor(m => m.Description, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-6">
+                            <div class="col-md-6 col-lg-4 scan_check" style="width:auto!important;">
+                                <div class="form-group">
+                                    <div class="col-xs-12 check_sys" style="padding-left:0px">
+                                        @*@Html.CheckBoxFor(m => m.isLocal,new {@class= "no_Checkbox" })*@
+                                        @if (Model != null && Model.isImportCustomer == true)
+                                        {
+                                            <input type="checkbox" id="isImportCustomer" checked="checked" class="no_Checkbox">
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox" id="isImportCustomer" class="no_Checkbox">
+                                        }
+                                        <label for="isImportCustomer">Customer Import</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 scan_check" style="width:auto!important;">
+                                <div class="form-group">
+                                    <div class="col-xs-12 check_sys" style="padding-left: 0px">
+                                        @*@Html.CheckBoxFor(m => m.isLocal,new {@class= "no_Checkbox" })*@
+                                        @if (Model != null && Model.isLocal == true)
+                                        {
+                                            <input type="checkbox" id="isLocal" checked="checked" class="no_Checkbox">
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox" id="isLocal" class="no_Checkbox">
+                                        }
+                                        <label for="isLocal">Local Import</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 scan_check" style="width:auto!important;">
+                                <div class="form-group">
+                                    <div class="col-xs-12 check_sys" style="padding-left: 0px">
+                                        @*@Html.CheckBoxFor(m => m.isImport, new { @class = "no_Checkbox" })*@
+                                        @if (Model != null && Model.isImport == true)
+                                        {
+                                            <input type="checkbox" id="isImport" checked="checked" class="no_Checkbox">
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox" id="isImport" class="no_Checkbox">
+                                        }
+                                        <label for="isImport">Direct Import</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding" style="margin-bottom:10px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                        <div class="col-xs-12 sys-rgt" style="padding:0;">
+                            @if (Model != null && Model.isImport == true)
+                            {
+                                <div class="form-group" id="ImportPrice_id">
+                                    <label class="form-label col-xs-12 sys_sco" for="text">Import price</label>
+                                    <div class="col-xs-12  sys_tech">
+                                        @Html.TextBoxFor(m => m.ImportPrice, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="form-group" id="ImportPrice_id" style="">
+                                    <label class="form-label col-xs-12 sys_sco" for="text">Import price</label>
+                                    <div class="col-xs-12  sys_tech">
+                                        @Html.TextBoxFor(m => m.ImportPrice, new { @class = "form-control text-field", @readonly = true })
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                        <div class="col-xs-12 sys-rgt" style="padding:0;">
+                            @if (Model != null && Model.isImportCustomer == true)
+                            {
+                                <div class="form-group" id="CustomerImportPrice_id">
+                                    <label class="form-label col-xs-12 sys_sco" for="text">Customer Import price</label>
+                                    <div class="col-xs-12  sys_tech">
+                                        @Html.TextBoxFor(m => m.CustomerImportPrice, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="form-group" id="CustomerImportPrice_id" style="">
+                                    <label class="form-label col-xs-12 sys_sco" for="text">Customer Import price</label>
+                                    <div class="col-xs-12  sys_tech">
+                                        @Html.TextBoxFor(m => m.CustomerImportPrice, new { @class = "form-control text-field", @readonly = true })
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12" style="padding-right:0;">
+                        <div class="col-xs-12" style="padding:0;">
+                            <label class="form-label col-xs-12 pad_left " for="text">Local Price(Rate/Unit)</label>
+                            <div class="col-xs-12 pad_left">
+                                @if (Model != null && Model.isLocal == true)
+                                {
+                                    @Html.TextBoxFor(m => m.Price, new { @class = "allownumericwithdecimal form-control text-field" })
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(m => m.Price, new { @class = "allownumericwithdecimal form-control text-field", @readonly = true })
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding" style="margin-bottom:10px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="form-group">
+                            <div class="col-xs-12 scan_sap">
+                                <label class="form-label" for="text">Customer manufacture</label>
+                            </div>
+                            <div class="col-xs-12" style="padding:0;">
+                                @if (Model != null && Model.isImportCustomer == true)
+                                {
+                                    @Html.DropDownListFor(m => m.CustomerManafactureName, MMS.Web.ExtensionMethod.HtmlHelper.ManufacturerName(), new { @class = "select-style text-field" })
+                                }
+                                else
+                                {
+                                    @Html.DropDownListFor(m => m.CustomerManafactureName, MMS.Web.ExtensionMethod.HtmlHelper.ManufacturerName(), new { @class = "select-style text-field", @disabled = true })
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="form-group">
+                            <div class="col-xs-12 scan_sap">
+                                <label class="form-label" for="text">Customer Currency</label>
+                            </div>
+                            <div class="col-xs-12" style="padding:0;">
+                                @if (Model != null && Model.isImportCustomer == true)
+                                {
+                                    @Html.DropDownListFor(m => m.CuomerImportCurrencyMasterId, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "select-style text-field" })
+                                }
+                                else
+                                {
+                                    @Html.DropDownListFor(m => m.CuomerImportCurrencyMasterId, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "select-style text-field", @disabled = true })
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="form-group">
+                            <div class="col-xs-12 scan_sap">
+                                <label class="form-label" for="text">Import Currency</label>
+                            </div>
+                            <div class="col-xs-12" style="padding:0;">
+                                @if (Model != null && Model.isImport == true)
+                                {
+                                    @Html.DropDownListFor(m => m.importCurrency, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "select-style text-field" })
+                                }
+                                else
+                                {
+                                    @Html.DropDownListFor(m => m.importCurrency, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "select-style text-field", @disabled = true })
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                @*<div class="form-group">
+                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 scan_sap">
+                            <label class="form-label" for="text">Import customer manufacture</label>
+                        </div>
+                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                            @Html.DropDownListFor(m => m.CustomerManafactureName, MMS.Web.ExtensionMethod.HtmlHelper.ManufacturerName(), new { @class = "select-style text-field" })
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-7 col-lg-6 col-xs-12">
+
+                        <label class="form-label col-md-12 col-sm-6 col-lg-12 col-xs-12" for="text">Customer Import Currency</label>
+                        <div class="col-md-12 col-sm-6 col-lg-12 col-xs-12 pad_right">
+                            @Html.DropDownListFor(m => m.CuomerImportCurrencyMasterId, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "select-style text-field" })
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-7 col-lg-6 col-xs-12">
+
+                        <label class="form-label col-md-12 col-sm-6 col-lg-12 col-xs-12" for="text"> Import Currency</label>
+                        <div class="col-md-12 col-sm-6 col-lg-12 col-xs-12 pad_right">
+                            @Html.DropDownListFor(m => m.importCurrency, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "select-style text-field" })
+                        </div>
+                    </div>*@
+
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding">
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 scan_sap">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                <label class="form-label" for="text">Material Color</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.HiddenFor(x => x.ColorMasterId_)
+                                <div id="ddlColorMasterId">
+                                    @Html.DropDownListFor(m => m.ColorMasterId, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { @class = "select-style text-field colorval" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                <label class="form-label" for="text">Machinery Name</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.DropDownListFor(m => m.MachineryMasterId, MMS.Web.ExtensionMethod.HtmlHelper.MachineName(), new { @class = "select-style text-field" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="form-group">
+                            @*<div class="col-md-5 col-sm-5 col-lg-6 col-xs-12">
+                                </div>*@
+                            <div class="col-xs-12" style="text-align:right;">
+                                @if (Model != null && Model.SameSizeForAllSize == true)
+                                {
+                                    <input type="checkbox" id="SameSizeForAllSize" checked="checked" class="no_Checkbox">
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="SameSizeForAllSize" class="no_Checkbox">
+                                }
+
+                                <label for="SameSizeForAllSize">Same Rate for all Size</label>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding" style="margin-top: 10px;">
+                    <div class="col-md-2 col-sm-4 col-lg-2 col-xs-12 scan_sap pad_right">
+                        <div class="form-group">
+                            <div class="col-md-12 col-sm-5 col-lg-12 col-xs-12">
+                                <label class="form-label" for="text">Grade</label>
+                            </div>
+                            <div class="col-md-12 col-sm-7 col-lg-12 col-xs-12">
+                                @Html.DropDownListFor(m => m.GradeMasterId, MMS.Web.ExtensionMethod.HtmlHelper.GetLeatherShoeGrade(), new { @class = "select-style text-field" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-lg-2 col-xs-12 pad_left">
+                        <div class="form-group">
+                            <div class="col-md-12 col-sm-5 col-lg-12 col-xs-12">
+                                <label class="form-label" for="text">Substance</label>
+                            </div>
+                            <div class="col-md-12 col-sm-7 col-lg-12 col-xs-12">
+                                @Html.DropDownListFor(m => m.SubstanceMasterId, MMS.Web.ExtensionMethod.HtmlHelper.SubstanceRange(), new { @class = "select-style text-field" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-lg-2 col-xs-12">
+                        <div class="form-group">
+                            <div class="col-md-12 col-sm-5 col-lg-12 col-xs-12">
+                                <label class="form-label" for="text">Ltr. Size</label>
+                            </div>
+                            <div class="col-md-12 col-sm-7 col-lg-12 col-xs-12">
+                                @Html.DropDownListFor(m => m.LeatherSizeMasterId, MMS.Web.ExtensionMethod.HtmlHelper.LeatherSizeName(), new { @class = "select-style text-field" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-lg-2 col-xs-12 pad_left">
+                        <div class="form-group">
+                            <div class="col-md-12 col-sm-5 col-lg-12 col-xs-12">
+                                <label class="form-label" for="text">Origin</label>
+                            </div>
+                            <div class="col-md-12 col-sm-7 col-lg-12 col-xs-12">
+                                @Html.DropDownListFor(m => m.OriginMasterId, MMS.Web.ExtensionMethod.HtmlHelper.OriginName(), new { @class = "select-style text-field" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-lg-2 col-xs-12">
+                        <div class="form-group">
+                            <div class="col-md-12 col-sm-5 col-lg-12 col-xs-12">
+                                <label class="form-label" for="text">Weight In Kgs</label>
+                            </div>
+                            <div class="col-md-12 col-sm-7 col-lg-12 col-xs-12">
+                                @Html.TextBoxFor(m => m.WeightInKg, new { @class = "allownumericwithdecimal form-control text-field" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-lg-2 col-xs-12">
+                        <div class="form-group">
+                            <div class="col-md-12 col-sm-5 col-lg-12 col-xs-12">
+                                <label class="form-label" for="text">Size Range</label>
+                            </div>
+                            <div class="col-md-12 col-sm-7 col-lg-12 col-xs-12" id="SizeRangeMasterId_">
+                                @Html.DropDownListFor(m => m.SizeRangeMasterId, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "select-style text-field" })
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding" style="margin-top: 15px; margin-bottom: 15px; overflow-x:auto;">
+                    <table class="table" id="sizeRangeTable" style="float: right; width: 98.5%;">
+                        <tbody>
+                            @if (Model.sizeItemMaterialList == null || Model.sizeItemMaterialList.Count == 0)
+                            {
+                                <tr>
+                                    <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 39px !important;">Size</td>
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important;">Rate</td>
+                                </tr>
+                            }
+                            @if (Model.sizeItemMaterialList != null && Model.sizeItemMaterialList.Count > 0)
+                            {
+                                <tr>
+
+                                    @if (Model.sizeItemMaterialList != null)
+                                    {
+                                        <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 39px !important; float: left;">Size</td>
+                                        foreach (var item in Model.sizeItemMaterialList)
+                                        {
+                                            <td class="SizeRangeRefValue">@item.SizeRange</td>
+                                            count++;
+                                        }
+                                    }
+                                </tr>
+
+                                <tr>
+
+                                    @if (Model.sizeItemMaterialList != null)
+                                    {
+                                        <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important; float: left;">Rate</td>
+                                        foreach (var item in Model.sizeItemMaterialList)
+                                        {
+                                            <td><input type="text" class="Rates" id="qtyId@(count)" value="@item.Rate" style='width:50px;' onchange="CalculateTotal(this)" /></td>
+                                            count++;
+                                        }
+                                    }
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding" style="margin-top: 15px; margin-bottom: 15px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 scan_sap" style="margin-top: 24px;">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                <label class="form-label" for="text">Decimal</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.TextBoxFor(m => m.Decimals, new { @class = "allownumericwithdecimal form-control text-field" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+                        <div class="form-group">
+
+                            <div class="col-md-12 col-sm-7 col-lg-12 col-xs-12">
+                                <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 pad_left">
+                                    <label class="form-label col-lg-12 col-md-12" for="text">Primary Unit</label>
+                                    @Html.DropDownListFor(m => m.Uom, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                    <div class="percent"></div>
+                                </div>
+
+
+                                <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 pad_right">
+                                    <label class="form-label col-md-12 col-sm-6 col-lg-12 col-xs-12 pad_left" for="text">Secondary Unit</label>
+                                    @Html.DropDownListFor(m => m.UomUnit, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field col-md-12 col-lg-12" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-2 col-lg-2 col-xs-12">
+
+                        <div class="form-group">
+                            <div class="col-xs-12">
+
+                                <label class="form-label col-md-12 col-sm-6 col-lg-12 col-xs-12" for="text">Currency</label>
+                                <div class="col-md-12 col-sm-6 col-lg-12 col-xs-12 pad_right">
+                                    @Html.DropDownListFor(m => m.CurrencyMasterId, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding" style="margin-bottom: 10px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 pad">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 scan_sap">
+                                    <label class="form-label" for="text">Manufacturer Name</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model != null && Model.isLocal == true)
+                                    {
+                                        @Html.DropDownListFor(m => m.ManufacturerMasterId, MMS.Web.ExtensionMethod.HtmlHelper.ManufacturerName(), new { @class = "select-style text-field" })
+                                    }
+                                    else
+                                    {
+                                        @Html.DropDownListFor(m => m.ManufacturerMasterId, MMS.Web.ExtensionMethod.HtmlHelper.ManufacturerName(), new { @class = "select-style text-field", @disabled = true })
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 pad">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 scan_sap">
+                                    <label class="form-label" for="text">Manufacturer Mat.Code</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.ManufacturerCode, new { @class = "form-control text-field", @readonly = true })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-8 col-sm-4 col-lg-8 col-xs-12 pad" style="border: 2px solid #f6d657; padding: 5px;">
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                            <div class="form-group">
+                                @if (Model != null && Model.componentcheck1sds == true)
+                                {
+                                    <input type="checkbox" checked="checked" id="componentcheck1sds" class="no_Checkbox">
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="componentcheck1sds" class="no_Checkbox">
+
+                                }
+                                <label for="componentcheck1sds">If Applicable</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 pad" id="packet_div">
+                            <div class="col-md-6 col-sm-12 col-lg-6 col-xs-12" style="padding-top: 18px;">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Packet Type</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.DropDownListFor(m => m.PacketType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12 col-lg-6 col-xs-12 pad">
+
+                                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 pad">
+                                    <div class="col-md-6 col-sm-12 col-lg-6 col-xs-12 ">
+                                        <div class="form-group">
+                                            <div class="col-md-12 pad_right col-sm-5 col-lg-12 col-xs-12">
+                                                <label class="form-label col-md-12 col-lg-12 pad" for="text">package Type Price</label>
+                                            </div>
+                                            <div class="col-md-12 col-sm-7 col-lg-12 col-xs-12">
+                                                @Html.TextBoxFor(m => m.PacketTypePrice, new { @class = "allownumericwithdecimal form-control text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-lg-6 col-xs-12 ">
+                                        <div class="form-group">
+                                            <div class="col-md-12 col-sm-5 col-lg-12 col-xs-12">
+                                                <label class="form-label" for="text">Currency</label>
+                                            </div>
+                                            <div class="col-md-12 col-sm-7 col-lg-12 col-xs-12">
+                                                @Html.DropDownListFor(m => m.PacketCurrency, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding" style="margin-top: 10px; margin-bottom: 10px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 scan_sap">
+                                <label class="form-label" for="text">Tax Category</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.DropDownListFor(m => m.TaxCategory, MMS.Web.ExtensionMethod.HtmlHelper.GetTaxRef(), new { @class = "select-style text-field" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 scan_sap">
+                                <label class="form-label" for="text">Import manufacture</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @if (Model != null && Model.isImport == true)
+                                {
+                                    @Html.DropDownListFor(m => m.importManafactureName, MMS.Web.ExtensionMethod.HtmlHelper.ManufacturerName(), new { @class = "select-style text-field" })
+                                }
+                                else
+                                {
+                                    @Html.DropDownListFor(m => m.importManafactureName, MMS.Web.ExtensionMethod.HtmlHelper.ManufacturerName(), new { @class = "select-style text-field", @disabled = true })
+                                }
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div class="col-md-8 col-lg-8 cl-sm-12 colsm-12 pad" style="border: 2px solid #f6d657; padding: 5px;">
+                        <div class="col-md-12 col-lg-12 cl-sm-12 colsm-12 pad">
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                <div class="form-group">
+                                    @if (Model != null && Model.IsPrimaryPackage == true)
+                                    {
+                                        <input type="checkbox" checked="checked" id="IsPrimaryPackage" class="no_Checkbox">
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="IsPrimaryPackage" class="no_Checkbox">
+                                    }
+                                    <label for="IsPrimaryPackage">If Applicable</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 pad">
+                                <div class="col-md-6 col-sm-4 col-lg-6 col-xs-12">
+                                    <div class="form-group">
+
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Primary Package</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.PrimaryPackage, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-4 col-lg-6 col-xs-12">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Secondary package</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.SecondaryPackage, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-sm-12 col-lg- 12 col-xs-12 pad">
+
+                    <div class="col-md-8 col-sm-8 col-lg-8 col-xs-12 pad" style="">
+                        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 pad" style="border: 2px solid #f6d657; margin-bottom: 3%; padding: 5px;">
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                <div class="form-group">
+                                    @if (Model != null && Model.IsSecondaryPackage == true)
+                                    {
+                                        <input type="checkbox" checked="checked" id="IsSecondaryPackage" class="no_Checkbox">
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="IsSecondaryPackage" class="no_Checkbox">
+                                    }
+                                    <label for="IsSecondaryPackage">If Applicable</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                <div class="form-group">
+                                    <div class="col-md-2 col-sm-3 col-lg-2 col-xs-12 pad">
+                                        <label class="form-label" for="text">Purchase UOM</label>
+                                    </div>
+                                    <div class="col-md-10 col-sm-9 col-lg-10 col-xs-12 pad">
+                                        <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12 pad">
+                                            <div class="col-md-2 col-xs-6 col-sm-6 col-lg-3 pad">
+                                                <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12 pad">
+                                                    <div class="form-group">
+                                                        <div class="col-md-12 col-sm-5 col-lg-12 col-xs-12 pad">
+                                                            @Html.TextBoxFor(m => m.PurchasePrimary, new { @class = "allownumericwithdecimal form-control text-field" })
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-xs-6 col-sm-6 col-lg-3 pad">
+                                                <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12 pad">
+                                                    <div class="form-group">
+
+
+                                                        <div class="col-md-12 col-sm-7 col-lg-12 col-xs-12">
+                                                            @Html.DropDownListFor(m => m.PrimaryUnit, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-6 col-sm-6 col-lg-3 pad">
+                                                <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12 pad">
+                                                    <div class="form-group">
+                                                        <div class="col-md-12 col-sm-5 col-lg-12 col-xs-12 pad">
+                                                            @Html.TextBoxFor(m => m.PurchasePacket, new { @class = "allownumericwithdecimal form-control text-field" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-6 col-sm-6 col-lg-3 pad">
+                                                <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12 pad">
+                                                    <div class="form-group">
+                                                        <div class="col-md-12 col-sm-7 col-lg-12 col-xs-12">
+                                                            @Html.DropDownListFor(m => m.PacketUnit, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-8 col-sm-12 col-xs-12">
+                            <div class="form-group">
+                                @if (Model != null && Model.IsActive == true)
+                                {
+                                    <input type="checkbox" class="width-20 no_Checkbox" id="IsActive" checked="checked" />
+                                    <label for="IsActive">Status</label>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" class="width-20 no_Checkbox" id="IsActive" />
+                                    <label for="IsActive">Status</label>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12">
+                           
+                            <div class="form-group">
+
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">BuyerItemCode</label>
+                                </div>
+                                @if (Model != null && Model.BuyerItemCode != "")
+                                {
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.BuyerItemCode, new { @class = "form-control text-field" })
+                                    </div>
+                                }
+                                else
+                                {
+                                 
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.BuyerItemCode, new { @class = "form-control text-field" })
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12">
+
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">HSNCode</label>
+                                </div>
+                                @if (Model != null && Model.HSNCode != "")
+                                {
+                                   
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.HSNCode, new { @class = "form-control text-field" })
+                                    </div>
+                                }
+                                else
+                                {
+                                   
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.HSNCode, new { @class = "form-control text-field" })
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12 pad mar_bot">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Lead Time</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.LeadTime, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12 pad mar_bot">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Max Ro Level</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.MaxRoLevel, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12 pad mar_bot">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Max Ro Level</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.MaxRoLevel, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12 pad mar_bot">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Min Ro Level</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.MinRoLevel, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12 pad mar_bot">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Re Order Level</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.ReOrderLevel, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12 pad mar_bot">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Expiry</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.Expiry, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+
+
+            <div class="row">
+                <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 pad">
+                                    <label class="section-title form-label" for="text" style="padding: 0px;">
+                                        Excess Allowed
+                                    </label>
+                                </div>
+
+                                <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+                                    <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12 pad">
+                                        <div class="col-md-3 col-xs-3 col-sm-3 col-lg-4">
+
+                                            <div class="form-group">
+                                                @if (Model.IsPurchase == true)
+                                                {
+                                                    <input type="checkbox" id="IsPurchase" checked="checked" class="no_Checkbox" />
+                                                    <label for="IsPurchase">Purchase</label>
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" id="IsPurchase" class="no_Checkbox" />
+                                                    <label for="IsPurchase">Purchase</label>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div class="form-group">
+
+                                                @if (Model.IsIssues == true)
+                                                {
+                                                    <input type="checkbox" id="IsIssues" checked="checked" class="no_Checkbox" />
+                                                    <label for="IsIssues">Issues</label>
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" id="IsIssues" class="no_Checkbox" />
+                                                    <label for="IsIssues">Issues</label>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <b></b>
+                        </div>
+                        <b></b>
+                    </div>
+                    <b></b>
+                </div>
+                <b>
+
+                    <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 pad    ">
+                                        <div class="form-group">
+                                            @if (Model.IsCustomerSupplied == true)
+                                            {
+                                                <input type="checkbox" class="width-20 no_Checkbox" id="IsCustomerSupplied" checked="checked" />
+                                                <label for="IsCustomerSupplied">Customer Supplied Material</label>
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" class="width-20 no_Checkbox" id="IsCustomerSupplied" />
+                                                <label for="IsCustomerSupplied">Customer Supplied Material</label>
+                                            }
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding">
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <ul class="list-outs">
+                                    <li>
+                                        <div class="form-group">
+                                            @if (Model.IsImportedMaterial == true)
+                                            {
+                                                <input type="checkbox" class="width-20 no_Checkbox" id="IsImportedMaterial" checked="checked" />
+                                                <label for="IsImportedMaterial">Imported Material</label>
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" class="width-20 no_Checkbox" id="IsImportedMaterial" />
+                                                <label for="IsImportedMaterial">Imported Material</label>
+                                            }
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="form-group">
+                                            @if (Model.IsLocalMaterial == true)
+                                            {
+                                                <input type="checkbox" class="width-20 no_Checkbox" id="IsLocalMaterial" checked="checked" />
+                                                <label for="IsLocalMaterial">Local Material</label>
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" class="width-20 no_Checkbox" id="IsLocalMaterial" />
+                                                <label for="IsLocalMaterial">Local Material</label>
+                                            }
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="form-group">
+                                            @if (Model.IsCriticalMaterial == true)
+                                            {
+                                                <input type="checkbox" class="width-20 no_Checkbox" id="IsCriticalMaterial" checked="checked" />
+                                                <label for="IsCriticalMaterial">Critical Material  (Key Item)</label>
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" class="width-20 no_Checkbox" id="IsCriticalMaterial" />
+                                                <label for="IsCriticalMaterial">Critical Material  (Key Item)</label>
+                                            }
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="form-group">
+                                            @if (Model.IsAllowNegativeStock == true)
+                                            {
+                                                <input type="checkbox" class="width-20 no_Checkbox" id="IsAllowNegativeStock" checked="checked" />
+                                                <label for="IsAllowNegativeStock">Tick to allow Negative Stock</label>
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" class="width-20 no_Checkbox" id="IsAllowNegativeStock" />
+                                                <label for="IsAllowNegativeStock">Tick to allow Negative Stock</label>
+                                            }
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="form-group">
+                                            @if (Model.IsLotNumberTracking == true)
+                                            {
+                                                <input type="checkbox" class="width-20 no_Checkbox" id="IsLotNumberTracking" checked="checked" />
+                                                <label for="IsLotNumberTracking">Lot Number Tracking Required</label>
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" class="width-20 no_Checkbox" id="IsLotNumberTracking" />
+                                                <label for="IsLotNumberTracking">Lot Number Tracking Required</label>
+                                            }
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="form-group">
+                                            @if (Model.IsIssueStrictly == true)
+                                            {
+                                                <input type="checkbox" class="width-20 no_Checkbox" id="IsIssueStrictly" checked="checked" />
+                                                <label for="IsIssueStrictly">Tick to issue Stricktly against IO</label>
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" class="width-20 no_Checkbox" id="IsIssueStrictly" />
+                                                <label for="IsIssueStrictly">Tick to issue Stricktly against IO</label>
+                                            }
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                            </div>
+                        </div>
+                    </div>
+                </b>
+            </div>
+            <b></b>
+        </div>
+        <b></b>
+        <b></b>
+
+        <div class="form-footer">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                    <input type="button" onclick="Cancel()" class="btn btn-default btn-style" title="Back" value="Back">
+                    @if (Model != null && Model.MaterialMasterId != 0)
+            {
+                        <input type="button" onclick="Save()" class="btn btn-default btn-style" title="Update" value="Update">
+                    }
+                    else
+                    {
+                        <input type="button" onclick="Save()" class="btn btn-default btn-style" title="Save" value="Save">
+                    }
+                    <button class="btn btn-default btn-style" type="button">Clear</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<div class="modal fade" id="auto_search" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header sear_head">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Material Name List</h4>
+            </div>
+            <div class="modal-body sear_body">
+                <ul class="mater_listers">
+                    @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.DynamicMaterialName().Where(x => x.Value != ""))
+                    {
+                    <li id="@item.Value">@item.Text</li>
+                    }
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button id="materialOpenId" type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="lefterr_icon">
+    <div class="direction">  &lt;  </div>
+</div>
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<link href="~/Scripts/EasyAutocomplete-1.3.5/comboStyles.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/ComboBox.js"></script>
+<script type="text/javascript">
+    $("#SameSizeForAllSize").change(function () {
+        if ($("#SameSizeForAllSize").is(':checked') == true) {
+            $('.Rates').attr("disabled", "disabled");
+            $('.Rates').val("0.00");
+        }
+        else {
+            $('.Rates').removeAttr("disabled");
+
+        }
+    });
+    $(document).on('change', '#SizeRangeMasterId', function () {
+        $('#sizeRangeTable tbody tr').each(function () {
+            $(this).find("td:not(:first)").remove();
+        });
+        $.ajax({
+            type: "GET",
+            dataType: "JSON",
+            url: '@Url.Action("GetSizeRange", "BuyerOrderEntryForm")',
+            data: { SizeRangeMasterId: $(this).val() },
+            success: function (data) {
+                $('#sizeRangeTable tbody tr').each(function () {
+                    $(this).find("td:not(:first)").remove();
+                });
+                var count = 1;
+                for (var i = 0; i <= data.length; i++) {
+                    $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue" style="background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;"> ' + data[i].SizeRangeRefValue + ' </td> ');
+                    $('#sizeRangeTable tbody tr:last').append("<td class='Rate' style='background-color: #ddd;padding-bottom: 3px;padding-left: 0;padding-top: 1px;width: 39px !important;'><input type='text' class='Rates' id='Rate' value='0' style='padding-bottom: 0;padding-top: 0;width: 34px;' /</td>");
+                    count++;
+                }
+            }
+        });
+    });
+
+
+    $("#StoreMasterId").combobox();
+    $("#MaterialCategoryMasterId").combobox();
+    $("#MaterialGroupMasterId").combobox();
+    $("#SubGroup").combobox();
+    $("#ColorMasterId").combobox();
+    $("#MaterialName").combobox();
+
+    $("#GradeMasterId").combobox();
+
+    $("#SubstanceMasterId").combobox();
+    $("#LeatherSizeMasterId").combobox();
+    $("#OriginMasterId").combobox();
+
+
+    $("#Uom").combobox();
+    $("#UomUnit").combobox();
+    $("#CurrencyMasterId").combobox();
+    $("#PacketType").combobox();
+
+    $("#PacketCurrency").combobox();
+    $("#PrimaryPackage").combobox();
+    $("#SecondaryPackage").combobox();
+    $("#PrimaryUnit").combobox();
+
+    $("#PacketUnit").combobox();
+
+</script>

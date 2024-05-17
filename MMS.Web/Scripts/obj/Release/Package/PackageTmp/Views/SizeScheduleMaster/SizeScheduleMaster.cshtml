@@ -1,0 +1,202 @@
+﻿@{
+    ViewBag.Title = "SizeScheduleMaster";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/Content/css/FormStyle.css" />
+}
+<style>
+
+</style>
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+
+        if ($('#SizeMatchingNo').val() == "") {
+            alert("Please Enter Size Matching No.")
+            $('#SizeMatchingNo').css('border-color', 'red');
+            $('#SizeMatchingNo').focus();
+            return false;
+        }
+        else {
+            $('#SizeMatchingNo').css('border-color', '');
+        }
+        if ($('#SizeRangeName').val() == "") {
+            alert("Please Enter Size Range Name.")
+            $('#SizeRangeName').css('border-color', 'red');
+            $('#SizeRangeName').focus();
+            return false;
+        }
+        else {
+            $('#SizeRangeName').css('border-color', '');
+        }
+        if ($('#list-amended-material tbody tr:nth-child(1) td').length - 1 == 0)
+        {
+            if ($('#FromValue').val() == "") {
+                alert("Please Enter From Value.")
+                $('#FromValue').css('border-color', 'red');
+                $('#FromValue').focus();
+                return false;
+            }
+            else {
+                $('#FromValue').css('border-color', '');
+            }
+            if ($('#ToValue').val() == "") {
+                alert("Please Enter To Value.")
+                $('#ToValue').css('border-color', 'red');
+                $('#ToValue').focus();
+                return false;
+            }
+            else {
+                $('#ToValue').css('border-color', '');
+            }
+            if ($('#Equals').val() == "") {
+                alert("Please Enter Equals.")
+                $('#Equals').css('border-color', 'red');
+                $('#Equals').focus();
+                return false;
+            }
+            else {
+                $('#Equals').css('border-color', '');
+            }
+        }
+        
+
+        var addValJs = [];       
+        $("#list-amended-material tbody tr:nth-child(2) td.size_value").each(function (index) {
+            addValJs.push({
+                SizeRangeRef_: $(this).text(),
+                SizeRangeRefValue_: $(this).attr("data-range")
+            });           
+        });       
+        var jsonOfLog = JSON.stringify(addValJs);       
+        $.ajax({
+            type: 'POST',
+            url: '/SizeScheduleMaster/SizeScheduleMaster',
+            data: {
+                SizeMatchingNo: $('#SizeMatchingNo').val(),
+                SizeRangeName: $('#SizeRangeName').val(),
+                FromValue: $('#FromValue').val(),
+                ToValue: $('#ToValue').val(),
+                Equals: $('#Equals').val(),
+                SketchNo: $('#SketchNo').val(),
+                MaterialName: $('#MaterialName').val(),
+                SizeScheduleMasterId: $('#SizeScheduleMasterId').val(),
+                ShortUnitID:$("#ShortUnitID").val(),
+                jsonOfLog:jsonOfLog
+                //OriginMasterId: $('#OriginMasterId').val()
+            },
+            success: function (data) {
+                if (data.SizeScheduleMasterID != 0 && data.SizeScheduleID != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/SizeScheduleMaster/SizeScheduleMaster";
+                    return false;
+                }
+                //else if (data.SizeScheduleMasterId == 0 && data.SizeScheduleID==0) {
+                //    alert('Already Exist in the database.');
+                //    return false;
+                //}
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/SizeScheduleMaster/SizeScheduleMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    //function Update(arg) {
+    //    if ($('#SizeMatchingNo').val() == "") {
+    //        alert("Please Enter Size Matching No.")
+    //        $('#SizeMatchingNo').css('border-color', 'red');
+    //        $('#SizeMatchingNo').focus();
+    //        return false;
+    //    }
+    //    else {
+    //        $('#SizeMatchingNo').css('border-color', '');
+    //    }
+    //    if ($('#SizeRangeName').val() == "") {
+    //        alert("Please Enter Size Range Name.")
+    //        $('#SizeRangeName').css('border-color', 'red');
+    //        $('#SizeRangeName').focus();
+    //        return false;
+    //    }
+    //    else {
+    //        $('#SizeRangeName').css('border-color', '');
+    //    }
+    //    if ($('#FromValue').val() == "") {
+    //        alert("Please Enter From Value.")
+    //        $('#FromValue').css('border-color', 'red');
+    //        $('#FromValue').focus();
+    //        return false;
+    //    }
+    //    else {
+    //        $('#FromValue').css('border-color', '');
+    //    }
+    //    if ($('#ToValue').val() == "") {
+    //        alert("Please Enter To Value.")
+    //        $('#ToValue').css('border-color', 'red');
+    //        $('#ToValue').focus();
+    //        return false;
+    //    }
+    //    else {
+    //        $('#ToValue').css('border-color', '');
+    //    }
+    //    if ($('#Equals').val() == "") {
+    //        alert("Please Enter Equals.")
+    //        $('#Equals').css('border-color', 'red');
+    //        $('#Equals').focus();
+    //        return false;
+    //    }
+    //    else {
+    //        $('#Equals').css('border-color', '');
+    //    }
+    //    $.ajax({
+    //        type: 'POST',
+    //        url: '/SizeScheduleMaster/Update',
+    //        data: {
+    //            SizeMatchingNo: $('#SizeMatchingNo').val(),
+    //            SizeRangeName: $('#SizeRangeName').val(),
+    //            FromValue: $('#FromValue').val(),
+    //            ToValue: $('#ToValue').val(),
+    //            Equals: $('#Equals').val(),
+    //            SizeScheduleMasterId: $('#SizeScheduleMasterId').val(),
+    //            SketchNo: $('#SketchNo').val(),
+    //            MaterialName: $('#MaterialName').val(),
+    //        },
+    //        success: function (data) {
+    //            if (data.SizeScheduleMasterId != "" || data.SizeScheduleMasterId != 0) {
+    //                alert('Updated Successfully.');
+    //                location.href = "/SizeScheduleMaster/SizeScheduleMaster";
+    //                return false;
+    //            }
+    //            else {
+    //                alert('Updation failed.');
+    //                location.href = "/SizeScheduleMaster/SizeScheduleMaster";
+    //                return false;
+    //            }
+
+    //        },
+    //        error: function (ex) {
+    //            alert('Already Exist in the database.');
+    //        }
+    //    });
+    //}
+</script>
+<h2 class="content-title">Size Schedule Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("SizeScheduleMasterGrid", "SizeScheduleMaster")
+    </div>
+</div>
+
+

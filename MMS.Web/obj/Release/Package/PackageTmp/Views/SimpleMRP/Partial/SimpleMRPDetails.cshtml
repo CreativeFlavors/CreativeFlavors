@@ -1,0 +1,636 @@
+﻿@model MMS.Web.Models.SimpleMRPModel.SimpleMRPModel
+@using MMS.Repository.Managers
+@using MMS.Core.Entities
+@{
+
+}
+<link href="~/Content/css/style.css" rel="stylesheet" />
+<link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+<style>
+    #MoveSelectedIOS, #SelectedItems select {
+        width: 100%;
+    }
+</style>
+@using (Html.BeginForm("Importexcel", "SimpleMRP", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken();
+    <div style="float:left;width:100%;background-color:#f5f7eb;margin-top:30px;">
+
+        <div class="col-xs-12">
+            <div class="row">
+                <div class="col-xs-3">
+                    <div class="checkbox chk-lbl">
+                        <label>@Html.CheckBoxFor(m => m.ProductionPlanBasic) Production Plan Basis</label>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="checkbox chk-lbl">
+                        <label>@Html.CheckBoxFor(m => m.OrderBasic) Order Basis</label>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="checkbox chk-lbl">
+                        <label>@Html.CheckBoxFor(m => m.RejectionorReplacement) Rejection / Replacement</label>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="checkbox chk-lbl">
+                        <label>@Html.CheckBoxFor(m => m.OverConsumption) Over Consumption</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-xs-12">
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>MRP No:</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.HiddenFor(x => x.SimpleMRPID)
+                    @Html.HiddenFor(x => x.MRPNO)
+                    @Html.TextBoxFor(m => m.MRPCode, new { @class = "form-control text-field" })
+                    @Html.ValidationMessageFor(m => m.MRPNO)
+                </div>
+            </div>
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>Date</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.TextBoxFor(m => m.MRPDate, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field" })
+                </div>
+            </div>
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>MRP Type</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.DropDownListFor(m => m.MRPType, new SelectList(
+               new List<Object>{
+                      new { value = 0 , text = "Please Select"  },
+                       new { value = 1 , text = "Purchase"  },
+                       new { value = 2 , text = "Enco" }
+
+                 },
+               "value",
+               "text",
+                0), new { @class = "select-style text-field " })
+                </div>
+            </div>
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>Cust. Plan</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.DropDownListFor(m => m.CustomerPlan, new SelectList(new List<Object>{new { value = 1 , text = "As Planned" },
+                                                                                    new { value = 2 , text = "Scheduled" } }, "value", "text"), "Please Select",
+                                                                                 new { @class = "select-style text-field" })
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-12">
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>Buyer</h2>
+
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.DropDownListFor(m => m.BuyerNameid, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field" })
+                </div>
+            </div>
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>Week No</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+
+                    @Html.DropDownListFor(m => m.WeekNO, MMS.Web.ExtensionMethod.HtmlHelper.WeekNo_Internal(), new { @class = "select-style text-field" })
+
+                </div>
+            </div>
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>Season</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.DropDownListFor(m => m.SeasonID, MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "select-style text-field" })
+                </div>
+            </div>
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>Lot No</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @*@Html.DropDownListFor(m => m.LotNO, MMS.Web.ExtensionMethod.HtmlHelper.LOtNowihSeason(), new { @class = "select-style text-field" })*@
+                    @Html.DropDownListFor(m => m.LotNO,
+                       new SelectList(MMS.Web.ExtensionMethod.HtmlHelper.LOtNowihSeason(), "Value", "Text", Model.LotNO),
+                       new { @class = "select-style text-field" })
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-12">
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>Size Range</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.DropDownListFor(m => m.SizeRangeID, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "select-style text-field" })
+                </div>
+            </div>
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1 form-label2">
+                        <h2 class="text-center">From:</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.TextBoxFor(m => m.From, new { @class = "form-control text-field" })
+                </div>
+            </div>
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1 form-label2">
+                        <h2 class="text-center">To</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.TextBoxFor(m => m.TO, new { @class = "form-control text-field" })
+                </div>
+            </div>
+            <div class="col-xs-3 input-block">
+                <div class="col-sm-4 col-xs-12" style="padding-left: 0;">
+                    <div class="form-label1">
+                        <h2>Total Order Count</h2>
+                    </div>
+                </div>
+                <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
+                    @Html.TextBoxFor(m => m.TotalOrderCount, new { @class = "form-control text-field", @disabled = true })
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-12   col-sm-10  choose-mtp">
+            <div class="col-lg-3 col-sm-3">
+                <div class="row">
+                    <div class="col-xs-12" style="padding-left:0;">
+                        <div class="form-label1">
+                            <h2>Display IO's</h2>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="file" id="dataFile" name="upload" />
+                        <br />
+                        <span id="lblError" style="color: red;"></span>
+                        <br />
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" value="Upload" onclick="return ValidateExtension()" class="btn btn-default btn-style" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9 col-sm-9">
+                <div class="row">
+                    <div class="col-xs-5">
+                        @if (Model != null && Model.IOS != null)
+                        {
+                            @Html.ListBoxFor(model => model.SelectedCities, new MultiSelectList(Model.IOS, "Value", "Text"), new { size = "10", @style = "width: 125px;" })
+                        }
+                        else
+                        {
+                            @Html.ListBoxFor(m => m.MoveSelectedIOS, Model.selectlist ?? new List<SelectListItem>())
+                        }
+
+                    </div>
+                    <div class="col-xs-2">
+                        <input id="btnAddAll" type="button" value=">>" onclick="addallItems();" />
+                        <input id="btnAdd" type="button" value=">" onclick="addItem();" />
+                        <input id="btnRemove" type="button" value="<" onclick="removeItem();" />
+                        <input id="btnRemoveAll" type="button" value="<<" onclick="removeallItems();" />
+                    </div>
+                    <div class="col-xs-5" id="SelectedItems">
+                        @if (Model != null && Model.IOS != null && Model.selectlist != null)
+                        {
+                            @Html.ListBoxFor(model => model.MoveSelectedIOS, new MultiSelectList(Model.selectlist, "Value", "Text"), new { @class = "SelectedValue", size = "10", @style = "width: 125px;" })
+                        }
+                        else
+                        {
+                            @Html.ListBoxFor(m => m.IOS, Model.selectlist ?? new List<SelectListItem>())
+                        }
+                    </div>
+
+                    @*<div class="row">
+                            @Html.TextBoxFor(m => m.TotalOrderCount, new { @class = "form-control text-field" })
+                        </div>*@
+                </div>
+
+            </div>
+
+            <div class="form-footer">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                        <input type="button" onclick="Cancel()" style="cursor: pointer;" title="Back" value="Back" class="btn btn-default btn-style">
+                        @if (Model != null && Model.SimpleMRPID != 0)
+                        {
+                            <input type="text" style="display:none;" class="form-control text-field" id="SimpleMRPID" value="@Model.SimpleMRPID">
+                            <input type="button" onclick="Save()" class="btn btn-default btn-style" id="CountryMasterId" title="Update" value="Update">
+                            <input type="button" id="BtnCalculte" onclick="Calculate()" class="btn btn-default btn-style" style="cursor:pointer;" title="Calculate" value="Calculate">
+                        }
+                        else
+                        {
+                            <input type="button" id="Btnsave" onclick="Save()" class="btn btn-default btn-style" title="Save" value="Save">
+                        }
+                        <input type="button" id="BtnCalculte" onclick="Calculate()" class="btn btn-default btn-style" style="cursor:pointer;display:none" title="Calculate" value="Calculate">
+                        <input type="button" id="BtnDisplay" class="btn btn-default btn-style" value="Display" />
+                    </div>
+                </div>
+            </div>
+            <div class="" id="step2">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="field-section">
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                <div class="col-xs-8" style="margin-top:10px;margin-bottom:10px;">
+                                    <p class="section-title ">List of Material </p>
+                                </div>
+                                <div class="col-xs-4" style="text-align:right;margin-top:10px;margin-bottom:10px;">
+                                    <input type="button" class="btn btn-default btn-style orderDispaly" style="cursor: pointer;" title="Add" value="Add" id="AUtoDisplay" />
+                                </div>
+                                <div class="col-xs-12">
+                                    <div class="table-responsive table-td-padding parent-table-height" style="height:300px;overflow:auto;">
+                                        <table id="list-amended-material" class="table">
+                                            <thead>
+                                                <tr>
+                                                    @*<td>Remove</td>
+                                                        <td>Edit</td>*@
+                                                    <td style="display: none">BOMID</td>
+                                                    <td style="display: none">BOMMaterialID</td>
+                                                    <td>Category</td>
+                                                    <td>MaterialGroup</td>
+                                                    <td>Substance</td>
+                                                    <td>Order No</td>
+                                                    <td>MaterialName</td>
+                                                    <td>Color</td>
+                                                    <td>Req Qty</td>
+                                                    <td>IntendQty</td>
+                                                    <td>Rate</td>
+                                                    <td>UOM</td>
+                                                    <td>Value</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+}
+<script type="text/javascript">
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    $("#MRPDate").datepicker({ dateFormat: "dd/mm/yy" ,maxDate :new Date()});
+    $("#From").datepicker({ dateFormat: "dd/mm/yy", maxDate: new Date() });
+    $("#TO").datepicker({ dateFormat: "dd/mm/yy"});
+    $("#BtnDisplay").click(function () {
+        var MRPNO = $("#MRPCode").val();
+        
+        $.ajax({
+            url: '/Indent/subGETMRPMaterialList',
+            type: 'GET',
+            data: { MRPNO: $("#SimpleMRPID").val() },
+            success: function (data) {
+                console.log(data);
+                $("#BtnCalculte").hide();
+                $("#CountryMasterId").hide();
+                $("#list-amended-material tbody").html("");
+                $.each(data, function (i, item) {
+                    $("#RemoveHead").css("display", "block");
+                    $("#EditHead").css("display", "block");
+                    if (item.SubstanceRange == null) {
+                        item.SubstanceRange = "";
+                    }
+                    if (item.BuyerPoNo == null) {
+                        item.BuyerPoNo = "";
+                    }
+                    if (item.Color == null) {
+                        item.Color = "";
+                    }
+                    if (item.IndentQTY == null) {
+                        item.IndentQTY = "";
+                    }
+                    var qty = parseFloat(item.RequiredQty)
+                    var rate = parseFloat(item.Price);
+                    var value = qty * rate;
+                    value = Math.round(value).toFixed(2);
+                    $("#list-amended-material tbody").append("<tr id=" + item.IndentMaterialID + "> <td id='BOMID' style='display:none' class='BOMID' value=''>" + item.BOMID + "</td>"
+                        //+ "<td><input type='button' value='Remove' onclick='Delete(" + item.IndentMaterialID + ")' class='' />" + "</td>"
+                        // + "<td><input type='button' value='Edit' onclick='RowClick(" + item.IndentMaterialID + "," + item.BOMID + ")' class='' />" + "</td>"
+                                 + "<td id='BOMMaterialID' style='display:none' class='BOMMaterialID' value=''>" + item.BOMMaterialID + "</td>"
+                                 + "<td id='MRPNO' style='display:none' class='MRPNO' value=''>" + item.MRPNO + "</td>"
+                                 + "<td id='CategoryName'  class='CategoryName' value=''>" + item.categoryname + "</td>"
+                                 + "<td id='GroupName'  class='GroupName' value=''>" + item.groupname + "</td>"
+                                      + "<td id='SubstanceRange'  class='SubstanceRange' value=''>" + item.substancerange + "</td>"
+                                         + "<td id='BuyerPoNo'  class='BuyerPoNo' value=''>" + item.buyerpono + "</td>"
+                                 + "<td id='MaterialDescription'  class='MaterialDescription' value=''>" + item.materialdescription + "</td>"
+                                 + "<td id='Color'  class='Color' value=''>" + item.color + "</td>"
+                                + "<td id='RequiredQty' class='RequiredQty' value=''>" + item.requiredqty + "</td>"
+                           + "<td id='IndentQTY'  class='IndentQTY' value=''>" + item.indentqty + "</td>"
+                            + "<td id='Price'  class='Price' value=''>" + item.price + "</td>"
+                            + "<td id='WastageName'  class='WastageName' value=''>" + item.wastagename + "</td>"
+                            + "<td id='Value'  class='Value' value=''>" + value + "</td>"
+                                    + "<td id='TotalNorms' style='display:none' class='TotalNorms' value=''>" + item.totalnorms + "</td>"
+                                    + "<td id='MaterialCategoryMasterId' style='display:none' class='MaterialCategoryMasterId' value=''>" + item.materialcategorymasterid + "</td>"
+                                    + "<td id='MaterialGroupMasterId' style='display:none' class='MaterialGroupMasterId' value=''>" + item.materialgroupmasterid + "</td>"
+                                    + "<td id='ColorMasterId' style='display:none'  class='ColorMasterId' value=''>" + item.colormasterid + "</td>"
+                                    + "<td id='SubstanceMasterId' style='display:none' class='SubstanceMasterId' value=''>" + item.substancemasterId + "</td>"
+                                    + "<td id='BuyerSeason' style='display:none' class='BuyerSeason' value=''>" + item.buyerseason + "</td>"
+                                    + "<td id='SeasonName' style='display:none' class='SeasonName' value=''>" + item.seasonname + "</td>"
+                                    + "<td id='RequiredQty' style='display:none' class='RequiredQty' value=''>" + item.requiredqty + "</td>"
+                                      + "<td id='Rate' style='display:none' class='Rate' value=''>" + item.rate + "</td>"
+                                        + "<td id='UomMasterId' style='display:none' class='UomMasterId' value=''>" + item.wastageqtyuom + "</td>"
+                                          + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.supplierid + "</td>"
+                                          + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.suppliername + "</td>"
+                                            + "<td id='BuyerFullName' style='display:none' class='BuyerFullName' value=''>" + item.buyerfullname + "</td>"
+                                              + "<td id='BuyerMasterId' style='display:none' class='BuyerMasterId' value=''>" + item.buyermasterid + "</td>"
+                                    + "<td id='OrderEntryId' style='display:none' class='OrderEntryId' value=''>" + item.orderentryid + "</td></tr>");
+
+                });
+            }
+        });
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    $(function () {
+        $('.loader-overlay').ajaxStart(function () {
+            $(this).fadeIn('slow');
+        }).ajaxStop(function () {
+            $(this).stop().fadeOut('fast');
+        });
+    });
+
+    function ValidateExtension() {
+        var allowedFiles = [".xls", ".xlsx", ".ods"];
+        var fileUpload = document.getElementById("dataFile");
+        var lblError = document.getElementById("lblError");
+        var regex = new RegExp("([a-zA-Z0-9\s_\\.\-:])+(" + allowedFiles.join('|') + ")$");
+        if (!regex.test(fileUpload.value.toLowerCase())) {
+            lblError.innerHTML = "Please upload files having extensions: <b>" + allowedFiles.join(', ') + "</b> only.";
+            return false;
+        }
+        lblError.innerHTML = "";
+        return true;
+    }
+
+
+    function addItem() {
+        if ($("#IOS option:selected").length > 0) {
+            $("#MoveSelectedIOS option:selected").each(function () {
+                $("#SelectedItems").find('#IOS').append(
+                                     $('<option></option>').val($(this).text()).text($(this).text()));
+            });
+        }
+        else if ($("#SelectedCities option:selected").length > 0) {
+            $("#SelectedCities option").appendTo("#MoveSelectedIOS");
+            $("#MoveSelectedIOS option").attr("selected", false);
+        }
+        else if ($("#MoveSelectedIOS option:selected").length > 0) {
+            $("#MoveSelectedIOS option:selected").each(function () {
+                $("#SelectedItems").find('#IOS').append(
+                                     $('<option></option>').val($(this).text()).text($(this).text()));
+            });
+        }
+        else {
+            $("#SelectedCities option:selected").appendTo("#MoveSelectedIOS");
+            $("#MoveSelectedIOS option").attr("selected", false);
+
+        }
+        var optionValues = [];
+        $('#MoveSelectedIOS option:selected').each(function () {
+            optionValues.push($(this).text());
+        });
+        var ParseText = JSON.stringify(optionValues);
+        $.ajax({
+            url: ' @Url.Action("GetTotalCount", "SimpleMRP")',
+            type: "GET",
+            dataType: "JSON",
+            data: { LotNo: ParseText },
+            success: function (cities) {
+                $('#TotalOrderCount').val(cities.Count);
+            }
+        });
+
+    }
+    function addallItems() {
+        if ($("#IOS option:selected").length > 0) {
+            $("#MoveSelectedIOS option").each(function () {
+                $("#SelectedItems").find('#IOS').append(
+                                     $('<option></option>').val($(this).text()).text($(this).text()));
+            });
+        }
+        else if ($("#SelectedCities option").length > 0) {
+            $("#SelectedCities option").each(function () {
+                $("#SelectedItems").find('#IOS').append(
+                                       $('<option></option>').val($(this).text()).text($(this).text()));
+            });
+        }
+        else if ($("#MoveSelectedIOS option").length > 0) {
+            $("#MoveSelectedIOS option").each(function () {
+                $("#SelectedItems").find('#IOS').append(
+                                       $('<option></option>').val($(this).text()).text($(this).text()));
+            });
+        }
+        else {
+            $("#SelectedCities option").appendTo("#MoveSelectedIOS");
+            $("#MoveSelectedIOS option").attr("selected", false);
+
+        }
+    }
+    function removeItem() {
+        if ($("#IOS option:selected").length > 0) {
+            $("#IOS option:selected").each(function () {
+                $(this).remove();
+            });
+        }
+        else if ($("#SelectedCities option:selected").length > 0) {
+            $("#IOS option:selected").each(function () {
+                $(this).remove();
+            });
+        }
+        else {
+            $("#MoveSelectedIOS option:selected").appendTo("#SelectedCities");
+            $("#SelectedCities option").attr("selected", false);
+
+        }
+
+    }
+    function removeallItems() {
+
+        if ($("#IOS option").length > 0) {
+            $("#IOS option").each(function () {
+                $(this).remove();
+            });
+        }
+        else {
+            $("#MoveSelectedIOS option").appendTo("#SelectedCities");
+            $("#SelectedCities option").attr("selected", false);
+        }
+
+    }
+    function Calculate() {
+        $('.loader-overlay').show();
+        $('.loader-overlay').fadeIn('fast');
+        var optionValues = [];
+        $('#IOS option').each(function () {
+            optionValues.push($(this).text());
+        });
+        var ParseText = JSON.stringify(optionValues);
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("IOSelectList", "SimpleMRP")',
+            data: { SelectText: ParseText, SimpleMRPID: $('#SimpleMRPID').val() },
+            success: function (data) {
+                $('.loader-overlay').fadeOut('fast');
+                $('.loader-overlay').hide();
+
+                if (data.InternalStatus != null && data.InternalStatus != "") {
+                    alert(data.InternalStatus);
+                }
+                if (data.BOMStatus != null && data.BOMStatus != "") {
+                    alert(data.BOMStatus);
+                }
+                if (data.status != null && data.status != "") {
+                    alert(data.status);
+                }
+                if (data.orderStatus != null && data.orderStatus != "") {
+                    alert("These are the order no already existed" + ":" + data.orderStatus);
+                }
+                return false;
+
+                $(".veh-tablewrap").html(data);
+                $(".veh-tablewrap").show();
+                $('#DivShow').hide();
+                $('#EditColorPartial').hide();
+            }
+        });
+    }
+    $("#WeekNO").change(function () {
+        var week = $("#WeekNO option:selected").text();
+        $.ajax({
+            url: ' @Url.Action("GetLotNo", "SimpleMRP")',
+            type: "GET",
+            dataType: "JSON",
+            data: { WeekNo: week },
+            success: function (cities) {
+                $("#LotNO").html("");
+                $.each(cities.lotNoList, function (i, item) {
+                    $("#LotNO").append(
+                        $('<option></option>').val(item.Value).html(item.Text));
+                });
+                $("#SeasonID").html("");
+                $("#MoveSelectedIOS").html("");
+                $.each(cities.seasonList_, function (i, season) {
+                    $("#SeasonID").append(
+                        $('<option></option>').val(season.Value).html(season.Text));
+                });
+            }
+        });
+    });
+
+    $("#BuyerNameid").change(function () {
+        var buyer = $("#BuyerNameid").val();
+        $.ajax({
+            url: ' @Url.Action("GetBuyerWithWeekNO", "SimpleMRP")',
+            type: "GET",
+            dataType: "JSON",
+            data: { BuyerName: buyer },
+            success: function (cities) {
+                $("#WeekNO").html("");
+                $("#MoveSelectedIOS").html("");
+                $.each(cities, function (i, item) {
+                    $("#WeekNO").append(
+                        $('<option></option>').val(item.Value).html(item.Text));
+                });
+            }
+        });
+    });
+    $("#SeasonID").change(function () {
+        var seasonName = $("#SeasonID option:selected").text();
+        $.ajax({
+            url: ' @Url.Action("GetLotNoWithSeason", "SimpleMRP")',
+            type: "GET",
+            dataType: "JSON",
+            data: { SeasonName: seasonName },
+            success: function (cities) {
+                $("#LotNO").html("");
+                $("#MoveSelectedIOS").html("");
+                $.each(cities.lotNoList_, function (i, item) {
+                    $("#LotNO").append(
+                        $('<option></option>').val(item.Text).html(item.Text));
+                });
+            }
+        });
+    });
+    $("#LotNO").change(function () {
+        if ($("#SeasonID").val() != "" && $("#SeasonID").val() != null) {
+            var lotno = $("#LotNO option:selected").text();
+            var SeasonID = $("#SeasonID").val();
+            var buyer = $("#BuyerNameid").val();
+            $.ajax({
+                url: ' @Url.Action("GetLotWithOrderNO", "SimpleMRP")',
+                type: "GET",
+                dataType: "JSON",
+                data: { LotNo: lotno, SeasonID, buyer },
+                success: function (cities) {
+                    $('#TotalOrderCount').val(cities.Count);
+                    $("#MoveSelectedIOS").html("");
+                    $.each(cities.lotNoList_, function (i, item) {
+                        $("#MoveSelectedIOS").append(
+                            $('<option></option>').val(item.Value).html(item.Text));
+                    });
+                }
+            });
+        }
+    });
+
+
+</script>

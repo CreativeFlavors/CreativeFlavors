@@ -1,0 +1,1256 @@
+﻿@{
+    ViewBag.Title = "GateEntryInwardMaterials";
+}
+
+
+<h2 class="content-title">Gate Entry Inward Form</h2>
+<div style="width: 100%; float: left;">
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("GateEntryInwardMaterialsGrid", "GateEntryInwardMaterials")
+    </div>
+</div>
+<script>
+   
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $("#EditColorPartial").hide();
+    });
+
+
+
+    var loadfile = function (event) {
+        
+
+        var fileName = "test.jpg";
+        var fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+
+        var files = event.target.files;
+        for (i = 0; i < files.length; i++) {
+            if (event.target.files[i].name.substring(event.target.files[i].name.lastIndexOf('.') + 1) == "pdf") {
+
+                $('#formcontrol').append("<embed  src='" + URL.createObjectURL(event.target.files[i]) + "' class='dynamicimg' style='width: 100%; height: 1000px;' /> <br>");
+            }
+            else {
+                $('#formcontrol').append("<img  src='" + URL.createObjectURL(event.target.files[i]) + "' class='dynamicimg' style='width: 100%;' /> <br>");
+            }
+        }
+    }
+
+    function cleartheupdatefiledata() {
+        $("#files").val('');
+        $('#formcontrol img').remove();
+        $('#formcontrol embed').remove();
+    }
+
+
+
+
+
+
+    function Save() {
+        var sizeRangeid = $('#SizeRangeId').val();
+        if (sizeRangeid != 0 && sizeRangeid != null) {           
+        }
+
+        if ($('#InwardMaterialType').val() == "") {
+            alert('Please Select InwardMaterialType');
+            $('#InwardMaterialType').css('border-color', 'red');
+            $('#InwardMaterialType').focus();
+            return false;
+        }
+        else {
+            $('#InwardMaterialType').css('border-color', '');
+        }
+        if ($("#IsNewInward").prop("checked")) {
+            $('#DcRefNo').css('border-color', '');
+        }
+        else if ($("#IsReturned").prop("checked")) {
+            {
+                if ($('#DcRefNo').val() == "") {
+                    alert("Please Enter DcRefNo");
+                    $('#DcRefNo').css('border-color', 'red');
+                    $('#DcRefNo').focus();
+                    return false;
+                }
+                else {
+                    $('#DcRefNo').css('border-color', '');
+                }
+            }
+        }
+        else if ($("#IsJobWork").prop("checked")) {
+            if ($('#DcRefNo').val() == "") {
+                alert("Please Enter DcRefNo");
+                $('#DcRefNo').css('border-color', 'red');
+                $('#DcRefNo').focus();
+                return false;
+            }
+            else {
+                $('#DcRefNo').css('border-color', '');
+            }
+        }
+        else {
+            if ($('#DcRefNo').val() == "") {
+                alert("Please Enter DcRefNo");
+                $('#DcRefNo').css('border-color', 'red');
+                $('#DcRefNo').focus();
+                return false;
+            }
+            else {
+                $('#DcRefNo').css('border-color', '');
+            }
+        }
+        if ($('#DcRefDate').val() == "") {
+            alert("Please Enter DcRefDate");
+            $('#DcRefDate').css('border-color', 'red');
+            $('#DcRefDate').focus();
+            return false;
+        }
+        else {
+            $('#DcRefDate').css('border-color', '');
+        }
+        if ($('#Company').val() == "") {
+            alert("Please Enter Company");
+            $('#Company').css('border-color', 'red');
+            $('#Company').focus();
+            return false;
+        }
+        else {
+            $('#Company').css('border-color', '');
+        }
+        if ($('#InvoiceCurrency').val() == "") {
+            alert('Please Select Invoice Currency');
+            $('#InvoiceCurrency').css('border-color', 'red');
+            $('#InvoiceCurrency').focus();
+            return false;
+        }
+        else {
+            $('#InvoiceCurrency').css('border-color', '');
+        }
+        if ($('#SupplierId').val() == "") {
+            alert('Please Select Supplier');
+            $('#SupplierId').css('border-color', 'red');
+            $('#SupplierId').focus();
+            return false;
+        }
+        else {
+            $('#SupplierId').css('border-color', '');
+        }
+
+        if ($('#MaterialNameId').val() == "") {
+            alert('Please Select Material Name');
+            $('#MaterialNameId').css('border-color', 'red');
+            $('#MaterialNameId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialNameId').css('border-color', '');
+        }
+        if ($('#StoresId').val() == "") {
+            alert('Please Select Store');
+            $('#StoresId').css('border-color', 'red');
+            $('#StoresId').focus();
+            return false;
+        }
+        else {
+            $('#StoresId').css('border-color', '');
+        }
+        //Save Size,PoQty,DcQty,ArrivedQty
+        var size = "";
+        $('#sizeRangeTable tbody tr').find('.SizeRangeRefValue').each(function () {
+
+            size += $(this).text() + ",";
+        });
+        size = size.slice(0, -1);
+
+        var poQty = "";
+        if ($('#PoNoId').val() != 0 && $('#PoNoId').val() != null && $('#PoNoId').val() != "") {
+            $('#sizeRangeTable tbody tr').find('.PoQuantity').each(function () {
+                poQty += $(this).text() + ",";
+            });
+        }
+        else {
+            $('#sizeRangeTable tbody tr').find('.gridPoQuantity').each(function () {
+                poQty += $(this).val() + ",";
+            });
+        }
+        poQty = poQty.slice(0, -1);
+
+        var dcQty_ = ""
+        $('#sizeRangeTable tbody tr').find('.gridDcQuantity').each(function () {
+            dcQty_ += $(this).val() + ",";
+        });
+        dcQty_ = dcQty_.slice(0, -1);
+
+        var arrQty_ = ""
+        $('#sizeRangeTable tbody tr').find('.gridArrivedQuantity').each(function () {
+            arrQty_ += $(this).val() + ",";
+        });
+        arrQty_ = arrQty_.slice(0, -1);
+
+        var pendingQty_ = ""
+        $('#sizeRangeTable tbody tr').find('.gridPendingQuantity').each(function () {
+            pendingQty_ += $(this).val() + ",";
+        });
+        pendingQty_ = pendingQty_.slice(0, -1);
+
+
+        var formdata = new FormData();
+        var fileInput = document.getElementById('files');
+        for (i = 0; i < fileInput.files.length; i++) {
+            formdata.append(fileInput.files[i].name, fileInput.files[i]);
+            // $('#formcontrol').append("<img id='" + fileInput.files[i].name + "'  src='" + fileInput.files[i].name + "' class='dynamicimg' /> <br>");
+
+        }
+        
+        formdata.append("GateEntryInwardId", $('#GateEntryInwardId').val());
+        formdata.append("GateEntryNo", $('#GateEntryNo').val());
+        formdata.append("EntryDate", $('#EntryDate').val());
+        formdata.append("Size", size);
+        formdata.append("PoQty", poQty);
+        formdata.append("DcQty", dcQty_);
+        formdata.append("ArrivedQty", arrQty_);
+        formdata.append("PendingQty", pendingQty_);
+        formdata.append("MaterialName", $('#MaterialName').val());
+        formdata.append("InwardEntryDateTime", $('#InwardEntryDateTime').val());
+        formdata.append("InwardMaterialType", $('#InwardMaterialType').val());
+        formdata.append("IsReturned", $('#IsReturned').is(":checked") ? "true" : "false");
+        formdata.append("IsNewInward", $('#IsNewInward').is(":checked") ? "true" : "false");
+        formdata.append("IsJobWork", $('#IsJobWork').is(":checked") ? "true" : "false");
+        formdata.append("DcRefNo", $('#DcRefNo').val());
+        formdata.append("DcRefDate", $('#DcRefDate').val());
+        formdata.append("Company", $('#Company').val());
+        formdata.append("UnitDivision", $("#UnitDivision option:selected").val());
+        formdata.append("ReturnType", $("#ReturnType option:selected").val());
+        formdata.append("MaterialType", $("#ReturnType option:selected").val());
+        formdata.append("DcNo", $('#DcNo').val());
+        formdata.append("DcDate", $('#DcDate').val());
+        formdata.append("InvoiceNo", $('#InvoiceNo').val());
+        formdata.append("InvoiceDate", $('#InvoiceDate').val());
+        formdata.append("ModeofTransport", $("#ModeofTransport option:selected").val());
+        formdata.append("InvoiceCurrency", $("#InvoiceCurrency option:selected").val());
+        formdata.append("InvoiceValue", $('#InvoiceValue').val());
+        formdata.append("VehicleNo", $('#VehicleNo').val());
+        formdata.append("PoNoId", $("#PoNoId option:selected").val());
+        formdata.append("SupplierId", $("#SupplierId option:selected").val());
+        formdata.append("StoresId", $("#StoresId option:selected").val());
+        formdata.append("MaterialNameId", $("#MaterialNameId option:selected").val());
+        formdata.append("HSNCode", $('#HSNCode').val());
+        formdata.append("SizeRangeId", $("#SizeRangeId option:selected").val());
+        formdata.append("UomId", $('#UomId').val());
+        formdata.append("Pcs", $('#Pcs').val());
+        formdata.append("ReceivedBy", $('#ReceivedBy').val());
+        formdata.append("AcknowledgedBy", $('#AcknowledgedBy').val());
+        formdata.append("Remarks", $('#Remarks').val());
+        formdata.append("Quantity", $('#Quantity').val());
+        formdata.append("TotalQty", $('#TotalQty').val());
+        formdata.append("Rate", $('#Rate').val());
+        formdata.append("Value", $('#Value').val());
+        formdata.append("DcTotal", $('#DcTotal').val());
+        formdata.append("ArrivedTotal", $('#ArrivedTotal').val());
+        formdata.append("InwardPo", $('#InwardPo option:selected').val());
+        formdata.append("PoTotal", $('#PoTotal').val());
+        formdata.append("PendingQuantity", $('#PendingQuantity').val());
+
+        
+        
+        data= {
+                    GateEntryNo: $('#GateEntryNo').val(),
+                    EntryDate: $('#EntryDate').val(),
+                    Size: size,
+                    PoQty: poQty,
+                    DcQty: dcQty_,
+                    ArrivedQty: arrQty_,
+                    PendingQty: pendingQty_,
+                    MaterialName: $('#MaterialName').val(),
+                    InwardEntryDateTime: $('#InwardEntryDateTime').val(),
+                    InwardMaterialType: $('#InwardMaterialType').val(),
+                    IsReturned: $('#IsReturned').is(":checked") ? "true" : "false",
+                    IsNewInward: $('#IsNewInward').is(":checked") ? "true" : "false",
+                    IsJobWork: $('#IsJobWork').is(":checked") ? "true" : "false",
+                    DcRefNo: $('#DcRefNo').val(),
+                    DcRefDate: $('#DcRefDate').val(),
+                    Company: $('#Company').val(),
+                    UnitDivision: $("#UnitDivision option:selected").val(),
+                    ReturnType: $("#ReturnType option:selected").val(),
+                    MaterialType: $("#MaterialType option:selected").val(),
+                    DcNo: $('#DcNo').val(),
+                    DcDate: $('#DcDate').val(),
+                    InvoiceNo: $('#InvoiceNo').val(),
+                    InvoiceDate: $('#InvoiceDate').val(),
+                    ModeofTransport : $("#ModeofTransport option:selected").val(),
+                    InvoiceCurrency : $("#InvoiceCurrency option:selected").val(),
+                    InvoiceValue: $('#InvoiceValue').val(),
+                    VehicleNo: $('#VehicleNo').val(),
+                    PoNoId: $("#PoNoId option:selected").val(),
+                    SupplierId: $("#SupplierId option:selected").val(),
+                    StoresId: $("#StoresId option:selected").val(),
+                    MaterialNameId: $("#MaterialNameId option:selected").val(),
+                    HSNCode: $('#HSNCode').val(),
+                    SizeRangeId: $("#SizeRangeId option:selected").val(),
+                    UomId: $('#UomId').val(),
+                    Pcs: $('#Pcs').val(),
+                    ReceivedBy: $('#ReceivedBy').val(),
+                    AcknowledgedBy: $('#AcknowledgedBy').val(),
+                    Remarks: $('#Remarks').val(),
+                    Quantity: $('#Quantity').val(),
+                    TotalQty: $('#TotalQty').val(),
+                    Rate: $('#Rate').val(),
+                    Value: $('#Value').val(),
+                    DcTotal: $('#DcTotal').val(),
+                    ArrivedTotal: $('#ArrivedTotal').val(),
+                    InwardPo: $('#InwardPo option:selected').val(),
+                    PoTotal: $('#PoTotal').val(),
+                    PendingQuantity: $('#PendingQuantity').val(),
+                },
+
+        $.ajax({
+            type: 'POST',
+            url: '/GateEntryInwardMaterials/GateEntryInwardMaterialsfile',
+            processData: false,
+            data: formdata,
+            contentType: false,
+            cache: false,
+            success: function (data) {
+                if (data.GateEntryInwardId != "" || data.GateEntryInwardId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/GateEntryInwardMaterials/GateEntryInwardMaterials";
+                    return false;
+                }
+
+                else {
+                    alert('Already Exist in the database.');
+                    location.href = "/GateEntryInwardMaterials/GateEntryInwardMaterials";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+
+
+        //$.ajax({
+        //    type: 'POST',
+        //    url: '/GateEntryInwardMaterials/GateEntryInwardMaterials',
+        //    data: {
+        //        GateEntryNo: $('#GateEntryNo').val(),
+        //        EntryDate: $('#EntryDate').val(),
+        //        Size: size,
+        //        PoQty: poQty,
+        //        DcQty: dcQty_,
+        //        ArrivedQty: arrQty_,
+        //        PendingQty: pendingQty_,
+        //        MaterialName: $('#MaterialName').val(),
+        //        InwardEntryDateTime: $('#InwardEntryDateTime').val(),
+        //        InwardMaterialType: $('#InwardMaterialType').val(),
+        //        IsReturned: $('#IsReturned').is(":checked") ? "true" : "false",
+        //        IsNewInward: $('#IsNewInward').is(":checked") ? "true" : "false",
+        //        IsJobWork: $('#IsJobWork').is(":checked") ? "true" : "false",
+        //        DcRefNo: $('#DcRefNo').val(),
+        //        DcRefDate: $('#DcRefDate').val(),
+        //        Company: $('#Company').val(),
+        //        UnitDivision: $("#UnitDivision option:selected").val(),
+        //        ReturnType: $("#ReturnType option:selected").val(),
+        //        MaterialType: $("#MaterialType option:selected").val(),
+        //        DcNo: $('#DcNo').val(),
+        //        DcDate: $('#DcDate').val(),
+        //        InvoiceNo: $('#InvoiceNo').val(),
+        //        InvoiceDate: $('#InvoiceDate').val(),
+        //        ModeofTransport: $("#ModeofTransport option:selected").val(),
+        //        InvoiceCurrency: $("#InvoiceCurrency option:selected").val(),
+        //        InvoiceValue: $('#InvoiceValue').val(),
+        //        VehicleNo: $('#VehicleNo').val(),
+        //        PoNoId: $("#PoNoId option:selected").val(),
+        //        SupplierId: $("#SupplierId option:selected").val(),
+        //        StoresId: $("#StoresId option:selected").val(),
+        //        MaterialNameId: $("#MaterialNameId option:selected").val(),
+        //        HSNCode: $('#HSNCode').val(),
+        //        SizeRangeId: $("#SizeRangeId option:selected").val(),
+        //        UomId: $('#UomId').val(),
+        //        Pcs: $('#Pcs').val(),
+        //        ReceivedBy: $('#ReceivedBy').val(),
+        //        AcknowledgedBy: $('#AcknowledgedBy').val(),
+        //        Remarks: $('#Remarks').val(),
+        //        Quantity: $('#Quantity').val(),
+        //        TotalQty: $('#TotalQty').val(),
+        //        Rate: $('#Rate').val(),
+        //        Value: $('#Value').val(),
+        //        DcTotal: $('#DcTotal').val(),
+        //        ArrivedTotal: $('#ArrivedTotal').val(),
+        //        InwardPo: $('#InwardPo option:selected').val(),
+        //        PoTotal: $('#PoTotal').val(),
+        //        PendingQuantity: $('#PendingQuantity').val(),
+        //    },
+        //    success: function (data) {
+        //        if (data.GateEntryInwardId != "" || data.GateEntryInwardId != 0) {
+        //            alert('Saved Successfully.');
+        //            location.href = "/GateEntryInwardMaterials/GateEntryInwardMaterials";
+        //            return false;
+        //        }
+
+        //        else {
+        //            alert('Already Exist in the database.');
+        //            location.href = "/GateEntryInwardMaterials/GateEntryInwardMaterials";
+        //            return false;
+        //        }
+
+        //    },
+        //    error: function (ex) {
+        //        alert('Already Exist in the database.');
+        //    }
+        //});
+
+    }
+
+    function Update() {
+        /*Calculation of Total Quantity */
+        var sizeRangeid = $('#SizeRangeId').val();
+        if (sizeRangeid != 0 && sizeRangeid != null) {
+           
+        }
+
+        if ($('#InwardMaterialType').val() == "") {
+            alert('Please Select InwardMaterialType');
+            $('#InwardMaterialType').css('border-color', 'red');
+            $('#InwardMaterialType').focus();
+            return false;
+        }
+        else {
+            $('#InwardMaterialType').css('border-color', '');
+        }
+        if ($("#IsNewInward").prop("checked")) {
+            $('#DcRefNo').css('border-color', '');
+        }
+        else if ($("#IsReturned").prop("checked")) {
+            {
+                if ($('#DcRefNo').val() == "") {
+                    alert("Please Enter DcRefNo");
+                    $('#DcRefNo').css('border-color', 'red');
+                    $('#DcRefNo').focus();
+                    return false;
+                }
+                else {
+                    $('#DcRefNo').css('border-color', '');
+                }
+            }
+        }
+        else if ($("#IsJobWork").prop("checked")) {
+            if ($('#DcRefNo').val() == "") {
+                alert("Please Enter DcRefNo");
+                $('#DcRefNo').css('border-color', 'red');
+                $('#DcRefNo').focus();
+                return false;
+            }
+            else {
+                $('#DcRefNo').css('border-color', '');
+            }
+        }
+        else {
+            if ($('#DcRefNo').val() == "") {
+                alert("Please Enter DcRefNo");
+                $('#DcRefNo').css('border-color', 'red');
+                $('#DcRefNo').focus();
+                return false;
+            }
+            else {
+                $('#DcRefNo').css('border-color', '');
+            }
+        }
+        if ($('#DcRefDate').val() == "") {
+            alert("Please Enter DcRefDate");
+            $('#DcRefDate').css('border-color', 'red');
+            $('#DcRefDate').focus();
+            return false;
+        }
+        else {
+            $('#DcRefDate').css('border-color', '');
+        }
+
+        if ($('#Company').val() == "") {
+            alert("Please Enter Company");
+            $('#Company').css('border-color', 'red');
+            $('#Company').focus();
+            return false;
+        }
+        else {
+            $('#Company').css('border-color', '');
+        }
+        if ($('#InvoiceCurrency').val() == "") {
+            alert('Please Select Invoice Currency');
+            $('#InvoiceCurrency').css('border-color', 'red');
+            $('#InvoiceCurrency').focus();
+            return false;
+        }
+        else {
+            $('#InvoiceCurrency').css('border-color', '');
+        }
+        if ($('#SupplierId').val() == "") {
+            alert('Please Select Supplier');
+            $('#SupplierId').css('border-color', 'red');
+            $('#SupplierId').focus();
+            return false;
+        }
+        else {
+            $('#SupplierId').css('border-color', '');
+        }
+
+        if ($('#MaterialNameId').val() == "") {
+            alert('Please Select Material Name');
+            $('#MaterialNameId').css('border-color', 'red');
+            $('#MaterialNameId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialNameId').css('border-color', '');
+        }
+        if ($('#StoresId').val() == "") {
+            alert('Please Select Store');
+            $('#StoresId').css('border-color', 'red');
+            $('#StoresId').focus();
+            return false;
+        }
+        else {
+            $('#StoresId').css('border-color', '');
+        }
+
+        //Save Size,PoQty,DcQty,ArrivedQty
+        var size = "";
+        $('#sizeRangeTable tbody tr').find('.SizeRangeRefValue').each(function () {
+
+            size += $(this).text() + ",";
+        });
+        size = size.slice(0, -1);
+
+        var poQty = "";
+        $('#sizeRangeTable tbody tr').find('.PoQuantity').each(function () {
+
+            poQty += $(this).text() + ",";
+        });
+        poQty = poQty.slice(0, -1);
+
+        var dcQty_ = ""
+        $('#sizeRangeTable tbody tr').find('.gridDcQuantity').each(function () {
+            dcQty_ += $(this).val() + ",";
+        });
+        dcQty_ = dcQty_.slice(0, -1);
+
+        var arrQty_ = ""
+        $('#sizeRangeTable tbody tr').find('.gridArrivedQuantity').each(function () {
+            arrQty_ += $(this).val() + ",";
+        });
+        arrQty_ = arrQty_.slice(0, -1);
+
+        var pendingQty_ = ""
+        $('#sizeRangeTable tbody tr').find('.gridPendingQuantity').each(function () {
+            pendingQty_ += $(this).val() + ",";
+        });
+        pendingQty_ = pendingQty_.slice(0, -1);
+
+        var sizeQtyID = "";
+        $('#sizeRangeTable tbody tr').find('.SizeQTy').each(function () {
+            sizeQtyID += $(this).val() + ",";
+        });
+        sizeQtyID = sizeQtyID.slice(0, -1);
+
+        var penQtyID = "";
+        $('#sizeRangeTable tbody tr').find('.PendingQty').each(function () {
+            penQtyID += $(this).val() + ",";
+        });
+        penQtyID = penQtyID.slice(0, -1);
+
+
+
+
+
+        var formdata = new FormData();
+        var fileInput = document.getElementById('files');
+        for (i = 0; i < fileInput.files.length; i++) {
+            formdata.append(fileInput.files[i].name, fileInput.files[i]);
+            // $('#formcontrol').append("<img id='" + fileInput.files[i].name + "'  src='" + fileInput.files[i].name + "' class='dynamicimg' /> <br>");
+
+        }
+
+        formdata.append("GateEntryInwardId", $('#GateEntryInwardId').val());
+        formdata.append("GateEntryNo", $('#GateEntryNo').val());
+        formdata.append("EntryDate", $('#EntryDate').val());
+        formdata.append("Size", size);
+        formdata.append("PoQty", poQty);
+        formdata.append("DcQty", dcQty_);
+        formdata.append("ArrivedQty", arrQty_);
+        formdata.append("PendingQty", pendingQty_);
+        formdata.append("MaterialName", $('#MaterialName').val());
+        formdata.append("InwardEntryDateTime", $('#InwardEntryDateTime').val());
+        formdata.append("InwardMaterialType", $('#InwardMaterialType').val());
+        formdata.append("IsReturned", $('#IsReturned').is(":checked") ? "true" : "false");
+        formdata.append("IsNewInward", $('#IsNewInward').is(":checked") ? "true" : "false");
+        formdata.append("IsJobWork", $('#IsJobWork').is(":checked") ? "true" : "false");
+        formdata.append("DcRefNo", $('#DcRefNo').val());
+        formdata.append("DcRefDate", $('#DcRefDate').val());
+        formdata.append("Company", $('#Company').val());
+        formdata.append("UnitDivision", $("#UnitDivision option:selected").val());
+        formdata.append("ReturnType", $("#ReturnType option:selected").val());
+        formdata.append("MaterialType", $("#ReturnType option:selected").val());
+        formdata.append("DcNo", $('#DcNo').val());
+        formdata.append("DcDate", $('#DcDate').val());
+        formdata.append("InvoiceNo", $('#InvoiceNo').val());
+        formdata.append("InvoiceDate", $('#InvoiceDate').val());
+        formdata.append("ModeofTransport", $("#ModeofTransport option:selected").val());
+        formdata.append("InvoiceCurrency", $("#InvoiceCurrency option:selected").val());
+        formdata.append("InvoiceValue", $('#InvoiceValue').val());
+        formdata.append("VehicleNo", $('#VehicleNo').val());
+        formdata.append("PoNoId", $("#PoNoId option:selected").val());
+        formdata.append("SupplierId", $("#SupplierId option:selected").val());
+        formdata.append("StoresId", $("#StoresId option:selected").val());
+        formdata.append("MaterialNameId", $("#MaterialNameId option:selected").val());
+        formdata.append("HSNCode", $('#HSNCode').val());
+        formdata.append("SizeRangeId", $("#SizeRangeId option:selected").val());
+        formdata.append("UomId", $('#UomId').val());
+        formdata.append("Pcs", $('#Pcs').val());
+        formdata.append("ReceivedBy", $('#ReceivedBy').val());
+        formdata.append("AcknowledgedBy", $('#AcknowledgedBy').val());
+        formdata.append("Remarks", $('#Remarks').val());
+        formdata.append("Quantity", $('#Quantity').val());
+        formdata.append("TotalQty", $('#TotalQty').val());
+        formdata.append("Rate", $('#Rate').val());
+        formdata.append("Value", $('#Value').val());
+        formdata.append("DcTotal", $('#DcTotal').val());
+        formdata.append("ArrivedTotal", $('#ArrivedTotal').val());
+        formdata.append("InwardPo", $('#InwardPo option:selected').val());
+        formdata.append("PoTotal", $('#PoTotal').val());
+        formdata.append("PendingQuantity", $('#PendingQuantity').val());
+        
+        data= {
+                GateEntryInwardId: $('#GateEntryInwardId').val(),
+                GateEntryNo: $('#GateEntryNo').val(),
+                Size: size,
+                PoQty: poQty,
+                DcQty: dcQty_,
+                ArrivedQty: arrQty_,
+                PendingQty: pendingQty_,
+                InwardMaterialSizeQtyRateId: sizeQtyID,
+                PendingQuantityId: penQtyID,
+                MaterialName: $('#MaterialName').val(),
+                InwardEntryDateTime: $('#InwardEntryDateTime').val(),
+                InwardMaterialType: $('#InwardMaterialType').val(),
+                IsReturned: $('#IsReturned').is(":checked") ? "true" : "false",
+                IsNewInward: $('#IsNewInward').is(":checked") ? "true" : "false",
+                IsJobWork: $('#IsJobWork').is(":checked") ? "true" : "false",
+                DcRefNo: $("#DcRefNo").val(),
+                DcRefDate: $("#DcRefDate").val(),
+                Company: $("#Company").val(),
+                UnitDivision: $("#UnitDivision option:selected").val(),
+                ReturnType: $("#ReturnType option:selected").val(),
+                MaterialType: $("#MaterialType option:selected").val(),
+                DcNo: $("#DcNo").val(),
+                DcDate: $('#DcDate').val(),
+                InvoiceNo: $('#InvoiceNo').val(),
+                InvoiceDate: $('#InvoiceDate').val(),
+                ModeofTransport: $("#ModeofTransport option:selected").val(),
+                InvoiceCurrency: $("#InvoiceCurrency option:selected").val(),
+                InvoiceValue: $('#InvoiceValue').val(),
+                VehicleNo: $('#VehicleNo').val(),
+                PoNoId: $("#PoNoId option:selected").val(),
+                SupplierId: $("#SupplierId option:selected").val(),
+                StoresId: $("#StoresId option:selected").val(),
+                MaterialNameId: $("#MaterialNameId option:selected").val(),
+                HSNCode: $('#HSNCode').val(),
+                SizeRangeId: $("#SizeRangeId option:selected").val(),
+                UomId: $('#UomId').val(),
+                Pcs: $('#Pcs').val(),
+                ReceivedBy: $('#ReceivedBy').val(),
+                AcknowledgedBy: $('#AcknowledgedBy').val(),
+                Remarks: $('#Remarks').val(),
+                EntryDate: $('#EntryDate').val(),
+                Quantity: $('#Quantity').val(),
+                TotalQty: $('#TotalQty').val(),
+                Rate: $('#Rate').val(),
+                Value: $('#Value').val(),
+                DcTotal: $('#DcTotal').val(),
+                ArrivedTotal: $('#ArrivedTotal').val(),
+                InwardPo: $('#InwardPo option:selected').val(),
+                PoTotal: $('#PoTotal').val(),
+                PendingQuantity: $('#PendingQuantity').val(),
+                }
+
+        $.ajax({
+            type: 'POST',
+            url: '/GateEntryInwardMaterials/GateEntryInwardMaterialsfile',
+            processData: false,
+            data: formdata,
+            contentType: false,
+            cache: false,
+            success: function (data) {
+                if (data.GateEntryInwardId != "" || data.GateEntryInwardId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/GateEntryInwardMaterials/GateEntryInwardMaterials";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/GateEntryInwardMaterials/GateEntryInwardMaterials";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+
+    function ADDNew() {    
+        var sizeRangeid = $('#SizeRangeId').val();
+        //  if (sizeRangeid != 0 && sizeRangeid != null) {
+
+        if ($('#InwardMaterialType').val() == "") {
+            alert('Please Select InwardMaterialType');
+            $('#InwardMaterialType').css('border-color', 'red');
+            $('#InwardMaterialType').focus();
+            return false;
+        }
+        else {
+            $('#InwardMaterialType').css('border-color', '');
+        }
+        if ($("#IsNewInward").prop("checked")) {
+            $('#DcRefNo').css('border-color', '');
+        }
+        else if ($("#IsReturned").prop("checked")) {
+            {
+                if ($('#DcRefNo').val() == "") {
+                    alert("Please Enter DcRefNo");
+                    $('#DcRefNo').css('border-color', 'red');
+                    $('#DcRefNo').focus();
+                    return false;
+                }
+                else {
+                    $('#DcRefNo').css('border-color', '');
+                }
+            }
+        }
+        else if ($("#IsJobWork").prop("checked")) {
+            if ($('#DcRefNo').val() == "") {
+                alert("Please Enter DcRefNo");
+                $('#DcRefNo').css('border-color', 'red');
+                $('#DcRefNo').focus();
+                return false;
+            }
+            else {
+                $('#DcRefNo').css('border-color', '');
+            }
+        }
+        else {
+            if ($('#DcRefNo').val() == "") {
+                alert("Please Enter DcRefNo");
+                $('#DcRefNo').css('border-color', 'red');
+                $('#DcRefNo').focus();
+                return false;
+            }
+            else {
+                $('#DcRefNo').css('border-color', '');
+            }
+        }
+        if ($('#DcRefDate').val() == "") {
+            alert("Please Enter DcRefDate");
+            $('#DcRefDate').css('border-color', 'red');
+            $('#DcRefDate').focus();
+            return false;
+        }
+        else {
+            $('#DcRefDate').css('border-color', '');
+        }
+        if ($('#Company').val() == "") {
+            alert("Please Enter Company");
+            $('#Company').css('border-color', 'red');
+            $('#Company').focus();
+            return false;
+        }
+        else {
+            $('#Company').css('border-color', '');
+        }
+        if ($('#InvoiceCurrency').val() == "") {
+            alert('Please Select Invoice Currency');
+            $('#InvoiceCurrency').css('border-color', 'red');
+            $('#InvoiceCurrency').focus();
+            return false;
+        }
+        else {
+            $('#InvoiceCurrency').css('border-color', '');
+        }
+        if ($('#SupplierId').val() == "") {
+            alert('Please Select Supplier');
+            $('#SupplierId').css('border-color', 'red');
+            $('#SupplierId').focus();
+            return false;
+        }
+        else {
+            $('#SupplierId').css('border-color', '');
+        }
+
+        if ($('#MaterialNameId').val() == "") {
+            alert('Please Select Material Name');
+            $('#MaterialNameId').css('border-color', 'red');
+            $('#MaterialNameId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialNameId').css('border-color', '');
+        }
+        if ($('#StoresId').val() == "") {
+            alert('Please Select Store');
+            $('#StoresId').css('border-color', 'red');
+            $('#StoresId').focus();
+            return false;
+        }
+        else {
+            $('#StoresId').css('border-color', '');
+        }
+
+
+        //Save Size,PoQty,DcQty,ArrivedQty
+        var size = "";
+        $('#sizeRangeTable tbody tr').find('.SizeRangeRefValue').each(function () {
+            size += $(this).text() + ",";
+        });
+        size = size.slice(0, -1);
+
+        var poQty = "";
+        if ($('#PoNoId').val() != 0 && $('#PoNoId').val() != null && $('#PoNoId').val() != "") {
+            $('#sizeRangeTable tbody tr').find('.gridPoQuantity').each(function () {
+                poQty += $(this).val() + ",";
+            });
+        }
+        else {
+            $('#sizeRangeTable tbody tr').find('.gridPoQuantity').each(function () {
+                poQty += $(this).val() + ",";
+            });
+        }
+        poQty = poQty.slice(0, -1);
+
+        var dcQty_ = ""
+        $('#sizeRangeTable tbody tr').find('.gridDcQuantity').each(function () {
+            dcQty_ += $(this).val() + ",";
+        });
+        dcQty_ = dcQty_.slice(0, -1);
+
+        var arrQty_ = ""
+        $('#sizeRangeTable tbody tr').find('.gridArrivedQuantity').each(function () {
+            arrQty_ += $(this).val() + ",";
+        });
+        arrQty_ = arrQty_.slice(0, -1);
+
+        var pendingQty_ = ""
+        $('#sizeRangeTable tbody tr').find('.gridPendingQuantity').each(function () {
+            pendingQty_ += $(this).val() + ",";
+        });
+        pendingQty_ = pendingQty_.slice(0, -1);
+        var sizeQtyID = "";
+        $('#sizeRangeTable tbody tr').find('.SizeQTy').each(function () {
+            sizeQtyID += $(this).val() + ",";
+        });
+        sizeQtyID = sizeQtyID.slice(0, -1);
+
+        var penQtyID = "";
+        $('#sizeRangeTable tbody tr').find('.PendingQty').each(function () {
+            penQtyID += $(this).val() + ",";
+        });
+        penQtyID = penQtyID.slice(0, -1);
+
+
+
+
+        var formdata = new FormData();
+        var fileInput = document.getElementById('files');
+        for (i = 0; i < fileInput.files.length; i++) {
+            formdata.append(fileInput.files[i].name, fileInput.files[i]);
+            // $('#formcontrol').append("<img id='" + fileInput.files[i].name + "'  src='" + fileInput.files[i].name + "' class='dynamicimg' /> <br>");
+
+        }
+
+        formdata.append("GateEntryInwardId", $('#GateEntryInwardId').val());
+        formdata.append("GateEntryNo", $('#GateEntryNo').val());
+        formdata.append("EntryDate", $('#EntryDate').val());
+        formdata.append("Size", size);
+        formdata.append("PoQty", poQty);
+        formdata.append("DcQty", dcQty_);
+        formdata.append("ArrivedQty", arrQty_);
+        formdata.append("PendingQty", pendingQty_);
+        formdata.append("MaterialName", $('#MaterialName').val());
+        formdata.append("InwardEntryDateTime", $('#InwardEntryDateTime').val());
+        formdata.append("InwardMaterialType", $('#InwardMaterialType').val());
+        formdata.append("IsReturned", $('#IsReturned').is(":checked") ? "true" : "false");
+        formdata.append("IsNewInward", $('#IsNewInward').is(":checked") ? "true" : "false");
+        formdata.append("IsJobWork", $('#IsJobWork').is(":checked") ? "true" : "false");
+        formdata.append("DcRefNo", $('#DcRefNo').val());
+        formdata.append("DcRefDate", $('#DcRefDate').val());
+        formdata.append("Company", $('#Company').val());
+        formdata.append("UnitDivision", $("#UnitDivision option:selected").val());
+        formdata.append("ReturnType", $("#ReturnType option:selected").val());
+        formdata.append("MaterialType", $("#ReturnType option:selected").val());
+        formdata.append("DcNo", $('#DcNo').val());
+        formdata.append("DcDate", $('#DcDate').val());
+        formdata.append("InvoiceNo", $('#InvoiceNo').val());
+        formdata.append("InvoiceDate", $('#InvoiceDate').val());
+        formdata.append("ModeofTransport", $("#ModeofTransport option:selected").val());
+        formdata.append("InvoiceCurrency", $("#InvoiceCurrency option:selected").val());
+        formdata.append("InvoiceValue", $('#InvoiceValue').val());
+        formdata.append("VehicleNo", $('#VehicleNo').val());
+        formdata.append("PoNoId", $("#PoNoId option:selected").val());
+        formdata.append("SupplierId", $("#SupplierId option:selected").val());
+        formdata.append("StoresId", $("#StoresId option:selected").val());
+        formdata.append("MaterialNameId", $("#MaterialNameId option:selected").val());
+        formdata.append("HSNCode", $('#HSNCode').val());
+        formdata.append("SizeRangeId", $("#SizeRangeId option:selected").val());
+        formdata.append("UomId", $('#UomId').val());
+        formdata.append("Pcs", $('#Pcs').val());
+        formdata.append("ReceivedBy", $('#ReceivedBy').val());
+        formdata.append("AcknowledgedBy", $('#AcknowledgedBy').val());
+        formdata.append("Remarks", $('#Remarks').val());
+        formdata.append("Quantity", $('#Quantity').val());
+        formdata.append("TotalQty", $('#TotalQty').val());
+        formdata.append("Rate", $('#Rate').val());
+        formdata.append("Value", $('#Value').val());
+        formdata.append("DcTotal", $('#DcTotal').val());
+        formdata.append("ArrivedTotal", $('#ArrivedTotal').val());
+        formdata.append("InwardPo", $('#InwardPo option:selected').val());
+        formdata.append("PoTotal", $('#PoTotal').val());
+        formdata.append("PendingQuantity", $('#PendingQuantity').val());
+
+        
+
+        data = {
+            GateEntryNo: $('#GateEntryNo').val(),
+            EntryDate: $('#EntryDate').val(),
+            Size: size,
+            PoQty: poQty,
+            DcQty: dcQty_,
+            ArrivedQty: arrQty_,
+            PendingQty: pendingQty_,
+            MaterialName: $('#MaterialName').val(),
+            InwardEntryDateTime: $('#InwardEntryDateTime').val(),
+            InwardMaterialType: $('#InwardMaterialType').val(),
+            IsReturned: $('#IsReturned').is(":checked") ? "true" : "false",
+            IsNewInward: $('#IsNewInward').is(":checked") ? "true" : "false",
+            IsJobWork: $('#IsJobWork').is(":checked") ? "true" : "false",
+            DcRefNo: $('#DcRefNo').val(),
+            DcRefDate: $('#DcRefDate').val(),
+            Company: $('#Company').val(),
+            UnitDivision: $("#UnitDivision option:selected").val(),
+            ReturnType: $("#ReturnType option:selected").val(),
+            MaterialType: $("#MaterialType option:selected").val(),
+            DcNo: $('#DcNo').val(),
+            DcDate: $('#DcDate').val(),
+            InvoiceNo: $('#InvoiceNo').val(),
+            InvoiceDate: $('#InvoiceDate').val(),
+            ModeofTransport: $("#ModeofTransport option:selected").val(),
+            InvoiceCurrency: $("#InvoiceCurrency option:selected").val(),
+            InvoiceValue: $('#InvoiceValue').val(),
+            VehicleNo: $('#VehicleNo').val(),
+            PoNoId: $("#PoNoId option:selected").val(),
+            SupplierId: $("#SupplierId option:selected").val(),
+            StoresId: $("#StoresId option:selected").val(),
+            MaterialNameId: $("#MaterialNameId option:selected").val(),
+            HSNCode: $('#HSNCode').val(),
+            SizeRangeId: $("#SizeRangeId option:selected").val(),
+            UomId: $('#UomId').val(),
+            Pcs: $('#Pcs').val(),
+            ReceivedBy: $('#ReceivedBy').val(),
+            AcknowledgedBy: $('#AcknowledgedBy').val(),
+            Remarks: $('#Remarks').val(),
+            Quantity: $('#Quantity').val(),
+            TotalQty: $('#TotalQty').val(),
+            Rate: $('#Rate').val(),
+            Value: $('#Value').val(),
+            DcTotal: $('#DcTotal').val(),
+            ArrivedTotal: $('#ArrivedTotal').val(),
+            InwardPo: $('#InwardPo option:selected').val(),
+            PoTotal: $('#PoTotal').val(),
+            PendingQuantity: $('#PendingQuantity').val(),
+        },
+
+
+        $.ajax({
+            type: 'POST',
+            url: '/GateEntryInwardMaterials/GateEntryInwardMaterialsfile',
+            processData: false,
+            data: formdata,
+            contentType: false,
+            cache: false,
+            success: function (data) {
+                
+                    var ss = data.Viewmodel.GEMaterialsGrid;
+                    $('#Outward-SubGrid tbody').html("");
+                    $.each(ss, function (i, city) {
+                        var subID_ = city.GateEntryInwardId;
+                        if (city.GateEntryInwardId != "" || city.GateEntryInwardId != 0) {
+                            if (city.SizeRangeDetails == null) {
+                                city.SizeRangeDetails = "";
+                            }
+                            if (city.Piecies == null) {
+                                city.Piecies = "";
+                            }
+                            $('#Outward-SubGrid tbody').append("<tr><td class='MaterialName' id='MaterialName'>" + city.MaterialName +
+                            "<td class='HSNCode' id='HSNCode'>" + city.HSNCode + "</td>" +
+                            "<td class='SizeRangeDetails' id='SizeRangeDetails'>" + city.SizeRangeDetails + "</td>" +
+                            "<td class='Uom' id='Uom'>" + city.StoreName + "</td>" +
+                            "<td class='Uom' id='Uom'>" + city.UnitName + "</td>" +
+                            "<td class='PendingQuantity' id='PendingQuantity'>" + city.PendingQuantity + "</td>" +
+                            "<td class='Quantity' id='Quantity'>" + city.TotalQty + "</td>" +
+                            "<td class='Piecies' id='Piecies'>" + city.Piecies + "</td>" +
+                            " <td>" + '' + "<a href='javascript:void(0)' id='watchlist-edit' onclick='Edit_Material(" + city.GateEntryInwardId + ")' class='watchlist-edit' title='Edit'></a>" + '' +
+                            "<a href='javascript:void(0)' id='DeleteVehicleWatchList' onclick='Delete(" + city.GateEntryInwardId + ")' class='watchlist-delete' title='Delete'></a>" + '' + "</td></tr>");
+
+                            $('#GateEntryNo').prop('readonly', true);
+                            $('#InwardEntryDateTime').prop('readonly', true);
+                            $('#InwardMaterialType option:selected').prop('readonly', true);
+                            $('#IsNewInward').prop('readonly', true);
+                            $('#IsReturned').prop('readonly', true);
+                            $('#IsJobWork').prop('readonly', true);
+                            $('#Company').prop('readonly', true);
+                            $('#MaterialName').prop('readonly', true);
+                            $('#DcRefNo').prop('readonly', true);
+                            $('#DcRefDate').prop('readonly', true);
+                            $("#UnitDivision option:selected").prop('readonly', true);
+                            $("#ReturnType option:selected").prop('readonly', true);
+                            $("#MaterialType option:selected").prop('readonly', true);
+                            $('#DcNo').prop('readonly', true);
+                            $('#DcDate').prop('readonly', true);
+                            $('#InvoiceNo').prop('readonly', true);
+                            $('#InvoiceDate').prop('readonly', true);
+                            $("#ModeofTransport option:selected").prop('readonly', true);
+                            $("#InvoiceCurrency option:selected").prop('readonly', true);
+                            // $('#InvoiceValue').prop('readonly', true);
+                            $('#VehicleNo').prop('readonly', true);
+                            $("#PoNoId option:selected").prop('readonly', true);
+                            $("#SupplierId option:selected").prop('readonly', true);
+                            $('#HSNCode').val('');
+                            $('#Pcs').val('');
+                            $('#Remarks').val('');
+                            $('#TotalQty').val('0');
+                            $('#Rate').val('0');
+                            $('#Value').val('');
+                            $('#PendingQuantity').val('');
+                            $('#DcTotal').val('');
+                            $('#ArrivedTotal').val('');
+                            $('#PoTotal').val('0');
+                            //$('#MaterialNameId').val("");
+                            //$('#MaterialNameId').combobox('destroy');
+                            //$('#MaterialNameId').combobox();
+                            $('#MaterialNameAutoComplete').find(".custom-combobox input").val('');
+                            $('#StoresAutoComplete').find(".custom-combobox input").val('');
+                            $('#SizeRangeAutoComplete').find(".custom-combobox input").val('');
+                            $('#ReceivedByAutoComplete').find(".custom-combobox input").val('');
+                            $('#UomAutoComplete').find(".custom-combobox input").val('');
+                            $('#AcknowledgedByAutoComplete').find(".custom-combobox input").val('');
+                            $('#PoNoAutoComplete').find(".custom-combobox input").val('');
+                            $('#sizeRangeTable tbody tr').html("");
+                        }
+                        else {
+                            alert('Already Exist in the database.');
+                            location.href = "/GateEntryOutward/GateEntryOutward";
+                            return false;
+                        }
+
+                    });
+
+            },
+
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+        //$.ajax({
+        //    type: 'POST',
+        //    url: '/GateEntryInwardMaterials/GateEntryInwardMaterials',
+        //    data: {
+        //        GateEntryInwardId: $('#GateEntryInwardId').val(),
+        //        GateEntryNo: $('#GateEntryNo').val(),
+        //        Size: size,
+        //        PoQty: poQty,
+        //        DcQty: dcQty_,
+        //        ArrivedQty: arrQty_,
+        //        PendingQty: pendingQty_,
+        //        InwardMaterialSizeQtyRateId: sizeQtyID,
+        //        PendingQuantityId: penQtyID,
+        //        MaterialName: $('#MaterialName').val(),
+        //        InwardEntryDateTime: $('#InwardEntryDateTime').val(),
+        //        InwardMaterialType: $('#InwardMaterialType').val(),
+        //        IsReturned: $('#IsReturned').is(":checked") ? "true" : "false",
+        //        IsNewInward: $('#IsNewInward').is(":checked") ? "true" : "false",
+        //        IsJobWork: $('#IsJobWork').is(":checked") ? "true" : "false",
+        //        DcRefNo: $("#DcRefNo").val(),
+        //        DcRefDate: $("#DcRefDate").val(),
+        //        Company: $("#Company").val(),
+        //        UnitDivision: $("#UnitDivision option:selected").val(),
+        //        ReturnType: $("#ReturnType option:selected").val(),
+        //        MaterialType: $("#MaterialType option:selected").val(),
+        //        DcNo: $("#DcNo").val(),
+        //        DcDate: $('#DcDate').val(),
+        //        InvoiceNo: $('#InvoiceNo').val(),
+        //        InvoiceDate: $('#InvoiceDate').val(),
+        //        ModeofTransport: $("#ModeofTransport option:selected").val(),
+        //        InvoiceCurrency: $("#InvoiceCurrency option:selected").val(),
+        //        InvoiceValue: $('#InvoiceValue').val(),
+        //        VehicleNo: $('#VehicleNo').val(),
+        //        PoNoId: $("#PoNoId option:selected").text(),
+        //        SupplierId: $("#SupplierId option:selected").val(),
+        //        StoresId: $("#StoresId option:selected").val(),
+        //        MaterialNameId: $("#MaterialNameId option:selected").val(),
+        //        HSNCode: $('#HSNCode').val(),
+        //        SizeRangeId: $("#SizeRangeId option:selected").val(),
+        //        UomId: $('#UomId').val(),
+        //        Pcs: $('#Pcs').val(),
+        //        ReceivedBy: $('#ReceivedBy').val(),
+        //        AcknowledgedBy: $('#AcknowledgedBy').val(),
+        //        Remarks: $('#Remarks').val(),
+        //        EntryDate: $('#EntryDate').val(),
+        //        Quantity: $('#Quantity').val(),
+        //        TotalQty: $('#TotalQty').val(),
+        //        Rate: $('#Rate').val(),
+        //        Value: $('#Value').val(),
+        //        DcTotal: $('#DcTotal').val(),
+        //        ArrivedTotal: $('#ArrivedTotal').val(),
+        //        InwardPo: $('#InwardPo option:selected').val(),
+        //        PoTotal: $('#PoTotal').val(),
+        //        PendingQuantity: $('#PendingQuantity').val(),
+        //    },
+        //    success: function (data) {
+        //            var ss = data.Viewmodel.GEMaterialsGrid;
+        //            $('#Outward-SubGrid tbody').html("");
+        //            $.each(ss, function (i, city) {
+        //                var subID_ = city.GateEntryInwardId;
+        //                if (city.GateEntryInwardId != "" || city.GateEntryInwardId != 0) {
+        //                    if (city.SizeRangeDetails == null) {
+        //                        city.SizeRangeDetails = "";
+        //                    }
+        //                    if (city.Piecies == null) {
+        //                        city.Piecies = "";
+        //                    }
+        //                    $('#Outward-SubGrid tbody').append("<tr><td class='MaterialName' id='MaterialName'>" + city.MaterialName +
+        //                    "<td class='HSNCode' id='HSNCode'>" + city.HSNCode + "</td>" +
+        //                    "<td class='SizeRangeDetails' id='SizeRangeDetails'>" + city.SizeRangeDetails + "</td>" +
+        //                    "<td class='Uom' id='Uom'>" + city.StoreName + "</td>" +
+        //                    "<td class='Uom' id='Uom'>" + city.UnitName + "</td>" +
+        //                    "<td class='PendingQuantity' id='PendingQuantity'>" + city.PendingQuantity + "</td>" +
+        //                    "<td class='Quantity' id='Quantity'>" + city.TotalQty + "</td>" +
+        //                    "<td class='Piecies' id='Piecies'>" + city.Piecies + "</td>" +
+        //                    " <td>" + '' + "<a href='javascript:void(0)' id='watchlist-edit' onclick='Edit_Material(" + city.GateEntryInwardId + ")' class='watchlist-edit' title='Edit'></a>" + '' +
+        //                    "<a href='javascript:void(0)' id='DeleteVehicleWatchList' onclick='Delete(" + city.GateEntryInwardId + ")' class='watchlist-delete' title='Delete'></a>" + '' + "</td></tr>");
+
+        //                    $('#GateEntryNo').prop('readonly', true);
+        //                    $('#InwardEntryDateTime').prop('readonly', true);
+        //                    $('#InwardMaterialType option:selected').prop('readonly', true);
+        //                    $('#IsNewInward').prop('readonly', true);
+        //                    $('#IsReturned').prop('readonly', true);
+        //                    $('#IsJobWork').prop('readonly', true);
+        //                    $('#Company').prop('readonly', true);
+        //                    $('#MaterialName').prop('readonly', true);
+        //                    $('#DcRefNo').prop('readonly', true);
+        //                    $('#DcRefDate').prop('readonly', true);
+        //                    $("#UnitDivision option:selected").prop('readonly', true);
+        //                    $("#ReturnType option:selected").prop('readonly', true);
+        //                    $("#MaterialType option:selected").prop('readonly', true);
+        //                    $('#DcNo').prop('readonly', true);
+        //                    $('#DcDate').prop('readonly', true);
+        //                    $('#InvoiceNo').prop('readonly', true);
+        //                    $('#InvoiceDate').prop('readonly', true);
+        //                    $("#ModeofTransport option:selected").prop('readonly', true);
+        //                    $("#InvoiceCurrency option:selected").prop('readonly', true);
+        //                    // $('#InvoiceValue').prop('readonly', true);
+        //                    $('#VehicleNo').prop('readonly', true);
+        //                    $("#PoNoId option:selected").prop('readonly', true);
+        //                    $("#SupplierId option:selected").prop('readonly', true);
+        //                    $('#HSNCode').val('');
+        //                    $('#Pcs').val('');
+        //                    $('#Remarks').val('');
+        //                    $('#TotalQty').val('0');
+        //                    $('#Rate').val('0');
+        //                    $('#Value').val('');
+        //                    $('#PendingQuantity').val('');
+        //                    $('#DcTotal').val('');
+        //                    $('#ArrivedTotal').val('');
+        //                    $('#PoTotal').val('0');
+        //                    //$('#MaterialNameId').val("");
+        //                    //$('#MaterialNameId').combobox('destroy');
+        //                    //$('#MaterialNameId').combobox();
+        //                    $('#MaterialNameAutoComplete').find(".custom-combobox input").val('');
+        //                    $('#StoresAutoComplete').find(".custom-combobox input").val('');
+        //                    $('#SizeRangeAutoComplete').find(".custom-combobox input").val('');
+        //                    $('#ReceivedByAutoComplete').find(".custom-combobox input").val('');
+        //                    $('#UomAutoComplete').find(".custom-combobox input").val('');
+        //                    $('#AcknowledgedByAutoComplete').find(".custom-combobox input").val('');
+        //                    $('#PoNoAutoComplete').find(".custom-combobox input").val('');
+        //                    $('#sizeRangeTable tbody tr').html("");
+        //                }
+        //                else {
+        //                    alert('Already Exist in the database.');
+        //                    location.href = "/GateEntryOutward/GateEntryOutward";
+        //                    return false;
+        //                }
+
+        //            });
+               
+        //    },
+
+        //    error: function (ex) {
+        //        alert('Already Exist in the database.');
+        //    }
+        //});
+
+        // }
+
+
+        /*Radio Button Validation*/
+        $('#IsNewInward').click(function () {
+            $('#IsReturned').prop('checked', false);
+            $('#IsJobWork').prop('checked', false);
+            $('#DcRefNo').prop('disabled', true);
+            $('#ReturnType').val('0');
+            $('#ReturnType').prop('disabled', false);
+        });
+        $('#IsReturned').click(function () {
+            $('#IsJobWork').prop('checked', false);
+            $('#IsNewInward').prop('checked', false);
+            $('#DcRefNo').prop('disabled', false);
+            $('#ReturnType').val('1');
+            $('#ReturnType').prop('disabled', true);
+        });
+        $('#IsJobWork').click(function () {
+            $('#IsNewInward').prop('checked', false);
+            $('#IsReturned').prop('checked', false);
+            $('#DcRefNo').prop('disabled', false);
+            $('#ReturnType').val('1');
+            $('#ReturnType').prop('disabled', true);
+        });
+        /*Multiplication of Total Quantity and Rate*/
+        $('#TotalQty, #Rate').change(function () {
+            var rate = parseFloat($('#TotalQty').val()) || 0;
+            var box = parseFloat($('#Rate').val()) || 0;
+            $('#Value').val((rate * box).toFixed(2));
+        });
+    }
+</script>

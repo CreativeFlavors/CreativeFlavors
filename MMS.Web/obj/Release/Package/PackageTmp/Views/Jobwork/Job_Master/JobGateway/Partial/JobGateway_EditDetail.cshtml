@@ -1,0 +1,1044 @@
+﻿@model MMS.Web.Models.GateEntryModel.GateEntryInwardMaterials
+@using MMS.Repository.Managers
+@using MMS.Core.Entities
+@{
+
+}
+<style>
+    button.btn.green-btn.custom_btn_g {
+        width: auto;
+    }
+    /*div#MaterialNameId_chosen {
+        width: 200px !important;
+    }
+    div#StoresId_chosen {
+        width: 150px !important;
+        
+    }*/
+</style>
+<script>
+    $(".chosen-select").chosen();
+    $("#ComponentId").on("change", function () {
+        $.ajax({
+            url: ' @Url.Action("Get_detail_by_ComponentId", "JobGateInwards")',
+            type: "GET",
+            dataType: "JSON",
+            data: {
+                Production_List: $("#ComponentId option:selected").val(),
+            },
+            success: function (data) {
+                
+
+                     $("#ReturnType").val(1).trigger('chosen:updated');
+               
+                     $("#TotalQty").val(data.TotalQty);
+                     $("#Rate").val(data.Rate);
+                    var count = 1;
+                    if (data.listOfSizeRange.length > 0) {
+                        //  $("#" + arg1 + "_" + DcRefNo).attr('readonly', true);
+                        $("#sizeRangeTable").html('')
+                        $("#sizeRangeTable").append("<tbody><tr><td>size</td></tr><tr><td>DC Qty</td></tr> <tr><td>Qty</td></tr></tbody>");
+                        for (var i = 0; i <= data.listOfSizeRange.length - 1; i++) {
+                         //   isSizeRangeMaster = true;
+                            $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue"  > ' + data.listOfSizeRange[i].Sizerange+ ' </td> ');
+                            $('#sizeRangeTable  tbody tr:nth-child(2)').append("<td ><input type='text' class='DC_Qty'  id='currentstock" + i + "' value=" + data.listOfSizeRange[i].Qty + " value='0'  /</td>");
+
+                            $('#sizeRangeTable tbody tr:last').append("<td ><input type='text'  class='Qty' onchange='CalculateTotal_ProductionJob(this," + data.listOfSizeRange[i].Qty + ")' id='Qty" + i + "' value='0'  /</td>");
+                            count++;
+                        }
+                    }
+            }
+        });
+
+    });
+    $("#InwardMaterialType").change(function () {
+        // var issueType = $("#IssueType option:selected").text();
+        $.ajax({
+            url: ' @Url.Action("GetJobWorkList_By_Job_Type", "JobWorkIssues")',
+            type: "GET",
+            dataType: "JSON",
+            data: {
+                InwardMaterialType: $("#InwardMaterialType option:selected").text(),
+            },
+            success: function (items) {
+                $("#SupplierId").html("").trigger('chosen:updated');
+                $.each(items, function (i, item) {
+                    $("#SupplierId").append(
+                        $('<option></option>').val(item.Value).html(item.Text)).trigger('chosen:updated');
+                });
+            }
+        });
+    });
+    $("#SupplierId").change(function () {
+       // var issueType = $("#IssueType option:selected").text();
+        $.ajax({
+            url: ' @Url.Action("GetJobWorkList_By_Jwname_Issueid", "JobWorkIssues")',
+            type: "GET",
+            dataType: "JSON",
+            data: {
+                Jw_Name: $("#SupplierId").val()
+            },
+            success: function (items) {
+                $("#DcRefNo").html("").trigger('chosen:updated');
+                $.each(items, function (i, item) {
+                    $("#DcRefNo").append(
+                        $('<option></option>').val(item.Value).html(item.Text)).trigger('chosen:updated');
+                });
+            }
+        });
+    });
+    $("#MaterialNameId").on("change", function () {
+        
+        $("#Issue_material").val('');
+        var DcRefNo = 0;
+        DcRefNo += $("#DcRefNo").val();
+        $.ajax({
+            type: 'POST',
+            url: '/JobGateInwards/Get_letherMAterialDetail',
+            data: {
+                IssueID: DcRefNo.substring(1),
+                MaterialNameId: $("#MaterialNameId").val(),
+                GateEntryInwardId: $("#GateEntryInwardId").val()
+            },
+            success: function (data) {
+                $('#save_Table_Value').hide();
+                
+                // $("#MaterialNameId").val(data.JobLeather_leatherMaster.Finished_Material).trigger('chosen:updated');
+                var current_issue = data.issueSlipManager.CurrentIssue;
+                $("#TotalQty").val(data.JobLeather_leatherMaster.Qty);
+                $("#Issue_material").val(data.issueSlipManager.IssueSlipId);
+                $("#Value").val(data.JobLeather_leatherMaster.Total);
+                $("#UomId").val(data.JobLeather_leatherMaster.Qty_Uom).trigger('chosen:updated');
+                $("#StoresId").val(data.JobLeather_leatherMaster.Stores).trigger('chosen:updated');
+                $("#Rate").val(data.JobLeather_leatherMaster.Rate);
+                $("#SupplierId").val(data.JobLeather_leatherMaster.Jw_Name).trigger('chosen:updated');
+                 $("#InwardMaterialType").val(16).trigger('chosen:updated');
+                $("#InwardPo").val(2).trigger('chosen:updated');
+                $("#ReturnType").val(1).trigger('chosen:updated');
+                if (data.GateEntryInwardMaterialsMaster == null) {
+                    $("#PendingQuantity").val(0);
+                    $("#Quantity").val(0);
+                }
+                else {
+                    $("#PendingQuantity").val(data.pending_qty);
+                    $("#Pending_Fixed").val(data.pending_qty);
+
+                   // $("#Quantity").val(data.GateEntryInwardMaterialsMaster.Quantity);
+                }
+                $("#ValueFixed").val(data.JobLeather_leatherMaster.Total);
+
+            },
+            error: function (ex) {
+                alert('This Color Already Exist in the database.');
+            }
+        });
+    });
+    function Getgate_In() {
+        $('#table_grid_ROW').html('')
+        var DcRefNo = 0;
+        DcRefNo += $("#DcRefNo").val();
+        $.ajax({
+            type: 'POST',
+            url: '/JobGateInwards/Get_jobgetIssuelist_forgateinwards',
+            data: {
+                IssueID: DcRefNo
+            },
+            success: function (data) {
+                
+                if ($("#InwardMaterialType option:selected").text() == "JobWork Production")
+                {
+                    $("#ComponentId").html("").trigger('chosen:updated');
+                    $.each(data.items_Component, function (i, item) {
+                        $("#ComponentId").append(
+                            $('<option></option>').val(item.Value).html(item.Text)).trigger('chosen:updated');
+                    });
+                   // $("#InwardPo").val(2).trigger('chosen:updated');
+               
+
+
+                }
+                 else if (data.JobSheet_PairMaster != "") {
+                    $("#InwardMaterialType").val(15).trigger('chosen:updated');
+                    $("#InwardPo").val(2).trigger('chosen:updated');
+                    $("#ReturnType").val(1).trigger('chosen:updated');
+                    var row = "";
+                    var rowCount = 0;
+                    var Issue_material = data.Issue_material;
+                    $("#Issue_material").val(Issue_material);
+                    $("#sizeRangeTable").html('')
+                    $.each(data.JobSheet_PairMaster, function (i, item) {
+
+                        
+
+                        row += "<tr><td id='IssueSlipNo" + rowCount + "' class='General_IssueSlipNo'>" + item.MaterialDescription + "</td>"
+                        row += "<td id='InternalValue" + rowCount + "' class='InternalValue_general'>" + item.qty + "</td>"
+
+                        row += "<td data-title='Dc_qty'><input type='number' class='form-control Dc_qty' id='" + item.jobsheet_pair_id+"'  value='0' style='width: 76px;'></td>"
+
+                        row += "<td data-title='Sequence'><input type='number' class='form-control " + item.Issue_Material + '_' + item.IssueSlipId + " Sequence' id='" + item.jobsheet_pair_id + '_' + item.DcRefNo + '_' + item.IssueSlipId + "' onchange='value_chenge(" + item.jobsheet_pair_id + ',' + item.Pending_qty + ',' + item.Material + ',' + item.DcRefNo + ',' + item.IssueSlipId + ")' value='0' style='width: 76px;'></td>"
+                        row += "<td id='DirectIssue_Style" + rowCount + "' class='DirectIssue_Style_general'>" + item.Jw_Rate + "</td>"
+                        row += "<td id='DirectIssue_Style" + rowCount + "' class='DirectIssue_Style_general'>" + item.Value + "</td>"
+                        row += "<td id='IssueType" + rowCount + "' class='issueTypecls'>" + item.Pending_qty + "</td></tr>"
+                        rowCount++;
+                    });
+                    $('#table_grid_ROW').append(row);
+                    $("#Sheet_grid").show();
+                    $("#save").attr("disabled", true);
+                    $('#save_Table_Value').show()
+                }
+                else if (data.JobLeather_leatherMaster != "")
+                {
+                    if (data.list != "") {
+                        
+                        $("#SupplierId").val(data.JobLeather_leatherMaster.Jw_Name).trigger('chosen:updated');
+                        $("#MaterialNameId").html("").trigger('chosen:updated');
+                        $.each(data.list, function (i, item) {
+                            $("#MaterialNameId").append(
+                                $('<option></option>').val(item.MaterialMasterId_Processid).html(item.MaterialDescription)).trigger('chosen:updated');
+                        });
+                    }
+                    else {
+                        $('#save_Table_Value').hide();
+                        
+                        $("#MaterialNameId").val(data.JobLeather_leatherMaster.Finished_Material).trigger('chosen:updated');
+                        $("#TotalQty").val(data.JobLeather_leatherMaster.Qty);
+                        $("#Value").val(data.JobLeather_leatherMaster.Total);
+                        $("#UomId").val(data.JobLeather_leatherMaster.Qty_Uom).trigger('chosen:updated');
+                        $("#StoresId").val(data.JobLeather_leatherMaster.Stores).trigger('chosen:updated');
+                        $("#Rate").val(data.JobLeather_leatherMaster.Rate);
+                        $("#SupplierId").val(data.JobLeather_leatherMaster.Jw_Name).trigger('chosen:updated');
+                        $("#InwardMaterialType").val(16).trigger('chosen:updated');
+                        $("#InwardPo").val(2).trigger('chosen:updated');
+                        $("#ReturnType").val(1).trigger('chosen:updated');
+                        if (data.GateEntryInwardMaterialsMaster == null) {
+                            $("#PendingQuantity").val(0);
+                        }
+                        else {
+                            $("#PendingQuantity").val(data.pending_qty);
+                            $("#Pending_Fixed").val(data.pending_qty);
+                        }
+                        $("#ValueFixed").val(data.JobLeather_leatherMaster.Total);
+
+                    }
+
+
+                }
+                else if (data.JobOtherWorkMaster != "") {
+                    $('#save_Table_Value').hide();
+                    if (JobLeather_leatherMaster.Spare_Id) {
+                        $("#MaterialNameId").val(data.JobOtherWorkMaster.Spare_Id).trigger('chosen:updated');
+                    }
+                    else {
+                        $("#MaterialNameId").val(data.JobOtherWorkMaster.ServiceDescription);
+
+                    }
+                    $("#TotalQty").val(data.JobOtherWorkMaster.Quantity);
+                    $("#Value").val(data.JobOtherWorkMaster.TotalCost);
+                    $("#UomId").val(data.JobOtherWorkMaster.UOM).trigger('chosen:updated');
+                    $("#StoresId").val(data.JobOtherWorkMaster.Stoeres_Id).trigger('chosen:updated');
+                    $("#Rate").val(data.JobOtherWorkMaster.JobWork_Price);
+                    $("#SupplierId").val(data.JobOtherWorkMaster.Jw_Name);
+                    $("#InwardMaterialType").val(17).trigger('chosen:updated');
+                    $("#InwardPo").val(2).trigger('chosen:updated');
+                    $("#ReturnType").val(1).trigger('chosen:updated');
+                    if (data.GateEntryInwardMaterialsMaster == null) {
+                        $("#PendingQuantity").val(0);
+                    }
+                    else {
+                        $("#PendingQuantity").val(data.pending_qty);
+                        $("#Pending_Fixed").val(data.pending_qty);
+                    }
+                    $("#ValueFixed").val(data.JobOtherWorkMaster.TotalCost);
+                }
+            },
+            error: function (ex) {
+                alert('This Color Already Exist in the database.');
+            }
+        });
+    }
+    function CalculateTotal_ProductionJob(agr1, arg2) {
+        
+        var CurrentIssue_ = $("#CurrentIssue").val();
+        if ($("#CurrentIssue").val() != "") {
+
+            if (parseFloat(agr1.value) > parseFloat(arg2)) {
+                $("#Add").hide();
+                alert("Actual size current stock exceed issue quantity");
+                return false;
+            }
+            else if (parseFloat(arg2) == 0 && parseFloat(agr1.value) != 0) {
+                $("#Add").hide();
+                alert("Actual size current stock is zero");
+                return false;
+            }
+            else {
+                $("#Add").show();
+                var add = 0;
+                $("#sizeRangeTable .Qty").each(function () {
+                    add += Number($(this).val());
+                });
+
+                $('#TotalQty').val(add);
+                $('#TotalQty').prop("disabled", true);
+                if (parseFloat(CurrentIssue_) < parseFloat(add)) {
+                    $("#Add").hide();
+                    alert("Current stock exceed issue qty");
+                    return false;
+                }
+                else {
+                    $("#Add").show();
+                }
+            }
+
+        }
+        else {
+            $("#Add").hide();
+            alert("Please add current issue quantity");
+            return false;
+        }
+
+    }
+    $("#Quantity").on("change", function () {
+        
+        if ($("#InwardMaterialType option:selected").text() != "JobWork Production") {
+            var DcRefNo = 0;
+            DcRefNo += $("#DcRefNo").val();
+            $.ajax({
+                type: 'POST',
+                url: '/JobGateInwards/Get_letherMAterialDetail',
+                data: {
+                    IssueID: DcRefNo,
+                    GateEntryInwardId: $("#GateEntryInwardId").val(),
+                    MaterialNameId: $("#MaterialNameId").val()
+                },
+                success: function (data) {
+                    if (data.JobSheet_PairMaster != "") {
+                        var current_issue = data.issueSlipManager.CurrentIssue;
+                        $("#InwardMaterialType").val(15).trigger('chosen:updated');
+                        $("#InwardPo").val(2).trigger('chosen:updated');
+                        $("#ReturnType").val(1).trigger('chosen:updated');
+                        validation_checkqty(current_issue);
+                    }
+                    else if (data.JobLeather_leatherMaster != "") {
+                        
+                        var current_issue = data.Total;
+                        $("#ValueFixed").val(data.JobLeather_leatherMaster.Total);
+                        if (data.pending_qty == "-0.1") {
+                            $("#PendingQuantity").val("");
+                            $("#Pending_Fixed").val('0');
+                        }
+
+                        validation_checkqty(current_issue);
+
+                    }
+                    else if (data.JobOtherWorkMaster != "") {
+                        if (JobLeather_leatherMaster.Spare_Id) {
+                            var current_issue = data.issueSlipManager.CurrentIssue;
+                            $("#MaterialNameId").val(data.JobOtherWorkMaster.Spare_Id).trigger('chosen:updated');
+                            $("#PendingQuantity").val(data.pending_qty);
+                            $("#Pending_Fixed").val(data.pending_qty);
+                            validation_checkqty(current_issue);
+                        }
+                        else {
+                            $("#MaterialNameId").val(data.JobOtherWorkMaster.ServiceDescription);
+                            validation_checkqty();
+                        }
+                        $("#ValueFixed").val(data.JobOtherWorkMaster.TotalCost);
+                    }
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+
+        }
+        else {
+            var DcTotal = $("#DcTotal").val();
+            var Rate = $("#Rate").val();
+            var value = DcTotal * Rate;
+            $("#Value").val(value);
+        }
+    });
+    function validation_checkqty(current_issue) {
+        debugger
+        var pending = $("#PendingQuantity").val();
+        var GateEntryInwardId = $("#GateEntryInwardId").val();
+
+        if (pending == "") {
+            $("#PendingQuantity").val('0')
+            var Current_issue = current_issue;
+            var Quantity = $("#Quantity").val();
+            var total_qty = $("#TotalQty").val();
+            var Remaining = Current_issue - Quantity;
+            // $("#PendingQuantity").val(Remaining);
+            var Value = $("#ValueFixed").val();
+            var single = Value / total_qty;
+            var Current_value = Quantity * single;
+            $("#Value").val(Current_value);
+            if (parseFloat(Current_issue) < parseFloat(Quantity)) {
+
+                alert("Recived qty can't be high than Issued qty");
+                $("#Quantity").val(0);
+            }
+            else if (parseFloat(total_qty) < parseFloat(Quantity)) {
+                alert("Recived qty can't be high than ordered qty");
+                $("#Quantity").val(0);
+            }
+            else {
+
+                $("#PendingQuantity").val(Remaining)
+            }
+        }
+       else if (pending == "0")
+        {
+            alert("Qty has been recived");
+            $("#Quantity").val(0);
+        }
+
+        else {
+            var Pending = $("#Pending_Fixed").val();
+            var Quantity = $("#Quantity").val();
+            var total_qty = $("#TotalQty").val();
+            var Remaining = Pending - Quantity;
+            // $("#PendingQuantity").val(Remaining);
+            var Value = $("#ValueFixed").val();
+            var single = Value / total_qty;
+            var Current_value = Quantity * single;
+            $("#Value").val(Current_value);
+            if (parseFloat(Pending) < parseFloat(Quantity)) {
+
+                alert("Recived qty can't be high than ordered qty");
+                $("#Quantity").val(0);
+            }
+            else {
+                $("#PendingQuantity").val(Remaining);
+            }
+        }
+    }
+    function value_chenge(arg1, arg2, arg3, DcRefNo, IssueSlipId) {
+        //var DcRefNo = 0;
+        $("#sizeRangeTable").html("");
+        var sheet = $('#InwardMaterialType').val();
+        if (sheet != '15') {
+            
+            $.ajax({
+                type: 'POST',
+                url: '/JobGateInwards/Get_Remaingqty_forsheet',
+                data: {
+                    IssueID: DcRefNo,
+                    Finished_Material: arg3,
+                    GateEntryInwardId: arg1
+
+                },
+                success: function (data) {
+                    if (data.GateEntryInwardMaterialsMaster == null) {
+                        var recived_qty = $("#" + arg1 + "_" + DcRefNo).val();
+                        var value = parseInt(arg2) - parseInt(recived_qty);
+                        if (parseInt(arg2) < parseInt(recived_qty)) {
+                            alert("Recivied qty cant be high");
+                            $("#" + arg1).val('');
+                        }
+                    }
+                    else {
+
+                        var recived_qty = $("#" + arg1 + "_" + DcRefNo + "_" + data.GateEntryInwardMaterialsMaster.IssueSlipId).val();
+                        var value = parseInt(arg2) - parseInt(recived_qty);
+                        if (parseInt(data.pending_qty) < parseInt(recived_qty)) {
+                            alert("Recivied qty cant be high remaining qty is " + data.pending_qty + "");
+                            $("#" + arg1).val('');
+                        }
+
+                    }
+
+                    $("#sizeRangeTable > tbody").hide();
+                    $.ajax({
+                        type: 'POST',
+                        url: '/JobSheet_pair/Material_change',
+                        data: { Materialid: arg3 },
+                        success: function (data) {
+                            
+                            var count = 1;
+                            if (data.listSizeItemMaterial.length > 0) {
+                                //  $("#" + arg1 + "_" + DcRefNo).attr('readonly', true);
+                                $("#sizeRangeTable").append("<tbody><tr><td>size</td></tr><tr><td>DC Qty</td></tr> <tr><td>Qty</td></tr></tbody>");
+                                for (var i = 0; i <= data.listSizeItemMaterial.length - 1; i++) {
+                                    isSizeRangeMaster = true;
+                                    $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue"  > ' + data.listSizeItemMaterial[i].SizeRange.trim() + ' </td> ');
+                                    $('#sizeRangeTable tbody tbody tr:nth-child(2)').append("<td ><input type='text' class='DC_Qty' id='DC_Qty" + i + '_' + IssueSlipId + '_' + arg3 + "' value='0'  /</td>");
+
+                                    $('#sizeRangeTable tbody tr:last').append("<td ><input type='text' class='" + IssueSlipId + '_' + arg3 + " Qty' onchange='CalculateTotal(" + arg1 + ',' + arg2 + ',' + arg3 + ',' + DcRefNo + ',' + IssueSlipId + ")' id='Qty" + i + '_' + IssueSlipId + '_' + arg3 + "' value='0'  /</td>");
+                                    count++;
+                                }
+                            }
+                        },
+                        error: function (ex) {
+                            alert('This Color Already Exist in the database.');
+                        }
+                    });
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+
+
+            });
+        }
+        else {
+
+           // $("#sizeRangeTable > tbody").hide();
+            $.ajax({
+                type: 'POST',
+                url: '/JobSheet_pair/Material_change',
+                data: { Materialid: arg3 },
+                success: function (data) {
+                    
+                    var count = 1;
+                    if (data.listSizeItemMaterial.length > 0) {
+                        //  $("#" + arg1 + "_" + DcRefNo).attr('readonly', true);
+                        $("#sizeRangeTable").append("<tbody><tr><td>size</td></tr><tr><td>DC Qty</td></tr> <tr><td>Qty</td></tr></tbody>");
+                        for (var i = 0; i <= data.listSizeItemMaterial.length - 1; i++) {
+                            isSizeRangeMaster = true;
+                            $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue"  > ' + data.listSizeItemMaterial[i].SizeRange.trim() + ' </td> ');
+
+                            $('#sizeRangeTable tbody tr:nth-child(2)').append("<td ><input type='text' class='DC_Qty' id='DC_Qty" + i + '_' + IssueSlipId + '_' + arg3 + "' value='0'  /</td>");
+
+                            $('#sizeRangeTable tbody tr:last').append("<td ><input type='text' class='" + IssueSlipId + '_' + arg3 + " Qty' onchange='CalculateTotal(" + arg1 + ',' + arg2 + ',' + arg3 + ',' + DcRefNo + ',' + IssueSlipId + ")' id='Qty" + i + '_' + IssueSlipId + '_' + arg3 + "' value='0'  /</td>");
+                            count++;
+                        }
+                    }
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+
+        }
+    }
+       // alert(arg2);
+    function CalculateTotal(arg1, arg2, arg3, DcRefNo, IssueSlipId) {
+            var recived_qty = $("#" + arg1 + "_" + DcRefNo).val();
+            
+            var Qty_ = 0;
+            var size = [];
+            var value_ = [];
+            var class_ ="Qty"+ DcRefNo + '_' + arg3 + "";
+            $('#sizeRangeTable tbody tr:last').find("." + IssueSlipId + "_" + arg3 + "").each(function () {
+                Qty_ += Number($(this).val());
+
+
+            });
+            var qty = $("#" + arg1 + "_" + DcRefNo + "_" + IssueSlipId).val();
+            if (qty != Qty_) {
+                swal("Quantity is not equal!", "", "info");
+                return false;
+            }
+            else {
+           //     $("#" + arg1 + "_" + DcRefNo + "_" + IssueSlipId).attr('readonly', true);
+                $('#sizeRangeTable tbody tr').find('.Qty').each(function () {
+                    $(this).val()
+                    value_ += $(this).val() + ";" + $(this).attr('id') + ",";
+
+                });
+            }
+
+        }
+
+    function Back() {
+        location.href = "/JobGateInwards/JobGateInwardsMaster";
+    }
+</script>
+ <div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+
+    <div class="header_list_tab  col-lg-12 col-md-12 col-sm-12  col-xs-12">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+            <div class="list_tab">
+                <div class="title">
+                    Detail
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-6 col-md-12 col-sm-12  col-xs-12">
+            <div class="button_tab  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="jobwork_leather2 col-lg-12 col-md-12 col-sm-12 col-xs-12 mob_padding">
+        <div class="col-xs-12 block-section ordr-sheet-blk">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-12">
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Jobwork Type</label>
+                                @Html.DropDownListFor(x => x.InwardMaterialType, MMS.Web.ExtensionMethod.HtmlHelper.GetJobWorkGRNType(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        @*<div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Jobwork N0</label>
+                                @Html.DropDownListFor(x => x.InwardPo, MMS.Web.ExtensionMethod.HtmlHelper.InwardMaterialPO(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>*@
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Supplier / JW Name</label>
+                                @Html.DropDownListFor(m => m.SupplierId, MMS.Web.ExtensionMethod.HtmlHelper.JobworkName(), new { @class = "form-control input chosen-select" })
+
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Our Dc Ref No </label>
+                                @Html.DropDownListFor(x => x.DcRefNo, MMS.Web.ExtensionMethod.HtmlHelper.IssueNo_ID_jOBGate(), new { @class = "form-control input chosen-select", @multiple = "multiple" })
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-12 input-blk">
+                            <div class="init_button">
+                                <label>&nbsp;</label>
+
+                                <button class="btn green-btn" onclick="Getgate_In()">GET</button>
+                                @*@Html.TextBoxFor(m => m.Manual_DcNo, new { @class = "form-control text-field" })*@
+                                <input type="hidden"  id="Issue_material" name="fname">
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Manual Dc NO </label>
+                                @Html.HiddenFor(m => m.GateEntryInwardId)
+                                @Html.TextBoxFor(m => m.DcNo, new { @class = "form-control text-field" })
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-12 align-padding-rt">
+                            <div class="form-group date my_picker" data-date-format="mm/dd/yyyy">
+                                <label>Manual Dc Date </label>
+                                @Html.TextBoxFor(m => m.DcDate, new { @class = "form-control text-field" })
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                            </div>
+                        </div>
+                     
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Process Material</label>
+                                @Html.TextBoxFor(m => m.GateEntryNo, new { @class = "form-control text-field", @readonly = "true" })
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Invoice No</label>
+                                @Html.TextBoxFor(m => m.InvoiceNo, new { @class = "form-control text-field" })
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-12">
+                            <label>Date</label>
+                            <div class="input-group date my_picker" data-date-format="mm/dd/yyyy">
+
+                                @Html.TextBoxFor(m => m.InvoiceDate, new { @class = "form-control text-field" })
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Company</label>
+                                @Html.TextBoxFor(m => m.Company, new { @class = "form-control text-field" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Return Type</label>
+                                @Html.DropDownListFor(m => m.ReturnType, new List<SelectListItem>{
+                                         new SelectListItem{ Text="Please Select", Value = "0"  },
+                                         new SelectListItem{ Text="Returnable", Value = "1" },
+                                         new SelectListItem{ Text="Non-Returnable", Value = "2" }}, new { @class = "form-control input chosen-select" })
+
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Transport</label>
+                                @Html.DropDownListFor(m => m.ModeofTransport, MMS.Web.ExtensionMethod.HtmlHelper.ModeofTransportGEDoc(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Vehicle No</label>
+                                @Html.TextBoxFor(m => m.VehicleNo, new { @class = "form-control text-field" })
+
+                            </div>
+                        </div>
+                     
+
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Unit / Division</label>
+                                @Html.DropDownListFor(m => m.UnitDivision, MMS.Web.ExtensionMethod.HtmlHelper.UnitDivision(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Material Type</label>
+                                @Html.DropDownListFor(m => m.MaterialType, new List<SelectListItem>
+
+                                          {
+                                      new SelectListItem{ Text="Please Select", Value = "0"  },
+                                       new SelectListItem{ Text="Local", Value = "1" },
+                                       new SelectListItem{ Text="Import", Value = "2" },
+                                       new SelectListItem{ Text="Customer", Value = "3" },
+
+                                       }, new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12">
+                            <label>Date</label>
+                            <div class="input-group date my_picker" data-date-format="mm/dd/yyyy">
+
+                                @Html.TextBoxFor(m => m.DcRefDate, new { @class = "form-control text-field" })
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Invoice Value</label>
+                                <div class="col-lg-6 col-md-6 col-sm-6 no-padding">
+                                    <div class="form-group custom_chosen_st">
+                                        @Html.DropDownListFor(m => m.InvoiceCurrency, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "form-control input chosen-select" })
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 align-padding-rt">
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.InvoiceValue, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        @*<div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Machinary name</label>
+                                @Html.TextBoxFor(m => m.MaterialName, new { @class = "form-control text-field" })
+                            </div>
+                        </div>*@
+                    </div>
+                    <div class="col-md-12 col-lg-12 col-sm-12">
+                        <div class="col-lg-6 col-md-6 col-sm-12 input-blk quantity-filter">
+                            @*<label>Quantity</label>*@
+                            @*<div class="col-lg-6 col-md-6 col-sm-6">
+                                    <div class="input-group date my_picker" data-date-format="mm/dd/yyyy">
+                                        <label>From</label>
+                                        @Html.TextBoxFor(m => m.DcRefDate, new { @class = "form-control text-field" })
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                    </div>
+                                </div>*@
+                        </div>
+                        @*<div class="col-lg-6 col-md-6 col-sm-6 align-padding-rt">
+                                <div class="input-group date my_picker" data-date-format="mm/dd/yyyy">
+                                    <label>Invoice No / date</label>
+                                    <div class="col-lg-6 col-md-6 col-sm-6">
+                                        <div class="form-group date my_picker">
+                                            @Html.TextBoxFor(m => m.InvoiceDate, new { @class = "form-control text-field" })
+                                            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 align-padding-rt">
+                                        <div class="form-group">
+                                            @Html.TextBoxFor(m => m.InvoiceNo, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+
+
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                </div>
+                            </div>*@
+
+                    </div>
+
+
+             
+
+                 
+                   
+                    <div class="col-lg-4 col-md-6 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>Material Name</label>
+                            @Html.DropDownListFor(m => m.MaterialNameId, MMS.Web.ExtensionMethod.HtmlHelper.GEMaterialName(), new { @class = "form-control input chosen-select" })
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-12 input-blk">
+                        <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                            <label>Stores</label>
+                            @Html.DropDownListFor(m => m.StoresId, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "form-control input chosen-select" })
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>Style</label>
+                            @*@Html.TextBox("Style", new { @class = "form-control text-field" })*@
+                            <input type="text" name="lname" id="Style" class="form-control text-field">
+                            <input type="hidden" name="lname" id="jobsheet_pair_Code_id" class="form-control text-field">
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>Component Master</label>
+                            <div class="input-group date" >
+                             @Html.DropDownListFor(x => x.ComponentId, MMS.Web.ExtensionMethod.HtmlHelper.ComponentMaster(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-12 col-lg-12 col-sm-12">
+
+               
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <div class="col-lg-3 col-md-4 col-sm-12 input-blk  pl-0">
+                            <div class="form-group">
+                                <label>UoM</label>
+                              
+                                    <div class="form-group custom_chosen_st">
+                                        @Html.DropDownListFor(m => m.UomId, MMS.Web.ExtensionMethod.HtmlHelper.LongUnitName(), new { @class = "form-control input chosen-select" })
+
+                                    </div>
+                             
+                               
+                            </div>
+                         
+                        </div>
+                        <div class="col-lg-1 col-md-4 col-sm-12 input-blk no-padding">
+                            <div class="form-group">
+                                <label>Quantity</label>
+                               
+
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.TotalQty, new { @class = "form-control text-field" })
+                                    </div>
+ 
+                            </div>
+
+                        </div>
+
+
+                       
+                       
+
+                        <div class="col-lg-2 col-md-6 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Rate</label>
+                                @Html.TextBoxFor(m => m.Rate, new { @class = "form-control text-field" })
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-6 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Value</label>
+                                <div class="input-group date ">
+                                    @Html.TextBoxFor(m => m.Value, new { @class = "form-control text-field" , @readonly = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-6 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Recived Qty</label>
+                                @Html.TextBoxFor(m => m.Quantity, new { @class = "form-control text-field" })
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-6 col-sm-12 input-blk">
+                            <div class="form-group">
+                                <label>Dc PCs </label>
+                                @Html.TextBoxFor(m => m.Pcs, new { @class = "form-control text-field" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                    <div class="col-lg-3 col-md-6 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>Acknowledged By</label>
+                            <div class="input-group date ">
+                                @Html.DropDownListFor(m => m.AcknowledgedBy, MMS.Web.ExtensionMethod.HtmlHelper.GateEntryEmpNameWithCode(), new { @class = "form-control input chosen-select" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12 input-blk quantity-filter">
+
+                        <div class="col-lg-12 col-md-12 col-sm-6 align-padding-rt">
+                            <div class="input-group date " data-date-format="mm/dd/yyyy">
+                                <label>DcTotal/ArrivedTotal</label>
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <div class="form-group ">
+                                        @Html.TextBoxFor(m => m.DcTotal, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 align-padding-rt">
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.ArrivedTotal, new { @class = "form-control text-field", @readonly = "true" })
+                                    </div>
+                                </div>
+
+                                <input class="form-control input-field" type="hidden" hidden id="ValueFixed">
+                                <input class="form-control input-field" type="hidden" hidden id="Pending_Fixed">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>Received By</label>
+                            @Html.DropDownListFor(m => m.ReceivedBy, MMS.Web.ExtensionMethod.HtmlHelper.GateEntryEmpNameWithCode(), new { @class = "form-control input chosen-select" })
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>Remarks</label>
+                            @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control text-field" })
+                        </div>
+                    </div>
+
+
+                </div>
+
+                
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                    <div class="col-lg-2 col-md-6 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>Po Total</label>
+                            @Html.TextBoxFor(m => m.PoTotal, new { @class = "form-control text-field" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-6 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>Pending Quantity</label>
+                            @Html.TextBoxFor(m => m.PendingQuantity, new { @class = "form-control text-field", @value = "0", @readonly = "true" })
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>HSN Code</label>
+                            <div class="input-group date">
+                                @Html.TextBoxFor(m => m.HSNCode, new { @class = "form-control text-field" })
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-12 input-blk">
+                        <div class="form-group">
+                            <label>Size Range</label>
+                            @Html.DropDownListFor(m => m.SizeRangeId, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "form-control input chosen-select" })
+                        </div>
+                    </div>
+                    </div>
+                    <div class="col-md-1"></div>
+                    @*<div id="no-more-tables" class="col-xs-12 no-padding">
+                <table id="Sheet_to_pair" class="col-md-12 table-striped table-condensed cf table-change home_dahboard home_process">
+                    <thead>
+                        <tr>
+                            <th>Material Name</th>
+                            <th>Order Qty</th>
+                            <th>Norm/Pair</th>
+                            <th>Reqd.qty</th>
+                            <th>Sheet</th>
+                            <th>Jw Rate</th>
+                            <th>Value</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody ID="table_grid_ROW" class="common-table-head"></tbody>
+                </table>
+            </div>*@
+                    <div class="col-md-12">
+                        <div class="col-md-12">
+                            <label>If Multiple IO's then cummulative size quantity</label>
+                            <div class="production_jobwork_tbl">
+                                <table id="sizeRangeTable" cellpadding="0" cellspacing="0" border="1" width="100%">
+
+                                    @*<tbody>
+                                <tr>
+                                    <td>size</td>
+
+                                </tr>
+                                <tr>
+                                    <td>Qty</td>
+
+                                </tr>
+                            </tbody>*@
+                                </table>
+                            </div>
+                            <button class="btn green-btn " id="Save_size" onclick="Save_size()">Save &amp; Save_size</button>
+                        </div>
+
+                    </div>
+
+                </div>
+        </div>
+    </div>
+
+    
+    <div id="" class="sheet_pair_2 mob_padding col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <!-- <div class="col-xs-12 block-section"> -->
+        
+        <div id="Sheet_grid" class="col-xs-12 no-padding hole_table">
+            <table id="Sheet_to_pair" class="col-md-12 table-striped table-condensed cf table-change home_dahboard color_table">
+                <thead>
+                    <tr>
+                        <th>Material Name</th>
+                        <th>Order Qty</th>
+                        <th>DC Qty</th>
+                        <th>Recivied Qty</th>
+                        <th>Jw Rate</th>
+                        <th>Value</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody ID="table_grid_ROW" class="common-table-head"></tbody>
+            </table>
+
+
+
+            <!-- </div> -->
+             
+        </div>
+        
+
+
+        <div class="init_action sheet-pairs col-lg-12 col-md-12 col-sm-12">
+            <div class="init_button">
+               <button class="btn green-grey" onclick="Back()">Back</button>
+
+                @if (Model.GateEntryInwardId != null && Model.GateEntryInwardId == 0)
+                {
+                    <button class="btn green-btn " id="save" onclick="Save()">Save &amp; Save</button>
+                }
+                else
+                {
+                    <button class="btn green-btn " onclick="UpdateLether()">Update</button>
+                }
+@if (Model.GateEntryInwardId != null && Model.GateEntryInwardId == 0)
+{
+                <button class="btn green-btn custom_btn_g" onclick="Save_SheetMaterial()" id="save_Table_Value">Save the Table Value</button>
+}
+            </div>
+            <div class="checkbox-option sheet-pairs">
+                <div class="form-group checkbox_tax">
+                    <input type="checkbox" id="tax">
+                    <label for="tax">SMS</label>
+                </div>
+                <div class="form-group checkbox_tax">
+                    <input type="checkbox" id="tax1">
+                    <label for="tax1">Email</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/Jobwork/js/datepicker.min.js"></script>
+<script src="~/Scripts/Jobwork/js/custom_script.js"></script>
+<script src="~/Scripts/moment.js"></script>

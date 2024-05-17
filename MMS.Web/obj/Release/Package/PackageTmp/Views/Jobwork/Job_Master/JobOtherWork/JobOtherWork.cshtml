@@ -1,0 +1,263 @@
+﻿@{
+    ViewBag.Title = "JobOtherWork";
+    Layout = "~/Views/Shared/_jobLayout.cshtml";
+}
+
+<div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+    <div class="dashboard-content col-xs-12 no-padding">
+        <div class="dashboard_head dashboard-title congest col-lg-12 col-md-12 col-sm-12  col-xs-12">
+            <div class="dashboard-title  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+                <h2>Other Job Work Service</h2>
+            </div>
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("JobOtherWorkList", "JobOtherWork")
+    </div>
+
+</div>
+<script>
+
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $('#example').DataTable();
+        $("#EditJobPartial").hide();
+    });
+
+    function AddJobOtherWork() {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("EditJobOtherworkList", "JobOtherWork")',
+            data: { OtherJobWork_Id: 0 },
+            success: function (data) {
+                $("#OtherJobWorkPartial").html(data);
+                $("#OtherJobWorkPartial").show();
+            }
+        });
+
+    }
+
+    function Save()
+    {
+        if (Validation() != false) {
+            var _date = moment($('#OtherJobWork_Date')).format('MM/DD/YYYY');
+            var value = $("input[type='radio'][name='group1']:checked").val();
+            var service = false;
+            if (value == 1)
+            {
+                service = true;
+            }
+            else
+            {
+                service = false;
+            }
+            $.ajax({
+                type: "POST",
+                url: '/JobOtherWork/SaveJobOtherWork',
+                data:
+                    {
+                        OtherJobWork_Code: $("#OtherJobWork_Code").val(),
+                        Department_Id: $("#Department_Id").val(),                        
+                        Services: service,
+                        OtherJobWork_Date: _date,
+                        JobWork_Id: $("#JobWork_Id").val(),
+                        Process_Id: $("#Process_Id").val(),
+                        Buyer_Id: $("#Buyer_Id").val(),
+                        Season_Id: $("#Season_Id").val(),
+                        Stoeres_Id: $("#Stoeres_Id").val(),
+                        Group_Id: $("#Group_Id").val(),
+                        Category_Id: $("#Category_Id").val(),
+                        Machinery_Id: $("#Machinery_Id").val(),
+                        Spare_Id: $("#Spare_Id").val(),
+                        Quantity: $("#Quantity").val(),
+                        UOM: $("#UOM").val(),
+                        ServiceDescription: $("#ServiceDescription").val(),
+                        JobWork_Price: $("#JobWork_Price").val(),
+                        JobWork_Price_Value: $("#JobWork_Price_Value").val(),
+                        GST: $("#GST").val(),
+                        GST_Amount: $("#GST_Amount").val(),
+                        TotalCost: $("#TotalCost").val(),
+                    },
+                success: function (data) {
+                    alert('Saved Successfully.');
+                    location.href = "/JobOtherWork/JobOtherWork";
+                }
+            });
+        }
+        
+    }
+
+    function Update()
+    {
+        if (Validation() != false) {
+            var _date = moment($('#OtherJobWork_Date')).format('MM/DD/YYYY');
+            var value = $("input[type='radio'][name='group1']:checked").val();
+            var service = false;
+            if (value == 1) {
+                service = true;
+            }
+            else {
+                service = false;
+            }
+            $.ajax({
+                type: "POST",
+                url: '/JobOtherWork/UpdateJobOtherWork',
+                data:
+                    {
+                        OtherJobWork_Id: $('#OtherJobWork_Id').val(),
+                        OtherJobWork_Code: $("#OtherJobWork_Code").val(),
+                        Department_Id: $("#Department_Id").val(),
+                        Services: service,
+                        OtherJobWork_Date: _date,
+                        JobWork_Id: $("#JobWork_Id").val(),
+                        Process_Id: $("#Process_Id").val(),
+                        Buyer_Id: $("#Buyer_Id").val(),
+                        Season_Id: $("#Season_Id").val(),
+                        Stoeres_Id: $("#Stoeres_Id").val(),
+                        Group_Id: $("#Group_Id").val(),
+                        Category_Id: $("#Category_Id").val(),
+                        Machinery_Id: $("#Machinery_Id").val(),
+                        Spare_Id: $("#Spare_Id").val(),
+                        Quantity: $("#Quantity").val(),
+                        UOM: $("#UOM").val(),
+                        ServiceDescription: $("#ServiceDescription").val(),
+                        JobWork_Price: $("#JobWork_Price").val(),
+                        JobWork_Price_Value: $("#JobWork_Price_Value").val(),
+                        GST: $("#GST").val(),
+                        GST_Amount: $("#GST_Amount").val(),
+                        TotalCost: $("#TotalCost").val(),
+                    },
+                success: function (data) {
+                    if (data.OtherJobWork_Id != "" || data.OtherJobWork_Id != 0) {
+                        alert('Job Work Updated Successfully.');
+                        location.href = "/JobOtherWork/JobOtherWork";
+                        return false;
+                    }
+                    else {
+                        alert('Job Work Updation failed.');
+                        location.href = "/JobOtherWork/JobOtherWork";
+                        return false;
+                    }
+                }
+            });
+        }
+        
+    }
+
+    function Back()
+    {
+        location.href = "/JobOtherWork/JobOtherWork";
+    }
+
+    function Edit(arg)
+    {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("EditJobOtherworkList", "JobOtherWork")',
+            data: { OtherJobWork_Id: arg },
+            success: function (data) {
+                $("#OtherJobWorkPartial").html(data);
+                $("#OtherJobWorkPartial").show();
+            }
+        });
+    }
+
+    function Delete(arg)
+    {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("DeleteJobOtherWork", "JobOtherWork")',
+                data: { OtherJobWork_Id: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Other Job Work Deleted Successfully.');
+                        location.href = "/JobOtherWork/JobOtherWork";
+                        return false;
+                    }
+                    else {
+                        alert('Other Job Work deletion failed.');
+                    }
+                },
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+    function Validation() {       
+        
+        if ($('#Department_Id').val() == "") {
+            alert("Please select the Department.")
+            $('#Department_Id').css('border-color', 'red');
+            $('#Department_Id').focus();
+            return false;
+        }
+        else {
+            $('#Department_Id').css('border-color', '');
+        }
+        if ($('#JobWork_Id').val() == "") {
+            alert("Please select the Job Work.")
+            $('#JobWork_Id').css('border-color', 'red');
+            $('#JobWork_Id').focus();
+            return false;
+        }
+        else {
+            $('#JobWork_Id').css('border-color', '');
+        }
+        if ($('#Process_Id').val() == "") {
+            alert("Please select the Process.")
+            $('#Process_Id').css('border-color', 'red');
+            $('#Process_Id').focus();
+            return false;
+        }
+        else {
+            $('#Process_Id').css('border-color', '');
+        }
+        
+        if ($('#Quantity').val() == "0") {
+            alert("Please Enter Quantity.")
+            $('#Quantity').css('border-color', 'red');
+            $('#Quantity').focus();
+            return false;
+        }
+        else {
+            $('#Quantity').css('border-color', '');
+        }
+
+        if ($('#Quantity').val() == "") {
+            alert("Please Enter the Quantity .")
+            $('#Quantity').css('border-color', 'red');
+            $('#Quantity').focus();
+            return false;
+        }
+        else {
+            $('#Quantity').css('border-color', '');
+        }
+
+        if ($('#UOM').val() == "") {
+            alert("Please select the UOM .")
+            $('#UOM').css('border-color', 'red');
+            $('#UOM').focus();
+            return false;
+        }
+        else {
+            $('#UOM').css('border-color', '');
+        }       
+        
+    }
+
+</script>

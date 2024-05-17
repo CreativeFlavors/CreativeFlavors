@@ -1,0 +1,159 @@
+﻿@model MMS.Web.Models.StageMaser.StageMasterModel
+@using MMS.Repository.Managers;
+@using MMS.Core.Entities;
+@{
+    List<MMS.Core.Entities.StageMaster> Stagelist = new List<MMS.Core.Entities.StageMaster>().ToList();
+    StageMasterManager StageMasterManager = new StageMasterManager();
+
+}
+
+<div class="veh-tablecont">
+    <div class="header_list_tab  col-lg-12 col-md-12 col-sm-12  col-xs-12">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+            <div class="list_tab">
+                <div class="title">
+                    List
+                </div>
+                <button class="rt_add" onclick="AddStage()">Add</button>
+            </div>
+
+        </div>
+        <div class="col-lg-6 col-md-12 col-sm-12  col-xs-12">
+            <div class="button_tab  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+
+            </div>
+        </div>
+    </div>
+
+    <div class="process_master col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="col-xs-12 block-section">
+            <div id="no-more-tables" class="col-xs-12 no-padding">
+                <table id="example" class="col-md-12 table-striped table-condensed cf table-change home_dahboard home_process">
+                    <thead>
+                        <tr>
+                            <th>SI.No</th>
+                            <th>Process Code</th>
+                            @*<th>Sequence Edit</th>*@
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="common-table-head">
+                        @if (Model.StageMasterList != null && Model.StageMasterList.Count > 0)
+                        {
+                            int count = 1;
+                            if (Stagelist == null || Stagelist.Count == 0)
+                            {
+                                foreach (var StageMaster in Model.StageMasterList)
+                                {
+                                    bool inspection = false;
+                                    if (StageMaster.IsInspection == true)
+                                    {
+                                        inspection = true;
+                                    }
+                        <tr>
+                            <td data-title="Si.No">@count</td>
+                            <td data-title="OperationType Code">@StageMaster.ProcessCode</td>
+                            @*<td data-title="Sequence"><input type="number" class="form-control Qty" id="id_@StageMaster.StageMasterId"  onchange="savesequence(@StageMaster.StageMasterId)" value="@StageMaster.Sequence" style="width: 76px;"></td>*@
+                            <td data-title="Action">
+                                <span class="action-icons">
+
+                                    <a><img onclick="Edit('@StageMaster.ProcessCode')" src="~/Scripts/Jobwork/images/edit.png"></a>
+                                    <img onclick="Delete('@StageMaster.ProcessCode')" src="~/Scripts/Jobwork/images/delete.png">
+                                </span>
+                            </td>
+                        </tr>
+                                    count++;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            int count = 1;
+                            foreach (var Stage in Stagelist)
+                            {
+
+                                    <tr>
+                                        <td class="veh-1">@count</td>
+                                        <td class="veh-1" onclick="">@Stage.StageCode/td>
+                                        <td class="veh-3">@Stage.StageName</td>
+                                        <td class="veh-3">@Stage.SubStage</td>
+                                        <td class="veh-3">@Stage.Sequence</td>
+                                        <td data-title="IO involved">
+                                            <div class="checkbox-option">
+                                                <div class="flex_section">
+                                                    <div class="form-group checkbox_tax">
+                                                        <input type="checkbox" id="tax3">
+                                                        <label for="tax3"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td data-title="Action">
+                                            <span class="action-icons">
+                                                <a href="Home_Process_Master_edit.html"><img src="~/Scripts/Jobwork/images/edit.png"></a>
+                                                <img src="~/Scripts/Jobwork/images/delete.png">
+                                            </span>
+                                        </td>
+                                    </tr>
+                                count++;
+                            }
+
+                            Stagelist = null;
+                        }
+                        </>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div id="EditStagePartial">
+    @*@Html.Partial("~/Views/Jobwork/Job_Master/ProcessMaster/Partial/ProcessEdit.cshtml", Model)*@
+</div>
+
+<script>
+    function savesequence(arg) {
+        var value = $("#id_" + arg + "").val();
+     
+        //   var answer = swal("Are you sure want to delete?");
+        debugger;
+        swal({
+            title: "Are you sure?",
+            text: "You want to change the sequence",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("Updatesequence", "StageMaster_Job")',
+                        data: { StageMasterId: arg, sequence: value },
+                        success: function (data) {
+                            if (data == "Success") {
+                                alert('Saved Successfully.');
+                                location.href = "/StageMaster_Job/StageMaster";
+                                return false;
+                            }
+                            else {
+                                alert('stage sequence updated sucefully.');
+                            }
+
+                        },
+                        error: function (ex) {
+                            alert(JSON.stringify(ex));
+                        }
+                    });
+                    //swal(value, {
+                    //    icon: "success",
+                    //});
+                } else {
+                    swal("Sequence is not saved!");
+                }
+            });
+    }
+
+</script>
+

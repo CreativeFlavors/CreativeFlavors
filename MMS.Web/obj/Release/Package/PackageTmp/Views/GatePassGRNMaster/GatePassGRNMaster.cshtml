@@ -1,0 +1,350 @@
+﻿@{  
+    ViewBag.Title = "GatePassGRNMaster";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+<style>
+    .popup-wrap {
+    background: #eaf1f7  none repeat scroll 0 0;
+    border-radius: 6px;
+    box-shadow: 1px 1px 13px #858585;
+    left: 36%;
+    padding: 16px;
+    position: absolute;
+    top: 46%;
+    width: 408px !important;
+}
+</style>
+<script>
+   
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $("#EditColorPartial").hide();
+    });
+    function Save() { 
+        if ($('#ReceiptNo').val() == "") {
+            alert("Please Enter Receipt No.")
+            $('#ReceiptNo').css('border-color', 'red');
+            $('#ReceiptNo').focus();
+            return false;
+        }
+        else {
+            $('#ReceiptNo').css('border-color', '');
+        }
+        if ($('#Date').val() == "") {
+            alert("Please Enter Date.")
+            $('#Date').css('border-color', 'red');
+            $('#Date').focus();
+            return false;
+        }
+        else {
+            $('#Date').css('border-color', '');
+        }
+
+        if ($('#PartyName').val() == "") {
+            alert("Please Enter PartyName.")
+            $('#PartyName').css('border-color', 'red');
+            $('#PartyName').focus();
+            return false;
+        }
+        else {
+            $('#PartyName').css('border-color', '');
+        }
+
+        if ($('#RefGatePassNo').val() == "") {
+            alert("Please Enter Ref Gate Pass No.")
+            $('#RefGatePassNo').css('border-color', 'red');
+            $('#RefGatePassNo').focus();
+            return false;
+        }
+        else {
+            $('#RefGatePassNo').css('border-color', '');
+        }
+
+        if ($('#Material').val() == "") {
+            alert("Please Select MaterialName.")
+            $('#Material').css('border-color', 'red');
+            $('#Material').focus();
+            return false;
+        }
+        else {
+            $('#Material').css('border-color', '');
+        }
+
+        if ($('#Quantity').val() == "") {
+            alert("Please Enter Quantity.")
+            $('#Quantity').css('border-color', 'red');
+            $('#Quantity').focus();
+            return false;
+        }
+        else {
+            $('#Quantity').css('border-color', '');
+        }
+
+        if ($('#UOM').val() == "") {
+            alert("Please Enter UOM.")
+            $('#UOM').css('border-color', 'red');
+            $('#UOM').focus();
+            return false;
+        }
+        else {
+            $('#UOM').css('border-color', '');
+        }
+
+        if ($('#Rate').val() == "") {
+            alert("Please Enter Rate.")
+            $('#Rate').css('border-color', 'red');
+            $('#Rate').focus();
+            return false;
+        }
+        else {
+            $('#Rate').css('border-color', '');
+        }
+        if ($('#Amount').val() == "") {
+            alert("Please Enter Amount.")
+            $('#Amount').css('border-color', 'red');
+            $('#Amount').focus();
+            return false;
+        }
+        else {
+            $('#Amount').css('border-color', '');
+        }
+        if ($('#Instructions').val() == "") {
+            alert("Please Enter Instructions.")
+            $('#Instructions').css('border-color', 'red');
+            $('#Instructions').focus();
+            return false;
+        }
+        else {
+            $('#Instructions').css('border-color', '');
+        }
+        var IsPrint  = null;
+        if ($('#IsPrintWithRateValue').is(":checked")) {
+            IsPrint = true;
+        }
+        else {
+            IsPrint = false;
+        }
+        
+        var IsPrintWithout = null;
+        if ($('#IsPrintWithoutCompanyAddress').is(":checked")) {
+            IsPrintWithout = true;
+        }
+        else {
+            IsPrintWithout = false;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/GatePassGRNMaster/GatePassGRNMaster',
+            data: {               
+                ReceiptNo: $('#ReceiptNo').val(),               
+                Date: $('#Date').val(),
+                IsSupplier: $('#IsSupplier').val(),
+                PartyName: $('#PartyName').val(),
+                RefGatePassNo: $('#RefGatePassNo').val(),
+                MaterialName: $('#MaterialName option:selected').val(),
+                Quantity: $('#Quantity').val(),
+                UOM: $('#UOM').val(),                
+                Rate: $('#Rate').val(),
+                Amount: $('#Amount').val(),                
+                Instructions: $('#Instructions').val(),
+                IsPrintWithRateValue:IsPrint,
+                IsPrintWithoutCompanyAddress: IsPrintWithout
+            },
+                
+            success: function (data) {             
+                if (data.GatePassInvwardId != "" || data.GatePassInvwardId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/GatePassGRNMaster/GatePassGRNMaster";
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/GatePassGRNMaster/GatePassGRNMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+       
+        if ($('#ReceiptNo').val() == "") {
+            alert("Please Enter Receipt No.")
+            $('#ReceiptNo').css('border-color', 'red');
+            $('#ReceiptNo').focus();
+            return false;
+        }
+        else {
+            $('#ReceiptNo').css('border-color', '');
+        }
+        if ($('#Date').val() == "") {
+            alert("Please Enter Date.")
+            $('#Date').css('border-color', 'red');
+            $('#Date').focus();
+            return false;
+        }
+        else {
+            $('#Date').css('border-color', '');
+        }
+
+        if ($('#PartyName').val() == "") {
+            alert("Please Enter PartyName.")
+            $('#PartyName').css('border-color', 'red');
+            $('#PartyName').focus();
+            return false;
+        }
+        else {
+            $('#PartyName').css('border-color', '');
+        }
+
+        if ($('#RefGatePassNo').val() == "") {
+            alert("Please Enter Ref Gate Pass No.")
+            $('#RefGatePassNo').css('border-color', 'red');
+            $('#RefGatePassNo').focus();
+            return false;
+        }
+        else {
+            $('#RefGatePassNo').css('border-color', '');
+        }
+
+        if ($('#Material').val() == "") {
+            alert("Please Select MaterialName.")
+            $('#Material').css('border-color', 'red');
+            $('#Material').focus();
+            return false;
+        }
+        else {
+            $('#Material').css('border-color', '');
+        }
+
+        if ($('#Quantity').val() == "") {
+            alert("Please Enter Quantity.")
+            $('#Quantity').css('border-color', 'red');
+            $('#Quantity').focus();
+            return false;
+        }
+        else {
+            $('#Quantity').css('border-color', '');
+        }
+
+        if ($('#UOM').val() == "") {
+            alert("Please Enter UOM.")
+            $('#UOM').css('border-color', 'red');
+            $('#UOM').focus();
+            return false;
+        }
+        else {
+            $('#UOM').css('border-color', '');
+        }
+
+        if ($('#Rate').val() == "") {
+            alert("Please Enter Rate.")
+            $('#Rate').css('border-color', 'red');
+            $('#Rate').focus();
+            return false;
+        }
+        else {
+            $('#Rate').css('border-color', '');
+        }
+        if ($('#Amount').val() == "") {
+            alert("Please Enter Amount.")
+            $('#Amount').css('border-color', 'red');
+            $('#Amount').focus();
+            return false;
+        }
+        else {
+            $('#Amount').css('border-color', '');
+        }
+        if ($('#Instructions').val() == "") {
+            alert("Please Enter Remarks.")
+            $('#Instructions').css('border-color', 'red');
+            $('#Instructions').focus();
+            return false;
+        }
+        else {
+            $('#Instructions').css('border-color', '');
+        }
+
+        var IsPrint  = null;
+        if ($('#IsPrintWithRateValue').is(":checked")) {
+            IsPrint = true;
+        }
+        else {
+            IsPrint = false;
+        }
+        
+        var IsPrintWithout = null;
+        if ($('#IsPrintWithoutCompanyAddress').is(":checked")) {
+            IsPrintWithout = true;
+        }
+        else {
+            IsPrintWithout = false;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/GatePassGRNMaster/Update',
+            data: {               
+                ReceiptNo: $('#ReceiptNo').val(),               
+                Date: $('#Date').val(),               
+                PartyName: $('#PartyName').val(),
+                RefGatePassNo: $('#RefGatePassNo').val(),
+                Material: $('#Material').val(),
+                Quantity: $('#Quantity').val(),
+                UOM: $('#UOM').val(),                
+                Rate: $('#Rate').val(),
+                Amount: $('#Amount').val(),
+                IfReturnable: $('#IfReturnable').val(),
+                Instructions: $('#Instructions').val(),
+                IsPrintWithRateValue:IsPrint,
+                IsPrintWithoutCompanyAddress: IsPrintWithout,
+                GatePassInvwardId: $('#GatePassInvwardId').val()
+            },         
+           
+            success: function (data) {
+                if (data.GatePassInvwardId != "" || data.GatePassInvwardId != 0) {
+                        alert('Updated Successfully.');
+                        location.href = "/GatePassGRNMaster/GatePassGRNMaster";
+                        return false;
+                    }
+                    else {
+                        alert('Updation failed.');
+                        location.href = "/GatePassGRNMaster/GatePassGRNMaster";
+                        return false;
+                    }
+                },
+                error: function (ex) {
+                    alert('Already Exist in the database.');
+                }
+            });
+        }
+     
+</script>
+<h2 class="content-title">Gate Pass GRN(Inward)</h2>
+<div style="width: 100%; float: left;">
+
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("GatePassGRNMasterGrid", "GatePassGRNMaster")
+    </div>
+</div>

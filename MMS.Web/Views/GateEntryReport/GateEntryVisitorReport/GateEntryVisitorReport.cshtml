@@ -1,0 +1,129 @@
+﻿@{
+    ViewBag.Title = "GateEntryVisitor";
+}
+
+<link type="text/css" href="~/Content/css/jquery-ui-1.8.19.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/Content/themes/base/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="~/Content/themes/base/jquery-ui-1.8.19.custom.min.js"></script>
+
+<div class="indent_report">
+    <h2>GateEntry Visitor</h2>
+</div>
+<div>
+
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div class="field-section indent_field">
+        <div class="form-group">
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">From Date :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                <input id="PeriodFrom" name="PeriodFrom" type="text" class="form-control text-field" />
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">To Date :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+
+                <input id="PeriodTo" name="PeriodTo" type="text" class="form-control text-field" />
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">GateEntryNo :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                <input id="GateEntryNo" name="GateEntryNo" type="text" class="form-control text-field" />
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">VisitorName :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+
+                <input id="VisitorName" name="VisitorName" type="text" class="form-control text-field" />
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Visitor Type :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("VisitorType", MMS.Web.ExtensionMethod.HtmlHelper.GEVisitorType(), new { @class = "select-style text-field" })
+            </div>
+           
+        </div>
+    </div>
+    <input id="ExportReport" class="indent_report_field" name="ExportReport" type="submit" value="Generate Report" />
+</div>
+
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+            $("#PeriodFrom").datepicker({ dateFormat: "dd/mm/yy" });
+            $("#PeriodTo").datepicker({ dateFormat: "dd/mm/yy" });
+         
+            $("#ExportReport").click(function (event) {
+
+                if ($('#PeriodFrom').val() == "") {
+                    alert("Please select Period From.")
+                    $('#PeriodFrom').css('border-color', 'red');
+                    $('#PeriodFrom').focus();
+                    return false;
+                }
+                else {
+                    $('#PeriodFrom').css('border-color', '');
+                }
+                if ($('#PeriodTo').val() == "") {
+                    alert("Please select Period To.")
+                    $('#PeriodTo').css('border-color', 'red');
+                    $('#PeriodTo').focus();
+                    return false;
+                }
+                else {
+                    $('#PeriodTo').css('border-color', '');
+                }
+                var From = $("#PeriodFrom").val();
+                var To = $("#PeriodTo").val();
+                var GateEntryNo = $("#GateEntryNo").val();
+                var VisitorName = $("#VisitorName").val();
+                var VisitorType = $("#VisitorType option:selected").val();
+                event.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: '/GateEntryVisitorReport/RedirectToAspx',
+                    data: {
+                        from: From,
+                        to: To,
+                        gateEntryNo: GateEntryNo,
+                        visitorName: VisitorName,
+                        visitorType: VisitorType
+                    },
+                    success: function (data) {
+                        debugger;
+                        console.log(data);
+                       
+                        var url = "@(System.Configuration.ConfigurationManager.AppSettings["ReportURL"].ToString())GateEntryVisitorReport.aspx?FromDate=" + data.From + "&ToDate=" + data.To + "&GateEntryNo=" + data.GateEntryNo + "&VisitorName=" + data.VisitorName + "&VisitorType=" + data.VisitorType;
+                        console.log(url);
+                        window.open(url, '_blank');
+                       
+                        return false
+                    }
+                });
+            });
+        })
+
+        //$("#Material").combobox();
+        //$("#toggle").click(function () {
+        //    $("#Material").toggle();
+        //});
+     
+</script>

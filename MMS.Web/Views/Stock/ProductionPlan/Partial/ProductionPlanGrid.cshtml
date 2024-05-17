@@ -1,0 +1,238 @@
+﻿@model MMS.Web.Models.StockModel.ProductionPlanModel
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+
+@{
+    MMS.Repository.Managers.StockManager.BuyerOrderEntryManager buyerOrderEntryManager = new MMS.Repository.Managers.StockManager.BuyerOrderEntryManager();
+    InternalOrderEntryForm orderEntryEntityModel = new InternalOrderEntryForm();
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Production Planning", PermissionSettingModel.PermissionID);
+    }
+    bool Add = false; bool Edit = false; bool Delete = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Add")
+        {
+            Add = true;
+        }
+        if (item.PermissionDesc == "Edit")
+        {
+            Edit = true;
+        }
+        if (item.PermissionDesc == "Delete")
+        {
+            Delete = true;
+        }
+    }
+}
+
+<div class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+
+        <table class="veh-table" id="empTable">
+            <thead>
+                <tr class="color-code-top-btn">
+                    <td colspan="9">
+                        <input type="text" id="SeaarchID" placeholder="Search.." />
+                        @if (Add == true)
+                        {
+                            <input type="button" value="Add" onclick="Add()">
+                        }
+                        else
+                        {
+                            <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Add">
+                        }
+
+                        <input type="button" value="Search" onclick="Search()"></td>
+                </tr>
+                <tr>
+                    <th class="veh-1">Si.NO
+                    </th>
+                    <th class="veh-1">Plan No
+                    </th>
+                    <th class="veh-1">Customer Name
+                    </th>
+                    <th class="veh-1">WeekPlan
+                    </th>
+                    <th class="veh-1">HouseCapacity 
+                    </th>
+                   
+                    <th class="veh-1">PlanQtyInMultiples
+                    </th>
+                    <th class="veh-4">Edit/Delete
+                    </th>
+
+                </tr>
+            </thead>
+            @if (Model.productionPlanningList.Count > 0 && Model.productionPlanningList != null)
+            {
+                int count = 1;
+                <tbody>
+
+                    @foreach (var ProductionPlan in Model.productionPlanningList)
+                    {
+                       
+                        <tr>
+                            <td class="veh-1" onclick="">@count</td>
+                            <td class="veh-1" onclick="">@ProductionPlan.PlanNo</td>
+                            <td class="veh-1" onclick="">@ProductionPlan.CustomerName</td>
+                            <td class="veh-1" onclick="">@ProductionPlan.WeekPlan</td>
+                            <td class="veh-1" onclick="">@ProductionPlan.InHouseCapacity</td>
+                             <td class="veh-1" onclick="">@ProductionPlan.PlanQtyInMultiples</td>
+                           
+                            <td class="veh-1 edit-del-wrap">
+                                @if (Edit == true)
+                                {
+                                    <a href="javascript:void(0)" onclick="Edit('@ProductionPlan.ProductionPlanId')" class="watchlist-edit" title="Edit"></a>
+                                }
+                                else
+                                {
+                                    <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-edit" title="Edit"></a>
+                                }
+                                @if (Delete == true)
+                                {
+                                    <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@ProductionPlan.ProductionPlanId')" class="watchlist-delete" title="Delete"></a>
+                                }
+                                else
+                                {
+                                    <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-delete" title="Delete"></a>
+                                }
+                            </td>
+                        </tr>
+                        count++;
+                    }
+
+
+                </tbody>
+                <tfoot class="footer-pager">
+                    <tr>
+                        <td colspan="4">
+                            <div id="pager">
+                                <form>
+                                    <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                    <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                    <input type="text" class="pagedisplay" />
+                                    <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                    <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                    <select class="pagesize">
+                                        <option selected="selected" value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="40">40</option>
+                                    </select>
+                                </form>
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                </tfoot>
+                
+            }
+            else
+            {
+                <li style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</li>
+            }
+        </table>
+
+    </div>
+
+    <div id="EditColorPartial">
+       @Html.Partial("~/Views/Stock/ProductionPlan/Partial/ProductionPlanDetails.cshtml", Model)
+    </div>
+
+
+</div>
+ 
+
+<script>
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    function Search() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Search", "ProductionPlan")',
+             data: { filter: $('#SeaarchID').val() },
+             success: function (data) {
+                 $(".veh-tablewrap").html(data);
+                 $(".veh-tablewrap").show();
+                 $('#DivShow').hide();
+             }
+         });
+     }
+     
+     function Cancel() {
+         
+         location.reload();
+     }
+     function Add() {
+         $.ajax({
+             type: "POST",
+             url: ' @Url.Action("ProductionPlanDetails", "ProductionPlan")',
+             data: { ProductionPlanId: 0 },
+             success: function (data) {
+                 $('.veh-tablecont').hide();
+                 $("#EditColorPartial").html(data);
+                 $("#EditColorPartial").show();
+             }
+         });
+
+     }
+     function Edit(arg) {
+         $.ajax({
+             type: "POST",
+             url: ' @Url.Action("ProductionPlanDetails", "ProductionPlan")',
+             data: { ProductionPlanId: arg },
+             success: function (data) {
+                 $('.veh-tablecont').hide();
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "ProductionPlan")',
+                data: { ProductionPlanId: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/ProductionPlan/ProductionPlan/";
+                        return false;
+                    }
+                    else {
+                        alert('Color Details deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+
+</script>

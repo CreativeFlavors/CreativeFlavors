@@ -1,0 +1,157 @@
+﻿@model MMS.Web.Models.UnitConversion.UnitConversionModel
+
+@{
+    
+}
+
+<div class="popup-wrap edit-popup-wrap " id="DivShow">
+</div>
+
+<div class="right-form-section clearfix">
+    <div class="container-fluid">
+        <div class="row">
+            <div id="DivUnitConversion">
+                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                    <h3>Unit Conversion</h3>
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                                <label for="text" class="form-label">Category</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.HiddenFor(x => x.UnitConversionId)
+                                @Html.DropDownListFor(m => m.Category, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                                <label for="text" class="form-label">Group</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.DropDownListFor(m => m.UcGroup, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                                <label for="text" class="form-label">Material</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.DropDownListFor(m => m.Material, MMS.Web.ExtensionMethod.HtmlHelper.MaterialName(), new { @class = "select-style text-field" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+           
+        </div>
+    </div>
+     <div id="DivConversion" class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding ">
+                <h3>Conversion Table</h3>
+                <div class="field-section">
+                    <div class="form-group">
+                        <div class="col-md-1 col-sm-1 col-lg-1 col-xs-1">
+                            <label for="text" class="form-label">Value</label>
+                        </div>
+                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding">
+                                <div class="col-md-2 col-lg-2 col-sm-2">
+                                    @Html.TextBoxFor(m => m.ShortUnitNameValue, new { @class = "form-control text-field", onclick = "Numeric()" })
+                                </div>
+                                <div class="col-md-2 col-lg-2 col-sm-2 pad_right">
+                                    @Html.DropDownListFor(m => m.ShortUnitID, MMS.Web.ExtensionMethod.HtmlHelper.ShortUnitName(), new { @class = "select-style text-field" })
+                                </div>
+                                <div class="col-md-1 col-lg-1 col-sm-2 pad_right" align="center">
+                                    =
+                                </div>
+                                <div class="col-md-2 col-lg-2 col-sm-2">
+                                    @Html.TextBoxFor(m => m.LongUnitNameValue, new { @class = "form-control text-field", onclick = "Numeric()" })
+                                </div>
+                                <div class="col-md-2 col-lg-2 col-sm-2 pad_right">
+                                    @Html.DropDownListFor(m => m.LongUnitValue, MMS.Web.ExtensionMethod.HtmlHelper.LongUnitName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="field-section">
+                    <div class="form-group">
+                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                            <label for="text" class="form-label"></label>
+                        </div>
+                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding">
+                                
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+    <div id="DivConversionBtns" class="row">
+        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center" style="margin: 15px 0px;">
+            <input type="button" onclick="Cancel()" style="cursor: pointer;" class="btn btn-default btn-style width-78" title="Back" value="Back">
+            @if (Model != null && Model.UnitConversionId != 0)
+            {
+
+                <input type="button" onclick="Update()" style="cursor: pointer;" class="btn btn-default btn-style width-78" id="UnitConversionId" title="Update" value="Update">
+            }
+            else
+            {
+                <input type="button" onclick="Save()" style="cursor: pointer;" class="btn btn-default btn-style width-78" title="Save" value="Save">
+            }
+            <input type="button" style="cursor: pointer;" class="btn btn-default btn-style width-78" title="Clear" value="Clear">
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    var specialKeys = new Array();
+    specialKeys.push(8); 
+    function Numeric() {
+
+        $("#ShortUnitNameValue,#LongUnitNameValue").bind("keypress", function (e) {
+            var keyCode = e.which ? e.which : e.keyCode
+            var ret = ((keyCode >= 48 && keyCode <= 57) || specialKeys.indexOf(keyCode) != -1);
+            $(".error").css("display", ret ? "none" : "inline");
+            return ret;
+        });
+        $("#ShortUnitNameValue,#LongUnitNameValue").bind("paste", function (e) {
+            return false;
+        });
+        $("#ShortUnitNameValue,#LongUnitNameValue").bind("drop", function (e) {
+            return false;
+        });
+    }
+</script>
+ <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<link href="~/Scripts/EasyAutocomplete-1.3.5/comboStyles.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/ComboBox.js"></script>
+<script>
+     $("#Category").combobox();
+    $("#UcGroup").combobox();
+    $("#Material").combobox();
+    $("#ShortUnitID").combobox();
+    $("#LongUnitValue").combobox();
+</script>

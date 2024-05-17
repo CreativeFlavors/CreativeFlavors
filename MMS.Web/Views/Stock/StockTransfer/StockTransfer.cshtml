@@ -1,0 +1,774 @@
+﻿@{
+    ViewBag.Title = "StockTransfer";
+}
+
+@model MMS.Web.Models.StockModel.StockTransferModel
+@using MMS.Core.Entities.Stock
+@using MMS.Core.Entities
+
+@{
+    MMS.Repository.Managers.MaterialCategoryManager materialCategoryManager = new MMS.Repository.Managers.MaterialCategoryManager();
+    MaterialCategoryMaster materialCategoryMaster = new MaterialCategoryMaster();
+    MMS.Repository.Managers.MaterialGroupManager materialGroupManager = new MMS.Repository.Managers.MaterialGroupManager();
+    MaterialGroupMaster_ materialGroupMaster_ = new MaterialGroupMaster_();
+
+    MMS.Repository.Managers.ColorManager colorManager = new MMS.Repository.Managers.ColorManager();
+    ColorMaster colorMaster = new ColorMaster();
+    MMS.Repository.Managers.IssueTypeManager IssueTypeManager = new MMS.Repository.Managers.IssueTypeManager();
+    IssueTypeMaster IssueTypeMaster = new IssueTypeMaster();
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Stock Transfer", PermissionSettingModel.PermissionID);
+    }
+    bool Add = true; bool Edit = false; bool Delete = false; bool Save = false; bool Update = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Add")
+        {
+            Add = true;
+        }
+        if (item.PermissionDesc == "Edit")
+        {
+            Edit = true;
+        }
+        if (item.PermissionDesc == "Delete")
+        {
+            Delete = true;
+        }
+        if (item.PermissionDesc == "Save")
+        {
+            Save = true;
+        }
+        if (item.PermissionDesc == "Update")
+        {
+            Update = true;
+        }
+    }
+}
+
+<div class="veh-tablewrap">
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+        
+            <table class="veh-table" id="empTable">
+                <thead>
+                    <tr class="color-code-top-btn">
+                        <td colspan="9">
+                            <input type="text" id="SeaarchID" placeholder="Search.." />
+                            @if (Add == true)
+                            {
+                                <input type="button" value="Add" onclick="Add()">
+                            }
+                            else
+                            {
+                                <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Add">
+                            }
+                            <input type="button" value="Search" onclick="Search()">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="veh-1">
+                            Si.NO
+                        </th>
+                        <th class="veh-1">
+                            Type
+                        </th>
+                        <th class="veh-1">
+                            Group
+                        </th>
+                        <th class="veh-1">
+                            Material
+                        </th>
+                        <th class="veh-1">
+                            Colour
+                        </th>
+                        <th class="veh-1">
+                            Rate
+                        </th>
+                        <th class="veh-1">
+                            Closing Stock All
+                        </th>
+                        <th class="veh-1">
+                            Closing Stock Current
+                        </th>
+                        <th class="veh-4">
+                            Edit/Delete
+                        </th>
+
+                    </tr>
+                </thead>
+                @if (Model.StockTransferList != null)
+                { 
+                if (Model.StockTransferList.Count > 0 && Model.StockTransferList != null)
+                {
+                    int count = 1;
+                    <tbody>
+
+                        @foreach (var storeTransf in Model.StockTransferList)
+                        {
+                            materialCategoryMaster = materialCategoryManager.GetMaterialCategoryMaster(storeTransf.MaterialCategoryID);
+                            materialGroupMaster_ = materialGroupManager.GetMaterialGroupMaster_Id(storeTransf.MaterialGroupID);
+                            colorMaster = colorManager.GetColorMasterID(storeTransf.ColorID);
+                            <tr>
+                                <td class="veh-1" onclick="">@count</td>
+                                <td class="veh-1" onclick="">@storeTransf.TypeId</td>
+                                <td class="veh-1" onclick="">@materialGroupMaster_.GroupName</td>
+                                <td class="veh-1" onclick="">@materialCategoryMaster.CategoryName</td>
+                                <td class="veh-1" onclick="">@colorMaster.Color</td>
+                                <td class="veh-1" onclick="">@storeTransf.Rate</td>
+                                <td class="veh-1" onclick="">@storeTransf.ClosingStockInAllStores</td>
+                                <td class="veh-1" onclick="">@storeTransf.ClosingStockInCurrentStores</td>
+
+                                <td class="veh-1 edit-del-wrap">
+                                    @if (Edit == true)
+                                    {
+                                        <a href="javascript:void(0)" onclick="Edit('@storeTransf.StockTransferID')" class="watchlist-edit" title="Edit"></a>
+                                    }
+                                    else
+                                    {
+                                        <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-edit" title="Edit"></a>
+                                    }
+                                    @if (Delete == true)
+                                    {
+                                        <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@storeTransf.StockTransferID')" class="watchlist-delete" title="Delete"></a>
+                                    }
+                                    else
+                                    {
+                                        <a href="javascript:void(0)" onclick="alert('No Permission To access !')" class="watchlist-delete" title="Delete"></a>
+                                    }
+                                </td>
+                            </tr>
+                                    count++;
+                        }
+
+
+                    </tbody>
+                    <tfoot class="footer-pager">
+                        <tr>
+                            <td colspan="4">
+                                <div id="pager">
+                                    <form>
+                                        <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                        <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                        <input type="text" class="pagedisplay" />
+                                        <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                        <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                        <select class="pagesize">
+                                            <option selected="selected" value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="30">30</option>
+                                            <option value="40">40</option>
+                                        </select>
+                                    </form>
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    </tfoot>
+                }
+                else
+                {
+                    <li style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</li>
+                }
+                }
+            </table>       
+</div>
+
+    <div id="EditColorPartial">
+        @Html.Partial("~/Views/Stock/StockTransfer/Partial/StockTransferDetails.cshtml", Model)
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('#EditColorPartial').hide();
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+
+    });
+     function Search() {
+         $.ajax({
+             type: "POST",
+             url: ' @Url.Action("Search", "StoreTransferForm")',
+             data: { filter: $('#SeaarchID').val() },
+             success: function (data) {
+                 $(".veh-tablewrap").html(data);
+                 $(".veh-tablewrap").show();
+                 $('#DivShow').hide();
+             }
+         });
+     }
+
+     function Cancel() {
+          
+         location.reload();
+     }
+     function Add() {
+         
+         $.ajax({
+             type: "POST",
+             url: ' @Url.Action("StockTransferDetails", "StockTransfer")',
+             data: { StockTransferID: 0 },
+             success: function (data) {
+                 $('.veh-tablecont').hide(); 
+                 $("#EditColorPartial").html(data);
+                 $("#EditColorPartial").show();
+             }
+         });
+     }
+    function Save() {
+        if ($('#TypeId').val() == "") {
+            alert("Please Enter Type");
+            $('#TypeId').css('border-color', 'red');
+            $('#TypeId').focus();
+            return false;
+        }
+        else {
+            $('#TypeId').css('border-color', '');
+        }
+
+        if ($('#DcGrnNo').val() == "") {
+            alert("Please Enter DcGrnNo");
+            $('#DcGrnNo').css('border-color', 'red');
+            $('#DcGrnNo').focus();
+            return false;
+        }
+        else {
+            $('#DcGrnNo').css('border-color', '');
+        }
+        if ($('#IssuedToFrom').val() == "") {
+            alert("Please Enter Issued To From");
+            $('#IssuedToFrom').css('border-color', 'red');
+            $('#IssuedToFrom').focus();
+            return false;
+        }
+        else {
+            $('#IssuedToFrom').css('border-color', '');
+        }
+        if ($('#MaterialCategoryID').val() == "") {
+            alert("Please Enter Material Category");
+            $('#MaterialCategoryID').css('border-color', 'red');
+            $('#MaterialCategoryID').focus();
+            return false;
+        }
+        else {
+            $('#MaterialCategoryID').css('border-color', '');
+        }
+        if ($('#MaterialGroupID').val() == "") {
+            alert("Please Enter Material Group");
+            $('#MaterialGroupID').css('border-color', 'red');
+            $('#MaterialGroupID').focus();
+            return false;
+        }
+        else {
+            $('#MaterialGroupID').css('border-color', '');
+        }
+        if ($('#ColorID').val() == "") {
+            alert("Please Enter Color ID");
+            $('#ColorID').css('border-color', 'red');
+            $('#ColorID').focus();
+            return false;
+        }
+        else {
+            $('#ColorID').css('border-color', '');
+        }
+      
+        if ($('#Stores').val() == "") {
+            alert("Please Enter Stores");
+            $('#Stores').css('border-color', 'red');
+            $('#Stores').focus();
+            return false;
+        }
+        else {
+            $('#Stores').css('border-color', '');
+        }
+        if ($('#QuantityAmount').val() == "") {
+            alert("Please Enter Quantity Amount");
+            $('#QuantityAmount').css('border-color', 'red');
+            $('#QuantityAmount').focus();
+            return false;
+        }
+        else {
+            $('#QuantityAmount').css('border-color', '');
+        }
+        if ($('#QuantityValue').val() == "") {
+            alert("Please Enter Quantity Value");
+            $('#QuantityValue').css('border-color', 'red');
+            $('#QuantityValue').focus();
+            return false;
+        }
+        else {
+            $('#QuantityValue').css('border-color', '');
+        }
+        if ($('#TransportDetails').val() == "") {
+            alert("Please Enter Transport Details");
+            $('#TransportDetails').css('border-color', 'red');
+            $('#TransportDetails').focus();
+            return false;
+        }
+        else {
+            $('#TransportDetails').css('border-color', '');
+        }
+        if ($('#ClosingStockInAllStores').val() == "") {
+            alert("Please Enter Closing Stock In All Stores");
+            $('#ClosingStockInAllStores').css('border-color', 'red');
+            $('#ClosingStockInAllStores').focus();
+            return false;
+        }
+        else {
+            $('#ClosingStockInAllStores').css('border-color', '');
+        }
+        if ($('#RefDcNo').val() == "") {
+            alert("Please Enter RefDcNo");
+            $('#RefDcNo').css('border-color', 'red');
+            $('#RefDcNo').focus();
+            return false;
+        }
+        else {
+            $('#RefDcNo').css('border-color', '');
+        }
+        if ($('#ClosingStockInCurrentStores').val() == "") {
+            alert("Please Enter Closing Stock In Current Stores");
+            $('#ClosingStockInCurrentStores').css('border-color', 'red');
+            $('#ClosingStockInCurrentStores').focus();
+            return false;
+        }
+        else {
+            $('#ClosingStockInCurrentStores').css('border-color', '');
+        }
+        if ($('#Remarks').val() == "") {
+            alert("Please Enter Remarks");
+            $('#Remarks').css('border-color', 'red');
+            $('#Remarks').focus();
+            return false;
+        }
+        else {
+            $('#Remarks').css('border-color', '');
+        }
+        if ($('#ReservedStock').val() == "") {
+            alert("Please Enter Reserved Stock");
+            $('#ReservedStock').css('border-color', 'red');
+            $('#ReservedStock').focus();
+            return false;
+        }
+        else {
+            $('#ReservedStock').css('border-color', '');
+        }
+        if ($('#Rate').val() == "") {
+            alert("Please Enter Rate");
+            $('#Rate').css('border-color', 'red');
+            $('#Rate').focus();
+            return false;
+        }
+        else {
+            $('#Rate').css('border-color', '');
+        }
+        if ($('#Value').val() == "") {
+            alert("Please Enter Value");
+            $('#Value').css('border-color', 'red');
+            $('#Value').focus();
+            return false;
+        }
+        else {
+            $('#Value').css('border-color', '');
+        }
+        if ($('#PartyDcNo').val() == "") {
+            alert("Please Enter Party DcNo");
+            $('#PartyDcNo').css('border-color', 'red');
+            $('#PartyDcNo').focus();
+            return false;
+        }
+        else {
+            $('#PartyDcNo').css('border-color', '');
+        }
+        if ($('#InvoiceRef').val() == "") {
+            alert("Please Enter Invoice Ref");
+            $('#InvoiceRef').css('border-color', 'red');
+            $('#InvoiceRef').focus();
+            return false;
+        }
+        else {
+            $('#InvoiceRef').css('border-color', '');
+        }
+        if ($('#FreeStock').val() == "") {
+            alert("Please Enter Free Stock");
+            $('#FreeStock').css('border-color', 'red');
+            $('#FreeStock').focus();
+            return false;
+        }
+        else {
+            $('#FreeStock').css('border-color', '');
+        }
+        if ($('#InvoiceDate').val() == "") {
+            alert("Please Enter Invoice Date");
+            $('#InvoiceDate').css('border-color', 'red');
+            $('#InvoiceDate').focus();
+            return false;
+        }
+        else {
+            $('#InvoiceDate').css('border-color', '');
+        }
+
+
+        
+        $.ajax({
+            type: 'POST',
+            url: '/StockTransfer/StockTransfer',
+            data: {
+                TypeId: $('#TypeId').val(),
+                DcGrnNo: $('#DcGrnNo').val(),
+                IssuedToFrom: $('#IssuedToFrom').val(),
+                Stores: $('#Stores').val(),
+                TransportDetails: $('#TransportDetails').val(),
+                Remarks: $('#Remarks').val(),
+                Rate: $('#Rate').val(),
+                QuantityValue: $('#QuantityValue').val(),
+                PartyDcNo: $('#PartyDcNo').val(),
+                MaterialCategoryID: $('#MaterialCategoryID').val(),
+                MaterialGroupID: $('#MaterialGroupID').val(),
+                ColorID: $('#ColorID').val(),
+                QuantityAmount: $('#QuantityAmount').val(),
+                ClosingStockInAllStores: $('#ClosingStockInAllStores').val(),
+                ClosingStockInCurrentStores: $('#ClosingStockInCurrentStores').val(),
+                ReservedStock: $('#ReservedStock').val(),
+                FreeStock: $('#FreeStock').val(),
+                InvoiceRef: $('#InvoiceRef').val(),
+                InvoiceDate: $('#InvoiceDate').val(),
+                RefDcNo: $('#RefDcNo').val(),
+                QuantityValue: $('#QuantityValue').val(),
+                Value: $('#Value').val(),
+
+           
+            },
+            success: function (data) {
+                if (data.StockTransferID != "" || data.StockTransferID != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/StockTransfer/StockTransfer";
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/StockTransfer/StockTransfer";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+
+
+    }
+
+    function Update(arg) {
+        if ($('#TypeId').val() == "") {
+            alert("Please Enter Type");
+            $('#TypeId').css('border-color', 'red');
+            $('#TypeId').focus();
+            return false;
+        }
+        else {
+            $('#TypeId').css('border-color', '');
+        }
+
+        if ($('#DcGrnNo').val() == "") {
+            alert("Please Enter DcGrnNo");
+            $('#DcGrnNo').css('border-color', 'red');
+            $('#DcGrnNo').focus();
+            return false;
+        }
+        else {
+            $('#DcGrnNo').css('border-color', '');
+        }
+        if ($('#IssuedToFrom').val() == "") {
+            alert("Please Enter Issued To From");
+            $('#IssuedToFrom').css('border-color', 'red');
+            $('#IssuedToFrom').focus();
+            return false;
+        }
+        else {
+            $('#IssuedToFrom').css('border-color', '');
+        }
+        if ($('#MaterialCategoryID').val() == "") {
+            alert("Please Enter Material Category");
+            $('#MaterialCategoryID').css('border-color', 'red');
+            $('#MaterialCategoryID').focus();
+            return false;
+        }
+        else {
+            $('#MaterialCategoryID').css('border-color', '');
+        }
+        if ($('#MaterialGroupID').val() == "") {
+            alert("Please Enter Material Group");
+            $('#MaterialGroupID').css('border-color', 'red');
+            $('#MaterialGroupID').focus();
+            return false;
+        }
+        else {
+            $('#MaterialGroupID').css('border-color', '');
+        }
+        if ($('#ColorID').val() == "") {
+            alert("Please Enter Color ID");
+            $('#ColorID').css('border-color', 'red');
+            $('#ColorID').focus();
+            return false;
+        }
+        else {
+            $('#ColorID').css('border-color', '');
+        }
+
+        if ($('#Stores').val() == "") {
+            alert("Please Enter Stores");
+            $('#Stores').css('border-color', 'red');
+            $('#Stores').focus();
+            return false;
+        }
+        else {
+            $('#Stores').css('border-color', '');
+        }
+        if ($('#QuantityAmount').val() == "") {
+            alert("Please Enter Quantity Amount");
+            $('#QuantityAmount').css('border-color', 'red');
+            $('#QuantityAmount').focus();
+            return false;
+        }
+        else {
+            $('#QuantityAmount').css('border-color', '');
+        }
+        if ($('#QuantityValue').val() == "") {
+            alert("Please Enter Quantity Value");
+            $('#QuantityValue').css('border-color', 'red');
+            $('#QuantityValue').focus();
+            return false;
+        }
+        else {
+            $('#QuantityValue').css('border-color', '');
+        }
+        if ($('#TransportDetails').val() == "") {
+            alert("Please Enter Transport Details");
+            $('#TransportDetails').css('border-color', 'red');
+            $('#TransportDetails').focus();
+            return false;
+        }
+        else {
+            $('#TransportDetails').css('border-color', '');
+        }
+        if ($('#ClosingStockInAllStores').val() == "") {
+            alert("Please Enter Closing Stock In All Stores");
+            $('#ClosingStockInAllStores').css('border-color', 'red');
+            $('#ClosingStockInAllStores').focus();
+            return false;
+        }
+        else {
+            $('#ClosingStockInAllStores').css('border-color', '');
+        }
+        if ($('#RefDcNo').val() == "") {
+            alert("Please Enter RefDcNo");
+            $('#RefDcNo').css('border-color', 'red');
+            $('#RefDcNo').focus();
+            return false;
+        }
+        else {
+            $('#RefDcNo').css('border-color', '');
+        }
+        if ($('#ClosingStockInCurrentStores').val() == "") {
+            alert("Please Enter Closing Stock In Current Stores");
+            $('#ClosingStockInCurrentStores').css('border-color', 'red');
+            $('#ClosingStockInCurrentStores').focus();
+            return false;
+        }
+        else {
+            $('#ClosingStockInCurrentStores').css('border-color', '');
+        }
+        if ($('#Remarks').val() == "") {
+            alert("Please Enter Remarks");
+            $('#Remarks').css('border-color', 'red');
+            $('#Remarks').focus();
+            return false;
+        }
+        else {
+            $('#Remarks').css('border-color', '');
+        }
+        if ($('#ReservedStock').val() == "") {
+            alert("Please Enter Reserved Stock");
+            $('#ReservedStock').css('border-color', 'red');
+            $('#ReservedStock').focus();
+            return false;
+        }
+        else {
+            $('#ReservedStock').css('border-color', '');
+        }
+        if ($('#Rate').val() == "") {
+            alert("Please Enter Rate");
+            $('#Rate').css('border-color', 'red');
+            $('#Rate').focus();
+            return false;
+        }
+        else {
+            $('#Rate').css('border-color', '');
+        }
+        if ($('#Value').val() == "") {
+            alert("Please Enter Value");
+            $('#Value').css('border-color', 'red');
+            $('#Value').focus();
+            return false;
+        }
+        else {
+            $('#Value').css('border-color', '');
+        }
+        if ($('#PartyDcNo').val() == "") {
+            alert("Please Enter Party DcNo");
+            $('#PartyDcNo').css('border-color', 'red');
+            $('#PartyDcNo').focus();
+            return false;
+        }
+        else {
+            $('#PartyDcNo').css('border-color', '');
+        }
+        if ($('#InvoiceRef').val() == "") {
+            alert("Please Enter Invoice Ref");
+            $('#InvoiceRef').css('border-color', 'red');
+            $('#InvoiceRef').focus();
+            return false;
+        }
+        else {
+            $('#InvoiceRef').css('border-color', '');
+        }
+        if ($('#FreeStock').val() == "") {
+            alert("Please Enter Free Stock");
+            $('#FreeStock').css('border-color', 'red');
+            $('#FreeStock').focus();
+            return false;
+        }
+        else {
+            $('#FreeStock').css('border-color', '');
+        }
+        if ($('#InvoiceDate').val() == "") {
+            alert("Please Enter Invoice Date");
+            $('#InvoiceDate').css('border-color', 'red');
+            $('#InvoiceDate').focus();
+            return false;
+        }
+        else {
+            $('#InvoiceDate').css('border-color', '');
+        }
+
+
+        
+        $.ajax({
+            type: 'POST',
+            url: '/StockTransfer/StockTransfer',
+            data: {
+               
+                StockTransferID:$('#StockTransferID').val(),
+                TypeId: $('#TypeId').val(),
+                DcGrnNo: $('#DcGrnNo').val(),
+                IssuedToFrom: $('#IssuedToFrom').val(),
+                Stores: $('#Stores').val(),
+                TransportDetails: $('#TransportDetails').val(),
+                Remarks: $('#Remarks').val(),
+                Rate: $('#Rate').val(),
+                QuantityValue: $('#QuantityValue').val(),
+                PartyDcNo: $('#PartyDcNo').val(),
+                MaterialCategoryID: $('#MaterialCategoryID').val(),
+                MaterialGroupID: $('#MaterialGroupID').val(),
+                ColorID: $('#ColorID').val(),
+                QuantityAmount: $('#QuantityAmount').val(),
+                ClosingStockInAllStores: $('#ClosingStockInAllStores').val(),
+                ClosingStockInCurrentStores: $('#ClosingStockInCurrentStores').val(),
+                ReservedStock: $('#ReservedStock').val(),
+                FreeStock: $('#FreeStock').val(),
+                InvoiceRef: $('#InvoiceRef').val(),
+                InvoiceDate: $('#InvoiceDate').val(),
+                RefDcNo: $('#RefDcNo').val(),
+                QuantityValue: $('#QuantityValue').val(),
+                Value: $('#Value').val(),
+                
+            },
+           
+            success: function (data) {
+                console.log(data);
+            
+                if (data.StockTransferID != "" || data.StockTransferID != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/StockTransfer/StockTransfer";
+                    return false;
+                  
+                }
+                else {
+                  
+                    alert('Update process Failed.');
+                    location.href = "/StockTransfer/StockTransfer";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+
+
+    }
+
+     function Edit(arg) {
+         $.ajax({
+             type: "POST",
+             url: ' @Url.Action("StockTransferDetails", "StockTransfer")',
+             data: { StockTransferID: arg },
+             success: function (data) {
+                 $('.veh-tablecont').hide();
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "StockTransfer")',
+                data: { StockTransferID: arg },
+                success: function (data) {
+                    if (data == true) {
+                        alert('Deleted Successfully.');
+                        location.href = "/StockTransfer/StockTransfer/";
+                        return false;
+                    }
+                    else {
+                        alert('Color Details deletion failed.');
+                    }
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+
+</script>
+

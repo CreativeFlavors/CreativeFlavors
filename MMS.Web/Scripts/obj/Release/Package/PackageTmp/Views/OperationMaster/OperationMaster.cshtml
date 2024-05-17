@@ -1,0 +1,125 @@
+﻿@{
+    ViewBag.Title = "OperationMaster";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+
+
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+    });
+    function Save() {
+        if ($('#OperationTypeCode').val() == "") {
+            alert("Please Enter Operation type.")
+            $('#OperationTypeCode').css('border-color', 'red');
+            $('#OperationTypeCode').focus();
+            return false;
+        }
+        else {
+            $('#OperationTypeCode').css('border-color', '');
+        }
+        if ($('#OperationName').val() == "") {
+            alert("Please Enter Operation Name.")
+            $('#OperationName').css('border-color', 'red');
+            $('#OperationName').focus();
+            return false;
+        }
+        else {
+            $('#OperationName').css('border-color', '');
+        }
+
+
+        $.ajax({
+            type: 'POST',
+            url: '/OperationMaster/OperationMaster',
+            data: {
+                OperationTypeCode: $('#OperationTypeCode').val(),
+                OperationName: $('#OperationName').val(),
+                OperationMasterId: $('#OperationMasterId').val()
+            },
+
+            success: function (data) {
+                if (data.OperationMasterId != "" || data.OperationMasterId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/OperationMaster/OperationMaster";
+                    return false;
+                }
+                else if (data.OperationMasterId == 0 && data.OperationName != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/OperationMaster/OperationMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+
+        if ($('#OperationTypeCode').val() == "") {
+            alert("Please Enter Operation type.")
+            $('#OperationTypeCode').css('border-color', 'red');
+            $('#OperationTypeCode').focus();
+            return false;
+        }
+        else {
+            $('#OperationTypeCode').css('border-color', '');
+        }
+        if ($('#OperationName').val() == "") {
+            alert("Please Enter Operation Name.")
+            $('#OperationName').css('border-color', 'red');
+            $('#OperationName').focus();
+            return false;
+        }
+        else {
+            $('#OperationName').css('border-color', '');
+        }
+
+
+        $.ajax({
+            type: 'POST',
+            url: '/OperationMaster/Update',
+            data: {
+                OperationTypeCode: $('#OperationTypeCode').val(),
+                OperationName: $('#OperationName').val(),
+
+                OperationMasterId: $('#OperationMasterId').val()
+            },
+            success: function (data) {
+                if (data.OperationMasterId != "" || data.OperationMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/OperationMaster/OperationMaster";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/OperationMaster/OperationMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+
+</script>
+<h2 class="content-title">Operation Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("OperationMasterGrid", "OperationMaster")
+    </div>
+</div>

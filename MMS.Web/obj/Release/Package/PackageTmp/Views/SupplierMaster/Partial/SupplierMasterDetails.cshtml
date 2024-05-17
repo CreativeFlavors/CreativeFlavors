@@ -1,0 +1,664 @@
+﻿@model MMS.Web.Models.SupplierMasterModel.SupplierMasterModel
+@{
+    int id = Model.SupplierMasterId;
+    Session["SupplierMasterId"] = id;
+    Model.SupplierCode = Model.SupplierCode;
+    var listhide = "";
+    if (Model.MaterialGroupList == null)
+    {
+
+        listhide = "display: none";
+    }
+    else
+    {
+        listhide = "";
+    }
+
+}
+
+<style>
+    .right-form-section {
+        width: 98% !important;
+    }
+
+    .ui-multiselect {
+        width: 100% !important;
+        position: relative !important;
+        background: #fff;
+        border-radius: 0px;
+        border: 2px solid #dedede;
+        color: #8a8c8c;
+        font-size: 14px;
+    }
+
+    .ui-icon {
+        position: absolute !important;
+        right: 0;
+        top: 4px;
+    }
+
+    .ui-multiselect {
+        position: relative !important;
+    }
+
+    .ui-multiselect-menu {
+        position: absolute;
+        display: none;
+    }
+
+    .ui-widget-content {
+        width: 200px !important;
+        height: 200px !important;
+        overflow: auto !important;
+    }
+</style>
+<style>
+    [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: static !important;
+    }
+</style>
+<div class="right-form-section clearfix" id="DivShow">
+    <form class="form-inline" role="form">
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#step1">Supplier</a></li>
+            <li><a data-toggle="tab" href="#step2">Details</a></li>
+            <li><a data-toggle="tab" href="#step3">Order terms</a></li>
+            <li><a data-toggle="tab" href="#step4">Commercial Details</a></li>
+        </ul>
+
+        <div class="tab-content">
+
+            @Html.HiddenFor(x => x.SupplierMasterId)
+
+            <div id="step1" class="tab-pane fade in active">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Supplier Code</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.SupplierCode, new { @readonly = true, @class = "form-control text-field", @style = "  width: 178px;" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Supplier Name</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.SupplierName, new { @class = "form-control text-field", @style = "  width: 178px;" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Currency</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.DropDownListFor(m => m.Currency, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Address</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.AddressLine1, new { @class = "form-control text-field", @style = "  width: 178px;" })
+                                        @Html.TextBoxFor(m => m.AddressLine2, new { @class = "form-control text-field", @style = "  width: 178px;" })
+                                        @Html.TextBoxFor(m => m.AddressLine3, new { @class = "form-control text-field", @style = "  width: 178px;" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Country</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.DropDownListFor(m => m.Country, MMS.Web.ExtensionMethod.HtmlHelper.CountryName(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" id="auto_search" role="dialog">
+                                <div class="modal-dialog modal-sm">
+                                    <div class="modal-content">
+                                        <div class="modal-header sear_head">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h4 class="modal-title">Material Name List</h4>
+                                        </div>
+                                        <div class="modal-body sear_body">
+                                            <ul class="mater_listers">
+                                                @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName().Where(x => x.Value != ""))
+                                                {
+                                                    <li id="@item.Value">@item.Text</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button id="materialOpenId" type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Supplier Type</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @if (Model != null && Model.IsDomestic != null && Model.IsDomestic != false)
+                                        {
+                                            <input type="checkbox" id="IsDomestic" name="IsDomestic" checked="checked" value="true"><label for="IsDomestic">Domestic</label>
+                                        }
+                                        else
+                                        {
+
+                                            @Html.CheckBoxFor(x => x.IsDomestic)<label for="IsDomestic">Domestic</label>
+                                        }
+                                        @if (Model != null && Model.IsImport != null && Model.IsImport != false)
+                                        {
+                                            <input type="checkbox" id="IsImport" name="IsImport" checked="checked" value="true"><label for="IsImport">Import</label>
+                                        }
+                                        else
+                                        {
+
+                                            @Html.CheckBoxFor(x => x.IsImport)<label for="IsImport">Import</label>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6" style="margin-top: 20px;">
+
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                <label class="form-label col-lg-5 col-md-5 "> Material Group Name</label>
+                                <div class="col-mg-6 col-lg-6 col-sm-12">
+                                    @if (Model.MaterialGroupList != null)
+                                    {
+                                        @Html.ListBoxFor(model => Model.MaterialSelectedItemId, new MultiSelectList(Model.MaterialGroupList, "Value", "Text"), new { @id = "MaterialSelectedItemId", @class = "GroupItem" })
+
+                                    }
+                                    else
+                                    {
+                                        @Html.ListBoxFor(model => Model.MaterialGroupList, new MultiSelectList(Model.MaterialGroupList, "Value", "Text"), new { @id = "MaterialSelectedItemId" })
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6" style="margin-top: 20px;">
+
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                <label class="form-label col-lg-5 col-md-5 ">  Material Name</label>
+                                <div class="col-mg-6 col-lg-6 col-sm-12">
+                                    @if (Model.materialList != null)
+                                    {
+                                        @Html.ListBoxFor(model => Model.SelectedItemId, new MultiSelectList(Model.materialList, "Value", "Text"), new { @id = "SelectedItemId" })
+                                    }
+                                    else
+                                    {
+                                        @Html.ListBoxFor(model => Model.materialList, new MultiSelectList(Model.materialList, "Value", "Text"), new { @id = "SelectedItemId" })
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6" style="margin-top: 20px;">
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                <label class="form-label col-lg-5 col-md-5 ">Supplier GSTN</label>
+                                <div class="col-mg-6 col-lg-6 col-sm-12">
+                                    @Html.TextBoxFor(model => model.SupplierGSTIN, new { @class = "form-control text-field", @style = "width: 178px;" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6" style="margin-top: 20px;">
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                <label class="form-label col-lg-5 col-md-5 ">Credit Limit</label>
+                                <div class="col-mg-6 col-lg-6 col-sm-12">
+                                    @Html.TextBoxFor(model => model.CreditLimit, new { @class = "form-control text-field", @style = "width: 178px;" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6" style="margin-top: 20px;">
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                <label class="form-label col-lg-5 col-md-5 ">Credit Days</label>
+                                <div class="col-mg-6 col-lg-6 col-sm-12">
+                                    @Html.TextBoxFor(model => model.CreditDays, new { @class = "form-control text-field", @style = "width: 178px;" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="step2" class="tab-pane fade">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Contact Person</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.ContactPerson, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Designation</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.Designation, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Mobile</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control text-field", onkeypress = "return isNumberKey(event)", @maxlength = 10 })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Phone</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.LandLine, new { @class = "form-control text-field", onkeypress = "return isNumberKey(event)" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Fax</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.Fax, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Email</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">ST NO Head</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.StNo, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">CST NO Head</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.CstNo, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Range</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.Range, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Division</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.Division, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">P.L.A No</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.PLANo, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">EOC No</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.EOCNo, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Regn.No</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.RegnNo, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="step3" class="tab-pane fade">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Payment Terms</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.PaymentTerms, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Delivery Terms</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.DeliveryTerms, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Packing Details</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.PackingDetails, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Insurance</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.Insurance, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Port Of Loading</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.PortOfLoading, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Despatch Through</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.DespatchThrough, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Freight</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.DropDownListFor(m => m.Freight, MMS.Web.ExtensionMethod.HtmlHelper.Freight(), new { @class = "form-control text-field" })
+                                        @Html.DropDownListFor(m => m.FreightName, MMS.Web.ExtensionMethod.HtmlHelper.FreightName(), new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Form</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.DropDownListFor(m => m.Form1, MMS.Web.ExtensionMethod.HtmlHelper.FormName(), new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">If Form is Applicable then Form Name</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.FormName, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Forwarder</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextAreaFor(m => m.Forwarder, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="step4" class="tab-pane fade">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Bank Name</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.BankName, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Bank Address</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextAreaFor(m => m.BankAddress, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Bank Code</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.BankCode, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Swift Code</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.SwiftCode, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Account Number</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.AccountNumber, new { @class = "form-control text-field", onkeypress = "return isNumberKey(event)" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">IBAN</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.IBAN, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Other Information</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextAreaFor(m => m.OtherInformation, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="form-footer">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                    <input type="button" onclick="Cancel()" style="cursor: pointer;" class="btn-style" title="Back" value="Back">
+                    @if (Model != null && Model.SupplierMasterId != 0)
+                    {
+
+                        <input type="button" onclick="Update()" style="cursor: pointer;" id="SupplierMasterId" class="btn-style" title="Update" value="Update">
+                    }
+                    else
+                    {
+                        <input type="button" onclick="Save()" style="cursor: pointer;" title="Save" class="btn-style" value="Save">
+                    }
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script>
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    $(function () {
+        $(".GroupItem").multiselect({
+            click: function (event, ui) {
+                alert('qwere')
+            }
+        });
+    });
+    $(".GroupItem").click(function () {
+        alert("ok");
+    });
+    $(document).ready(function () {
+        $("#MaterialSelectedItemId").multiselect({
+            classes: "materialID"
+        });
+        $("#SelectedItemId").multiselect({
+            classes: "materialNameID"
+        });
+
+    });
+
+    $(".ui-widget.materialID input[type='checkbox']").change(function () {
+        var MaterialGroupMasterId = "";
+        $(".ui-widget.materialID input[type='checkbox']").each(function () {
+            if ($(this).prop("checked") == true) {
+                MaterialGroupMasterId = MaterialGroupMasterId + "," + $(this).val();
+            }
+        });
+        setTimeout(function () {
+            $.ajax({
+                url: '/SupplierMaster/MaterialGroupCheckboxeails',
+                type: "GET",
+                dataType: "JSON",
+                data: { MaterialGroupMasterId: MaterialGroupMasterId.slice(1) },
+                success: function (cities) {
+                    $("#SelectedItemId").html("");
+                    $.each(cities, function (i, city) {
+
+                        $("#SelectedItemId").append(
+                            $('<option></option>').html(city.MaterialDescription).attr("value", city.MaterialMasterID));
+                    });
+
+                    setTimeout(function () {
+
+                        $("#SelectedItemId").multiselect("refresh");
+                    }, 500);
+                }
+            });
+        }, 300);
+    });
+</script>
+
+<script>
+
+</script>

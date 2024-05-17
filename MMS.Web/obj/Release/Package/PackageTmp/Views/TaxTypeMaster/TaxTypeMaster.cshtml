@@ -1,0 +1,204 @@
+﻿@{
+    ViewBag.Title = "TaxTypeMaster";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+}
+
+<script>
+
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#TaxName').val() == "") {
+            alert("Please Enter Tax Name.")
+            $('#TaxName').css('border-color', 'red');
+            $('#TaxName').focus();
+            return false;
+        }
+        else {
+            $('#TaxName').css('border-color', '');
+        }
+
+        if ($('#TaxRef').val() == "") {
+            alert("Please Select Tax Ref.")
+            $('#TaxRef').css('border-color', 'red');
+            $('#TaxRef').focus();
+            return false;
+        }
+        else {
+            $('#TaxRef').css('border-color', '');
+        }
+        if ($('#TaxValue').val() == "") {
+            alert("Please Enter Tax Value.")
+            $('#TaxValue').css('border-color', 'red');
+            $('#TaxValue').focus();
+            return false;
+        }
+        else {
+            $('#TaxValue').css('border-color', '');
+        }
+        if ($('#TaxValueMode').val() == "") {
+            alert("Please Select Value Mode.")
+            $('#TaxValueMode').css('border-color', 'red');
+            $('#TaxValueMode').focus();
+            return false;
+        }
+        else {
+            $('#TaxValueMode').css('border-color', '');
+        }
+
+        if ($('#Form').val() == "") {
+            alert("Please Select Form.")
+            $('#Form').css('border-color', 'red');
+            $('#Form').focus();
+            return false;
+        }
+        else {
+            $('#Form').css('border-color', '');
+        }
+
+
+        $.ajax({
+            type: 'POST',
+            url: '/TaxTypeMaster/TaxTypeMaster',
+            data: {
+                TaxName: $('#TaxName').val(),
+                TaxRef: $('#TaxRef').val(),
+                TaxValue: $('#TaxValue').val(),
+                TaxValueMode: $('#TaxValueMode').val(),
+                Form: $('#Form').val(),
+                TaxOn: $('#TaxOn').val(),
+
+            },
+            success: function (data) {
+                if (data.TaxMasterID != "" || data.TaxMasterID != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/TaxTypeMaster/TaxTypeMaster";
+                    return false;
+                }
+                else if (data.TaxMasterID == 0 && data.TaxName != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process failed');
+                    location.href = "/TaxTypeMaster/TaxTypeMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#TaxName').val() == "") {
+            alert("Please Enter Tax Name.")
+            $('#TaxName').css('border-color', 'red');
+            $('#TaxName').focus();
+            return false;
+        }
+        else {
+            $('#TaxName').css('border-color', '');
+        }
+
+        if ($('#TaxRef').val() == "") {
+            alert("Please Select Tax Ref.")
+            $('#TaxRef').css('border-color', 'red');
+            $('#TaxRef').focus();
+            return false;
+        }
+        else {
+            $('#TaxRef').css('border-color', '');
+        }
+        if ($('#TaxValue').val() == "") {
+            alert("Please Enter Tax Value.")
+            $('#TaxValue').css('border-color', 'red');
+            $('#TaxValue').focus();
+            return false;
+        }
+        else {
+            $('#TaxValue').css('border-color', '');
+        }
+        if ($('#TaxValueMode').val() == "") {
+            alert("Please Select Value Mode.")
+            $('#TaxValueMode').css('border-color', 'red');
+            $('#TaxValueMode').focus();
+            return false;
+        }
+        else {
+            $('#TaxValueMode').css('border-color', '');
+        }
+
+        if ($('#Form').val() == "") {
+            alert("Please Select Form.")
+            $('#Form').css('border-color', 'red');
+            $('#Form').focus();
+            return false;
+        }
+        else {
+            $('#Form').css('border-color', '');
+        }
+
+
+
+        $.ajax({
+            type: 'POST',
+            url: '/TaxTypeMaster/Update',
+            data: {
+                TaxName: $('#TaxName').val(),
+                TaxRef: $('#TaxRef').val(),
+                TaxValue: $('#TaxValue').val(),
+                TaxValueMode: $('#TaxValueMode').val(),
+                Form: $('#Form').val(),
+                TaxOn: $('#TaxOn').val(),
+
+                TaxMasterID: $('#TaxMasterID').val()
+            },
+            success: function (data) {
+                if (data.TaxMasterID != "" || data.TaxMasterID != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/TaxTypeMaster/TaxTypeMaster";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/TaxTypeMaster/TaxTypeMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Tax Type Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("TaxTypeMasterGrid", "TaxTypeMaster")
+    </div>
+</div>

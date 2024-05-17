@@ -1,0 +1,191 @@
+﻿@model MMS.Web.Models.StockModel.BillOfMaterialModel
+@using MMS.Core.Entities.Stock
+@using MMS.Repository.Managers.StockManager
+@using MMS.Repository.Managers
+@using MMS.Core.Entities
+@using MMS.Web.Models.StockModel
+@{
+    MMS.Repository.Managers.ColorManager colorManager = new MMS.Repository.Managers.ColorManager();
+    ColorMaster colorMaster = new ColorMaster();
+    MaterialManager materialManager = new MaterialManager();
+    MaterialMaster materialMaster = new MaterialMaster();
+    MMS.Repository.Managers.SubstanceMasterManager substanceMasterManager = new MMS.Repository.Managers.SubstanceMasterManager();
+    SubstanceMaster substanceMaster = new SubstanceMaster();
+    MMS.Repository.Managers.SupplierMasterManager supplierMasterManager = new MMS.Repository.Managers.SupplierMasterManager();
+    SupplierMaster supplierMaster = new SupplierMaster();
+    if (Model.bomMaterialGridList != null && Model.bomMaterialGridList.Count > 0)
+    {
+        Model.bomMaterialGridList = Model.bomMaterialGridList.Where(x => x.IsDeleted == false).ToList();
+    }
+
+}
+<style>
+    .Delete input,.Edit input{cursor: pointer;
+background: #0f8aba;
+color: #fff;
+border: 0px;
+padding: 7px 10px;
+border-radius: 3px;
+border: none;
+box-shadow: none;}
+</style>
+<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+    <p class="section-title">List of material and other items</p>
+    <div class="table-responsive table-td-padding parent-table-height" style="height:auto">
+        <table class="table" id="list-materials">
+            <thead>
+                <tr>
+                    <td class="" style="display:none">BomNo</td>
+                    <td style="display:none">Description</td>
+                    <td style="display:none">BuyerMaster</td>
+                    <td style="display:none">BuyerModel</td>
+                    <td style="display:none">MeanSize</td>
+                    <td style="display:none">Date</td>
+                    <td style="display:none">ParentBomNo</td>
+                    <td style="display:none">LastBomNoEntered</td>
+                    <td style="display:none">LinkBomNo</td>
+                    <td class="" style="display:none">BOMMaterialID</td>
+                    <td class="" style="display:none">BomGridId</td>
+                    <td class="Delete" style="">Delete</td>
+                    <td class="Edit" style="">Edit</td>
+                    <td>MaterialCategoryMasterId</td>
+                    <td>MaterialName</td>
+                    <td>MaterialGroupMasterId</td>
+                    <td>ColorMasterId</td>
+                    <td>SubstanceMasterId</td>
+
+                    <td>SampleNorms</td>
+                    @*<td>Wastage %</td>
+                        <td>WastageQty</td>*@
+                    <td>WastageQtyUOM</td>
+                    <td>TotalNorms</td>
+                    @*<td>TotalNormsUOM</td>*@
+                    <td style="display:none">ComponentName</td>
+                    <td style="display:none">BuyerNorms</td>
+                    <td style="display:none">NoOfSets</td>
+                    <td style="display:none">UomMasterId</td>
+                    <td style="display:none">SupplierMasterId</td>
+                    <td style="display:none">SizeRangeMasterId</td>
+                    <td style="display:none">OurNorms</td>
+                    <td style="display:none">OurNormsPercent</td>
+                    <td style="display:none">PurchaseNorms</td>
+                    <td style="display:none">PurchaseNormsPercent</td>
+                    <td style="display:none">IssueNorms</td>
+                    <td style="display:none">IssueNormsPercent</td>
+                    <td style="display:none">CostingNorms</td>
+                    <td style="display:none">CostingNormsPercent</td>
+                    <td style="display:none">PreparedBy</td>
+                    <td style="display:none">VerifiedBy</td>
+                    <td style="display:none">CheckedBy</td>
+                    <td style="display:none">BOMMaterialID</td>
+                    <td class="" style="display:none">SizeScheduleMasterId</td>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.bomMaterialGridList != null)
+                {
+                    foreach (var item in Model.bomMaterialGridList)
+                    {
+                        string Category = string.Empty;
+                        string GroupName = string.Empty;
+                        string MaterialName = string.Empty;
+                        string SubstanceName = string.Empty;
+                        string ColorName = string.Empty;
+                        string substanceName = string.Empty;
+                        BuyerManager buyerManager = new BuyerManager();
+                        BuyerMaster buyerMaster = new BuyerMaster();
+                        MaterialGroupManager groupManager = new MaterialGroupManager();
+                        MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
+                        MaterialCategoryMaster materialCategoryMaster = new MaterialCategoryMaster();
+                        MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
+                        materialCategoryMaster = materialCategoryManager.GetMaterialCategoryMaster(item.MaterialCategoryMasterId);
+                        materialGroupMaster = groupManager.GetMaterialGroupMaster_Id(item.MaterialGroupMasterId);
+                        materialMaster = materialManager.GetMaterialMasterId(item.MaterialMasterId);
+                        MaterialNameManager nameManager = new MaterialNameManager();
+                        MaterialNameMaster nameMaster = new MaterialNameMaster();
+                        nameMaster = nameManager.GetMaterialNameMasterId(materialMaster.MaterialName);
+                        colorMaster = colorManager.GetColorMasterID(item.ColorMasterId);
+                        substanceMaster = substanceMasterManager.GetsubstanceMasterId(item.SubstanceMasterId);
+                        buyerMaster = buyerManager.GetBuyerMasterId(item.BuyerMasterId);
+                        if (materialCategoryMaster != null)
+                        {
+                            Category = materialCategoryMaster.CategoryName;
+                        }
+                        if (materialGroupMaster != null)
+                        {
+                            GroupName = materialGroupMaster.GroupName;
+                        }
+                        if (colorMaster != null)
+                        {
+                            ColorName = colorMaster.Color;
+                        }
+                        if (nameMaster != null)
+                        {
+                            MaterialName = nameMaster.MaterialDescription + " " + ColorName;
+                        }
+                        if (substanceMaster != null)
+                        {
+                            substanceName = substanceMaster.SubstanceRange;
+                        }
+
+                        ///<tr id="rowid_@item.BOMMaterialID" onclick="RowClick('@item.BOMMaterialID','@item.BomId')">
+                        <tr id="rowid_@item.BOMMaterialID">
+                            <td style="display:none" class="BomId" id="BomId"> @item.BomId</td>
+                            <td style="display:none" class="BomNo" id="BomNo"> @item.BomNo</td>
+                            <td style="display:none" class="Description" id="Description">@item.Description</td>
+                            <td style="display:none" class="BuyerMasterId" id="BuyerMasterId">@buyerMaster.BuyerFullName</td>
+                            <td style="display:none" class="BuyerModel" id="BuyerModel">@item.BuyerModel</td>
+                            <td style="display:none" class="MeanSize" id="MeanSize">@item.MeanSize</td>
+                            <td style="display:none" class="Date" id="Date">@item.Date</td>
+                            <td style="display:none" class="ParentBomNo" id="ParentBomNo">@item.ParentBomNo</td>
+                            <td style="display:none" class="LastBomNoEntered" id="LastBomNoEntered">@item.LastBomNoEntered</td>
+                            <td style="display:none" class="LinkBomNo" id="LinkBomNo">@item.LinkBomNo</td>
+                            <td style="display:none" class="BOMMaterialID" id="BOMMaterialID">@item.BOMMaterialID</td>
+                            <td style="display:none" class="BomGridId" id="BomGridId">@item.BomGridId</td>
+                            <td title="Delete" style="cursor:pointer;" class="Delete" id="Delete"><input type="button" value="Delete" style="cursor:pointer;" title="Delete" onclick="Deletebtn('@item.BOMMaterialID')" class="change_status change_status_" /></td>
+                            <td title="Edit" style="cursor:pointer;" class="Edit" id="Edit"> <input type="button" value="Edit" style="cursor:pointer;" title="Edit" onclick="RowClick('@item.BOMMaterialID','@item.BomId')" class="change_status change_status_" /></td>
+                            <td class="MaterialCategoryMasterId" id="MaterialCategoryMasterId">@Category</td>
+                            <td class="MaterialMasterId" id="MaterialMasterId">@MaterialName</td>
+                            <td class="MaterialGroupMasterId" id="MaterialMasterId">@GroupName</td>
+                            <td class="ColorMasterId" id="ColorMasterId">@ColorName</td>
+                            <td class="SubtanceMasterID" id="SubtanceMasterID">@substanceName</td>
+                            @*<td class="SubtanceMasterID" id="SubtanceMasterID">@item.SizeScheduleMasterId</td>*@
+                            <td class="SampleNorms" id="SampleNorms">@item.SampleNorms</td>
+                            @*<td class="Wastage" id="Wastage">@item.Wastage</td>
+                                <td class="WastageQty" id="WastageQty">@item.WastageQty</td>*@
+                            <td class="WastageQtyUOM" id="WastageQtyUOM">@item.WastageqtyUOM</td>
+                            <td class="TotalNorms" id="TotalNorms">@item.TotalNorms</td>
+                            @*<td class="TotalNormsUOM" id="TotalNormsUOM">@item.TotalNormsUOM</td>*@
+                            <td style="display:none" class="ComponentName" id="ComponentName">@item.ComponentName</td>
+                            <td style="display:none" class="BuyerNorms" id="BuyerNorms">@item.BuyerNorms</td>
+                            <td style="display:none" class="NoOfSets" id="NoOfSets">@item.NoOfSets</td>
+                            <td style="display:none" class="UomMasterId" id="UomMasterId">@item.UomMasterId</td>
+                            <td style="display:none" class="SupplierMasterId" id="SupplierMasterId">@item.SupplierMasterId</td>
+                            <td style="display:none" class="SizeRangeMasterId" id="SizeRangeMasterId">@item.SizeRangeMasterId</td>
+                            <td style="display:none" class="OurNorms" id="OurNorms">@item.OurNorms</td>
+                            <td style="display:none" class="OurNormsPercent" id="OurNormsPercent">@item.OurNormsPercent</td>
+                            <td style="display:none" class="PurchaseNorms" id="PurchaseNorms">@item.PurchaseNorms</td>
+                            <td style="display:none" class="PurchaseNormsPercent" id="PurchaseNormsPercent">@item.PurchaseNormsPercent</td>
+                            <td style="display:none" class="IssueNorms" id="IssueNorms">@item.IssueNorms</td>
+                            <td style="display:none" class="IssueNormsPercent" id="IssueNormsPercent">@item.IssueNormsPercent</td>
+                            <td style="display:none" class="CostingNorms" id="CostingNorms">@item.CostingNorms</td>
+                            <td style="display:none" class="CostingNormsPercent" id="CostingNormsPercent">@item.CostingNormsPercent</td>
+                            <td style="display:none" class="PreparedBy" id="PreparedBy">@item.PreparedBy</td>
+                            <td style="display:none" class="VerifiedBy" id="VerifiedBy">@item.VerifiedBy</td>
+                            <td style="display:none" class="CheckedBy" id="CheckedBy">@item.CheckedBy</td>
+                            <td style="display:none" class="BOMMaterialID" id="BOMMaterialID">@item.BOMMaterialID</td>
+
+
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+
+    </div>
+</div>
+
+<script>
+    
+</script>

@@ -1,0 +1,493 @@
+﻿@model MMS.Web.Models.StockModel.ProductionPlanModel
+@using MMS.Core.Entities
+@{
+    int id = Model.ProductionPlanId;
+    Session["ProductionPlanId"] = id;
+
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Production Planning", PermissionSettingModel.PermissionID);
+    }
+    bool Save = false; bool Update = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Save")
+        {
+            Save = true;
+        }
+        if (item.PermissionDesc == "Update")
+        {
+            Update = true;
+        }
+    }
+}
+<style>
+    [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: static !important;
+    }
+</style>
+
+<script>
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    $("#ShipDate").datepicker({ dateFormat: "dd/mm/yy" });
+    $("#ShipTo").datepicker({ dateFormat: "dd/mm/yy" });
+    $("#From").datepicker({ dateFormat: "dd/mm/yy" });
+    $("#To").datepicker({ dateFormat: "dd/mm/yy" });
+   
+</script>
+
+<script type="text/javascript">
+
+
+     $(function () {
+         $('#MultipleIO option:selected').remove().appendTo('#DisplayIO');
+
+     });
+     function moveAll(MultipleIO, DisplayIO) {
+         $('#' + MultipleIO + ' option').appendTo('#' + DisplayIO);
+     }
+
+     function moveSelected(MultipleIO, DisplayIO) {
+         $('#' + MultipleIO + ' option:selected').appendTo('#' + DisplayIO);
+     }
+     function selectAll() {
+         $("select option").attr("selected", "selected");
+     }
+
+</script>
+
+
+<div class="right-form-section clearfix">
+    <form role="form" class="form-inline">
+        <div class="container-fluid">
+            <div class="row">
+                <p class="section-title text-center">Production Planning</p>
+
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Plan NO</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.HiddenFor(x => x.ProductionPlanId)
+                                    @Html.TextBoxFor(m => m.PlanNo, new { @class = "form-control text-field" })
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">In House Capacity</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.InHouseCapacity, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Ship Date</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model != null && Model.ProductionPlanId != 0)
+                                    {
+                                        var shpdate = Model.ShipDate;
+                                        @Html.TextBoxFor(m => m.ShipDate, new { @class = "form-control text-field", @Value = shpdate })
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.ShipDate, new { @class = "form-control text-field", @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy") })
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Ship To</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model != null && Model.ProductionPlanId != 0)
+                                    {
+                                        var shpto = Model.ShipTo;
+                                        @Html.TextBoxFor(m => m.ShipTo, new { @class = "form-control text-field", @Value = shpto })
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.ShipTo, new { @class = "form-control text-field", @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy") })
+                                    }
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Customer Name</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.CustomerName, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Order Qty</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.OrderQty, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Week Plan</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.WeekPlan, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Plan Qty</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.PlanQty, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Style Durea </label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model.IsStyleDurea == true)
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsStyleDurea" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsStyleDurea" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                       
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Select All</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model.IsSelectAll == true)
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsSelectAll" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsSelectAll" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Style</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model.IsStyle == true)
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsStyle" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsStyle" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">From</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model != null && Model.ProductionPlanId != 0)
+                                    {
+                                        var Prodfrom = Model.From;
+                                        @Html.TextBoxFor(m => m.From, new { @class = "form-control text-field", @Value = Prodfrom })
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.From, new { @class = "form-control text-field", @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy") })
+                                    }
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">To</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model != null && Model.ProductionPlanId != 0)
+                                    {
+                                        var Prodto = Model.To;
+                                        @Html.TextBoxFor(m => m.To, new { @class = "form-control text-field", @Value = Prodto })
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => m.To, new { @class = "form-control text-field", @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy") })
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8 col-sm-4 col-lg-8 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-2 col-sm-5 col-lg-2 col-xs-12">
+                                    <label class="form-label" for="text">Multiple IO'S</label>
+                                </div>
+                                <div class="col-md-2 col-sm-7 col-lg-2 col-xs-12">
+                                    @if (Model == null || Model.ProductionPlanId == 0)
+                                    {
+                                        @Html.ListBoxFor(m => m.MultipleIO, MMS.Web.ExtensionMethod.HtmlHelper.GetInternalOrderIONO(), new { @id = "MultipleIO", @class="form-control"  })
+                                    }
+                                    else
+                                    {
+                                        @Html.ListBoxFor(m => m.FromGrid, MMS.Web.ExtensionMethod.HtmlHelper.GetInternalOrderIONO(), new { @id = "MultipleIO", @class="form-control"  })
+                                    }
+                                </div>
+                                <div class="col-lg-1 col-md-2 col-xs-12">
+                                    <div class="controls">
+                                        <a class="left_arr" href="javascript:moveSelected('MultipleIO', 'DisplayIO')">&gt;</a><br/>
+                                        <a class="right_arr" href="javascript:moveSelected('DisplayIO', 'MultipleIO')">&lt;</a>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-7 col-lg-4 col-xs-12">
+                                    
+                                    @if (Model == null || Model.ProductionPlanId == 0)
+                                    {
+                                        <select multiple id="DisplayIO" class="form-control" size="4" name="topics[]"></select>
+                                    }
+                                    else
+                                    {
+                                        @Html.ListBoxFor(m => m.ToGrid, MMS.Web.ExtensionMethod.HtmlHelper.GetInternalOrderIONO(), new { @id = "DisplayIO", @class="form-control" })
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text"></label>
+                                </div>
+                               
+                            </div>
+                        </div>
+
+                    </div>
+
+                    
+
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Plan Qty In Multiples</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                   @Html.TextBoxFor(m => m.PlanQtyInMultiples, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Remarks</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Allocate style Prop </label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model.IsAllocateStyleProp == true)
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsAllocateStyleProp" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsAllocateStyleProp" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Allocate Size Prop </label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @if (Model.IsAllocateSizeProp == true)
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsAllocateSizeProp" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="width-20" id="IsAllocateSizeProp" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <div class="form-footer">
+            <div class="row">
+                <div style="margin: 15px 0px;" class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                    <input type="button" onclick="Cancel()" class="btn btn-default btn-style width-78" style="cursor: pointer;" title="Back" value="Back">
+                    @if (Model.ProductionPlanId == 0)
+                    {
+                        if (Save == true)
+                        {
+                            <input type="button" onclick="Save()" style="cursor: pointer;" class="btn btn-default btn-style width-78" title="Save" value="Save">
+                        }
+                        else
+                        {
+                            <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style width-78" value="Save">
+                        }
+                    }
+                    else
+                    {
+                        if (Update == true)
+                        {
+                            <input type="button" onclick="Update()" style="cursor: pointer;" class="btn btn-default btn-style width-78" id="ProductionPlanId" title="Update" value="Update">
+                        }
+                        else
+                        {
+                            <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style width-78" value="Update">
+                        }
+                    }
+
+                    <input type="button" onclick="Clear()" class="btn btn-default btn-style width-78" title="Clear" value="Clear">
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<script type="text/javascript">
+
+
+    $(".allownumericwithdecimal").on("keypress keyup blur", function (event) {
+        $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+        if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+            event.preventDefault();
+        }
+    });
+
+    function Clear() {
+        $('#PlanNo').val('');
+        $('#InHouseCapacity').val('');
+        $('#CustomerName').val('');
+        $('#WeekPlan').val('');
+        $('#OrderQty').val('');
+        $('#PlanQty').val('');
+        $('#IsStyleDurea').removeAttr("checked", false);
+        $('#IsSelectAll').removeAttr("checked", false);
+        $('#IsStyle').removeAttr("checked", false);
+        $('#PlanQtyInMultiples').val('');
+        $('#Remarks').val('');
+        $('#IsAllocateStyleProp').removeAttr("checked", false);
+        $('#IsAllocateSizeProp').removeAttr("checked", false);
+
+     }
+ </script>

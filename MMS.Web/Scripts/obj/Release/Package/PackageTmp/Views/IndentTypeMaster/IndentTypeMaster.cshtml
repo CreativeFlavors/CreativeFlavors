@@ -1,0 +1,118 @@
+﻿@{
+    ViewBag.Title = "IndentMaster";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+    });
+    function Save() {
+        if ($('#IndentTypeCode').val() == "") {
+            alert("Please Enter Indent Type Code.")
+            $('#IndentTypeCode').css('border-color', 'red');
+            $('#IndentTypeCode').focus();
+            return false;
+        }
+        else {
+            $('#IndentTypeCode').css('border-color', '');
+        }
+        if ($('#IndentTypeName').val() == "") {
+            alert("Please Enter Indent Type Name.")
+            $('#IndentTypeName').css('border-color', 'red');
+            $('#IndentTypeName').focus();
+            return false;
+        }
+        else {
+            $('#IndentTypeName').css('border-color', '');
+        }                  
+        $.ajax({
+            type: 'POST',
+            url: '/IndentTypeMaster/IndentTypeMaster',
+            data: {
+                IndentTypeCode: $('#IndentTypeCode ').val(),
+                IndentTypeName: $('#IndentTypeName').val(),
+                IndentMasterID: $('#IndentMasterID').val()
+            },
+            success: function (data) {
+                //alert(data.SeasonMasterId)
+                if (data.IndentMasterID != "" || data.IndentMasterID != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/IndentTypeMaster/IndentTypeMaster";
+                    return false;
+                }
+                else if(data.IndentMasterID == 0 && data.IndentTypeName != "")
+                {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/IndentTypeMaster/IndentTypeMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#IndentTypeCode').val() == "") {
+            alert("Please Enter Indent Type Code.")
+            $('#IndentTypeCode').css('border-color', 'red');
+            $('#IndentTypeCode').focus();
+            return false;
+        }
+        else {
+            $('#IndentTypeCode').css('border-color', '');
+        }
+        if ($('#IndentTypeName').val() == "") {
+            alert("Please Enter Indent Type Name.")
+            $('#IndentTypeName').css('border-color', 'red');
+            $('#IndentTypeName').focus();
+            return false;
+        }
+        else {
+            $('#IndentTypeName').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/IndentTypeMaster/Update',
+            data: {
+                IndentTypeCode: $('#IndentTypeCode ').val(),
+                IndentTypeName: $('#IndentTypeName').val(),            
+                                 
+                IndentMasterID: $('#IndentMasterID').val()
+            },
+            success: function (data) {
+                if (data.IndentMasterID != "" || data.IndentMasterID != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/IndentTypeMaster/IndentTypeMaster";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/IndentTypeMaster/IndentTypeMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Indent Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("IndentTypeMasterGrid", "IndentTypeMaster")
+    </div>
+</div>

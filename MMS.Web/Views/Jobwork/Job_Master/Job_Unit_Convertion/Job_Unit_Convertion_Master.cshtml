@@ -1,0 +1,524 @@
+﻿@{
+    ViewBag.Title = "View1";
+    Layout = "~/Views/Shared/_jobLayout.cshtml";
+}
+<div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+    <div class="dashboard-content col-xs-12 no-padding">
+        <div class="dashboard_head dashboard-title congest col-lg-12 col-md-12 col-sm-12  col-xs-12">
+            <div class="dashboard-title  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+                <h2>Unit Convertion</h2>
+            </div>
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("UnitConvertionGrid", "UnitConvertion")
+    </div>
+
+</div>
+<script>
+
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $('#example').DataTable();
+        $("#EditJobPartial").hide();
+    });
+    function AddUnitConvertion() {
+        debugger;
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("UnitConvertioneDetails", "UnitConvertion")',
+            data: { UC_No_Id: 0 },
+            success: function (data) {
+                debugger;
+                $("#EditUnitConvertionPartial").html(data);
+                $("#EditUnitConvertionPartial").show();
+            }
+        });
+
+    }
+    function Edit(arg) {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("UnitConvertioneDetails", "UnitConvertion")',
+            data: { UC_No_Id: arg },
+            success: function (data) {
+                $("#EditUnitConvertionPartial").html(data);
+                $("#EditUnitConvertionPartial").show();
+            }
+        });
+
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "UnitConvertion")',
+                data: { UC_No_Id: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/UnitConvertion/UnitConvertionMaster";
+                        return false;
+                    }
+                    else {
+                        alert('deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+    function save() {
+        if ($('#UC_No_Code').val() == "") {
+            //alert("Please Enter UC_No_Code.")
+            $('#UC_No_Code').css('border-color', 'red');
+            $('#UC_No_Code').focus();
+            return false;
+        }
+        else {
+            $('#UC_No_Code').css('border-color', '');
+        }
+        if ($('#Store_id_from').val() == "") {
+            alert("Please Enter Store id from.")
+            $('#Store_id_from').css('border-color', 'red');
+            $('#Store_id_from').focus();
+            return false;
+        }
+        else {
+            $('#Store_id_from').css('border-color', '');
+        }
+      
+        if ($('#Group_From').val() == "") {
+            alert("Please Enter Group From Name.")
+            $('#Group_From').css('border-color', 'red');
+            $('#Group_From').focus();
+            return false;
+        }
+        else {
+            $('#Group_From').css('border-color', '');
+        }
+        if ($('#Category_From').val() == "") {
+            alert("Please Enter Category Name from.")
+            $('#Category_From').css('border-color', 'red');
+            $('#Category_From').focus();
+            return false;
+        }
+        else {
+            $('#Category_From').css('border-color', '');
+        }
+        if ($('#Material_id_From').val() == "") {
+            alert("Please Enter Material Name from.")
+            $('#Material_id_From').css('border-color', 'red');
+            $('#Material_id_From').focus();
+            return false;
+        }
+        else {
+            $('#Material_id_From').css('border-color', '');
+        }
+
+
+        if ($('#Store_id_to').val() == "") {
+            alert("Please Enter Store id To.")
+            $('#Store_id_to').css('border-color', 'red');
+            $('#Store_id_to').focus();
+            return false;
+        }
+        else {
+            $('#Store_id_to').css('border-color', '');
+        }
+
+        if ($('#Group_To').val() == "") {
+            alert("Please Enter Group To Name.")
+            $('#Group_To').css('border-color', 'red');
+            $('#Group_To').focus();
+            return false;
+        }
+        else {
+            $('#Group_To').css('border-color', '');
+        }
+        if ($('#Category_To').val() == "") {
+            alert("Please Enter Category To Name .")
+            $('#Category_To').css('border-color', 'red');
+            $('#Category_To').focus();
+            return false;
+        }
+        else {
+            $('#Category_To').css('border-color', '');
+        }
+        if ($('#Material_id_To').val() == "") {
+            alert("Please Enter Material Name TO.")
+            $('#Material_id_To').css('border-color', 'red');
+            $('#Material_id_To').focus();
+            return false;
+        }
+        else {
+            $('#Material_id_To').css('border-color', '');
+        }
+
+        if ($('#Noms').val() == "") {
+            alert("Please Enter Noms.")
+            $('#Noms').css('border-color', 'red');
+            $('#Noms').focus();
+            return false;
+        }
+        else {
+            $('#Noms').css('border-color', '');
+        }
+        if ($('#Uom1').val() == "") {
+            alert("Please Enter Uom.")
+            $('#Uom1').css('border-color', 'red');
+            $('#Uom1').focus();
+            return false;
+        }
+        else {
+            $('#Uom1').css('border-color', '');
+        }
+        if ($('#Uom2').val() == "") {
+            alert("Please Enter Uom.")
+            $('#Uom2').css('border-color', 'red');
+            $('#Uom2').focus();
+            return false;
+        }
+        else {
+            $('#Uom2').css('border-color', '');
+        }
+        if ($('#No_sheet').val() == "") {
+            alert("Please Enter No sheet.")
+            $('#No_sheet').css('border-color', 'red');
+            $('#No_sheet').focus();
+            return false;
+        }
+        else {
+            $('#No_sheet').css('border-color', '');
+        }
+        if ($('#No_sheet_Uom').val() == "") {
+            alert("Please Enter  Uom.")
+            $('#No_sheet_Uom').css('border-color', 'red');
+            $('#No_sheet_Uom').focus();
+            return false;
+        }
+        else {
+            $('#No_sheet_Uom').css('border-color', '');
+        }
+        if ($('#Sheet_Value').val() == "") {
+            alert("Please Enter  Sheet Value.")
+            $('#Sheet_Value').css('border-color', 'red');
+            $('#Sheet_Value').focus();
+            return false;
+        }
+        else {
+            $('#Sheet_Value').css('border-color', '');
+        }
+        if ($('#Sheet_Value_Uom').val() == "") {
+            alert("Please Enter Sheet Value Uom.")
+            $('#Sheet_Value_Uom').css('border-color', 'red');
+            $('#Sheet_Value_Uom').focus();
+            return false;
+        }
+        else {
+            $('#Sheet_Value_Uom').css('border-color', '');
+        }
+        if ($('#Value').val() == "") {
+            alert("Please Enter Value.")
+            $('#Value').css('border-color', 'red');
+            $('#Value').focus();
+            return false;
+        }
+        else {
+            $('#Value').css('border-color', '');
+        }
+        if ($('#Value_Uom').val() == "") {
+            alert("Please Enter Value.")
+            $('#Value_Uom').css('border-color', 'red');
+            $('#Value_Uom').focus();
+            return false;
+        }
+        else {
+            $('#Value_Uom').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/UnitConvertion/UnitConvertionInsert',
+            data: {
+                UC_No_Code: $("#UC_No_Code").val(),
+                Store_id_from: $("#Store_id_from").val(),
+                Group_From: $("#Group_From").val(),
+                Category_From: $("#Category_From").val(),
+                Material_id_From: $('#Material_id_From').val(),
+
+                Store_id_to: $("#Store_id_to").val(),
+                Group_to: $("#Group_To").val(),
+                Category_To: $("#Category_To").val(),
+                Material_id_To: $('#Material_id_To').val(),
+
+                Noms: $("#Noms").val(),
+                Uom1: $("#Uom1").val(),
+                Uom2: $("#Uom2").val(),
+                No_sheet: $("#No_sheet").val(),
+                No_sheet_Uom: $("#No_sheet_Uom").val(),
+                Sheet_Value: $('#Sheet_Value').val(),
+                Sheet_Value_Uom: $("#Sheet_Value_Uom").val(),
+                Value: $("#Value").val(),
+                Value_Uom: $("#Value_Uom").val()
+            },
+
+            success: function (data) {
+                if (data.UC_No_Id != "" || data.UC_No_Id != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/UnitConvertion/UnitConvertionMaster";
+                    return false;
+                }
+                else if (data.OperationMasterId == 0 && data.OperationName != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/UnitConvertion/UnitConvertionMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update() {
+
+        if ($('#UC_No_Code').val() == "") {
+            //alert("Please Enter UC_No_Code.")
+            $('#UC_No_Code').css('border-color', 'red');
+            $('#UC_No_Code').focus();
+            return false;
+        }
+        else {
+            $('#UC_No_Code').css('border-color', '');
+        }
+        if ($('#Store_id_from').val() == "") {
+            alert("Please Enter Store id from.")
+            $('#Store_id_from').css('border-color', 'red');
+            $('#Store_id_from').focus();
+            return false;
+        }
+        else {
+            $('#Store_id_from').css('border-color', '');
+        }
+
+        if ($('#Group_From').val() == "") {
+            alert("Please Enter Group From Name.")
+            $('#Group_From').css('border-color', 'red');
+            $('#Group_From').focus();
+            return false;
+        }
+        else {
+            $('#Group_From').css('border-color', '');
+        }
+        if ($('#Category_From').val() == "") {
+            alert("Please Enter Category Name from.")
+            $('#Category_From').css('border-color', 'red');
+            $('#Category_From').focus();
+            return false;
+        }
+        else {
+            $('#Category_From').css('border-color', '');
+        }
+        if ($('#Material_id_From').val() == "") {
+            alert("Please Enter Material Name from.")
+            $('#Material_id_From').css('border-color', 'red');
+            $('#Material_id_From').focus();
+            return false;
+        }
+        else {
+            $('#Material_id_From').css('border-color', '');
+        }
+
+
+        if ($('#Store_id_to').val() == "") {
+            alert("Please Enter Store id To.")
+            $('#Store_id_to').css('border-color', 'red');
+            $('#Store_id_to').focus();
+            return false;
+        }
+        else {
+            $('#Store_id_to').css('border-color', '');
+        }
+
+        if ($('#Group_To').val() == "") {
+            alert("Please Enter Group To Name.")
+            $('#Group_To').css('border-color', 'red');
+            $('#Group_To').focus();
+            return false;
+        }
+        else {
+            $('#Group_To').css('border-color', '');
+        }
+        if ($('#Category_To').val() == "") {
+            alert("Please Enter Category To Name .")
+            $('#Category_To').css('border-color', 'red');
+            $('#Category_To').focus();
+            return false;
+        }
+        else {
+            $('#Category_To').css('border-color', '');
+        }
+        if ($('#Material_id_To').val() == "") {
+            alert("Please Enter Material Name TO.")
+            $('#Material_id_To').css('border-color', 'red');
+            $('#Material_id_To').focus();
+            return false;
+        }
+        else {
+            $('#Material_id_To').css('border-color', '');
+        }
+
+        if ($('#Noms').val() == "") {
+            alert("Please Enter Noms.")
+            $('#Noms').css('border-color', 'red');
+            $('#Noms').focus();
+            return false;
+        }
+        else {
+            $('#Noms').css('border-color', '');
+        }
+        if ($('#Uom1').val() == "") {
+            alert("Please Enter Uom.")
+            $('#Uom1').css('border-color', 'red');
+            $('#Uom1').focus();
+            return false;
+        }
+        else {
+            $('#Uom1').css('border-color', '');
+        }
+        if ($('#Uom2').val() == "") {
+            alert("Please Enter Uom.")
+            $('#Uom2').css('border-color', 'red');
+            $('#Uom2').focus();
+            return false;
+        }
+        else {
+            $('#Uom2').css('border-color', '');
+        }
+        if ($('#No_sheet').val() == "") {
+            alert("Please Enter No sheet.")
+            $('#No_sheet').css('border-color', 'red');
+            $('#No_sheet').focus();
+            return false;
+        }
+        else {
+            $('#No_sheet').css('border-color', '');
+        }
+        if ($('#No_sheet_Uom').val() == "") {
+            alert("Please Enter  Uom.")
+            $('#No_sheet_Uom').css('border-color', 'red');
+            $('#No_sheet_Uom').focus();
+            return false;
+        }
+        else {
+            $('#No_sheet_Uom').css('border-color', '');
+        }
+        if ($('#Sheet_Value').val() == "") {
+            alert("Please Enter  Sheet Value.")
+            $('#Sheet_Value').css('border-color', 'red');
+            $('#Sheet_Value').focus();
+            return false;
+        }
+        else {
+            $('#Sheet_Value').css('border-color', '');
+        }
+        if ($('#Sheet_Value_Uom').val() == "") {
+            alert("Please Enter Sheet Value Uom.")
+            $('#Sheet_Value_Uom').css('border-color', 'red');
+            $('#Sheet_Value_Uom').focus();
+            return false;
+        }
+        else {
+            $('#Sheet_Value_Uom').css('border-color', '');
+        }
+        if ($('#Value').val() == "") {
+            alert("Please Enter Value.")
+            $('#Value').css('border-color', 'red');
+            $('#Value').focus();
+            return false;
+        }
+        else {
+            $('#Value').css('border-color', '');
+        }
+        if ($('#Value_Uom').val() == "") {
+            alert("Please Enter Value.")
+            $('#Value_Uom').css('border-color', 'red');
+            $('#Value_Uom').focus();
+            return false;
+        }
+        else {
+            $('#Value_Uom').css('border-color', '');
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/UnitConvertion/Update',
+            data: {
+                UC_No_Id: $("#UC_No_Id").val(),
+                UC_No_Code: $("#UC_No_Code").val(),
+                Store_id_from: $("#Store_id_from").val(),
+                Group_From: $("#Group_From").val(),
+                Category_From: $("#Category_From").val(),
+                Material_id_From: $('#Material_id_From').val(),
+
+                Store_id_to: $("#Store_id_to").val(),
+                Group_to: $("#Group_To").val(),
+                Category_To: $("#Category_To").val(),
+                Material_id_To: $('#Material_id_To').val(),
+
+                Noms: $("#Noms").val(),
+                Uom1: $("#Uom1").val(),
+                Uom2: $("#Uom2").val(),
+                No_sheet: $("#No_sheet").val(),
+                No_sheet_Uom: $("#No_sheet_Uom").val(),
+                Sheet_Value: $('#Sheet_Value').val(),
+                Sheet_Value_Uom: $("#Sheet_Value_Uom").val(),
+                Value: $("#Value").val(),
+                Value_Uom: $("#Value_Uom").val()
+            },
+            success: function (data) {
+                if (data.UC_No_Id != "" || data.UC_No_Id != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/UnitConvertion/UnitConvertionMaster";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/UnitConvertion/UnitConvertionMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+
+    function Back() {
+        location.href = "/UnitConvertion/UnitConvertionMaster";
+    }
+</script>

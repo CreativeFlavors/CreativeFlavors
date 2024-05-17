@@ -1,0 +1,126 @@
+﻿@{
+    ViewBag.Title = "GroupSystemCalculation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+<script>
+     
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#ProductionPercent').val() == "") {
+            alert("Please Enter Production Percent.")
+            $('#ProductionPercent').css('border-color', 'red');
+            $('#ProductionPercent').focus();
+            return false;
+        }
+        else {
+            $('#ProductionPercent').css('border-color', '');
+        }
+        if ($('#Amount').val() == "") {
+            alert("Please Enter Amount.")
+            $('#Amount').css('border-color', 'red');
+            $('#Amount').focus();
+            return false;
+        }
+        else {
+            $('#Amount').css('border-color', '');
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/GroupSystemCalculation/GroupSystemCalculation',
+            data: {
+                Amount: $('#Amount').val(),
+                ProductionPercent: $('#ProductionPercent').val()              
+            },
+            success: function (data) {
+                if (data.GroupSystemCalculationId != "" || data.GroupSystemCalculationId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/GroupSystemCalculation/GroupSystemCalculation";
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/GroupSystemCalculation/GroupSystemCalculation";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#ProductionPercent').val() == "") {
+            alert("Please Enter Production Percent.")
+            $('#ProductionPercent').css('border-color', 'red');
+            $('#ProductionPercent').focus();
+            return false;
+        }
+        else {
+            $('#ProductionPercent').css('border-color', '');
+        }
+        if ($('#Amount').val() == "") {
+            alert("Please Enter Amount.")
+            $('#Amount').css('border-color', 'red');
+            $('#Amount').focus();
+            return false;
+        }
+        else {
+            $('#Amount').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/GroupSystemCalculation/Update',
+            data: {
+                Amount: $('#Amount').val(),
+                ProductionPercent: $('#ProductionPercent').val(),
+                GroupSystemCalculationId: $('#GroupSystemCalculationId').val()
+            },
+            success: function (data) {
+                if (data.GroupSystemCalculationId != "" || data.GroupSystemCalculationId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/GroupSystemCalculation/GroupSystemCalculation";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/GroupSystemCalculation/GroupSystemCalculation";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Group System Calculation</h2>
+<div style="width: 100%; float: left;">
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("GroupSystemCalculationGrid", "GroupSystemCalculation")
+    </div>
+</div>

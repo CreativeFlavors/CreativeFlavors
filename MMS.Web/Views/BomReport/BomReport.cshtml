@@ -1,0 +1,397 @@
+﻿@model MMS.Web.Models.StockModel.BillOfMaterialModel
+@{
+    ViewBag.Title = "BomReport";
+}
+
+<script>
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    $(function () {
+        $('#txtPL').keyup(function () {
+            filter(this);
+        });
+    });
+    function filter(element) {
+        var value = $(element).val().toLowerCase();
+        $(".customDrop .listItemPL").each(function () {
+            if ($(this).text().toLowerCase().indexOf(value) > -1) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+        $(".customDrop").show();
+    }
+    $(function () {
+        $("#chkAll").change(function () {
+            var chkAll = $(this).is(':checked');
+            if (chkAll)
+                $(".chkProduct").prop("checked", true);
+            else
+                $(".chkProduct").prop("checked", false);
+        });
+    });
+</script>
+
+<style>
+    .scrollable {
+        overflow: auto;
+        width: 300px; /* adjust this width depending to amount of text to display */
+        height: 200px; /* adjust height depending on number of options to display */
+    }
+
+        .scrollable select {
+            border: none;
+        }
+
+    .customDrop, customDropHeader {
+        padding-left: 0px !important;
+        z-index: 999999999;
+        position: absolute;
+        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    }
+
+    .listItemPL {
+        cursor: pointer;
+        padding: 5px;
+        border: 1px solid #94c0d2;
+        list-style: none;
+        border-bottom-style: none;
+        background-color: #daecf4;
+    }
+
+        .listItemPL:hover {
+            background-color: #9ED9F9;
+        }
+        .customDrop{position: relative;
+height: 66px;
+overflow-y: auto;
+margin-top: 0;
+width: 286px;
+overflow-x: hidden;}
+</style>
+@*<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>*@
+<div class="indent_report">
+    <h2>Bom Report</h2>
+</div>
+
+<div>
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div class="field-section indent_field">
+        <div class="form-group">
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Buyer :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                @Html.DropDownList("Buyer", MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field " })
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Season</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                @Html.DropDownList("Season", MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "select-style text-field" })
+            </div>
+
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label"> Lot No :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 space_status">
+                @Html.DropDownList("LotNo", MMS.Web.ExtensionMethod.HtmlHelper.LOtNo(), new { @class = "select-style text-field" })
+            </div>
+
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Bom NO  : </label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12" width="100%">               
+                <div class="customDrop">
+                    <div>
+                        <input type="text" autocomplete="off" placeholder="Enter the BOM No.." name="name" id="txtPL" class="text-field" style="width: 100%;" />
+                    </div>
+                    <div class="listItemPL">
+                        <label>
+                            <input type="checkbox" id="chkAll" value="0" /> Select All
+                        </label>
+                    </div>                   
+
+                </div>
+            </div>
+
+
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Store :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("Store", MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
+
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Category :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("Category", MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Group :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("Group", MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+            </div>
+
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Material :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("Material", MMS.Web.ExtensionMethod.HtmlHelper.DynamicMaterialName(), new { @class = "select-style text-field" })
+            </div>
+        </div>
+    </div>
+    <input id="ExportReport" class="indent_report_field" name="Generate Report" type="submit" value="Generate Report" />
+</div>
+
+
+
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+
+<script>
+
+
+
+    $('.customDrop li').html(' ');
+    debugger;
+    var int=  $('#chkAll').val();
+   
+    if (int==0)
+     {
+    $.ajax({
+        url: '/BomReport/Index',
+        type: "GET",
+        dataType: "JSON",
+        data: {
+            lotNo: '', Buyer: '', SeasonName: ''
+        },
+        success: function (data) {
+            debugger;
+            $(".chkProduct").prop("checked", false);
+            var result = '';
+            var li = "";
+            var input = "";
+            result = data.ResultList;
+            var search = "";
+            $.each(result, function (i, city) {
+                li = "";
+                if (city.Text != null) {
+                    li = $('<li class="listItemPL" style="max-width: 380px; min-width: 380px; display: list-item;"><Label><input type="checkbox" name="AllcheckedProductsPL" class="chkProduct" value="' + city.Text + '"> ' + city.Text + ' </input></Label>')
+                    $(".customDrop").append(li);
+                }
+
+            });
+        }
+    });
+
+    }
+
+
+
+
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    $("#Buyer").change(function () {
+        var Buyer = $('#Buyer').val();
+        $.ajax({
+            url: '/BomReport/GetBuyerToSeason',
+            type: "GET",
+            dataType: "JSON",
+            data: { Buyer: Buyer },
+            success: function (cities) {
+                if (cities != null && cities != "") {
+                    $("#Season").html(""); // clear before appending new list
+                    $('#Season').append('<option value="" selected="selected">Please Select</option>');
+                    $.each(cities, function (i, city) {
+                        $("#Season").append(
+                            $('<option></option>').val(city.SeasonMasterId).html(city.SeasonName));
+                    });
+                }
+            }
+        });
+    });
+    $("#Season").change(function () {
+        var seasonId = $('#Season').val();
+        $.ajax({
+            url: '/BomReport/GetSeasonToLotno',
+            type: "GET",
+            dataType: "JSON",
+            data: { seasonIds: seasonId },
+            success: function (cities) {
+                if (cities != null && cities != "") {
+                    $("#LotNo").html(""); // clear before appending new list
+                    $('#LotNo').append('<option value="" selected="selected">Please Select</option>');
+                    $.each(cities.LotNo, function (i, city) {
+                        $("#LotNo").append(
+                            $('<option></option>').val(city.OrderEntryId).html(city.LotNo));
+                    });
+                }
+            }
+        });
+    });
+    $("#LotNo").change(function () {
+        var LotNo = $('#LotNo option:selected').text();
+        var buyer = $('#Buyer option:selected').val();
+        var season = $('#Season').val();
+        $.ajax({
+            url: '/BomReport/Index',
+            type: "GET",
+            dataType: "JSON",
+            data: {
+                lotNo: LotNo, Buyer: buyer, SeasonName: season
+            },
+            success: function (data) {
+                debugger;
+                $('.customDrop').html(' ');
+                var div = "";
+                div = $('<div class="listItemPL"><label><input type="checkbox" id="chkAll" value="0" /> Select All</label></div>')
+                $(".customDrop").append(div);
+                $(".chkProduct").prop("checked", false);
+                var result = '';
+                var li = "";
+                var input = "";
+                result = data.ResultList;
+                var search = "";            
+                $.each(result, function (i, city) {
+                    li = "";
+                    if (city.Text != null)
+                    {                       
+                        li = $('<li class="listItemPL" style="max-width: 380px; min-width: 380px; display: list-item;"><Label><input type="checkbox" name="AllcheckedProductsPL" class="chkProduct" value="' + city.Text + '"> ' + city.Text + ' </input></Label>')
+                        $(".customDrop").append(li);
+                    }
+                   
+                });
+            }
+        });
+    });
+    $("#Store").change(function () {
+
+        var StoreId = $('#Store').val();
+        $.ajax({
+            url: '/MaterialMaster/FillMaterialCateogoryid',
+            type: "GET",
+            dataType: "JSON",
+            data: { StoreMasterId: StoreId },
+            success: function (cities) {
+                $("#Category").html(""); // clear before appending new list
+                $('#Category').append('<option value="" selected="selected">Please Select</option>');
+                $.each(cities, function (i, city) {
+                    $("#Category").append(
+                        $('<option></option>').val(city.MaterialCategoryMasterId).html(city.CategoryName));
+                });
+            }
+        });
+    });
+    $("#Category").change(function () {
+        var MaterialCategoryMasterId_ = $('#Category').val();
+        $.ajax({
+            url: '/MaterialMaster/FillCateogoryid',
+            type: "GET",
+            dataType: "JSON",
+            data: { MaterialCategoryMasterId: MaterialCategoryMasterId_ },
+            success: function (cities) {
+                $("#Group").html(""); // clear before appending new list
+                $('#Group').append('<option value="" selected="selected">Please Select</option>');
+                $.each(cities, function (i, city) {
+                    $("#Group").append(
+                        $('<option></option>').val(city.MaterialGroupMasterId).html(city.GroupName));
+                });
+            }
+        });
+
+    });
+    $("#Group").change(function () {
+        var Material = $('#Group').val();
+        $.ajax({
+            url: '/StockStatementReport/GetMaterial',
+            type: "GET",
+            dataType: "JSON",
+            data: { MaterialId: Material },
+            success: function (cities) {
+
+                $("#Material").html(""); // clear before appending new list
+                $('#Material').append('<option value="" selected="selected">Please Select</option>');// clear before appending new list
+                $.each(cities, function (i, city) {
+                    $("#Material").append(
+                        $('<option></option>').val(city.MaterialMasterID).html(city.MaterialDescription));
+                });
+            }
+        });
+
+    });
+    $("#ExportReport").click(function (event) {
+        var Store = $('#Store').val();
+        var Group = $('#Group').val();
+        var Category = $('#Category').val();
+        var buyer = $('#Buyer').val();
+        if (buyer.toLowerCase() == "please select") {
+            buyer = "";
+        }
+        var chkArray = [];
+        $(".chkProduct:checked").each(function () {
+            chkArray.push($(this).val());
+        });
+        /* we join the array separated by the comma */
+        var selected;
+        selected = chkArray.join(',');
+        var BomNumber = selected;      
+        var LotNo = $('#LotNo option:selected').text();
+        if (LotNo.toLowerCase() == "please select") {
+            LotNo = "";
+        }
+        var Season = $('#Season').val();
+        var Material = $('#Material').val();
+        $.ajax({
+            type: 'POST',
+            url: '/BomReport/RedirectToAspx',
+            data: {
+                Buyer: buyer,
+                Bom: BomNumber,
+                group: Group,
+                store: Store,
+                category: Category,
+                lotNo: LotNo,
+                season: Season,
+                material: Material
+            },
+            success: function (data) {
+                var url = "@(System.Configuration.ConfigurationManager.AppSettings["ReportURL"].ToString())BomReport.aspx?Buyer=" + data.Buyer + "&Bom=" + data.Bom + "&Category=" + data.Category + "&Group=" + data.Group + "&Store=" + data.Store + "&Season=" + data.Season + "&Material=" + data.Material + "&LotNo=" + data.LotNo;
+                window.open(url, '_blank');
+                return false
+            }
+        });
+    });
+
+    $("#Material").combobox();
+    $("#toggle").click(function () {
+        $("#Material").toggle();
+    });
+</script>

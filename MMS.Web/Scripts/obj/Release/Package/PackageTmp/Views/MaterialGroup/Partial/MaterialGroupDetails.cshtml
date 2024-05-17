@@ -1,0 +1,291 @@
+﻿@model MMS.Web.Models.MaterialGroupMaster.MaterialGroupMasterModel
+@using MMS.Repository.Managers
+@using MMS.Core.Entities;
+@{
+    int id = Model.MaterialGroupMasterId;
+    Session["MaterialGroupMasterId"] = id;
+    MaterialCategoryManager manager = new MaterialCategoryManager();
+    MaterialCategoryMaster materialCategoryMaster = new MaterialCategoryMaster();
+    //materialCategoryMaster = manager.GetMaterialCategoryMaster(Model.MaterialGroupMasterId);
+    //if (materialCategoryMaster != null)
+    //{
+    //    Model.CategoryName = materialCategoryMaster.CategoryName;
+    //    Model.CateogoryCode = materialCategoryMaster.CategoryCode;
+    //}
+}
+@*<script src="~/Scripts/multiselect/js/jquery.multiselect.min.js"></script>
+<script src="~/Scripts/multiselect/js/jquery.multiselect.filter.min.js"></script>
+<script src="~/Scripts/multiselect/js/jquery.multiselect.filter.js"></script>
+<script src="~/Scripts/multiselect/js/jquery.multiselect.js"></script>
+<link href="~/Scripts/multiselect/jquery.multiselect.filter.css" rel="stylesheet" />
+<link href="~/Scripts/multiselect/jquery.multiselect.css" rel="stylesheet" />*@
+@*<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>*@
+<script>
+   
+</script>
+<style>
+   [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+    position: fixed !important;
+}
+</style>
+@using (Html.BeginForm("MaterialGroup", "MaterialGroup", FormMethod.Post))
+{
+    
+    <div class="right-form-section clearfix">
+        <form role="form" class="form-inline">
+            <div class="container-fluid">
+
+                <div style="margin-top: 20px;" class="row">
+                    <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-padding">
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Store Name</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.StoreName, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Category Code</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.CateogoryCode, new { @class = "form-control text-field", @readonly=true })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Category Name</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.DropDownListFor(m => m.MaterialCategoryMasterId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Group Code</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.HiddenFor(x => x.MaterialGroupMasterId)
+                                    @Html.TextBoxFor(m => m.GroupCode, new { @readonly = true, @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Group Name</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.GroupName, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                        @*   <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                    <label class="form-label" for="text">Sub Group</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                                    @Html.ListBoxFor(model => Model.SelectedItemId, new MultiSelectList(Model.SubGroupList, "Value", "Text"))
+
+
+                                </div>
+                            </div>
+                        </div>*@
+
+                        <div class="field-section">
+                            <ul class="list_sec group_cat_list_sec">
+                                <li>
+                                    @if (Model.IsSubstance == true)
+                                    {
+                                        <input type="checkbox" id="IsSubstance" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="IsSubstance" />
+                                    }
+                                    <label for="IsSubstance">Select if substance , Grade , Leater Size , origin fields are required </label>
+                                </li>
+                                <li>
+                                    @if (Model.IsSize == true)
+                                    {
+                                        <input type="checkbox" id="IsSize" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="IsSize" />
+                                    }
+                                    <label for="IsSize">Select if Size is applicable for this group</label>
+                                </li>
+                                <li>
+                                    @if (Model.IsColor == true)
+                                    {
+                                        <input type="checkbox" id="IsColor" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="IsColor" />
+                                    }
+                                    <label for="IsColor">Select if colour is applicable for this group </label>
+                                </li>
+                                <li>
+                                    @if (Model.IsConsumption == true)
+                                    {
+                                        <input type="checkbox" id="IsConsumption" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="IsConsumption" />
+                                    }
+                                    <label for="IsConsumption">Select if consumption of the group will change based on buyer order</label>
+                                </li>
+                                <li>
+                                    @if (Model.IsInspection == true)
+                                    {
+                                        <input type="checkbox" id="IsInspection" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="IsInspection" />
+                                    }
+                                    <label for="IsInspection">Select if inspection is required for this group</label>
+                                </li>
+                                <li>
+                                    @if (Model.IsSubstance == true)
+                                    {
+                                        <input type="checkbox" id="IsReservation" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="IsReservation" />
+                                    }
+                                    <label for="IsReservation">Select if Reservation is required for the Group</label>
+                                </li>
+                                <li>
+                                    @if (Model.IsDisplay == true)
+                                    {
+                                        <input type="checkbox" id="IsDisplay" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="IsDisplay" />
+                                    }
+                                    <label for="IsDisplay">Select if display Group is required for the Group</label>
+                                </li>
+                                <li>
+                                    @if (Model.IsBatchcode == true)
+                                    {
+                                        <input type="checkbox" id="IsBatchcode" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="IsBatchcode" />
+                                    }
+                                    <label for="IsBatchcode">Select if barcode is required for the Group</label>
+                                </li>
+                                <li>
+                                    @if (Model.IsMultipleUnits == true)
+                                    {
+                                        <input type="checkbox" id="IsMultipleUnits" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="IsMultipleUnits" />
+                                    }
+                                    <label for="IsMultipleUnits">Select if multiple unit is required for the group</label>
+                                </li>
+                                <li>
+                                    @if (Model.IsLeatherType == true)
+                                    {
+                                        <input type="checkbox" id="IsLeatherType" checked />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="IsLeatherType" />
+                                    }
+                                    <label for="IsLeatherType">Select if Leather Type is required for the group</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="form-footer">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                        <input type="button" onclick="Cancel()" class="btn btn-default btn-style" title="Back" value="Back">
+                        @if (Model != null && Model.MaterialGroupMasterId != 0)
+                        {
+
+                            <input type="button" onclick="Update()" class="btn btn-default btn-style" id="MaterialGroupMasterId" title="Update" value="Update">
+                        }
+                        else
+                        {
+                            <input type="button" onclick="Save()" class="btn btn-default btn-style" title="Save" value="Save">
+                        }
+                        <button class="btn btn-default btn-style" type="submit">Clear</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+}
+<script>
+   
+
+    $("#MaterialCategoryMasterId").change(function () {
+
+        $.ajax({
+            type: 'POST',
+            url: ' @Url.Action("GetMaterialName", "MaterialGroup")',
+                data: { MaterialGroupMasterId: $('#MaterialCategoryMasterId').val() },
+                success: function (data) {
+                    $('#MaterialCode').val(data)
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+    });
+
+    $("#MaterialCategoryMasterId").change(function () {
+    
+        $.ajax({
+            type: 'POST',
+            url: ' @Url.Action("CategoryCodeDetail", "MaterialGroup")',
+            data: { CategoryId: $('#MaterialCategoryMasterId').val() },
+            success: function (data) {
+                $("#CateogoryCode").val(data.CateogoryCode);
+            },
+        });
+
+    });
+
+</script>
+ 
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<link href="~/Scripts/EasyAutocomplete-1.3.5/comboStyles.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/ComboBox.js"></script>
+<script>
+             $("#MaterialCategoryMasterId").combobox();
+             $("#StoreName").combobox();
+</script>

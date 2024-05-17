@@ -1,0 +1,112 @@
+﻿@{
+    ViewBag.Title = "Country";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#ShortCountryName').val() == "") {
+            alert("Please Enter Short Country Name.")
+            $('#ShortCountryName').css('border-color', 'red');
+            $('#ShortCountryName').focus();
+            return false;
+        }
+        else {
+            $('#ShortCountryName').css('border-color', '');
+        }
+        if ($('#LongCountryName').val() == "") {
+            alert("Please Enter Long Country Name.")
+            $('#LongCountryName').css('border-color', 'red');
+            $('#LongCountryName').focus();
+            return false;
+        }
+        else {
+            $('#LongCountryName').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/Country/Country',
+            data: {
+                ShortCountryName: $('#ShortCountryName').val(),
+                LongCountryName: $('#LongCountryName').val(),
+            },
+            success: function (data) {
+                if (data.CountryMasterId != "" || data.CountryMasterId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/Country/Country";
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/Country/Country";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#ShortCountryName').val() == "") {
+            alert("Please Enter Short Country Name.")
+            $('#ShortCountryName').css('border-color', 'red');
+            $('#ShortCountryName').focus();
+            return false;
+        }
+        else {
+            $('#ShortCountryName').css('border-color', '');
+        }
+        if ($('#LongCountryName').val() == "") {
+            alert("Please Enter Long Country Name.")
+            $('#LongCountryName').css('border-color', 'red');
+            $('#LongCountryName').focus();
+            return false;
+        }
+        else {
+            $('#LongCountryName').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/Country/Update',
+            data: {
+                ShortCountryName: $('#ShortCountryName').val(),
+                LongCountryName: $('#LongCountryName').val(),              
+                CountryMasterId: $('#CountryMasterId').val()
+            },
+            success: function (data) {
+                if (data.CountryMasterId != "" || data.CountryMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/Country/Country";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/Country/Country";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Country Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("CountryGrid", "Country")
+    </div>
+</div>

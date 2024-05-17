@@ -1,0 +1,204 @@
+﻿@{
+    ViewBag.Title = "MrpReqReport";
+}
+
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+<div class="indent_report"><h2>Mrp Requirement Report</h2></div>
+<div>
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div class="field-section indent_field">
+        <div class="form-group">
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">MrP NO </label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
+                @Html.DropDownList("MrpNo", MMS.Web.ExtensionMethod.HtmlHelper.MRPNO(), new { @class = "select-style text-field" })
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Store :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("Store", MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Category :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("Category", MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Group :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("Group", MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+            </div>
+
+
+        </div>
+    </div>
+    <div class="field-section indent_field">
+        <div class="form-group">
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Indent Type</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                @Html.DropDownList("IndentType", new SelectList(
+                                       new List<object> {
+                                            new { value=0, text="Please select" },
+                                           new { value=1, text="Local" },
+                                           new { value=2, text="Customer Import"},
+                                            new { value=3, text="Direct Import"}
+                                       },
+                                       "value",
+                                       "text", 0), new { @class = "select-style text-field" })
+                @*@Html.DropDownList("IndentType", new SelectList(
+                    new List<object> {
+                         new { value="", text="Please Select" },
+                        new { value=0, text="Local" },
+                        new { value=1, text="Import"}
+                    },
+                    "value",
+                    "text", 0), new { @class = "select-style text-field" })*@
+            </div>
+        </div>
+    </div>
+    <div class="field-section indent_field">
+        <div class="form-group">
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Buyer</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                @Html.DropDownList("BuyerId", MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field" })
+            </div>
+        </div>
+    </div>
+
+    <input id="ExportReport" class="indent_report_field" name="ExportReport" type="submit" value="Export Report" />
+</div>
+<script>
+    $(document).ready(function () {
+
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $("#Store").change(function () {
+            var StoreId = $('#Store').val();
+            $.ajax({
+                url: '/MaterialMaster/FillMaterialCateogoryid',
+                type: "GET",
+                dataType: "JSON",
+                data: { StoreMasterId: StoreId },
+                success: function (cities) {
+                    debugger
+                    $("#Category").html(""); // clear before appending new list
+                    $('#Category').append('<option value="" selected="selected">Please Select</option>');
+                    $.each(cities, function (i, city) {
+                        $("#Category").append(
+                            $('<option></option>').val(city.MaterialCategoryMasterId).html(city.CategoryName));
+                    });
+                }
+            });
+        });
+        $("#Category").change(function () {
+            var MaterialCategoryMasterId_ = $('#Category').val();
+            $.ajax({
+                url: '/MaterialMaster/FillCateogoryid',
+                type: "GET",
+                dataType: "JSON",
+                data: { MaterialCategoryMasterId: MaterialCategoryMasterId_ },
+                success: function (cities) {
+                    $("#Group").html("");
+                    $('#Group').append('<option value="" selected="selected">Please Select</option>');
+                    // clear before appending new list
+                    $.each(cities, function (i, city) {
+                        $("#Group").append(
+                            $('<option></option>').val(city.MaterialGroupMasterId).html(city.GroupName));
+                    });
+                }
+            });
+
+        });
+
+        $("#ExportReport").click(function (event) {
+
+
+
+            if ($('#MrpNo option:selected').text() == "" || $('#MrpNo option:selected').text().toLowerCase() == "please select") {
+                alert("Please select Mrp No.")
+                $('#MrpNo').css('border-color', 'red');
+                $('#MrpNo').focus();
+                return false;
+            }
+            else {
+                $('#MrpNo').css('border-color', '');
+            }
+
+
+            if ($('#Store option:selected').text() == "") {
+                alert("Please select Indent Type.")
+                $('#Store').css('border-color', 'red');
+                $('#Store').focus();
+                return false;
+            }
+            else {
+                $('#Store').css('border-color', '');
+            }
+            if ($('#Category option:selected').text() == "") {
+                alert("Please select Category  .")
+                $('#Category').css('border-color', 'red');
+                $('#Category').focus();
+                return false;
+            }
+            else {
+                $('#Category').css('border-color', '');
+            }
+            var MrpNo = $("#MrpNo option:selected").text();
+            var IndentType = $("#IndentType option:selected").val();
+            var BuyerId = $("#BuyerId option:selected").val();
+            var Group = $('#Group option:selected').text();
+            var Store = $("#Store").val();
+            var Category = $("#Category option:selected").text();
+            event.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '/MRPRequirement/RedirectToAspx',
+                data: {
+                    group: Group,
+                    store: Store,
+                    mrpNo: MrpNo,
+                    indentType: IndentType,
+                    buyerId: BuyerId,
+                    category: Category
+                },
+                success: function (data) {
+                    // var url = 'http://mms.encoshoesapps.com/MMSReport/View/Views/MrpRequirement.aspx?MrpNo=' + data.MrpNo + "&IndentType=" + data.IndentType + "&Buyer=" + data.Buyer;
+
+                    var url = "@(System.Configuration.ConfigurationManager.AppSettings["ReportURL"].ToString())MrpRequirement.aspx?MrpNo=" + data.MRPNO + "&IndentType=" + data.IndentType + "&Buyer=" + data.Buyer + "&Group=" + data.Group + "&Store=" + data.Store + "&Category=" + data.Category;
+                    //window.location.href = url;
+                    window.open(url, '_blank');
+                    return false
+                }
+            });
+        });
+    })
+
+    $("#Group").combobox();
+    $("#toggle").click(function () {
+        $("#Group").toggle();
+    });
+</script>

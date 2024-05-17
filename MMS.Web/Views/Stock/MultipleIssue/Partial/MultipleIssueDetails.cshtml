@@ -1,0 +1,2449 @@
+﻿@model MMS.Data.StoredProcedureModel.IssueSlip_SingleModel
+@using MMS.Core.Entities;
+@{
+    bool Order = true;
+    MMS.Repository.Managers.StockManager.SizeRangeQtyRateManager sizerangeManager = new MMS.Repository.Managers.StockManager.SizeRangeQtyRateManager();
+    MMS.Repository.Managers.StockManager.BuyerOrderEntryManager buyerOrderManager = new MMS.Repository.Managers.StockManager.BuyerOrderEntryManager();
+
+    int count = 1;
+    if (Model != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0 && Model.issueSlip_MaterialDetails.FirstOrDefault().IssueType != null && Model.issueSlip_MaterialDetails.FirstOrDefault().IssueType != "" && Model.IssueTypeName == "Order")
+    {
+        Order = true;
+        Model.IssueType_ = Model.IssueType;
+
+    }
+    else if (Model != null && Model.issueSlip_MaterialDetails == null)
+    {
+        Order = true;
+        Model.IssueType_ = Model.IssueType;
+    }
+    else
+    {
+        Order = false;
+    }
+    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Multiple Issue", PermissionSettingModel.PermissionID);
+    }
+
+}
+@{
+    bool Save = false; bool Add = false; bool Update = false; bool Display = false; bool Edit = false; bool Delete = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Save")
+        {
+            Save = true;
+        }
+        if (item.PermissionDesc == "Add")
+        {
+            Add = true;
+        }
+        if (item.PermissionDesc == "Update")
+        {
+            Update = true;
+        }
+        if (item.PermissionDesc == "Display")
+        {
+            Display = true;
+        }
+        if (item.PermissionDesc == "Edit")
+        {
+            Edit = true;
+        }
+        if (item.PermissionDesc == "Delete")
+        {
+            Delete = true;
+        }
+    }
+}
+
+<script>
+    $(".hasDatepicker2").datepicker({ dateFormat: "dd/mm/yy", maxDate: new Date() });
+</script>
+<style>
+    .scrollable {
+        overflow: auto;
+        width: 300px; /* adjust this width depending to amount of text to display */
+        height: 200px; /* adjust height depending on number of options to display */
+    }
+
+        .scrollable select {
+            border: none;
+        }
+
+    .customDrop, customDropHeader {
+        padding-left: 0px !important;
+        z-index: 999999999;
+        position: absolute;
+        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    }
+
+    .listItemPL {
+        cursor: pointer;
+        padding: 5px;
+        border: 1px solid #94c0d2;
+        list-style: none;
+        border-bottom-style: none;
+        background-color: #daecf4;
+    }
+
+        .listItemPL:hover {
+            background-color: #9ED9F9;
+        }
+
+    .customDrop {
+        position: relative;
+        height: 66px;
+        overflow-y: auto;
+        margin-top: 0;
+        width: 286px;
+        overflow-x: hidden;
+    }
+
+
+    .right-form-section {
+        width: 98% !important;
+    }
+
+    .ColorError_issue {
+        background-color: #FF5A5A !important;
+    }
+
+    .ColorError_ {
+        background-color: #FFA500 !important;
+    }
+
+
+    #MaterialMasterId_div .custom-combobox-input {
+        display: inline-block !important;
+        width: 90% !important;
+    }
+
+    #MaterialMasterId_div .ui-button {
+        display: inline-block !important;
+        height: 34px !important;
+    }
+
+    .material-table-width {
+        width: 300px !important;
+        display: block;
+        border: none;
+    }
+
+    .white-space-tbl tr {
+        white-space: nowrap;
+    }
+
+    .ui-multiselect {
+        width: 100% !important;
+    }
+
+    .ui-multiselect-menu {
+        width: 268px !important;
+    }
+</style>
+
+<div class="right-form-section clearfix">
+    <form class="form-inline" role="form">
+        <div class="tab-content">
+            <div class="tab-pane fade in active">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-xs-12" style="width: 666px; height: 368px;scroll;" id="my-dialog">
+
+                <table class="table" id="dialog">
+                    <thead>
+                        <tr>
+                            <td>Order No</td>
+                            <td>Style</td>
+                            <td>Material</td>
+                            <td>Color</td>
+                            <td>Rate</td>
+                            <td>Reqd qty</td>
+                            <td>Alreday issued</td>
+                            <td>Current Issue</td>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="container-fluid">
+                <div class="row">
+                </div>
+            </div>
+            <div class="col-xs-12 no-padding" style="margin-bottom:20px;">
+                <div style="width: 514px;margin: auto;margin-bottom:20px;">
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                <label for="text" class="form-label">Issue Type </label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.HiddenFor(x => x.MultipleIssueSlipID)
+                                @if (Model != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+                                {
+                                    if (Model != null && Model.IssueType_ != null)
+                                    {
+                                        @Html.DropDownListFor(m => Model.IssueType_, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field issueTypecls" })
+                                    }
+                                    else
+                                    {
+                                        @Html.DropDownListFor(m => Model.IssueType, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field issueTypecls" })
+                                    }
+                                    
+                                }
+                                else
+                                {
+                                    @Html.DropDownListFor(m => m.IssueType, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field issueTypecls" })
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @if (Model != null && Model.IssueSlipNo != "" && Model.IssueTypeName != null && Model.IssueTypeName != "Direct Issue" && Model.IssueTypeName != "Other Issue" && Model.IssueType != 0)
+            {
+                <div class="tab-content" id="Order">
+                    <div id="step1" class="tab-pane fade in active">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-4 col-sm-4 col-lg-6 col-xs-12 no-padding">
+                                    <div class="field-section" style="display:none;">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Issue Type </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.HiddenFor(x => x.MultipleIssueSlipID)
+                                                @if (Model != null && Model.InternalOderID != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+                                                {
+                                                    @Html.DropDownListFor(m => Model.IssueType_, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field issueTypecls" })
+                                                }
+                                                else
+                                                {
+                                                    @Html.DropDownListFor(m => m.IssueType, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field issueTypecls" })
+                                                }
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Issue Slip No.</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(x => x.IssueSlipNo, new { @class = "form-control text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Stores</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.StoreName, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field StoreName storeGeneral_" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Season</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.Season, MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "select-style text-field seasoncls_" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Category</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.CategoryName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field CategoryName categoryGeneral_" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Date</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(x => x.Date, new { @class = "form-control text-field hasDatepicker2" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Lot No </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 ui-multiselect-menu-ch">
+                                                @Html.DropDownListFor(m => m.LotNo, MMS.Web.ExtensionMethod.HtmlHelper.LOtNo(), new { @class = "select-style text-field LotNo_general" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Cutting Issue Type</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.CuttingIssueTypeID, new SelectList(
+                                            new List<Object>
+                                                {
+                                                new { value = 0, text = "Please Select"  },
+                                                new { value = 1, text = "Cutting"  },
+                                                new { value = 2, text = "Full Shoes Closing" },
+                                                new { value =3, text = "Upper Shoes Closing" }
+
+                                                },
+                                                "value",
+                                                "text",
+                                                0), new { @class = "select-style text-field " })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Internal Order</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 ui-multiselect-menu-ch" id="FocusOutInternalOrder">
+
+                                                <div class="customDrop">
+                                                    <div>
+                                                        <input type="text" autocomplete="off" placeholder="Enter the order  No.." name="name" id="txtPL" class="text-field" style="width: 100%;" />
+                                                    </div>
+                                                    <div class="listItemPL">
+                                                        <label>
+                                                            <input type="checkbox" id="chkAll" value="0" /> Select All
+                                                        </label>
+                                                    </div>
+
+                                                </div>
+                                                <input type="button" value="Show" title="show" style="cursor:pointer;" onclick="Show()" class="internal-order-btn" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Style No</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.Style, MMS.Web.ExtensionMethod.HtmlHelper.BomStyleNo(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Ordering For </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.HiddenFor(x => x.MultipleIssueSlipID)
+                                                @Html.DropDownListFor(m => m.InternalOrderingFor, new SelectList(
+                                            new List<object>
+                                                {
+                                                new { value=0, text="Please Select" },
+                                                new { value=1, text="Rework" },
+                                                new { value=2, text="Recut"},
+                                                new { value=3, text="Excess Issues"},
+                                                new { value=4, text="Sample"},
+                                                new { value=5, text="Order"},
+                                                new { value=6, text="Sales"},
+                                                new { value=7, text="Scrap"},
+                                                },
+                                                "value",
+                                                "text", 0), new { @class = "select-style text-field" })
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Numberof sets/Pairs </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(x => x.OrderQty, new { @class = "form-control text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Group</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.GroupName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Material</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.MaterialDescription, MMS.Web.ExtensionMethod.HtmlHelper.MaterialName(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Color</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.Color, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Machine Name</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.MachineName, MMS.Web.ExtensionMethod.HtmlHelper.MachineName(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Substance</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.SubtanceID, MMS.Web.ExtensionMethod.HtmlHelper.SubstanceRange(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Conveyor </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.ConveyorID, MMS.Web.ExtensionMethod.HtmlHelper.Conveyor(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                                    <div class="field-section">
+                                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                            <div class="table-responsive table-td-padding parent-table-height parent-table-height-change" style="height:auto;">
+                                                <table class="table" id="sizeRangeTables" style="float: left; width: 98.5%;display:none;">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style="background-color: #ddd; width: 83px !important; float: left;">Size</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="background-color: #ddd; width: 83px !important; float: left;">Issue Qty</td>
+                                                        </tr>
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div style="float:right">
+                            <input type="checkbox" value="Issue" id="allIssue" /><span>Save All Issue</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                                <div class="field-section">
+                                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                        <div class="table-responsive table-td-padding parent-table-height" style="height:auto;">
+                                            <table class="table" id="list-amended-material">
+                                                <thead>
+                                                    <tr>
+                                                        <td>Size Range Details</td>
+                                                        <td>Issue Slip No</td>
+                                                        <td>Order No</td>
+                                                        <td>Style</td>
+                                                        <td>Issue Type</td>
+                                                        <td>Material Type</td>
+                                                        <td>Group</td>
+                                                        <td>Category</td>
+                                                        <td>StoresName</td>
+                                                        <td>Material</td>
+                                                        <td>Color</td>
+                                                        <td>Current Stock</td>
+                                                        <td>Reqd qty</td>
+                                                        <td>Alreday issued</td>
+                                                        <td>Current Issue</td>
+                                                        <td>Rate</td>
+                                                        <td>ExceptIssue</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if (Model != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+                                                    {
+                                                        foreach (var item in Model.issueSlip_MaterialDetails)
+                                                        {
+                                                            MMS.Core.Entities.Stock.InternalOrderEntryForm orderEntry = new MMS.Core.Entities.Stock.InternalOrderEntryForm();
+                                                            List<MMS.Core.Entities.Stock.SizeRangeQtyRate> sizeRangeQtyRateList = new List<MMS.Core.Entities.Stock.SizeRangeQtyRate>();
+                                                            orderEntry = buyerOrderManager.GetBuyerOderSlNo(item.OrderNo);
+                                                            sizeRangeQtyRateList = sizerangeManager.GetSizeRangeByOrderEntryId(orderEntry.OrderEntryId);
+                                                            <tr>
+
+                                                                <td id="IssueSlipId" name="IssueSlipId" class="IssueSlipId" style="display:none">@item.IssueSlipId</td>
+                                                                <td id="IssueSlipFK" name="IssueSlipFK" class="IssueSlipFK" style="display:none">@item.IssueSlipFK</td>
+
+                                                                <td id="Details" name="Details" class="Details" style="cursor:pointer" title="Details">
+                                                                    <input type="button" value="Detils" onclick="ExapndDeatils('@item.MaterialName','@item.OrderNo','@item.ColourId')" />
+
+                                                                </td>
+                                                                <td id="IssueSlipNo" name="IssueSlipNo" class="IssueSlipNo">@Model.IssueSlipNo</td>
+                                                                <td id="InternalOderID1" name="InternalOderID1" class="multipleOrder1_">@item.OrderNo</td>
+                                                                <td id="Style" name="Style" class="Style">@item.Style</td>
+                                                                <td id="IssueType" name="IssueType" class="IssueType">@item.IssueType</td>
+                                                                <td id="MaterialTypes" name="MaterialTypes" class="MaterialTypes">@item.MaterialTypes</td>
+                                                                <td id="GroupName" name="GroupName" class="GroupName">@item.GroupId</td>
+                                                                <td id="CategoryName" name="CategoryName" class="CategoryName">@item.CategoryId</td>
+                                                                <td id="StoreName" name="StoreName" class="StoreName">@item.StoreName</td>
+                                                                <td id="MaterialDescription" name="MaterialDescription" class="MaterialDescription">@item.MaterialName</td>
+                                                                <td id="Color" name="Color" class="Color">@item.ColourId</td>
+                                                                <td id="BalanceStock" name="BalanceStock" class="BalanceStock">@item.CurrentStock</td>
+                                                                <td id="RequiredQty" name="RequiredQty" class="RequiredQty">@item.RequiredQty</td>
+                                                                <td id="AlredayIssued" name="AlredayIssued" class="AlredayIssued">@item.AlredayIssued</td>
+                                                                <td id="CurrentIssue" name="CurrentIssue" class="CurrentIssue"><input type="text" onchange="issueChange('@item.BalanceStock',this.value)" class="CurrentIssueValue" style="width: 50px;" value="@item.CurrentIssue" /></td>
+                                                                <td id="Piecies" name="Piecies" class="Piecies">@item.Rate</td>
+                                                                @if (item.IsChecked == true)
+                                                                {
+                                                                    <td id="IsChecked" class="IsChecked"><input type="checkbox" class="isMaterialckbox" value="" checked="checked" /></td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td id="IsChecked" class="IsChecked"><input type="checkbox" class="isMaterialckbox" value="" /></td>
+                                                                }
+                                                                <td id="MaterialMasterId" name="MaterialMasterId" class="MaterialMasterId" style="display:none">@item.MaterialMasterId</td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (Model != null && Model.IssueSlipNo != "" && Model.IssueTypeName != null && Model.IssueTypeName != "Order" && Model.IssueType != 0)
+            {
+                Order = false;
+                <div class="tab-content" id="General">
+                    <div id="step1" class="tab-pane fade in active">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Issue Date </label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.IssueDate, new { @class = "form-control text-field hasDatepicker2" })
+                                    </div>
+                                    <div class="field-section" style="display:none;">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Issue Type </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.HiddenFor(x => x.MultipleIssueSlipID)
+                                                @if (Model != null && Model.InternalOderID != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+                                                {
+                                                    @Html.DropDownListFor(m => Model.IssueType_, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field issueType_cls" })
+                                                }
+                                                else
+                                                {
+                                                    @Html.DropDownListFor(m => m.IssueType, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field issueType_cls" })
+                                                }
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Issue Slip No.</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.HiddenFor(x => x.IssueSlipID)
+                                                @Html.HiddenFor(x => x.IssueSlipFK)
+                                                @Html.TextBoxFor(x => x.IssueSlipNo, new { @class = "form-control text-field General_IssueSlipNo" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group" id="internal_Order">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Internal Order</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(m => m.InternalOderID, new { @class = "form-control text-field " })
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="display:none" id="internal_DirectIssue">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Internal Order</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.InternalValue, MMS.Web.ExtensionMethod.HtmlHelper.OrderIONO(), new { @class = "select-style text-field InternalValue_general" })
+                                                @*@Html.TextBoxFor(x => x.InternalValue, new { @class = "form-control text-field InternalValue_general" })*@
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group" id="Direct_Style">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Style No</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.Style, MMS.Web.ExtensionMethod.HtmlHelper.BomStyleNo(), new { @class = "select-style text-field styleGeneral_" })
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="display:none" id="internal_DirectIssue_Style">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Style No</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(x => x.DirectIssue_Style, new { @class = "form-control text-field DirectIssue_Style_general" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Stores</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.StoreName, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field storeGeneral_" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Season</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.Season, MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "select-style text-field seasoncls_direct" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Category</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.CategoryName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field categoryGeneral_" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Group</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.GroupName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field groupGeneral_" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Stock Type </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.HiddenFor(x => x.MultipleIssueSlipID)
+                                                @Html.DropDownListFor(m => m.MaterialType, new SelectList(
+                                            new List<object>
+                                                {
+                                                new { value=0, text="Please select" },
+                                                new { value=1, text="Local" },
+                                                new { value=2, text="Customer Import"},
+                                                new { value=3, text="Direct Import"}
+                                                },
+                                                "value",
+                                                "text", 0), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Piecies </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-3 col-xs-12">
+                                                @Html.TextBoxFor(x => x.Piecies, new { @class = "form-control text-field Piecies_genral" })
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-4 col-xs-12" style="padding-left:0;">
+                                                @Html.DropDownListFor(m => m.PieciesType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field PieciesType_general" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                LotNo
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(x => x.LotNo, new { @class = "form-control text-field LotNo_general" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Balance in this Lot</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 pad_left">
+                                                    @Html.TextBoxFor(x => x.BalanceInThisListlot, new { @class = "form-control text-field BalanceInThisListlot_general" })
+                                                </div>
+                                                <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-padding">
+                                                    @Html.TextBoxFor(x => x.BalanceInthisListType, new { @class = "form-control text-field BalanceInthisListType_general" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Machine Name</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.MachineName, MMS.Web.ExtensionMethod.HtmlHelper.MachineName(), new { @class = "select-style text-field MachineName_general" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12" style="padding-right:0;">
+                                                <label for="text" class="form-label">Number of sets/pairs</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(x => x.NoOfSets, new { @class = "form-control text-field NoOfSets_general" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Color</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.Color, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { @class = "select-style text-field color_Genral" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Rate</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(x => x.Rate, new { @class = "form-control text-field rate_general" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Substance</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.SubtanceID, MMS.Web.ExtensionMethod.HtmlHelper.SubstanceRange(), new { @class = "select-style text-field substance_color" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="divWithoutPieces" name="WithoutPieces">
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                    <label for="text" class="form-label">Required Qty</label>
+                                                </div>
+                                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                    <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 pad_left">
+                                                        @Html.TextBoxFor(x => x.RequiredQty, new { @class = "form-control text-field" })
+                                                    </div>
+                                                    <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-padding">
+                                                        @Html.DropDownListFor(m => m.RequiredType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field requiredType_general" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                    <label for="text" class="form-label">Already Issued</label>
+                                                </div>
+                                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                    <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 pad_left">
+                                                        @Html.TextBoxFor(x => x.AlredayIssued, new { @class = "form-control text-field" })
+                                                    </div>
+                                                    <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-padding">
+                                                        @Html.DropDownListFor(m => m.AlreadyUsedType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field AlreadyUsedType_general" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                    <label for="text" class="form-label">Current Issues</label>
+                                                </div>
+                                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                    <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 pad_left">
+                                                        @Html.TextBoxFor(x => x.CurrentIssue, new { @class = "form-control text-field" })
+                                                    </div>
+                                                    <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-padding">
+                                                        @Html.DropDownListFor(m => m.CurrentIssuesType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field CurrentIssuesType_general" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="divPiecesIssue" name="PiecesIssue">
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-9 col-sm-9 col-lg-3 col-xs-12 pad_left">
+                                                        <label for="text" class="form-label">Requried</label>
+                                                        @Html.TextBoxFor(x => x.RequiredQty, new { @class = "form-control text-field RequiredQty_Cls" })
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" style="padding:0;">
+                                                        <label for="text" class="form-label">Uom Type</label>
+                                                        @Html.DropDownListFor(m => m.RequiredType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field RequiredType_cls" })
+                                                    </div>
+                                                    <div class="col-md-9 col-sm-9 col-lg-3 col-xs-12">
+                                                        <label for="text" class="form-label">Pcs</label>
+                                                        @Html.TextBoxFor(x => x.PiecesRequiredQTY, new { @class = "form-control text-field PiecesRequiredQTY_cls" })
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" style="padding:0;">
+                                                        <label for="text" class="form-label">Type</label>
+                                                        @Html.DropDownListFor(m => m.PiecesRequiredQtyType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field PiecesRequiredQtyType_cls" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-9 col-sm-9 col-lg-3 col-xs-12 pad_left">
+                                                        <label for="text" class="form-label">Already</label>
+                                                        @Html.TextBoxFor(x => x.AlredayIssued, new { @class = "form-control text-field AlredayIssued_cls" })
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" style="padding:0;">
+                                                        <label for="text" class="form-label">Uom Type</label>
+                                                        @Html.DropDownListFor(m => m.AlreadyUsedType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field AlreadyUsedType_cls" })
+                                                    </div>
+                                                    <div class="col-md-9 col-sm-9 col-lg-3 col-xs-12">
+                                                        <label for="text" class="form-label">Pcs</label>
+                                                        @Html.TextBoxFor(x => x.PiecesAlreadyIssue, new { @class = "form-control text-field PiecesAlreadyIssue_cls" })
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" style="padding:0;">
+                                                        <label for="text" class="form-label">Type</label>
+                                                        @Html.DropDownListFor(m => m.PiecesAlreadyIssueType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field PiecesAlreadyIssueType_cls" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-9 col-sm-9 col-lg-3 col-xs-12 pad_left">
+                                                        <label for="text" class="form-label">Current</label>
+                                                        @Html.TextBoxFor(x => x.CurrentIssue, new { @class = "form-control text-field CurrentIssueGeneral_cls" })
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" style="padding:0;">
+                                                        <label for="text" class="form-label">Uom Type</label>
+                                                        @Html.DropDownListFor(m => m.CurrentIssuesType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field CurrentIssuesType_cls" })
+                                                    </div>
+                                                    <div class="col-md-9 col-sm-9 col-lg-3 col-xs-12">
+                                                        <label for="text" class="form-label">Pcs</label>
+                                                        @Html.TextBoxFor(x => x.PiecesCurrentIssue, new { @class = "form-control text-field PiecesCurrentIssue_cls" })
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" style="padding:0;">
+                                                        <label for="text" class="form-label">Type</label>
+                                                        @Html.DropDownListFor(m => m.PiecesCurrentType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field PiecesCurrentType_cls" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Conveyor </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.ConveyorID, MMS.Web.ExtensionMethod.HtmlHelper.Conveyor(), new { @class = "select-style text-field conveyorid_general" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Issuing For </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.HiddenFor(x => x.MultipleIssueSlipID)
+                                                @if (Model != null && Model.InternalOderID != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+                                                {
+                                                    @Html.DropDownListFor(m => m.InternalOrderingFor, new SelectList(
+                                            new List<object>
+                                                {
+                                                new { value=0, text="Please Select" },
+                                                new { value=1, text="Rework" },
+                                                new { value=2, text="Recut"},
+                                                new { value=3, text="Excess Issues"},
+                                                new { value=4, text="Sample"},
+                                                new { value=5, text="Order"},
+                                                new { value=6, text="Sales"},
+                                                new { value=7, text="Scrap"},
+                                                       new { value=8, text="Conversion"},
+                                                        new { value=9, text="Transfer"},
+                                                },
+                                                "value",
+                                                "text", 0), new { @class = "select-style text-field InternalOrderingFor_cls" })
+                                                }
+                                                else
+                                                {
+                                                    @Html.DropDownListFor(m => m.InternalOrderingFor, new SelectList(
+                                                new List<object>
+                                                    {
+                                                    new { value=0, text="Please Select" },
+                                                    new { value=1, text="Rework" },
+                                                    new { value=2, text="Recut"},
+                                                    new { value=3, text="Excess Issues"},
+                                                    new { value=4, text="Sample"},
+                                                    new { value=5, text="Order"},
+                                                    new { value=6, text="Sales"},
+                                                    new { value=7, text="Scrap"},
+                                                           new { value=8, text="Conversion"},
+                                                            new { value=9, text="Transfer"},
+                                                    },
+                                                    "value",
+                                                    "text", 0), new { @class = "select-style text-field InternalOrderingFor_cls" })
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 no-padding">
+                                    <div class="col-xs-8 no-padding">
+                                        <div class="field-section" style="margin-bottom:5px;">
+                                            <div class="form-group">
+                                                <div class="col-md-5 col-sm-5 col-lg-2 col-xs-12">
+                                                    <label for="text" class="form-label">Material</label>
+                                                </div>
+                                                <div class="col-md-7 col-sm-7 col-lg-10 col-xs-12" style="padding-left:42px;padding-right:0;" id="MaterialMasterId_div">
+                                                    @Html.DropDownListFor(m => m.MaterialDescription, MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName(), new { @class = "select-style text-field MaterialGeneral_" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-4 no-padding">
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                    <label for="text" class="form-label">Customer Name </label>
+                                                </div>
+                                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                    @Html.DropDownListFor(x => x.BuyerMasterId, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field BuyerMasterId_cls" })
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding" style="margin-top: 15px; margin-bottom: 15px; overflow-x:auto;">
+                                <table class="table" id="sizeRangeTable" style="float: left; width: 98.5%;">
+                                    <tbody>
+                                        @if (Model.sizeItemMaterialList == null || Model.sizeItemMaterialList.Count == 0)
+                                        {
+                                            <tr>
+                                                <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 39px !important;">Size</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important;">Stock</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important;">Issue</td>
+                                            </tr>
+                                        }
+                                        @if (Model.sizeItemMaterialList != null && Model.sizeItemMaterialList.Count > 0)
+                                        {
+                                            <tr>
+
+                                                @if (Model.sizeItemMaterialList != null)
+                                                {
+                                                    <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 39px !important; float: left;">Size</td>
+                                                    foreach (var item in Model.sizeItemMaterialList)
+                                                    {
+                                                        <td class="sizeVal">@item.SizeRange</td>
+                                                        count++;
+                                                    }
+                                                }
+                                            </tr>
+
+                                            <tr>
+
+                                                @if (Model.sizeItemMaterialList != null)
+                                                {
+                                                    <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important; float: left;">Rate</td>
+                                                    foreach (var item in Model.sizeItemMaterialList)
+                                                    {
+                                                        <td><input type="text" class="Qty" id="qtyId@(count)" value="@item.Rate" style='width:50px;' onchange="CalculateTotal(this)" /></td>
+                                                        count++;
+                                                    }
+                                                }
+                                            </tr>
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div>
+                                <div>
+                                    Total Qty
+                                </div>
+                                @Html.TextBoxFor(x => x.TotalQty, new { @class = "form-control text-field" })
+                            </div>
+                            <div class="row">
+                                <div align="center" class=" col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                                    <div align="center" class="back-color col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                                        @if (Model != null && Model.IssueSlipNo != "")
+                                        {
+                                            if (Update == true)
+                                            {
+                                                <button type="button" id="Add" class="btn btn-danger packing-button" style="padding: 6px 20px;">ADD</button>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (Save == true)
+                                            {
+                                                <button type="button" id="Add" class="btn btn-danger packing-button" style="padding: 6px 20px;">ADD</button>
+                                            }
+
+                                        }
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 trop">
+                                    <div class="col-md-4 col-lg-4 col-sm-4 col-xs-12 no-pad">
+                                        <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                            <div class="col-md-12 col-lg-12 col-sm-6 col-xs-12 no-pad new_bot_margin">
+                                                <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 no-pad">
+                                                        <label for="component-check" style="margin-top: 8px;">Current Stock</label>
+                                                    </div>
+                                                    <div class="col-md-3 col-lg-4 col-sm-6 col-xs-12">
+                                                        @Html.TextBoxFor(x => x.CurrentStock, new { @class = "form-control text-field" })
+                                                    </div>
+                                                    <div class="col-md-4 col-lg-5 col-sm-6 col-xs-12 pad_left">
+                                                        @Html.DropDownListFor(m => m.CurrentStockType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad parti-u">
+                                            <div class="col-md-12 col-lg-12 col-sm-6 col-xs-12 no-pad">
+                                                <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 no-pad">
+                                                        <label for="component-check" style="margin-top: 8px;">Closing in all stock stores</label>
+                                                    </div>
+                                                    <div class="col-md-3 col-lg-4 col-sm-6 col-xs-12">
+                                                        @Html.TextBoxFor(x => x.ClosingStockinAllStores, new { @class = "form-control text-field" })
+                                                    </div>
+                                                    <div class="col-md-4 col-lg-5 col-sm-6 col-xs-12 pad_left">
+                                                        @Html.DropDownListFor(m => m.ClosingStockinAllStoredType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-lg-4 col-sm-4 col-xs-12">
+                                        <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                            <div class="col-md-12 col-lg-12 col-sm-6 col-xs-12 no-pad new_bot_margin">
+                                                <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 no-pad">
+                                                        <label for="component-check" style="margin-top: 8px;">Freestock</label>
+                                                    </div>
+                                                    <div class="col-md-3 col-lg-4 col-sm-6 col-xs-12">
+                                                        @Html.TextBoxFor(x => x.FreeStock, new { @class = "form-control text-field" })
+                                                    </div>
+                                                    <div class="col-md-4 col-lg-5 col-sm-6 col-xs-12 pad_left">
+                                                        @Html.DropDownListFor(m => m.FreeStockType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad parti-u">
+                                            <div class="col-md-12 col-lg-12 col-sm-6 col-xs-12 no-pad new_bot_margin">
+                                                <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 no-pad">
+                                                        <label for="component-check" style="margin-top: 8px;">In Transit</label>
+                                                    </div>
+                                                    <div class="col-md-3 col-lg-4 col-sm-6 col-xs-12">
+                                                        @Html.TextBoxFor(x => x.InTransitValue, new { @class = "form-control text-field" })
+                                                    </div>
+                                                    <div class="col-md-4 col-lg-5 col-sm-6 col-xs-12 pad_left">
+                                                        @Html.DropDownListFor(m => m.InTransitType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-4 col-lg-4 col-sm-4 col-xs-12">
+                                        <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                            <div class="col-md-12 col-lg-12 col-sm-6 col-xs-12 no-pad">
+                                                <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 no-pad">
+                                                        <label for="component-check" style="margin-top: 8px;">Reserved Stock</label>
+                                                    </div>
+                                                    <div class="col-md-3 col-lg-4 col-sm-6 col-xs-12">
+                                                        @Html.TextBoxFor(x => x.ReserverQty, new { @class = "form-control text-field" })
+                                                    </div>
+                                                    <div class="col-md-4 col-lg-5 col-sm-6 col-xs-12 pad_left">
+                                                        @Html.DropDownListFor(m => m.ReserverQtyType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad parti-u1">
+                                            @if (Model.IssueSlipID == 0)
+                                            {
+
+                                                <div align="center" class="col-md-6 col-xs-12 col-lg-6 col-sm-6">
+                                                    <button type="button" class="btn btn-primary" id="AutoDisplay_">Auto Display</button>
+                                                </div>
+                                            }
+                                            <div align="center" class="col-md-6 col-xs-12 col-lg-6 col-sm-6">
+                                                <button type="button" class="btn btn-primary" id="ReleaseReserved">Release Reserved stk</button>
+                                            </div>
+                                            <div align="center">
+                                                <button type="button" class="btn btn-primary" id="ReserveFreeStock" style="margin-top:10px;">Reserve Free Stock</button>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="del_botton_border" style="margin: 20px 0px;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="del_botton_border" style="margin: 20px 0px;">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                                    <div class="field-section">
+                                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+
+                                            <div class="table-responsive table-td-padding parent-table-height">
+                                                <table class="table" id="list-amended-material_">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>Edit</td>
+                                                            <td>Remove</td>
+                                                            <td>Issue Slip No</td>
+                                                            <td>Order No</td>
+                                                            <td>Style</td>
+                                                            <td>Issue Type</td>
+                                                            <td>NoofSets</td>
+                                                            <td>Group</td>
+                                                            <td>Category</td>
+                                                            <td>StoresName</td>
+                                                            <td>Material</td>
+                                                            <td>Color</td>
+                                                            <td>Reqd qty</td>
+                                                            <td>Alreday issued</td>
+                                                            <td>Current Issue</td>
+                                                            <td>Rate</td>
+                                                            <td>season</td>
+                                                        </tr>
+                                                    </thead>
+                                                    @if (Model != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+                                                    {
+                                                        <tbody>
+                                                            @foreach (var item in Model.issueSlip_MaterialDetails)
+                                                            {
+                                                                <tr id="@item.IssueSlipId">
+                                                                    @if (Delete == true)
+                                                                    {
+                                                                        <td><input type='button' value='Remove' onclick='Delete("@item.IssueSlipId")' class='' /></td>
+                                                                    }
+                                                                    @if (Update == true)
+                                                                    {
+                                                                        <td><input type='button' name='Edit' id='EditRow' value='Edit' onclick='EditClick("@item.IssueSlipId")' class='' /></td>
+                                                                    }
+
+                                                                    <td id='IssueSlipNo' class='General_IssueSlipNo'>@item.IssueSlipNo</td>
+                                                                    @if (@item.Style == "0" || !string.IsNullOrEmpty(@item.OrderNo))
+                                                                    {
+                                                                        <td id='OrderNo' class='General_OrderNo'>@item.InternalValue</td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td id='OrderNo' class='General_OrderNo'>@item.OrderNo</td>
+                                                                    }
+
+                                                                    @if (@item.Style == "0" || !string.IsNullOrEmpty(@item.Style))
+                                                                    {
+                                                                        <td id='InternalValue' class='InternalValue_general'>@item.DirectIssue_Style </td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td id='InternalValue' class='InternalValue_general'>@item.Style </td>
+                                                                    }
+
+                                                                    <td id='IssueType' class='issueTypecls'>@item.IssueType</td>
+                                                                    <td id='NoOfSets' class='NoOfSets_general'>@item.NoOfSets</td>
+                                                                    <td id='GroupName' class='groupGeneral_'>@item.GroupId </td>
+                                                                    <td id='CategoryName' class='categoryGeneral_'>@item.CategoryId</td>
+                                                                    <td id='StoreName' class='storeGeneral_'>@item.StoreName</td>
+                                                                    <td id='MaterialDescription' class=''>@item.MaterialName</td>
+                                                                    <td id='Color' class='color_Genral'>@item.ColourId</td>
+                                                                    <td id='RequiredQty' class='RequiredQty'>@item.RequiredQty</td>
+                                                                    <td id='AlredayIssued" + rowCount + "' class='AlredayIssued'>@item.AlredayIssued</td>
+                                                                    <td id='CurrentIssue' class='CurrentIssue'>@item.CurrentIssue</td>
+                                                                    <td style='' id='Rate' class='rate_general'>@item.Rate</td>
+                                                                    <td style='' id='Rate' class='rate_general'>@item.Season</td>
+                                                                    
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    }
+                                                    else
+                                                    {
+                                                        <tbody></tbody>
+                                                    }
+
+                                                </table>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            }
+            else
+            {
+                <div class="tab-content" id="Order">
+                    <div id="step1" class="tab-pane fade in active">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-4 col-sm-4 col-lg-6 col-xs-12 no-padding">
+                                    <div class="field-section" style="display:none;">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Issue Type </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.HiddenFor(x => x.MultipleIssueSlipID)
+                                                @if (Model != null && Model.InternalOderID != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+                                                {
+                                                    @Html.DropDownListFor(m => Model.IssueType_, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field issueTypecls" })
+                                                }
+                                                else
+                                                {
+                                                    @Html.DropDownListFor(m => m.IssueType, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field issueTypecls" })
+                                                }
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Issue Slip No.</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(x => x.IssueSlipNo, new { @class = "form-control text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Stores</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.StoreName, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field StoreName storeGeneral_" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Category</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.CategoryName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field CategoryName categoryGeneral_" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Date</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(x => x.Date, new { @class = "form-control text-field hasDatepicker2" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Cutting Issue Type</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.CuttingIssueTypeID, new SelectList(
+                                            new List<Object>
+                                                {
+                                                new { value = 0, text = "Please Select"  },
+                                                new { value = 1, text = "Cutting"  },
+                                                new { value = 2, text = "Full Shoes Closing" },
+                                                new { value =3, text = "Upper Shoes Closing" }
+
+                                                },
+                                                "value",
+                                                "text",
+                                                0), new { @class = "select-style text-field " })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Buyer</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.BuyerMasterId, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Season</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.Season, MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "select-style text-field seasoncls" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Lot No </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.LotNo, MMS.Web.ExtensionMethod.HtmlHelper.LOtNo(), new { @class = "select-style text-field LotNo_general" })
+                                                <input type="button" value="GetLotNO" title="GetLotNO" style="cursor:pointer;" onclick="GetLotNO()" class="internal-order-btn" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Style </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.BomStyle, MMS.Web.ExtensionMethod.HtmlHelper.BomStyleNo(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Internal Order</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 ui-multiselect-menu-ch" id="FocusOutInternalOrder">
+
+                                                <div class="customDrop">
+                                                    <div>
+                                                        <input type="text" autocomplete="off" placeholder="Enter the order  No.." name="name" id="txtPL" class="text-field" style="width: 100%;" />
+                                                    </div>
+                                                    <div class="listItemPL">
+                                                        <label>
+                                                            <input type="checkbox" id="chkAll" value="0" /> Select All
+                                                        </label>
+                                                    </div>
+
+                                                </div>
+                                                <input type="button" value="Show" title="show" style="cursor:pointer;" onclick="Show()" class="internal-order-btn" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Style No</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.Style, MMS.Web.ExtensionMethod.HtmlHelper.BomStyleNo(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Ordering For </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.HiddenFor(x => x.MultipleIssueSlipID)
+                                                @Html.DropDownListFor(m => m.InternalOrderingFor, new SelectList(
+                                            new List<object>
+                                                {
+                                                new { value=0, text="Please Select" },
+                                                new { value=1, text="Rework" },
+                                                new { value=2, text="Recut"},
+                                                new { value=3, text="Excess Issues"},
+                                                new { value=4, text="Sample"},
+                                                new { value=5, text="Order"},
+                                                  new { value=6, text="Sales"},
+                                                new { value=7, text="Scrap"},
+                                                },
+                                                "value",
+                                                "text", 0), new { @class = "select-style text-field" })
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Numberof sets/Pairs </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(x => x.OrderQty, new { @class = "form-control text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Group</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.GroupName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Material</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.MaterialDescription, MMS.Web.ExtensionMethod.HtmlHelper.MaterialName(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Color</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.Color, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Machine Name</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.MachineName, MMS.Web.ExtensionMethod.HtmlHelper.MachineName(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Substance</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.SubtanceID, MMS.Web.ExtensionMethod.HtmlHelper.SubstanceRange(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Conveyor </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.ConveyorID, MMS.Web.ExtensionMethod.HtmlHelper.Conveyor(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                                    <div class="field-section">
+                                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                            <div class="table-responsive table-td-padding parent-table-height parent-table-height-change" style="height:auto;">
+                                                <table class="table" id="sizeRangeTables" style="float: left; width: 98.5%;display:none;">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style="background-color: #ddd; width: 83px !important; float: left;">Size</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="background-color: #ddd; width: 83px !important; float: left;">Issue Qty</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="float:right">
+                            <input type="checkbox" value="Issue" id="allIssue" /><span>Save All Issue</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                                <div class="field-section">
+                                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                        <div class="table-responsive table-td-padding parent-table-height" style="height:auto;">
+                                            <table class="table" id="list-amended-material">
+                                                <thead>
+                                                    <tr>
+                                                        <td>Size Range Details</td>
+                                                        <td>Issue Slip No</td>
+                                                        <td>Order No</td>
+                                                        <td>Style</td>
+                                                        <td>Issue Type</td>
+                                                        <td>Material Type</td>
+                                                        <td>Group</td>
+                                                        <td>Category</td>
+                                                        <td>StoresName</td>
+                                                        <td>Material</td>
+                                                        <td>Color</td>
+                                                        <td>Current Stock</td>
+                                                        <td>Reqd qty</td>
+                                                        <td>Alreday issued</td>
+                                                        <td>Current Issue</td>
+                                                        <td>Rate</td>
+                                                        <td>ExceptIssue</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if (Model != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+                                                    {
+                                                        foreach (var item in Model.issueSlip_MaterialDetails)
+                                                        {
+                                                            <tr>
+                                                                <td id="IssueSlipId" name="IssueSlipId" class="IssueSlipId" style="display:none">@item.IssueSlipId</td>
+                                                                <td id="IssueSlipFK" name="IssueSlipFK" class="IssueSlipFK" style="display:none">@item.IssueSlipFK</td>
+                                                                <td id="Details" name="Details" class="Details" style="cursor:pointer" title="Details"><input type="button" value="Detils" onclick="ExapndDeatils('@item.MaterialName','@item.OrderNo','@item.ColourId')" /></td>
+                                                                <td id="IssueSlipNo" name="IssueSlipNo" class="IssueSlipNo">@Model.IssueSlipNo</td>
+                                                                <td id="InternalOderID1" name="InternalOderID1" class="multipleOrder1_">@item.OrderNo</td>
+                                                                <td id="Style" name="Style" class="Style">@item.Style</td>
+                                                                <td id="IssueType" name="IssueType" class="IssueType">@item.IssueType</td>
+                                                                <td id="MaterialTypes" name="MaterialTypes" class="MaterialTypes">@item.MaterialTypes</td>
+                                                                <td id="GroupName" name="GroupName" class="GroupName">@item.GroupId</td>
+                                                                <td id="CategoryName" name="CategoryName" class="CategoryName">@item.CategoryId</td>
+                                                                <td id="StoreName" name="StoreName" class="StoreName">@item.StoreName</td>
+                                                                <td id="MaterialDescription" name="MaterialDescription" class="MaterialDescription">@item.MaterialName</td>
+                                                                <td id="Color" name="Color" class="Color">@item.ColourId</td>
+                                                                <td id="BalanceStock" name="BalanceStock" class="BalanceStock">@item.BalanceStock</td>
+                                                                <td id="RequiredQty" name="RequiredQty" class="RequiredQty">@item.RequiredQty</td>
+                                                                <td id="AlredayIssued" name="AlredayIssued" class="AlredayIssued">@item.AlredayIssued</td>
+                                                                <td id="CurrentIssue" name="CurrentIssue" class="CurrentIssue"><input type="text" class="CurrentIssueValue" style="width: 50px;" value="@item.CurrentIssue" /></td>
+                                                                <td id="Piecies" name="Piecies" class="Piecies">@item.Rate</td>
+                                                                @if (item.IsChecked == true)
+                                                                {
+                                                                    <td id="IsChecked" class="IsChecked"><input type="checkbox" class="isMaterialckbox" value="" checked="checked" /></td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td id="IsChecked" class="IsChecked"><input type="checkbox" class="isMaterialckbox" value="" /></td>
+                                                                }
+                                                                <td id="MaterialMasterId" name="MaterialMasterId" class="MaterialMasterId" style="display:none">@item.MaterialMasterId</td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-content" id="General">
+                    <div id="step1" class="tab-pane fade in active">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Issue Date</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.Partial("~/Views/Stock/MultipleIssue/Partial/DatePickerView.cshtml")
+                                    </div>
+                                    <div class="field-section" style="display:none;">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Issue Type </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.HiddenFor(x => x.MultipleIssueSlipID)
+                                                @if (Model != null && Model.InternalOderID != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+                                                {
+                                                    @Html.DropDownListFor(m => Model.IssueType_, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field issueType_cls" })
+                                                }
+                                                else
+                                                {
+                                                    @Html.DropDownListFor(m => m.IssueType, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field issueType_cls" })
+                                                }
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Issue Slip No.</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.HiddenFor(x => x.IssueSlipID)
+                                                @Html.HiddenFor(x => x.IssueSlipFK)
+                                                @Html.TextBoxFor(x => x.IssueSlipNo, new { @class = "form-control text-field General_IssueSlipNo" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        @*<div class="form-group" id="internal_Order">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Internal Order</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.InternalOderID, MMS.Web.ExtensionMethod.HtmlHelper.InternalOrderIONO(), new { @class = "select-style text-field multipleGeneral_" })
+                                            </div>
+                                        </div>*@
+                                        <div class="form-group" style="display:none" id="internal_DirectIssue">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Internal Order</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.InternalValue, MMS.Web.ExtensionMethod.HtmlHelper.OrderIONO(), new { @class = "select-style text-field InternalValue_general" })
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group" id="Direct_Style">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Style No</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.Style, MMS.Web.ExtensionMethod.HtmlHelper.BomStyleNo(), new { @class = "select-style text-field styleGeneral_" })
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="display:none" id="internal_DirectIssue_Style">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Style No</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(x => x.DirectIssue_Style, new { @class = "form-control text-field DirectIssue_Style_general" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Stores</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.StoreName, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field storeGeneral_direct" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Season</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.Season, MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "select-style text-field seasoncls_direct" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Category</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.CategoryName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field categoryGeneral_" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Group</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.GroupName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field groupGeneral_" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Stock Type </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.HiddenFor(x => x.MultipleIssueSlipID)
+                                                @Html.DropDownListFor(m => m.MaterialType, new SelectList(
+                                            new List<object>
+                                                {
+                                                new { value=0, text="Please select" },
+                                                new { value=1, text="Local" },
+                                                new { value=2, text="Customer Import"},
+                                                new { value=3, text="Direct Import"}
+                                                },
+                                                "value",
+                                                "text", 0), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Piecies </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-3 col-xs-12">
+                                                @Html.TextBoxFor(x => x.Piecies, new { @class = "form-control text-field Piecies_genral" })
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-4 col-xs-12" style="padding-left:0;">
+                                                @Html.DropDownListFor(m => m.PieciesType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field PieciesType_general" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                LotNo
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(x => x.LotNo, new { @class = "form-control text-field LotNo_general" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Balance in this Lot</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 pad_left">
+                                                    @Html.TextBoxFor(x => x.BalanceInThisListlot, new { @class = "form-control text-field BalanceInThisListlot_general" })
+                                                </div>
+                                                <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-padding">
+                                                    @Html.TextBoxFor(x => x.BalanceInthisListType, new { @class = "form-control text-field BalanceInthisListType_general" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Machine Name</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.MachineName, MMS.Web.ExtensionMethod.HtmlHelper.MachineName(), new { @class = "select-style text-field MachineName_general" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12" style="padding-right:0;">
+                                                <label for="text" class="form-label">Number of sets/pairs</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(x => x.NoOfSets, new { @class = "form-control text-field NoOfSets_general" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Color</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.Color, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { @class = "select-style text-field color_Genral" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Rate</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.TextBoxFor(x => x.Rate, new { @class = "form-control text-field rate_general" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Substance</label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.SubtanceID, MMS.Web.ExtensionMethod.HtmlHelper.SubstanceRange(), new { @class = "select-style text-field substance_color" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="divWithoutPieces" name="WithoutPieces">
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                    <label for="text" class="form-label">Required Qty</label>
+                                                </div>
+                                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                    <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 pad_left">
+                                                        @Html.TextBoxFor(x => x.RequiredQty, new { @class = "form-control text-field" })
+                                                    </div>
+                                                    <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-padding">
+                                                        @Html.DropDownListFor(m => m.RequiredType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field requiredType_general" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                    <label for="text" class="form-label">Already Issued</label>
+                                                </div>
+                                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                    <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 pad_left">
+                                                        @Html.TextBoxFor(x => x.AlredayIssued, new { @class = "form-control text-field" })
+                                                    </div>
+                                                    <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-padding">
+                                                        @Html.DropDownListFor(m => m.AlreadyUsedType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field AlreadyUsedType_general" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                    <label for="text" class="form-label">Current Issues</label>
+                                                </div>
+                                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                    <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 pad_left">
+                                                        @Html.TextBoxFor(x => x.CurrentIssue, new { @class = "form-control text-field" })
+                                                    </div>
+                                                    <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-padding">
+                                                        @Html.DropDownListFor(m => m.CurrentIssuesType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field CurrentIssuesType_general" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="divPiecesIssue" name="PiecesIssue">
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-9 col-sm-9 col-lg-3 col-xs-12 pad_left">
+                                                        <label for="text" class="form-label">Requried</label>
+                                                        @Html.TextBoxFor(x => x.RequiredQty, new { @class = "form-control text-field RequiredQty_Cls" })
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" style="padding:0;">
+                                                        <label for="text" class="form-label">Uom Type</label>
+                                                        @Html.DropDownListFor(m => m.RequiredType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field RequiredType_cls" })
+                                                    </div>
+                                                    <div class="col-md-9 col-sm-9 col-lg-3 col-xs-12">
+                                                        <label for="text" class="form-label">Pcs</label>
+                                                        @Html.TextBoxFor(x => x.PiecesRequiredQTY, new { @class = "form-control text-field PiecesRequiredQTY_cls" })
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" style="padding:0;">
+                                                        <label for="text" class="form-label">Type</label>
+                                                        @Html.DropDownListFor(m => m.PiecesRequiredQtyType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field PiecesRequiredQtyType_cls" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-9 col-sm-9 col-lg-3 col-xs-12 pad_left">
+                                                        <label for="text" class="form-label">Already</label>
+                                                        @Html.TextBoxFor(x => x.AlredayIssued, new { @class = "form-control text-field AlredayIssued_cls" })
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" style="padding:0;">
+                                                        <label for="text" class="form-label">Uom Type</label>
+                                                        @Html.DropDownListFor(m => m.AlreadyUsedType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field AlreadyUsedType_cls" })
+                                                    </div>
+                                                    <div class="col-md-9 col-sm-9 col-lg-3 col-xs-12">
+                                                        <label for="text" class="form-label">Pcs</label>
+                                                        @Html.TextBoxFor(x => x.PiecesAlreadyIssue, new { @class = "form-control text-field PiecesAlreadyIssue_cls" })
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" style="padding:0;">
+                                                        <label for="text" class="form-label">Type</label>
+                                                        @Html.DropDownListFor(m => m.PiecesAlreadyIssueType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field PiecesAlreadyIssueType_cls" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-9 col-sm-9 col-lg-3 col-xs-12 pad_left">
+                                                        <label for="text" class="form-label">Current</label>
+                                                        @Html.TextBoxFor(x => x.CurrentIssue, new { @class = "form-control text-field CurrentIssueGeneral_cls" })
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" style="padding:0;">
+                                                        <label for="text" class="form-label">Uom Type</label>
+                                                        @Html.DropDownListFor(m => m.CurrentIssuesType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field CurrentIssuesType_cls" })
+                                                    </div>
+                                                    <div class="col-md-9 col-sm-9 col-lg-3 col-xs-12">
+                                                        <label for="text" class="form-label">Pcs</label>
+                                                        @Html.TextBoxFor(x => x.PiecesCurrentIssue, new { @class = "form-control text-field PiecesCurrentIssue_cls" })
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" style="padding:0;">
+                                                        <label for="text" class="form-label">Type</label>
+                                                        @Html.DropDownListFor(m => m.PiecesCurrentType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field PiecesCurrentType_cls" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Conveyor </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.ConveyorID, MMS.Web.ExtensionMethod.HtmlHelper.Conveyor(), new { @class = "select-style text-field conveyorid_general" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Issuing For </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.HiddenFor(x => x.MultipleIssueSlipID)
+                                                @if (Model != null && Model.InternalOderID != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+                                                {
+                                                    @Html.DropDownListFor(m => m.InternalOrderingFor, new SelectList(
+                                            new List<object>
+                                                {
+                                                new { value=0, text="Please Select" },
+                                                new { value=1, text="Rework" },
+                                                new { value=2, text="Recut"},
+                                                new { value=3, text="Excess Issues"},
+                                                new { value=4, text="Sample"},
+                                                new { value=5, text="Order"},
+                                                  new { value=6, text="Sales"},
+                                                new { value=7, text="Scrap"},
+                                                new { value=8, text="Conversion"},
+                                                 new { value=9, text="Transfer"},
+                                                },
+                                                "value",
+                                                "text", 0), new { @class = "select-style text-field InternalOrderingFor_cls" })
+                                                }
+                                                else
+                                                {
+                                                    @Html.DropDownListFor(m => m.InternalOrderingFor, new SelectList(
+                                                new List<object>
+                                                    {
+                                                    new { value=0, text="Please Select" },
+                                                    new { value=1, text="Rework" },
+                                                    new { value=2, text="Recut"},
+                                                    new { value=3, text="Excess Issues"},
+                                                    new { value=4, text="Sample"},
+                                                    new { value=5, text="Order"},
+                                                      new { value=6, text="Sales"},
+                                                new { value=7, text="Scrap"},
+                                                      new { value=8, text="Conversion"},
+                                                       new { value=9, text="Transfer"},
+                                                    },
+                                                    "value",
+                                                    "text", 0), new { @class = "select-style text-field InternalOrderingFor_cls" })
+                                                }
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 no-padding">
+                                    <div class="col-xs-8 no-padding">
+                                        <div class="field-section" style="margin-bottom:5px;">
+                                            <div class="form-group">
+                                                <div class="col-md-5 col-sm-5 col-lg-2 col-xs-12">
+                                                    <label for="text" class="form-label">Material</label>
+                                                </div>
+                                                <div class="col-md-7 col-sm-7 col-lg-10 col-xs-12" style="padding-left:42px;padding-right:0;" id="MaterialMasterId_div">
+                                                    @Html.DropDownListFor(m => m.MaterialDescription, MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName(), new { @class = "select-style text-field MaterialGeneral_" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-4 no-padding">
+                                        <div class="field-section">
+                                            <div class="form-group">
+                                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                    <label for="text" class="form-label">Customer Name </label>
+                                                </div>
+                                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                    @Html.DropDownListFor(x => x.BuyerMasterId, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field BuyerMasterId_cls" })
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-padding" style="margin-top: 15px; margin-bottom: 15px; overflow-x:auto;">
+                                <table class="table" id="sizeRangeTable" style="float: left; width: 98.5%;">
+                                    <tbody>
+                                        @if (Model.sizeItemMaterialList == null || Model.sizeItemMaterialList.Count == 0)
+                                        {
+                                            <tr>
+                                                <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 39px !important;">Size</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important;">Stock</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important;">Issue</td>
+                                            </tr>
+                                        }
+                                        @if (Model.sizeItemMaterialList != null && Model.sizeItemMaterialList.Count > 0)
+                                        {
+                                            <tr>
+
+                                                @if (Model.sizeItemMaterialList != null)
+                                                {
+                                                    <td style="background-color: #ddd; padding-bottom: 3px;  padding-left: 0;  padding-top: 1px;  width: 39px !important; float: left;">Size</td>
+                                                    foreach (var item in Model.sizeItemMaterialList)
+                                                    {
+                                                        <td class="sizeVal">@item.SizeRange</td>
+                                                        count++;
+                                                    }
+                                                }
+                                            </tr>
+
+                                            <tr>
+
+                                                @if (Model.sizeItemMaterialList != null)
+                                                {
+                                                    <td style="background-color: #ddd; padding-bottom: 3px;padding-left: 0;  padding-top: 1px;  width: 39px !important; float: left;">Rate</td>
+                                                    foreach (var item in Model.sizeItemMaterialList)
+                                                    {
+                                                        <td><input type="text" class="Qty" id="qtyId@(count)" value="@item.Rate" style='width:50px;' onchange="CalculateTotal(this)" /></td>
+                                                        count++;
+                                                    }
+                                                }
+                                            </tr>
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div>
+                                <div>
+                                    Total Qty
+                                </div>
+                                @Html.TextBoxFor(x => x.TotalQty, new { @class = "form-control text-field" })
+                            </div>
+
+
+                            <div class="row">
+                                <div align="center" class=" col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                                    <div align="center" class="back-color col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                                        @if (Model != null && Model.IssueSlipNo != "" && Model.IssueType != null && Model.IssueType != 0)
+                                        {
+                                            if (Update == true)
+                                            {
+                                                <button type="button" id="Add" class="btn btn-danger packing-button" style="padding: 6px 20px;">ADD</button>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (Add == true)
+                                            {
+                                                <button type="button" id="Add" class="btn btn-danger packing-button" style="padding: 6px 20px;">ADD</button>
+                                            }
+                                        }
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 trop">
+                                    <div class="col-md-4 col-lg-4 col-sm-4 col-xs-12 no-pad">
+                                        <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                            <div class="col-md-12 col-lg-12 col-sm-6 col-xs-12 no-pad new_bot_margin">
+                                                <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 no-pad">
+                                                        <label for="component-check" style="margin-top: 8px;">Current Stock</label>
+                                                    </div>
+                                                    <div class="col-md-3 col-lg-4 col-sm-6 col-xs-12">
+                                                        @Html.TextBoxFor(x => x.CurrentStock, new { @class = "form-control text-field" })
+                                                    </div>
+                                                    <div class="col-md-4 col-lg-5 col-sm-6 col-xs-12 pad_left">
+                                                        @Html.DropDownListFor(m => m.CurrentStockType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad parti-u">
+                                            <div class="col-md-12 col-lg-12 col-sm-6 col-xs-12 no-pad">
+                                                <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 no-pad">
+                                                        <label for="component-check" style="margin-top: 8px;">Closing in all stock stores</label>
+                                                    </div>
+                                                    <div class="col-md-3 col-lg-4 col-sm-6 col-xs-12">
+                                                        @Html.TextBoxFor(x => x.ClosingStockinAllStores, new { @class = "form-control text-field" })
+                                                    </div>
+                                                    <div class="col-md-4 col-lg-5 col-sm-6 col-xs-12 pad_left">
+                                                        @Html.DropDownListFor(m => m.ClosingStockinAllStoredType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-lg-4 col-sm-4 col-xs-12">
+                                        <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                            <div class="col-md-12 col-lg-12 col-sm-6 col-xs-12 no-pad new_bot_margin">
+                                                <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 no-pad">
+                                                        <label for="component-check" style="margin-top: 8px;">Freestock</label>
+                                                    </div>
+                                                    <div class="col-md-3 col-lg-4 col-sm-6 col-xs-12">
+                                                        @Html.TextBoxFor(x => x.FreeStock, new { @class = "form-control text-field" })
+                                                    </div>
+                                                    <div class="col-md-4 col-lg-5 col-sm-6 col-xs-12 pad_left">
+                                                        @Html.DropDownListFor(m => m.FreeStockType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad parti-u">
+                                            <div class="col-md-12 col-lg-12 col-sm-6 col-xs-12 no-pad new_bot_margin">
+                                                <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 no-pad">
+                                                        <label for="component-check" style="margin-top: 8px;">In Transit</label>
+                                                    </div>
+                                                    <div class="col-md-3 col-lg-4 col-sm-6 col-xs-12">
+                                                        @Html.TextBoxFor(x => x.InTransitValue, new { @class = "form-control text-field" })
+                                                    </div>
+                                                    <div class="col-md-4 col-lg-5 col-sm-6 col-xs-12 pad_left">
+                                                        @Html.DropDownListFor(m => m.InTransitType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-4 col-lg-4 col-sm-4 col-xs-12">
+                                        <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                            <div class="col-md-12 col-lg-12 col-sm-6 col-xs-12 no-pad">
+                                                <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 no-pad">
+                                                        <label for="component-check" style="margin-top: 8px;">Reserved Stock</label>
+                                                    </div>
+                                                    <div class="col-md-3 col-lg-4 col-sm-6 col-xs-12">
+                                                        @Html.TextBoxFor(x => x.ReserverQty, new { @class = "form-control text-field" })
+                                                    </div>
+                                                    <div class="col-md-4 col-lg-5 col-sm-6 col-xs-12 pad_left">
+                                                        @Html.DropDownListFor(m => m.ReserverQtyType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad parti-u1">
+                                            @if (Model.IssueSlipID == 0)
+                                            {
+
+                                                <div align="center" class="col-md-6 col-xs-12 col-lg-6 col-sm-6">
+                                                    <button type="button" class="btn btn-primary" id="AutoDisplay_">Auto Display</button>
+                                                </div>
+                                            }
+                                            <div align="center" class="col-md-6 col-xs-12 col-lg-6 col-sm-6">
+                                                <button type="button" class="btn btn-primary" id="ReleaseReserved">Release Reserved stk</button>
+                                            </div>
+                                            <div align="center">
+                                                <button type="button" class="btn btn-primary" id="ReserveFreeStock" style="margin-top:10px;">Reserve Free Stock</button>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="del_botton_border" style="margin: 20px 0px;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="del_botton_border" style="margin: 20px 0px;">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                                    <div class="field-section">
+                                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+
+                                            <div class="table-responsive table-td-padding parent-table-height">
+                                                <table class="table" id="list-amended-material_">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>Edit</td>
+                                                            <td>Remove</td>
+                                                            <td>Issue Slip No</td>
+                                                            <td>Order No</td>
+                                                            <td>Style</td>
+                                                            <td>Issue Type</td>
+                                                            <td>NoofSets</td>
+                                                            <td>Group</td>
+                                                            <td>Category</td>
+                                                            <td>StoresName</td>
+                                                            <td>Material</td>
+                                                            <td>Color</td>
+                                                            <td>Reqd qty</td>
+                                                            <td>Alreday issued</td>
+                                                            <td>Current Issue</td>
+                                                            <td>Rate</td>
+                                                        </tr>
+                                                    </thead>
+                                                    @if (Model != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+                                                    {
+                                                        <tbody>
+                                                            @foreach (var item in Model.issueSlip_MaterialDetails)
+                                                            {
+                                                                <tr id="@item.IssueSlipId">
+                                                                    @if (Delete == true)
+                                                                    {
+                                                                        <td><input type='button' value='Remove' onclick='Delete("@item.IssueSlipId")' class='' /></td>
+                                                                    }
+                                                                    @if (Update == true)
+                                                                    {
+                                                                        <td><input type='button' name='Edit' id='EditRow' value='Edit' onclick='EditClick("@item.IssueSlipId")' class='' /></td>
+                                                                    }
+
+                                                                    <td id='IssueSlipNo' class='General_IssueSlipNo'>@item.IssueSlipNo</td>
+                                                                    <td id='OrderNo' class='General_OrderNo'>@item.OrderNo</td>
+                                                                    <td id='InternalValue' class='InternalValue_general'>@item.Style </td>
+                                                                    <td id='IssueType' class='issueTypecls'>@item.IssueType</td>
+                                                                    <td id='NoOfSets' class='NoOfSets_general'>@item.NoOfSets</td>
+                                                                    <td id='GroupName' class='groupGeneral_'>@item.GroupId </td>
+                                                                    <td id='CategoryName' class='categoryGeneral_'>@item.CategoryId</td>
+                                                                    <td id='StoreName' class='storeGeneral_'>@item.StoreName</td>
+                                                                    <td id='MaterialDescription' class=''>@item.MaterialName</td>
+                                                                    <td id='Color' class='color_Genral'>@item.ColourId</td>
+                                                                    <td id='RequiredQty' class='RequiredQty'>@item.RequiredQty</td>
+                                                                    <td id='AlredayIssued" + rowCount + "' class='AlredayIssued'>@item.AlredayIssued</td>
+                                                                    <td id='CurrentIssue' class='CurrentIssue'>@item.CurrentIssue</td>
+                                                                    <td style='' id='Rate' class='rate_general'>@item.Rate</td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    }
+                                                    else
+                                                    {
+                                                        <tbody></tbody>
+                                                    }
+
+                                                </table>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            }
+            <div class="form-footer">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+
+                        @if (Model.IssueSlipID == 0)
+                        {
+                            <input type="button" id="BtnSave" class="btn btn-default btn-style" value="Save" />
+                        }
+                        else
+                        {
+                            @Html.HiddenFor(x => x.IssueSlipID)
+                            <input type="button" id="BtnUpdate" class="btn btn-default btn-style" value="Update" onclick="Update()" />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="lefterr_icon">
+    <div class="direction">  &lt;  </div>
+</div>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/ComboBox.js"></script>
+
+@Scripts.Render("~/bundles/MultiplIssue")
+@Styles.Render("~/Content/MMS/css")
+@using System.Web.Optimization;
+<script>
+    if ('@Order' == 'True') {
+        $("#General").hide();
+        $("#Order").show();
+        $(".multipleGeneral_").multiselect();
+        $(".multipleGeneral_").multiselect({
+            noneSelectedText: "Please Select",
+            classes: "selLocCsr"
+        });
+        $(".multipleOrder_").multiselect();
+        $(".multipleOrder_").multiselect({
+            noneSelectedText: "Please Select",
+            classes: "selLocCsr"
+        });
+        $("#MaterialDescription").combobox();
+        $(".MaterialGeneral_").combobox();
+        $(".InternalValue_general").combobox();
+        $(".LotNo_general").multiselect();
+        $(".LotNo_general").multiselect({
+            noneSelectedText: "Please Select",
+            classes: "selLocCsr"
+        });
+    }
+    else {
+       
+        $(".MaterialGeneral_").combobox();
+        $(".InternalValue_general").combobox();
+        $("#General").show();
+        $("#internal_Order").hide();
+        $("#internal_DirectIssue").show();
+        $("#InternalValue").val("");
+        $("#Direct_Style").hide();
+        $("#internal_DirectIssue_Style").show();
+        $("#DirectIssue_Style").val("");
+        $("#Order").hide();
+    }
+</script>
+<script src="~/Scripts/MultipleIssueScript.js"></script>
+

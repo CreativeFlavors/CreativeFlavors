@@ -1,0 +1,2639 @@
+﻿@model MMS.Web.Models.StockModel.IndentModel
+@using MMS.Repository.Managers
+@using MMS.Core.Entities
+@{
+    int id = Model.IndentId;
+    Session["CountryMasterId"] = id;
+    List<int> ioconver = new List<int>();
+    List<int> SelectedValue = new List<int>();
+    if (id == 0)
+    {
+        Model.UnitId = Guid.Parse("3c3cad63-2b68-4f28-9cc9-f99930e7b5ae");
+    }
+    bool Order = false;
+    if (!string.IsNullOrEmpty(Model.MRPNO_txtValue))
+    {
+        Order = true;
+    }
+
+    tbl_PermissionSetting PermissionSettingModel = new MMS.Core.Entities.tbl_PermissionSetting();
+    PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
+
+    List<tbl_Permission> PermissionModel = new List<tbl_Permission>();
+    if (PermissionSettingModel != null)
+    {
+        PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Indent", PermissionSettingModel.PermissionID);
+    }
+
+}
+@{
+    bool GridDelete = false; bool Save = false; bool Add = false; bool Update = false; bool Display = false; bool Edit = false; bool Delete = false;
+    foreach (var item in PermissionModel)
+    {
+        if (item.PermissionDesc == "Save")
+        {
+            Save = true;
+        }
+        if (item.PermissionDesc == "Add")
+        {
+            Add = true;
+        }
+        if (item.PermissionDesc == "Update")
+        {
+            Update = true;
+        }
+        if (item.PermissionDesc == "Edit")
+        {
+            Edit = true;
+        }
+        if (item.PermissionDesc == "GridDelete")
+        {
+            GridDelete = true;
+        }
+        if (item.PermissionDesc == "Delete")
+        {
+            Delete = true;
+        }
+    }
+}
+
+<style>
+    .right-form-section {
+        width: 98% !important;
+    }
+
+    .veh-tablecont1 {
+        margin: 16px -75px -16px !important;
+    }
+
+    #ui-id-2 {
+        width: 500px !important;
+        height: 300px;
+        overflow: auto;
+    }
+
+    .not-allowed input {
+        cursor: not-allowed !important;
+    }
+
+    .not-allowed {
+        cursor: not-allowed !important;
+    }
+
+    #ui-id-3, #ui-id-4 {
+        width: 163px !important;
+        height: 150px;
+        overflow: auto;
+    }
+</style>
+@Scripts.Render("~/bundles/MultiplIssue")
+@Styles.Render("~/Content/MMS/css")
+@using System.Web.Optimization;
+<script type="text/javascript">
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+    $(".multipleOrder_").multiselect();
+    $(".multipleOrder_").multiselect({
+        noneSelectedText: "Please Select",
+        classes: "selLocCsr"
+    });
+    $('.multipleOrder_').multiselect({
+        includeSelectAllOption: true
+    });
+    $(document).ready(function () {
+        $("#MaterialName").combobox();
+        $("#MaterialGrpId").combobox();
+        $("#MaterialCatId").combobox();
+        if(@id==0)
+        {
+            $("#UnitId").val("3c3cad63-2b68-4f28-9cc9-f99930e7b5ae");
+        }
+    });
+    $("#Date").datepicker({ dateFormat: "dd-mm-yy" , maxDate: new Date() });
+    $("#AmmendmentDate").datepicker({ dateFormat: "dd-mm-yy" , maxDate: new Date() });
+    function moveAll(IoNoLst, SelectedIndentNO) {
+        $('#' + IoNoLst + ' option').appendTo('#' + SelectedIndentNO);
+    }
+
+    function moveSelected(IoNoLst, SelectedIndentNO) {
+        $('#' + IoNoLst + ' option:selected').appendTo('#' + SelectedIndentNO);
+    }
+    function selectAll() {
+        $("select option").attr("selected", "selected");
+    }
+</script>
+
+<div class="right-form-section clearfix">
+    <form role="form" class="form-inline">
+        <div class="tab-content">
+            <div class="tab-pane fade in active" id="step1">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 pull-right no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 ">
+                                        <label class="form-label" for="text"><span class="orange-lable">Amendment</span></label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.AmmendmentNo, new { @class = "form-control text-field red_sec2", @placeholder = "No...." })
+                                        @if (Model != null && Model.IndentId != 0)
+                                        {
+                                            var amndtDate = Model.AmmendmentDate;
+                                            @Html.TextBoxFor(m => m.AmmendmentDate, new { @Value = amndtDate, @class = "form-control text-field red_sec left_box" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(m => m.AmmendmentDate, new { @Value = string.Empty, @class = "form-control text-field red_sec left_box" })
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Indent Type</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.HiddenFor(x => x.IndentId)
+                                        @Html.DropDownListFor(m => m.IndentType, new SelectList(
+                                       new List<object> {
+                                           new { value=0, text="Local" },
+                                           new { value=1, text="Import"}
+                                       },
+                                       "value",
+                                       "text", 0), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Indent No</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(x => x.IndentNo, new { @class = "form-control text-field", @readonly = true })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Simple MRP No</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12" id="MRPID">
+                                        @if (Model.MRPNO_txtValue == "" || Model.MRPNO_txtValue == null)
+                                        {
+                                            if (Model != null && Model.IndentId != 0 && Model.MRPList != null && Model.MRPList.Count > 0)
+                                            {
+                                                @Html.ListBox("InternalOderID_", new MultiSelectList(Model.MRPList, "SimpleMRPID", "MRPNO", Model.MRPNO.Split(',').Select(x => int.Parse(x)).ToArray()), new { multiple = "multiple", placeholder = "Please select category", @class = "multipleOrder_", @style = "width:172px;", id = "multipleOrder_", required = "required" })
+                                            }
+                                            else
+                                            {
+                                                @Html.ListBox("InternalOderID_", new SelectList(Model.MRPList, "SimpleMRPID", "MRPNO", Model.MRPList), new { multiple = "multiple", placeholder = "Please select filter type", @class = "multipleOrder_", @style = "width:172px;", id = "multipleOrder_", required = "required" })
+
+                                            }
+                                            <input type="button" value="click" id="MRPNO_CHANGE">
+                                        }
+
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12" id="Order_id">
+                                        @Html.TextBoxFor(x => x.MRPNO_txtValue, new { @class = "form-control text-field", @readonly = true, @style = "display:none;" })
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Requested by</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.Hidden("HiddenIndentId")
+                                        @Html.TextBoxFor(m => m.RequestedBy, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Unit Name</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.DropDownListFor(m => m.UnitId, MMS.Web.ExtensionMethod.HtmlHelper.IndentCompanyName(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Order By</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.DropDownListFor(m => m.Indendingfor, MMS.Web.ExtensionMethod.HtmlHelper.GetIndentType(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Mat Category</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12" id="MaterialCatId_">
+                                        @Html.DropDownListFor(m => m.MaterialCatId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section" id="">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Indending For</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @if (Model != null && Model.IndentId != 0)
+                                        {
+                                            @Html.DropDownListFor(m => m.OrderTypeID, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field issueTypecls" })
+                                        }
+                                        else
+                                        {
+                                            @Html.DropDownListFor(m => m.OrderType, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field issueTypecls" })
+                                        }
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Date</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @if (Model != null && Model.IndentId != 0)
+                                        {
+                                            var indate = Model.Date;
+                                            @Html.TextBoxFor(m => m.Date, new { @Value = indate, @class = "form-control text-field" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(m => m.Date, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field" })
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Season</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.DropDownListFor(m => m.SeasonId, MMS.Web.ExtensionMethod.HtmlHelper.SeasonName(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Mat Group</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12" id="MaterialGrpId_">
+                                        @Html.DropDownListFor(m => m.MaterialGrpId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Buyer</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.DropDownListFor(m => m.BuyerId, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="col-lg-8 col-sm-6 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-2 col-xs-12 no-padding">
+                                            <label class="form-label" for="text">Material Name</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-10 col-xs-12" id="MaterialName_" style="padding-left:30px;">
+                                            @Html.DropDownListFor(m => m.MaterialName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName(), new { @class = "select-style text-field " })
+                                            <button type="button" class="btn btn-info btn-sm but_search_styles" data-toggle="modal" title="Material List" data-target="#auto_search">...</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12" style="padding-left:20px;">
+                                            <label class="form-label" for="text">Color</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12" style="padding-left:23px;padding-right:0;">
+                                            @Html.HiddenFor(x => x.ColourId)
+                                            @Html.DropDownListFor(m => m.ColourId, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { @class = "select-style text-field colorval" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">UOM</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.DropDownListFor(m => m.UOMId, MMS.Web.ExtensionMethod.HtmlHelper.ShortUnitName(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Required Qty</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.ReqQty, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Store Stock</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.StoreStock, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Supplier</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.DropDownListFor(m => m.SupplierId, MMS.Web.ExtensionMethod.HtmlHelper.SupplierName(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section"></div>
+                            <div class="field-section"></div>
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Rate</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.Rate, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Intend Qty</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.IntendQty, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Free Stock</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.FreeStock, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Store</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.DropDownListFor(m => m.StoreId, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Value</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextBoxFor(m => m.Value, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Remark</label>
+                                    </div>
+                                    @Html.HiddenFor(x => x.BOMMaterialID)
+                                    @Html.HiddenFor(x => x.BOMID)
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label class="form-label" for="text">Size Range</label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.DropDownListFor(m => m.SizeRangeID, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 no-pad over-all-mar">
+                            <div class="col-md-4 col-lg-4 col-sm-4 col-xs-12">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Prepared By</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.PreparedBy, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Material Type</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.MaterialType, new SelectList(
+                                            new List<object>
+                                                {
+                                                new { value=0, text="Please select" },
+                                                new { value=1, text="Local" },
+                                                new { value=2, text="Customer Import"},
+                                                new { value=3, text="Direct Import"}
+                                                },
+                                                "value",
+                                                "text", 0), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-4 col-sm-4 col-xs-12">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Subtance </label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.SubstanceMasterID, MMS.Web.ExtensionMethod.HtmlHelper.SubstanceRange(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-4 col-sm-4 col-xs-12">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Checked By</label>
+                                        </div>
+                                        @Html.HiddenFor(x => x.IndentMaterialID)
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.CheckedBy, new { @class = "form-control text-field", @Readonly = "true" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-4 col-sm-4 col-xs-12">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label class="form-label" for="text">Approved By</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(m => m.ApprovedBy, new { @class = "form-control text-field", @Readonly = "true" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="field-section">
+                <div class="form-group">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                        <div class="table-responsive table-td-padding parent-table-height padding-lr-6px table-row-bg" style="height:300px;overflow:auto;width:188px;">
+                            @Html.HiddenFor(x => x.SizeRangeDetails)
+                            <table class="table" id="sizeRangeTable" style="">
+                                <thead>
+                                    <tr>
+                                        <td>S.No</td>
+                                        <td>Qty</td>
+                                        <td>Rate</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        decimal total = 0;
+                                        if (Model.PurchaseOrderSizeRangeQuantityList != null && Model.PurchaseOrderSizeRangeQuantityList.Count > 0)
+                                        {
+                                            total = Model.PurchaseOrderSizeRangeQuantityList.Sum(x => x.Quantity);
+                                            foreach (var item in Model.PurchaseOrderSizeRangeQuantityList)
+                                            {
+                                                <tr>
+                                                    <td>@item.Size</td>
+                                                    <td><input type="text" value="@item.Quantity" style="width: 50px;" /></td>
+                                                    <td><input type="text" value="@item.Rate" style="width: 50px;" /></td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+
+                                </tbody>
+                                <tfoot class="footer-bg-gray">
+                                    <tr>
+                                        <td>Total</td>
+                                        <td id="TotalCount">@total </td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="" id="step2">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="field-section">
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                <div class="col-xs-8" style="margin-top:10px;margin-bottom:10px;">
+                                    <p class="section-title ">List of Material </p>
+                                </div>
+                                <div class="col-xs-4" style="text-align:right;margin-top:10px;margin-bottom:10px;">
+                                    <input type="button" class="btn btn-default btn-style orderDispaly" style="cursor: pointer;" title="Add" value="Add" id="AUtoDisplay" />
+                                </div>
+                                <div class="col-xs-12">
+                                    <div class="table-responsive table-td-padding parent-table-height" style="height:300px;overflow:auto;">
+                                        <table id="list-amended-material" class="table">
+                                            <thead>
+                                                <tr>
+                                                    @if (Model != null && Model.IndentNo != "" && string.IsNullOrEmpty(Model.MRPNO) || string.IsNullOrEmpty(Model.MRPNO) || Model.MRPNO == "0")
+                                                    {
+                                                        <td>Remove</td>
+                                                        <td>Edit</td>
+                                                        <td style="display:none">IndentId</td>
+                                                        <td style="display:none">IndentNo</td>
+                                                        <td>CategroyName</td>
+                                                        <td>GroupName</td>
+                                                        <td>MaterialName</td>
+                                                        <td>Color</td>
+                                                        <td>SupplierName</td>
+                                                        <td>UOMName</td>
+                                                        <td>Rate</td>
+                                                        <td>Value</td>
+                                                        <td>ReqQty</td>
+                                                        <td>IntendQty</td>
+                                                        <td>StoreStock</td>
+                                                        <td>FreeStock</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>Remove</td>
+                                                        <td>Edit</td>
+                                                        <td style="display: none">BOMID</td>
+                                                        <td style="display: none">BOMMaterialID</td>
+                                                        <td>Category</td>
+                                                        <td>MaterialGroup</td>
+                                                        <td>Substance</td>
+                                                        <td>Order No</td>
+                                                        <td>MaterialName</td>
+                                                        <td>Color</td>
+                                                        <td>Req Qty</td>
+                                                        <td>IntendQty</td>
+                                                        <td>Rate</td>
+                                                        <td>UOM</td>
+                                                        <td>Value</td>
+
+                                                    }
+
+
+                                                </tr>
+                                            </thead>
+                                            @if (Model.IndentMaterialsList != null && Model.IndentMaterialsList.Count > 0)
+                                            {
+                                                <tbody>
+                                                    @if (Model != null && Model.IndentMaterialsList != null && Model.IndentMaterialsList.Count > 0)
+                                                    {
+                                                        decimal? totalCount = 0;
+                                                        int column = 1;
+                                                        foreach (var item in Model.IndentMaterialsList)
+                                                        {
+                                                            GRNTypeManager manger = new GRNTypeManager();
+                                                            ColorManager colorManager = new ColorManager();
+                                                            ColorMaster colorMaster = new ColorMaster();
+                                                            string colorname = "";
+                                                            colorMaster = colorManager.GetColorMasterID(item.ColorMasterID);
+                                                            if (colorMaster != null && colorMaster.ColorMasterId != 0)
+                                                            {
+                                                                colorname = colorMaster.Color;
+                                                            }
+                                                            var OrderType = manger.Get().Where(x => x.GrnTypeMasterId == item.OrderType);
+                                                            if (item.OrderType != null && OrderType.FirstOrDefault().IssueType.Trim() == "General")
+                                                            {
+                                                                <tr class='' id="@item.IndentMaterialID">
+                                                                    <td id='BOMID' style='display:none' class='BOMID' value=''>@item.BOMID </td>
+                                                                    <td id='MRPNO' style='display:none' class='MRPNO' value=''>@item.MRPNO </td>
+                                                                    <td id='BOMMaterialID' style='display:none' class='BOMMaterialID' value=''>@item.BOMMaterialID </td>
+                                                                    @if (GridDelete == true)
+                                                                    {
+                                                                        <td><input type='button' value='Remove' onclick='Delete("@item.IndentMaterialID")' class='Delete' /></td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td><input type='button' value='Remove' onclick='alert("No Permission To Access")' class='Delete' /></td>
+                                                                    }
+                                                                    @if (Edit == true)
+                                                                    {
+                                                                        <td><input type='button' value='Edit' onclick="RowClick('@item.IndentMaterialID','0')" class='Edit' /> </td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td><input type='button' value='Edit' onclick="alert('No Permission To Access')" class='Edit' /> </td>
+                                                                    }
+                                                                    <td id='CategoryName' class='CategoryName' value=''>@item.CategoryName </td>
+                                                                    <td id='GroupName' class='GroupName' value=''> @item.GroupName</td>
+                                                                    <td id='SubstanceRange' class='SubstanceRange' value=''> @item.SubstanceRange </td>
+                                                                    <td id='BuyerPoNo' class='BuyerPoNo' value=''>@item.BuyerPoNo</td>
+                                                                    <td id='MaterialDescription' class='MaterialDescription' value=''>@item.MaterialDescription</td>
+                                                                    <td id='Color' class='Color' value=''>@colorname</td>
+                                                                    <td id='RequiredQty' class='RequiredQty' value=''>@item.RequiredQty</td>
+                                                                    <td id='IndentQTY' class='IndentQTY' value=''>@item.IndentQTY</td>
+                                                                    <td id='Price' class='Price' value=''>@item.Price</td>
+                                                                    <td id='WastageName' class='WastageName' value=''>@item.WastageName</td>
+                                                                    <td id='Value' class='Value' value=''>@item.Value</td>
+
+                                                                </tr>
+                                                                column++;
+                                                            }
+                                                            else
+                                                            {
+                                                                <tr id="@item.IndentMaterialID" class=''>
+                                                                    <td id='BOMID' style='display:none' class='BOMID' value=''>@item.BOMID </td>
+                                                                    <td id='MRPNO' style='display:none' class='MRPNO' value=''>@item.MRPNO </td>
+
+                                                                    <td id='BOMMaterialID' style='display:none' class='BOMMaterialID' value=''>@item.BOMMaterialID </td>
+                                                                    @if (GridDelete == true)
+                                                                    {
+                                                                        <td><input type='button' value='Remove' onclick='Delete("@item.IndentMaterialID")' class='Delete' /></td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td><input type='button' value='Remove' onclick='alert("No Permission To Access")' class='Delete' /></td>
+                                                                    }
+                                                                    @if (Edit == true)
+                                                                    {
+                                                                        <td><input type='button' value='Edit' onclick="RowClick('@item.IndentMaterialID','@item.BOMID')" class='Delete' /> </td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td><input type='button' value='Edit' onclick="alert('No Permission To Access')" class='Delete' /> </td>
+                                                                    }
+
+                                                                    <td id='CategoryName' class='CategoryName' value=''>@item.CategoryName </td>
+
+                                                                    <td id='GroupName' class='GroupName' value=''> @item.GroupName</td>
+
+                                                                    <td id='SubstanceRange' class='SubstanceRange' value=''> @item.SubstanceRange </td>
+                                                                    <td id='BuyerPoNo' class='BuyerPoNo' value=''>@item.BuyerPoNo</td>
+                                                                    <td id='MaterialDescription' class='MaterialDescription' value=''>@item.MaterialDescription</td>
+
+                                                                    <td id='Color' class='Color' value=''>@item.Color</td>
+
+                                                                    <td id='RequiredQty' class='RequiredQty' value=''>@item.RequiredQty</td>
+
+                                                                    <td id='IndentQTY' class='IndentQTY' value=''>@item.IndentQTY</td>
+                                                                    <td id='Price' class='Price' value=''>@item.Price</td>
+                                                                    <td id='WastageName' class='WastageName' value=''>@item.WastageName</td>
+
+                                                                    <td id='Value' class='Value' value=''>@item.Value</td>
+
+
+                                                                </tr>
+                                                                column++;
+
+                                                            }
+                                                        }
+                                                    }
+
+                                                </tbody>
+                                            }
+                                            else if (Model != null && Model.IndentNo != "" && Model.IndentId != 0 && Model.MRPNO == "" || Model.MRPNO == "0")
+                                            {
+                                                int column = 1;
+                                                foreach (var item in Model.IndentMateriallist)
+                                                {
+                                                    string CategroyName = string.Empty;
+                                                    string GroupName = string.Empty;
+                                                    string Color = string.Empty;
+                                                    string SupplierName = string.Empty;
+                                                    string UOMName = string.Empty;
+                                                    string MaterialName = string.Empty;
+                                                    MaterialCategoryMaster materialCategroyMaster = new MaterialCategoryMaster();
+                                                    materialgroupmaster groupMaster = new materialgroupmaster();
+                                                    SupplierMaster supplierMaster = new SupplierMaster();
+                                                    UomMaster uomMaster = new UomMaster();
+                                                    tbl_materialnamemaster materialNameMaster = new tbl_materialnamemaster();
+                                                    MaterialMaster materialMaster = new MaterialMaster();
+                                                    MMS.Repository.Managers.MaterialManager materialManager = new MMS.Repository.Managers.MaterialManager();
+                                                    MMS.Repository.Managers.MaterialNameManager materialNameManager = new MMS.Repository.Managers.MaterialNameManager();
+                                                    MMS.Repository.Managers.UOMManager uomManager = new MMS.Repository.Managers.UOMManager();
+                                                    MMS.Repository.Managers.SupplierMasterManager supplierMasterManager = new MMS.Repository.Managers.SupplierMasterManager();
+                                                    supplierMaster = supplierMasterManager.GetSupplierMasterId(item.SupplierId);
+                                                    MMS.Repository.Managers.MaterialGroupManager groupManager = new MMS.Repository.Managers.MaterialGroupManager();
+                                                    groupMaster = groupManager.GetmaterialgroupmasterId(item.MaterialGrpId);
+                                                    MMS.Repository.Managers.MaterialCategoryManager CatergoryManager = new MMS.Repository.Managers.MaterialCategoryManager();
+                                                    materialCategroyMaster = CatergoryManager.GetMaterialCategoryMaster(item.MaterialCatId);
+                                                    ColorMaster colorMaster = new ColorMaster();
+                                                    MMS.Repository.Managers.ColorManager colorManager = new MMS.Repository.Managers.ColorManager();
+                                                    colorMaster = colorManager.GetColorMasterID(item.ColourId);
+                                                    uomMaster = uomManager.GetUomMasterId(item.UOMId);
+                                                    materialMaster = materialManager.GetMaterialMasterId(item.MaterialId);
+                                                    if (materialMaster != null)
+                                                    {
+                                                        materialNameMaster = materialNameManager.GetMaterialNameMasterId(materialMaster.MaterialName);
+                                                    }
+                                                    if (supplierMaster != null)
+                                                    {
+                                                        SupplierName = supplierMaster.SupplierName;
+                                                    }
+                                                    if (materialCategroyMaster != null)
+                                                    {
+                                                        CategroyName = materialCategroyMaster.CategoryName;
+                                                    }
+                                                    if (groupMaster != null)
+                                                    {
+                                                        GroupName = groupMaster.GroupName;
+                                                    }
+                                                    if (colorMaster != null)
+                                                    {
+                                                        Color = colorMaster.Color;
+                                                    }
+                                                    if (uomMaster != null)
+                                                    {
+                                                        UOMName = uomMaster.LongUnitName;
+                                                    }
+                                                    if (materialNameMaster != null)
+                                                    {
+                                                        MaterialName = materialNameMaster.MaterialDescription;
+                                                    }
+                                                    <tr id="@item.IndentId" class=''>
+                                                        <td id='IndentId' style='display:none' class='IndentId' value=''>@item.IndentId </td>
+
+                                                        <td id='IndentNo' style='display:none' class='IndentNo' value=''>@item.IndentNo </td>
+                                                        <td></td>
+                                                        @if (GridDelete == true)
+                                                        {
+                                                            <td> <input type='button' value='Remove' onclick='Delete(" + @item.IndentId+")' class='Delete' /></td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td> <input type='button' value='Remove' onclick='alert("No Permission To Access")' class='Delete' /></td>
+                                                        }
+                                                        @if (GridDelete == true)
+                                                        {
+                                                            <td> <input type='button' value='Edit' onclick='RowClick(" + @item.IndentId+")' class='Edit' /></td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td> <input type='button' value='Edit' onclick='alert("No Permission To Access")' class='Edit' /></td>
+                                                        }
+                                                        <td id='CategoryName' class='CategoryName' value=''>@CategroyName</td>
+                                                        <td id='GroupName' class='GroupName' value=''> @GroupName</td>
+                                                        <td id='GroupName' class='GroupName' value=''> @MaterialName</td>
+                                                        <td id='Color' class='Color' value=''> @Color </td>
+                                                        <td id='SupplierName' class='SupplierName' value=''>@SupplierName</td>
+                                                        <td id='UOMName' class='UOMName' value=''>@UOMName</td>
+                                                        <td id='Rate' class='Rate' value=''>@item.Rate</td>
+                                                        <td id='Value' class='Value' value=''>@item.Value</td>
+                                                        <td id='ReqQty' class='ReqQty' value=''>@item.ReqQty</td>
+                                                        <td id='IntendQty' style='display:none' class='IntendQty' value=''>@item.IntendQty</td>
+                                                        <td id='StoreStock' style='display:none' class='StoreStock' value=''>@item.StoreStock</td>
+                                                        <td id='FreeStock' style='display:none' class='FreeStock' value=''>@item.FreeStock</td>
+                                                        <td id='MaterialCatId' style='display:none' class='MaterialCatId' value=''>@item.MaterialCatId</td>
+                                                        <td id='MaterialGrpId' style='display:none' class='MaterialGrpId' value=''>@item.MaterialGrpId</td>
+                                                        <td id='ColourId' style='display:none' class='ColourId' value=''>@item.ColourId</td>
+                                                        <td id='UOMId' style='display:none' class='UOMId' value=''>@item.UOMId</td>
+                                                        <td id='SupplierId' style='display:none' class='SupplierId' value=''>@item.SupplierId</td>
+                                                        <td id='MaterialName' style='display:none' class='MaterialName' value=''>@item.MaterialId</td>
+                                                        <td id='BuyerId' style='display:none' class='BuyerId' value=''>@item.BuyerId</td>
+                                                        <td id='SeasonId' style='display:none' class='SeasonId' value=''>@item.SeasonId</td>
+                                                        <td id='SelectedIndentNO' style='display:none' class='SelectedIndentNO' value=''>@item.SelectedIndentNO</td>
+                                                        <td id='IndentId' style='display:none' class='IndentId' value=''>@item.IndentId</td>
+                                                        <td id='AmmendmentNo' style='display:none' class='AmmendmentNo' value=''>@item.AmmendmentNo</td>
+                                                        <td id='AmmendmentDate' style='display:none' class='AmmendmentDate' value=''>@item.AmmendmentDate</td>
+                                                        <td id='IndentType' style='display:none' class='IndentType' value=''>@item.IndentType</td>
+                                                        <td id='IoNo' style='display:none' class='IoNo' value=''>@item.IoNo</td>
+                                                        <td id='UnitId' style='display:none' class='UnitId' value=''>@item.UnitId</td>
+                                                        <td id='Indendingfor' style='display:none' class='Indendingfor' value=''>@item.Indendingfor</td>
+                                                        <td id='Date' style='display:none' class='Date' value=''>@item.Date</td>
+                                                        <td id='RequestedBy' style='display:none' class='RequestedBy' value=''>@item.RequestedBy</td>
+                                                        <td id='StoreStock' style='display:none' class='StoreStock' value=''>@item.StoreStock</td>
+                                                        <td id='Rate' style='display:none' class='Rate' value=''>@item.Rate</td>
+                                                        <td id='IntendQty' style='display:none' class='IntendQty' value=''>@item.IntendQty</td>
+                                                        <td id='FreeStock' style='display:none' class='FreeStock' value=''>@item.FreeStock</td>
+                                                        <td id='ColourId' style='display:none' class='ColourId' value=''>@item.ColourId</td>
+                                                        <td id='SupplierId' style='display:none' class='SupplierId' value=''>@item.SupplierId</td>
+                                                        <td id='MRPNO' style='display:none' class='MRPNO' value=''>@item.MRPNO</td>
+
+                                                    </tr>
+                                                    column++;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tbody></tbody>
+                                            }
+
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-footer">
+            <div class="row">
+                <div align="right" class="col-xs-12 col-md-12 col-sm-12" sstyle="margin-top:5px;margin-bottom:5px;">
+                    <div class="col-md-2" style="float: right;">
+                        <label style="text-align: left;" class="form-label" for="text">Total Amount</label>
+                        @if (Model != null && Model.IndentMaterialsList != null && Model.IndentMaterialsList.Count > 0)
+                        {
+
+                            <input type="text" style="cursor: pointer;" id="TotalAmount" value="@Model.IndentMaterialsList.Sum(x => x.IndentQTY)" />
+                        }
+                        else
+                        {
+                            <input type="text" style="cursor: pointer;" id="TotalAmount" value="" />
+                        }
+
+                    </div>
+                </div>
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                    <input type="button" class="btn btn-default btn-style" value="Close" onclick="Cancel()" />
+
+
+
+                    @{
+                        if (Model.IndentId == 0)
+                        {
+                            if (Save == true)
+                            {
+                                <input type="button" id="BtnSave" class="btn btn-default btn-style" value="Save" onclick="Save()" />
+                                <input type="hidden" id="HdnCurrencyExchangeID" />
+                            }
+                            else
+                            {
+                                <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Save">
+                            }
+                        }
+                        else
+                        {
+                            if (Update == true)
+                            {
+                                <input type="button" class="btn btn-default btn-style" value="Update" onclick="Save()" />
+                            }
+                            else
+                            {
+                                <input type="button" onclick="alert('No Permission To access !')" style="cursor: pointer;" class="btn btn-default btn-style" value="Update">
+                            }
+
+                        }
+                        <input type="button" class="btn btn-default btn-style" value="Back" onclick="Back()" />
+                    }
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="auto_search" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header sear_head">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Material Name List</h4>
+            </div>
+            <div class="modal-body sear_body">
+                <ul class="mater_listers">
+                    @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName().Where(x => x.Value != ""))
+                    {
+                        <li id="@item.Value">@item.Text</li>
+                    }
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button id="materialOpenId" type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="lefterr_icon">
+    <div class="direction">&lt;  </div>
+</div>
+
+<script>
+    $( document ).ready(function() {
+        if ('@Update' == 'False' || '@Edit' == 'False') {
+            $('#list-amended-material tbody tr').each(function () {
+                $(this).find(".Edit").addClass('not-allowed').removeAttr('onclick');
+            });
+        }
+        else {
+            $('#list-amended-material  tbody tr').each(function () {
+            });
+        }
+        if ('@Delete' == 'False') {
+            $('#list-amended-material  tbody tr').each(function () {
+                $(this).find(".Delete").addClass('not-allowed').removeAttr('onclick');
+            });
+        }
+        else {
+            $('#list-amended-material  tbody tr').each(function () {
+            });
+        }
+    });
+    $(function () {
+
+        if(('@Model'!='null'&& '@Model.MRPNO_txtValue'!='null'&&'@Model.MRPNO_txtValue'!=""))
+        {
+            $("#Order_id").show();
+            $("#MRPNO_txtValue").show();
+            $("#MRPID").hide();
+        }
+        else
+        {
+            $("#MRPID").show();
+            $("#Order_id").hide();
+            $("#MRPNO_txtValue").hide();
+        }
+    });
+    $(function () {
+        $("#MaterialName").combobox();
+        $("#MaterialGrpId").combobox();
+        $("#MaterialCatId").combobox();
+        $("#ColourId").attr("disabled", true);
+    });
+
+    function Save() {
+        var rowCount = $('#list-amended-material tbody tr').length;
+        var internalOrderArray = $('.multipleOrder_').val();
+        var InternalOrderid = "";
+        if (internalOrderArray != null && internalOrderArray.length > 0) {
+            for (i = 0; i < internalOrderArray.length; i++) {
+                if (internalOrderArray[i] != 0) {
+                    InternalOrderid += internalOrderArray[i] + ",";
+                }
+            }
+            InternalOrderid = InternalOrderid.slice(0, -1);
+        }
+        else {
+            alert("Please select internal order no");
+            return false;
+        }
+        if(rowCount>=0)
+        {
+            if ($('#IndentType').val() == "") {
+                alert("Please Select Indent Type.")
+                $('#IndentType').css('border-color', 'red');
+                $('#IndentType').focus();
+                return false;
+            }
+            else {
+                $('#IndentType').css('border-color', '');
+            }
+            if ($('#Date').val() == "") {
+                alert("Please Enter  Date.")
+                $('#Date').css('border-color', 'red');
+                $('#Date').focus();
+                return false;
+            }
+            else {
+                $('#Date').css('border-color', '');
+            }
+
+            if ($('#Indendingfor').val() == "") {
+                alert("Please Enter Indendingfor.")
+                $('#Indendingfor').css('border-color', 'red');
+                $('#Indendingfor').focus();
+                return false;
+            }
+            else {
+                $('#Indendingfor').css('border-color', '');
+
+            }
+            if( $(".issueTypecls option:selected").text()=="General")
+            {
+                if ($('#MRPNO_txtValue').val() == "") {
+                    alert("Please select MRPNO.")
+                    $('#MRPNO_txtValue').css('border-color', 'red');
+                    $('#MRPNO_txtValue').focus();
+                    return false;
+                }
+                else {
+                    $('#MRPNO_txtValue').css('border-color', '');
+                }
+            }
+            else{
+                if ($('.multipleOrder_').val() == ""||$('.multipleOrder_').val()==null) {
+                    alert("Please select MRPNO.")
+                    $('#MRPNO').css('border-color', 'red');
+                    $('#MRPNO').focus();
+                    return false;
+                }
+                else {
+                    $('#MRPNO').css('border-color', '');
+                }
+            }
+            var myDropDownListValues = $(".multipleOrder_").multiselect("getChecked").map(function()
+            {
+                return this.title;
+            }).get();
+            var MRPNO = "";
+            for (i = 0; i < myDropDownListValues.length; i++) {
+
+                if(myDropDownListValues[i].startsWith(","))
+                {
+
+                }
+                else{
+                    MRPNO += myDropDownListValues[i] + ",";
+                }
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/Indent/Indent',
+                data: $("form").serialize()+ '&MRPSelectedValues=' + InternalOrderid+ '&MRPNO=' + MRPNO,
+                success: function (data) {
+                    $("#BtnSave").hide();
+                    if (data == true) {
+                        if ($("#BtnSave").val() == "Save") {
+                            alert('Saved Successfully.');
+                            location.href = "/Indent/Indent";
+                            return false;
+                            $("#ColourId").attr("disabled", true);
+                        }
+                        else {
+                            alert('Updated Successfully.');
+                            location.href = "/Indent/Indent";
+                            return false;
+                            $("#ColourId").attr("disabled", true);
+                        }
+
+                        location.href = "/Indent/Indent";
+                        return false;
+                    }
+                    else {
+                        alert('Save process Failed.');
+                        location.href = "/Indent/Indent";
+                        return false;
+                    }
+
+                }
+            });
+
+        }
+        else{
+
+            if ($('#IndentType').val() == "") {
+                alert("Please Select Indent Type.")
+                $('#IndentType').css('border-color', 'red');
+                $('#IndentType').focus();
+                return false;
+            }
+            else {
+                $('#IndentType').css('border-color', '');
+            }
+            if ($('#IndentNo').val() == "") {
+                alert("Please Enter Indent No.")
+                $('#IndentNo').css('border-color', 'red');
+                $('#IndentNo').focus();
+                return false;
+            }
+            else {
+                $('#IndentNo').css('border-color', '');
+            }
+            if ($('#Indendingfor option:selected').text() == "ORDER") {
+                if ($('#IoNo').val() == "") {
+                    alert("Please Enter Io No.")
+                    $('#IoNo').css('border-color', 'red');
+                    $('#IoNo').focus();
+                    return false;
+                }
+                else {
+                    $('#IoNo').css('border-color', '');
+                }
+            }
+            if ($("#UnitId :selected").val() == "") {
+                alert("Please Select UnitId.")
+                $('#UnitId').css('border-color', 'red');
+                $('#UnitId').focus();
+                return false;
+            }
+            else {
+                $('#UnitId').css('border-color', '');
+            }
+
+            if ($('#Indendingfor').val() == "") {
+                alert("Please Enter Indent For.")
+                $('#Indendingfor').css('border-color', 'red');
+                $('#Indendingfor').focus();
+                return false;
+            }
+            else {
+                $('#Indendingfor').css('border-color', '');
+            }
+
+
+            if ($('#Date').val() == "") {
+                alert("Please Select Date.")
+                $('#Date').css('border-color', 'red');
+                $('#Date').focus();
+                return false;
+            }
+            else {
+                $('#Date').css('border-color', '');
+            }
+
+            var myDropDownListValues = $(".multipleOrder_").multiselect("getChecked").map(function()
+            {
+                return this.value;
+            }).get();
+            var InternalOrderid = "";
+            for (i = 0; i < myDropDownListValues.length; i++) {
+                if(myDropDownListValues[i].startsWith(","))
+                {
+                }
+                else{
+                    InternalOrderid += myDropDownListValues[i] + ",";
+                }
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/Indent/Indent',
+                data: $("form").serialize()+ '&MRPNO=' + InternalOrderid,
+                success: function (data) {
+                    $("#BtnSave").hide();
+                    if (data == true) {
+                        if ($("#BtnSave").val() == "Save") {
+                            alert('Saved Successfully.');
+                            location.href = "/Indent/Indent";
+                            return false;
+                            $("#ColourId").attr("disabled", true);
+                        }
+                        else {
+                            alert('Updated Successfully.');
+                            location.href = "/Indent/Indent";
+                            return false;
+                            $("#ColourId").attr("disabled", true);
+                        }
+
+                        location.href = "/Indent/Indent";
+                        return false;
+                    }
+                    else {
+                        alert('Save process Failed.');
+                        location.href = "/Indent/Indent";
+                        return false;
+                    }
+
+                }
+            });
+
+
+
+        }
+
+
+
+
+    }
+    function pad(num) {
+        num = "0" + num;
+        return num.slice(-2);
+    }
+    function RowClick(arg, arg1) {
+        $("#AUtoDisplay").show();
+        $("#BtnSave").hide();
+        var indentno=   $('#IndentNo').val()
+        var mrpNO;
+
+        $('#list-amended-material tr#' + arg + '').remove();
+        if($('.issueTypecls option:selected').text()=="General")
+        {
+            
+            mrpNO=$('#MRPNO').val();
+            $.ajax({
+                type: 'POST',
+                url: '/Indent/RowClickMaterialList',
+                data: { IndentMaterialID: arg, BOMID: 0 ,MRPNO:mrpNO},
+                success: function (data) {
+                    if(data!=null&data.Message!=null)
+                    {
+                        alert(data.Message);
+                        return false;
+                    }
+                    else {
+                        $("#MRPID").hide();
+                        $("#ReqQty").attr('readonly', true)
+                        $("#Order_id").show();
+                        $("#MRPNO_txtValue").show();
+                        $("#MRPNO_txtValue").val(0);
+                        $("#MRPNO_txtValue").attr('readonly', true);
+                        $('#StoreId').val(data.materialmater.StoreMasterId);
+                        $('#IndentMaterialID').val(data.indentMaterial.IndentMaterialID);
+                        $('#SubstanceMasterID').val(data.indentMaterial.SubstanceMasterId);
+                        $('#BOMMaterialID').val(data.indentMaterial.BOMMaterialID);
+                        $('#BOMMaterialID').val(arg);
+                        $('#BOMID').val(arg1);
+                        $('#BomNo').val(data.indentMaterial.BomNo);
+                        $('#IndentNo').val(indentno);
+                        $('#SeasonId').val(data.indentMaterial.SeasonId);
+                        $('#BuyerMasterId').val(data.indentMaterial.BuyerMasterId);
+                        var finalDate = "";
+                        if (data.indentMaterial.CreatedDate != null && data.indentMaterial.CreatedDate != "") {
+                            var str, year, month, day, hour, minute, d;
+                            str = data.indentMaterial.CreatedDate.replace(/\D/g, "");
+                            d = new Date(parseInt(str));
+
+                            year = d.getFullYear();
+                            month = pad(d.getMonth() + 1);
+                            day = pad(d.getDate());
+                            hour = pad(d.getHours());
+                            minutes = pad(d.getMinutes());
+
+                            finalDate = day  + "/" + month  + "/" + year;
+                            $("#Date").val(finalDate);
+                        }
+                        $('#BuyerId').val(data.indentMaterial.BuyerMasterId);
+                        $('select[name=SupplierId]').val(data.indentMaterial.SupplierId);
+                        $('#MaterialName').val(data.indentMaterial.MaterialMasterID);
+                        $("#MaterialName").combobox('destroy') ;
+                        $("#MaterialName").combobox();
+                        $('#MaterialCatId').val(data.indentMaterial.MaterialCategoryMasterId);
+                        $("#MaterialCatId").combobox('destroy') ;
+                        $("#MaterialCatId").combobox();
+                        $('#MaterialGrpId').val(data.indentMaterial.MaterialGroupMasterId);
+                        $("#MaterialGrpId").combobox('destroy') ;
+                        $("#MaterialGrpId").combobox();
+
+                        $('select[name=ColourId]').val(data.indentMaterial.ColorMasterID)
+                        $('select[name=UOMId]').val(data.indentMaterial.UomMasterId)
+                        $('#ReqQty').val(data.indentMaterial.RequiredQty);
+                        if(data.indentMaterial.IndentQTY!=0)
+                        {
+
+                            $('#IntendQty').val(data.indentMaterial.IndentQTY);
+                        }
+                        else
+                        {
+                            $('#IntendQty').val(data.indentMaterial.RequiredQty);
+                        }
+                        $('#Rate').val(data.indentMaterial.Price);
+                        $('#StoreStock').val(data.indentMaterial.StoreStock);
+                        $('#SeasonId').val(data.indentMaterial.BuyerSeason);
+                        $('#Date').val(data.indentMaterial.Date);
+                        $('#AmmendmentNo').val(data.indentMaterial.AmmendmentNo);
+                        $('#BuyerId').val(data.indentMaterial.BuyerMasterId);
+                        $('#FreeStock').val(data.indentMaterial.FreeStock);
+                        $('#Remarks').val();
+                        $('#Value').val(data.indentMaterial.Value);
+                        $('#sizeRangeTable tbody tr').each(function () {
+                            $(this).find("td:not(:first)").remove();
+                        });
+                        var count = 1;
+                        var totalQty = 0;
+                        $("#sizeRangeTable tbody").html("");
+                        if(data.indentSizeRange.length>0)
+                        {
+                            for (var i = 0; i <= data.indentSizeRange.length - 1; i++) {
+                                if(data.indentSizeRange[i].quantity==null)
+                                {
+                                    data.indentSizeRange[i].quantity="";
+                                }
+                                if(data.indentSizeRange[i].Rate==null)
+                                {
+                                    data.indentSizeRange[i].Rate="";
+                                }
+                                $("#sizeRangeTable tbody").append("<tr><td class='sizeVal'>" + data.indentSizeRange[i].Size + "</td><td><input class='qty_Total' type='text'  id='qtyId" + data.indentSizeRange[i].quantity + "'  value='" + data.indentSizeRange[i].quantity + "' style='width:50px;' onchange='CalculateTotal(this)' /></td><td><input type='text' class='sizeRate' id='Rate" + data.indentSizeRange[i].Rate + "' value='" + data.indentSizeRange[i].Rate + "' style='width:50px;' /></td></tr>");
+                                count++;
+                                totalQty += parseInt(data.indentSizeRange[i].quantity);
+                            }
+                        }
+                        else{
+                            $("#sizeRangeTable tbody").html("");
+                            for (var i = 0; i <= data.MaterialSizeRange.length - 1; i++) {
+                                if(data.MaterialSizeRange[i].Qty==null)
+                                {
+                                    data.MaterialSizeRange[i].Qty="";
+                                }
+                                if(data.MaterialSizeRange[i].Rate==null)
+                                {
+                                    data.MaterialSizeRange[i].Rate="";
+                                }
+                                $("#sizeRangeTable tbody").append("<tr><td class='sizeVal'>" + data.MaterialSizeRange[i].SizeRange + "</td><td><input class='qty_Total' type='text'  id='qtyId" + data.MaterialSizeRange[i].Qty + "'  value='" + data.MaterialSizeRange[i].Qty + "' style='width:50px;' onchange='CalculateTotal(this)' /></td><td><input type='text' class='sizeRate' id='Rate" + data.MaterialSizeRange[i].Rate + "' value='" + data.MaterialSizeRange[i].Rate + "' style='width:50px;' /></td></tr>");
+                                count++;
+                                totalQty += parseInt(data.MaterialSizeRange[i].Qty);
+                            }
+                        }
+                        $("#TotalCount").text(totalQty);
+                    }
+                }
+            });
+        }
+        else{
+
+            mrpNO= $('#MRPNO option:selected').text(); $.ajax({
+                type: 'POST',
+                url: '/Indent/RowClickMaterialList',
+                data: { IndentMaterialID: arg, BOMID: arg1 ,MRPNO:mrpNO},
+                success: function (data) {
+                    $('#StoreId').val(data.materialmater.StoreMasterId);
+                    $('#IndentMaterialID').val(data.indentMaterial.IndentMaterialID)
+                    $('#BOMMaterialID').val(data.indentMaterial.BOMMaterialID);
+                    $('#BOMMaterialID').val(arg);
+                    $('#BOMID').val(arg1);
+
+                    $('#BomNo').val(data.indentMaterial.BomNo);
+                    $('#IndentNo').val(indentno);
+                    $('#SeasonId').val(data.indentMaterial.SeasonId);
+                    $('#BuyerMasterId').val(data.indentMaterial.BuyerMasterId);
+
+                    $('select[name=SupplierId]').val(data.indentMaterial.SupplierId);
+                    $('#MaterialName').val(data.indentMaterial.MaterialMasterID);
+                    $("#MaterialName").combobox('destroy') ;
+                    $("#MaterialName").combobox();
+                    $('#MaterialCatId').val(data.indentMaterial.MaterialCategoryMasterId);
+                    $("#MaterialCatId").combobox('destroy') ;
+                    $("#MaterialCatId").combobox();
+                    $('#MaterialGrpId').val(data.indentMaterial.MaterialGroupMasterId);
+                    $("#MaterialGrpId").combobox('destroy') ;
+                    $("#MaterialGrpId").combobox();
+                    var finalDate = "";
+                    if (data.indentMaterial.CreatedDate != null && data.indentMaterial.CreatedDate != "") {
+                        var str, year, month, day, hour, minute, d;
+                        str = data.indentMaterial.CreatedDate.replace(/\D/g, "");
+                        d = new Date(parseInt(str));
+
+                        year = d.getFullYear();
+                        month = pad(d.getMonth() + 1);
+                        day = pad(d.getDate());
+                        hour = pad(d.getHours());
+                        minutes = pad(d.getMinutes());
+
+                        finalDate = day  + "/" + month  + "/" + year;
+                        $("#Date").html(finalDate);
+                    }
+
+                    $('select[name=ColourId]').val(data.indentMaterial.ColorMasterID)
+                    $('select[name=UOMId]').val(data.indentMaterial.UomMasterId)
+                    $('#ReqQty').val(data.indentMaterial.RequiredQty);
+                    if(data.indentMaterial.IndentQTY!=0)
+                    {
+
+                        $('#IntendQty').val(data.indentMaterial.IndentQTY);
+                    }
+                    else
+                    {
+                        $('#IntendQty').val(data.indentMaterial.RequiredQty);
+                    }
+                    $('#Rate').val(data.indentMaterial.Price);
+                    $('#StoreStock').val(data.indentMaterial.StoreStock);
+                    $('#SeasonId').val(data.indentMaterial.BuyerSeason);
+                    $('#SubstanceMasterID').val(data.indentMaterial.SubstanceMasterId);
+                    $('#AmmendmentNo').val(data.indentMaterial.AmmendmentNo);
+                    $('#BuyerId').val(data.indentMaterial.BuyerMasterId);
+                    $('#FreeStock').val(data.indentMaterial.FreeStock);
+                    $('#Remarks').val();
+                    $('#Value').val(data.indentMaterial.Value);
+                    $('#sizeRangeTable tbody tr').each(function () {
+                        $(this).find("td:not(:first)").remove();
+                    });
+                    var count = 1;
+                    var totalQty = 0;
+                    $("#sizeRangeTable tbody").html("");
+                    if(data.indentSizeRange.length>0)
+                    {
+                        for (var i = 0; i <= data.indentSizeRange.length - 1; i++) {
+                            if(data.indentSizeRange[i].quantity==null)
+                            {
+                                data.indentSizeRange[i].quantity="";
+                            }
+                            if(data.indentSizeRange[i].Rate==null)
+                            {
+                                data.indentSizeRange[i].Rate="";
+                            }
+                            $("#sizeRangeTable tbody").append("<tr><td class='sizeVal'>" + data.indentSizeRange[i].Size + "</td><td><input class='qty_Total' type='text'  id='qtyId" + data.indentSizeRange[i].quantity + "'  value='" + data.indentSizeRange[i].quantity + "' style='width:50px;' onchange='CalculateTotal(this)' /></td><td><input type='text' class='sizeRate' id='Rate" + data.indentSizeRange[i].Rate + "' value='" + data.indentSizeRange[i].Rate + "' style='width:50px;' /></td></tr>");
+                            count++;
+                            totalQty += parseInt(data.indentSizeRange[i].quantity);
+                        }
+                    }
+                    else if(data.MRPSizeScheduleMaterial.length>0)
+                    {
+                        for (var i = 0; i <= data.MRPSizeScheduleMaterial.length - 1; i++) {
+                            if(data.MRPSizeScheduleMaterial[i].Qty==null)
+                            {
+                                data.MRPSizeScheduleMaterial[i].Qty="";
+                            }
+                            if(data.MRPSizeScheduleMaterial[i].Rate==null)
+                            {
+                                data.MRPSizeScheduleMaterial[i].Rate="";
+                            }
+                            $("#sizeRangeTable tbody").append("<tr><td class='sizeVal'>" + data.MRPSizeScheduleMaterial[i].Size + "</td><td><input class='qty_Total' type='text'  id='qtyId" + data.MRPSizeScheduleMaterial[i].Qty + "'  value='" + data.MRPSizeScheduleMaterial[i].Qty + "' style='width:50px;' onchange='CalculateTotal(this)' /></td><td><input type='text' class='sizeRate' id='Rate" + data.MRPSizeScheduleMaterial[i].Rate + "' value='" + data.MRPSizeScheduleMaterial[i].Rate + "' style='width:50px;' /></td></tr>");
+                            count++;
+                            totalQty += parseInt(data.MRPSizeScheduleMaterial[i].Qty);
+                        }
+                    }
+                    else{
+                        for (var i = 0; i <= data.MaterialSizeRange.length - 1; i++) {
+                            if(data.MaterialSizeRange[i].Qty==null)
+                            {
+                                data.MaterialSizeRange[i].Qty="";
+                            }
+                            if(data.MaterialSizeRange[i].Rate==null)
+                            {
+                                data.MaterialSizeRange[i].Rate="";
+                            }
+                            $("#sizeRangeTable tbody").append("<tr><td class='sizeVal'>" + data.MaterialSizeRange[i].SizeRange + "</td><td><input class='qty_Total' type='text'  id='qtyId" + data.MaterialSizeRange[i].Qty + "'  value='" + data.MaterialSizeRange[i].Qty + "' style='width:50px;' onchange='CalculateTotal(this)' /></td><td><input type='text' class='sizeRate' id='Rate" + data.MaterialSizeRange[i].Rate + "' value='" + data.MaterialSizeRange[i].Rate + "' style='width:50px;' /></td></tr>");
+                            count++;
+                            totalQty += parseInt(data.MaterialSizeRange[i].Qty);
+                        }
+                    }
+                    $("#TotalCount").text(totalQty);
+
+                }
+            });
+        }
+
+    }
+    function Delete(arg){
+
+        $.ajax({
+            type: 'POST',
+            url: '/Indent/DeleteMaterial',
+            data: { IndentMaterialID: arg},
+            success: function (data) {
+                $("#list-amended-material tbody").html("");
+                $.each(data, function (i, item) {
+                    $("#list-amended-material tbody").append("<tr id=" + item.BOMMaterialID + "> <td id='BOMID' style='display:none' class='BOMID' value=''>" + item.BOMID + "</td>"
+                        + "<td><input type='button' value='Remove' onclick='Delete("+item.IndentMaterialID+","+item.MRPNO +")' class='removeSchedule btn btn-default btn-style' />"+"</td>"
+                         + "<td><input type='button' value='Edit' onclick='RowClick(" + item.BOMMaterialID + "," + item.BOMID + ")' class='' />"+"</td>"
+                                 + "<td id='BOMMaterialID' style='display:none' class='BOMMaterialID' value=''>" + item.BOMMaterialID +"</td>"
+                                 + "<td id='MRPNO' style='display:none' class='MRPNO' value=''>" + item.MRPNO +"</td>"
+                                   + "<td id='CategoryName'  class='CategoryName' value=''>" + item.CategoryName + "</td>"
+                                     + "<td id='GroupName'  class='GroupName' value=''>" + item.GroupName + "</td>"
+                                      + "<td id='SubstanceRange'  class='SubstanceRange' value=''>" + item.SubstanceRange + "</td>"
+                                         + "<td id='BuyerPoNo'  class='BuyerPoNo' value=''>" + item.BuyerPoNo + "</td>"
+                                 + "<td id='MaterialDescription'  class='MaterialDescription' value=''>" + item.MaterialDescription + "</td>"
+                                 +"<td id='Color'  class='Color' value=''>" + item.Color + "</td>"
+                                  + "<td id='RequiredQty' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                   + "<td id='IndentQTY'  class='IndentQTY' value=''>" + item.IndentQTY + "</td>"
+                                    + "<td id='WastageName'  class='WastageName' value=''>" + item.WastageName + "</td>"
+                                    + "<td id='Value'  class='Value' value=''>" + item.Value + "</td>"
+                                    + "<td id='TotalNorms' style='display:none'class='TotalNorms' value=''>" + item.TotalNorms + "</td>"
+                                    + "<td id='MaterialCategoryMasterId' style='display:none' class='MaterialCategoryMasterId' value=''>" + item.MaterialCategoryMasterId + "</td>"
+                                    + "<td id='MaterialGroupMasterId' style='display:none' class='MaterialGroupMasterId' value=''>" + item.MaterialGroupMasterId + "</td>"
+                                    + "<td id='ColorMasterId' style='display:none'  class='ColorMasterId' value=''>" + item.ColorMasterId + "</td>"
+                                    + "<td id='SubstanceMasterId' style='display:none' class='SubstanceMasterId' value=''>" + item.SubstanceMasterId + "</td>"
+                                    + "<td id='BuyerSeason' style='display:none' class='BuyerSeason' value=''>" + item.BuyerSeason + "</td>"
+                                    + "<td id='SeasonName' style='display:none' class='SeasonName' value=''>" + item.SeasonName + "</td>"
+                                    + "<td id='RequiredQty' style='display:none' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                      + "<td id='Rate' style='display:none' class='Rate' value=''>" + item.Rate + "</td>"
+                                        + "<td id='UomMasterId' style='display:none' class='UomMasterId' value=''>" + item.WastageQtyUOM + "</td>"
+                                          + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierId + "</td>"
+                                          + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierName + "</td>"
+                                            + "<td id='BuyerFullName' style='display:none' class='BuyerFullName' value=''>" + item.BuyerFullName + "</td>"
+                                              + "<td id='BuyerMasterId' style='display:none' class='BuyerMasterId' value=''>" + item.BuyerMasterId + "</td>"
+                                    + "<td id='OrderEntryId' style='display:none' class='OrderEntryId' value=''>" + item.OrderEntryId + "</td></tr>");
+                });
+            }
+        });
+
+    }
+
+    $(function () {
+        $("#MRPNO_CHANGE").click(function () {
+            var mrpSelectedText="";
+            var myDropDownListValues = $(".multipleOrder_").multiselect("getChecked").map(function()
+            {
+                return this.value;
+            }).get();
+            var InternalOrderid = "";
+            for (i = 0; i < myDropDownListValues.length; i++) {
+
+                if(myDropDownListValues[i].startsWith(","))
+                {
+                }
+                else{
+                    InternalOrderid += myDropDownListValues[i] + ",";
+                }
+            }
+            let dsvalue = 0;
+            $.ajax({
+                url: '/Indent/ShowMaterialList',
+                type: 'GET',
+                data: { MRPNO: InternalOrderid},
+                success: function (data) {
+                    console.log(data);
+                    if(data.Satus=="AlredayExist")
+                    {
+                        $("#AUtoDisplay").hide();
+                        $("#BtnSave").hide();
+                        $("#list-amended-material tbody").html("");
+                        $.each(data.Indent, function (i, item) {
+                             dsvalue = item.Value ?? 0
+                            $("#RemoveHead").css("display","block");
+                            $("#EditHead").css("display","block");
+                            $("#list-amended-material tbody").append("<tr id=" + item.IndentMaterialID + "> <td id='BOMID' style='display:none' class='BOMID' value=''>" + item.BOMID + "</td>"
+                                + "<td><input type='button' value='Remove' onclick='Delete(" + item.IndentMaterialID+")' class='' />"+"</td>"
+                                 + "<td><input type='button' value='Edit' onclick='RowClick(" + item.IndentMaterialID + "," + item.BOMID + ")' class='' />"+"</td>"
+                                         + "<td id='BOMMaterialID' style='display:none' class='BOMMaterialID' value=''>" + item.BOMMaterialID +"</td>"
+                                         + "<td id='MRPNO' style='display:none' class='MRPNO' value=''>" + item.MRPNO +"</td>"
+                                           + "<td id='CategoryName'  class='CategoryName' value=''>" + item.CategoryName + "</td>"
+                                             + "<td id='GroupName'  class='GroupName' value=''>" + item.GroupName + "</td>"
+                                              + "<td id='SubstanceRange'  class='SubstanceRange' value=''>" + item.SubstanceRange + "</td>"
+                                               + "<td id='BuyerPoNo'  class='BuyerPoNo' value=''>" + item.BuyerPoNo + "</td>"
+                                         + "<td id='MaterialDescription'  class='MaterialDescription' value=''>" + item.MaterialDescription + "</td>"
+                                         +"<td id='Color'  class='Color' value=''>" + item.Color + "</td>"
+                                        + "<td id='RequiredQty' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                   + "<td id='IndentQTY'  class='IndentQTY' value=''>" + item.RequiredQty + "</td>"
+                                    + "<td id='Price'  class='Price' value=''>" + item.Price + "</td>"
+                                    + "<td id='WastageName'  class='WastageName' value=''>" + item.WastageName + "</td>"
+                                + "<td id='Value'  class='Value' value=''>" + dsvalue + "</td>"
+                                            + "<td id='TotalNorms' style='display:none' class='TotalNorms' value=''>" + item.TotalNorms + "</td>"
+                                            + "<td id='MaterialCategoryMasterId' style='display:none' class='MaterialCategoryMasterId' value=''>" + item.MaterialCategoryMasterId + "</td>"
+                                            + "<td id='MaterialGroupMasterId' style='display:none' class='MaterialGroupMasterId' value=''>" + item.MaterialGroupMasterId + "</td>"
+                                            + "<td id='ColorMasterId' style='display:none'  class='ColorMasterId' value=''>" + item.ColorMasterId + "</td>"
+                                            + "<td id='SubstanceMasterId' style='display:none' class='SubstanceMasterId' value=''>" + item.SubstanceMasterId + "</td>"
+                                            + "<td id='BuyerSeason' style='display:none' class='BuyerSeason' value=''>" + item.BuyerSeason + "</td>"
+                                            + "<td id='SeasonName' style='display:none' class='SeasonName' value=''>" + item.SeasonName + "</td>"
+                                            + "<td id='RequiredQty' style='display:none' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                              + "<td id='Rate' style='display:none' class='Rate' value=''>" + item.Rate + "</td>"
+                                                + "<td id='UomMasterId' style='display:none' class='UomMasterId' value=''>" + item.WastageQtyUOM + "</td>"
+                                                  + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierId + "</td>"
+                                                  + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierName + "</td>"
+                                                    + "<td id='BuyerFullName' style='display:none' class='BuyerFullName' value=''>" + item.BuyerFullName + "</td>"
+                                                      + "<td id='BuyerMasterId' style='display:none' class='BuyerMasterId' value=''>" + item.BuyerMasterId + "</td>"
+                                                       + "<td id='StoreStock' style='display:none' class='StoreStock' value=''>" + item.StoreStock + "</td>"
+                                            + "<td id='OrderEntryId' style='display:none' class='OrderEntryId' value=''>" + item.OrderEntryId + "</td></tr>");
+                        });
+                        alert("This MRPNO Already indented");
+                        return false;
+                    }
+                    else{
+
+                        $("#list-amended-material tbody").html("");
+                        $.each(data, function (i, item) {
+                            $("#RemoveHead").css("display","block");
+                            $("#EditHead").css("display","block");
+                            $("#list-amended-material tbody").append("<tr id=" + item.IndentMaterialID + "> <td id='BOMID' style='display:none' class='BOMID' value=''>" + item.BOMID + "</td>"
+                                + "<td><input type='button' value='Remove' onclick='Delete(" + item.IndentMaterialID+")' class='' />"+"</td>"
+                                 + "<td><input type='button' value='Edit' onclick='RowClick(" + item.IndentMaterialID + "," + item.BOMID + ")' class='' />"+"</td>"
+                                         + "<td id='BOMMaterialID' style='display:none' class='BOMMaterialID' value=''>" + item.BOMMaterialID +"</td>"
+                                         + "<td id='MRPNO' style='display:none' class='MRPNO' value=''>" + item.MRPNO +"</td>"
+                                           + "<td id='CategoryName'  class='CategoryName' value=''>" + item.CategoryName + "</td>"
+                                             + "<td id='GroupName'  class='GroupName' value=''>" + item.GroupName + "</td>"
+                                              + "<td id='SubstanceRange'  class='SubstanceRange' value=''>" + item.SubstanceRange + "</td>"
+                                                 + "<td id='BuyerPoNo'  class='BuyerPoNo' value=''>" + item.BuyerPoNo + "</td>"
+                                         + "<td id='MaterialDescription'  class='MaterialDescription' value=''>" + item.MaterialDescription + "</td>"
+                                         +"<td id='Color'  class='Color' value=''>" + item.Color + "</td>"
+                                        + "<td id='RequiredQty' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                   + "<td id='IndentQTY'  class='IndentQTY' value=''>" + item.RequiredQty + "</td>"
+                                    + "<td id='Price'  class='Price' value=''>" + item.Price + "</td>"
+                                    + "<td id='WastageName'  class='WastageName' value=''>" + item.WastageName + "</td>"
+                                    + "<td id='Value'  class='Value' value=''>" + item.Value + "</td>"
+                                            + "<td id='TotalNorms' style='display:none' class='TotalNorms' value=''>" + item.TotalNorms + "</td>"
+                                            + "<td id='MaterialCategoryMasterId' style='display:none' class='MaterialCategoryMasterId' value=''>" + item.MaterialCategoryMasterId + "</td>"
+                                            + "<td id='MaterialGroupMasterId' style='display:none' class='MaterialGroupMasterId' value=''>" + item.MaterialGroupMasterId + "</td>"
+                                            + "<td id='ColorMasterId' style='display:none'  class='ColorMasterId' value=''>" + item.ColorMasterId + "</td>"
+                                            + "<td id='SubstanceMasterId' style='display:none' class='SubstanceMasterId' value=''>" + item.SubstanceMasterId + "</td>"
+                                            + "<td id='BuyerSeason' style='display:none' class='BuyerSeason' value=''>" + item.BuyerSeason + "</td>"
+                                            + "<td id='SeasonName' style='display:none' class='SeasonName' value=''>" + item.SeasonName + "</td>"
+                                            + "<td id='RequiredQty' style='display:none' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                              + "<td id='Rate' style='display:none' class='Rate' value=''>" + item.Rate + "</td>"
+                                                + "<td id='UomMasterId' style='display:none' class='UomMasterId' value=''>" + item.WastageQtyUOM + "</td>"
+                                                  + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierId + "</td>"
+                                                  + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierName + "</td>"
+                                                    + "<td id='BuyerFullName' style='display:none' class='BuyerFullName' value=''>" + item.BuyerFullName + "</td>"
+                                                      + "<td id='BuyerMasterId' style='display:none' class='BuyerMasterId' value=''>" + item.BuyerMasterId + "</td>"
+                                                        + "<td id='StoreStock' style='display:none' class='StoreStock' value=''>" + item.StoreStock + "</td>"
+                                            + "<td id='OrderEntryId' style='display:none' class='OrderEntryId' value=''>" + item.OrderEntryId + "</td></tr>");
+                        });
+                        $("#AUtoDisplay").hide();
+                        $("#BtnSave").show();
+                        $("#AUtoDisplay").hide();
+                    }
+                }
+            });
+        });
+
+    });
+
+    function HideShowEditDelete() {
+
+        if ('@Update' == 'False' || '@Edit' == 'False') {
+            $('#list-amended-material tbody tr').each(function () {
+                $(this).find(".Edit").addClass('not-allowed').removeAttr('onclick');
+            });
+        }
+        else {
+            $('#list-amended-material  tbody tr').each(function () {
+            });
+        }
+        if ('@Delete' == 'False') {
+            $('#list-amended-material  tbody tr').each(function () {
+                $(this).find(".Delete").addClass('not-allowed').removeAttr('onclick');
+            });
+        }
+        else {
+            $('#list-amended-material  tbody tr').each(function () {
+            });
+        }
+    }
+    $('#IntendQty').change(function () {
+        var qty = $('#IntendQty').val();
+        var Value = (parseFloat(qty) * parseFloat($('#Rate').val()));
+        var Value_ = (Value).toFixed(2);
+        $('#Value').val(Value_);
+        $('#TotalAmount').val(Value_);
+    });
+    $("#Indendingfor").change(function () {
+
+        if ($('#Indendingfor option:selected').text() == "ORDER") {
+            $('#IoNo').attr('readonly',false)
+        }
+        else {
+
+            $('#IoNo').attr('readonly',true)
+        }
+    });
+
+    $(function () {
+        
+        $('.issueTypecls').change(function () {
+            if ($('#OrderType option:selected').text() == "General") {
+                $("#MRPID").hide();
+                $("#ReqQty").attr('readonly', true)
+                $("#Order_id").show();
+                $("#MRPNO_txtValue").show();
+                $("#MRPNO_txtValue").val(0);
+                $("#MRPNO_txtValue").attr('readonly', true)
+            }
+          else if($('#OrderType option:selected').text()!="Order")
+            {
+                $("#MRPID").hide();
+                $.ajax({
+                    url: '/Indent/GetLastMRPNO',
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function (data) {
+                        $("#MRPID").hide();
+                        $("#ReqQty").attr('readonly',true)
+                        $("#Order_id").show();
+                        $("#MRPNO_txtValue").show();
+                        $("#MRPNO_txtValue").val(data);
+                        $("#MRPNO_txtValue").attr('readonly',true)
+                    },
+                    error:function(){
+
+                    }
+                });
+            }
+            else
+            {
+                $("#MRPID").show();
+                $("#Order_id").hide();
+                $("#MRPNO_txtValue").hide();
+            }
+        });
+    });
+    $(function(){
+        $("#MaterialGrpId").combobox({
+            select: function() {
+                var MaterialGrpId = $('#MaterialGrpId').val();
+                var mrpSelectedText="";
+                var myDropDownListValues = $(".multipleOrder_").multiselect("getChecked").map(function()
+                {
+                    return this.value;
+                }).get();
+                var InternalOrderid = "";
+                for (i = 0; i < myDropDownListValues.length; i++) {
+
+                    if(myDropDownListValues[i].startsWith(","))
+                    {
+                    }
+                    else{
+                        InternalOrderid += myDropDownListValues[i] + ",";
+                    }
+                }
+                var SeasonId = $('#SeasonId').val();
+                var categoryID=$("#MaterialCatId").val();
+                var storeId= $('#StoreId').val();
+
+                $.ajax({
+                    url: '/Indent/FillMaterialName',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { MaterialGroupMasterId: MaterialGrpId },
+                    success: function (cities) {
+
+                        $("#MaterialName").prop("disabled", false);
+                        $("#MaterialName").html("");
+                        $("#MaterialName").append("<option value='0'>--Select--</option>");
+                        $.each(cities, function (i, city) {
+                            $("#MaterialName").append('<option value=' + city.MaterialMasterId + '>' + city.MaterialDescription + '</option>');
+                        });
+                    }
+                });
+                $.ajax({
+                    url: '/Indent/ShowMaterialList',
+                    type: 'GET',
+                    data: {
+                        MRPNO: InternalOrderid,
+                        MaterialGroupMasterId:MaterialGrpId,
+                        SeasonId:SeasonId,
+                        MaterialCategoryID:categoryID,
+                        StoreId :storeId
+                    },
+                    success: function (data) {
+                        if(data.Satus=="AlredayExist")
+                        {
+                            $("#BtnSave").hide();
+                            $("#list-amended-material tbody").html("");
+                            $.each(data.Indent, function (i, item) {
+                                $("#RemoveHead").css("display","block");
+                                $("#EditHead").css("display","block");
+                                $("#list-amended-material tbody").append("<tr id=" + item.IndentMaterialID + "> <td id='BOMID' style='display:none' class='BOMID' value=''>" + item.BOMID + "</td>"
+                                    + "<td><input type='button' value='Remove' onclick='Delete(" + item.IndentMaterialID+")' class='' />"+"</td>"
+                                     + "<td><input type='button' value='Edit' onclick='RowClick(" + item.IndentMaterialID + "," + item.BOMID + ")' class='' />"+"</td>"
+                                             + "<td id='BOMMaterialID' style='display:none' class='BOMMaterialID' value=''>" + item.BOMMaterialID +"</td>"
+                                             + "<td id='MRPNO' style='display:none' class='MRPNO' value=''>" + item.MRPNO +"</td>"
+                                               + "<td id='CategoryName'  class='CategoryName' value=''>" + item.CategoryName + "</td>"
+                                                 + "<td id='GroupName'  class='GroupName' value=''>" + item.GroupName + "</td>"
+                                                  + "<td id='SubstanceRange'  class='SubstanceRange' value=''>" + item.SubstanceRange + "</td>"
+                                                   + "<td id='BuyerPoNo'  class='BuyerPoNo' value=''>" + item.BuyerPoNo + "</td>"
+                                             + "<td id='MaterialDescription'  class='MaterialDescription' value=''>" + item.MaterialDescription + "</td>"
+                                             +"<td id='Color'  class='Color' value=''>" + item.Color + "</td>"
+                                            + "<td id='RequiredQty' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                       + "<td id='IndentQTY'  class='IndentQTY' value=''>" + item.IndentQTY + "</td>"
+                                        + "<td id='Price'  class='Price' value=''>" + item.Price + "</td>"
+                                        + "<td id='WastageName'  class='WastageName' value=''>" + item.WastageName + "</td>"
+                                        + "<td id='Value'  class='Value' value=''>" + item.Value + "</td>"
+                                                + "<td id='TotalNorms' style='display:none' class='TotalNorms' value=''>" + item.TotalNorms + "</td>"
+                                                + "<td id='MaterialCategoryMasterId' style='display:none' class='MaterialCategoryMasterId' value=''>" + item.MaterialCategoryMasterId + "</td>"
+                                                + "<td id='MaterialGroupMasterId' style='display:none' class='MaterialGroupMasterId' value=''>" + item.MaterialGroupMasterId + "</td>"
+                                                + "<td id='ColorMasterId' style='display:none'  class='ColorMasterId' value=''>" + item.ColorMasterId + "</td>"
+                                                + "<td id='SubstanceMasterId' style='display:none' class='SubstanceMasterId' value=''>" + item.SubstanceMasterId + "</td>"
+                                                + "<td id='BuyerSeason' style='display:none' class='BuyerSeason' value=''>" + item.BuyerSeason + "</td>"
+                                                + "<td id='SeasonName' style='display:none' class='SeasonName' value=''>" + item.SeasonName + "</td>"
+                                                + "<td id='RequiredQty' style='display:none' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                                  + "<td id='Rate' style='display:none' class='Rate' value=''>" + item.Rate + "</td>"
+                                                    + "<td id='UomMasterId' style='display:none' class='UomMasterId' value=''>" + item.WastageQtyUOM + "</td>"
+                                                      + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierId + "</td>"
+                                                      + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierName + "</td>"
+                                                        + "<td id='BuyerFullName' style='display:none' class='BuyerFullName' value=''>" + item.BuyerFullName + "</td>"
+                                                          + "<td id='BuyerMasterId' style='display:none' class='BuyerMasterId' value=''>" + item.BuyerMasterId + "</td>"
+                                                + "<td id='OrderEntryId' style='display:none' class='OrderEntryId' value=''>" + item.OrderEntryId + "</td></tr>");
+                            });
+                            alert("This MRPNO Already indented");
+                            return false;
+                        }
+                        else{
+                            $("#AUtoDisplay").show();
+                            $("#BtnSave").show();
+                            $("#list-amended-material tbody").html("");
+                            $.each(data, function (i, item) {
+                                $("#RemoveHead").css("display","block");
+                                $("#EditHead").css("display","block");
+                                $("#list-amended-material tbody").append("<tr id=" + item.IndentMaterialID + "> <td id='BOMID' style='display:none' class='BOMID' value=''>" + item.BOMID + "</td>"
+                                    + "<td><input type='button' value='Remove' onclick='Delete(" + item.IndentMaterialID+")' class='' />"+"</td>"
+                                     + "<td><input type='button' value='Edit' onclick='RowClick(" + item.IndentMaterialID + "," + item.BOMID + ")' class='' />"+"</td>"
+                                             + "<td id='BOMMaterialID' style='display:none' class='BOMMaterialID' value=''>" + item.BOMMaterialID +"</td>"
+                                             + "<td id='MRPNO' style='display:none' class='MRPNO' value=''>" + item.MRPNO +"</td>"
+                                               + "<td id='CategoryName'  class='CategoryName' value=''>" + item.CategoryName + "</td>"
+                                                 + "<td id='GroupName'  class='GroupName' value=''>" + item.GroupName + "</td>"
+                                                  + "<td id='SubstanceRange'  class='SubstanceRange' value=''>" + item.SubstanceRange + "</td>"
+                                                     + "<td id='BuyerPoNo'  class='BuyerPoNo' value=''>" + item.BuyerPoNo + "</td>"
+                                             + "<td id='MaterialDescription'  class='MaterialDescription' value=''>" + item.MaterialDescription + "</td>"
+                                             +"<td id='Color'  class='Color' value=''>" + item.Color + "</td>"
+                                            + "<td id='RequiredQty' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                       + "<td id='IndentQTY'  class='IndentQTY' value=''>" + item.IndentQTY + "</td>"
+                                        + "<td id='Price'  class='Price' value=''>" + item.Price + "</td>"
+                                        + "<td id='WastageName'  class='WastageName' value=''>" + item.WastageName + "</td>"
+                                        + "<td id='Value'  class='Value' value=''>" + item.Value + "</td>"
+                                                + "<td id='TotalNorms' style='display:none' class='TotalNorms' value=''>" + item.TotalNorms + "</td>"
+                                                + "<td id='MaterialCategoryMasterId' style='display:none' class='MaterialCategoryMasterId' value=''>" + item.MaterialCategoryMasterId + "</td>"
+                                                + "<td id='MaterialGroupMasterId' style='display:none' class='MaterialGroupMasterId' value=''>" + item.MaterialGroupMasterId + "</td>"
+                                                + "<td id='ColorMasterId' style='display:none'  class='ColorMasterId' value=''>" + item.ColorMasterId + "</td>"
+                                                + "<td id='SubstanceMasterId' style='display:none' class='SubstanceMasterId' value=''>" + item.SubstanceMasterId + "</td>"
+                                                + "<td id='BuyerSeason' style='display:none' class='BuyerSeason' value=''>" + item.BuyerSeason + "</td>"
+                                                + "<td id='SeasonName' style='display:none' class='SeasonName' value=''>" + item.SeasonName + "</td>"
+                                                + "<td id='RequiredQty' style='display:none' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                                  + "<td id='Rate' style='display:none' class='Rate' value=''>" + item.Rate + "</td>"
+                                                    + "<td id='UomMasterId' style='display:none' class='UomMasterId' value=''>" + item.WastageQtyUOM + "</td>"
+                                                      + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierId + "</td>"
+                                                      + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierName + "</td>"
+                                                        + "<td id='BuyerFullName' style='display:none' class='BuyerFullName' value=''>" + item.BuyerFullName + "</td>"
+                                                          + "<td id='BuyerMasterId' style='display:none' class='BuyerMasterId' value=''>" + item.BuyerMasterId + "</td>"
+                                                + "<td id='OrderEntryId' style='display:none' class='OrderEntryId' value=''>" + item.OrderEntryId + "</td></tr>");
+                            });
+                        }
+
+                    }
+                });
+            }
+        });
+    });
+
+    $(function(){
+        $("#StoreId").change(function(){
+            var mrpSelectedText = "";
+            let value = 0;
+            var myDropDownListValues = $(".multipleOrder_").multiselect("getChecked").map(function()
+            {
+                return this.value;
+            }).get();
+            var InternalOrderid = "";
+            for (i = 0; i < myDropDownListValues.length; i++) {
+
+                if(myDropDownListValues[i].startsWith(","))
+                {
+                }
+                else{
+                    InternalOrderid += myDropDownListValues[i] + ",";
+                }
+            }
+            var storeid=$("#StoreId").val();
+            var SeasonId = $('#SeasonId').val();
+            var categoryID=$("#MaterialCatId").val();
+            $.ajax({
+                url: '/Indent/ShowMaterialList',
+                type: 'GET',
+                data: { MRPNO: InternalOrderid,
+                    StoreId:storeid,
+                    SeasonId:SeasonId,
+                    MaterialCategoryID:categoryID,
+                },
+                success: function (data) {
+                    $("#list-amended-material tbody").html("");
+                    $.each(data, function (i, item) {
+                        console.log("data", data);
+                         value = item.Value ?? 0;
+                        $("#RemoveHead").css("display","block");
+                        $("#EditHead").css("display","block");
+                        $("#list-amended-material tbody").append("<tr id=" + item.IndentMaterialID + "> <td id='BOMID' style='display:none' class='BOMID' value=''>" + item.BOMID + "</td>"
+                            + "<td><input type='button' value='Remove' onclick='Delete(" + item.IndentMaterialID+")' class='' />"+"</td>"
+                             + "<td><input type='button' value='Edit' onclick='RowClick(" + item.IndentMaterialID + "," + item.BOMID + ")' class='' />"+"</td>"
+                                     + "<td id='BOMMaterialID' style='display:none' class='BOMMaterialID' value=''>" + item.BOMMaterialID +"</td>"
+                                     + "<td id='MRPNO' style='display:none' class='MRPNO' value=''>" + item.MRPNO +"</td>"
+                                       + "<td id='CategoryName'  class='CategoryName' value=''>" + item.CategoryName + "</td>"
+                                         + "<td id='GroupName'  class='GroupName' value=''>" + item.GroupName + "</td>"
+                                          + "<td id='SubstanceRange'  class='SubstanceRange' value=''>" + item.SubstanceRange + "</td>"
+                                             + "<td id='BuyerPoNo'  class='BuyerPoNo' value=''>" + item.BuyerPoNo + "</td>"
+                                     + "<td id='MaterialDescription'  class='MaterialDescription' value=''>" + item.MaterialDescription + "</td>"
+                                     +"<td id='Color'  class='Color' value=''>" + item.Color + "</td>"
+                                    + "<td id='RequiredQty' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                               + "<td id='IndentQTY'  class='IndentQTY' value=''>" + item.RequiredQty + "</td>"
+                                + "<td id='Price'  class='Price' value=''>" + item.Price + "</td>"
+                                + "<td id='WastageName'  class='WastageName' value=''>" + item.WastageName + "</td>"
+                            + "<td id='Value'  class='Value' value=''>" + value + "</td>"
+                                        + "<td id='TotalNorms' style='display:none' class='TotalNorms' value=''>" + item.TotalNorms + "</td>"
+                                        + "<td id='MaterialCategoryMasterId' style='display:none' class='MaterialCategoryMasterId' value=''>" + item.MaterialCategoryMasterId + "</td>"
+                                        + "<td id='MaterialGroupMasterId' style='display:none' class='MaterialGroupMasterId' value=''>" + item.MaterialGroupMasterId + "</td>"
+                                        + "<td id='ColorMasterId' style='display:none'  class='ColorMasterId' value=''>" + item.ColorMasterId + "</td>"
+                                        + "<td id='SubstanceMasterId' style='display:none' class='SubstanceMasterId' value=''>" + item.SubstanceMasterId + "</td>"
+                                        + "<td id='BuyerSeason' style='display:none' class='BuyerSeason' value=''>" + item.BuyerSeason + "</td>"
+                                        + "<td id='SeasonName' style='display:none' class='SeasonName' value=''>" + item.SeasonName + "</td>"
+                                        + "<td id='RequiredQty' style='display:none' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                          + "<td id='Rate' style='display:none' class='Rate' value=''>" + item.Rate + "</td>"
+                                            + "<td id='UomMasterId' style='display:none' class='UomMasterId' value=''>" + item.WastageQtyUOM + "</td>"
+                                              + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierId + "</td>"
+                                              + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierName + "</td>"
+                                                + "<td id='BuyerFullName' style='display:none' class='BuyerFullName' value=''>" + item.BuyerFullName + "</td>"
+                                                  + "<td id='BuyerMasterId' style='display:none' class='BuyerMasterId' value=''>" + item.BuyerMasterId + "</td>"
+                                        + "<td id='OrderEntryId' style='display:none' class='OrderEntryId' value=''>" + item.OrderEntryId + "</td></tr>");
+                    });
+                    $("#AUtoDisplay").hide();
+                    $("#BtnSave").show();
+                    $("#AUtoDisplay").hide();
+                }
+            });
+
+
+        })
+    })
+
+    $(function () {
+        debugger
+        $("#MaterialName").combobox({
+            select: function() {
+                var materialName = $('#MaterialName').val();
+                $("#MaterialName").append("<option value='0'>Please Select </option>");
+                $.ajax({
+                    url: '/MaterialMaster/PurchaseOrderFillMaterialNameBasedonColor',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { MaterialNameID: materialName },
+                    success: function (cities) {
+                        if (cities.BalanceStock != null&&cities.BalanceStock !="") {
+                            $("#StoreStock").val(cities.BalanceStock);
+                        }
+                        else{
+                            $("#StoreStock").val(0);
+                        }
+                        $("#StoreStock").prop("disabled", true);
+                        $.each(cities.Material, function (i, city) {
+                            $('.colorval').val(city.ColorMasterId);
+                            document.getElementById("ColourId").readOnly = true;
+
+                            $('#ColourId').val(city.ColorMasterId);
+                            $('#UOMId').val(city.Uom);
+                            $('#StoreId').val(city.StoreMasterId);
+                            $('#Rate').val(city.Price);
+                            $('#MaterialCatId').val(city.MaterialCategoryMasterId);
+                            $("#MaterialCatId").combobox('destroy') ;
+                            $("#MaterialCatId").combobox() ;
+                            $('#MaterialGrpId').val(city.MaterialGroupMasterId);
+                            $("#MaterialGrpId").combobox('destroy') ;
+                            $("#MaterialGrpId").combobox();
+                            $('#SizeRangeID').val(city.SizeRangeMasterId);
+                            $('#SubstanceMasterID').val(city.SubstanceMasterId);
+                            document.getElementById("ColourId").disabled = true;
+                            var count = 1;
+                            var totalQty = 0;
+                            $("#sizeRangeTable tbody").html("");
+                            for (var i = 0; i <= cities.SizeRange.length - 1; i++) {
+                                $("#sizeRangeTable tbody").append("<tr><td class='sizeVal'>" + cities.SizeRange[i].SizeRange + "</td><td><input class='qty_Total' type='text'  id='qtyId" + cities.SizeRange[i].Qty + "' style='width:50px;' onchange='CalculateTotal(this)' /></td><td><input type='text' class='sizeRate' id='Rate" + cities.SizeRange[i].Rate + "' value='" + cities.SizeRange[i].Rate + "' style='width:50px;' /></td></tr>");
+                                count++;
+                                totalQty += parseInt(totalQty);
+                            }
+                            $("#TotalCount").val(totalQty);
+                        });
+                    }
+                });
+            }
+        });
+    });
+    function CalculateTotal(agr1) {
+
+        var buyerTotalcnt = 0;
+        var add = 0;
+        $("#sizeRangeTable .qty_Total").each(function () {
+            add += Number($(this).val());
+        });
+        if ($('#TotalCount').val() == "") {
+            buyerTotalcnt = 0;
+        }
+        else {
+            buyerTotalcnt = $('#TotalCount').val();
+        }
+        $('#TotalCount').text(add);
+    }
+    var decimal=0;
+    $('#AUtoDisplay').click(function () {
+        if ($('#IndentType').val() == "") {
+            alert("Please Select Indent Type.")
+            $('#IndentType').css('border-color', 'red');
+            $('#IndentType').focus();
+            return false;
+        }
+        else {
+            $('#IndentType').css('border-color', '');
+        }
+        if ($('#UnitId').val() == ""||$('#UnitId').val() ==null) {
+            alert("Please Select Unit Type.")
+            $('#UnitId').css('border-color', 'red');
+            $('#UnitId').focus();
+            return false;
+        }
+        else {
+            $('#UnitId').css('border-color', '');
+        }
+        if ($('#Date').val() == "") {
+            alert("Please Enter  Date.")
+            $('#Date').css('border-color', 'red');
+            $('#Date').focus();
+            return false;
+        }
+        else {
+            $('#Date').css('border-color', '');
+        }
+
+        if ($('#IndentNo').val() == "") {
+            alert("Please Enter Indent No.")
+            $('#IndentNo').css('border-color', 'red');
+            $('#IndentNo').focus();
+            return false;
+        }
+        else {
+            $('#IndentNo').css('border-color', '');
+        }
+        if ($('#Indendingfor').val() == "") {
+            alert("Please Enter Indendingfor.")
+            $('#Indendingfor').css('border-color', 'red');
+            $('#Indendingfor').focus();
+            return false;
+        }
+        else {
+            $('#Indendingfor').css('border-color', '');
+
+        }
+
+        if ($('#SeasonId').val() == "") {
+            alert("Please select Season.")
+            $('#SeasonId').css('border-color', 'red');
+            $('#SeasonId').focus();
+            return false;
+        }
+        else {
+            $('#SeasonId').css('border-color', '');
+        }
+
+        if ($('#StoreId').val() == "") {
+            alert("Please select Store.")
+            $('#StoreId').css('border-color', 'red');
+            $('#StoreId').focus();
+            return false;
+        }
+        else {
+            $('#StoreId').css('border-color', '');
+        }
+        if ($('#BuyerId').val() == "") {
+            alert("Please select Buyer.")
+            $('#BuyerId').css('border-color', 'red');
+            $('#BuyerId').focus();
+            return false;
+        }
+        else {
+            $('#BuyerId').css('border-color', '');
+        }
+        if( $(".issueTypecls option:selected").text()=="General")
+        {
+            if ($('#MRPNO_txtValue').val() == "") {
+                alert("Please select MRPNO.")
+                $('#MRPNO_txtValue').css('border-color', 'red');
+                $('#MRPNO_txtValue').focus();
+                return false;
+            }
+            else {
+                $('#MRPNO_txtValue').css('border-color', '');
+            }
+        }
+        else{
+            if ($('.multipleOrder_').val() == ""||$('.multipleOrder_').val()==null) {
+                alert("Please select MRPNO.")
+                $('#MRPNO').css('border-color', 'red');
+                $('#MRPNO').focus();
+                return false;
+            }
+            else {
+                $('#MRPNO').css('border-color', '');
+            }
+        }
+        if ($('#MaterialCatId').val() == "") {
+            alert("Please select Material Category.")
+            $('#MaterialCatId').css('border-color', 'red');
+            $('#MaterialCatId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialCatId').css('border-color', '');
+        }
+        if ($('#MaterialGrpId').val() == "") {
+            alert("Please select Material Group.")
+            $('#MaterialGrpId').css('border-color', 'red');
+            $('#MaterialGrpId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialGrpId').css('border-color', '');
+        }
+        if ($('#MaterialGrpId').val() == "") {
+            alert("Please select Material Group.")
+            $('#MaterialGrpId').css('border-color', 'red');
+            $('#MaterialGrpId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialGrpId').css('border-color', '');
+        }
+        if ($('#MaterialName').val() == ""||$('#MaterialName').val() == 0) {
+            alert("Please select Material Name.")
+            $('#MaterialName').css('border-color', 'red');
+            $('#MaterialName').focus();
+            return false;
+        }
+        else {
+            $('#MaterialName').css('border-color', '');
+        }
+        
+        if ($('#OrderType option:selected').text() != 'General' && $('#OrderTypeID option:selected').text() != 'General')
+        {
+            if ($('#ReqQty').val() == "") {
+                alert("Please enter ReqQty.")
+                $('#ReqQty').css('border-color', 'red');
+                $('#ReqQty').focus();
+                return false;
+            }
+            else {
+                $('#ReqQty').css('border-color', '');
+            }
+        }
+        if ($('#IntendQty').val() == "") {
+            alert("Please enter IntendQty.")
+            $('#IntendQty').css('border-color', 'red');
+            $('#IntendQty').focus();
+            return false;
+        }
+        else {
+            $('#IntendQty').css('border-color', '');
+        }
+        var mrpno="";
+
+
+
+        var sizeRangeArr = [];
+        $('#sizeRangeTable tbody tr').each(function () {
+            sizeRangeArr.push(
+                    {
+                        Size: $(this).find('td:first').html(),
+                        quantity: $(this).find('input[type=text]').val(),
+                        Rate: $(this).find(':last-child').text()
+                    });
+
+        });
+        $('#SizeRangeDetails').val(JSON.stringify(sizeRangeArr));
+        var myDropDownListValues = $(".multipleOrder_").multiselect("getChecked").map(function()
+        {
+            return this.value;
+        }).get();
+        var InternalOrderid = "";
+        for (i = 0; i < myDropDownListValues.length; i++) {
+
+            if(myDropDownListValues[i].startsWith(","))
+            {
+            }
+            else{
+                InternalOrderid += myDropDownListValues[i] + ",";
+            }
+        }
+
+        if($('.issueTypecls option:selected').text()=='General')
+        {
+            if($('#IndentId').val()==""||$('#IndentId').val()=="0")
+            {
+                var indentno=  $('#IndentNo').val();
+            }
+            mrpno=$('#MRPNO_txtValue').val();
+            $.ajax({
+                type: 'POST',
+                url: '/Indent/SaveIndentMaterialGeneral',
+                data: {
+                    IndentMaterialID: $('#IndentMaterialID').val(),
+                    MRPNO:mrpno,
+                    BuyerSeason: $('#SeasonId').val(),
+                    MaterialGroupMasterId: $('#MaterialGrpId').val(),
+                    BuyerMasterId:$('#BuyerId').val(),
+                    MaterialCategoryMasterId:$('#MaterialCatId').val(),
+                    UomMasterId: $('#UOMId').val(),
+                    MaterialMasterID:$('#MaterialName').val(),
+                    IndentQTY:$('#IntendQty').val(),
+                    TotalNorms: $('#Rate').val(),
+                    StoreStock: $('#StoreStock').val(),
+                    FreeStock: $('#FreeStock').val(),
+                    Value: $('#Value').val(),
+                    Price: $('#Rate').val(),
+                    RequiredQty: $('#ReqQty').val(),
+                    SupplierId:$('#SupplierId').val(),
+                    StoreStock: $('#StoreStock').val(),
+                    FreeStock:$('#FreeStock').val(),
+                    IndentID:$('#IndentId').val(),
+                    CategoryName: $('#MaterialCatId option:selected').text(),
+                    GroupName:$('#MaterialGrpId option:selected').text(),
+                    BuyerFullName: $('#BuyerId option:selected').text(),
+                    MaterialDescription: $('#MaterialName option:selected').text(),
+                    ColorMasterID:  $('#ColourId').val(),
+                    SupplierId: $('#SupplierId').val(),
+                    WastageName: $('#UOMId option:selected').text(),
+                    TotalNormsName: $('#UOMId option:selected').text(),
+                    SeasonName: $('#SeasonId option:selected').text(),
+                    UnitId:$("#UnitId").val(),
+                    IndentType:$("#IndentType").val(),
+                    Indendingfor:$("#Indendingfor").val(),
+                    OrderType:$(".issueTypecls").val(),
+                    StoreId:$("#StoreId").val(),
+                    MaterialType:$("#MaterialType").val(),
+                    hiddenIndentId: $("#HiddenIndentId").val(),
+                    SizeRangeDetails:$("#SizeRangeDetails").val(),
+                    SubstanceMasterID:$("#SubstanceMasterID").val(),
+                    SizeRangeMasterID:$("#SizeRangeID").val(),
+                    OrderTypeID:$(".issueTypecls").val(),
+                    IndentNo_:$('#IndentNo').val()
+                },
+                success: function (data) {
+                    if(data.StatusMessage=="Already Existed")
+                    {
+                        alert(data.StatusMessage);
+                        return false;
+                    }
+                    else{
+                        alert(data.StatusMessage);
+                        $('#MaterialCatId_ .custom-combobox input').val('');
+                        $("#sizeRangeTable tbody").html("");
+                        $("#TotalCount").text("");
+                        $('#MaterialGrpId_ .custom-combobox input').val('');
+                        $("#list-amended-material tbody").html("");
+                        $('#RequestedBy').val('');
+                        $('#MaterialName_ .custom-combobox input').val('');
+                        $('#ColourId').val('');
+                        $('#UOMId').val('');
+                        $('#Rate').val('');
+                        $('#Value').val('');
+                        $('#ReqQty').val('');
+                        $('#IntendQty').val('');
+                        $('#StoreStock').val('');
+                        $('#FreeStock').val('');
+                        $('#Remarks').val('');
+                        $("#TotalAmount").val(data.totalAmount);
+                        $.each(data.IndentMaterial, function (i, item) {
+                            if(item.SubstanceRange==null)
+                            {
+                                item.SubstanceRange="";
+                            }
+                            if(item.RequiredQty==null||item.RequiredQty=="")
+                            {
+                                item.RequiredQty="";
+                            }
+                            $('#HiddenIndentId').val(item.IndentID);
+                            $("#RemoveHead").css("display","block");
+                            $("#EditHead").css("display","block");
+                            $("#list-amended-material tbody").append("<tr id=" + item.IndentMaterialID + "> <td id='BOMID' style='display:none' class='BOMID' value=''>" + item.IndentMaterialID + "</td>"
+                                + "<td><input type='button' value='Remove' onclick='Delete(" +item.IndentMaterialID+")' class='Delete' />"+"</td>"
+                                 + "<td><input type='button' value='Edit' onclick='RowClick(" +item.IndentMaterialID + "," + item.BOMID + ")' class='Edit' />"+"</td>"
+                                         + "<td id='BOMMaterialID' style='display:none' class='BOMMaterialID' value=''>" + item.BOMMaterialID +"</td>"
+                                         + "<td id='MRPNO' style='display:none' class='MRPNO' value=''>" + item.MRPNO +"</td>"
+                                           + "<td id='CategoryName'  class='CategoryName' value=''>" + item.CategoryName + "</td>"
+                                             + "<td id='GroupName'  class='GroupName' value=''>" + item.GroupName + "</td>"
+                                              + "<td id='SubstanceRange'  class='SubstanceRange' value=''>" + item.SubstanceRange + "</td>"
+                                                + "<td id='BuyerPoNo'  class='BuyerPoNo' value=''>" + data.OrderType + "</td>"
+                                         + "<td id='MaterialDescription'  class='MaterialDescription' value=''>" + item.MaterialDescription + "</td>"
+                                         +"<td id='Color'  class='Color' value=''>" + item.ColorMasterID + "</td>"
+                                        + "<td id='RequiredQty' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                   + "<td id='IndentQTY'  class='IndentQTY' value=''>" + item.IndentQTY + "</td>"
+                                    + "<td id='Price'  class='Price' value=''>" + item.Price + "</td>"
+                                    + "<td id='WastageName'  class='WastageName' value=''>" + item.WastageName + "</td>"
+                                    + "<td id='Value'  class='Value' value=''>" + item.Value + "</td>"
+                                            + "<td id='TotalNorms' style='display:none' class='TotalNorms' value=''>" + item.TotalNorms + "</td>"
+                                            + "<td id='MaterialCategoryMasterId' style='display:none' class='MaterialCategoryMasterId' value=''>" + item.MaterialCategoryMasterId + "</td>"
+                                            + "<td id='MaterialGroupMasterId' style='display:none' class='MaterialGroupMasterId' value=''>" + item.MaterialGroupMasterId + "</td>"
+                                            + "<td id='ColorMasterId' style='display:none'  class='ColorMasterId' value=''>" + item.ColorMasterId + "</td>"
+                                            + "<td id='SubstanceMasterId' style='display:none' class='SubstanceMasterId' value=''>" + item.SubstanceMasterId + "</td>"
+                                            + "<td id='BuyerSeason' style='display:none' class='BuyerSeason' value=''>" + item.BuyerSeason + "</td>"
+                                            + "<td id='SeasonName' style='display:none' class='SeasonName' value=''>" + item.SeasonName + "</td>"
+                                            + "<td id='RequiredQty' style='display:none' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                              + "<td id='Rate' style='display:none' class='Rate' value=''>" + item.Rate + "</td>"
+                                                + "<td id='UomMasterId' style='display:none' class='UomMasterId' value=''>" + item.WastageQtyUOM + "</td>"
+                                                  + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierId + "</td>"
+                                                  + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierName + "</td>"
+                                                    + "<td id='BuyerFullName' style='display:none' class='BuyerFullName' value=''>" + item.BuyerFullName + "</td>"
+                                                      + "<td id='BuyerMasterId' style='display:none' class='BuyerMasterId' value=''>" + item.BuyerMasterId + "</td>"
+                                            + "<td id='OrderEntryId' style='display:none' class='OrderEntryId' value=''>" + item.OrderEntryId + "</td>"
+                                            + + "<td id='SizeRangeName' style='' class='SizeRangeName' value=''>" + item.SizeRangeName + "</td>"
+                                                      + "<td id='SizeRangeMasterID' style='display:none' class='SizeRangeMasterID' value=''>" + item.SizeRangeMasterID + "</td></tr>");
+                        });
+                        HideShowEditDelete();
+                        return false;
+                    }
+                }});
+
+        }
+        else{
+
+            mrpno= InternalOrderid;
+            $.ajax({
+                type: 'POST',
+                url: '/Indent/SaveIndentMaterial',
+                data: {
+                    IndentMaterialID: $('#IndentMaterialID').val(),
+                    MRPNO:mrpno,
+                    BuyerSeason: $('#SeasonId').val(),
+                    MaterialGroupMasterId: $('#MaterialGrpId').val(),
+                    BuyerMasterId:$('#BuyerId').val(),
+                    MaterialCategoryMasterId:$('#MaterialCatId').val(),
+                    UomMasterId: $('#UOMId').val(),
+                    MaterialMasterID:$('#MaterialName').val(),
+                    IndentQTY:$('#IntendQty').val(),
+                    TotalNorms: $('#Rate').val(),
+                    StoreStock: $('#StoreStock').val(),
+                    FreeStock: $('#FreeStock').val(),
+                    Value: $('#Value').val(),
+                    Price: $('#Rate').val(),
+                    RequiredQty: $('#ReqQty').val(),
+                    SupplierId:$('#SupplierId').val(),
+                    StoreStock: $('#StoreStock').val(),
+                    FreeStock:$('#FreeStock').val(),
+                    IndentID:$('#IndentId').val(),
+                    CategoryName: $('#MaterialCatId option:selected').text(),
+                    GroupName:$('#MaterialGrpId option:selected').text(),
+                    BuyerFullName: $('#BuyerId option:selected').text(),
+                    MaterialDescription: $('#MaterialName option:selected').text(),
+                    ColorMasterID:  $('#ColourId').val(),
+                    SupplierId: $('#SupplierId').val(),
+                    WastageName: $('#UOMId option:selected').text(),
+                    TotalNormsName: $('#UOMId option:selected').text(),
+                    SeasonName: $('#SeasonId option:selected').text(),
+                    UnitId:$("#UnitId").val(),
+                    IndentType:$("#IndentType").val(),
+                    Indendingfor:$("#Indendingfor").val(),
+                    OrderType:$(".issueTypecls").val(),
+                    SizeRangeDetails:$("#SizeRangeDetails").val(),
+                    SubstanceMasterID:$("#SubstanceMasterID").val(),
+                    SizeRangeID:$("#SizeRangeID").val(),
+                    OrderTypeID:$(".issueTypecls").val(),
+                },
+                success: function (data) {
+                    if(data.StatusMessage=="Updated Successfully")
+                    {
+                        alert(data.StatusMessage);
+                        $("#sizeRangeTable tbody").html("");
+                        $("#list-amended-material tbody").html("");
+                        $("#TotalCount").text("");
+                        $('#RequestedBy').val('');
+                        $('#MaterialCatId').val('');
+                        $("#MaterialCatId").combobox('destroy') ;
+                        $("#MaterialCatId").combobox();
+                        $('#MaterialGrpId').val('');
+                        $("#MaterialGrpId").combobox('destroy') ;
+                        $("#MaterialGrpId").combobox();
+                        $('#MaterialName').val('');
+                        $("#MaterialName").combobox('destroy') ;
+                        $("#MaterialName").combobox();
+                        $('#ColourId').val('');
+                        $('#UOMId').val('');
+                        $('#Rate').val('');
+                        $('#Value').val('');
+                        $('#ReqQty').val('');
+                        $('#IntendQty').val('');
+                        $('#SupplierId').val('');
+                        $('#StoreStock').val('');
+                        $('#FreeStock').val('');
+                        $('#Remarks').val('');
+                        $("#TotalAmount").val(data.TotalAmount);
+                        $.each(data.indentMaterials, function (i, item) {
+                            $("#RemoveHead").css("display","block");
+                            $("#EditHead").css("display","block");
+                            $("#list-amended-material tbody").append("<tr id=" + item.IndentMaterialID + "> <td id='BOMID' style='display:none' class='BOMID' value=''>" + item.BOMID + "</td>"
+                                + "<td><input type='button' value='Remove' onclick='Delete(" + item.IndentMaterialID+")' class='Delete' />"+"</td>"
+                                 + "<td><input type='button' value='Edit' onclick='RowClick(" + item.IndentMaterialID + "," + item.BOMID + ")' class='Edit' />"+"</td>"
+                                         + "<td id='BOMMaterialID' style='display:none' class='BOMMaterialID' value=''>" + item.BOMMaterialID +"</td>"
+                                         + "<td id='MRPNO' style='display:none' class='MRPNO' value=''>" + item.MRPNO +"</td>"
+                                           + "<td id='CategoryName'  class='CategoryName' value=''>" + item.CategoryName + "</td>"
+                                             + "<td id='GroupName'  class='GroupName' value=''>" + item.GroupName + "</td>"
+                                              + "<td id='SubstanceRange'  class='SubstanceRange' value=''>" + item.SubstanceRange + "</td>"
+                 + "<td id='BuyerPoNo'  class='BuyerPoNo' value=''>" + item.BuyerPoNo + "</td>"
+                                         + "<td id='MaterialDescription'  class='MaterialDescription' value=''>" + item.MaterialDescription + "</td>"
+                                         +"<td id='Color'  class='Color' value=''>" + item.Color + "</td>"
+                                        + "<td id='RequiredQty' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                   + "<td id='IndentQTY'  class='IndentQTY' value=''>" + item.IndentQTY + "</td>"
+                                    + "<td id='Price'  class='Price' value=''>" + item.Price + "</td>"
+                                    + "<td id='WastageName'  class='WastageName' value=''>" + item.WastageName + "</td>"
+                                    + "<td id='Value'  class='Value' value=''>" + item.Value + "</td>"
+                                            + "<td id='TotalNorms' style='display:none' class='TotalNorms' value=''>" + item.TotalNorms + "</td>"
+                                            + "<td id='MaterialCategoryMasterId' style='display:none' class='MaterialCategoryMasterId' value=''>" + item.MaterialCategoryMasterId + "</td>"
+                                            + "<td id='MaterialGroupMasterId' style='display:none' class='MaterialGroupMasterId' value=''>" + item.MaterialGroupMasterId + "</td>"
+                                            + "<td id='ColorMasterId' style='display:none'  class='ColorMasterId' value=''>" + item.ColorMasterId + "</td>"
+                                            + "<td id='SubstanceMasterId' style='display:none' class='SubstanceMasterId' value=''>" + item.SubstanceMasterId + "</td>"
+                                            + "<td id='BuyerSeason' style='display:none' class='BuyerSeason' value=''>" + item.BuyerSeason + "</td>"
+                                            + "<td id='SeasonName' style='display:none' class='SeasonName' value=''>" + item.SeasonName + "</td>"
+                                            + "<td id='RequiredQty' style='display:none' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                              + "<td id='Rate' style='display:none' class='Rate' value=''>" + item.Rate + "</td>"
+                                                + "<td id='UomMasterId' style='display:none' class='UomMasterId' value=''>" + item.WastageQtyUOM + "</td>"
+                                                  + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierId + "</td>"
+                                                  + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierName + "</td>"
+                                                    + "<td id='BuyerFullName' style='display:none' class='BuyerFullName' value=''>" + item.BuyerFullName + "</td>"
+                                                      + "<td id='BuyerMasterId' style='display:none' class='BuyerMasterId' value=''>" + item.BuyerMasterId + "</td>"
+                                               + "<td id='StoreStock' style='display:none' class='StoreStock' value=''>" + item.StoreStock + "</td>"
+                                           + "<td id='OrderEntryId' style='display:none' class='OrderEntryId' value=''>" + item.OrderEntryId + "</td></tr>");
+                        });
+                        HideShowEditDelete();
+                        return false;
+                    }
+                    else{
+                        alert(data.StatusMessage);
+                        return false;
+                    }
+                }});
+        }
+
+    });
+    function Back()
+    {
+        location.href = "/Indent/Indent";
+        return false;
+    }
+    //for MRP NO with Category filter
+    $(function(){
+        $("#MaterialCatId").combobox({
+            select: function() {
+                var mrpSelectedText="";
+                var myDropDownListValues = $(".multipleOrder_").multiselect("getChecked").map(function()
+                {
+                    return this.value;
+                }).get();
+                var InternalOrderid = "";
+                for (i = 0; i < myDropDownListValues.length; i++) {
+
+                    if(myDropDownListValues[i].startsWith(","))
+                    {
+                    }
+                    else{
+                        InternalOrderid += myDropDownListValues[i] + ",";
+                    }
+                }
+                var categoryID=$("#MaterialCatId").val();
+                var SeasonId = $('#SeasonId').val();
+                var storeId= $('#StoreId').val();
+                $.ajax({
+                    url: '/MaterialMaster/FillCateogoryid',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { MaterialCategoryMasterId: categoryID },
+                    success: function (cities) {
+                        $("#MaterialGrpId").html(""); // clear before appending new list
+                        $.each(cities, function (i, city) {
+                            $("#MaterialGrpId").append(
+                                $('<option></option>').val(city.MaterialGroupMasterId).html(city.GroupName));
+                        });
+                        $.ajax({
+                            url: '/Indent/ShowMaterialList',
+                            type: 'GET',
+                            data: {
+                                MRPNO: InternalOrderid,
+                                MaterialCategoryID:categoryID,
+                                SeasonId:SeasonId,
+                                StoreId:storeId
+                            },
+                            success: function (data) {
+                                if(data.Satus=="AlredayExist")
+                                {
+                                    $("#AUtoDisplay").hide();
+                                    $("#BtnSave").hide();
+                                    $("#list-amended-material tbody").html("");
+                                    $.each(data.Indent, function (i, item) {
+                                        $("#RemoveHead").css("display","block");
+                                        $("#EditHead").css("display","block");
+                                        $("#list-amended-material tbody").append("<tr id=" + item.IndentMaterialID + "> <td id='BOMID' style='display:none' class='BOMID' value=''>" + item.BOMID + "</td>"
+                                            + "<td><input type='button' value='Remove' onclick='Delete(" + item.IndentMaterialID+")' class='' />"+"</td>"
+                                             + "<td><input type='button' value='Edit' onclick='RowClick(" + item.IndentMaterialID + "," + item.BOMID + ")' class='' />"+"</td>"
+                                                     + "<td id='BOMMaterialID' style='display:none' class='BOMMaterialID' value=''>" + item.BOMMaterialID +"</td>"
+                                                     + "<td id='MRPNO' style='display:none' class='MRPNO' value=''>" + item.MRPNO +"</td>"
+                                                       + "<td id='CategoryName'  class='CategoryName' value=''>" + item.CategoryName + "</td>"
+                                                         + "<td id='GroupName'  class='GroupName' value=''>" + item.GroupName + "</td>"
+                                                          + "<td id='SubstanceRange'  class='SubstanceRange' value=''>" + item.SubstanceRange + "</td>"
+                                                           + "<td id='BuyerPoNo'  class='BuyerPoNo' value=''>" + item.BuyerPoNo + "</td>"
+                                                     + "<td id='MaterialDescription'  class='MaterialDescription' value=''>" + item.MaterialDescription + "</td>"
+                                                     +"<td id='Color'  class='Color' value=''>" + item.Color + "</td>"
+                                                    + "<td id='RequiredQty' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                               + "<td id='IndentQTY'  class='IndentQTY' value=''>" + item.IndentQTY + "</td>"
+                                                + "<td id='Price'  class='Price' value=''>" + item.Price + "</td>"
+                                                + "<td id='WastageName'  class='WastageName' value=''>" + item.WastageName + "</td>"
+                                                + "<td id='Value'  class='Value' value=''>" + item.Value + "</td>"
+                                                        + "<td id='TotalNorms' style='display:none' class='TotalNorms' value=''>" + item.TotalNorms + "</td>"
+                                                        + "<td id='MaterialCategoryMasterId' style='display:none' class='MaterialCategoryMasterId' value=''>" + item.MaterialCategoryMasterId + "</td>"
+                                                        + "<td id='MaterialGroupMasterId' style='display:none' class='MaterialGroupMasterId' value=''>" + item.MaterialGroupMasterId + "</td>"
+                                                        + "<td id='ColorMasterId' style='display:none'  class='ColorMasterId' value=''>" + item.ColorMasterId + "</td>"
+                                                        + "<td id='SubstanceMasterId' style='display:none' class='SubstanceMasterId' value=''>" + item.SubstanceMasterId + "</td>"
+                                                        + "<td id='BuyerSeason' style='display:none' class='BuyerSeason' value=''>" + item.BuyerSeason + "</td>"
+                                                        + "<td id='SeasonName' style='display:none' class='SeasonName' value=''>" + item.SeasonName + "</td>"
+                                                        + "<td id='RequiredQty' style='display:none' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                                          + "<td id='Rate' style='display:none' class='Rate' value=''>" + item.Rate + "</td>"
+                                                            + "<td id='UomMasterId' style='display:none' class='UomMasterId' value=''>" + item.WastageQtyUOM + "</td>"
+                                                              + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierId + "</td>"
+                                                              + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierName + "</td>"
+                                                                + "<td id='BuyerFullName' style='display:none' class='BuyerFullName' value=''>" + item.BuyerFullName + "</td>"
+                                                                  + "<td id='BuyerMasterId' style='display:none' class='BuyerMasterId' value=''>" + item.BuyerMasterId + "</td>"
+                                                          + "<td id='StoreStock' style='display:none' class='StoreStock' value=''>" + item.StoreStock + "</td>"
+                                                      + "<td id='OrderEntryId' style='display:none' class='OrderEntryId' value=''>" + item.OrderEntryId + "</td></tr>");
+                                    });
+                                    alert("This MRPNO Already indented");
+                                    return false;
+                                }
+                                else{
+                                    $("#AUtoDisplay").show();
+                                    $("#BtnSave").show();
+                                    $("#list-amended-material tbody").html("");
+                                    $.each(data, function (i, item) {
+                                        $("#RemoveHead").css("display","block");
+                                        $("#EditHead").css("display","block");
+                                        $("#list-amended-material tbody").append("<tr id=" + item.IndentMaterialID + "> <td id='BOMID' style='display:none' class='BOMID' value=''>" + item.BOMID + "</td>"
+                                            + "<td><input type='button' value='Remove' onclick='Delete(" + item.IndentMaterialID+")' class='' />"+"</td>"
+                                             + "<td><input type='button' value='Edit' onclick='RowClick(" + item.IndentMaterialID + "," + item.BOMID + ")' class='' />"+"</td>"
+                                                     + "<td id='BOMMaterialID' style='display:none' class='BOMMaterialID' value=''>" + item.BOMMaterialID +"</td>"
+                                                     + "<td id='MRPNO' style='display:none' class='MRPNO' value=''>" + item.MRPNO +"</td>"
+                                                       + "<td id='CategoryName'  class='CategoryName' value=''>" + item.CategoryName + "</td>"
+                                                         + "<td id='GroupName'  class='GroupName' value=''>" + item.GroupName + "</td>"
+                                                          + "<td id='SubstanceRange'  class='SubstanceRange' value=''>" + item.SubstanceRange + "</td>"
+                                                             + "<td id='BuyerPoNo'  class='BuyerPoNo' value=''>" + item.BuyerPoNo + "</td>"
+                                                     + "<td id='MaterialDescription'  class='MaterialDescription' value=''>" + item.MaterialDescription + "</td>"
+                                                     +"<td id='Color'  class='Color' value=''>" + item.Color + "</td>"
+                                                    + "<td id='RequiredQty' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                               + "<td id='IndentQTY'  class='IndentQTY' value=''>" + item.IndentQTY + "</td>"
+                                                + "<td id='Price'  class='Price' value=''>" + item.Price + "</td>"
+                                                + "<td id='WastageName'  class='WastageName' value=''>" + item.WastageName + "</td>"
+                                                + "<td id='Value'  class='Value' value=''>" + item.Value + "</td>"
+                                                        + "<td id='TotalNorms' style='display:none' class='TotalNorms' value=''>" + item.TotalNorms + "</td>"
+                                                        + "<td id='MaterialCategoryMasterId' style='display:none' class='MaterialCategoryMasterId' value=''>" + item.MaterialCategoryMasterId + "</td>"
+                                                        + "<td id='MaterialGroupMasterId' style='display:none' class='MaterialGroupMasterId' value=''>" + item.MaterialGroupMasterId + "</td>"
+                                                        + "<td id='ColorMasterId' style='display:none'  class='ColorMasterId' value=''>" + item.ColorMasterId + "</td>"
+                                                        + "<td id='SubstanceMasterId' style='display:none' class='SubstanceMasterId' value=''>" + item.SubstanceMasterId + "</td>"
+                                                        + "<td id='BuyerSeason' style='display:none' class='BuyerSeason' value=''>" + item.BuyerSeason + "</td>"
+                                                        + "<td id='SeasonName' style='display:none' class='SeasonName' value=''>" + item.SeasonName + "</td>"
+                                                        + "<td id='RequiredQty' style='display:none' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                                          + "<td id='Rate' style='display:none' class='Rate' value=''>" + item.Rate + "</td>"
+                                                            + "<td id='UomMasterId' style='display:none' class='UomMasterId' value=''>" + item.WastageQtyUOM + "</td>"
+                                                              + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierId + "</td>"
+                                                              + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierName + "</td>"
+                                                                + "<td id='BuyerFullName' style='display:none' class='BuyerFullName' value=''>" + item.BuyerFullName + "</td>"
+                                                                  + "<td id='BuyerMasterId' style='display:none' class='BuyerMasterId' value=''>" + item.BuyerMasterId + "</td>"
+                                                          + "<td id='StoreStock' style='display:none' class='StoreStock' value=''>" + item.StoreStock + "</td>"
+                                                      + "<td id='OrderEntryId' style='display:none' class='OrderEntryId' value=''>" + item.OrderEntryId + "</td></tr>");
+                                    });
+                                }
+
+                            }
+                        });
+
+                    }
+                });
+
+
+            }
+        });
+    });
+</script>

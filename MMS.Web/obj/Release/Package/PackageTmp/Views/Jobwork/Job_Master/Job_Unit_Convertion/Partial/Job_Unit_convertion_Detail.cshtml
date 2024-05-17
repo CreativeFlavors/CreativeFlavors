@@ -1,0 +1,253 @@
+﻿@model MMS.Web.Models.JobworkModel.UnitConvertionModel
+@{
+  
+}
+<link href="~/Content/chosen/bootstrap-chosen.css" rel="stylesheet" />
+<script src="~/Scripts/chosen/chosen.jquery.js"></script>
+<script>
+
+    $(".chosen-select").chosen();
+    $("#Sheet_Value").on("change", function () {
+        var Sheet_Value = $("#Sheet_Value").val();
+        var Noms = $("#Noms").val();
+        var Value = Sheet_Value / Noms;
+        alert(Value);
+        $('#Value').val(Math.round(Value))
+    });
+
+
+    $("#UC_No_Code").on("change", function () {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("Check_UcNo", "UnitConvertion")',
+            data: { UC_No_Code: $("#UC_No_Code").val() },
+            success: function (data) {
+                
+                if (data != 0) {
+                    alert("Name alredy Exist");
+                    $("#UC_No_Code").val('');
+                }
+                
+              
+            },
+            error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    });
+
+    $("#Material_id_From").on("change", function () {
+           $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("Getmaterial_SelectDetail", "UnitConvertion")',
+                        data: { MaterialNameID: $("#Material_id_From").val() },
+                        success: function (data) {
+
+                                
+                            $("#Store_id_from").val(data[0].StoreMasterId).trigger('chosen:updated'),
+                                $("#Group_From").val(data[0].MaterialGroupMasterId).trigger('chosen:updated'),
+                                $("#Category_From").val(data[0].MaterialCategoryMasterId).trigger('chosen:updated')
+                        },
+                        error: function (ex) {
+                            alert(JSON.stringify(ex));
+                        }
+                    });
+    });
+    $("#Material_id_To").on("change", function () {
+           $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("Getmaterial_SelectDetail", "UnitConvertion")',
+                        data: { MaterialNameID: $("#Material_id_To").val() },
+                        success: function (data) {
+
+                                
+                            $("#Store_id_to").val(data[0].StoreMasterId).trigger('chosen:updated'),
+                                $("#Group_To").val(data[0].MaterialGroupMasterId).trigger('chosen:updated'),
+                                $("#Category_To").val(data[0].MaterialCategoryMasterId).trigger('chosen:updated')
+                        },
+                        error: function (ex) {
+                            alert(JSON.stringify(ex));
+                        }
+                    });
+    });
+</script>
+
+
+<div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+
+<div class="header_list_tab  col-lg-12 col-md-12 col-sm-12  col-xs-12">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+        <div class="list_tab">
+            <div class="title">
+                Detail
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-12 col-sm-12  col-xs-12">
+        <div class="button_tab  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+
+        </div>
+    </div>
+</div>
+
+<div class="unit_convert col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 block-section input_list_group">
+        <div class="input_left col-lg-11 col-md-11 col-sm-12 no-padding">
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        @Html.HiddenFor(m => m.UC_No_Id)
+                        <label for="usr">UC No</label>
+                        @Html.TextBoxFor(m => m.UC_No_Code, new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <label for="usr">Store Name (From)</label>
+                        @Html.DropDownListFor(x => x.Store_id_from, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "form-control input chosen-select" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <label for="usr">Group</label>
+                        @Html.DropDownListFor(x => x.Group_From, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "form-control input chosen-select" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <label for="usr">Category</label>
+                        @Html.DropDownListFor(x => x.Category_From, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "form-control input chosen-select" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12 col-md-12 col-sm-12 input_full">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <label for="usr">Material Name (From)</label>
+                        @Html.DropDownListFor(x => x.Material_id_From, MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName(), new { @class = "form-control input chosen-select" })
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-lg-3 col-md-4 col-sm-12">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <label for="usr">Store Name (To)</label>
+                        @Html.DropDownListFor(x => x.Store_id_to, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "form-control input chosen-select" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-12">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <label for="usr">Group</label>
+                       @Html.DropDownListFor(x => x.Group_To, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "form-control input chosen-select" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-12">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <label for="usr">Category</label>
+                        @Html.DropDownListFor(x => x.Category_To, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "form-control input chosen-select" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12 col-md-12 col-sm-12 input_full">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <label for="usr">Material Name (To)</label>
+                        @Html.DropDownListFor(x => x.Material_id_To, MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName(), new { @class = "form-control input chosen-select" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6 col-sm-12 input_flex flex_first">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <label for="usr">Noms Calculation</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-1 col-md-6 col-sm-12 input_flex flex_first">
+                <div class="form_input_group">
+                    <div class="form-group">
+                       @Html.TextBoxFor(m => m.Noms, new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6 col-sm-12 input_flex flex_second">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <div class="form-group form_input_group after_content cnt">
+                            @Html.DropDownListFor(x => x.Uom1, MMS.Web.ExtensionMethod.HtmlHelper.UomUnit(), new { @class = "form-control input chosen-select" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6 col-sm-12 input_flex flex_second adjusant">
+                <div class="form_input_group">
+                    <div class="form-group">
+                        <div class="form-group form_input_group cnt">
+                            @Html.DropDownListFor(x => x.Uom2, MMS.Web.ExtensionMethod.HtmlHelper.UomUnit(), new { @class = "form-control input chosen-select" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-12 col-sm-12 input_full adjusant_totalcal">
+                <div class="form_input_group">
+                    <div class="form-group">
+                      
+                    </div>
+                </div>
+            </div>
+
+            <div class="input_group_items overflow col-lg-8 col-md-12 col-sm-12">
+                <div class="form_input_group">
+                    <div class="form-group flex_section">
+                        @Html.TextBoxFor(m => m.No_sheet, new { @class = "form-control" , @style = "width: 110px;" })
+                        @Html.DropDownListFor(x => x.No_sheet_Uom, MMS.Web.ExtensionMethod.HtmlHelper.UomUnit(), new { @class = "form-control input chosen-select" , @style = "width: 110px;" })
+                        <input type="text" class="form-control one" id="" placeholder="" value="=">
+                        @Html.TextBoxFor(m => m.Sheet_Value, new { @class = "form-control", @style = "width: 110px;" })
+                        @Html.DropDownListFor(x => x.Sheet_Value_Uom, MMS.Web.ExtensionMethod.HtmlHelper.UomUnit(), new { @class = "form-control input chosen-select", @style = "width: 110px;" })
+
+                        <input type="text" class="form-control one" id="" placeholder="" value="=">
+                        @Html.TextBoxFor(m => m.Value, new { @class = "form-control", @style = "width: 110px;" })
+                        @Html.DropDownListFor(x => x.Value_Uom, MMS.Web.ExtensionMethod.HtmlHelper.UomUnit(), new { @class = "form-control input chosen-select", @style = "width: 110px;" })
+                    </div>
+                </div>
+            </div>
+            <!--Empty-->
+            <div class="input_empty col-lg-1 col-md-1 col-sm-12">
+
+            </div>
+
+        </div>
+        <div class="init_action cntl_btn col-lg-12 col-md-12 col-sm-12">
+            @if (Model.UC_No_Id != null && Model.UC_No_Id == 0)
+            {
+                <button class="btn green-btn " onclick="save()">Save</button>
+            }
+            else
+            {
+                <button class="btn green-btn " onclick="Update()">Update</button>
+            }
+            <button class="btn green-grey" onclick="Back()">Back</button>
+        </div>
+
+    </div>
+
+
+
+</div>
+</div>

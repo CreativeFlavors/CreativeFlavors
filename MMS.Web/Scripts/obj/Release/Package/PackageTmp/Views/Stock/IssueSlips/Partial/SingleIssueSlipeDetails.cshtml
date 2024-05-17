@@ -1,0 +1,1494 @@
+﻿@model MMS.Web.Models.StockModel.IssueSlip_SingleModel
+@{
+    bool Order = true;
+    if (Model != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0 && Model.issueSlip_MaterialDetails.FirstOrDefault().IssueType == "Order")
+    {
+        Order = true;
+        Model.IssueType_ = Model.IssueType;
+        //Model.InternalOderID = Model.OrderEntryId;
+    }
+    else if (Model != null && Model.issueSlip_MaterialDetails == null)
+    {
+        Order = true;
+        Model.IssueType_ = Model.IssueType;
+    }
+    else
+    {
+        Order = false;
+    }
+}
+<style>
+    .right-form-section {
+        width: 98% !important;
+    }
+</style>
+
+<div class="right-form-section clearfix">
+    <form class="form-inline" role="form">
+        <!-- <ul class="nav nav-tabs">
+               <li class="active"><a data-toggle="tab" href="#step1">step 1</a></li>
+               <li><a data-toggle="tab" href="#step2">Step 2</a></li>
+            </ul> -->
+        <div class="tab-content">
+            <div class="tab-pane fade in active">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Issue Type </label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.HiddenFor(x => x.IssueSlipID)
+                                        @if (Model != null && Model.InternalOderID != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+                                        {
+                                            Model.IssueType_ = 1;
+                                            @Html.DropDownListFor(m => Model.IssueType_, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field" })
+                                        }
+                                        else
+                                        {
+                                            @Html.DropDownListFor(m => m.IssueType, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field" })
+                                        }
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Numberof sets/Pairs </label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(x => x.OrderQty, new { @class = "form-control text-field" })
+                                        </div>                                       
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="Order">
+                <div id="step1" class="tab-pane fade in active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Issue Slip No.</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(x => x.IssueSlipNo, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Stores</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.StoreName, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field StoreName" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Category</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.CategoryName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field CategoryName" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Internal Order</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @if (Model != null && Model.InternalOderID != "")
+                                            {
+                                                @Html.DropDownListFor(m => m.OrderEntryId, MMS.Web.ExtensionMethod.HtmlHelper.InternalOrderIONO(), new { @class = "select-style text-field InternalOder_" })
+                                            }
+                                            else
+                                            {
+                                                @Html.DropDownListFor(m => m.InternalOderID, MMS.Web.ExtensionMethod.HtmlHelper.InternalOrderIONO(), new { @class = "select-style text-field" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Style No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.Style, MMS.Web.ExtensionMethod.HtmlHelper.BomStyleNo(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Cutting Issue Type</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.CuttingIssueTypeID, new SelectList(
+                                     new List<Object>
+                                         {
+                                                                new { value = 0, text = "Please Select"  },
+                                                                new { value = 1, text = "Cutting"  },
+                                                                new { value = 2, text = "Full Shoes Closing" },
+                                                                 new { value =3, text = "Upper Shoes Closing" }
+
+                                         },
+                                         "value",
+                                         "text",
+                                         0), new { @class = "select-style text-field " })
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                @*<div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @if (Model.IssueSlipID == 0)
+                                                {
+                                                <button type="button" class="btn btn-primary auto_dis ">Auto Display</button>
+                                                }
+                                                <button type="button" class="btn btn-primary auto_dis">Multiple IO's</button>
+                                            </div>
+                                        </div>
+                                    </div>*@
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Group</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.GroupName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Material</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.MaterialDescription, MMS.Web.ExtensionMethod.HtmlHelper.MaterialName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Color</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.Color, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Machine Name</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.MachineName, MMS.Web.ExtensionMethod.HtmlHelper.MachineName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Substance</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.SubtanceID, MMS.Web.ExtensionMethod.HtmlHelper.SubstanceRange(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                @*<div class="field-section">
+                                        <div class="form-group">
+                                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                                <label for="text" class="form-label">Issue Type </label>
+                                            </div>
+                                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                                @Html.DropDownListFor(m => m.IssueType, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>*@
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Conveyor </label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.ConveyorID, MMS.Web.ExtensionMethod.HtmlHelper.Conveyor(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                @*<div class="row">
+                                        <div align="center" class="">
+                                           
+                                                <div align="center" class="">
+                                                    <button type="button" id="Add" class="btn btn-danger packing-button">ADD</button>
+                                                </div>
+                                           
+                                        </div>
+                                    </div>*@
+                            </div>
+                            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                                <div class="field-section">
+                                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+
+                                        <!-- <div class="table-scroll content mCustomScrollbar light" data-mcs-theme="minimal-dark"> -->
+                                        <div class="table-responsive table-td-padding parent-table-height" style="height:auto;">
+                                            <table class="table" id="list-amended">
+
+                                                <tbody>
+                                                    @if (Model != null && Model.sizeRangeQtyRateList != null && Model.sizeRangeQtyRateList.Count > 0)
+                                                    {
+                                                        <tr>
+                                                            <td style="background-color: #ddd; width: 50px !important; float: left;">Size</td>
+                                                            @foreach (var item in Model.sizeRangeQtyRateList)
+                                                            {
+                                                                <td style="background-color: #ddd; width: 50px !important; float: left;" class="size_value">@item.SizeRange</td>
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="background-color: #ddd; width: 50px !important; float: left;">Reqd.Qty</td>
+                                                            @foreach (var item in Model.sizeRangeQtyRateList)
+                                                            {
+                                                                <td style="background-color: #ddd; width: 50px !important; float: left;" data-range="@item.Qty" class="size_value">@item.Qty</td>
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="background-color: #ddd; width: 50px !important; float: left;">Current Issue</td>
+                                                            @foreach (var item in Model.sizeRangeQtyRateList)
+                                                            {
+                                                                <td style="background-color: #ddd; width: 50px !important; float: left;" data-range="@item.Rate" class="size_value">@item.Rate</td>
+                                                            }
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- </div> -->
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                            <div class="field-section">
+                                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+
+                                    <!-- <div class="table-scroll content mCustomScrollbar light" data-mcs-theme="minimal-dark"> -->
+                                    <div class="table-responsive table-td-padding parent-table-height" style="height:auto;">
+                                        <table class="table" id="list-amended-material">
+                                            <thead>
+                                                <tr>
+                                                    <td>Issue Slip No</td>
+                                                    <td>Order No</td>
+                                                    <td>Style</td>
+                                                    <td>Issue Type</td>
+                                                    <td>NoofSets</td>
+                                                    <td>Group</td>
+                                                    <td>Category</td>
+                                                    <td>StoresName</td>
+                                                    <td>Material</td>
+                                                    <td>Color</td>
+                                                    <td>Reqd qty</td>
+                                                    <td>Alreday issued</td>
+                                                    <td>Current Issue</td>
+                                                    <td> Pieces  </td>
+                                                    <td> Current Stock  </td>
+                                                    <td>Rate</td>
+                                                    <td>Issue</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (Model != null && Model.issueSlip_MaterialDetails != null && Model.issueSlip_MaterialDetails.Count > 0)
+                                                {
+                                                    foreach (var item in Model.issueSlip_MaterialDetails)
+                                                    {
+                                                        <tr>
+                                                            <td id="IssueSlipId" name="IssueSlipId" class="IssueSlipId" style="display:none">@item.IssueSlipId</td>
+                                                            <td id="IssueSlipFK" name="IssueSlipFK" class="IssueSlipFK" style="display:none">@item.IssueSlipFK</td>
+                                                            <td id="IssueSlipNo" name="IssueSlipNo" class="IssueSlipNo">@Model.IssueSlipNo</td>
+                                                            <td id="InternalOderID" name="InternalOderID" class="InternalOderID">@item.OrderNo</td>
+                                                            <td id="Style" name="Style" class="Style">@item.Style</td>
+                                                            <td id="IssueType" name="IssueType" class="IssueType">@item.IssueType</td>
+                                                            <td id="NoOfSets" name="NoOfSets" class="NoOfSets">@item.NoOfSets</td>
+                                                            <td id="GroupName" name="GroupName" class="GroupName">@item.GroupId</td>
+                                                            <td id="CategoryName" name="CategoryName" class="CategoryName">@item.CategoryId</td>
+                                                            <td id="StoreName" name="StoreName" class="StoreName">@item.StoreName</td>
+                                                            <td id="MaterialDescription" name="MaterialDescription" class="MaterialDescription">@item.MaterialName</td>
+                                                            <td id="Color" name="Color" class="Color">@item.ColourId</td>
+                                                            <td id="RequiredQty" name="RequiredQty" class="RequiredQty">@item.RequiredQty</td>
+                                                            <td id="AlredayIssued" name="AlredayIssued" class="AlredayIssued">@item.AlredayIssued</td>
+                                                            <td id="CurrentIssue" name="CurrentIssue" class="CurrentIssue"><input type="text" class="CurrentIssueValue" style="width: 50px;" value="@item.CurrentIssue" /></td>
+                                                            <td id="Piecies" name="Piecies" class="Piecies"><input type="text" class="Piecies_" style="width: 50px;" value="@item.Piecies" /></td>
+                                                            <td id="CurrentStock" name="CurrentStock" class="CurrentStock"><input type="text" class="CurrentStock_" style="width: 50px;" value="@item.CurrentStock" /></td>
+                                                            <td id="Rate" name="Rate" class="Rate">@item.Rate</td>
+                                                            @if (item.IsChecked == true)
+                                                            {
+                                                                <td id="IsChecked" class="IsChecked"><input type="checkbox" class="assign" value="" checked /></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td id="IsChecked" class="IsChecked"><input type="checkbox" class="assign" value="" /></td>
+                                                            }
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-content" id="General">
+                <div id="step1" class="tab-pane fade in active">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Issue Slip No.</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(x => x.IssueSlipNo, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Internal Order</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.InternalOderID, MMS.Web.ExtensionMethod.HtmlHelper.InternalOrderIONO(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Style No</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.Style, MMS.Web.ExtensionMethod.HtmlHelper.BomStyleNo(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Stores</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.StoreName, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field StoreName" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Category</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.CategoryName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Group</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.GroupName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Material</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.MaterialDescription, MMS.Web.ExtensionMethod.HtmlHelper.MaterialName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Color</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.Color, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                @*<div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @if (Model.IssueSlipID == 0)
+                                            {
+                                                <button type="button" class="btn btn-primary auto_dis ">Auto Display</button>
+                                            }
+                                            <button type="button" class="btn btn-primary auto_dis">Multiple IO's</button>
+                                        </div>
+                                    </div>
+                                </div>*@
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Piecies </label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(x => x.Piecies, new { @class = "form-control text-field" })
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.PieciesType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            LotNo
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(x => x.LotNo, new { @class = "form-control text-field" })
+                                            @*@Html.DropDownListFor(m => m.LotNo, MMS.Web.ExtensionMethod.HtmlHelper.LOtNo(), new { @class = "select-style text-field" })*@
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Balance in this Lot</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 pad_left">
+                                                @Html.TextBoxFor(x => x.BalanceInThisListlot, new { @class = "form-control text-field" })
+                                            </div>
+                                            <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-padding">
+                                                @Html.TextBoxFor(x => x.BalanceInthisListType, new { @class = "form-control text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Machine Name</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.MachineName, MMS.Web.ExtensionMethod.HtmlHelper.MachineName(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Number of sets/pairs</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(x => x.NoOfSets, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Rate</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.TextBoxFor(x => x.Rate, new { @class = "form-control text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Substance</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.SubtanceID, MMS.Web.ExtensionMethod.HtmlHelper.SubstanceRange(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Required Qty</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 pad_left">
+                                                @Html.TextBoxFor(x => x.RequiredQty, new { @class = "form-control text-field" })
+                                            </div>
+                                            <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-padding">
+                                                @Html.DropDownListFor(m => m.RequiredType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Already Issued</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 pad_left">
+                                                @Html.TextBoxFor(x => x.AlredayIssued, new { @class = "form-control text-field" })
+                                            </div>
+                                            <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-padding">
+                                                @Html.DropDownListFor(m => m.AlreadyUsedType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Current Issues</label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 pad_left">
+                                                @Html.TextBoxFor(x => x.CurrentIssue, new { @class = "form-control text-field" })
+                                            </div>
+                                            <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 no-padding">
+                                                @Html.DropDownListFor(m => m.CurrentIssuesType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                                @*<div class="field-section">
+                                    <div class="form-group">
+                                        <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                            <label for="text" class="form-label">Issue Type </label>
+                                        </div>
+                                        <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                            @Html.DropDownListFor(m => m.IssueType, MMS.Web.ExtensionMethod.HtmlHelper.GetGRNType(), new { @class = "select-style text-field" })
+                                        </div>
+                                    </div*@
+                            </div>
+                            <div class="field-section">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                        <label for="text" class="form-label">Conveyor </label>
+                                    </div>
+                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                        @Html.DropDownListFor(m => m.ConveyorID, MMS.Web.ExtensionMethod.HtmlHelper.Conveyor(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div align="center" class=" col-md-12 col-lg-12 col-sm-12 col-xs-12">                              
+                                    <div align="center" class="back-color col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                                        <button type="button" id="Add" class="btn btn-danger packing-button">ADD</button>
+                                    </div>    
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 roe-top">
+                                <div class="col-md-8 col-lg-8 col-xs-12 col-sm-8 no-pad ">
+                                    <p>If Category is WETBLUE Calculate Weight, Shinkage, Wastage, Shortage</p>
+                                </div>
+
+                            </div>
+                            <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 trop">
+                                <div class="col-md-4 col-lg-4 col-sm-4 col-xs-12 no-pad">
+                                    <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                        <div class="col-md-12 col-lg-12 col-sm-6 col-xs-12 no-pad new_bot_margin">
+                                            <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                                <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 no-pad">
+                                                    <label for="component-check" style="margin-top: 8px;">Current Stock</label>
+                                                </div>
+                                                <div class="col-md-3 col-lg-4 col-sm-6 col-xs-12">
+                                                    @Html.TextBoxFor(x => x.CurrentStock, new { @class = "form-control text-field" })
+                                                </div>
+                                                <div class="col-md-4 col-lg-5 col-sm-6 col-xs-12 pad_left">
+                                                    @Html.DropDownListFor(m => m.CurrentStockType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad parti-u">
+                                        <div class="col-md-12 col-lg-12 col-sm-6 col-xs-12 no-pad">
+                                            <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                                <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 no-pad">
+                                                    <label for="component-check" style="margin-top: 8px;">Closing in all stock stores</label>
+                                                </div>
+                                                <div class="col-md-3 col-lg-4 col-sm-6 col-xs-12">
+                                                    @Html.TextBoxFor(x => x.ClosingStockinAllStores, new { @class = "form-control text-field" })
+                                                </div>
+                                                <div class="col-md-4 col-lg-5 col-sm-6 col-xs-12 pad_left">
+                                                    @Html.DropDownListFor(m => m.ClosingStockinAllStoredType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-lg-4 col-sm-4 col-xs-12">
+                                    <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                        <div class="col-md-12 col-lg-12 col-sm-6 col-xs-12 no-pad new_bot_margin">
+                                            <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                                <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 no-pad">
+                                                    <label for="component-check" style="margin-top: 8px;">Freestock</label>
+                                                </div>
+                                                <div class="col-md-3 col-lg-4 col-sm-6 col-xs-12">
+                                                    @Html.TextBoxFor(x => x.FreeStock, new { @class = "form-control text-field" })
+                                                </div>
+                                                <div class="col-md-4 col-lg-5 col-sm-6 col-xs-12 pad_left">
+                                                    @Html.DropDownListFor(m => m.FreeStockType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad parti-u">
+                                        <div class="col-md-12 col-lg-12 col-sm-6 col-xs-12 no-pad new_bot_margin">
+                                            <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                                <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 no-pad">
+                                                    <label for="component-check" style="margin-top: 8px;">In Transit</label>
+                                                </div>
+                                                <div class="col-md-3 col-lg-4 col-sm-6 col-xs-12">
+                                                    @Html.TextBoxFor(x => x.InTransitValue, new { @class = "form-control text-field" })
+                                                </div>
+                                                <div class="col-md-4 col-lg-5 col-sm-6 col-xs-12 pad_left">
+                                                    @Html.DropDownListFor(m => m.InTransitType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-4 col-lg-4 col-sm-4 col-xs-12">
+                                    <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                        <div class="col-md-12 col-lg-12 col-sm-6 col-xs-12 no-pad">
+                                            <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad">
+                                                <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 no-pad">
+                                                    <label for="component-check" style="margin-top: 8px;">Reserved Stock</label>
+                                                </div>
+                                                <div class="col-md-3 col-lg-4 col-sm-6 col-xs-12">
+                                                    @Html.TextBoxFor(x => x.ReserverQty, new { @class = "form-control text-field" })
+                                                </div>
+                                                <div class="col-md-4 col-lg-5 col-sm-6 col-xs-12 pad_left">
+                                                    @Html.DropDownListFor(m => m.ReserverQtyType, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field" })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12 no-pad parti-u1">
+                                        @if (Model.IssueSlipID == 0)
+                                        {
+
+                                            <div align="center" class="col-md-6 col-xs-12 col-lg-6 col-sm-6">
+                                                <button type="button" class="btn btn-primary" id="AutoDisplay_">Auto Display</button>
+                                            </div>
+                                        }
+
+                                    </div>
+                                    <div align="center">
+                                        <button type="button" class="btn btn-primary" id="ReleaseReserved">Release Reserved stk</button>
+                                    </div>
+                                    <div align="center">
+                                        <button type="button" class="btn btn-primary" id="ReserveFreeStock">Reserve Free Stock</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="del_botton_border" style="margin: 20px 0px;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="del_botton_border" style="margin: 20px 0px;">
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class=" col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                                <div class="field-section">
+                                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+
+                                        <!-- <div class="table-scroll content mCustomScrollbar light" data-mcs-theme="minimal-dark"> -->
+                                        <div class="table-responsive table-td-padding parent-table-height">
+                                            <table class="table" id="list-amended-material_">
+                                                <thead>
+                                                    <tr>
+                                                        <td>Issue Slip No</td>
+                                                        <td>Order No</td>
+                                                        <td>Style</td>
+                                                        <td>Issue Type</td>
+                                                        <td>NoofSets</td>
+                                                        <td>Group</td>
+                                                        <td>Category</td>
+                                                        <td>StoresName</td>
+                                                        <td>Material</td>
+                                                        <td>Color</td>
+                                                        <td>Reqd qty</td>
+                                                        <td>Alreday issued</td>
+                                                        <td>Current Issue</td>
+                                                        <td>Rate</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
+                                        <!-- </div> -->
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="form-footer">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                        <button type="submit" class="btn btn-default btn-style">Excel</button>
+                        <button type="submit" class="btn btn-default btn-style">Set Up</button>
+                        <button type="submit" class="btn btn-default btn-style">Preview</button>
+                        <button type="submit" class="btn btn-default btn-style">Print</button>
+                        <button type="submit" class="btn btn-default btn-style">Reserve</button>
+                        <button type="submit" class="btn btn-default btn-style">Clear</button>
+                        <button type="submit" class="btn btn-default btn-style">Close</button>
+
+                        @if (Model.IssueSlipID == 0)
+                        {
+                        <input type="button" id="BtnSave" class="btn btn-default btn-style" value="Save" />
+                        }
+                        else
+                        {
+                        @Html.HiddenFor(x => x.IssueSlipID)
+                        <input type="button" id="BtnUpdate" class="btn btn-default btn-style" value="Update" onclick="Update()" />
+                        }
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+    </form>
+</div>
+<div class="lefterr_icon">
+    <div class="direction">  &lt;  </div>
+</div>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.10.2.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/AutoComplete%20v1.11.4.js"></script>
+<script src="~/Scripts/AutoCompleteCommon.js"></script>
+<script>
+    // A $( document ).ready() block.
+    $(document).ready(function () {      
+        if ('@Order' == 'True') {
+            $("#General").hide();
+            $("#Order").show();
+        }
+        else {
+            $("#General").show();
+            $("#Order").hide();
+        }
+    });
+    //  $("#InternalOderID").val()
+    $("#InternalOderID").combobox();
+    $("#toggle").click(function () {
+        $("#InternalOderID").toggle();
+    });
+    $("#OrderEntryId").combobox();
+    $("#toggle").click(function () {
+        $("#OrderEntryId").toggle();
+    });
+
+    $("#MaterialDescription").combobox();
+    $("#toggle").click(function () {
+        $("#MaterialDescription").toggle();
+    });
+    //$("#Material").combobox();
+    //$("#toggle").click(function () {
+    //    $("#Material").toggle();
+    //});
+    $(function () {
+        $("#IssueType").change(function () {
+           
+            var types = "";
+            var id = $("#IssueType").val();
+            types = $("#IssueType option:selected").text().trim();
+            $("#IssueType").val("");
+            if (types == "Order") {
+              
+                $("#IssueType").val(id);
+                $("#General").hide();
+                $("#Order").show();
+            }
+            else {
+                
+                $("#IssueType").val(id);
+                $("#General").show();
+                $("#Order").hide();
+            }
+        });
+    });
+
+    $(function () {
+        $("#IssueType_").change(function () {
+           
+            var types = "";
+            var id = $("#IssueType_").val();
+            types = $("#IssueType_ option:selected").text().trim();
+            $("#IssueType_").val("");
+            if (types == "Order") {
+               
+                $("#IssueType_").val(id);
+                $("#General").hide();
+                $("#Order").show();
+            }
+           else {
+               
+                $("#IssueType_").val(id);
+                $("#General").show();
+                $("#Order").hide();
+            }
+        });
+    });
+
+    $("#BtnSave").click(function () {
+        if ($('#txtSIssueSlipNo').val() == "") {
+            alert("Please Enter Issue Slip No."); $('#txtSIssueSlipNo').css('border-color', 'red'); $('#txtSIssueSlipNo').focus(); return false;
+        }
+        else {
+            $('#txtSIssueSlipNo').css('border-color', '');
+        }
+        if ($('#ddlIssueType').val() == "") {
+            alert("Please Enter Issue Type."); $('#ddlIssueType').css('border-color', 'red'); $('#ddlIssueType').focus(); return false;
+        }
+        else {
+            $('#ddlIssueType').css('border-color', '');
+        }
+        if ($('#txtDate').val() == "") {
+            alert("Please Enter Date."); $('#txtDate').css('border-color', 'red'); $('#txtDate').focus(); return false;
+        }
+        else {
+            $('#txtDate').css('border-color', '');
+        }
+        if ($('#ddlConveyor').val() == "") {
+            alert("Please Enter Conveyor."); $('#ddlConveyor').css('border-color', 'red'); $('#ddlConveyor').focus(); return false;
+        }
+        else {
+            $('#ddlConveyor').css('border-color', '');
+        }
+        if ($('#InternalOrderId').val() == "") {
+            alert("Please Enter Internal Order."); $('#InternalOrderId').css('border-color', 'red'); $('#InternalOrderId').focus(); return false;
+        }
+        else {
+            $('#InternalOrderId').css('border-color', '');
+        }
+
+        if ($('#MachineNameId').val() == "") {
+            alert("Please Enter Machine Name."); $('#MachineNameId').css('border-color', 'red'); $('#MachineNameId').focus(); return false;
+        }
+        else {
+            $('#MachineNameId').css('border-color', '');
+        }
+        if ($('#txtStyleNo').val() == "") {
+            alert("Please Enter Style No."); $('#txtStyleNo').css('border-color', 'red'); $('#txtStyleNo').focus(); return false;
+        }
+        else {
+            $('#txtStyleNo').css('border-color', '');
+        }
+        if ($('#txtNoOfsetsPairs').val() == "") {
+            alert("Please Enter No Of sets Pairs."); $('#txtNoOfsetsPairs').css('border-color', 'red'); $('#txtNoOfsetsPairs').focus(); return false;
+        }
+        else {
+            $('#txtNoOfsetsPairs').css('border-color', '');
+        }
+        if ($('#StoresId').val() == "") {
+            alert("Please Enter Stores."); $('#StoresId').css('border-color', 'red'); $('#StoresId').focus(); return false;
+        }
+        else {
+            $('#StoresId').css('border-color', '');
+        }
+        if ($('#RateId').val() == "") {
+            alert("Please Enter Rate."); $('#RateId').css('border-color', 'red'); $('#RateId').focus(); return false;
+        }
+        else {
+            $('#RateId').css('border-color', '');
+        }
+        if ($('#CategoryId').val() == "") {
+            alert("Please Enter Category."); $('#CategoryId').css('border-color', 'red'); $('#CategoryId').focus(); return false;
+        }
+        else {
+            $('#CategoryId').css('border-color', '');
+        }
+        if ($('#SubstanceId').val() == "") {
+            alert("Please Enter Substance."); $('#SubstanceId').css('border-color', 'red'); $('#SubstanceId').focus(); return false;
+        }
+        else {
+            $('#SubstanceId').css('border-color', '');
+        }
+        if ($('#GroupId').val() == "") {
+            alert("Please Enter Group."); $('#GroupId').css('border-color', 'red'); $('#GroupId').focus(); return false;
+        }
+        else {
+            $('#GroupId').css('border-color', '');
+        }
+        if ($('#txtReqQty').val() == "") {
+            alert("Please Enter Required Qty."); $('#txtReqQty').css('border-color', 'red'); $('#txtReqQty').focus(); return false;
+        }
+        else {
+            $('#txtReqQty').css('border-color', '');
+        }
+        if ($('#MaterialId').val() == "") {
+            alert("Please Enter Material."); $('#MaterialId').css('border-color', 'red'); $('#MaterialId').focus(); return false;
+        }
+        else {
+            $('#MaterialId').css('border-color', '');
+        }
+        if ($('#ColourId').val() == "") {
+            alert("Please Enter Colour."); $('#ColourId').css('border-color', 'red'); $('#ColourId').focus(); return false;
+        }
+        else {
+            $('#ColourId').css('border-color', '');
+        }
+        if ($('#txtAlreadyIssued').val() == "") {
+            alert("Please Enter Already Issued."); $('#txtAlreadyIssued').css('border-color', 'red'); $('#txtAlreadyIssued').focus(); return false;
+        }
+        else {
+            $('#txtAlreadyIssued').css('border-color', '');
+        }
+
+        if ($('#txtCurrentIssues').val() == "") {
+            alert("Please Enter Current Issues."); $('#txtCurrentIssues').css('border-color', 'red'); $('#txtCurrentIssues').focus(); return false;
+        }
+        else {
+            $('#txtCurrentIssues').css('border-color', '');
+        }
+        if ($('#ddlCurrentSharesVal').val() == "") {
+            alert("Please Enter Current Shares Value ."); $('#ddlCurrentSharesVal').css('border-color', 'red'); $('#ddlCurrentSharesVal').focus(); return false;
+        }
+        else {
+            $('#ddlCurrentSharesVal').css('border-color', '');
+        }
+        if ($('#txtBalanceILOTSQFT').val() == "") {
+            alert("Please Enter Balance LOT SQFT."); $('#txtBalanceILOTSQFT').css('border-color', 'red'); $('#txtBalanceILOTSQFT').focus(); return false;
+        }
+        else {
+            $('#txtBalanceILOTSQFT').css('border-color', '');
+        }
+        if ($('#txtBalanceILOTSPCS').val() == "") {
+            alert("Please Enter Balance LOTS PCS."); $('#txtBalanceILOTSPCS').css('border-color', 'red'); $('#txtBalanceILOTSPCS').focus(); return false;
+        }
+        else {
+            $('#txtBalanceILOTSPCS').css('border-color', '');
+        }
+        if ($('#txtCurrentStock').val() == "") {
+            alert("Please Enter Current Stock."); $('#txtCurrentStock').css('border-color', 'red'); $('#txtCurrentStock').focus(); return false;
+        }
+        else {
+            $('#txtCurrentStock').css('border-color', '');
+        }
+        if ($('#txtCurrentStockUOM').val() == "") {
+            alert("Please Enter Current Stock UOM."); $('#txtCurrentStockUOM').css('border-color', 'red'); $('#txtCurrentStockUOM').focus(); return false;
+        }
+        else {
+            $('#txtCurrentStockUOM').css('border-color', '');
+        }
+
+
+
+
+
+        $.ajax({
+            url: '/IssueSlip_Single/SaveDetails',
+            type: "POST",
+            dataType: "JSON",
+            data: {
+                IssuesSlipId: $("#IssuesSlipId").val(),
+                IssuesTypeId: $("#ddlIssueType").val(),
+                IssuesSlipNo: $("#IssueSlipNo").val(),
+                Date: $("#txtDate").val(),
+                ConveyorId: $('#ConveyorID').val(),
+                InternalOderID: $('#InternalOderID').val(),//$("#InternalOrderId").val();
+                MachineNameId: $('#MachineName').val(),// $("#MachineNameId").val();
+                StyleNo: $("#StyleNo").val(),
+                NoOfSets_Pairs: $("#txtNoOfsetsPairs").val(),
+                StoresID: $("#StoresID").val(),
+                Rate: $("#Rate").val(),
+                CategoryID: $("#CategoryID").val(),
+                SubstanceId: $('#SubtanceID').val(), // $("#SubstanceId").val();
+                GroupID: $("#GroupID").val(),
+                RequiredQTY: $("#RequiredQTY").val(),
+                RequiredType: $("#RequiredType").val(),
+                AlreadyUsed: $("#AlreadyUsed").val(),
+                AlreadyUsedType: $("#AlreadyUsedType").val(),
+                Material: $("#Material").val(),
+                ColorID: $("#ColorID").val(),
+                AlreadyIssued: $("#txtAlreadyIssued").val(),
+                LotNo: $("#LotNo").val(),
+                CurrentIssue: $("#CurrentIssue").val(),
+                CurrentIssuesType: $("#CurrentIssuesType").val(),
+                BalanceInThisListlot: $("#BalanceInThisListlot").val(),
+                BalanceInthisListType: $("#BalanceInthisListType").val(),
+                NoOfSetPairs: $("#NoOfSetPairs").val(),
+                CurrentStock: $("#CurrentStock").val(),
+                CurrentStockType: $("#CurrentStockType").val(),
+                FreeStock: $("#FreeStock").val(),
+                FreeStockType: $("#FreeStockType").val(),
+                ReserverQty: $("#ReserverQty").val(),
+                ReserverQtyType: $("#ReserverQtyType").val(),
+                ClosingStockinAllStores: $("#ClosingStockinAllStores").val(),
+                ClosingStockinAllStoredType: $("#ClosingStockinAllStoredType").val(),
+                InTransitValue: $("#InTransitValue").val(),
+                InTransitType: $("#InTransitType").val(),
+            },
+            success: function (data) {
+
+            }
+        });
+    });
+    $("#InternalOderID").combobox({
+        select: function (event, ui) {
+          
+            var InternalOderID = $("#InternalOderID option:selected").text();
+            $.ajax({
+                url: '/IssueSlip_Single/GetInternalBuyeSlNoWithMaterialName',
+                type: "GET",
+                dataType: "JSON",
+                data: {
+                    InternalOderID: InternalOderID,
+                    IssueType: $("#IssueType option:selected").text(),
+                    StoreName: $('#StoreName').val(),
+                    CategoryName: $("#CategoryName").val()
+                },
+                success: function (data) {                   
+                    $("#OrderQty").val(data.TotalAmount);
+                    $("#list-amended-material tbody").html("");
+                    $.each(data.Material, function (i, item) {
+                     
+                        $("#RemoveHead").css("display", "block");
+                        $("#EditHead").css("display", "block");
+                        $("#list-amended-material tbody").append("<tr id=" + item.IssueSlipId + "> <td id='IssueSlipId' style='display:none' class='IssueSlipId' value=''>" + item.IssueSlipId + "</td>"
+                            //+ "<td><input type='button' value='Remove' onclick='Delete(" + item.BOMMaterialID + ")' class='' />" + "</td>"
+                            // + "<td><input type='button' value='Edit' onclick='RowClick(" + item.BOMMaterialID + "," + item.BOMID + ")' class='' />" + "</td>"
+                                     + "<td id='IssueSlipFK' style='display:none' class='IssueSlipFK' value=''>" + item.IssueSlipFK + "</td>"
+                                   //  + "<td id='MRPNO' style='display:none' class='MRPNO' value=''>" + item.MRPNO + "</td>"
+                                     + "<td id='IssueSlipNo'  name='IssueSlipNo' class='IssueSlipNo' value=''>" + $('#IssueSlipNo').val() + "</td>"
+                                       + "<td id='InternalOderID'name='InternalOderID'  class='InternalOderID' value=''>" + $('#InternalOderID option:selected').text() + "</td>"
+                                         + "<td id='Style'name='Style'  class='Style' value=''>" + $('#StyleNo option:selected').text() + "</td>"
+                                           + "<td id='IssueType' name='IssueType' class='IssueType' value=''>" + $('#IssueType option:selected').text() + "</td>"
+                                           + "<td id='NoOfSets' name='NoOfSets'  class='NoOfSets' value=''>" + item.NoOfSets + "</td>"
+                                       + "<td id='GroupName' name='GroupName' class='GroupName' value=''>" + item.GroupId + "</td>"
+                                         + "<td id='CategoryName' name='CategoryName' class='CategoryName' value=''>" + item.CategoryId + "</td>"
+                                          + "<td id='StoreName' name='StoreName'  class='StoreName' value=''>" + item.StoreName + "</td>"
+                                     + "<td id='MaterialDescription' name='MaterialDescription' class='MaterialDescription' value=''>" + item.MaterialName + "</td>"
+                                     + "<td id='Color'  class='Color' name='Color' value=''>" + item.ColourId + "</td>"
+                                    + "<td id='RequiredQty' name='RequiredQty' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                     + "<td id='AlredayIssued' name='AlredayIssued' class='AlredayIssued' value=''>" + item.RequiredQty + "</td>"
+                                       + "<td id='CurrentIssue' name='CurrentIssue' class='CurrentIssue' value=''><input style='width: 49px;' type='text' class='CurrentIssueValue' value='" + item.RequiredQty + "'></td>"
+                               + "<td id='Rate'  class='Rate' name='Rate' value=''>" + item.Rate + "</td>"
+                                + "<td id='IsChecked' class='IsChecked'><input type='checkbox' name='case' class='assign'></td></tr>");
+                    });
+                }
+            });
+        }
+    }
+);
+    $("#OrderEntryId").combobox({
+        select: function (event, ui) {
+         
+            $('#OrderEntryId').css("display", "block");
+            $('.custom-combobox').css("display", "none");
+            var InternalOderID = $(".InternalOder_ option:selected").text();
+            $('.custom-combobox').css("display", "block");
+            $('#OrderEntryId').css("display", "none");
+            $.ajax({
+                url: '/IssueSlip_Single/GetInternalBuyeSlNoWithMaterialName',
+                type: "GET",
+                dataType: "JSON",
+                data: {
+                    InternalOderID: InternalOderID,
+                    IssueType: $("#IssueType option:selected").text(),
+                    StoreName: $('#StoreName').val(),
+                    CategoryName: $("#CategoryName").val()
+                },
+                success: function (data) {                    
+                    $("#OrderQty").val(data.TotalAmount);                  
+                    $("#list-amended-material tbody").html("");
+                    $.each(data.Material, function (i, item) {
+                        $("#RemoveHead").css("display", "block");
+                        $("#EditHead").css("display", "block");
+                        $("#list-amended-material tbody").append("<tr id=" + item.IssueSlipId + "> <td id='IssueSlipId' style='display:none' class='IssueSlipId' value=''>" + item.IssueSlipId + "</td>"
+                            //+ "<td><input type='button' value='Remove' onclick='Delete(" + item.BOMMaterialID + ")' class='' />" + "</td>"
+                            // + "<td><input type='button' value='Edit' onclick='RowClick(" + item.BOMMaterialID + "," + item.BOMID + ")' class='' />" + "</td>"
+                                     + "<td id='IssueSlipFK' style='display:none' class='IssueSlipFK' value=''>" + item.IssueSlipFK + "</td>"
+                                   //  + "<td id='MRPNO' style='display:none' class='MRPNO' value=''>" + item.MRPNO + "</td>"
+                                     + "<td id='IssueSlipNo'  name='IssueSlipNo' class='IssueSlipNo' value=''>" + $('#IssueSlipNo').val() + "</td>"
+                                       + "<td id='InternalOderID'name='InternalOderID'  class='InternalOderID' value=''>" + $('#OrderEntryId option:selected').text() + "</td>"
+                                         + "<td id='Style'name='Style'  class='Style' value=''>" + $('#StyleNo option:selected').text() + "</td>"
+                                           + "<td id='IssueType' name='IssueType' class='IssueType' value=''>" + $('#IssueType option:selected').text() + "</td>"
+                                           + "<td id='NoOfSets' name='NoOfSets'  class='NoOfSets' value=''>" + item.NoOfSets + "</td>"
+                                       + "<td id='GroupName' name='GroupName' class='GroupName' value=''>" + item.GroupId + "</td>"
+                                         + "<td id='CategoryName' name='CategoryName' class='CategoryName' value=''>" + item.CategoryId + "</td>"
+                                          + "<td id='StoreName' name='StoreName'  class='StoreName' value=''>" + item.StoreName + "</td>"
+                                     + "<td id='MaterialDescription' name='MaterialDescription' class='MaterialDescription' value=''>" + item.MaterialName + "</td>"
+                                     + "<td id='Color'  class='Color' name='Color' value=''>" + item.ColourId + "</td>"
+                                    + "<td id='RequiredQty' name='RequiredQty' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
+                                     + "<td id='AlredayIssued' name='AlredayIssued' class='AlredayIssued' value=''>" + item.RequiredQty + "</td>"
+                                       + "<td id='CurrentIssue' name='CurrentIssue' class='CurrentIssue' value=''><input style='width: 49px;' type='text' class='CurrentIssueValue' value='" + item.RequiredQty + "'></td>"
+                               + "<td id='Piecies'  class='Piecies' name='Piecies' value=''><input style='width: 49px;' type='text' class='Piecies_' value='" + item.Piecies + "'></td>"
+                                   + "<td id='CurrentStock'  class='CurrentStock' name='CurrentStock' value=''><input style='width: 49px;' type='text' class='CurrentStock_' value='" + item.CurrentStock + "'></td>"
+                                       + "<td id='Rate'  class='Rate' name='Rate' value=''>" + item.Rate + "</td>"
+                                + "<td id='IsChecked' class='IsChecked'><input type='checkbox' name='case' class='assign'></td></tr>");
+                    });
+                }
+            });
+        }
+    }
+);
+
+    $("#list-amended-material").on('click', '.CurrentIssueValue', function () {
+        var currentRow_ = $(this).closest("tr");
+        var RequiredQty = currentRow_.find(".RequiredQty").text();       
+      
+        var CurrentIssue = currentRow_.find(".CurrentIssueValue").val();        
+        if (RequiredQty == "") {
+            RequiredQty = 0;
+        }
+        if (RequiredQty > CurrentIssue) {
+            alert("Please enter valid Current issue.");
+            return false;
+        }
+    });
+    $("#list-amended-material").on('click', '.assign', function () {
+        // get the current row
+     
+        var currentRow = $(this).closest("tr");
+        var primaryID = currentRow.find(".IssueSlipId").text()
+        var col1 = currentRow.find(".IssueSlipNo").text();
+        var col2 = currentRow.find(".InternalOderID").text();
+        var col3 = currentRow.find(".Style").text();
+        var col4 = currentRow.find(".IssueType").text();
+        var col5 = currentRow.find(".NoOfSets").text();
+        var col6 = currentRow.find(".GroupName").text();
+        var col7 = currentRow.find(".CategoryName").text();
+        var col8 = currentRow.find(".StoreName").text();
+        var col9 = currentRow.find(".MaterialDescription ").text();
+        var col10 = currentRow.find(".Color").text();
+        var col11 = currentRow.find(".RequiredQty").text();
+        var col12 = currentRow.find(".AlredayIssued").text();
+        var col13 = currentRow.find(".CurrentIssueValue").val();
+        var col14 = currentRow.find(".Rate").text();
+        var col15 = currentRow.find(".Piecies_").val();
+        var col16 = currentRow.find(".CurrentStock_").val();        
+        
+        $.ajax({
+            url: '/IssueSlip_Single/SaveDetails',
+            type: "Post",
+            //  dataType: "JSON",
+            data: {
+                IssueSlipNo: col1,
+                InternalOderID: col2,
+                Style: col3,
+                IssueType: col4,
+                NoOfSets: col5,
+                GroupName: col6,
+                CategoryName: col7,
+                StoreName: col8,
+                MaterialDescription: col9,
+                Color: col10,
+                RequiredQty: col11,
+                AlredayIssued: col12,
+                CurrentIssue: col13,
+                Rate: col14,
+                Piecies: col15,
+                CurrentStock: col16,
+                ConveyorID: $('#ConveyorID').val(),
+                SubtanceID: $('#SubtanceID').val(),
+                MachineName: $('#MachineName').val(),
+                IssueSlipID: $('#IssueSlipID').val(),
+                CuttingIssueTypeID: $('#CuttingIssueTypeID').val(),
+                IssueSlipMaterialId: primaryID
+
+            },
+            success: function (data) {
+                if (data.IssueSlipId != 0) {
+                    alert("Issued Successfully.");
+                    return false;
+                }
+
+            }
+        });
+
+    });
+    // });
+
+
+    $("#StoresID").combobox({
+        select: function (event, ui) {
+            var StoresID = $("#StoresID").val();
+            if ($("#StoresID option:selected").text().trim() == "Maintenance Store") {
+                alert("Please select Machine Name");
+                return false;
+            }
+            $.ajax({
+                url: '/IssueSlip_Single/GetStoredIDWithMaterialName',
+                type: "GET",
+                dataType: "JSON",
+                data: { StoredID: StoresID },
+                success: function (data) {
+                    $("#Material").html(""); // clear before appending new list
+                    $.each(data, function (i, city) {
+                        $("#Material").append(
+                            $('<option></option>').val(city.Value).html(city.Text));
+
+                    });
+                }
+            });
+        }
+    }
+);
+    //$("#StoreName").change(function () {
+    //    alert();
+    //    var StoresID = $("#StoreName").val();
+    //    if ($("#StoreName option:selected").text().trim() == "Maintenance Store") {
+    //        alert("Please select Machine Name");
+    //        return false;
+    //    }
+    //    $.ajax({
+    //        url: '/IssueSlip_Single/GetStoredIDWithMaterialName',
+    //        type: "GET",
+    //        dataType: "JSON",
+    //        data: { StoredID: StoresID },
+    //        success: function (data) {
+    //            $("#MaterialDescription").html(""); // clear before appending new list
+    //            $.each(data, function (i, city) {
+    //                $("#MaterialDescription").append(
+    //                    $('<option></option>').val(city.Value).html(city.Text));
+
+    //            });
+    //        }
+    //    });
+    //}
+    // );
+    $(".StoreName").change(function () {
+      
+            var StoresID = $("#StoreName").val();
+            if ($("#StoreName option:selected").text().trim() == "Maintenance Store") {
+                alert("Please select Machine Name");
+                return false;
+            }
+            $.ajax({
+                url: '/IssueSlip_Single/GetStoredIDWithMaterialName',
+                type: "GET",
+                dataType: "JSON",
+                data: { StoredID: StoresID },
+                success: function (data) {
+                    $("#MaterialDescription").html(""); // clear before appending new list
+                    $.each(data, function (i, city) {
+                        $("#MaterialDescription").append(
+                            $('<option></option>').val(city.Value).html(city.Text));
+
+                    });
+                }
+            });
+        }
+    );
+    $("#CategoryID").combobox({
+        select: function (event, ui) {
+            var CategoryID = $("#CategoryID").val();
+            var StoresID = $("#StoresID").val();
+            $.ajax({
+                url: '/IssueSlip_Single/GetCategoryIDWithMaterialName',
+                type: "GET",
+                dataType: "JSON",
+                data: {
+                    CategoryID: CategoryID,
+                    StoresID: StoresID
+                },
+                success: function (data) {
+                    $("#Material").html(""); // clear before appending new list
+                    $.each(data, function (i, city) {
+                        $("#Material").append(
+                            $('<option></option>').val(city.Value).html(city.Text));
+
+                    });
+                }
+            });
+        }
+    }
+);
+
+    $(".CategoryName").change(function () {
+       
+            var CategoryID = $("#CategoryName").val();
+            var StoresID = $("#StoreName").val();
+            $.ajax({
+                url: '/IssueSlip_Single/GetCategoryIDWithMaterialName',
+                type: "GET",
+                dataType: "JSON",
+                data: {
+                    CategoryID: CategoryID,
+                    StoresID: StoresID
+                },
+                success: function (data) {
+                    $("#MaterialDescription").html(""); // clear before appending new list
+                    $.each(data, function (i, city) {
+                        $("#MaterialDescription").append(
+                            $('<option></option>').val(city.Value).html(city.Text));
+
+                    });
+                }
+            });
+        }
+    
+);
+    $('#CurrentIssue').change(function () {
+        var requiredQTy = $('#RequiredQTY').val();
+        var CurrentIssues = $('#CurrentIssue').val();
+        if (parseFloat(CurrentIssues) > parseFloat(requiredQTy)) {
+            alert("Please enter less than Required Qty.");
+            return false;
+        }
+    });
+
+    $("#MaterialDescription").combobox({
+        select: function (event, ui) {
+            var Material = $('#MaterialDescription').val();
+            var InternalOderID = $("#InternalOderID option:selected").text();
+            $.ajax({
+                url: '/IssueSlip_Single/GetMaterialDetails',
+                type: "GET",
+                dataType: "JSON",
+                data: {
+                    Material: Material,
+                    InternalOrderNo: InternalOderID
+                },
+                success: function (data) {
+                    $('#CategoryID').val(data.BomMaterial.MaterialCategoryMasterId);
+                    $('#GroupID').val(data.BomMaterial.MaterialGroupMasterId);
+                    $('#ColorID').val(data.BomMaterial.ColorMasterId);
+                    $('#RequiredQTY').val(data.BomMaterial.RequiredQty);
+                    $('#AlreadyUsed').val(data.AlreadyIssued);
+                    $('#SubtanceID').val(data.BomMaterial.SubstanceMasterId);
+                    $('#Rate').val(data.BomMaterial.Rate);
+                    $('#LotNo').val(data.LotNo);
+                    $('#RequiredType').val(data.BomMaterial.TotalNormsUOM);
+                    $('#AlreadyUsedType').val(data.BomMaterial.TotalNormsUOM);
+                    $('#CurrentIssuesType').val(data.BomMaterial.TotalNormsUOM);
+                    $('#CurrentStockType').val(data.BomMaterial.TotalNormsUOM);
+                    $('#UOMStockID').val(data.BomMaterial.TotalNormsUOM);
+                    $('#ClosingStockinAllStoredType').val(data.BomMaterial.TotalNormsUOM);
+                    $('#ClosingStockingUOMType').val(data.BomMaterial.TotalNormsUOM);
+                    $('#FreeStockUOMType').val(data.BomMaterial.TotalNormsUOM);
+                    $('#InTransitType').val(data.BomMaterial.TotalNormsUOM);
+                    $('#IntransitUOMType').val(data.BomMaterial.TotalNormsUOM);
+                    $('#ReserverQtyType').val(data.BomMaterial.TotalNormsUOM);
+                    $('#ReservedUOMType').val(data.BomMaterial.TotalNormsUOM);
+                    $('#CurrentStock').val(data.OpeningBalance);
+                    $('#FreeStock').val(data.OpeningBalance);
+                    $('#FreeStockType').val(data.BomMaterial.TotalNormsUOM);
+
+
+                }
+            });
+        }
+    });
+//    $("#Material").combobox({
+//    select: function (event, ui) {
+//        var Material = $('#Material').val();
+//        var InternalOderID = $("#InternalOderID option:selected").text();
+//        $.ajax({
+//            url: '/IssueSlip_Single/GetMaterialDetails',
+//            type: "GET",
+//            dataType: "JSON",
+//            data: {
+//                Material: Material,
+//                InternalOrderNo: InternalOderID
+//            },
+//            success: function (data) {
+//                $('#CategoryID').val(data.BomMaterial.MaterialCategoryMasterId);
+//                $('#GroupID').val(data.BomMaterial.MaterialGroupMasterId);
+//                $('#ColorID').val(data.BomMaterial.ColorMasterId);
+//                $('#RequiredQTY').val(data.BomMaterial.RequiredQty);
+//                $('#AlreadyUsed').val(data.AlreadyIssued);
+//                $('#SubtanceID').val(data.BomMaterial.SubstanceMasterId);
+//                $('#Rate').val(data.BomMaterial.Rate);
+//                $('#LotNo').val(data.LotNo);
+//                $('#RequiredType').val(data.BomMaterial.TotalNormsUOM);
+//                $('#AlreadyUsedType').val(data.BomMaterial.TotalNormsUOM);
+//                $('#CurrentIssuesType').val(data.BomMaterial.TotalNormsUOM);
+//                $('#CurrentStockType').val(data.BomMaterial.TotalNormsUOM);
+//                $('#UOMStockID').val(data.BomMaterial.TotalNormsUOM);
+//                $('#ClosingStockinAllStoredType').val(data.BomMaterial.TotalNormsUOM);
+//                $('#ClosingStockingUOMType').val(data.BomMaterial.TotalNormsUOM);
+//                $('#FreeStockUOMType').val(data.BomMaterial.TotalNormsUOM);
+//                $('#InTransitType').val(data.BomMaterial.TotalNormsUOM);
+//                $('#IntransitUOMType').val(data.BomMaterial.TotalNormsUOM);
+//                $('#ReserverQtyType').val(data.BomMaterial.TotalNormsUOM);
+//                $('#ReservedUOMType').val(data.BomMaterial.TotalNormsUOM);
+//                $('#CurrentStock').val(data.OpeningBalance);
+//                $('#FreeStock').val(data.OpeningBalance);
+//                $('#FreeStockType').val(data.BomMaterial.TotalNormsUOM);
+
+
+//            }
+//        });
+//    }
+//    }
+//);
+</script>

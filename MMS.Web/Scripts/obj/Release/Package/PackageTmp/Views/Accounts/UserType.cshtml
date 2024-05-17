@@ -1,0 +1,227 @@
+﻿@model MMS.Web.Models.UserModel.UserTypeModel
+
+<div id="DivShowUserType"  class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+        <div class="table-responsive table-td-padding padding-lr-6px table-row-bg" style="overflow: auto;">
+            <table class="veh-table" id="empTable">
+                <thead>
+                    <tr class="color-code-top-btn">
+                        <td colspan="7">
+                            <input type="text" id="SeaarchID" placeholder="Search.." />
+                            <input type="button" value="Search" onclick="Search()">
+                            <input type="button" value="Add" onclick="Add()">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="veh-1">
+                            S.No
+                        </th>
+                        <th class="veh-1">
+                            User Type
+                        </th>
+                        <th class="veh-3">
+                            User Type Description
+                        </th>
+                        <th class="veh-4">
+                            Edit / Delete
+                        </th>
+                    </tr>
+                </thead>
+                @if (Model.UserTypeModelList != null && Model.UserTypeModelList.Count > 0)
+                {
+                    int count = 1;
+                    <tbody>
+
+                        @foreach (var item in Model.UserTypeModelList)
+                        {
+                            <tr>
+                                <td class="veh-3">@count</td>
+                                <td style="display:none;" class="veh-1">@item.UserTypeID</td>
+                                <td class="veh-1">@item.UserType</td>
+                                <td class="veh-3">@item.UserTypeDesc</td>
+                                <td class="veh-1 edit-del-wrap" style=" width: 284px;">
+                                    <a href="javascript:void(0);" class="selected watchlist-edit" title="Edit"></a>
+                                    <a href="javascript:void(0);" class="Delete watchlist-delete" title="Delete"></a>
+                                </td>
+                            </tr>
+                            count++;
+                        }
+
+                    </tbody>
+                    <tfoot class="footer-pager">
+                        <tr>
+                            <td colspan="4">
+                                <div id="pager">
+                                    <form>
+                                        <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                        <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                        <input type="text" class="pagedisplay" />
+                                        <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                        <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                        <select class="pagesize">
+                                            <option selected="selected" value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="30">30</option>
+                                            <option value="40">40</option>
+                                        </select>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+
+                }
+
+            </table>
+        </div>
+        @if (Model.UserTypeModelList != null && Model.UserTypeModelList.Count == 0)
+        {
+            <div style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+        }
+    </div>
+</div>
+    <div style="display:none;" id="DivAddUserType" class="right-form-section clearfix">
+        <form id="FromUser" role="form" class="form-inline">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding stage_top_sec">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                                    <label class="form-label" for="text">User Type</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.HiddenFor(x => x.UserTypeID)
+                                    @Html.TextBoxFor(m => m.UserType, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding stage_top_sec">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                                    <label class="form-label" for="text">User Type Description</label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    @Html.TextBoxFor(m => m.UserTypeDesc, new { @class = "form-control text-field" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding stage_top_sec">
+                        <div class="field-section">
+                            <div class="form-group">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                                    <label class="form-label" for="text"></label>
+                                </div>
+                                <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                    <input type="button" id="btnCancel" onclick="Cancel()" class="btn btn-default btn-style width-78" value="Cancel" name="btnSave" />
+                                    <input type="button" id="btnSave" class="btn btn-default btn-style width-78" value="Save" name="btnSave" />
+                                    <input type="button" id="btnClear" onclick="Clear()" class="btn btn-default btn-style width-78" value="Clear" name="btnSave" />
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+    <script>
+        function Add() {
+            $("#DivAddUserType").show();
+            $("#DivShowUserType").hide();
+            Clear();
+        }
+        function Cancel() {
+            Clear();
+            $("#DivAddUserType").hide();
+            $("#DivShowUserType").show();
+        }
+        function Clear() {
+            $("#UserTypeID").val(0);
+            $("#UserType").val("");
+            $("#UserTypeDesc").val("");
+            $("#btnSave").val("Save");
+        }
+
+
+        $(document).ready(function () {
+            $("#btnSave").val("Save");
+
+            $(".selected").click(function () {
+                $("#btnSave").val("Update");
+                var UserTypeID = $(this).closest("tr").find('td:eq(1)').text();
+                var UserType = $(this).closest("tr").find('td:eq(2)').text();
+                var UserTypeDesc = $(this).closest("tr").find('td:eq(3)').text();
+
+                $("#UserTypeID").val(UserTypeID);
+                $("#UserType").val(UserType);
+                $("#UserTypeDesc").val(UserTypeDesc);
+
+                if (UserType.toLowerCase() == "admin" || UserType.toLowerCase() == "super admin") {
+                    $("#UserType").attr("readonly", true)
+                }
+                else {
+                    $("#UserType").attr("readonly", false)
+                }
+
+                $("#DivAddUserType").show();
+                $("#DivShowUserType").hide();
+            });
+
+            $("#btnSave").click(function () {
+                if ($("#UserType").val() == "") {
+                    alert("Please Enter User Type !");
+                    return false;
+                }
+                if ($("#UserTypeDesc").val() == "") {
+                    alert("Please Enter User Type Description !");
+                    return false;
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Accounts/UserType',
+                    data: $("form").serialize(),
+                    success: function (data) {
+                        if (data == true) {
+                            alert('' + $("#btnSave").val() + 'd Successfully.');
+                            location.href = "/Accounts/UserType";
+                            return false;
+                        }
+                    }
+                });
+            });
+
+            $(".Delete").click(function () {
+
+                if (confirm("Are You Sure Want to Delete !")) {
+                    var UserTypeID = $(this).closest("tr").find('td:eq(1)').text();
+                    var UserType = $(this).closest("tr").find('td:eq(2)').text();
+                    if (UserType.toLowerCase() != "admin" && UserType.toLowerCase() != "super admin") {
+                        $("#UserTypeID").val(UserTypeID);
+                        $.post("/Accounts/DeleteUser", $("form").serialize(), function (data) {
+                            if (data == true) {
+                                alert('Deleted Successfully.');
+                                location.href = "/Accounts/UserType";
+                                return false;
+                            }
+                        });
+                    }
+                    else {
+                        alert("No Permission To Delete " + UserType + " User Type !");
+                    }
+                }
+            });
+
+        });
+    </script>

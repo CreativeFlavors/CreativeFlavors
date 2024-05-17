@@ -1,0 +1,425 @@
+﻿@{
+    ViewBag.Title = "MaterialOpening";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Material Opening Balance</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+
+    <script type="text/javascript">
+
+        $(function () {
+            //alert(1);
+            $("#EditColorPartial").hide();
+            $("#Date").datepicker({
+                changeMonth: true,
+                changeYear: true
+            });
+        });
+
+    </script>
+</head>
+<body>
+    <h2 class="content-title">Material Opening Balance</h2>
+    <div style="width: 100%; float: left;">
+
+        <div id="tabVehicleWatchList">
+            @Html.Action("MaterialOpeningMasterGrid", "MaterialOpeningStock")
+        </div>
+    </div>
+
+</body>
+</html>
+
+
+<script>
+
+    $(document).on('change', '#SizeRangeMasterId', function () {
+        $.ajax({
+            type: "GET",
+            dataType: "JSON",
+            url: '@Url.Action("GetSizeRange", "MaterialOpeningStock")',
+            data: { SizeRangeMasterId: $(this).val() },
+            success: function (data) {
+                var count = 1;
+                $("#sizetable tbody").html("");
+                for (var i = 0; i <= data.length - 1; i++) {
+                    $("#sizetable tbody").append("<tr><td>" + data[i].Size + "</td><td><input type='text' id='qtyId" + count + "' value='0' class='form-control text-field numeric' /></td><td><input type='text' id='qtyId" + rate + "' value='0' class='form-control text-field numeric' /></td></tr>");
+                    count++;
+                }
+                $(".numeric").bind("keypress", function (e) {
+                    var keyCode = e.which ? e.which : e.keyCode
+                    var ret = ((keyCode >= 48 && keyCode <= 57) || specialKeys.indexOf(keyCode) != -1);
+                    $(".error").css("display", ret ? "none" : "inline");
+                    return ret;
+                });
+                $(".numeric").bind("paste", function (e) {
+                    return false;
+                });
+                $(".numeric").bind("drop", function (e) {
+                    return false;
+                });
+            }
+        });
+    });
+
+    function Save() {
+        if ($('#Store').val() == "") {
+            alert("Please Enter Store.")
+            $('#Store').css('border-color', 'red');
+            $('#Store').focus();
+            return false;
+        }
+        else {
+            $('#Store').css('border-color', '');
+        }
+        if ($('#MaterialCategoryMasterId').val() == "") {
+            alert("Please Select Category.")
+            $('#MaterialCategoryMasterId').css('border-color', 'red');
+            $('#MaterialCategoryMasterId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialCategoryMasterId').css('border-color', '');
+        }
+        if ($('#MaterialGroupMasterId').val() == "") {
+            alert("Please Select Group.")
+            $('#MaterialGroupMasterId').css('border-color', 'red');
+            $('#MaterialGroupMasterId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialGroupMasterId').css('border-color', '');
+        }
+
+        if ($('#MaterialMasterId').val() == "") {
+            alert("Please Select Material.")
+            $('#MaterialMasterId').css('border-color', 'red');
+            $('#MaterialMasterId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialMasterId').css('border-color', '');
+        }
+
+        if ($('#ColorMasterId').val() == "") {
+            alert("Please Select Colour.")
+            $('#ColorMasterId').css('border-color', 'red');
+            $('#ColorMasterId').focus();
+            return false;
+        }
+        else {
+            $('#ColorMasterId').css('border-color', '');
+        }
+
+        if ($('#PrimaryUomMasterId').val() == "") {
+            alert("Please Select Uom.")
+            $('#PrimaryUomMasterId').css('border-color', 'red');
+            $('#PrimaryUomMasterId').focus();
+            return false;
+        }
+        else {
+            $('#PrimaryUomMasterId').css('border-color', '');
+        }
+
+        if ($('#SecondaryUomMasterId').val() == "") {
+            alert("Please Select Uom.")
+            $('#SecondaryUomMasterId').css('border-color', 'red');
+            $('#SecondaryUomMasterId').focus();
+            return false;
+        }
+        else {
+            $('#SecondaryUomMasterId').css('border-color', '');
+        }
+        if ($('#Date').val() == "") {
+            alert("Please Select Date.")
+            $('#Date').css('border-color', 'red');
+            $('#Date').focus();
+            return false;
+        }
+        else {
+            $('#Date').css('border-color', '');
+        }
+        if ($("#SizeRangeMasterId").val() == "") {
+            if ($('#Qty').val() == "" || $('#Qty').val() == "0") {
+                alert("Please Enter Qty.")
+                $('#Qty').css('border-color', 'red');
+                $('#Qty').focus();
+                return false;
+            }
+            else {
+                $('#Qty').css('border-color', '');
+            }
+        }
+
+        //if ($('#Rate').val() == "" || $('#Rate').val() == "0") {
+        //    alert("Please Enter Rate.")
+        //    $('#Rate').css('border-color', 'red');
+        //    $('#Rate').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#Rate').css('border-color', '');
+        //}
+
+        //if ($('#Remarks').val() == "") {
+        //    alert("Please Enter Remarks.")
+        //    $('#Remarks').css('border-color', 'red');
+        //    $('#Remarks').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#Remarks').css('border-color', '');
+        //}
+
+        //var qtyArr = [];
+
+        //$('#sizetable tbody tr').each(function () {
+
+        //    if ($(this).find('input[type=text]').val() != 0) {
+
+        //        qtyArr.push(
+        //                {
+        //                    Size: $(this).find('td:first').html(),
+        //                    quantity: $(this).find('input[type=text]').val(),
+        //                    Rate: ""
+        //                });
+        //    }
+
+        //});
+
+        //$('#SizeQuantityRate').val(JSON.stringify(qtyArr));
+
+        var size = "";
+        $('#sizeRangeTable tbody tr').find('.SizeRangeRefValue').each(function () {
+
+            size += $(this).text() + ",";
+
+        });
+        size = size.slice(0, -1);
+        var Qty_ = "";
+        $('#sizeRangeTable tbody tr').find('.quantity').each(function () {         
+            Qty_ += $(this).val() + ",";
+
+        });
+        Qty_ = Qty_.slice(0, -1);
+        var rate = "";
+        $('#sizeRangeTable tbody tr').find('.Rates').each(function () {
+            // alert($(this).val())
+            rate += $(this).val() + ",";
+
+        });
+        rate = rate.slice(0, -1);
+
+        $.ajax({
+            type: 'POST',
+            url: '/MaterialOpeningStock/MaterialOpeningStock',
+            data: $("form").serialize() + '&SizeRange=' + size + '&Quantity=' + Qty_ + '&Rates=' + rate,
+            success: function (data) {
+               
+                if (data == "Alreday Exist") {
+                    alert('Alreday Exist.');
+                    //location.href = "/MaterialOpeningStock/MaterialOpening";
+                    return false;
+                }
+                else if (data == "Saved Successfully") {
+                    alert('Saved Successfully.');
+                    location.href = "/MaterialOpeningStock/MaterialOpening";
+                    return false;
+                }
+                else if (data == "Updated Successfully") {
+                    alert('Updated Successfully.');
+                    location.href = "/MaterialOpeningStock/MaterialOpening";
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                   // location.href = "/MaterialOpeningStock/MaterialOpening";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+
+    function Update() {
+        if ($('#Store').val() == "") {
+            alert("Please Enter Store.")
+            $('#Store').css('border-color', 'red');
+            $('#Store').focus();
+            return false;
+        }
+        else {
+            $('#Store').css('border-color', '');
+        }
+        if ($('#MaterialCategoryMasterId').val() == "") {
+            alert("Please Select Category.")
+            $('#MaterialCategoryMasterId').css('border-color', 'red');
+            $('#MaterialCategoryMasterId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialCategoryMasterId').css('border-color', '');
+        }
+        if ($('#MaterialGroupMasterId').val() == "") {
+            alert("Please Select Group.")
+            $('#MaterialGroupMasterId').css('border-color', 'red');
+            $('#MaterialGroupMasterId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialGroupMasterId').css('border-color', '');
+        }
+
+        if ($('#MaterialMasterId').val() == "") {
+            alert("Please Select Material.")
+            $('#MaterialMasterId').css('border-color', 'red');
+            $('#MaterialMasterId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialMasterId').css('border-color', '');
+        }
+
+        if ($('#ColorMasterId').val() == "") {
+            alert("Please Select Colour.")
+            $('#ColorMasterId').css('border-color', 'red');
+            $('#ColorMasterId').focus();
+            return false;
+        }
+        else {
+            $('#ColorMasterId').css('border-color', '');
+        }
+        if ($('#PrimaryUomMasterId').val() == "") {
+            alert("Please Select Uom.")
+            $('#PrimaryUomMasterId').css('border-color', 'red');
+            $('#PrimaryUomMasterId').focus();
+            return false;
+        }
+        else {
+            $('#PrimaryUomMasterId').css('border-color', '');
+        }
+
+        if ($('#SecondaryUomMasterId').val() == "") {
+            alert("Please Select Uom.")
+            $('#SecondaryUomMasterId').css('border-color', 'red');
+            $('#SecondaryUomMasterId').focus();
+            return false;
+        }
+        else {
+            $('#SecondaryUomMasterId').css('border-color', '');
+        }
+        if ($('#Date').val() == "") {
+            alert("Please Select Date.")
+            $('#Date').css('border-color', 'red');
+            $('#Date').focus();
+            return false;
+        }
+        else {
+            $('#Date').css('border-color', '');
+        }
+        if ($('#Qty').val() == "" || $('#Qty').val() == "0") {
+            alert("Please Enter Qty.")
+            $('#Qty').css('border-color', 'red');
+            $('#Qty').focus();
+            return false;
+        }
+        else {
+            $('#Qty').css('border-color', '');
+        }
+        if ($('#Rate').val() == "" || $('#Rate').val() == "0") {
+            alert("Please Enter Rate.")
+            $('#Rate').css('border-color', 'red');
+            $('#Rate').focus();
+            return false;
+        }
+        else {
+            $('#Rate').css('border-color', '');
+        }
+        if ($('#Pcs').val() == "" || $('#Pcs').val() == "0") {
+            alert("Please Enter Pcs.")
+            $('#Pcs').css('border-color', 'red');
+            $('#Pcs').focus();
+            return false;
+        }
+        else {
+            $('#Pcs').css('border-color', '');
+        }
+        //if ($('#Remarks').val() == "") {
+        //    alert("Please Enter Remarks.")
+        //    $('#Remarks').css('border-color', 'red');
+        //    $('#Remarks').focus();
+        //    return false;
+        //}
+        //else {
+        //    $('#Remarks').css('border-color', '');
+        //}
+
+        var qtyArr = [];
+
+        $('#sizetable tbody tr').each(function () {
+            if ($(this).find('input[type=text]').val() != 0) {
+                qtyArr.push(
+                        {
+                            Size: $(this).find('td:first').html(),
+                            quantity: $(this).find('input[type=text]').val(),
+                            Rate: ""
+                        });
+            }
+        });
+
+
+        $('#SizeQuantityRate').val(JSON.stringify(qtyArr));
+
+        $.ajax({
+            type: 'POST',
+            url: '/MaterialOpeningStock/Update',
+            data: {
+                Store: $('#Store').val(),
+                MaterialOpeningId: $('#MaterialOpeningId').val(),
+                MaterialCategoryMasterId: $('#MaterialCategoryMasterId').val(),
+                MaterialGroupMasterId: $('#MaterialGroupMasterId').val(),
+                MaterialMasterId: $('#MaterialMasterId').val(),
+                MaterialCode: $('#MaterialCode').val(),
+                ColorMasterId: $('#ColorMasterId').val(),
+                Date: $('#Date').val(),
+                PrimaryUomMasterId: $('#PrimaryUomMasterId').val(),
+                SecondaryUomMasterId: $('#SecondaryUomMasterId').val(),
+                Qty: $('#Qty').val(),
+                Rate: $('#Rate').val(),
+                Pcs: $('#Pcs').val(),
+                SizeRangeMasterId: $("#SizeRangeMasterId").val(),
+                Remarks: $('#Remarks').val(),
+                SizeQuantityRate: $('#SizeQuantityRate').val(),
+                QtyPcs: $('#QtyPcs').val(),
+                MaterialPcs: $('#MaterialPcs').val()
+            },
+            success: function (data) {
+                if (data.MaterialOpeningId != "" || data.MaterialOpeningId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/MaterialOpeningStock/MaterialOpening";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/MaterialOpeningStock/MaterialOpening";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>

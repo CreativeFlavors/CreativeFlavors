@@ -1,0 +1,171 @@
+﻿@{
+    ViewBag.Title = "GateEntryOutward";
+}
+
+<link type="text/css" href="~/Content/css/jquery-ui-1.8.19.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/Content/themes/base/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="~/Content/themes/base/jquery-ui-1.8.19.custom.min.js"></script>
+
+<div class="indent_report">
+    <h2>GateEntry Outward</h2>
+</div>
+<div>
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div class="field-section indent_field">
+        <div class="form-group">
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">From Date :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                <input id="PeriodFrom" name="PeriodFrom" type="text" class="form-control text-field" />
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">To Date :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+
+                <input id="PeriodTo" name="PeriodTo" type="text" class="form-control text-field" />
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Purpose :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("Purpose", MMS.Web.ExtensionMethod.HtmlHelper.GetPurpose(), new { @class = "select-style text-field" })
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Return Type :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("ReturnType", new SelectList(
+                                       new List<object> {
+                                            new { value="", text="Please select" },
+                                           new { value=1, text="Returnable" },
+                                           new { value=2, text="Non-Returnable"}
+                                       },
+                                       "value",
+                                       "text", 0), new { @class = "select-style text-field" })
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Supplier Name :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("SupplierId", MMS.Web.ExtensionMethod.HtmlHelper.SupplierName(), new { @class = "select-style text-field" })
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Material Name :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("MaterialNameId", MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName(), new { @class = "select-style text-field" })
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                <label for="text" class="form-label">Store Name :</label>
+            </div>
+            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12 primary_report">
+                @Html.DropDownList("StoresName", MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
+            </div>
+        </div>
+    </div>
+    <input id="ExportReport" class="indent_report_field" name="ExportReport" type="submit" value="Generate Report" />
+</div>
+
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+
+        $("#PeriodFrom").datepicker({ dateFormat: "dd/mm/yy" });
+        $("#PeriodTo").datepicker({ dateFormat: "dd/mm/yy" });
+
+        $("#MaterialNameId").change(function () {
+            var StoresName = $('#MaterialNameId').val();
+            $.ajax({
+                url: '/GateEntryOutwardReport/GetStore',
+                type: "GET",
+                dataType: "JSON",
+                data: { StoresName: StoresName },
+                success: function (cities) {
+                    
+                    console.log(cities);
+                    $("#StoresName").html(""); // clear before appending new list
+                    $('#StoresName').append('<option value="" selected="selected">Please Select</option>');
+                    $.each(cities, function (i, city) {
+                        $("#StoresName").append(
+                            $('<option></option>').val(city.StoreMasterId).html(city.StoreName));
+                    });
+                }
+            });
+        });
+
+
+        $("#ExportReport").click(function (event) {
+
+            if ($('#PeriodFrom').val() == "") {
+                alert("Please select Period From.")
+                $('#PeriodFrom').css('border-color', 'red');
+                $('#PeriodFrom').focus();
+                return false;
+            }
+            else {
+                $('#PeriodFrom').css('border-color', '');
+            }
+            if ($('#PeriodTo').val() == "") {
+                alert("Please select Period To.")
+                $('#PeriodTo').css('border-color', 'red');
+                $('#PeriodTo').focus();
+                return false;
+            }
+            else {
+                $('#PeriodTo').css('border-color', '');
+            }
+
+            var From = $("#PeriodFrom").val();
+            var To = $("#PeriodTo").val();
+            var Purpose = $("#Purpose").val();
+            var ReturnType = $("#ReturnType").val();
+            var SupplierId = $("#SupplierId").val();
+            var MaterialNameId = $("#MaterialNameId").val();
+            var StoresName = $("#StoresName").val();
+
+
+            event.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '/GateEntryOutwardReport/RedirectToAspx',
+                data: {
+                    from: From,
+                    to: To,
+                    purpose: Purpose,
+                    returnType: ReturnType,
+                    supplierId: SupplierId,
+                    materialNameId: MaterialNameId,
+                    storesName: StoresName
+                },
+                success: function (data) {
+                    
+                    console.log(data);
+
+                    var url = "@(System.Configuration.ConfigurationManager.AppSettings["ReportURL"].ToString())GateEntryOutward.aspx?FromDate=" + data.From + "&ToDate=" + data.To + "&Purpose=" + data.Purpose + "&ReturnType=" + data.ReturnType + "&SupplierId=" + data.SupplierId + "&MaterialNameId=" + data.MaterialNameId + "&StoresName=" + data.StoresName;
+
+                    console.log(url);
+                    window.open(url, '_blank');
+
+                    return false
+                }
+            });
+        });
+    })
+
+
+</script>

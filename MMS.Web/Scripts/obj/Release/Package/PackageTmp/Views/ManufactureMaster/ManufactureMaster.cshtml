@@ -1,0 +1,121 @@
+﻿@{
+    ViewBag.Title = "ManufactureMaster";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+<style>
+
+</style>
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#ManufacturerCode').val() == "") {
+            alert("Please Enter Manufacturer Codee.")
+            $('#ManufacturerCode').css('border-color', 'red');
+            $('#ManufacturerCode').focus();
+            return false;
+        }
+        else {
+            $('#ManufacturerCode').css('border-color', '');
+        }
+        if ($('#ManufacturerName').val() == "") {
+            alert("Please Enter Manufacturer Name.")
+            $('#ManufacturerName').css('border-color', 'red');
+            $('#ManufacturerName').focus();
+            return false;
+        }
+        else {
+            $('#ManufacturerName').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/ManufactureMaster/ManufactureMaster',
+            data: {
+                ManufacturerCode: $('#ManufacturerCode').val(),
+                ManufacturerName: $('#ManufacturerName').val(),
+                ManufacturerMasterId: $('#ManufacturerMasterId').val()
+            },
+            success: function (data) {
+                if (data.ManufacturerMasterId != "" || data.ManufacturerMasterId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/ManufactureMaster/ManufactureMaster";
+                    return false;
+                }
+                else if (data.ManufacturerMasterId == 0 && data.ManufacturerName != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/ManufactureMaster/ManufactureMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#ManufacturerCode').val() == "") {
+            alert("Please Enter Manufacturer Codee.")
+            $('#ManufacturerCode').css('border-color', 'red');
+            $('#ManufacturerCode').focus();
+            return false;
+        }
+        else {
+            $('#ManufacturerCode').css('border-color', '');
+        }
+        if ($('#ManufacturerName').val() == "") {
+            alert("Please Enter Manufacturer Name.")
+            $('#ManufacturerName').css('border-color', 'red');
+            $('#ManufacturerName').focus();
+            return false;
+        }
+        else {
+            $('#ManufacturerName').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/ManufactureMaster/Update',
+            data: {
+                ManufacturerCode: $('#ManufacturerCode').val(),
+                ManufacturerName: $('#ManufacturerName').val(),
+                ManufacturerMasterId: $('#ManufacturerMasterId').val()
+            },
+            success: function (data) {
+                if (data.ManufacturerMasterId != "" || data.ManufacturerMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/ManufactureMaster/ManufactureMaster";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/ManufactureMaster/ManufactureMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title">Manufacture Master</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("ManufactureGrid", "ManufactureMaster")
+    </div>
+</div>
+
+

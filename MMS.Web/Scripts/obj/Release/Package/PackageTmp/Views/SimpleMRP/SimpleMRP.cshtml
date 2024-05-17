@@ -1,0 +1,248 @@
+﻿@{
+    ViewBag.Title = "SimpleMRP";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.js"></script>
+<link href="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.css" rel="stylesheet" />
+<link type="text/css" href="~/Datepicker/css/ui-lightness/jquery-ui-1.8.19.custom.css" rel="stylesheet" />
+
+<script>
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+    function Save() {
+        if ($('#MRPNO').val() == "") {
+            alert("Please Enter MRPNO Name.")
+            $('#MRPNO').css('border-color', 'red');
+            $('#MRPNO').focus();
+            return false;
+        }
+        else {
+            $('#MRPNO').css('border-color', '');
+        }
+        if ($('#MRPDate').val() == "") {
+            alert("Please Enter MRP Date.")
+            $('#MRPDate').css('border-color', 'red');
+            $('#MRPDate').focus();
+            return false;
+        }
+        else {
+            $('#MRPDate').css('border-color', '');
+        }
+        if ($('#MRPType').val() == "") {
+            alert("Please select MRP Type.")
+            $('#MRPType').css('border-color', 'red');
+            $('#MRPType').focus();
+            return false;
+        }
+        else {
+            $('#MRPType').css('border-color', '');
+        }
+        if ($('#BuyerNameid').val() == "") {
+            alert("Please Select Period From.")
+            $('#BuyerNameid').css('border-color', 'red');
+            $('#BuyerNameid').focus();
+            return false;
+        }
+        else {
+            $('#BuyerNameid').css('border-color', '');
+        }
+        if ($('#WeekNO').val() == "") {
+            alert("Please Select Week NO.")
+            $('#WeekNO').css('border-color', 'red');
+            $('#WeekNO').focus();
+            return false;
+        }
+        else {
+            $('#WeekNO').css('border-color', '');
+        }
+        if ($('#SeasonID').val() == "") {
+            alert("Please Select Season name.")
+            $('#SeasonID').css('border-color', 'red');
+            $('#SeasonID').focus();
+            return false;
+        }
+        else {
+            $('#SeasonID').css('border-color', '');
+        }
+        if ($('#LotNO').val() == "") {
+            alert("Please Select Lot NO.")
+            $('#LotNO').css('border-color', 'red');
+            $('#LotNO').focus();
+            return false;
+        }
+        else {
+            $('#LotNO').css('border-color', '');
+        }
+        if ($('#SizeRangeID').val() == "") {
+            alert("Please Select Size Range.")
+            $('#SizeRangeID').css('border-color', 'red');
+            $('#SizeRangeID').focus();
+            return false;
+        }
+        else {
+            $('#SizeRangeID').css('border-color', '');
+        }
+        if ($('#CustomerPlan').val() == "") {
+            alert("Please Select Customer Plan.")
+            $('#CustomerPlan').css('border-color', 'red');
+            $('#CustomerPlan').focus();
+            return false;
+        }
+        else {
+            $('#CustomerPlan').css('border-color', '');
+        }
+        if ($('#dataFile').val() == "") {
+            alert("Please Upload Excel file.")
+            $('#dataFile').css('border-color', 'red');
+            $('#dataFile').focus();
+            return false;
+        }
+        else {
+            $('#dataFile').css('border-color', '');
+        }
+       // $('#dataFile').val()
+        $.ajax({
+            type: 'POST',
+            url: '/SimpleMRP/SimpleMRPSave',
+            data: {
+                MRPNO: $('#MRPNO').val(),
+                MRPDate: $('#MRPDate').val(),
+                MRPType: $('#MRPType').val(),
+                BuyerNameid: $('#BuyerNameid').val(),
+                WeekNO: $('#WeekNO').val(),
+                SeasonID: $('#SeasonID').val(),
+                LotNO: $('#LotNO').val(),
+                SizeRangeID: $('#SizeRangeID').val(),
+                From: $('#From').val(),
+                TO: $('#TO').val(),
+                CustomerPlan: $('#CustomerPlan').val(),
+                SimpleMRPID: $('#SimpleMRPID').val(),
+                ProductionPlanBasic: $('#ProductionPlanBasic').is(":checked"),
+                OrderBasic: $('#OrderBasic').is(":checked"),
+                RejectionorReplacement: $('#RejectionorReplacement').is(":checked"),
+                OverConsumption: $('#OverConsumption').is(":checked")
+            },
+            success: function (data) {
+                console.log(data);
+                //alert(data.SeasonMasterId)
+                if (data.UpdatedBy != ""&&data.UpdatedBy!=null) {
+                    alert('Updated Successfully.');
+                    location.href = "/SimpleMRP/SimpleMRP";
+                    return false;
+                }
+                else if (data.CreatedBy != "") {
+                    alert('Saved Successfully.');
+                    location.href = "/SimpleMRP/SimpleMRP";
+                    return false;
+                }
+                else if (data.SimpleMRPID == 0 && data.SimpleMRPID != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/SimpleMRP/SimpleMRP";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Update(arg) {
+        if ($('#SeasonName').val() == "") {
+            alert("Please Enter Season Name.")
+            $('#SeasonName').css('border-color', 'red');
+            $('#SeasonName').focus();
+            return false;
+        }
+        else {
+            $('#SeasonName').css('border-color', '');
+        }
+        if ($('#SpringSummerYear').val() == "") {
+            alert("Please Enter Springs Summer Year.")
+            $('#SpringSummerYear').css('border-color', 'red');
+            $('#SpringSummerYear').focus();
+            return false;
+        }
+        else {
+            $('#SpringSummerYear').css('border-color', '');
+        }
+        if ($('#SpringDescription').val() == "") {
+            alert("Please Enter Spring Description.")
+            $('#SpringDescription').css('border-color', 'red');
+            $('#SpringDescription').focus();
+            return false;
+        }
+        else {
+            $('#SpringDescription').css('border-color', '');
+        }
+        if ($('#PeriodFrom').val() == "") {
+            alert("Please Select Period From.")
+            $('#PeriodFrom').css('border-color', 'red');
+            $('#PeriodFrom').focus();
+            return false;
+        }
+        else {
+            $('#PeriodFrom').css('border-color', '');
+        }
+        if ($('#PeriodTo').val() == "") {
+            alert("Please Select Period To.")
+            $('#PeriodTo').css('border-color', 'red');
+            $('#PeriodTo').focus();
+            return false;
+        }
+        else {
+            $('#PeriodTo').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/SeasonMaster/Update',
+            data: {
+                SeasonName: $('#SeasonName').val(),
+                SpringSummerYear: $('#SpringSummerYear').val(),
+                SpringDescription: $('#SpringDescription').val(),
+                PeriodFrom: $('#PeriodFrom').val(),
+                PeriodTo: $('#PeriodTo').val(),
+
+
+                SeasonMasterId: $('#SeasonMasterId').val()
+            },
+            success: function (data) {
+                if (data.SeasonMasterId != "" || data.SeasonMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/SeasonMaster/SeasonMaster";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/SeasonMaster/SeasonMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+
+    $(function () {
+        $("#MRPDate").datepicker({ dateFormat: "dd/mm/yy" });
+        $("#From").datepicker({ dateFormat: "dd/mm/yy" });
+        $("#TO").datepicker({ dateFormat: "dd/mm/yy" });
+    });
+</script>
+<h2 class="content-title"> MRP Simple</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("SimpleMRPGrid", "SimpleMRP")
+    </div>
+</div>
+

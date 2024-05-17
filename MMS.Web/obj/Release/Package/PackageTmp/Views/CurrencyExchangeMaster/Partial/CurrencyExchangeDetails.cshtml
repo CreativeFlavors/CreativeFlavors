@@ -1,0 +1,123 @@
+﻿@model MMS.Web.Models.Currency.CurrencyExchangeModel
+@{
+    int id = Model.CurrencyExchangeMasterId;
+    Session["CountryMasterId"] = id;
+}
+
+<script type="text/javascript">
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    $(window).load(function () {
+        $('.loader-overlay').fadeOut('fast');
+    });
+
+    var specialKeys = new Array();
+    specialKeys.push(8); //Backspace
+    function Numeric() {
+
+        $("#ValueInRupees").bind("keypress", function (e) {
+            var keyCode = e.which ? e.which : e.keyCode
+            var ret = ((keyCode >= 48 && keyCode <= 57) || specialKeys.indexOf(keyCode) != -1);
+            $(".error").css("display", ret ? "none" : "inline");
+            return ret;
+        });
+        $("#ValueInRupees").bind("paste", function (e) {
+            return false;
+        });
+        $("#ValueInRupees").bind("drop", function (e) {
+            return false;
+        });
+    }
+    $("#Date").datepicker({ dateFormat: "dd/mm/yy" });
+    //$("#Date").datepicker('option', 'dateFormat', 'dd/mm/yy');
+
+</script>
+
+<div class="right-form-section clearfix">
+    <form role="form" class="form-inline">
+        <div class="container-fluid">
+            <div style="margin-top: 20px;" class="row">
+                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding"></div>
+                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                <label class="form-label" for="text">Date</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.HiddenFor(x => x.CurrencyExchangeMasterId)
+                                @if (Model != null && Model.CurrencyExchangeMasterId != 0)
+                                {
+                                    var dat = Model.Date;
+                                @Html.TextBoxFor(m => m.Date, new { @Value = dat, @class = "form-control text-field" })
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(m => m.Date, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field" })
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                <label class="form-label" for="text">Currency</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.DropDownListFor(m => m.Currency, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "select-style text-field" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
+                                <label class="form-label" for="text">Valu in Rupees</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.TextBoxFor(m => m.ValueInRupees, new { @class = "form-control text-field", onclick = "Numeric()" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-footer">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                 
+                    <input type="button" onclick="Cancel()" class="btn btn-default btn-style" title="Back" value="Back">
+                    @if (Model != null && Model.CurrencyExchangeMasterId != 0)
+                    {
+                        <input type="hidden" id="HdnCurrencyExchangeID" value="@Model.CurrencyExchangeMasterId" />
+                        <input type="button" onclick="Save()" class="btn btn-default btn-style" id="CurrencyExchangeMasterId" title="Update" value="Update">
+                    }
+                    else
+                    {
+                        <input type="button" id="BtnSave" onclick="Save()" class="btn btn-default btn-style" title="Save" value="Save">
+                        
+                    }
+                    <button class="btn btn-default btn-style" type="submit">Clear</button>
+                 
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<link href="~/Scripts/EasyAutocomplete-1.3.5/comboStyles.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="~/Scripts/EasyAutocomplete-1.3.5/ComboBox.js"></script>
+<script>
+          $("#Currency").combobox();
+</script>
+ 
+ 

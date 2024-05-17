@@ -1,0 +1,115 @@
+﻿@model MMS.Web.Models.ColorMasterModel.ColorMasterModel
+@{
+    int id = Model.ColorMasterId;
+    Session["ColorID"] = id;
+}
+
+<style>
+    .veh-tablewrap {
+    float: left !important;
+    margin: 0 1px 56px;
+    text-align: left;
+    width: 100%;
+}
+</style>
+
+<div class="right-form-section clearfix">
+    <form role="form" class="form-inline">
+        <div class="container-fluid">
+            <div class="row">
+
+                <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12">
+                    <h3>Colour Master</h3>
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                                <label class="form-label" for="text">Colour</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.HiddenFor(x => x.ColorMasterId)
+                                @Html.TextBoxFor(m => m.Color, new { @class = "form-control text-field" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                                <label class="form-label" for="text">Colour Code</label>
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @Html.TextBoxFor(m => m.BuyerColorCode, new { @class = "form-control text-field" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-section">
+                        <div class="form-group">
+                            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12 stage_lable_sec">
+                            </div>
+                            <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+                                @if (Model != null && Model.ColorImages != "" && Model.ColorImages != null)
+                                {
+                                    string scr = "../ColorUpload/" + @Model.ColorImages;
+                                    <div>
+                                        <input type="file" id="UploadImg">
+                                        <img src="@scr" alt="Image" style=" float: right;height: 50px;" />
+
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div>
+                                        <input type="file" id="UploadImg">
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center" style="margin: 15px 0px;">
+                    <input type="button" onclick="Cancel()" class="btn btn-default btn-style width-78" style="cursor: pointer;" title="Back" value="Back">
+                    @if (Model != null && Model.ColorMasterId != 0)
+                    {
+
+                        <input type="button" onclick="UpdateColor()" class="btn btn-default btn-style width-78" style="cursor: pointer;" id="masterID" title="Update" value="Update">
+                    }
+                    else
+                    {
+                        <input type="button" onclick="SaveColor()" class="btn btn-default btn-style width-78" style="cursor: pointer;" title="Save" value="Save">
+                    }
+                    <input type="button" onclick="Clear()" class="btn btn-default btn-style width-78" style="cursor: pointer;" title="Clear" value="Clear">
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script>
+
+    $('#BuyerColorCode').blur(function () {
+        var ColourCode = $('#BuyerColorCode').val();
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetColourStatus", "Color")', // we are calling json method
+
+            data: { ColourCode: $('#BuyerColorCode').val() }, // here we are get value of selected country and passing same value   as inputto json method GetStates.
+            success: function (Message) {
+                if (Message == "Failed") {
+                }
+                else if (Message == "Exist") {
+                    alert("ColourCode Already Exist");
+                }
+
+            },
+            error: function (ex) {
+                alert('Failed to retrieve states.' + ex);
+            }
+        });
+    });
+</script>
+

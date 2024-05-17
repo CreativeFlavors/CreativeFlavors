@@ -1,0 +1,414 @@
+﻿
+@{
+    ViewBag.Title = "StockConversion";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $('#EditColorPartial').hide();
+    })
+    function Save() {
+        
+        if ($('#DocNo').val() == "") {
+            alert("Please Enter DocNo.")
+            $('#DocNo').css('border-color', 'red');
+            $('#DocNo').focus();
+            return false;
+        }
+        else {
+            $('#DocNo').css('border-color', '');
+        }
+        if ($('#FromStore').val() == "") {
+            alert("Please Enter FromStore.")
+            $('#FromStore').css('border-color', 'red');
+            $('#FromStore').focus();
+            return false;
+        }
+        else {
+            $('#FromStore').css('border-color', '');
+        }
+        if ($('#ToStore').val() == "") {
+            alert("Please Enter ToStore.")
+            $('#ToStore').css('border-color', 'red');
+            $('#ToStore').focus();
+            return false;
+        }
+        else {
+            $('#ToStore').css('border-color', '');
+        }
+        if ($('#Date').val() == "") {
+            alert("Please Select Date.")
+            $('#Date').css('border-color', 'red');
+            $('#Date').focus();
+            return false;
+        }
+        else {
+            $('#Date').css('border-color', '');
+        }
+        if ($('#Remarks').val() == "") {
+            alert("Please Enter Remarks.")
+            $('#Remarks').css('border-color', 'red');
+            $('#Remarks').focus();
+            return false;
+        }
+        else {
+            $('#Remarks').css('border-color', '');
+        }
+        if ($('#MaterialGroupId').val() == "") {
+            alert("Please Select Group.")
+            $('#MaterialGroupId').css('border-color', 'red');
+            $('#MaterialGroupId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialGroupId').css('border-color', '');
+        }
+        if ($('#UomId').val() == "") {
+            alert("Please Select Uom.")
+            $('#UomId').css('border-color', 'red');
+            $('#UomId').focus();
+            return false;
+        }
+        else {
+            $('#UomId').css('border-color', '');
+        }
+        if ($('#ReservedStock').val() == "") {
+            alert("Please Enter ReservedStock.")
+            $('#ReservedStock').css('border-color', 'red');
+            $('#ReservedStock').focus();
+            return false;
+        }
+        else {
+            $('#ReservedStock').css('border-color', '');
+        }
+        if ($('#MaterialMasterId').val() == "") {
+            alert("Please Select Material.")
+            $('#MaterialMasterId').css('border-color', 'red');
+            $('#MaterialMasterId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialMasterId').css('border-color', '');
+        }
+        if ($('#ColourMasterId').val() == "") {
+            alert("Please Select Colour.")
+            $('#ColourMasterId').css('border-color', 'red');
+            $('#ColourMasterId').focus();
+            return false;
+        }
+        else {
+            $('#ColourMasterId').css('border-color', '');
+        }
+        if ($('#FreeStock').val() == "") {
+            alert("Please Enter FreeStock.")
+            $('#FreeStock').css('border-color', 'red');
+            $('#FreeStock').focus();
+            return false;
+        }
+        else {
+            $('#FreeStock').css('border-color', '');
+        }
+        if ($('#IoNo').val() == "") {
+            alert("Please Select IoNo.")
+            $('#IoNo').css('border-color', 'red');
+            $('#IoNo').focus();
+            return false;
+        }
+        else {
+            $('#IoNo').css('border-color', '');
+        }
+        if ($('#Quantity').val() == "") {
+            alert("Please Enter Quantity.")
+            $('#Quantity').css('border-color', 'red');
+            $('#Quantity').focus();
+            return false;
+        }
+        else {
+            $('#Quantity').css('border-color', '');
+        }
+        if ($('#StockInAllStores').val() == "") {
+            alert("Please Enter Stock In All Stores.")
+            $('#StockInAllStores').css('border-color', 'red');
+            $('#StockInAllStores').focus();
+            return false;
+        }
+        else {
+            $('#StockInAllStores').css('border-color', '');
+        }
+        if ($('#StockInCurrentStores').val() == "") {
+            alert("Please Enter Stock In Current Stores.")
+            $('#StockInCurrentStores').css('border-color', 'red');
+            $('#StockInCurrentStores').focus();
+            return false;
+        }
+        else {
+            $('#StockInCurrentStores').css('border-color', '');
+        }
+        if ($('#Rate').val() == "") {
+            alert("Please Enter Rate.")
+            $('#Rate').css('border-color', 'red');
+            $('#Rate').focus();
+            return false;
+        }
+        else {
+            $('#Rate').css('border-color', '');
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/StockConversion/StockConversion/',
+            data: {
+                StockConversionId: $('#StockConversionId').val(),
+                DocNo: $('#DocNo').val(),
+                FromStore: $('#FromStore').val(),
+                ToStore: $('#ToStore').val(),
+                Remarks: $('#Remarks').val(),
+                StockValueChange: $('#StockValueChange').is(":checked"),
+                MaterialGroupId: $('#MaterialGroupId').val(),
+                UomId: $('#UomId').val(),
+                MaterialMasterId: $('#MaterialMasterId').val(),
+                ColourMasterId: $('#ColourMasterId').val(),
+                IoNo: $('#IoNo').val(),
+                Quantity: $('#Quantity').val(),
+                Rate: $('#Rate').val(),
+                ReservedStock: $('#ReservedStock').val(),
+                FreeStock: $('#FreeStock').val(),
+                StockInAllStores: $('#StockInAllStores').val(),
+                StockInCurrentStores: $('#StockInCurrentStores').val(),
+                Date: $('#Date').val(),
+            },
+            success: function (data) {
+                if (data.StockConversionId != "" || data.StockConversionId != 0) {
+                    alert('Saved Successfully.');                  
+                    $('#EditColorPartial').hide();
+                    $('.veh-tablewrap').show();
+                    location.href = "/StockConversion/StockConversion/";
+                    return false;
+                }
+                else {
+                    alert('Save Process Failed.');
+                    location.href = "/StockConversion/StockConversion/";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        })
+    }
+
+    function Update(arg) {
+
+        if ($('#DocNo').val() == "") {
+            alert("Please Enter DocNo.")
+            $('#DocNo').css('border-color', 'red');
+            $('#DocNo').focus();
+            return false;
+        }
+        else {
+            $('#DocNo').css('border-color', '');
+        }
+        if ($('#FromStore').val() == "") {
+            alert("Please Enter FromStore.")
+            $('#FromStore').css('border-color', 'red');
+            $('#FromStore').focus();
+            return false;
+        }
+        else {
+            $('#FromStore').css('border-color', '');
+        }
+        if ($('#ToStore').val() == "") {
+            alert("Please Enter ToStore.")
+            $('#ToStore').css('border-color', 'red');
+            $('#ToStore').focus();
+            return false;
+        }
+        else {
+            $('#ToStore').css('border-color', '');
+        }
+        if ($('#Date').val() == "") {
+            alert("Please Select Date.")
+            $('#Date').css('border-color', 'red');
+            $('#Date').focus();
+            return false;
+        }
+        else {
+            $('#Date').css('border-color', '');
+        }
+        if ($('#Remarks').val() == "") {
+            alert("Please Enter Remarks.")
+            $('#Remarks').css('border-color', 'red');
+            $('#Remarks').focus();
+            return false;
+        }
+        else {
+            $('#Remarks').css('border-color', '');
+        }
+        if ($('#MaterialGroupId').val() == "") {
+            alert("Please Select Group.")
+            $('#MaterialGroupId').css('border-color', 'red');
+            $('#MaterialGroupId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialGroupId').css('border-color', '');
+        }
+        if ($('#UomId').val() == "") {
+            alert("Please Select Uom.")
+            $('#UomId').css('border-color', 'red');
+            $('#UomId').focus();
+            return false;
+        }
+        else {
+            $('#UomId').css('border-color', '');
+        }
+        if ($('#ReservedStock').val() == "") {
+            alert("Please Enter ReservedStock.")
+            $('#ReservedStock').css('border-color', 'red');
+            $('#ReservedStock').focus();
+            return false;
+        }
+        else {
+            $('#ReservedStock').css('border-color', '');
+        }
+        if ($('#MaterialMasterId').val() == "") {
+            alert("Please Select Material.")
+            $('#MaterialMasterId').css('border-color', 'red');
+            $('#MaterialMasterId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialMasterId').css('border-color', '');
+        }
+        if ($('#ColourMasterId').val() == "") {
+            alert("Please Select Colour.")
+            $('#ColourMasterId').css('border-color', 'red');
+            $('#ColourMasterId').focus();
+            return false;
+        }
+        else {
+            $('#ColourMasterId').css('border-color', '');
+        }
+        if ($('#FreeStock').val() == "") {
+            alert("Please Enter FreeStock.")
+            $('#FreeStock').css('border-color', 'red');
+            $('#FreeStock').focus();
+            return false;
+        }
+        else {
+            $('#FreeStock').css('border-color', '');
+        }
+        if ($('#IoNo').val() == "") {
+            alert("Please Select IoNo.")
+            $('#IoNo').css('border-color', 'red');
+            $('#IoNo').focus();
+            return false;
+        }
+        else {
+            $('#IoNo').css('border-color', '');
+        }
+        if ($('#Quantity').val() == "") {
+            alert("Please Enter Quantity.")
+            $('#Quantity').css('border-color', 'red');
+            $('#Quantity').focus();
+            return false;
+        }
+        else {
+            $('#Quantity').css('border-color', '');
+        }
+        if ($('#StockInAllStores').val() == "") {
+            alert("Please Enter Stock In All Stores.")
+            $('#StockInAllStores').css('border-color', 'red');
+            $('#StockInAllStores').focus();
+            return false;
+        }
+        else {
+            $('#StockInAllStores').css('border-color', '');
+        }
+        if ($('#StockInCurrentStores').val() == "") {
+            alert("Please Enter Stock In Current Stores.")
+            $('#StockInCurrentStores').css('border-color', 'red');
+            $('#StockInCurrentStores').focus();
+            return false;
+        }
+        else {
+            $('#StockInCurrentStores').css('border-color', '');
+        }
+        if ($('#Rate').val() == "") {
+            alert("Please Enter Rate.")
+            $('#Rate').css('border-color', 'red');
+            $('#Rate').focus();
+            return false;
+        }
+        else {
+            $('#Rate').css('border-color', '');
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/StockConversion/Update/',
+            data: {
+                StockConversionId: $('#StockConversionId').val(),
+                DocNo: $('#DocNo').val(),
+                FromStore: $('#FromStore').val(),
+                ToStore: $('#ToStore').val(),
+                Remarks: $('#Remarks').val(),
+                StockValueChange: $('#StockValueChange').is(":checked"),
+                MaterialGroupId: $('#MaterialGroupId').val(),
+                UomId: $('#UomId').val(),
+                MaterialMasterId: $('#MaterialMasterId').val(),
+                ColourMasterId: $('#ColourMasterId').val(),
+                IoNo: $('#IoNo').val(),
+                Quantity: $('#Quantity').val(),
+                Rate: $('#Rate').val(),
+                ReservedStock: $('#ReservedStock').val(),
+                FreeStock: $('#FreeStock').val(),
+                StockInAllStores: $('#StockInAllStores').val(),
+                StockInCurrentStores: $('#StockInCurrentStores').val(),
+                Date: $('#Date').val(),
+            },
+            success: function (data) {
+                if (data.StockConversionId != "" || data.StockConversionId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/StockConversion/StockConversion/";
+                    return false;
+                }
+                else {
+                    alert('Updated Failed.');
+                    location.href = "/StockConversion/StockConversion/";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        })
+    }
+
+</script>
+
+<h2 class="content-title">Stock Conversion</h2>
+<div style="width: 100%; float: left;">
+
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("StockConversionGrid", "StockConversion")
+    </div>
+</div>

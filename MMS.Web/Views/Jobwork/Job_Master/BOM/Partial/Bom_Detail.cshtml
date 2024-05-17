@@ -1,0 +1,2453 @@
+﻿@model MMS.Web.Models.StockModel.BillOfMaterialModel
+
+@using MMS.Core.Entities.Stock
+@using MMS.Repository.Managers.StockManager
+@using MMS.Repository.Managers
+@using MMS.Core.Entities
+@using MMS.Web.Models.StockModel
+@using System.Globalization;
+
+@{
+    ViewBag.Title = "Bom_Detail";
+    Layout = "~/Views/Shared/_jobLayout.cshtml";
+       
+}
+<style>
+    .chosen-container-single {
+    width: 100%!important;
+}
+    div#no-more-tables {
+    overflow: scroll;
+}
+
+
+</style>
+<link href="~/Content/chosen/bootstrap-chosen.css" rel="stylesheet" />
+<script src="~/Scripts/chosen/chosen.jquery.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".chosen-select").chosen();
+        $('#list-materials').DataTable();
+        if(@Model.BomId==0)
+        {
+            $("#MeanSize").val(121);
+            $("#NoOfSets").val("1");
+        }
+        $('#Addrowfields tbody').remove();
+
+    });
+    function callChange(arg) {
+        var id = '';
+        var id1 = '';
+        id = $('#Addrowfields tbody tr .WastagePercent' + arg).val();
+        id1 = $('#Addrowfields tbody tr .SampleNorms' + arg).val();
+
+        var wastage = parseFloat(id);
+        var norms = parseFloat(id1);
+        var wq = parseFloat(norms) * parseFloat(wastage) / 100;
+        var tn = parseFloat(norms) + parseFloat(wq);
+        $('#Addrowfields tbody tr .WastageQty' + arg).val(wq);
+        $('#Addrowfields tbody tr .TotalNormsQty' + arg).val(tn);
+    }
+    $("#CommnBOM1,#CommnBOM2,#CommnBOM3,#CommnBOM4,#CommnBOM5").unbind('change');
+    $(function () {
+
+        $('#CommnBOM1,#CommnBOM2,#CommnBOM3,#CommnBOM4,#CommnBOM5').change(function () {
+            $('.loader-overlay').fadeIn('slow');
+            $.ajax({
+                type: 'GET',
+                url: '/BillOfMaterial/ParentMaterialList',
+                data: {
+                    BomId: $(this).val(),
+                    BomNo:$("#BomNo").val(),
+                    Description:$("#Description").val(),
+                    BuyerMasterId:$("#BuyerMasterId").val(),
+                    BuyerModel:$("#BuyerModel").val(),
+                    MeanSize:$("#MeanSize").val(),
+                    Date:$("#Date").val(),
+                    LastBomNoEntered:$("#LastBomNoEntered").val(),
+                    LinkBomNo:$("#LinkBomNo").val(),
+                    CommnBOM1:$("#CommnBOM1").val(),
+                    CommnBOM2:$("#CommnBOM2").val(),
+                    CommnBOM3:$("#CommnBOM3").val(),
+                    CommnBOM4:$("#CommnBOM4").val(),
+                    CommnBOM5:$("#CommnBOM5").val(),
+                    OurNorms:$("#OurNorms").val(),
+                    OurNormsPercent:$("#OurNormsPercent").val(),
+                    PurchaseNorms:$("#PurchaseNorms").val(),
+                    PurchaseNormsPercent:$("#PurchaseNormsPercent").val(),
+                    IssueNorms:$("#IssueNorms").val(),
+                    IssueNormsPercent:$("#IssueNormsPercent").val(),
+                    CostingNorms:$("#CostingNorms").val(),
+                    CostingNormsPercent:$("#CostingNormsPercent").val(),
+                    SNo: $('.bommaterialtable tr').find('.SNO').length
+                },
+                success: function (data) {
+                    debugger; 
+                    var sno="";
+                    sno=  $('.bommaterialtable tr').find('.SNO').length;
+                    sno++;
+                    var hiddenSno = $("#SNO").val();
+                    window.location.href = "BillOfMaterialDetails?BOMID=" + data.Bomid;
+                    //if(hiddenSno!=0)
+                    //{
+                    //    sno=hiddenSno;
+                    //}
+                    //$('.loader-overlay').fadeOut('fast');
+
+                    //$("#BomNo").val(data.Model.BomNo);
+                    //$("#Description").val(data.Model.Description);
+                    //$("#BuyerMasterId").val(data.Model.BuyerMasterId);
+                    //$("#BuyerMasterId").val(data.Model.BuyerMasterId);
+                    //$("#BuyerModel").val(data.Model.BuyerModel);
+                    //$("#MeanSize").val(data.Model.MeanSize);
+                    //$("#BuyerNorms").val(data.Model.BuyerNorms);
+                    //$("#NoOfSets").val(data.Model.NoOfSets);
+                    //$("#UomMasterId").val(data.Model.UomMasterId);
+                    //$("#SupplierMasterId").val(data.Model.SupplierMasterId);
+                    //$("#SizeScheduleMasterId").val(data.Model.SizeScheduleMasterId);
+                    //$("#SizeRangeMasterId").val(data.Model.SizeRangeMasterId);
+                    //$('#list-materials tbody').html("")
+                    //var rowCount = 0;
+                    //$.each(data.Material, function (index, item) {
+                    //    if(item.SubtranceRangeName==null)
+                    //    {
+                    //        item.SubtranceRangeName="";
+                    //    }
+                    //    if(item.SampleNorms==null)
+                    //    {
+                    //        item.SampleNorms="";
+                    //    }
+                    //    item.SNO=item.SNO;
+                    //    $('#list-materials tbody').append("<tr id=rowid_" + item.BOMMaterialID + "> <td style='display:none' class='BomNo'><span>" + item.BOMMaterialID + "</span><input type='hidden' class='BomId' value='" + item.BomId + "'></td>" +
+
+                    //                                                                                            "<td style='display:none' class='Description' id='Description'>" + item.Description + "</td>" +
+                    //                                                                                            "<td style='display:none' class='BuyerMasterId' id='BuyerMasterId'>" + item.BuyerMasterId + "</td>" +
+                    //                                                                                            "<td style='display:none' class='BuyerModel' id='BuyerModel'>" + item.BuyerModel + "</td>" +
+                    //                                                                                            "<td style='display:none' class='MeanSize' id='MeanSize'>" + item.MeanSize + "</td>" +
+                    //                                                                                            "<td style='display:none' class='Date' id='Date'>" + item.Date + "</td>" +
+                    //                                                                                            "<td style='display:none' class='ParentBomNo' id='ParentBomNo'>" + "" + "</td>" +
+                    //                                                                                            "<td style='display:none' class='LinkBomNo' id='LinkBomNo'>" + "" + "</td>" +
+                    //                                                                                            "<td style='display:none' class='CommnBOM1' id='CommnBOM1'>" + item.CommnBOM1 + "</td>" +
+                    //                                                                                            "<td style='display:none' class='CommnBOM1' id='CommnBOM1'>" + item.BOMMaterialID + "</td>" +
+                    //                                                                                            "<td style='' class='SNO' id='SNO'>" + item.SNO + "</td>" +
+                    //                                                                                            "<td title='Delete'  style='cursor:pointer;' class='Delete' id='Delete'><input type='button' value='Delete' style='cursor:pointer;' title='Delete' onclick='Deletebtn(" + item.BOMMaterialID+")' class='change_status change_status_  Delete input Edit input' /></td>" +
+                    //                                                                                            "<td title='Edit'  style='cursor:pointer;' class='Edit' id='Edit'><input type='button' value='Edit' style='cursor:pointer;' title='Edit' onclick='RowClick(" + item.BOMMaterialID + "," + item.BomId+ ")' class='change_status change_status_ Delete input Edit input' /></td>" +
+                    //                                                                                            "<td class='MaterialCategoryMasterId_' id='MaterialCategoryMasterId_'>" + item.CategoryName + "</td>" +
+                    //                                                                                            "<td class='MaterialName_' id='MaterialName_'>" + item.MaterialName + "</td>" +
+                    //                                                                                            "<td class='SupplybyID' id='SupplybyID'>" + item.SupplierMasterID + "</td>"+
+                    //                                                                                            "<td class='MaterialGroupMasterId_' id='MaterialGroupMasterId_'>" + item.GroupName + "</td>" +
+                    //                                                                                            "<td class='ColorMasterId_' id='ColorMasterId_'>" + item.ColorName + "</td>" +
+                    //                                                                                            "<td class='SubstanceMasterId_' id='SubstanceMasterId_'>" + item.SubtranceRangeName + "</td>" +
+                    //                                                                                            "<td class='SampleNorms' id='SampleNorms'>" + item.SampleNorms + "</td>" +
+                    //                                                                                            "<td class='WastageQtyUOM' id='WastageQtyUOM'>" + item.WastageqtyUOM + "</td>" +
+                    //                                                                                            "<td class='TotalNorms' id='TotalNorms'>" + item.TotalNorms + "</td>" +
+                    //                                                                                            "<td style='display:none' class='ComponentName' id='ComponentName'>" + item.ComponentName + "</td>" +
+                    //                                                                                            "<td style='display:none' class='BuyerNorms' id='BuyerNorms'>" + item.BuyerNorms + "</td>" +
+                    //                                                                                            "<td style='display:none' class='NoOfSets' id='NoOfSets'>" + item.NoOfSets + "</td>" +
+                    //                                                                                            "<td style='display:none' class='UomMasterId' id='UomMasterId'>" + item.UomMasterId + "</td>" +
+                    //                                                                                            "<td style='display:none' class='SupplierMasterId' id='SupplierMasterId'>" + item.SupplierMasterId + "</td>" +
+                    //                                                                                            "<td style='display:none' class='SizeRangeMasterId' id='SizeRangeMasterId'>" + item.SizeRangeMasterId + "</td>" +
+                    //                                                                                            "<td style='display:none' class='OurNorms' id='OurNorms'>" + item.OurNorms + "</td>" +
+                    //                                                                                            "<td style='display:none' class='OurNormsPercent' id='OurNormsPercent'>" + item.OurNormsPercent + "</td>" +
+                    //                                                                                            "<td style='display:none' class='PurchaseNorms' id='PurchaseNorms'>" + item.PurchaseNorms + "</td>" +
+                    //                                                                                            "<td style='display:none' class='PurchaseNormsPercent' id='PurchaseNormsPercent'>" + item.PurchaseNormsPercent + "</td>" +
+                    //                                                                                            "<td style='display:none' class='IssueNorms' id='IssueNorms'>" + item.IssueNorms + "</td>" +
+                    //                                                                                            "<td style='display:none' class='IssueNormsPercent' id='IssueNormsPercent'>" + item.IssueNormsPercent + "</td>" +
+                    //                                                                                            "<td style='display:none' class='CostingNorms' id='CostingNorms'>" + item.CostingNorms + "</td>" +
+                    //                                                                                             "<td style='display:none' class='Conversion' id='Conversion'>" + item.Conversion + "</td>" +
+                    //                                                                                             "<td style='display:none'class='MaterialCategoryMasterId' id='MaterialCategoryMasterId'>" + item.MaterialCategoryMasterId + "</td>" +
+                    //                                                                                            "<td style='display:none' class='MaterialName' id='MaterialName'>" + item.MaterialName + "</td>" +
+                    //                                                                                            "<td style='display:none' class='MaterialGroupMasterId' id='MaterialGroupMasterId'>" + item.MaterialGroupMasterId + "</td>" +
+                    //                                                                                            "<td style='display:none' class='ColorMasterId' id='ColorMasterId'>" + item.ColorMasterId + "</td>" +
+                    //                                                                                            "<td style='display:none' class='SubstanceMasterId' id='SubstanceMasterId'>" + item.SubstanceMasterId + "</td>" +
+                    //                                                                                            "<td style='display:none' class='CostingNormsPercent' id='CostingNormsPercent'>" + item.CostingNormsPercent + "</td>" +
+                    //                                                                                            "<td style='display:none' class='PreparedBy' id='PreparedBy'>" + item.PreparedBy + "</td>" +
+                    //                                                                                            "<td style='display:none' class='WastageQtyUOM' id='WastageQtyUOM'>" + item.WastageQtyUOM + "</td>" +
+                    //                                                                                            "<td style='display:none' class='VerifiedBy' id='VerifiedBy'>" + item.VerifiedBy + "</td>" +
+                    //                                                                                            "<td style='display:none' class='CheckedBy' id='CheckedBy'>" + item.CheckedBy + "</td>"
+                    //                                                                                            + "<td style='display:none' class='AddRowFields'>" + $('#AddRowFields').val() + "</td></tr>");
+                    //    rowCount++;
+                    //    sno++;
+                    //});
+
+
+                }
+            });
+        });
+    });
+    var SnoVal = 1;
+    // $("#add-Compenent").unbind('change');
+    function comp() {
+        debugger;
+        var SnoVal = $("#Addrowfields tr").find('.sno_').length;
+        SnoVal++;
+        $("#Addrowfields").append("<tr ><td id='Sno' class='sno_' value='SnoVal'>" + SnoVal +"</td><td class='width-141'><select id="+SnoVal+"><option value = '' > --Select --</option ></select ></td><td class='width-91'><input type='text' id='length' class='length' value='' onkeypress=' return isNumberKey(event)' /></td><td class='width-91'><input type='text' id='width' class='width' value='' onkeypress='return isNumberKey(event)' /></td><td class='width-91'><input type='text' id='Nos' class='Nos' value='' onkeypress='return isNumberKey(event)' /></td><td class='width-91'><input type='text' id='SampleNorms' class='SampleNorms" + SnoVal + "' onkeypress='return isNumberKey(event)' /></td><td class='width-91'><input type='text' id='WastagePercent' class='WastagePercent" + SnoVal + "' onkeypress='return isNumberKey(event)' onchange='callChange(" + SnoVal + ")' /></td></td><td class='width-91'><input type='text' id='WastageQty' class='WastageQty" + SnoVal + "' onkeypress='return isNumberKey(event)' /></td><td class='width-91'><input type='text' id='TotalNormsQty' class='TotalNormsQty" + SnoVal + "' onkeypress='return isNumberKey(event)' /><td><input type='button' value='Remove' class='removeSchedule btn btn-default btn-style' /></td></tr>");
+        
+        component_select(SnoVal);
+      
+
+    }
+
+    function component_select(arg) {
+        //   var MaterialCategoryMasterId_ = $('#MaterialCategoryMasterId').val();
+        $.ajax({
+            url: '/Component/ComponentGrid_Get',
+            type: "GET",
+            dataType: "JSON",
+            success: function (data) {
+                debugger;
+                //SnoVal--;
+                $("#" + arg).html(""); // clear before appending new list
+                var options = "";
+                $("#" + arg).append(
+                    $('<option></option>').val("0").html("Please Select")), 
+                 
+                $.each(data.component, function (i, city) {
+                    debugger
+                  //  options = options + `<option value="${city.ComponentMasterId}">${city.ComponentName}</option>`;
+                    //$(SnoVal).append("<option value='test'>test</option>");
+                    $("#" + arg).append(      
+                            
+                        $('<option></option>').val(city.ComponentMasterId).html(city.ComponentName));       
+                });
+              //  $("#" + SnoVal + "").html(options); 
+            }
+        });
+
+    }
+    $(document).on('click', '.removeSchedule', function () {
+        $(this).closest("tr").remove();
+    });
+    function validation() {
+        if ($('#BomNo').val() == "") {
+            alert("Please Enter BomNo.")
+            $('#BomNo').css('border-color', 'red');
+            $('#BomNo').focus();
+            return false;
+        }
+        else {
+            $('#BomNo').css('border-color', '');
+        }
+        if ($('#Description').val() == "") {
+            alert("Please Enter Description.")
+            $('#Description').css('border-color', 'red');
+            $('#Description').focus();
+            return false;
+        }
+        else {
+            $('#Description').css('border-color', '');
+        }
+        if ($('#BuyerMasterId').val() == "") {
+            $('#BuyerMasterId').css('border-color', 'red');
+            $('#BuyerMasterId').focus();
+            alert("Please Select BuyerMasterId.")
+            return false;
+        }
+        else {
+            $('#BuyerMasterId').css('border-color', '');
+        }
+
+        if ($('#MeanSize').val() == "") {
+            alert("Please Enter Last MeanSize.")
+            $('#MeanSize').css('border-color', 'red');
+            $('#MeanSize').focus();
+            return false;
+        }
+        else {
+            $('#MeanSize').css('border-color', '');
+        }
+        if ($('#Date').val() == "") {
+            alert("Please Enter Date.")
+            $('#Date').css('border-color', 'red');
+            $('#Date').focus();
+            return false;
+        }
+        else {
+            $('#Date').css('border-color', '');
+        }
+
+        if ($('#MaterialCategoryMasterId').val() == "") {
+            alert("Please select category.")
+            $('#MaterialCategoryMasterId').css('border-color', 'red');
+            $('#MaterialCategoryMasterId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialCategoryMasterId').css('border-color', '');
+        }
+
+
+        if ($('#MaterialName').val() == "" && $('#MaterialName').val()==0) {
+            alert("Please select Material Name.")
+            $('#MaterialName').css('border-color', 'red');
+            $('#MaterialName').focus();
+            return false;
+        }
+        else {
+            $('#MaterialName').css('border-color', '');
+        }
+
+
+        if ($('#BuyerModel').val() == "") {
+            alert("Please Select BuyerModel.")
+            $('#BuyerModel').css('border-color', 'red');
+            $('#BuyerModel').focus();
+            return false;
+        }
+        else {
+            $('#BuyerModel').css('border-color', '');
+        }
+
+        if ($('#MeanSize').val() == "") {
+            alert("Please Enter Last MeanSize.")
+            $('#MeanSize').css('border-color', 'red');
+            $('#MeanSize').focus();
+            return false;
+        }
+        else {
+            $('#MeanSize').css('border-color', '');
+        }
+
+        if($("#LinkBomNo").prop('disabled')!=true)
+        {
+            if ($('#LinkBomNo').val() == "") {
+                alert("Please Enter Order LinkBomNo.")
+                $('#LinkBomNo').css('border-color', 'red');
+                $('#LinkBomNo').focus();
+                return false;
+            }
+            else {
+                $('#LinkBomNo').css('border-color', '');
+            }
+        }
+
+        if ($('#MaterialCategoryMasterId').val() == "") {
+            alert("Please Enter Category.")
+            $('#MaterialCategoryMasterId').css('border-color', 'red');
+            $('#MaterialCategoryMasterId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialCategoryMasterId').css('border-color', '');
+        }
+
+        if ($('#MaterialGroupMasterId').val() == "") {
+            alert("Please Enter Group.")
+            $('#MaterialGroupMasterId').css('border-color', 'red');
+            $('#MaterialGroupMasterId').focus();
+            return false;
+        }
+        else {
+            $('#MaterialGroupMasterId').css('border-color', '');
+        }
+        if ($('#ColorMasterId').val() == "") {
+            alert("Please Enter Color.")
+            $('#ColorMasterId').css('border-color', 'red');
+            $('#ColorMasterId').focus();
+            return false;
+        }
+        else {
+            $('#ColorMasterId').css('border-color', '');
+        }
+        if($('#SubstanceMasterId').prop('disabled')==false)
+        {
+            if ($('#SubstanceMasterId').val() == "") {
+                alert("Please Enter Substance.")
+                $('#SubstanceMasterId').css('border-color', 'red');
+                $('#SubstanceMasterId').focus();
+                return false;
+            }
+            else {
+                $('#SubstanceMasterId').css('border-color', '');
+            }
+        }
+
+
+        if ($('#TotalNorms').val() == "") {
+            alert("Please Enter TotalNorms.")
+            $('#TotalNorms').css('border-color', 'red');
+            $('#TotalNorms').focus();
+            return false;
+        }
+        else {
+            $('#TotalNorms').css('border-color', '');
+        }
+        if ($('#WastageQtyUOM').val() == "") {
+
+            $('#WastageQtyUOM').css('border-color', 'red');
+            $('#WastageQtyUOM').focus();
+            return false;
+        }
+        else {
+            $('#WastageQtyUOM').css('border-color', '');
+        }
+
+
+        if ($('#NoOfSets').val() == "") {
+            alert("Please Enter NoOfSets.")
+            $('#NoOfSets').css('border-color', 'red');
+            $('#NoOfSets').focus();
+            return false;
+        }
+        else {
+            $('#NoOfSets').css('border-color', '');
+        }
+    }
+    function Save() {
+        var systemUserValue = '';
+        var Sno = '';
+        var compnt = '';
+        var _length = '';
+        var width = '';
+        var nos = '';
+        var samplenms = '';
+        var wstg = '';
+        var wstqty = '';
+        var wsttotalNorms = '';
+        $('#Addrowfields tbody tr').each(function () {
+            Sno = '';
+            compnt = '';
+            _length = '';
+            width = '';
+            nos = '';
+            samplenms = '';
+            wstg = '';
+            wstqty = '';
+            wsttotalNorms = '';
+            $(this).find("td").each(function () {
+                Sno = $('#Sno').val();
+                if (Sno != undefined && Sno.trim().length > 0) {
+                    systemUserValue += Sno + ',';
+                }
+                compnt = $(this).find('#Component').val();
+                if (compnt != undefined && compnt.trim().length > 0) {
+                    systemUserValue += compnt + ',';
+                }
+                _length = $(this).find('#length').val();
+                if (_length != undefined && _length.trim().length > 0) {
+                    systemUserValue += _length + ',';
+                }
+                width = $(this).find('#width').val();
+                if (width != undefined && width.trim().length > 0) {
+                    systemUserValue += width + ',';
+
+                }
+                nos = $(this).find('#Nos').val();
+                if (nos != undefined && nos.trim().length > 0) {
+                    systemUserValue += nos + ',';
+                }
+
+                samplenms = $(this).find('#SampleNorms').val();
+                if (samplenms != undefined && samplenms.trim().length > 0) {
+                    systemUserValue += samplenms + ',';
+                }
+                wstg = $(this).find('#WastagePercent').val();
+                if (wstg != undefined && wstg.trim().length > 0) {
+                    systemUserValue += wstg + ',';
+                }
+                wstqty = $(this).find('#WastageQty').val();
+                if (wstqty != undefined && wstqty.trim().length > 0) {
+                    systemUserValue += wstqty + ',';
+                }
+                wsttotalNorms = $(this).find('#TotalNormsQty').val();
+                if (wsttotalNorms != undefined && wsttotalNorms.trim().length > 0) {
+                    systemUserValue += wsttotalNorms;
+                }
+
+            });
+            systemUserValue += '#';
+
+        });
+        var form = systemUserValue;
+        console.log($('.AddRowFields').val());
+        $('#AddRowFields').val(form);
+        var CommnBOM = "";
+        if ($('#CommnBOM1').val() != "") {
+            CommnBOM = $('#CommnBOM1').val();
+        }
+        if ($('#CommnBOM2').val() != "") {
+            CommnBOM += "," + $('#CommnBOM2').val();
+        }
+        if ($('#CommnBOM3').val() != "") {
+            CommnBOM += "," + $('#CommnBOM3').val();
+        }
+        if ($('#CommnBOM4').val() != "") {
+            CommnBOM += "," + $('#CommnBOM4').val();
+        }
+        if ($('#CommnBOM5').val() != "") {
+            CommnBOM += "," + $('#CommnBOM5').val();
+        }
+        var rowCount = $('#list-materials tr').length - 1;
+        if (rowCount == 0) {
+
+            if (validation()) {
+
+
+                var forms_ = $(".form-inline").serialize();
+
+                if ($("#list-materials tbody tr").length == 0) {
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/BillOfMaterial/BillOfMaterialDetails',
+                        data: { forms: forms_, Grid: $('.AddRowFields').text(), BomGridlst: '@Model.BomGridlst' },
+                        success: function (data) {
+                            if (data == true) {
+                                if ($("#BtnSave").val() == "Save") {
+                                    alert('Saved Successfully.');
+                                }
+                                else {
+                                    alert('Updated Successfully.');
+                                }
+
+                                location.href = "/BillOfMaterial/BOMMaterialListGrid";
+                                return false;
+                            }
+                            else {
+                                alert('Save process Failed.');
+                                location.href = "/BillOfMaterial/BOMMaterialListGrid";
+                                return false;
+                            }
+                        }
+                    });
+
+                }
+            }
+        }
+        else {
+
+            var wholeJsonList = [];
+            console.log(forms_);
+            console.log($('#AddRowFields').val());
+            console.log($('#AddRowFields').val(form))
+            $('#list-materials tbody tr').each(function () {
+                $(this).addClass("curChangeableRow"),
+               $(this).siblings().removeClass("curChangeableRow"),
+              $('.curChangeableRow').hide(),
+
+    wholeJsonList.push(
+        {
+
+            forms: forms_,
+            Grid: $('.AddRowFields').text(),
+            BomGridlst: '@Model.BomGridlst',
+            BomNo: $(this).find('span').html(),
+            Description: $(this).find('.Description').html(),
+            BuyerMasterId: $(this).find('.BuyerMasterId').html(),
+            BuyerModel: $(this).find('.BuyerModel').html(),
+            MeanSize: $(this).find('.MeanSize').html(),
+            Date: $(this).find('.Date').html(),
+            ParentBomNo: $(this).find('.ParentBomNo').html(),
+            LinkBomNo: $(this).find('.LinkBomNo').html(),
+            CommnBOM1: $(this).find('.CommnBOM1').html(),
+            MaterialCategoryMasterId: $(this).find('.MaterialCategoryMasterId').html(),
+            MaterialName: $(this).find('.MaterialName').html(),
+            MaterialGroupMasterId: $(this).find('.MaterialGroupMasterId').html(),
+            ColorMasterId: $(this).find('.ColorMasterId').html(),
+            SubstanceMasterId: $(this).find('.SubstanceMasterId').html(),
+            SampleNorms: $(this).find('.SampleNorms').html(),
+            Wastage: $(this).find('.Wastage').html(),
+            WastageQty: $(this).find('.WastageQty').html(),
+            WastageQtyUOM: $(this).find('.WastageQtyUOM').html(),
+            TotalNorms: $(this).find('.TotalNorms').html(),
+            TotalNormsUOM: $(this).find('.TotalNormsUOM').html(),
+            ComponentName: $(this).find('.ComponentName').html(),
+            BuyerNorms: $(this).find('.BuyerNorms').html(),
+            NoOfSets: $(this).find('.NoOfSets').html(),
+            UomMasterId: $(this).find('.UomMasterId').html(),
+            SupplierMasterId: $(this).find('.SupplierMasterId').html(),
+            SizeRangeMasterId: $(this).find('.SizeRangeMasterId').html(),
+            SizeScheduleMasterId: $(this).find('.SizeScheduleMasterId').html(),
+            OurNorms: $(this).find('.OurNorms').html(),
+            OurNormsPercent: $(this).find('.OurNormsPercent').html(),
+            PurchaseNorms: $(this).find('.PurchaseNorms').html(),
+            PurchaseNormsPercent: $(this).find('.PurchaseNormsPercent').html(),
+            IssueNorms: $(this).find('.IssueNorms').html(),
+            IssueNormsPercent: $(this).find('.IssueNormsPercent').html(),
+            CostingNorms: $(this).find('.CostingNorms').html(),
+            CostingNormsPercent: $(this).find('.CostingNormsPercent').html(),
+            PreparedBy: $(this).find('.PreparedBy').html(),
+            VerifiedBy: $(this).find('.VerifiedBy').html(),
+            CheckedBy: $(this).find('.CheckedBy').html(),
+
+        });
+            });
+
+            var wholeJsonListLength = wholeJsonList.length;
+
+            var i = 0;
+            for (i = 0; i <= wholeJsonListLength - 1; i++) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/BillOfMaterial/BillOfMaterialDetails',
+
+                    data: wholeJsonList[i],
+                    success: function (data) {
+                        if (data == true) {
+                            if ($("#BtnSave").val() == "Save") {
+                                alert('Saved Successfully.');
+
+                            }
+                            else {
+                                alert('Updated Successfully.');
+                            }
+
+                            location.href = "/BillOfMaterial/BOMMaterialListGrid";
+                            return false;
+                        }
+                        else {
+                            alert('Save process Failed.');
+                            location.href = "/BillOfMaterial/BOMMaterialListGrid";
+                            return false;
+                        }
+                    }
+                });
+            }
+        }
+
+    }
+    function DisplaySizeRange(){
+        debugger;
+        $("#sizeRangeTable > tbody").html("");
+        $('.loader-overlay').fadeIn('slow');
+        if($("#Displaycheck").is(":checked")==true && $('#SizeRangeMasterId').val()!=0) {
+            $.ajax({
+                type: "GET",
+                dataType: "JSON",
+                url: '@Url.Action("GetSizeRange", "BuyerOrderEntryForm")',
+                data: { SizeRangeMasterId: $('#SizeRangeMasterId').val() },
+                success: function (data) {
+                    $('.loader-overlay').fadeOut('fast');
+                    var count = 1;
+                    $('#sizeRangeTable tbody tr').each(function () {
+                        $(this).find("td:not(:first)").remove();
+                    });
+                    $("#sizeRangeTable").append("<tbody><tr><td>size</td></tr> <tr><td>Qty</td></tr></tbody>");
+                        for (var i = 0; i <= data.length-1; i++) {
+                        $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue"  > ' +data[i].SizeRangeRefValue+ ' </td> ');
+                        $('#sizeRangeTable tbody tr:last').append("<td > <input type='checkbox'name='size_chk' id='size_chk"+i+"' class='checked_checkbox' >  <label for='Production  for='size_chk"+i+"' style='' class='lbl-ch''></label> </td>");
+                        count++;
+                    }
+
+
+                
+
+                }
+            });
+        }
+        else
+        {
+            $('#sizeRangeTable tbody tr').each(function(){
+                $(this).find("td:not(:first)").remove();
+            });
+            $('.loader-overlay').fadeOut('fast');
+        }
+
+    }
+</script>
+<div class="Home_Jobworker_Master editable col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+
+    <div class="header_list_tab  col-lg-12 col-md-12 col-sm-12  col-xs-12">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+            <div class="list_tab">
+                <ul class="nav nav-tabs">
+                    <li class="active title">
+                        <a data-toggle="tab" href="#step1">Step 1</a>
+                    </li>
+                    <li class="title">
+                        <a data-toggle="tab" href="#step2">Step 2</a>
+                    </li>
+
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 block-section input_list_group material-tab">
+                <div class="tab-content">
+                    <div id="step1" class="tab-pane fade in active">
+                        <div class="row">
+                            <div class="col-md-11">
+
+                                <div class="col-md-12">
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        @if (Model != null && Model.BomId != 0)
+                                        {
+                                            <div class="input-group date ">
+                                                <label>Date</label>
+
+                                                @if (Model != null && Model.BomId != 0)
+                                                {
+                                                    var from = Model.Date;
+                                                    @Html.TextBoxFor(m => m.Date, new { @Value = from, @class = "form-control input-field" })
+                                                }
+
+                                                <span class="input-group-addon">
+                                                    <i class="glyphicon glyphicon-calendar"></i>
+                                                </span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="input-group date my_picker" data-date-format="mm/dd/yyyy">
+                                                <label>Date</label>
+                                                @Html.TextBoxFor(m => m.Date, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control filter-cal" })
+                                           
+                                                <span class="input-group-addon">
+                                                    <i class="glyphicon glyphicon-calendar"></i>
+                                                </span>
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>BOM No. (sketch No)</label>
+                                            @Html.TextBoxFor(m => m.BomNo, new { @class = "form-control input-field",placeholder = "Enter Text" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Description</label>
+                                            @Html.TextBoxFor(m => m.Description, new { @class = "form-control input-field",placeholder = "Enter Text" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Product Group (Buyer Name)</label>
+                                            @Html.DropDownListFor(x => x.BuyerMasterId, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "form-control input chosen-select" })
+
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Buyer Model</label>
+                                            @Html.DropDownListFor(x => x.BuyerModel, MMS.Web.ExtensionMethod.HtmlHelper.BuyerModel(), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Mean size</label>
+                                            @Html.DropDownListFor(x => x.MeanSize, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeValue(), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Parent BOM No</label>
+                                            @Html.DropDownListFor(x => x.ParentBomNo, MMS.Web.ExtensionMethod.HtmlHelper.GetBomNo(), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Last BOM No. Entered</label>
+                                            @Html.TextBoxFor(m => m.LastBomNoEntered, new { @class = "form-control text-field", @readonly = "true" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Link BOM yo this style/product</label>
+                                            @Html.DropDownListFor(m => m.LinkBomNo, Model.bomStyleList, "Please Select", new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Amendment</label>
+                                            @Html.HiddenFor(m => m.BOMAmendmentMaterialID)
+                                            @Html.HiddenFor(m => m.BomId)
+                                            @Html.HiddenFor(m => m.SNO)
+                                            @Html.HiddenFor(x => x.HiddenParentBOMID)
+                                            @{
+                                                if (Model != null && Model.amendmentmaterialList != null && Model.amendmentmaterialList.Count > 0)
+                                                {
+                                                    int count = 0;
+                                                    count = Model.amendmentmaterialList.Count();
+                                                    @Html.TextBoxFor(m => count, new { @class = "form-control input-field", placeholder = "enter text", @readonly = true })
+                                                }
+                                                else
+                                                {
+                                                    @Html.TextBoxFor(m => m.Ammendment, new { @class = "form-control input-field", placeholder = "enter text" })
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Common BOM No</label>
+                                            @Html.DropDownListFor(x => x.CommnBOM1, MMS.Web.ExtensionMethod.HtmlHelper.GetBomNo(), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>&nbsp;</label>
+                                            @Html.DropDownListFor(x => x.CommnBOM2, MMS.Web.ExtensionMethod.HtmlHelper.Bom(), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>&nbsp;</label>
+                                            @Html.DropDownListFor(x => x.CommnBOM3, MMS.Web.ExtensionMethod.HtmlHelper.Bom(), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>&nbsp;</label>
+                                            @Html.DropDownListFor(m => m.CommnBOM4, MMS.Web.ExtensionMethod.HtmlHelper.Bom(), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>&nbsp;</label>
+                                            @Html.DropDownListFor(m => m.CommnBOM5, MMS.Web.ExtensionMethod.HtmlHelper.Bom(), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-11">
+                                <div class="col-md-12">
+                                    <div class="col-md-12">
+                                        <h3>Material Cateogory</h3>
+                                    </div>
+
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Material Cateogory</label>
+                                            @Html.DropDownListFor(m => m.MaterialCategoryMasterId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Material Group</label>
+                                            @Html.DropDownListFor(m => m.MaterialGroupMasterId, MMS.Web.ExtensionMethod.HtmlHelper.MaterialGroupName(), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Substance</label>
+                                            @Html.DropDownListFor(m => m.SubstanceMasterId, MMS.Web.ExtensionMethod.HtmlHelper.SubstanceRange(), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Color</label>
+                                            @Html.DropDownListFor(m => m.ColorMasterId, MMS.Web.ExtensionMethod.HtmlHelper.ColourName(), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 input-blk">
+                                        @Html.HiddenFor(m => m.AddRowFields)
+                                        @Html.HiddenFor(m => m.BOMMaterialID)
+                                        <div class="form-group">
+                                            <label>Material Name</label>
+                                            @Html.DropDownListFor(m => m.MaterialName, MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName(), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="col-lg-2 col-md-2 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>
+                                                M
+                                                <sup>2</sup>conversion
+                                            </label>
+                                            @Html.TextBoxFor(m => m.Conversion, new { @class = "form-control input-field", @onkeypress = "return isNumberKey(event)", placeholder = "enter text" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Total Norms</label>
+                                            @Html.TextBoxFor(m => m.TotalNorms, new { @class = "form-control input-field", @onkeypress = "return isNumberKey(event)", placeholder = "enter text" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Buyer Norms</label>
+                                            @Html.TextBoxFor(m => m.BuyerNorms, new { @class = "form-control input-field", @onkeypress = "return isNumberKey(event)", placeholder = "enter text" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>UOM</label>
+                                            @Html.DropDownListFor(m => m.WastageQtyUOM, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>No of SET's</label>
+                                            @if (Model != null && Model.BomId != 0)
+                                            {
+                                                @Html.TextBoxFor(m => m.NoOfSets, new { @class = "form-control input-field", @onkeypress = "return isNumberKey(event)" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.NoOfSets, new { @class = "form-control input-field", @Value = "1", @onkeypress = "return isNumberKey(event)" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Sample Norms</label>
+                                            @Html.TextBoxFor(m => m.SampleNorms, new { @class = "form-control input-field ", @onkeypress = "return isNumberKey(event)", placeholder = "enter value" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Mat. supply By</label>
+                                            @Html.DropDownListFor(m => m.SupplierMasterId, new SelectList(
+                                                            new List<Object>
+                                                                {
+                                                                new { value = 0 , text = "Please Select"  },
+                                                                new { value = 1 , text = "Buyer"  },
+                                                                new { value = 2 , text = "Enco" }
+
+                                                                },
+                                                                "value",
+                                                                "text",
+                                                                0), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Size Match</label>
+                                            @Html.DropDownListFor(m => m.SizeScheduleMasterId, MMS.Web.ExtensionMethod.HtmlHelper.SizeScheduleMaster(), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-12 input-blk">
+                                        <div class="form-group">
+                                            <label>Size Schedule</label>
+                                            @Html.DropDownListFor(m => m.SizeRangeMasterId, MMS.Web.ExtensionMethod.HtmlHelper.SizeRangeMaster(), new { @class = "form-control input chosen-select" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="transaction_bom_check checkbox-option">
+                                    <form action="#">
+                                        <span>
+                                            <div class="form-group checkbox_tax">
+                                                <input type="checkbox" id="Displaycheck" onclick="DisplaySizeRange()">
+                                                <label for="Displaycheck">Display size Range</label>
+                                            </div>
+                                        </span>
+                                        <span>
+                                            <div class="form-group checkbox_tax">
+                                                <input type="checkbox" id="SelectAll">
+                                                <label for="SelectAll">Select All</label>
+                                            </div>
+                                        </span>
+                                    </form>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="production_jobwork_tbl col-md-12">
+                                        <table id="sizeRangeTable" cellpadding="0" cellspacing="0" border="1" width="100%">
+                                            @*<tbody>
+                        <tr>
+                            <td>size</td>
+
+                        </tr>
+                        <tr>
+                            <td>Qty</td>
+
+                        </tr>
+                    </tbody>*@
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 no-padding">
+                                    <div class="transaction_bom_check checkbox-option">
+
+                                        <span>
+                                            <div class="form-group checkbox_tax">
+                                                <span class="check_lbl">If multiple component for this material</span>
+                                                <input type="checkbox" id="component">
+                                                <label for="component">components</label>
+
+
+
+
+                                            </div>
+
+                                        </span>
+
+                                    </div>
+                                </div>
+                                <button class="btn violet-btn" style="background-color:#16a085;color: #ffffff;" onclick="comp()"id="">Add Component </button>
+
+
+                                <button class="btn violet-btn" style="background-color:#16a085;color: #ffffff;" onclick="editadd()">Add Material </button>
+
+                            </div>
+                            <div class="col-md-12">
+                                <div class="col-lg-7 col-md-12">
+                                    <div class="add-comp-material col-sm-12">
+                                        <h3>List the Components (Multiple component)</h3>
+
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction_bom_tbl">
+                                        <div id="no-more-tables" class="col-xs-12 no-padding">
+                                            <table class="col-md-12 table-striped table-condensed cf table-change home_dahboard" id="Addrowfields">
+                                                <thead>
+                                                    <tr id="GetData">
+                                                        <th>Si.No</th>
+                                                        <th>Component</th>
+                                                        <th>Length</th>
+                                                        <th>Width</th>
+                                                        <th>nos</th>
+                                                        <th>Sample Norms</th>
+                                                        <th>Wastage %</th>
+                                                        <th>Wastage Qty</th>
+                                                        <th>Total Norms</th>
+                                                        <th>Delete</th>
+                                                    </tr>
+                                                </thead>
+                                                    @if (Model != null && Model.bomGridList != null && Model.bomGridList.Count > 0)
+                                                    {
+                                                        foreach (BomGrid bom in Model.bomGridList)
+                                                        {
+                                                        <tbody class="common-table-head">
+                                                            <tr id='appendvalue1' class='test'>
+                                                                <td>
+
+                                                                    <input type="hidden" id="bomGridId" value="@bom.BomGridId">
+                                                                    <input type='text' id='Sno' value="@bom.Sno" disabled='disabled' />
+                                                                </td>
+                                                                <td>
+                                                                    <input type='text' id='Component' class="Component" value="@bom.Component" />
+                                                                </td>
+                                                                <td>
+                                                                    <input type='text' id='Length' class="Length" value="@bom.Length" onkeypress="isNumberKey(event)" />
+                                                                </td>
+                                                                <td>
+                                                                    <input type='text' id='Width' class="Width" value="@bom.Width" onkeypress="isNumberKey(event)" />
+                                                                </td>
+                                                                <td>
+                                                                    <input type='text' id='Nos' class="Nos" value="@bom.Nos" onkeypress="isNumberKey(event)" />
+                                                                </td>
+                                                                <td>
+                                                                    <input type='text' id='SampleNorms' class="SampleNorms" onkeypress="isNumberKey(event)" value="@bom.SampleNorms" />
+                                                                </td>
+                                                                <td>
+                                                                    <input type='text' id='WastagePercent' class="WastagePercent" onkeypress="isNumberKey(event)" value="@bom.WastagePercent" />
+                                                                </td>
+                                                                <td>
+                                                                    <input type='text' id='WastageQty' class="WastageQty" onkeypress="isNumberKey(event)" value="@bom.WastageQtyGrid" />
+                                                                </td>
+                                                                <td>
+                                                                    <input type='text' id='TotalNormsQty' class="TotalNormsQty" onkeypress="isNumberKey(event)" value="@bom.TotalNormsQty" />
+                                                                </td>
+                                                                <td>
+                                                                    <button type="button" class="remove-button" onkeypress="isNumberKey(event)" data-id='@bom.BomGridId'>Delete</button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                        }
+                                                    }
+
+
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5 col-md-12 norms_forms">
+                                    <h3>Set norms with sample forms</h3>
+                                    <div class="col-md-12 no-padding forms-blk">
+                                        <div class="col-sm-5 no-padding">
+                                            <label>Our Norms/sample Norms</label>
+                                        </div>
+                                        <div class="col-sm-4 select_percent">
+                                            @Html.DropDownListFor(m => m.OurNorms, new SelectList(
+                                                                    new List<Object>
+                                                                        {
+                                                                        new { value = 0 , text = "Please Select"  },
+                                                                        new { value = 1 , text = "Increase" },
+                                                                        new { value = 2 , text = "Decrease" },
+                                                                        new { value = 3 , text = "Same" }
+                                                                        },
+                                                                        "value",
+                                                                        "text",
+                                                                        0), new { @class = "form-control text-field ", style = "  width: 80px;" })
+                                            <span>%</span>
+                                        </div>
+                                        <div class="col-sm-3 no-padding">
+                                            @Html.TextBoxFor(m => m.OurNormsPercent, new { @class = "form-control input-field ", @placeholder = "0.2558" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 no-padding forms-blk">
+                                        <div class="col-sm-5 no-padding">
+                                            <label>Purchase Norms</label>
+                                        </div>
+                                        <div class="col-sm-4 select_percent">
+                                            @Html.DropDownListFor(m => m.PurchaseNorms, new SelectList(
+                                                                    new List<Object>
+                                                                        {
+                                                                        new { value = 0 , text = "Please Select"  },
+                                                                        new { value = 1 , text = "Increase" },
+                                                                        new { value = 2 , text = "Decrease" },
+                                                                        new { value = 3 , text = "Same" }
+
+                                                                        },
+                                                                        "value",
+                                                                        "text",
+                                                                        0), new { @class = "form-control text-field ", style = "  width: 80px;" })
+                                            <span>%</span>
+                                        </div>
+                                        <div class="col-sm-3 no-padding">
+                                            @Html.TextBoxFor(m => m.PurchaseNormsPercent, new { @class = "form-control input-field ", @placeholder = "0.2558" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 no-padding forms-blk">
+                                        <div class="col-sm-5 no-padding">
+                                            <label>Issue Norms</label>
+                                        </div>
+                                        <div class="col-sm-4 select_percent">
+                                            @Html.DropDownListFor(m => m.IssueNorms, new SelectList(
+                                                                    new List<Object>
+                                                                        {
+                                                                        new { value = 0 , text = "Please Select"  },
+                                                                        new { value = 1 , text = "Increase" },
+                                                                        new { value = 2 , text = "Decrease" },
+                                                                        new { value = 3 , text = "Same" }
+
+                                                                        },
+                                                                        "value",
+                                                                        "text",
+                                                                        0), new { @class = "form-control text-field ", style = "  width: 80px;" })
+
+
+                                            <span>%</span>
+                                        </div>
+                                        <div class="col-sm-3 no-padding">
+                                            @Html.TextBoxFor(m => m.IssueNormsPercent, new { @class = "form-control input-field ", @placeholder = "0.2558" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 no-padding forms-blk">
+                                        <div class="col-sm-5 no-padding">
+                                            <label>Costing Norms</label>
+                                        </div>
+                                        <div class="col-sm-4 select_percent">
+                                            @Html.DropDownListFor(m => m.CostingNorms, new SelectList(
+                                                                    new List<Object>
+                                                                        {
+                                                                        new { value = 0 , text = "Please Select"  },
+                                                                        new { value = 1 , text = "Increase" },
+                                                                        new { value = 2 , text = "Decrease" },
+                                                                        new { value = 3 , text = "Same" }
+
+                                                                        },
+                                                                        "value",
+                                                                        "text",
+                                                                        0), new { @class = "form-control text-field ", style = "  width: 80px;" })
+                                            <span>%</span>
+                                        </div>
+                                        <div class="col-sm-3 no-padding">
+                                            @Html.TextBoxFor(m => m.CostingNormsPercent, new { @class = "form-control text-field ", @placeholder = "0.2558" })
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="" id="MaterialListGrid">
+                            @{Html.RenderPartial("~/Views/Jobwork/Job_Master/BOM/Partial/Bom_Detail_grid.cshtml", Model);}
+
+                        </div>
+
+
+                    </div>
+                    <!--second-->
+                    <div id="step2" class="tab-pane fade">
+                        <h3>List of Amended Material</h3>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding tab-table">
+                            <div id="no-more-tables" class="col-xs-12 no-padding">
+                                <table class="col-md-12 table-striped table-condensed cf table-change home_dahboard">
+                                    <thead>
+                                        <tr>
+                                            <th>SL No</th>
+                                            <th>Cateogory Name</th>
+                                            <th>Material Name</th>
+                                            <th>Group Name</th>
+                                            <th>Color</th>
+                                            <th>Substance Name</th>
+                                            <th>Sample Name</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="common-table-head">
+                                        <tr>
+                                            <td data-title="No">01</td>
+                                            <td data-title="Cateogory Name">Lorem</td>
+                                            <td data-title="Material Name">Lorem Ipsum </td>
+                                            <td data-title="Group Name">Lorem Ipsum </td>
+                                            <td data-title="Color">Blue</td>
+                                            <td data-title="Substance Name">NA</td>
+                                            <td data-title="Sample Name">Wetblue</td>
+                                            <td data-title="Action">
+                                                <span class="action-icons">
+                                                    @*<img src="images/edit.png" class="mCS_img_loaded">
+                                                    <img src="images/delete.png" class="mCS_img_loaded">*@
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td data-title="No">01</td>
+                                            <td data-title="Cateogory Name">Lorem</td>
+                                            <td data-title="Material Name">Lorem Ipsum </td>
+                                            <td data-title="Group Name">Lorem Ipsum </td>
+                                            <td data-title="Color">Blue</td>
+                                            <td data-title="Substance Name">NA</td>
+                                            <td data-title="Sample Name">Wetblue</td>
+                                            <td data-title="Action">
+                                                <span class="action-icons">
+                                                    @*<img src="images/edit.png" class="mCS_img_loaded">
+                                                    <img src="images/delete.png" class="mCS_img_loaded">*@
+                                                </span>
+                                            </td>
+                                        </tr>
+                                       
+                                        <tr>
+                                            <td data-title="No">01</td>
+                                            <td data-title="Cateogory Name">Lorem</td>
+                                            <td data-title="Material Name">Lorem Ipsum </td>
+                                            <td data-title="Group Name">Lorem Ipsum </td>
+                                            <td data-title="Color">Blue</td>
+                                            <td data-title="Substance Name">NA</td>
+                                            <td data-title="Sample Name">Wetblue</td>
+                                            <td data-title="Action">
+                                                <span class="action-icons">
+                                                    @*<img src="images/edit.png" class="mCS_img_loaded">
+                                                    <img src="images/delete.png" class="mCS_img_loaded">*@
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td data-title="No">01</td>
+                                            <td data-title="Cateogory Name">Lorem</td>
+                                            <td data-title="Material Name">Lorem Ipsum </td>
+                                            <td data-title="Group Name">Lorem Ipsum </td>
+                                            <td data-title="Color">Blue</td>
+                                            <td data-title="Substance Name">NA</td>
+                                            <td data-title="Sample Name">Wetblue</td>
+                                            <td data-title="Action">
+                                                <span class="action-icons">
+                                                    @*<img src="images/edit.png" class="mCS_img_loaded">
+                                                    <img src="images/delete.png" class="mCS_img_loaded">*@
+                                                </span>
+                                            </td>
+                                        </tr>
+                                     
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="col-md-12 init_action material-footr-btn">
+        <button class="btn meadow-btn">Close</button>
+        <button class="btn meadow-btn notify">Notify Msg/MSS</button>
+        <button class="btn meadow-btn">Excel</button>
+        <button class="btn meadow-btn">Setup</button>
+        <button class="btn meadow-btn">Preview</button>
+        <button class="btn meadow-btn">Print</button>
+        <button class="btn meadow-btn">Delete</button>
+        <button class="btn meadow-btn">Clear</button>
+        <button class="btn meadow-btn">Update</button>
+    </div>
+</div>
+
+
+<script src="~/Scripts/Jobwork/js/datepicker.min.js"></script>
+<script src="~/Scripts/Jobwork/js/custom_script.js"></script>
+<script src="~/Scripts/moment.js"></script>
+
+<script>
+    $(document).ajaxStart(function () {
+        $(".loader-overlay").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function () {
+        $(".loader-overlay").css("display", "none");
+    });
+    //$(window).load(function () {
+    //    $('.loader-overlay').fadeOut('fast');
+    //});
+ 
+
+    function isNumberKey(evt) {
+
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode != 46 && charCode > 31
+          && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+    $("#Conversion").on("change", function () {
+        var Total_buyerNormsPercentage = 0.00;
+        var style = $('#Conversion').val();
+        if (style != "") {
+            var ConvertedNorms = parseFloat(style) * 10.76;
+            ConvertedNorms = ConvertedNorms.toFixed(4);
+            var ourNormsPercentage = $("#OurNormsPercent").val();
+            var buyerNormsPercentage = ((parseFloat(ConvertedNorms) / 100) * parseFloat(ourNormsPercentage));
+            $('#BuyerNorms').val(ConvertedNorms);
+            if ($('#OurNorms option:selected').text().trim() == "Increase") {
+                Total_buyerNormsPercentage = parseFloat(ConvertedNorms) + parseFloat(buyerNormsPercentage);
+                $('#TotalNorms').val(Total_buyerNormsPercentage.toFixed(4));
+            }
+            else if ($('#OurNorms option:selected').text().trim() == "Decrease") {
+                Total_buyerNormsPercentage = parseFloat(ConvertedNorms) - parseFloat(buyerNormsPercentage);
+                $('#TotalNorms').val(Total_buyerNormsPercentage.toFixed(4));
+            }
+        }
+    });
+    $("#SampleNorms").on("change", function () {
+        var Total_buyerNormsPercentage = 0.00;
+        var style = $('#Conversion').val();
+        if (style != "") {
+            var ConvertedNorms = parseFloat(style) * 10.76;
+            ConvertedNorms = ConvertedNorms.toFixed(4);
+            var ourNormsPercentage = $("#OurNormsPercent").val();
+            var buyerNormsPercentage = ((parseFloat(ConvertedNorms) / 100) * parseFloat(ourNormsPercentage));
+            $('#BuyerNorms').val(ConvertedNorms);
+            if ($('#OurNorms option:selected').text().trim() == "Increase") {
+                Total_buyerNormsPercentage = parseFloat(ConvertedNorms) + parseFloat(buyerNormsPercentage);
+                $('#TotalNorms').val(Total_buyerNormsPercentage.toFixed(4));
+            }
+            else if ($('#OurNorms option:selected').text().trim() == "Decrease") {
+                Total_buyerNormsPercentage = parseFloat(ConvertedNorms) - parseFloat(buyerNormsPercentage);
+                $('#TotalNorms').val(Total_buyerNormsPercentage.toFixed(4));
+            }
+        }
+    });
+    $("#TotalNorms").on("change", function () {
+
+        if($("#MaterialCategoryMasterId option:selected").text()=="Leathers")
+        {
+
+        }
+        else{
+            $("#Conversion").val('');
+            $("#BuyerNorms").val('');
+        }
+
+    });
+    $("#BuyerNorms").on("change", function () {
+
+        var Total_buyerNormsPercentage = 0.00;
+        var ConvertedNorms = $('#BuyerNorms').val();
+        if (ConvertedNorms != "") {
+            $('#TotalNorms').val('');
+            var ourNormsPercentage = $("#OurNormsPercent").val();
+            var buyerNormsPercentage = ((parseFloat(ConvertedNorms) / 100) * parseFloat(ourNormsPercentage));
+            if ($('#OurNorms option:selected').text().trim() == "Increase") {
+                Total_buyerNormsPercentage = parseFloat(ConvertedNorms) + parseFloat(buyerNormsPercentage);
+                $('#TotalNorms').val(Total_buyerNormsPercentage.toFixed(4));
+            }
+            else if ($('#OurNorms option:selected').text().trim() == "Decrease") {
+                Total_buyerNormsPercentage = parseFloat(ConvertedNorms) - parseFloat(buyerNormsPercentage);
+                $('#TotalNorms').val(Total_buyerNormsPercentage.toFixed(4));
+            }
+        }
+    });
+    $("#IssueNormsPercent").on("change", function () {
+        var endurea= "@(System.Configuration.ConfigurationManager.AppSettings["EnduraURL"].ToString())";
+
+        if(hostname==endurea)
+        {
+            var Total_buyerNormsPercentage =0;
+            var norms=  $("#IssueNormsPercent").val();
+            var buyernorms=  $("#BuyerNorms").val();
+            var buyerNormsPercentage = ((parseFloat(buyernorms) / 100) * parseFloat(norms));
+            if ($('#IssueNorms option:selected').text().trim() == "Increase") {
+                Total_buyerNormsPercentage = parseFloat(buyernorms) + parseFloat(buyerNormsPercentage);
+                $('#TotalNorms').val(Total_buyerNormsPercentage.toFixed(4));
+            }
+            else if ($('#IssueNorms option:selected').text().trim() == "Decrease") {
+                Total_buyerNormsPercentage = parseFloat(buyernorms) - parseFloat(buyerNormsPercentage);
+                $('#TotalNorms').val(Total_buyerNormsPercentage.toFixed(4));
+            }
+            else if ($('#IssueNorms option:selected').text().trim() == "Same") {
+                $('#TotalNorms').val(parseFloat(buyernorms).toFixed(4));
+            }
+        }
+
+
+
+    });
+    $("#BomNo").on("change", function () {
+        var style = $('#BomNo').val();
+        var letterNumber = /^[a-zA-Z-,]+(\s{0,1}[a-zA-Z-, ])*$/;
+        if((style.match(letterNumber)))
+        {
+            $('#Description').val(style);
+            $("#LinkBomNo").val("");
+            $("#LinkBomNo").prop('disabled', true);
+        }
+        else{
+            $("#LinkBomNo").prop('disabled', false);
+            $.ajax({
+                type: 'GET',
+                url: ' @Url.Action("CheckBomNo", "BillOfMaterial")',
+                data: { BomNo: style },
+                success: function (data) {
+                    if (data.Message == "Already Existed") {
+                        $('#Description').val(style);
+                        $("#LinkBomNo").val("");
+                        $("#add-Material").hide();
+                        $("#BtnSave").hide();
+                        alert("Already Existed please try another BOM.");
+                        return false;
+                    }
+                    else {
+                        if (data.productStyleMaster != null) {
+                            $("#LinkBomNo").val(data.productStyleMaster.ProductOrBuyerStyleId);
+                        }
+                        else {
+                            $("#LinkBomNo").val("");
+                        }
+                        $('#Description').val(style);
+                        $("#add-Material").show();
+                        $("#BtnSave").show();
+                    }
+
+                },
+            });
+        }
+    });
+    $(function () {
+
+        $("#SelectAll").click(function(){
+            if (this.checked == false) {
+                $('.checked_checkbox:checked').attr('checked', false);
+            }
+            else {
+                $('.checked_checkbox:not(:checked)').attr('checked', true);
+            }
+
+        });
+    });
+    $("#MaterialCategoryMasterId").on("change", function () {
+        var MaterialCategoryMasterId_ = $('#MaterialCategoryMasterId').val();
+        $.ajax({
+            url: '/MaterialMaster/FillCateogoryid',
+            type: "GET",
+            dataType: "JSON",
+            data: { MaterialCategoryMasterId: MaterialCategoryMasterId_ },
+            success: function (cities) {
+                $("#MaterialGroupMasterId").html(""); // clear before appending new list
+                $.each(cities, function (i, city) {
+                    $("#MaterialGroupMasterId").append(
+                        $('<option></option>').val(city.MaterialGroupMasterId).html(city.GroupName));
+                }).trigger('chosen:updated');
+            }
+        });
+    
+    });
+    $("#MaterialCategoryMasterId").on("change", function () {
+      
+            var MaterialGroupMasterId_ = $('#MaterialGroupMasterId').val();
+            var groupname=  $('#MaterialGroupMasterId option:selected').text();
+            $.ajax({
+                url: '/MaterialMaster/FillMaterialName',
+                type: "GET",
+                dataType: "JSON",
+                data: { MaterialGroupMasterId: MaterialGroupMasterId_ },
+                success: function (cities) {
+                    hostname="";
+                    hostname="http://"+cities.host;
+                    var endurea= "@(System.Configuration.ConfigurationManager.AppSettings["EnduraURL"].ToString())";
+
+                    if (cities.IsSubstance == true) {
+                        $("#SubstanceMasterId").prop('disabled', false);
+                    }
+                    else {
+                        $("#SubstanceMasterId").prop('disabled', true);
+                        $('#SubstanceMasterId').val("");
+                    }
+                    if (cities.IsSize == false) {
+                        $("#SizeRangeMasterId").prop('disabled', true);
+                        $("#SizeScheduleMasterId").prop('disabled', true);
+                        $("#SizeRangeMasterId").val("");
+                        $("#SizeScheduleMasterId").val("");
+                    }
+                    else {
+                        $("#SizeRangeMasterId").prop('disabled', false);
+                        $("#SizeScheduleMasterId").prop('disabled', false);
+                    }
+                    if (cities.normDetails != null && cities.normDetails.BuyerNameid == parseInt($('#BuyerMasterId').val())) {
+                        $('#TotalNorms').val("");
+                        $("#OurNormsPercent").prop("disabled", true);
+                        $("#CostingNormsPercent").prop("disabled", true);
+                        $("#PurchaseNormsPercent").prop("disabled", true);
+                        $("#IssueNormsPercent").prop("disabled", true);
+
+                        $("#OurNorms").val(cities.normDetails.OurNorms);
+                        $("#OurNormsPercent").val(cities.normDetails.NormsPercentage);
+
+                        $("#PurchaseNorms").val(cities.normDetails.PurchaseNormsid);
+                        $("#PurchaseNormsPercent").val(cities.normDetails.NormsPercentage1);
+
+                        $("#IssueNorms").val(cities.normDetails.IssueNormsid);
+                        $("#IssueNormsPercent").val(cities.normDetails.NormsPercentage2);
+
+                        $("#CostingNorms").val(cities.normDetails.CostingNorms);
+                        $("#CostingNormsPercent").val(cities.normDetails.NormsPercentage3);
+                        if (cities.normDetails.BuyerOption == 1) {
+                            $("#Conversion").prop("disabled", false);
+
+
+                            $("#BuyerNorms").prop("disabled", false);
+                            $("#TotalNorms").prop("disabled", true);
+                            $("#SampleNorms").prop("disabled", true);
+                            var ourNormsPercentage = $("#OurNormsPercent").val();
+                            var BuyerNorms = $('#BuyerNorms').val();
+                            var buyerNormsPercentage = ((parseFloat(ConvertedNorms) / 100) * parseFloat(ourNormsPercentage));
+                            if ($('#OurNorms option:selected').text().trim() == "Increase") {
+                                Total_buyerNormsPercentage = parseFloat(ConvertedNorms) + parseFloat(buyerNormsPercentage);
+                                $('#TotalNorms').val(Total_buyerNormsPercentage.toFixed(4));
+                            }
+                            else if ($('#OurNorms option:selected').text().trim() == "Decrease") {
+                                Total_buyerNormsPercentage = parseFloat(ConvertedNorms) - parseFloat(buyerNormsPercentage);
+                                $('#TotalNorms').val(Total_buyerNormsPercentage.toFixed(4));
+                            }
+                            $('#TotalNorms').val("");
+                        }
+                        else if (cities.normDetails.BuyerOption == 2) {
+                            $('#TotalNorms').val("");
+                            $("#SampleNorms").prop("disabled", false);
+                            var ourNormsPercentage = $("#OurNormsPercent").val();
+                            var ConvertedNorms = $('#SampleNorms').val();
+                            if (ConvertedNorms != "") {
+                                var buyerNormsPercentage = ((parseFloat(ConvertedNorms) / 100) * parseFloat(ourNormsPercentage));
+                                $("#BuyerNorms").val(buyerNormsPercentage.toFixed(4));
+                                if ($('#OurNorms option:selected').text().trim() == "Increase") {
+                                    Total_buyerNormsPercentage = parseFloat(ConvertedNorms) + parseFloat(buyerNormsPercentage);
+                                    $('#TotalNorms').val(Total_buyerNormsPercentage.toFixed(4));
+                                }
+                                else if ($('#OurNorms option:selected').text().trim() == "Decrease") {
+                                    Total_buyerNormsPercentage = parseFloat(ConvertedNorms) - parseFloat(buyerNormsPercentage);
+                                    $('#TotalNorms').val(Total_buyerNormsPercentage.toFixed(4));
+                                }
+                            }
+                            $("#TotalNorms").prop("disabled", true);
+                            if(hostname!=null &&hostname==endurea &&groupname=="Upper Leather")
+                            {
+                                $("#BuyerNorms").prop("disabled", false);
+                            }
+                            else
+                            {
+                                $("#BuyerNorms").prop("disabled", true);
+                            }
+
+                        }
+                        else if (cities.normDetails.BuyerOption == 3) {
+
+                            $("#BuyerNorms").val("");
+                            $("#Conversion").prop("disabled", true);
+                            $("#SampleNorms").prop("disabled", true);
+                            if(hostname!=null &&hostname==endurea &&groupname=="Upper Leather")
+                            {
+
+                                $("#BuyerNorms").prop("disabled", false);
+                            }
+                            else
+                            {
+                                $("#BuyerNorms").prop("disabled", true);
+                            }
+                            $("#TotalNorms").prop("disabled", false);
+                        }
+                    }
+                    else if (cities.normDetails != null && cities.normDetails.BuyerNameid != parseInt($('#BuyerMasterId').val())) {
+
+                        $("#BuyerNorms").val("");
+                        $("#SampleNorms").val("");
+                        $("#Conversion").prop("disabled", true);
+                        $("#SampleNorms").prop("disabled", true);
+                        $("#TotalNorms").prop("disabled", false);
+                        if(hostname!=null && hostname==endurea && groupname=="Upper Leather")
+                        {
+                            $("#BuyerNorms").prop("disabled", false);
+                        }
+                        else
+                        {
+                            $("#BuyerNorms").prop("disabled", true);
+                        }
+
+                    }
+                    else if (cities.normDetails == null) {
+
+                        $("#BuyerNorms").val("");
+                        $("#SampleNorms").val("");
+                        $("#Conversion").prop("disabled", true);
+                        $("#SampleNorms").prop("disabled", true);
+                        $("#TotalNorms").prop("disabled", false);
+                        if(hostname!=null&&hostname==endurea && groupname=="Upper Leather")
+                        {
+                            $("#BuyerNorms").prop("disabled", false);
+                        }
+                        else
+                        {
+                            $("#BuyerNorms").prop("disabled", true);
+                        }
+                    }
+                    if(hostname!=null &&hostname==endurea && groupname=="Upper Leather")
+                    {
+                        $("#BuyerNorms").prop("disabled", false);
+                    }
+                    else
+                    {
+                        $("#BuyerNorms").prop("disabled", true);
+                    }
+                    $("#MaterialName").html(""); // clear before appending new list
+                    $.each(cities.Material, function (i, city) {
+                        $("#MaterialName").append(
+                            $('<option></option>').val(city.Value).html(city.Text));
+                    });
+                }
+            });
+        
+    });
+    $("#MaterialName").on("change", function (){
+        
+            debugger;
+            var MaterialGroupMasterId_ = $('#BuyerMasterId').val();
+            if(MaterialGroupMasterId_==""||MaterialGroupMasterId_==0)
+            {
+                $('#MaterialName').val("").trigger('chosen:updated');
+                alert("Please select buyername");
+                return false;
+            }
+            var materialId = $('#MaterialName').val();
+            $.ajax({
+                url: '/MaterialMaster/FillMaterialNameBasedonColor',
+                type: "GET",
+                dataType: "JSON",
+                data: { MaterialNameID: materialId,buyername:$("#BuyerMasterId").val() },
+                success: function (cities) {
+                    if(cities.norms!=null)
+                    {
+
+                        $("#OurNorms").val(cities.norms.OurNorms);
+                        $("#OurNormsPercent").val(cities.norms.NormsPercentage);
+                        $("#PurchaseNorms").val(cities.norms.PurchaseNormsid);
+                        $("#PurchaseNormsPercent").val(cities.norms.NormsPercentage1);
+                        $("#IssueNorms").val(cities.norms.IssueNormsid);
+                        $("#IssueNormsPercent").val(cities.norms.NormsPercentage2);
+                        $("#CostingNorms").val(cities.norms.CostingNorms);
+                        $("#CostingNormsPercent").val(cities.norms.NormsPercentage3);
+                    }
+                    $.each(cities.distinctList, function (i, city) {
+
+                        if($('#SubstanceMasterId').prop('disabled')==false)
+                        {
+                            $('#SubstanceMasterId').val(city.SubstanceMasterId);
+                        }
+                        else{
+                            $('#SubstanceMasterId').prop('disabled',true);
+                        }
+                        $('#MaterialCategoryMasterId').val(city.MaterialCategoryMasterId).trigger('chosen:updated');
+                        $('#MaterialGroupMasterId').val(city.MaterialGroupMasterId).trigger('chosen:updated');
+                        document.getElementById("ColorMasterId").disabled = true;
+                        if (city.SizeRangeMasterId != null && city.SizeRangeMasterId != 0 && $('#SizeRangeMasterId').prop('disabled') == false) {
+                            $('#SizeRangeMasterId').val(city.SizeRangeMasterId).trigger('chosen:updated');
+                        }
+                        else if (city.SizeRangeMasterId==null||city.SizeRangeMasterId==0) {
+                            $("#SizeRangeMasterId").prop('disabled', true).trigger('chosen:updated');
+                            $("#SizeScheduleMasterId").prop('disabled', true).trigger('chosen:updated');
+                            $("#SizeRangeMasterId").val("").trigger('chosen:updated').trigger('chosen:updated');
+                            $("#SizeScheduleMasterId").val("").trigger('chosen:updated').trigger('chosen:updated');
+                        }
+                        else {
+                            $("#SizeRangeMasterId").prop('disabled', false).trigger('chosen:updated');
+                            $("#SizeScheduleMasterId").prop('disabled', false).trigger('chosen:updated');
+                        }
+                        $('#ColorMasterId').val(city.ColorMasterId).trigger('chosen:updated');
+                        $('#WastageQtyUOM').val(city.Uom).trigger('chosen:updated');
+                    });
+                    if(cities.materialCategoryMaster!=null && cities.materialCategoryMaster.CategoryName=="Leathers")
+                    {
+                        $("#Conversion").prop("disabled", false);
+                        $("#BuyerNorms").prop("disabled", false);
+                        $("#TotalNorms").prop("disabled", false);
+                        $("#SampleNorms").prop("disabled", true);
+                        $("#SizeRangeMasterId").prop('disabled', true).trigger('chosen:updated');
+                        $("#SizeScheduleMasterId").prop('disabled', true).trigger('chosen:updated');
+                        $("#SizeRangeMasterId").val("").trigger('chosen:updated');
+                        $("#SizeScheduleMasterId").val("").trigger('chosen:updated');
+                        $('#SubstanceMasterId').prop('disabled', true).trigger('chosen:updated');
+                        $('#SubstanceMasterId').val(cities.SubstanceMasterId).trigger('chosen:updated');
+                    }
+                    else{
+                        $("#Conversion").prop("disabled", true);
+                        $("#BuyerNorms").prop("disabled", false);
+                        $("#TotalNorms").prop("disabled", false);
+                        $("#SampleNorms").prop("disabled", true);
+                        $("#SizeRangeMasterId").prop('disabled', false).trigger('chosen:updated');
+                        $("#SizeScheduleMasterId").prop('disabled', false).trigger('chosen:updated');
+                        $('#SubstanceMasterId').prop('disabled', true).trigger('chosen:updated');
+                    }
+                }
+            });
+        
+
+    });
+    //$(document).on('click', '#editadd', function () {
+    //    alert("ss");
+    //});
+   
+     
+    function editadd() {
+        debugger;
+        var sno = "";
+        sno = $('.bommaterialtable tr').find('.SNO').length;
+        sno++;
+        var hiddenSno = $("#SNO").val();
+        if (hiddenSno != 0) {
+            sno = hiddenSno;
+        }
+        var style = $('#BomNo').val();
+        var letterNumber = /^[a-zA-Z-,]+(\s{0,1}[a-zA-Z-, ])*$/;
+        if ((style.match(letterNumber))) {
+            $('#Description').val(style);
+            $("#LinkBomNo").val("");
+            $("#LinkBomNo").prop('disabled', true);
+        }
+        else {
+            $("#LinkBomNo").prop('disabled', false);
+        }
+        validation();
+        if (validation() != false) {
+            $('#BtnSave').hide();
+            if (confirm("Are you sure you want to add material new this?")) {
+                $('#BOMMaterialID').val("");
+            }
+            var conversion_ = $("#Conversion").val();
+            $("#Conversion").val("");
+            var rowCount = $('#list-materials tr').length;
+            var systemUserValue = '';
+            var Sno = '';
+            var compnt = '';
+            var _length = '';
+            var width = '';
+            var nos = '';
+            var samplenms = '';
+            var wstg = '';
+            var wstqty = '';
+            var wsttotalNorms = '';
+            $('#Addrowfields tbody tr').each(function () {
+                debugger;
+                Sno = '';
+                compnt = '';
+                _length = '';
+                width = '';
+                nos = '';
+                samplenms = '';
+                wstg = '';
+                wstqty = '';
+                wsttotalNorms = '';
+                $(this).find("td").each(function () {
+                    Sno = $('#Sno').text();
+                    if (Sno != undefined && Sno.trim().length > 0) {
+
+                        compnt = $(this).find('#' + Sno).val();
+                        if (compnt != undefined && compnt.trim().length > 0) {
+                            systemUserValue += compnt + ',';
+                        }
+                    }
+                    _length = $(this).find('#length').val();
+                    if (_length != undefined && _length.trim().length > 0) {
+                        debugger;
+                        systemUserValue += _length + ',';
+                    }
+                    width = $(this).find('#width').val();
+                    if (width != undefined && width.trim().length > 0) {
+                        systemUserValue += width + ',';
+
+                    }
+                    nos = $(this).find('#Nos').val();
+                    if (nos != undefined && nos.trim().length > 0) {
+                        systemUserValue += nos + ',';
+                    }
+
+                    samplenms = $(this).find('#SampleNorms').val();
+                    if (samplenms != undefined && samplenms.trim().length > 0) {
+                        systemUserValue += samplenms + ',';
+                    }
+                    wstg = $(this).find('#WastagePercent').val();
+                    if (wstg != undefined && wstg.trim().length > 0) {
+                        systemUserValue += wstg + ',';
+                    }
+                    wstqty = $(this).find('#WastageQty').val();
+                    if (wstqty != undefined && wstqty.trim().length > 0) {
+                        systemUserValue += wstqty + ',';
+                    }
+                    wsttotalNorms = $(this).find('#TotalNormsQty').val();
+                    if (wsttotalNorms != undefined && wsttotalNorms.trim().length > 0) {
+                        systemUserValue += wsttotalNorms;
+                    }
+
+                });
+                systemUserValue += '#';
+
+            });
+            var form = systemUserValue;
+            $('#AddRowFields').val(form);
+            $('#BOMMaterialID').val($('#BOMMaterialID').val())
+            var CommnBOM = "";
+            if ($('#CommnBOM1').val() != "") {
+                CommnBOM = $('#CommnBOM1').val();
+            }
+            if ($('#CommnBOM2').val() != "") {
+                CommnBOM += "," + $('#CommnBOM2').val();
+            }
+            if ($('#CommnBOM3').val() != "") {
+                CommnBOM += "," + $('#CommnBOM3').val();
+            }
+            if ($('#CommnBOM4').val() != "") {
+                CommnBOM += "," + $('#CommnBOM4').val(); S
+            }
+            if ($('#CommnBOM5').val() != "") {
+                CommnBOM += "," + $('#CommnBOM5').val();
+            }
+            $('#BOMMaterialID').val()
+            //Display size range get implementation
+            var CheckBoxIschecked_ = "";
+            $('#sizeRangeTable tbody tr').find('.checked_checkbox').each(function () {
+                CheckBoxIschecked_ += $(this).is(':checked') + ",";
+            });
+            CheckBoxIschecked_ = CheckBoxIschecked_.slice(0, -1);
+            var CheckBoxsize_ = "";
+            $('#sizeRangeTable tbody tr').find('.SizeRangeRefValue').each(function () {
+                CheckBoxsize_ += $(this).text().trim() + ",";
+            });
+            $("#OurNorms").prop('disabled', false);
+            $("#OurNormsPercent").prop('disabled', false);
+            $("#PurchaseNorms").prop('disabled', false);
+            $("#PurchaseNormsPercent").prop('disabled', false);
+            $("#IssueNorms").prop('disabled', false);
+            $("#IssueNormsPercent").prop('disabled', false);
+            $("#CostingNorms").prop('disabled', false);
+            $("#CostingNormsPercent").prop('disabled', false);
+            $("#BuyerNorms").prop('disabled', false);
+            $("#Conversion").prop('disabled', false);
+            CheckBoxsize_ = CheckBoxsize_.slice(0, -1);
+            var rowCount = $('#list-materials tr').length - 1;
+            if (rowCount == 0) {
+                if (validation() != false) {
+                    $('.loader-overlay').show();
+                    $('.loader-overlay').fadeIn('slow');
+                   // var forms_ = $(".form-inline").serialize() + '&BOMMaterialID=' + $('#BOMMaterialID').val() + '&CheckBoxsize=' + CheckBoxsize_ + '&CheckBoxIschecked=' + CheckBoxIschecked_ + '&ParentBomNo=' + $('#ParentBomNo').val() + '&SizeScheduleMasterId=' + $("#SizeScheduleMasterId").val() + '&SNO=' + sno + '&Date_=' + $("#Date").val();
+                    if ($("#list-materials tbody tr").length == 0) {
+                        try {
+                            $.ajax({
+                                type: 'POST',
+                                url: '/BillOfMaterial/BillOfMaterialDetails',
+                                data: {
+                                    Grid: form,
+                                   // forms: forms_,
+                                    BOMMaterialID_: $('#BOMMaterialID').val(),
+                                    BomId: $('#BomId').val(),
+                                    BomNo: $('#BomNo').val(),
+                                    Description: $('#Description').val(),
+                                    BuyerMasterId: $('#BuyerMasterId').val(),
+                                    BuyerModel: $("#BuyerModel").val(),
+                                    MeanSize: $("#MeanSize").val(),
+                                    Date: $("#Date").val(),
+                                    ParentBomNo: $("#ParentBomNo").val(),
+                                    LastBomNoEntered: $("#LastBomNoEntered").val(),
+                                    LinkBomNo: $("#LinkBomNo").val(),
+                                    Ammendment: $("#Ammendment").val(),
+                                    CommnBOM1: $('#CommnBOM1').val(),
+                                    CommnBOM2: $('#CommnBOM2').val(),
+                                    CommnBOM3: $('#CommnBOM3').val(),
+                                    CommnBOM4: $('#CommnBOM4').val(),
+                                    CommnBOM5: $('#CommnBOM5').val(),
+                                    PreparedBy: $("#PreparedBy").val(),
+                                    VerifiedBy: $("#VerifiedBy").val(),
+                                    CheckedBy: $("#CheckedBy").val(),
+                                    MaterialName: $("#MaterialName").val(),
+                                    MaterialCategoryMasterId: $("#MaterialCategoryMasterId").val(),
+                                    MaterialGroupMasterId: $("#MaterialGroupMasterId").val(),
+                                    ColorMasterId: $("#ColorMasterId").val(),
+                                    SubstanceMasterId: $("#SubstanceMasterId").val(),
+                                    SizeScheduleMasterId: $("#SizeScheduleMasterId").val(),
+                                    SampleNorms: $("#SampleNorms").val(),
+                                    Wastage: $("#Wastage").val(),
+                                    SupplierMasterId: $("#SupplierMasterId").val(),
+                                    UomMasterId: $("#UomMasterId").val(),
+                                    SizeRangeMasterId: $("#SizeRangeMasterId").val(),
+                                    WastageQty: $("#WastageQty").val(),
+                                    WastageQtyUOM: $("#WastageQtyUOM").val(),
+                                    TotalNorms: $("#TotalNorms").val(),
+                                    TotalNormsUOM: $("#TotalNormsUOM").val(),
+                                    ComponentName: $("#ComponentName").val(),
+                                    NoOfSets: $("#NoOfSets").val(),
+                                    BuyerNorms: $("#BuyerNorms").val(),
+                                    OurNorms: $("#OurNorms").val(),
+                                    OurNormsPercent: $("#OurNormsPercent").val(),
+                                    PurchaseNorms: $("#PurchaseNorms").val(),
+                                    PurchaseNormsPercent: $("#PurchaseNormsPercent").val(),
+                                    IssueNorms: $("#IssueNorms").val(),
+                                    IssueNormsPercent: $("#IssueNormsPercent").val(),
+                                    CostingNorms: $("#CostingNorms").val(),
+                                    Conversion: conversion_,
+                                    SNO: sno,
+                                    CostingNormsPercent: $("#CostingNormsPercent").val(),
+                                    BomGridlst: '@Model.BomGridlst',
+                                    CheckBoxsize: CheckBoxsize_,
+                                    CheckBoxIschecked: CheckBoxIschecked_,
+                                    HiddenParentBOMID: $("#HiddenParentBOMID").val()
+                                },
+
+                                success: function (data) {
+                                    debugger;
+                                    $("#BuyerNorms").prop('disabled', true);
+                                    $("#Conversion").prop('disabled', true);
+                                    $("#OurNorms").prop('disabled', true);
+                                    $("#OurNormsPercent").prop('disabled', true);
+                                    $("#PurchaseNorms").prop('disabled', true);
+                                    $("#PurchaseNormsPercent").prop('disabled', true);
+                                    $("#IssueNorms").prop('disabled', true);
+                                    $("#IssueNormsPercent").prop('disabled', true);
+                                    $("#CostingNorms").prop('disabled', true);
+                                    $("#CostingNormsPercent").prop('disabled', true);
+                                    $('.loader-overlay').fadeOut('fast');
+                                    $('.loader-overlay').hide();
+                                    setTimeout(function () {
+                                        if (data.AlertMessage == "Already Existed") {
+                                            alert("Already  Existed this BOM.");
+                                            return false;
+                                        }
+                                        else if (data.AlertMessage == "Saved Successfully") {
+                                            alert("Saved Successfully.");
+                                            window.location.href = "BillOfMaterialDetails?BOMID=" + data.BOM.BomId;
+                                            //$("#Edit_jobBOMPartial").html(data);
+                                            return false;
+                                        }
+                                        else if (data.AlertMessage == "Updated Successfully") {
+                                            debugger;
+                                            window.location.href = "BillOfMaterialDetails?BOMID=" + data.BOM.BomId;
+                                            alert("Updated Successfully.");
+                                            return false;
+                                        }
+                                    }, 3000);
+                                }
+                            });
+                        } catch (e) {
+                            Console.log(JSON.stringify(e));
+                        }
+                    }
+                }
+            }
+            else {
+
+               // var forms_ = $(".form-inline").serialize() + '&BOMMaterialID=' + $('#BOMMaterialID').val() + '&CheckBoxsize=' + CheckBoxsize_ + '&CheckBoxIschecked=' + CheckBoxIschecked_ + '&ParentBomNo=' + $('#ParentBomNo').val() + '&SizeScheduleMasterId=' + $("#SizeScheduleMasterId").val();
+                $('.loader-overlay').show();
+                $('.loader-overlay').fadeIn('fast');
+                $("#OurNorms").prop('disabled', false);
+                $("#OurNormsPercent").prop('disabled', false);
+                $("#PurchaseNorms").prop('disabled', false);
+                $("#PurchaseNormsPercent").prop('disabled', false);
+                $("#IssueNorms").prop('disabled', false);
+                $("#IssueNormsPercent").prop('disabled', false);
+                $("#CostingNorms").prop('disabled', false);
+                $("#CostingNormsPercent").prop('disabled', false);
+                try {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/BillOfMaterial/BillOfMaterialDetails',
+                        data: {
+                            Grid: form,
+                           // forms: forms_,
+                            BOMMaterialID_: $('#BOMMaterialID').val(),
+                            BomId: $('#BomId').val(),
+                            BomNo: $('#BomNo').val(),
+                            Description: $('#Description').val(),
+                            BuyerMasterId: $('#BuyerMasterId').val(),
+                            BuyerModel: $("#BuyerModel").val(),
+                            MeanSize: $("#MeanSize").val(),
+                            Date: $("#Date").val(),
+                            ParentBomNo: $("#ParentBomNo").val(),
+                            LastBomNoEntered: $("#LastBomNoEntered").val(),
+                            LinkBomNo: $("#LinkBomNo").val(),
+                            Ammendment: $("#Ammendment").val(),
+                            CommnBOM1: $('#CommnBOM1').val(),
+                            CommnBOM2: $('#CommnBOM2').val(),
+                            CommnBOM3: $('#CommnBOM3').val(),
+                            CommnBOM4: $('#CommnBOM4').val(),
+                            CommnBOM5: $('#CommnBOM5').val(),
+                            PreparedBy: $("#PreparedBy").val(),
+                            VerifiedBy: $("#VerifiedBy").val(),
+                            CheckedBy: $("#CheckedBy").val(),
+                            MaterialName: $("#MaterialName").val(),
+                            MaterialCategoryMasterId: $("#MaterialCategoryMasterId").val(),
+                            MaterialGroupMasterId: $("#MaterialGroupMasterId").val(),
+                            ColorMasterId: $("#ColorMasterId").val(),
+                            SubstanceMasterId: $("#SubstanceMasterId").val(),
+                            SizeScheduleMasterId: $("#SizeScheduleMasterId").val(),
+                            SampleNorms: $("#SampleNorms").val(),
+                            Wastage: $("#Wastage").val(),
+                            SupplierMasterId: $("#SupplierMasterId").val(),
+                            UomMasterId: $("#UomMasterId").val(),
+                            SizeRangeMasterId: $("#SizeRangeMasterId").val(),
+                            WastageQty: $("#WastageQty").val(),
+                            WastageQtyUOM: $("#WastageQtyUOM").val(),
+                            TotalNorms: $("#TotalNorms").val(),
+                            TotalNormsUOM: $("#TotalNormsUOM").val(),
+                            ComponentName: $("#ComponentName").val(),
+                            NoOfSets: $("#NoOfSets").val(),
+                            BuyerNorms: $("#BuyerNorms").val(),
+                            OurNorms: $("#OurNorms").val(),
+                            OurNormsPercent: $("#OurNormsPercent").val(),
+                            PurchaseNorms: $("#PurchaseNorms").val(),
+                            PurchaseNormsPercent: $("#PurchaseNormsPercent").val(),
+                            IssueNorms: $("#IssueNorms").val(),
+                            IssueNormsPercent: $("#IssueNormsPercent").val(),
+                            CostingNorms: $("#CostingNorms").val(),
+                            Conversion: conversion_,
+                            SNO: sno,
+                            CostingNormsPercent: $("#CostingNormsPercent").val(),
+                            BomGridlst: '@Model.BomGridlst',
+                            CheckBoxsize: CheckBoxsize_,
+                            CheckBoxIschecked: CheckBoxIschecked_,
+                            HiddenParentBOMID: $("#HiddenParentBOMID").val()
+
+                        },
+                        success: function (data) {
+                            console.log(JSON.stringify(data));
+                            $("#OurNorms").prop('disabled', true);
+                            $("#OurNormsPercent").prop('disabled', true);
+                            $("#PurchaseNorms").prop('disabled', true);
+                            $("#PurchaseNormsPercent").prop('disabled', true);
+                            $("#IssueNorms").prop('disabled', true);
+                            $("#IssueNormsPercent").prop('disabled', true);
+                            $("#CostingNorms").prop('disabled', true);
+                            $("#CostingNormsPercent").prop('disabled', true);
+                            $('.loader-overlay').fadeOut('fast');
+                            $('.loader-overlay').hide();
+                            setTimeout(function () {
+                                if (data.AlertMessage == "Already Existed") {
+                                    alert("Already  Existed this BOM.");
+                                    return false;
+                                }
+                                else if (data.AlertMessage == "Saved Successfully") {
+                                    alert("Saved Successfully.");
+                                    window.location.href = "BillOfMaterialDetails?BOMID=" + data.BOM.BomId;
+                                    return false;
+
+                                }
+                                else if (data.AlertMessage == "Updated Successfully") {
+                                    debugger;
+                                    alert("Updated Successfully.");
+                                    window.location.href = "BillOfMaterialDetails?BOMID=" + data.BOM.BomId;
+                                    return false;
+
+                                }
+                                if (data == "Material Existed") {
+                                    alert("Already  Existed this Material");
+                                    return false;
+                                }
+                            }, 3000);
+                        }
+                    });
+                } catch (e) {
+                    Console.log(JSON.stringify(e));
+                }
+            }
+
+        }
+    }
+    function RowClick(arg, arg1) {
+        $("#sizeRangeTable > tbody").html("");
+        debugger;
+        var Removerow = "rowid_" + arg;
+        $('#'+Removerow+'').remove();
+        $('#add-Material').show();
+        $('.material_BOM').show();
+        $('#Removerow')
+        $('#Addrowfields tbody tr').remove();
+        $(this).addClass("curChangeableRow"),
+        $(this).siblings().removeClass("curChangeableRow"),
+        $('.curChangeableRow').hide(),
+        $.ajax({
+            type: 'POST',
+            url: '/BillOfMaterial/GetBOMMaterilsList',
+            data: { BOMMaterialID: arg, BOMID: arg1,BuyerMasterId:$("#BuyerMasterId").val() },
+            success: function (data) {
+                debugger;
+                if (data.BOM.BOMID != 0) {
+                    $('#BOMMaterialID').val(data.Material.BOMMaterialID).trigger('chosen:updated');
+                    $("#SNO").val(data.Material.SNO);
+                    $('#BOMMaterialID').val(arg);
+                    $('#BomNo').val(data.BOM.BomNo);
+                    $('#Description').val(data.BOM.Description);
+                    $('#BuyerMasterId').val(data.BOM.BuyerMasterId).trigger('chosen:updated');
+                    $('#BuyerModel').val(data.BOM.BuyerModel).trigger('chosen:updated');
+                    $('#MeanSize').val(data.BOM.MeanSize).trigger('chosen:updated');
+                    $('#Conversion').val(data.Material.Conversion);
+                    $('#ParentBomNo').val(data.BOM.ParentBomNo).trigger('chosen:updated');
+                    $('#LastBomNoEntered').val(data.BOM.LastBomNoEntered);
+                    $('#LinkBomNo').val(data.BOM.LinkBomNo).trigger('chosen:updated');
+                    $('#Ammendment').val(data.BOM.Ammendment);
+                    $('#CommonBomNo').val(data.BOM.CommonBomNo);
+                    $('#CommnBOM1').val(data.BOM.CommnBOM1).trigger('chosen:updated');
+                    $('#CommnBOM2').val(data.BOM.CommnBOM2).trigger('chosen:updated');
+                    $('#CommnBOM3').val(data.BOM.CommnBOM3).trigger('chosen:updated');
+                    $('#CommnBOM4').val(data.BOM.CommnBOM4).trigger('chosen:updated');
+                    $('#CommnBOM5').val(data.BOM.CommnBOM5).trigger('chosen:updated');
+                    $('#PreparedBy').val(data.BOM.PreparedBy);
+                    $('#VerifiedBy').val(data.BOM.VerifiedBy);
+                    $('#CheckedBy').val(data.BOM.CheckedBy);
+                    $('#ComponentName').val(data.BOM.ComponentName);
+                    $('#BuyerNorms').val(data.BOM.BuyerNorms);
+                    $('#NoOfSets').val(data.BOM.NoOfSets);
+                    $('#UomMasterId').val(data.BOM.UomMasterId);
+                    $('#SupplierMasterId').val(data.Material.SupplierMasterID).trigger('chosen:updated');
+                    $('#SizeRangeMasterId').val(data.BOM.SizeRangeMasterId).trigger('chosen:updated');
+                    $('#SizeScheduleMasterId').val(data.Material.SizeScheduleMasterId).trigger('chosen:updated');
+                    if(data.Norms!=null)
+                    {
+                        $("#OurNorms").val(data.Norms.OurNorms).trigger('chosen:updated');
+                        $("#OurNormsPercent").val(data.Norms.NormsPercentage);
+                        $("#PurchaseNorms").val(data.Norms.PurchaseNormsid).trigger('chosen:updated');
+                        $("#PurchaseNormsPercent").val(data.Norms.NormsPercentage1);
+                        $("#IssueNorms").val(data.Norms.IssueNormsid).trigger('chosen:updated');
+                        $("#IssueNormsPercent").val(data.Norms.NormsPercentage2);
+                        $("#CostingNorms").val(data.Norms.CostingNorms).trigger('chosen:updated');
+                        $("#CostingNormsPercent").val(data.Norms.NormsPercentage3);
+                    }
+                        //later changes sow from bommaterial to populate below columns
+                    else{
+                        $('#OurNorms').val(data.Material.OurNorms).trigger('chosen:updated');
+                        $('#OurNormsPercent').val(data.Material.OurNormsPercent);
+                        $('#PurchaseNorms').val(data.Material.PurchaseNorms).trigger('chosen:updated');
+                        $('#PurchaseNormsPercent').val(data.Material.PurchaseNormsPercent);
+                        $('#IssueNorms').val(data.Material.IssueNorms).trigger('chosen:updated');
+                        $('#IssueNormsPercent').val(data.Material.IssueNormsPercent);
+                        $('#CostingNorms').val(data.Material.CostingNorms).trigger('chosen:updated');
+                        $('#CostingNormsPercent').val(data.Material.CostingNormsPercent);
+                    }
+
+                    $('#MaterialCategoryMasterId').val(data.Material.MaterialCategoryMasterId).trigger('chosen:updated');
+                    $('#MaterialGroupMasterId').val(data.Material.MaterialGroupMasterId).trigger('chosen:updated');
+                    $('#SubstanceMasterId').val(data.Material.SubstanceMasterId).trigger('chosen:updated');
+                    $('#MaterialName').val(data.Material.MaterialName).trigger('chosen:updated');
+                    $('#ColorMasterId').val(data.Material.ColorMasterId).trigger('chosen:updated');
+                    $('#SampleNorms').val(data.Material.SampleNorms).trigger('chosen:updated');
+                    $('#Wastage').val(data.Material.Wastage);
+                    $('#WastageQty').val(data.Material.WastageQty);
+                    $('#WastageQtyUOM').val(data.Material.WastageQtyUOM).trigger('chosen:updated');
+                    $('#TotalNorms').val(data.Material.TotalNorms);
+                    $('#BuyerNorms').val(data.Material.BuyerNorms);
+                    $('#TotalNormsUOM').val(data.Material.TotalNormsUOM);
+                    if (data.MaterialGroup.IsSubstance == true) {
+                        $("#SubstanceMasterId").prop('disabled', false);
+                    }
+                    else {
+                        $("#SubstanceMasterId").prop('disabled', true);
+                    }
+                    if (data.MaterialGroup.IsSize == false) {
+                        $("#SizeRangeMasterId").prop('disabled', true).trigger('chosen:updated');
+                        $("#SizeScheduleMasterId").prop('disabled', true).trigger('chosen:updated');
+                        $("#SizeRangeMasterId").val("").trigger('chosen:updated');
+                        $("#SizeScheduleMasterId").val("").trigger('chosen:updated');
+                    }
+                    else {
+                        $("#SizeRangeMasterId").prop('disabled', false).trigger('chosen:updated');
+                        $("#SizeScheduleMasterId").prop('disabled', false).trigger('chosen:updated');
+                    }
+                    if (data.Norms != null && data.Norms.BuyerNameid == parseInt($('#BuyerMasterId').val())) {
+
+                        $("#OurNormsPercent").prop("disabled", false);
+                        $("#CostingNormsPercent").prop("disabled", false);
+                        $("#PurchaseNormsPercent").prop("disabled", false);
+                        $("#IssueNormsPercent").prop("disabled", false);
+                        if (data.materialCategoryMaster.CategoryName=="Leathers") {
+                            $("#Conversion").prop("disabled", false);
+                            $("#BuyerNorms").prop("disabled", false);
+                            $("#TotalNorms").prop("disabled", false);
+                            $("#SampleNorms").prop("disabled", true);
+                            var ourNormsPercentage = $("#OurNormsPercent").val();
+                            var BuyerNorms = $('#BuyerNorms').val();
+                            var buyerNormsPercentage = ((parseFloat(BuyerNorms) / 100) * parseFloat(ourNormsPercentage));
+
+                            if ($('#OurNorms option:selected').text().trim() == "Increase") {
+
+                                Total_buyerNormsPercentage = parseFloat(BuyerNorms) + parseFloat(buyerNormsPercentage);
+                                $('#TotalNorms').val(Total_buyerNormsPercentage.toFixed(4));
+                            }
+                            else if ($('#OurNorms option:selected').text().trim() == "Decrease") {
+                                Total_buyerNormsPercentage = parseFloat(BuyerNorms) - parseFloat(buyerNormsPercentage);
+                                $('#TotalNorms').val(Total_buyerNormsPercentage.toFixed(4));
+                            }
+
+                        }
+                        else if (data.materialCategoryMaster.CategoryName!="Leathers") {
+
+                            $("#SampleNorms").prop("disabled", false);
+                            var ourNormsPercentage = $("#OurNormsPercent").val();
+                            var ConvertedNorms = $('#SampleNorms').val();
+                            if (ConvertedNorms != "") {
+                                var buyerNormsPercentage = ((parseFloat(ConvertedNorms) / 100) * parseFloat(ourNormsPercentage));
+                                $("#BuyerNorms").val(buyerNormsPercentage.toFixed(4));
+                                if ($('#OurNorms option:selected').text().trim() == "Increase") {
+                                    Total_buyerNormsPercentage = parseFloat(ConvertedNorms) + parseFloat(buyerNormsPercentage);
+                                    $('#TotalNorms').val(Total_buyerNormsPercentage.toFixed(4));
+                                }
+                                else if ($('#OurNorms option:selected').text().trim() == "Decrease") {
+                                    Total_buyerNormsPercentage = parseFloat(ConvertedNorms) - parseFloat(buyerNormsPercentage);
+                                    $('#TotalNorms').val(Total_buyerNormsPercentage.toFixed(4));
+                                }
+                            }
+                            $("#Conversion").prop("disabled", true);
+                            $("#BuyerNorms").prop("disabled", false);
+                            $("#TotalNorms").prop("disabled", false);
+                            $("#SampleNorms").prop("disabled", true);
+                        }
+                        else {
+
+                            $("#BuyerNorms").val("");
+                            $("#Conversion").prop("disabled", true);
+                            $("#SampleNorms").prop("disabled", true);
+                            $("#BuyerNorms").prop("disabled", true);
+                            $("#TotalNorms").prop("disabled", false);
+                        }
+                    }
+                    else if (data.Norms!= null && data.Norms.BuyerNameid != parseInt($('#BuyerMasterId').val())) {
+
+                        $("#BuyerNorms").val(data.Material.BuyerNorms);
+                        $("#SampleNorms").val("");
+                        $("#Conversion").prop("disabled", true);
+                        $("#SampleNorms").prop("disabled", true);
+                        $("#TotalNorms").prop("disabled", false);
+                        $("#BuyerNorms").prop("disabled", true);
+                    }
+                    else if (data.Norms == null) {
+                        $("#SampleNorms").val("");
+                        $("#Conversion").prop("disabled", true);
+                        $("#SampleNorms").prop("disabled", true);
+                        $("#TotalNorms").prop("disabled", false);
+                        $("#BuyerNorms").prop("disabled", false);
+                    }
+                    var count = 1;
+                    if (data.MaterialGroup.IsSize == true) {
+                        debugger;
+                        $('#Displaycheck').prop('checked',true);
+                        
+                        $("#sizeRangeTable").append("<tbody><tr><td>size</td></tr> <tr><td>Qty</td></tr></tbody>");
+                        for (var i = 0; i <= data.DisplaySize.length-1; i++) {
+
+
+                           
+
+
+                            if(data.DisplaySize[i].SizeIsChecked==true)
+                            {
+                                $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue"  > ' + data.DisplaySize[i].SizeRange + ' </td> ');
+                                $('#sizeRangeTable tbody tr:last').append("<td > <input type='checkbox'name='size_chk' checked='checked' id='size_chk"+i+"' class='checked_checkbox' >  <label for='Production  for='size_chk"+i+"' style='' class='lbl-ch''></label> </td>");
+                                count++;
+                            }
+                            else{
+                                $('#sizeRangeTable tbody tr:first-child').append('<td class="SizeRangeRefValue"  > ' + data.DisplaySize[i].SizeRange + ' </td> ');
+                                $('#sizeRangeTable tbody tr:last').append("<td > <input type='checkbox'name='size_chk' id='size_chk"+i+"' class='checked_checkbox' >  <label for='Production  for='size_chk"+i+"' style='' class='lbl-ch''></label> </td>");
+                                count++;
+                            }
+                            count++;
+                        }
+                    }
+                    else{
+                        $('#Displaycheck').prop('checked',false);
+                        $('#sizeRangeTable tbody tr').each(function(){
+                            $(this).find("td:not(:first)").remove();
+                        });
+                    }
+                    $.each(data.Grid, function (i, item) {
+                        $("#Addrowfields").append("<tr class='Append'><td id='Sno' class='Sno' value=''>" + item.Sno + "</td>"
+                        + "<td class='width-141'><input type='text' id='Component' class='Component' value=" + item.Component + "></td>"
+                        + "<td class='width-91'><input type='text' id='length' class='length' value=" + item.Length + " onkeypress=' return isNumberKey(event)' /></td>"
+                        + "<td class='width-91'><input type='text' id='width' class='width' value=" + item.Width + " onkeypress='return isNumberKey(event)' /></td>"
+                        + "<td class='width-91'><input type='text' id='Nos' class='Nos' value=" + item.Nos + " onkeypress='return isNumberKey(event)' /></td>"
+                        + "<td class='width-91'><input type='text' id='SampleNorms' class='SampleNorms' value=" + item.SampleNorms + " onkeypress='return isNumberKey(event)' /></td>"
+                        + "<td class='width-91'><input type='text' id='WastagePercent' class='WastagePercent' value=" + item.WastagePercent + " onkeypress='return isNumberKey(event)' /></td>"
+                        + "<td class='width-91'><input type='text' id='WastageQty' class='WastageQty' value=" + item.WastageQtyGrid + " onkeypress='return isNumberKey(event)' /></td>"
+                        + "<td class='width-91'><input type='text' id='TotalNormsQty' class='TotalNormsQty' value=" + item.TotalNormsQty + " onkeypress='return isNumberKey(event)' /></td>"
+                        + "<td><input type='button' value='Remove' class='removeSchedule btn btn-default btn-style' /></td></tr>");
+                    });
+
+                }
+            }
+
+        });
+
+    }
+</script>
+
+<script>
+    $("#ParentBomNo").unbind('change');
+    $("#ParentBomNo").on("change", function () {
+        alert("dd");
+        //  $('.loader-overlay').fadeIn('slow');
+        if ($("#ParentBomNo option:selected").text().trim() == $("#BomNo").val().trim() || $("#BomNo").val().trim() == "") {
+            //  $('.loader-overlay').fadeOut('fast');
+            alert("Please enter correct bom.")
+            $('#BomNo').css('border-color', 'red');
+            $('#BomNo').focus();
+            $("#ParentBomNo").val('').trigger('chosen:updated');
+
+            return false;
+        }
+        else {
+            $("#HiddenParentBOMID").val($(this).val());
+            $('#BomNo').css('border-color', '');
+            $.ajax({
+                type: 'GET',
+                url: '/BillOfMaterial/ParentBOMMaterialList',
+                data: {
+                    BomId: $(this).val(),
+                    BomNo: $("#BomNo").val(),
+                    Description: $("#Description").val(),
+                    BuyerMasterId: $("#BuyerMasterId").val(),
+                    BuyerModel: $("#BuyerModel").val(),
+                    MeanSize: $("#MeanSize").val(),
+                    Date: $("#Date").val(),
+                    LastBomNoEntered: $("#LastBomNoEntered").val(),
+                    LinkBomNo: $("#LinkBomNo").val(),
+                    CommnBOM1: $("#CommnBOM1").val(),
+                    CommnBOM2: $("#CommnBOM2").val(),
+                    CommnBOM3: $("#CommnBOM3").val(),
+                    CommnBOM4: $("#CommnBOM4").val(),
+                    CommnBOM5: $("#CommnBOM5").val(),
+                    OurNorms: $("#OurNorms").val(),
+                    OurNormsPercent: $("#OurNormsPercent").val(),
+                    PurchaseNorms: $("#PurchaseNorms").val(),
+                    PurchaseNormsPercent: $("#PurchaseNormsPercent").val(),
+                    IssueNorms: $("#IssueNorms").val(),
+                    IssueNormsPercent: $("#IssueNormsPercent").val(),
+                    CostingNorms: $("#CostingNorms").val(),
+                    CostingNormsPercent: $("#CostingNormsPercent").val(),
+
+                },
+                success: function (data) {
+                    debugger;
+                    if (data.data != null) {
+                        $('.loader-overlay').fadeOut('fast');
+                        alert("This parent bom is alredy saved")
+                    }
+                    var sno = "";
+                    sno = $('.bommaterialtable tr').find('.SNO').length;
+                    sno++;
+                    var hiddenSno = $("#SNO").val();
+                    if (hiddenSno != 0) {
+                        sno = hiddenSno;
+                    }
+                    window.location.href = "BillOfMaterialDetails?BOMID=" + data.Bomid;
+                    //   $('.loader-overlay').fadeOut('fast');
+                    //$("#BomNo").val(data.Model.BomNo);
+                    //$("#Description").val(data.Model.Description);
+                    //$("#BuyerMasterId").val(data.Model.BuyerMasterId);
+                    //$("#BuyerMasterId").val(data.Model.BuyerMasterId);
+                    //$("#BuyerModel").val(data.Model.BuyerModel);
+                    //$("#MeanSize").val(data.Model.MeanSize);
+                    //$("#LinkBomNo").val(data.Model.LinkBomNo);
+                    //$("#BuyerNorms").val(data.Model.BuyerNorms);
+                    //$("#NoOfSets").val(data.Model.NoOfSets);
+                    //$("#UomMasterId").val(data.Model.UomMasterId);
+                    //$("#SupplierMasterId").val(data.Model.SupplierMasterId);
+                    //$("#SizeScheduleMasterId").val(data.Model.SizeScheduleMasterId);
+                    //$("#SizeRangeMasterId").val(data.Model.SizeRangeMasterId);
+                    //var rowCount = 0;
+                    //$('#list-materials tbody').html("")
+                    //$.each(data.Material, function (index, item) {
+                    //    item.SNO = item.SNO;
+                    //    if (item.SubtranceRangeName == null) {
+                    //        item.SubtranceRangeName = "";
+                    //    }
+                    //    if (item.SampleNorms == null) {
+                    //        item.SampleNorms = "";
+                    //    }
+                    //    $('#list-materials tbody').append("<tr id=rowid_" + item.BOMMaterialID + "> <td style='display:none' class='BomNo'><span>" + item.BOMMaterialID + "</span><input type='hidden' class='BomId' value='" + item.BomId + "'></td>" +
+
+                    //        "<td style='display:none' class='Description' id='Description'>" + item.Description + "</td>" +
+                    //        "<td style='display:none' class='BuyerMasterId' id='BuyerMasterId'>" + item.BuyerMasterId + "</td>" +
+                    //        "<td style='display:none' class='BuyerModel' id='BuyerModel'>" + item.BuyerModel + "</td>" +
+                    //        "<td style='display:none' class='MeanSize' id='MeanSize'>" + item.MeanSize + "</td>" +
+                    //        "<td style='display:none' class='Date' id='Date'>" + item.Date + "</td>" +
+                    //        "<td style='display:none' class='ParentBomNo' id='ParentBomNo'>" + item.ParentBomNo + "</td>" +
+                    //        "<td style='display:none' class='LinkBomNo' id='LinkBomNo'>" + item.LinkBomNo + "</td>" +
+                    //        "<td style='display:none' class='CommnBOM1' id='CommnBOM1'>" + item.CommnBOM1 + "</td>" +
+                    //        "<td style='display:none' class='CommnBOM1' id='CommnBOM1'>" + item.BOMMaterialID + "</td>" +
+                    //        "<td style='' class='SNO' id='SNO'>" + item.SNO + "</td>" +
+                    //        " <td title='Delete'  style='cursor:pointer;' class='Delete' id='Delete'><input type='button' value='Delete' style='cursor:pointer;' title='Delete' onclick='Deletebtn(" + item.BOMMaterialID + ")' class='change_status change_status_  Delete input Edit input' /></td>" +
+                    //        " <td title='Edit'  style='cursor:pointer;' class='Edit' id='Edit'><input type='button' value='Edit' style='cursor:pointer;' title='Edit' onclick='RowClick(" + item.BOMMaterialID + "," + item.BomId + ")' class='change_status change_status_ Delete input Edit input' /></td>" +
+                    //        "<td class='MaterialCategoryMasterId_' id='MaterialCategoryMasterId_'>" + item.CategoryName + "</td>" +
+                    //        "<td class='MaterialName_' id='MaterialName_'>" + item.MaterialName + "</td>" +
+                    //        //ee
+                    //        "<td class='SupplybyID' id='SupplybyID'>" + item.SupplierMasterID + "</td>" +
+                    //        "<td class='MaterialGroupMasterId_' id='MaterialGroupMasterId_'>" + item.GroupName + "</td>" +
+                    //        "<td class='ColorMasterId_' id='ColorMasterId_'>" + item.ColorName + "</td>" +
+                    //        "<td class='SubstanceMasterId_' id='SubstanceMasterId_'>" + item.SubtranceRangeName + "</td>" +
+                    //        "<td class='SampleNorms' id='SampleNorms'>" + item.SampleNorms + "</td>" +
+                    //        "<td class='WastageQtyUOM' id='WastageQtyUOM'>" + item.WastageqtyUOM + "</td>" +
+                    //        "<td class='TotalNorms' id='TotalNorms'>" + item.TotalNorms + "</td>" +
+                    //        "<td style='display:none' class='ComponentName' id='ComponentName'>" + item.ComponentName + "</td>" +
+                    //        "<td style='display:none' class='BuyerNorms' id='BuyerNorms'>" + item.BuyerNorms + "</td>" +
+                    //        "<td style='display:none' class='NoOfSets' id='NoOfSets'>" + item.NoOfSets + "</td>" +
+                    //        "<td style='display:none' class='UomMasterId' id='UomMasterId'>" + item.UomMasterId + "</td>" +
+                    //        "<td style='display:none' class='SupplierMasterId' id='SupplierMasterId'>" + item.SupplierMasterId + "</td>" +
+                    //        "<td style='display:none' class='SizeRangeMasterId' id='SizeRangeMasterId'>" + item.SizeRangeMasterId + "</td>" +
+
+                    //        "<td style='display:none' class='OurNorms' id='OurNorms'>" + item.OurNorms + "</td>" +
+                    //        "<td style='display:none' class='OurNormsPercent' id='OurNormsPercent'>" + item.OurNormsPercent + "</td>" +
+                    //        "<td style='display:none' class='PurchaseNorms' id='PurchaseNorms'>" + item.PurchaseNorms + "</td>" +
+                    //        "<td style='display:none' class='PurchaseNormsPercent' id='PurchaseNormsPercent'>" + item.PurchaseNormsPercent + "</td>" +
+                    //        "<td style='display:none' class='IssueNorms' id='IssueNorms'>" + item.IssueNorms + "</td>" +
+                    //        "<td style='display:none' class='IssueNormsPercent' id='IssueNormsPercent'>" + item.IssueNormsPercent + "</td>" +
+                    //        "<td style='display:none' class='CostingNorms' id='CostingNorms'>" + item.CostingNorms + "</td>" +
+                    //        "<td style='display:none' class='Conversion' id='Conversion'>" + item.Conversion + "</td>" +
+                    //        "<td style='display:none'class='MaterialCategoryMasterId' id='MaterialCategoryMasterId'>" + item.MaterialCategoryMasterId + "</td>" +
+                    //        "<td style='display:none' class='MaterialName' id='MaterialName'>" + item.MaterialName + "</td>" +
+                    //        "<td style='display:none' class='MaterialGroupMasterId' id='MaterialGroupMasterId'>" + item.MaterialGroupMasterId + "</td>" +
+                    //        "<td style='display:none' class='ColorMasterId' id='ColorMasterId'>" + item.ColorMasterId + "</td>" +
+                    //        "<td style='display:none' class='SubstanceMasterId' id='SubstanceMasterId'>" + item.SubstanceMasterId + "</td>" +
+                    //        "<td style='display:none' class='CostingNormsPercent' id='CostingNormsPercent'>" + item.CostingNormsPercent + "</td>" +
+                    //        "<td style='display:none' class='PreparedBy' id='PreparedBy'>" + item.PreparedBy + "</td>" +
+                    //        "<td style='display:none' class='WastageQtyUOM' id='WastageQtyUOM'>" + item.WastageQtyUOM + "</td>" +
+                    //        "<td style='display:none' class='VerifiedBy' id='VerifiedBy'>" + item.VerifiedBy + "</td>" +
+                    //        "<td style='display:none' class='CheckedBy' id='CheckedBy'>" + item.CheckedBy + "</td>"
+                    //        + "<td style='display:none' class='AddRowFields'>" + $('#AddRowFields').val() + "</td></tr>");
+
+                    //    rowCount++;
+                    //    sno++;
+                    //});
+
+
+                }
+            });
+        }
+
+
+
+    });
+   
+</script>

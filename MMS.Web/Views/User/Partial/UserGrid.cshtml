@@ -1,0 +1,162 @@
+﻿@model MMS.Web.Models.UserModel.UserModel
+
+<div class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+        <div class="table-responsive table-td-padding padding-lr-6px table-row-bg" style="overflow: auto;">
+            <table class="veh-table" id="empTable">
+                <thead>
+                    <tr class="color-code-top-btn">
+                        <td colspan="7">
+                            <input type="text" id="SeaarchID" placeholder="Search.." />
+                            <input type="button" value="Search" onclick="Search()">
+                            <input type="button" value="Add" onclick="Add()">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="veh-1">
+                            Si. No
+                        </th>
+                        <th class="veh-1">
+                            First Name
+                        </th>
+                        <th class="veh-3">
+                            Last Name
+                        </th>
+                        <th class="veh-4">
+                            User Type
+                        </th>
+                        <th class="veh-4">
+                            Email
+                        </th>
+                        <th class="veh-4">
+                            Status
+                        </th>
+                        <th class="veh-4">
+                            Edit / Delete
+                        </th>
+                    </tr>
+                </thead>
+                @if (Model.UserList != null && Model.UserList.Count > 0)
+            {
+                int count = 1;
+            <tbody>
+
+                @foreach (var item in Model.UserList)
+                    {
+                    <tr>
+                        <td class="veh-3">@count</td>
+                        <td class="veh-1">@item.FirstName</td>
+                        <td class="veh-3">@item.LastName</td>
+                        <td class="veh-3">@item.UserType</td>
+                        <td class="veh-3">@item.Email</td>
+                        <td class="veh-3">@item.IsActive</td>
+                        <td class="veh-1 edit-del-wrap" style=" width: 284px;">
+                            <a href="javascript:void(0)" onclick="Edit('@item.UserID')" class="watchlist-edit" title="Edit"></a>
+                            <a href="javascript:void(0)" onclick="Delete('@item.UserID')" class="watchlist-delete" title="Delete"></a>
+                        </td>
+                    </tr>
+                        count++;
+                    }
+
+            </tbody>
+            <tfoot class="footer-pager">
+                <tr>
+                    <td colspan="4">
+                        <div id="pager">
+                            <form>
+                                <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                <input type="text" class="pagedisplay" />
+                                <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                <select class="pagesize">
+                                    <option selected="selected" value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="30">30</option>
+                                    <option value="40">40</option>
+                                </select>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+
+            }
+
+            </table>
+        </div>
+            @if (Model.UserList != null && Model.UserList.Count == 0)
+            {
+                <div style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+            }
+        </div>
+
+    <div id="EditColorPartial">
+        @Html.Partial("Partial/UserDetails", Model)
+    </div>
+
+
+</div>
+
+<script>
+    function Search() {
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("Search", "User")',
+            data: { filter: $('#SeaarchID').val() },
+            success: function (data) {
+                $(".veh-tablecont").html(data);
+                $(".veh-tablecont").show();
+                $("#EditColorPartial").hide();
+            }
+        });
+    }    
+    function Add() {
+        $('.veh-tablecont').hide();
+        $('#EditColorPartial').show();
+    }
+    function Edit(arg) {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("UserDetails", "User")',
+            data: { UserId: arg },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "User")',
+                data: { UserId: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/User/Index";
+                        return false;
+                    }
+                    else {
+                        alert('Color Details deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+
+</script>

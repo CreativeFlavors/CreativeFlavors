@@ -1,0 +1,114 @@
+﻿@{
+    ViewBag.Title = "GateEntryDocType";
+}
+<h2 class="content-title">Gate Entry Document Type</h2>
+<div style="width: 100%; float: left;">
+    <div class="loader-overlay" style="position:fixed;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;">
+        <div id="spinner" style="position:relative;height:64px;width:64px;margin:auto;top:50%;">
+            <img src="~/Content/Images/round.gif" id="imgLoading" alt="Loading..." />
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("GEInwardDocTypeGrid", "GEInwardDocType")
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+
+        $("#EditColorPartial").hide();
+  });
+ function Save(){
+
+     if ($('#DocumentType').val() == "") {
+         alert("Please Enter Document Type");
+         $('#DocumentType').css('border-color', 'red');
+         $('#DocumentType').focus();
+          return false;
+      }
+      else {
+         $('#DocumentType').css('border-color', '');
+      }
+    
+      $.ajax({
+          type: 'POST',
+          url: '/GEInwardDocType/GEInwardDocType',
+          data: {
+              DocumentType: $('#DocumentType').val(),       
+                },
+          success: function (data) {
+
+              if (data.InwardDocumentTypeId != "" || data.InwardDocumentTypeId != 0) {
+                  alert('Saved Successfully.');
+                  location.href = "/GEInwardDocType/GEInwardDocType";
+                  return false;
+              }
+
+              else {
+                  alert('Already Exist in the database.');
+                  location.href = "/GEInwardDocType/GEInwardDocType";
+                  return false;
+              }
+
+          },
+          error: function (ex) {
+              alert('Already Exist in the database.');
+          }
+      });
+
+  }
+
+
+  function Update() {
+
+      if ($('#DocumentType').val() == "") {
+          alert("Please Enter Document Type");
+          $('#DocumentType').css('border-color', 'red');
+          $('#DocumentType').focus();
+          return false;
+      }
+      else {
+          $('#DocumentType').css('border-color', '');
+      }
+      $.ajax({
+          type: 'POST',
+          url: '/GEInwardDocType/GEInwardDocType',
+          data: {
+              InwardDocumentTypeId: $('#InwardDocumentTypeId').val(),
+              DocumentType: $('#DocumentType').val(),
+          },
+          success: function (data) {
+
+              if (data.InwardDocumentTypeId != "" || data.InwardDocumentTypeId != 0) {
+                  alert('Updated Successfully.');
+                  location.href = "/GEInwardDocType/GEInwardDocType";
+                  return false;
+              }
+              else {
+                  alert('Updation failed.');
+                  location.href = "/GEInwardDocType/GEInwardDocType";
+                  return false;
+              }
+
+          },
+          error: function (ex) {
+              alert('Already Exist in the database.');
+          }
+      });
+
+
+
+  }
+
+
+</script>

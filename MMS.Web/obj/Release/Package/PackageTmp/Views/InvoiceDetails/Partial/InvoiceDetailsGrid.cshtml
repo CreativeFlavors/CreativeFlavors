@@ -1,0 +1,174 @@
+﻿@using MMS.Core.Entities
+@model MMS.Web.Models.InvoiceDetails.InvoiceDetails
+<style>
+    .form-inline {
+        margin-left: 5%;
+    }
+
+    .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
+        padding: 5px;
+    }
+</style>
+
+<div class="veh-tablewrap">
+    <div class="veh-tablecont">
+        <div id="sortMsg" style="text-align: center; color: Red;"></div>
+        <div class="table-responsive table-td-padding padding-lr-6px table-row-bg">
+            <table class="veh-table sep-table-style table" id="empTable">
+                <thead>
+                    <tr class="color-code-top-btn">
+                        <td colspan="13">
+                            <input type="text" id="SeaarchID" placeholder="Search.." /><input type="button" value="Add" id="add">
+                            <input type="button" value="Search" onclick="Search()">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="veh-1">
+                            Si. No
+                        </th>
+                        <th class="veh-1">
+                            Order No
+                        </th>
+                        <th class="veh-2">
+                            Category Code
+                        </th>
+                        <th class="veh-3">
+                            Order Date
+                        </th>
+                        <th class="veh-7">
+                            OrdeFullFill Date
+                        </th>
+                        <th class="veh-8">
+                            Company Address
+                        </th>
+                        <th class="veh-10">
+                            Shipping Address
+                        </th>
+                        <th class="veh-11">
+                            Billing Address
+                        </th>
+                        <th class="veh-11">
+                            Total Amount
+                        </th>
+                        <th class="veh-11">
+                            Discount Amount
+                        </th>
+                        <th class="veh-11">
+                            Tax Amount
+                        </th>
+                        <th class="veh-12">
+                            Edit / Delete
+                        </th>
+                    </tr>
+                </thead>
+                @if (Model.Invoicedetailslist != null && Model.Invoicedetailslist.Count > 0)
+                {
+                    int count = 1;
+                    <tbody>
+
+                        @foreach (var oInvoice in Model.Invoicedetailslist)
+                        {
+
+                            <tr>
+                                <td class="veh-1">@count</td>
+                                <td class="veh-2" style="width: 12%;">@oInvoice.OrderId</td>
+                                <td class="veh-3" style="width: 12%;">@oInvoice.CCode</td>
+                                <td class="veh-3" style="width: 12%;">@oInvoice.OrderDate</td>
+                                <td class="veh-4" style="width: 12%;">@oInvoice.OrderFullFillDate</td>
+                                <td class="veh-4" style="width: 12%;">@oInvoice.add1</td>
+                                <td class="veh-5" style="width: 12%;">@oInvoice.add2</td>
+                                <td class="veh-3" style="width: 12%;">@oInvoice.add3</td>
+                                <td class="veh-4" style="width: 12%;">@oInvoice.TotalAmount</td>
+                                <td class="veh-4" style="width: 12%;">@oInvoice.DiscAmount</td>
+                                <td class="veh-4" style="width: 12%;">@oInvoice.TaxAmount</td>
+                                <td class="veh-1 edit-del-wrap">
+                                    @*<a href="javascript:void(0)" onclick="Edit('@oInvoice.Id')" class="watchlist-edit" title="Edit"></a>*@
+                                    <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@oInvoice.Id')" class="watchlist-delete" title="Delete"></a>
+
+                                </td>
+                            </tr>
+                            count++;
+                        }
+
+
+                    </tbody>
+                    <tfoot class="footer-pager">
+                        <tr>
+                            <td colspan="4">
+                                <div id="pager">
+                                    <form>
+                                        <img src="@Url.Content("~/Content/images/first.png")" class="first" />
+                                        <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
+                                        <input type="text" class="pagedisplay" />
+                                        <img src="@Url.Content("~/Content/images/next.png")" class="next" />
+                                        <img src="@Url.Content("~/Content/images/last.png")" class="last" />
+                                        <select class="pagesize">
+                                            <option selected="selected" value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="30">30</option>
+                                            <option value="40">40</option>
+                                        </select>
+                                    </form>
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    </tfoot>
+
+                }
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="EditColorPartial">
+
+</div>
+
+<script>
+    function Cancel() {
+
+        location.reload();
+    }
+</script>
+<script>
+
+    $(document).ready(function () {
+        //$(document).on("click", "#add", function () {
+        //    $('#empTable').hide();
+        //    debugger;
+        //    $.ajax({
+        //        type: "GET",
+        //        url: '/InvoiceDetails/InvoiceDetails',
+        //        success: function (values) {
+        //            debugger;
+        //           $("#EditColorPartial").html(values);
+        //            $("#EditColorPartial").show();
+        //            $('.veh-tablecont').show();
+        //            $("#empTable").hide();
+        //        }
+
+        //    });
+        //});
+        $('#add').click(function () {
+            $('#empTable').hide();
+            debugger;
+            $.ajax({
+                type: "GET",
+                url: '/InvoiceDetails/InvoiceDetails',
+                success: function (values) {
+                    debugger;
+                    $("#EditColorPartial").html(values);
+                    $("#EditColorPartial").show();
+                    $('.veh-tablecont').show();
+                    $("#empTable").hide();
+                }
+
+            });
+        });
+    });
+
+</script>

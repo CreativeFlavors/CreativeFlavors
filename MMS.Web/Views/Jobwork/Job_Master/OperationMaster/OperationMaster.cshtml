@@ -1,0 +1,196 @@
+﻿@{
+    ViewBag.Title = "OperationMaster";
+    Layout = "~/Views/Shared/_jobLayout.cshtml";
+
+}
+
+<div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+    <div class="dashboard-content col-xs-12 no-padding">
+        <div class="dashboard_head dashboard-title congest col-lg-12 col-md-12 col-sm-12  col-xs-12">
+            <div class="dashboard-title  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+                <h2>Operation Master</h2>
+            </div>
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("OperationMasterGrid", "OperationMaster_Job")
+    </div>
+
+</div>
+<script>
+
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+        $('#example').DataTable();
+        $("#EditColorPartial").hide();
+      
+    });
+    function AddOperation() {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("OperationMasterDetails", "OperationMaster_Job")',
+            data: { OperationMasterId: 0 },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+
+    }
+    function Edit(arg) {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("OperationMasterDetails", "OperationMaster_Job")',
+            data: { OperationMasterId: arg },
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+            }
+        });
+
+    }
+    function Delete(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Delete", "OperationMaster_Job")',
+                data: { OperationMasterId: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Deleted Successfully.');
+                        location.href = "/OperationMaster_Job/OperationMaster";
+                        return false;
+                    }
+                    else {
+                        alert('deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Color Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+    function Save() {
+        if ($('#OperationTypeCode').val() == "") {
+            alert("Please Enter Operation type.")
+            $('#OperationTypeCode').css('border-color', 'red');
+            $('#OperationTypeCode').focus();
+            return false;
+        }
+        else {
+            $('#OperationTypeCode').css('border-color', '');
+        }
+        if ($('#OperationName').val() == "") {
+            alert("Please Enter Operation Name.")
+            $('#OperationName').css('border-color', 'red');
+            $('#OperationName').focus();
+            return false;
+        }
+        else {
+            $('#OperationName').css('border-color', '');
+        }
+
+
+        $.ajax({
+            type: 'POST',
+            url: '/OperationMaster_Job/OperationMaster',
+            data: {
+                OperationTypeCode: $('#OperationTypeCode').val(),
+                OperationName: $('#OperationName').val(),
+                OperationMasterId: $('#OperationMasterId').val()
+            },
+
+            success: function (data) {
+                if (data.OperationMasterId != "" || data.OperationMasterId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/OperationMaster_Job/OperationMaster";
+                    return false;
+                }
+                else if (data.OperationMasterId == 0 && data.OperationName != "") {
+                    alert('Already Exist in the database.');
+                    return false;
+                }
+                else {
+                    alert('Save process Failed.');
+                    location.href = "/OperationMaster_Job/OperationMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function UpdateOperation(arg) {
+
+        if ($('#OperationTypeCode').val() == "") {
+            alert("Please Enter Operation type.")
+            $('#OperationTypeCode').css('border-color', 'red');
+            $('#OperationTypeCode').focus();
+            return false;
+        }
+        else {
+            $('#OperationTypeCode').css('border-color', '');
+        }
+        if ($('#OperationName').val() == "") {
+            alert("Please Enter Operation Name.")
+            $('#OperationName').css('border-color', 'red');
+            $('#OperationName').focus();
+            return false;
+        }
+        else {
+            $('#OperationName').css('border-color', '');
+        }
+
+
+        $.ajax({
+            type: 'POST',
+            url: '/OperationMaster/Update',
+            data: {
+                OperationTypeCode: $('#OperationTypeCode').val(),
+                OperationName: $('#OperationName').val(),
+
+                OperationMasterId: $('#OperationMasterId').val()
+            },
+            success: function (data) {
+                if (data.OperationMasterId != "" || data.OperationMasterId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/OperationMaster_Job/OperationMaster";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/OperationMaster_Job/OperationMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+    function Back() {
+        location.href = "/OperationMaster_Job/OperationMaster";
+    }
+</script>
+

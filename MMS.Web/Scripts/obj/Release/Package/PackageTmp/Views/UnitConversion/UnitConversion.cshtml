@@ -1,0 +1,303 @@
+﻿@{
+    ViewBag.Title = "BasicUnitMaster";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/FormStyle.css" rel="stylesheet" />
+}
+
+<script>
+    //$(".activity_repoty_table").tablesorter();
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $("#EditColorPartial").hide();
+
+    });
+
+    function AddUnits() {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("BasicUnitMasterDetails", "BasicUnitMaster")',
+            data: { BasicUnitID:0},
+            success: function (data) {
+                $("#EditColorPartial").html(data);
+                $("#EditColorPartial").show();
+                $("#DivUnitConversion").hide();
+                $("#DivConversion").hide();
+                $("#DivConversionBtns").hide();
+                $("#DivUnits").show();
+            }
+        });
+
+    }
+    function SaveUnits() {
+        if ($('#CategoryId').val() == "") {
+            alert("Please Enter Category.")
+            $('#CategoryId').css('border-color', 'red');
+            $('#CategoryId').focus();
+            return false;
+        }
+        else {
+            $('#CategoryId').css('border-color', '');
+        }
+        if ($('#GroupID').val() == "") {
+            alert("Please Enter BUGroup.")
+            $('#GroupID').css('border-color', 'red');
+            $('#GroupID').focus();
+            return false;
+        }
+        else {
+            $('#GroupID').css('border-color', '');
+        }
+        if ($('#MaterialID').val() == "") {
+            alert("Please Enter Material.")
+            $('#MaterialID').css('border-color', 'red');
+            $('#MaterialID').focus();
+            return false;
+        }
+        else {
+            $('#MaterialID').css('border-color', '');
+        }
+        if ($('#ShortUnitValue').val() == "") {
+            alert("Please Enter ShortUnitNameValue.")
+            $('#ShortUnitValue').css('border-color', 'red');
+            $('#ShortUnitValue').focus();
+            return false;
+        }
+        else {
+            $('#ShortUnitValue').css('border-color', '');
+        }
+        if ($('#ShortUnitID').val() == "") {
+            alert("Please Enter Short Unit.")
+            $('#ShortUnitID').css('border-color', 'red');
+            $('#ShortUnitID').focus();
+            return false;
+        }
+        else {
+            $('#ShortUnitID').css('border-color', '');
+        }
+        if ($('#LongUnitValue').val() == "") {
+            alert("Please Enter LongUnitNameValue.")
+            $('#LongUnitValue').css('border-color', 'red');
+            $('#LongUnitValue').focus();
+            return false;
+        }
+        else {
+            $('#LongUnitValue').css('border-color', '');
+        }
+        if ($('#LongUnitID').val() == "") {
+            alert("Please Enter Long Unit.")
+            $('#LongUnitID').css('border-color', 'red');
+            $('#LongUnitID').focus();
+            return false;
+        }
+        else {
+            $('#LongUnitID').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/UnitConversion/UnitConversion',
+            data: {
+                MaterialID: $('#MaterialID').val(),
+                GroupID: $('#GroupID').val(),
+                CategoryId: $('#CategoryId').val(),
+                ShortUnitValue: $('#ShortUnitValue').val(),
+                ShortUnitID: $('#ShortUnitID').val(),
+                LongUnitValue: $('#LongUnitValue').val(),
+                LongUnitID: $('#LongUnitID').val(),
+                UnitConversionId: $('#UnitConversionId').val(),
+            },
+            success: function (data) {
+                if (data == true) {
+                    alert('Saved Successfully.');
+                    location.href = "/UnitConversion/UnitConversion";
+                    return false;
+                }
+            }
+        });
+    }
+
+    function Save() {
+        if ($('#Category').val() == "") {
+            alert("Please Enter Category.")
+            $('#Category').css('border-color', 'red');
+            $('#Category').focus();
+            return false;
+        }
+        else {
+            $('#Category').css('border-color', '');
+        }
+        if ($('#UcGroup').val() == "") {
+            alert("Please Enter BUGroup.")
+            $('#UcGroup').css('border-color', 'red');
+            $('#UcGroup').focus();
+            return false;
+        }
+        else {
+            $('#UcGroup').css('border-color', '');
+        }
+        if ($('#Material').val() == "") {
+            alert("Please Enter Material.")
+            $('#Material').css('border-color', 'red');
+            $('#Material').focus();
+            return false;
+        }
+        else {
+            $('#Material').css('border-color', '');
+        }
+        if ($('#ShortUnitNameValue').val() == "") {
+            alert("Please Enter ShortUnitNameValue.")
+            $('#ShortUnitNameValue').css('border-color', 'red');
+            $('#ShortUnitNameValue').focus();
+            return false;
+        }
+        else {
+            $('#ShortUnitNameValue').css('border-color', '');
+        }
+        if ($('#ShortUnitID').val() == "") {
+            alert("Please Enter Short Unit.")
+            $('#ShortUnitID').css('border-color', 'red');
+            $('#ShortUnitID').focus();
+            return false;
+        }
+        else {
+            $('#ShortUnitID').css('border-color', '');
+        }
+        if ($('#LongUnitNameValue').val() == "") {
+            alert("Please Enter LongUnitNameValue.")
+            $('#LongUnitNameValue').css('border-color', 'red');
+            $('#LongUnitNameValue').focus();
+            return false;
+        }
+        else {
+            $('#LongUnitNameValue').css('border-color', '');
+        }
+        if ($('#LongUnitValue').val() == "") {
+            alert("Please Enter Long Unit.")
+            $('#LongUnitValue').css('border-color', 'red');
+            $('#LongUnitValue').focus();
+            return false;
+        }
+        else {
+            $('#LongUnitValue').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/UnitConversion/UnitConversion',
+            data: {
+                Category: $('#Category').val(),
+                UcGroup: $('#UcGroup').val(),
+                Material: $('#Material').val(),
+                ShortUnitNameValue: $('#ShortUnitNameValue').val(),
+                ShortUnitID: $('#ShortUnitID').val(),
+                LongUnitValue: $('#LongUnitValue').val(),
+                LongUnitNameValue: $('#LongUnitNameValue').val(),
+                UnitConversionId: $('#UnitConversionId').val(),
+            },
+            success: function (data) {
+                if (data.UnitConversionId != "" || data.UnitConversionId != 0) {
+                    alert('Saved Successfully.');
+                    location.href = "/UnitConversion/UnitConversion";
+                    return false;
+                }
+                else {
+                    alert('Already Exist in the database.');
+                    location.href = "/UnitConversion/UnitConversion";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+
+    function Update(arg) {
+        if ($('#Category').val() == "") {
+            alert("Please Enter Category.")
+            $('#Category').css('border-color', 'red');
+            $('#Category').focus();
+            return false;
+        }
+        else {
+            $('#Category').css('border-color', '');
+        }
+        if ($('#BUGroup').val() == "") {
+            alert("Please Enter BUGroup.")
+            $('#BUGroup').css('border-color', 'red');
+            $('#BUGroup').focus();
+            return false;
+        }
+        else {
+            $('#BUGroup').css('border-color', '');
+        }
+        if ($('#Material').val() == "") {
+            alert("Please Enter Material.")
+            $('#Material').css('border-color', 'red');
+            $('#Material').focus();
+            return false;
+        }
+        else {
+            $('#Material').css('border-color', '');
+        }
+
+        if ($('#ShortUnitNameValue').val() == "") {
+            alert("Please Enter ShortUnitNameValue.")
+            $('#ShortUnitNameValue').css('border-color', 'red');
+            $('#ShortUnitNameValue').focus();
+            return false;
+        }
+        else {
+            $('#ShortUnitNameValue').css('border-color', '');
+        }
+        if ($('#LongUnitNameValue').val() == "") {
+            alert("Please Enter LongUnitNameValue.")
+            $('#LongUnitNameValue').css('border-color', 'red');
+            $('#LongUnitNameValue').focus();
+            return false;
+        }
+        else {
+            $('#LongUnitNameValue').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/UnitConversion/Update',
+            data: {
+                Category: $('#Category').val(),
+                UcGroup: $('#UcGroup').val(),
+                Material: $('#Material').val(),
+                ShortUnitNameValue: $('#ShortUnitNameValue').val(),
+                ShortUnitID: $('#ShortUnitID').val(),
+                LongUnitValue: $('#LongUnitValue').val(),
+                LongUnitNameValue: $('#LongUnitNameValue').val(),
+                UnitConversionId: $('#UnitConversionId').val(),
+            },
+            success: function (data) {
+                if (data.UnitConversionId != "" || data.UnitConversionId != 0) {
+                    alert('Updated Successfully.');
+                    location.href = "/UnitConversion/UnitConversion";
+                    return false;
+                }
+                else {
+                    alert('Updation failed.');
+                    location.href = "/UnitConversion/UnitConversion";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('Already Exist in the database.');
+            }
+        });
+    }
+</script>
+<h2 class="content-title"> Unit Conversion</h2>
+<div style="width: 100%; float: left;">
+
+    <div id="tabVehicleWatchList">
+        @Html.Action("UnitConversionGrid", "UnitConversion")
+    </div>
+</div>

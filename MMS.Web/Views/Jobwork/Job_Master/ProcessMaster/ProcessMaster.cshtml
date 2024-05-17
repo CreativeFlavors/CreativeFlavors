@@ -1,0 +1,165 @@
+﻿@model MMS.Web.Models.JobworkModel.ProcessModel
+@{
+    ViewBag.Title = "ProcessMaster";
+    Layout = "~/Views/Shared/_jobLayout.cshtml";
+}
+
+<div class="home_dashboard col-xs-12 dashboard-content-pad dashboard-content-pad-scroll mCustomScrollbar light" data-mcs-theme="minimal-dark">
+    <div class="dashboard-content col-xs-12 no-padding">
+        <div class="dashboard_head dashboard-title congest col-lg-12 col-md-12 col-sm-12  col-xs-12">
+            <div class="dashboard-title  col-lg-12 col-md-12 col-sm-12 col-12 no-padding">
+                <h2>Process Master</h2>
+            </div>
+        </div>
+    </div>
+    <div id="tabVehicleWatchList">
+        @Html.Action("ProcessGrid", "ProcessMaster")
+    </div>
+
+</div>
+<script>
+
+    $(document).ready(function () {
+    
+        $(document).ajaxStart(function () {
+            $(".loader-overlay").css("display", "block");
+        });
+
+        $(document).ajaxComplete(function () {
+            $(".loader-overlay").css("display", "none");
+        });
+        $(window).load(function () {
+            $('.loader-overlay').fadeOut('fast');
+        });
+      
+        $("#EditProcessPartial").hide();
+        $('#example').DataTable();
+    });
+    function AddProcess() {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("EditProcessList", "ProcessMaster")',
+            data: { ProcessId: 0 },
+            success: function (data) {
+                $("#EditProcessPartial").html(data);
+                $("#EditProcessPartial").show();
+                $("input[type='hidden'][name='Ioinvolved']").remove();
+            }
+        });
+
+    }
+       function EditProcess(arg) {
+        $('.veh-tablecont').hide();
+        $.ajax({
+            type: "POST",
+            url: ' @Url.Action("EditProcessList", "ProcessMaster")',
+            data: { ProcessId: arg },
+            success: function (data) {
+                $("#EditProcessPartial").html(data);
+                $("#EditProcessPartial").show();
+                $("input[type='hidden'][name='Ioinvolved']").remove();
+            }
+        });
+
+    }
+    function DeleteProcess(arg) {
+        var answer = confirm("Are you sure want to delete?");
+        if (answer) {
+            $.ajax({
+                type: 'POST',
+                url: ' @Url.Action("Deleteprocess", "ProcessMaster")',
+                data: { ProcessId: arg },
+                success: function (data) {
+                    if (data == "Success") {
+                        alert('Process Details Deleted Successfully.');
+                        location.href = "/ProcessMaster/ProcessMaster";
+                        return false;
+                    }
+                    else {
+                        alert('Process Details deletion failed.');
+                    }
+
+                },
+                error: function (ex) {
+                    alert('This Process Already Exist in the database.');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+    //$(function () {
+    //    $("input[type='hidden'][name='Ioinvolved']").remove();
+    //});
+    function Save() {
+        debugger;
+        if ($('#ProcessName').val() == "") {
+            alert("Please Enter the Process Name.")
+            $('#ProcessName').css('border-color', 'red');
+            $('#ProcessName').focus();
+            return false;
+        }
+        else {
+            $('#ProcessName').css('border-color', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/ProcessMaster/saveProcess',
+            data: {
+                ProcessName: $('#ProcessName').val(),
+                Ioinvolved: $("#Ioinvolved").prop('checked'),
+                ProcessId: $('#ProcessId').val(),
+                ProcessCode: $('#ProcessCode').val()
+            },
+            success: function (data) {
+                if (data.ProcessId != "" || data.ProcessId != 0) {
+                    alert('Process Details Saved Successfully.');
+                    location.href = "/ProcessMaster/ProcessMaster";
+                    return false;
+                }
+                else if (data.ProcessId == 0 && data.ProcessId != "") {
+                    alert('This Color Already Exist in the database.');
+                    return false;
+                }
+            },
+            error: function (ex) {
+                alert('This Process Already Exist in the database.');
+            }
+        });
+    }
+    function UpdateProcess(arg) {
+
+        $.ajax({
+            type: 'POST',
+            url: '/ProcessMaster/UpdateProcess',
+            data: {
+                ProcessName: $('#ProcessName').val(),
+                Ioinvolved: $("#Ioinvolved").prop('checked'),
+                ProcessId: $('#ProcessId').val(),
+                ProcessCode: $('#ProcessCode').val()
+            },
+            success: function (data) {
+                if (data.ProcessId != "" || data.ProcessId != 0) {
+                    alert('Process Details Updated Successfully.');
+                    location.href = "/ProcessMaster/ProcessMaster";
+                    return false;
+                }
+                else {
+                    alert('Process Details Updation failed.');
+                    location.href = "/ProcessMaster/ProcessMaster";
+                    return false;
+                }
+
+            },
+            error: function (ex) {
+                alert('This Process Already Exist in the database.');
+            }
+        });
+    }
+    function Back() {
+        location.href = "/ProcessMaster/ProcessMaster";
+    }
+</script>
