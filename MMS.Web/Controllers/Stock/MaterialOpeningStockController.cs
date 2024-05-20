@@ -214,7 +214,7 @@ namespace MMS.Web.Controllers.Stock
         public ActionResult Update(MaterialOpeningModel model)
         {
             MaterialOpeningMaster materialOpening = new MaterialOpeningMaster();
-            int MaterialOpeningId = 0;
+            //int MaterialOpeningId = 0;
 
             if (ModelState.IsValid)
             {
@@ -320,10 +320,10 @@ namespace MMS.Web.Controllers.Stock
             MaterialOpeningStockManager materialStockManager = new MaterialOpeningStockManager();
             List<StoreMaster> storeMasterList = new List<StoreMaster>();
             StoreMasterManager storeManager = new StoreMasterManager();
-            List<MaterialGroupMaster_> materialGroupList_ = new List<MaterialGroupMaster_>();
+            List<materialgroupmaster> materialGroupList_ = new List<materialgroupmaster>();
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
             MaterialNameManager materialNameManager = new MaterialNameManager();
-            List<MaterialNameMaster> materialNameMasterlist = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterlist = new List<tbl_materialnamemaster>();
             MaterialManager materialmanager = new MaterialManager();
             ColorManager colorManager = new ColorManager();
             List<MaterialMaster> MaterialMasterMasterlist = new List<MaterialMaster>();

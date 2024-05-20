@@ -3,14 +3,14 @@
 @using MMS.Core.Entities.Stock
 @using MMS.Core.Entities
 @{
-    List<InternalOrderEntryForm> orderEntryEntityModelist = new List<InternalOrderEntryForm>();
+    List<OrderEntry> orderEntryEntityModelist = new List<OrderEntry>();
     BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
     MMS.Web.Models.StockModel.OrderEntryModel model = new MMS.Web.Models.StockModel.OrderEntryModel();
     MMS.Repository.Managers.SeasonManager seasonManager = new MMS.Repository.Managers.SeasonManager();
     SeasonMaster seasonMaster = new SeasonMaster();
-    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    tbl_PermissionSetting PermissionSettingModel = new MMS.Core.Entities.tbl_PermissionSetting();
     PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
-    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    List<tbl_Permission> PermissionModel = new List<tbl_Permission>();
     if (PermissionSettingModel != null)
     {
         PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("InternalOrderForm", PermissionSettingModel.PermissionID);
@@ -23,25 +23,24 @@
         $("#Date").datepicker({ dateFormat: "dd/mm/yy", maxDate: new Date() });
         $("#CustomerDate").datepicker({ dateFormat: "dd/mm/yy", maxDate: new Date() });
         $("#ExFactoryDate").datepicker({ dateFormat: "dd/mm/yy", maxDate: new Date() });
-      
-    });
-    function Search() {
-        $.ajax({
-            type: "POST",
-            url: ' @Url.Action("Search", "InternalOrderForm")',
-            data: { filter: $('#SeaarchID').val() },
-            success: function (data) {
-             
-                $(".veh-tablewrap").html(data);
-                $(".veh-tablewrap").show();
-                $('#DivShow').hide();
-                $('#EditColorPartial').hide();
-            }
-        });
-    }
 
-    function Cancel() {
+    });
+     function Search() {
      
+     $.ajax({
+         type: "POST",
+         url: ' @Url.Action("Search", "BuyerOrderEntryForm")',
+         data: { filter: $('#SeaarchID').val() },
+         success: function (data) {
+             $(".veh-tablewrap").html(data);
+             $(".veh-tablewrap").show();
+             $('#DivShow').hide();
+             $('#EditColorPartial').hide();
+         }
+     });
+ }
+    function Cancel() {
+
         location.reload();
     }
     function Add() {
@@ -61,13 +60,13 @@
             url: '@Url.Action("FindWeekNo", "InternalOrderForm")',
             data: {  },
             success: function (data) {
-            
+
                 $('#WeekNo').val(data.weekNum);
                 $("#FinishedProdType option:selected").text("Full Shoes");
-                
+
             }
         });
-      
+
     }
     function Edit(arg) {
         $('.veh-tablecont').hide();
@@ -175,13 +174,13 @@
                     </th>
                 </tr>
             </thead>
-            @if (Model.OrderEntryList != null &&  Model.OrderEntryList.Count > 0 )
+            @if (Model.OrderEntryList != null && Model.OrderEntryList.Count > 0)
             {
                 int count = 1;
                 <tbody>
                     @foreach (var item in Model.OrderEntryList)
                     {
-                  
+
                         <tr>
                             <td style="display: none" class="veh-12">@item.OrderEntryId</td>
                             <td class="veh-1">@count</td>

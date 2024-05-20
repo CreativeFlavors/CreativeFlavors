@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MMS.Data.Mapping
 {
-    public class MaterialNameMap : EntityTypeConfiguration<MaterialNameMaster>
+    public class MaterialNameMap : EntityTypeConfiguration<tbl_materialnamemaster>
     {
         public MaterialNameMap()
         {

@@ -148,15 +148,10 @@ namespace MMS.Repository.Managers
             BuyerMaster buyerMaster = new BuyerMaster();
             if (BuyerMasterId != 0)
             {
-                buyerMaster = buyerMasterRepository.Table.Where(x => x.BuyerMasterId == BuyerMasterId).SingleOrDefault();
+                buyerMaster = buyerMasterRepository.Table.Where(x => x.BuyerMasterId == BuyerMasterId).FirstOrDefault();
             }
             return buyerMaster;
         }
-
-
-
-
-
 
 
         public BuyerMaster Get(int id)

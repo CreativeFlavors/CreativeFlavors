@@ -52,7 +52,7 @@ namespace MMS.Data.Mapping.StockMap
             Property(t => t.TotalNorms);
             Property(t => t.TotalNormsUOM);
             Property(t => t.ComponentName);
-            Property(t => t.NoOfSets);
+            Property(t => t.NoOfSets5);
             Property(t => t.BuyerNorms);
             Property(t => t.OurNorms);
             Property(t => t.OurNormsPercent);

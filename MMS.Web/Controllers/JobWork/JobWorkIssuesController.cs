@@ -63,18 +63,18 @@ namespace MMS.Web.Controllers.JobWork
             Data.StoredProcedureModel.IssueSlip_SingleModel model = new Data.StoredProcedureModel.IssueSlip_SingleModel();
             MultipleIssueSlip arg = new MultipleIssueSlip();
             IssueSlip_SingleManager Manager = new IssueSlip_SingleManager();
-            List<IssueSlip_MaterialDetails> issueSlipMaterials = new List<IssueSlip_MaterialDetails>();
+            List<tbl_issueslipdetails> issueSlipMaterials = new List<tbl_issueslipdetails>();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             IssueSlipManager issueSlipManager = new IssueSlipManager();
-            IssueSlip_MaterialDetails issueSlip_MaterialDetails = new IssueSlip_MaterialDetails();
+            tbl_issueslipdetails issueSlip_MaterialDetails = new tbl_issueslipdetails();
             var IssueSlip = Manager.GetMultipleIssueGRNSelectedRow(IssueSlipId);
-            List<InternalOrderEntryForm> _items = new List<InternalOrderEntryForm>();
+            List<OrderEntry> _items = new List<OrderEntry>();
             BuyerOrderEntryManager buyerOrderManager = new BuyerOrderEntryManager();
-            InternalOrderEntryForm orderEntryList = new InternalOrderEntryForm();
+            OrderEntry orderEntryList = new OrderEntry();
             PurchaseOrderManager purchaseOrderManager = new PurchaseOrderManager();
 
-            AutoGenIssueSlipDetails autoGenIssueSlipDetails = new AutoGenIssueSlipDetails();
-            AutoGenIssueSlipDetails autoGenIssue = new AutoGenIssueSlipDetails();
+            tblautogenissueslipdetails autoGenIssueSlipDetails = new tblautogenissueslipdetails();
+            tblautogenissueslipdetails autoGenIssue = new tblautogenissueslipdetails();
             AutoGenIssueSlipDetailsManager autoManager = new AutoGenIssueSlipDetailsManager();
 
             if (IssueSlipId == 0)
@@ -114,7 +114,7 @@ namespace MMS.Web.Controllers.JobWork
 
                     foreach (var item in distinctList_)
                     {
-                        InternalOrderEntryForm orderform = new InternalOrderEntryForm();
+                        OrderEntry orderform = new OrderEntry();
                         orderform.BuyerPoNo = item.BuyerPoNo;
                         orderform.OrderEntryId = item.OrderEntryId;
                         _items.Add(orderform);
@@ -132,7 +132,7 @@ namespace MMS.Web.Controllers.JobWork
 
                 foreach (var item in distinctList)
                 {
-                    InternalOrderEntryForm orderform = new InternalOrderEntryForm();
+                    OrderEntry orderform = new OrderEntry();
                     orderform.BuyerPoNo = item.BuyerPoNo;
                     orderform.OrderEntryId = item.OrderEntryId;
                     _items.Add(orderform);
@@ -147,7 +147,7 @@ namespace MMS.Web.Controllers.JobWork
                 var grouped = issueSlipMaterials
     .GroupBy(s => s.OrderNo)
     .Select(x => x.Key);
-                InternalOrderEntryForm orderEntryForm = new InternalOrderEntryForm();
+                OrderEntry orderEntryForm = new OrderEntry();
                 orderEntryForm = buyerOrderEntryManager.GetBuyerOderSlNo(arg.InternalOderID);
                 model.OrderEntryId = orderEntryForm != null ? orderEntryForm.OrderEntryId : 0;
                 model.issueSlip_MaterialDetails = issueSlipMaterials;
@@ -192,17 +192,17 @@ namespace MMS.Web.Controllers.JobWork
             Models.StockModel.IssueSlip_SingleModel model = new Models.StockModel.IssueSlip_SingleModel();
             MultipleIssueSlip arg = new MultipleIssueSlip();
             IssueSlip_SingleManager Manager = new IssueSlip_SingleManager();
-            List<IssueSlip_MaterialDetails> issueSlipMaterials = new List<IssueSlip_MaterialDetails>();
+            List<tbl_issueslipdetails> issueSlipMaterials = new List<tbl_issueslipdetails>();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             IssueSlipManager issueSlipManager = new IssueSlipManager();
-            IssueSlip_MaterialDetails issueSlip_MaterialDetails = new IssueSlip_MaterialDetails();
+            tbl_issueslipdetails issueSlip_MaterialDetails = new tbl_issueslipdetails();
             var IssueSlip = Manager.GetMultipleIssueGRNSelectedRow(IssueSlipId);
-            List<InternalOrderEntryForm> _items = new List<InternalOrderEntryForm>();
+            List<OrderEntry> _items = new List<OrderEntry>();
             BuyerOrderEntryManager buyerOrderManager = new BuyerOrderEntryManager();
-            InternalOrderEntryForm orderEntryList = new InternalOrderEntryForm();
+            OrderEntry orderEntryList = new OrderEntry();
             PurchaseOrderManager purchaseOrderManager = new PurchaseOrderManager();
-            AutoGenIssueSlipDetails autoGenIssueSlipDetails = new AutoGenIssueSlipDetails();
-            AutoGenIssueSlipDetails autoGenIssue = new AutoGenIssueSlipDetails();
+            tblautogenissueslipdetails autoGenIssueSlipDetails = new tblautogenissueslipdetails();
+            tblautogenissueslipdetails autoGenIssue = new tblautogenissueslipdetails();
             AutoGenIssueSlipDetailsManager autoManager = new AutoGenIssueSlipDetailsManager();
             if (IssueSlipId == 0)
             {
@@ -235,7 +235,7 @@ namespace MMS.Web.Controllers.JobWork
 
                 foreach (var item in distinctList_)
                 {
-                    InternalOrderEntryForm orderform = new InternalOrderEntryForm();
+                    OrderEntry orderform = new OrderEntry();
                     orderform.BuyerPoNo = item.BuyerPoNo;
                     orderform.OrderEntryId = item.OrderEntryId;
                     _items.Add(orderform);
@@ -253,7 +253,7 @@ namespace MMS.Web.Controllers.JobWork
 
                 foreach (var item in distinctList)
                 {
-                    InternalOrderEntryForm orderform = new InternalOrderEntryForm();
+                    OrderEntry orderform = new OrderEntry();
                     orderform.BuyerPoNo = item.BuyerPoNo;
                     orderform.OrderEntryId = item.OrderEntryId;
                     _items.Add(orderform);
@@ -268,7 +268,7 @@ namespace MMS.Web.Controllers.JobWork
                 var grouped = issueSlipMaterials
     .GroupBy(s => s.OrderNo)
     .Select(x => x.Key);
-                InternalOrderEntryForm orderEntryForm = new InternalOrderEntryForm();
+                OrderEntry orderEntryForm = new OrderEntry();
                 orderEntryForm = buyerOrderEntryManager.GetBuyerOderSlNo(arg.InternalOderID);
                 model.OrderEntryId = orderEntryForm != null ? orderEntryForm.OrderEntryId : 0;
                 model.issueSlip_MaterialDetails = issueSlipMaterials;
@@ -303,7 +303,7 @@ namespace MMS.Web.Controllers.JobWork
         public ActionResult LoadOrderList()
         {
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
-            List<InternalOrderEntryForm> _items = new List<InternalOrderEntryForm>();
+            List<OrderEntry> _items = new List<OrderEntry>();
             _items = buyerOrderEntryManager.Get().Where(x => x.IsInternal == true).OrderBy(x => x.BuyerOrderSlNo).ToList();
             Models.StockModel.IssueSlip_SingleModel model = new Models.StockModel.IssueSlip_SingleModel();
             model.orderList = _items;
@@ -311,13 +311,13 @@ namespace MMS.Web.Controllers.JobWork
         }
 
         [HttpGet]
-        public ActionResult GetInternalOrderID(int InternalOrderno)
-        {
-            InternalOrderEntryForm internalOrderEntryForm = new InternalOrderEntryForm();
-            BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
-            internalOrderEntryForm = buyerOrderEntryManager.GetInteranlOrderEntryId(InternalOrderno);
-            return Json(internalOrderEntryForm, JsonRequestBehavior.AllowGet);
-        }
+       // public ActionResult GetInternalOrderID(int InternalOrderno)
+        //{
+        //    InternalOrderForm internalOrderEntryForm = new InternalOrderForm();
+        //    BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
+        //    internalOrderEntryForm = buyerOrderEntryManager.GetInteranlOrderEntryId(InternalOrderno);
+        //    return Json(internalOrderEntryForm, JsonRequestBehavior.AllowGet);
+        //}
         public ActionResult IssueSlipSingle()
         {
             string SearchFilter = Request.QueryString["SearchFilter"];
@@ -602,17 +602,17 @@ namespace MMS.Web.Controllers.JobWork
             try
             {
                 StoreMasterManager StoreMasterManager = new StoreMasterManager();
-                List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+                List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
                 ColorManager colorManager = new ColorManager();
                 MaterialNameManager materialNameManager = new MaterialNameManager();
                 MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
                 MaterialManager materialManager = new MaterialManager();
                 string Message = "";
                 JobLeather_leatherManager jobLeather = new JobLeather_leatherManager();
-                List<IssueSlip_MaterialDetails> issueSlipMaterialList = new List<IssueSlip_MaterialDetails>();
+                List<tbl_issueslipdetails> issueSlipMaterialList = new List<tbl_issueslipdetails>();
                 IssueSlipManager issueSlipManager = new IssueSlipManager();
                 JobLeather_leatherMaster Jw_Name = new JobLeather_leatherMaster();
-                List<IssueSlip_MaterialDetails> IssueObjList = new List<IssueSlip_MaterialDetails>();
+                List<tbl_issueslipdetails> IssueObjList = new List<tbl_issueslipdetails>();
                 List<System.Web.Mvc.SelectListItem> materaildesc_List = new List<System.Web.Mvc.SelectListItem>();
                 BillOfMaterialManager billofMaterialManager = new BillOfMaterialManager();
                 List<MMS.Data.StoredProcedureModel.MaterialDropDownmodel> list = new List<Data.StoredProcedureModel.MaterialDropDownmodel>();
@@ -648,7 +648,7 @@ namespace MMS.Web.Controllers.JobWork
                 {
                     string items = item.ToString();
                     //  IssueObjList.AddRange(issueSlipManager.Get().Where(x => x.jobsheet_pair_Code_id.Trim().Contains(items.Trim())).ToList());
-                    IssueObjList.AddRange(issueSlipManager.Get().Where(x => x.jobsheet_pair_Code_id == items).ToList());
+                    IssueObjList.AddRange(issueSlipManager.Get().Where(x => x.Jobsheet_pair_Code_id == items).ToList());
                 }
                 Balance_stock = Convert.ToDecimal(IssueObjList.Sum(x => x.CurrentIssue));
                 foreach (var items in materaildesc_)
@@ -729,7 +729,7 @@ namespace MMS.Web.Controllers.JobWork
             {
                 string Message = "";
                 JobLeather_leatherManager jobLeather = new JobLeather_leatherManager();
-                List<IssueSlip_MaterialDetails> issueSlipMaterialList = new List<IssueSlip_MaterialDetails>();
+                List<tbl_issueslipdetails> issueSlipMaterialList = new List<tbl_issueslipdetails>();
                 IssueSlipManager issueSlipManager = new IssueSlipManager();
                 JobLeather_leatherMaster Jw_Name = new JobLeather_leatherMaster();
                 var Balance_stock = Convert.ToDecimal(0);
@@ -869,7 +869,7 @@ namespace MMS.Web.Controllers.JobWork
                 materaildesc_List_.Insert(0, ShotName);
                 int value;
                 var Balance_stock = Convert.ToDecimal(0);
-                count = issueSlipManager.Get().Where(x => jobWorkId_CommoSep_string.Contains(x.jobsheet_pair_Code_id)).Count();
+                count = issueSlipManager.Get().Where(x => jobWorkId_CommoSep_string.Contains(x.Jobsheet_pair_Code_id)).Count();
                 //if (int.TryParse(jobWorkId, out value))
                 //{ 
                 // materaildesc = ProductionJobworkMasterManager_.GetproductionMaster_id(Convert.ToInt32(jobWorkId));
@@ -920,7 +920,7 @@ namespace MMS.Web.Controllers.JobWork
         {
             string Message = "";
             JobSheet_PairManager jobSheet = new JobSheet_PairManager();
-            List<IssueSlip_MaterialDetails> issueSlipMaterialList = new List<IssueSlip_MaterialDetails>();
+            List<tbl_issueslipdetails> issueSlipMaterialList = new List<tbl_issueslipdetails>();
             IssueSlipManager issueSlipManager = new IssueSlipManager();
             Data.StoredProcedureModel.IssueSlip_SingleModel model = new Data.StoredProcedureModel.IssueSlip_SingleModel();
             Job_ApprovedPriceManager Job_ApprovedPriceMaster = new Job_ApprovedPriceManager();
@@ -1120,7 +1120,7 @@ namespace MMS.Web.Controllers.JobWork
             MaterialManager materialManager = new MaterialManager();
             ApprovedPriceListManager approvedPricelistManager = new ApprovedPriceListManager();
             List<ApprovedPriceList> approvedPriceList = new List<ApprovedPriceList>();
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             ColorManager colorManager = new ColorManager();
             List<string> issueItems;
             IssueSlipManager issueSlipManager_Detail = new IssueSlipManager();
@@ -1262,7 +1262,7 @@ namespace MMS.Web.Controllers.JobWork
             {
                 string Message = "";
                 JobLeather_leatherManager jobLeather = new JobLeather_leatherManager();
-                List<IssueSlip_MaterialDetails> issueSlipMaterialList = new List<IssueSlip_MaterialDetails>();
+                List<tbl_issueslipdetails> issueSlipMaterialList = new List<tbl_issueslipdetails>();
                 IssueSlipManager issueSlipManager = new IssueSlipManager();
                 JobLeather_leatherMaster Jw_Name = new JobLeather_leatherMaster();
 
@@ -1286,7 +1286,7 @@ namespace MMS.Web.Controllers.JobWork
             //   Models.StockModel.IssueSlip_SingleModel model = new Models.StockModel.IssueSlip_SingleModel();
             MultipleIssueSlip EntModel = new MultipleIssueSlip();
             IssueSlip_SingleManager ObjManager = new IssueSlip_SingleManager();
-            List<IssueSlip_MaterialDetails> issueSlipMaterialList = new List<IssueSlip_MaterialDetails>();
+            List<tbl_issueslipdetails> issueSlipMaterialList = new List<tbl_issueslipdetails>();
             EntModel.MultipleIssueSlipID = Model.MultipleIssueSlipID;
             EntModel.IssueSlipNo = Model.IssueSlipNo;
             EntModel.InternalOderID = Model.InternalOderID;
@@ -1305,10 +1305,10 @@ namespace MMS.Web.Controllers.JobWork
             MultipleIssueSlip issueSlip = new MultipleIssueSlip();
             MultipleIssueSlip issueSlip_ = new MultipleIssueSlip();
             GrnTypeMaster grnTypeMaster = new GrnTypeMaster();
-            IssueSlip_MaterialDetails issueSlip_MaterialDetails = new IssueSlip_MaterialDetails();
+            tbl_issueslipdetails issueSlip_MaterialDetails = new tbl_issueslipdetails();
             IssueSlipManager issueSlipManager = new IssueSlipManager();
-            IssueSlip_MaterialDetails issueSlipMaterial = new IssueSlip_MaterialDetails();
-            IssueSlip_MaterialDetails issueSlipMaterials = new IssueSlip_MaterialDetails();
+            tbl_issueslipdetails issueSlipMaterial = new tbl_issueslipdetails();
+            tbl_issueslipdetails issueSlipMaterials = new tbl_issueslipdetails();
             issueSlip_ = ObjManager.MultipleIssuePost(EntModel);
  //       var IssueDate_=    DateTime.ParseExact(Model.IssueDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
             if (issueSlip_ != null && issueSlip_.MultipleIssueSlipID != 0)
@@ -1320,10 +1320,10 @@ namespace MMS.Web.Controllers.JobWork
                 MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
                 MaterialCategoryMaster materialCategoryMaster = new MaterialCategoryMaster();
                 MaterialGroupManager materialGroupManager = new MaterialGroupManager();
-                MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
+                materialgroupmaster materialGroupMaster = new materialgroupmaster();
                 MaterialMaster materialMaster = new MaterialMaster();
                 MaterialManager materialManager = new MaterialManager();
-                MaterialNameMaster materialNameMaster = new MaterialNameMaster();
+                tbl_materialnamemaster materialNameMaster = new tbl_materialnamemaster();
                 MaterialNameManager materialNameManager = new MaterialNameManager();
                 ColorManager colorManager = new ColorManager();
                 ColorMaster colorMaster = new ColorMaster();
@@ -1332,7 +1332,7 @@ namespace MMS.Web.Controllers.JobWork
                 storeMaster = storeMasterManager.GetStoreMasterId(Convert.ToInt32(Model.StoreName));
                 grnTypeMaster = grnTypeManager.GetIssueTypeMasterId(Model.IssueType);
                 materialCategoryMaster = materialCategoryManager.GetMaterialCategoryMaster(Convert.ToInt32(Model.CategoryName));
-                materialGroupMaster = materialGroupManager.GetMaterialGroupMaster_Id(Convert.ToInt32(Model.GroupName));
+                materialGroupMaster = materialGroupManager.GetmaterialgroupmasterId(Convert.ToInt32(Model.GroupName));
                 materialMaster = materialManager.GetMaterialMasterId(Convert.ToInt32(Model.MaterialDescription));
                 if (materialMaster != null && materialMaster.MaterialMasterId != 0)
                 {
@@ -1428,13 +1428,13 @@ namespace MMS.Web.Controllers.JobWork
                 {
                     issueSlipMaterials.Jobworktype_Id = Model.Jobworktype_Id;
 
-                    issueSlipMaterials.jobsheet_pair_Code_id = Model.jobsheet_pair_Code_id.ToString();
+                    issueSlipMaterials.Jobsheet_pair_Code_id = Model.jobsheet_pair_Code_id.ToString();
                 }
                 else
                 {
                     issueSlipMaterials.Jobworktype_Id = Model.Jobworktype_Id;
 
-                    issueSlipMaterials.jobsheet_pair_Code_id = Model.Jobworktype_Id.ToString();
+                    issueSlipMaterials.Jobsheet_pair_Code_id = Model.Jobworktype_Id.ToString();
                 }
                 
                 issueSlipMaterials.Jw_Name = Model.Jw_Name;
@@ -1500,7 +1500,7 @@ namespace MMS.Web.Controllers.JobWork
             //   Models.StockModel.IssueSlip_SingleModel model = new Models.StockModel.IssueSlip_SingleModel();
             MultipleIssueSlip EntModel = new MultipleIssueSlip();
             IssueSlip_SingleManager ObjManager = new IssueSlip_SingleManager();
-            List<IssueSlip_MaterialDetails> issueSlipMaterialList = new List<IssueSlip_MaterialDetails>();
+            List<tbl_issueslipdetails> issueSlipMaterialList = new List<tbl_issueslipdetails>();
             EntModel.MultipleIssueSlipID = Model.MultipleIssueSlipID;
             EntModel.IssueSlipNo = Model.IssueSlipNo;
             EntModel.InternalOderID = Model.InternalOderID;
@@ -1519,10 +1519,10 @@ namespace MMS.Web.Controllers.JobWork
             MultipleIssueSlip issueSlip = new MultipleIssueSlip();
             MultipleIssueSlip issueSlip_ = new MultipleIssueSlip();
             GrnTypeMaster grnTypeMaster = new GrnTypeMaster();
-            IssueSlip_MaterialDetails issueSlip_MaterialDetails = new IssueSlip_MaterialDetails();
+            tbl_issueslipdetails issueSlip_MaterialDetails = new tbl_issueslipdetails();
             IssueSlipManager issueSlipManager = new IssueSlipManager();
-            IssueSlip_MaterialDetails issueSlipMaterial = new IssueSlip_MaterialDetails();
-            IssueSlip_MaterialDetails issueSlipMaterials = new IssueSlip_MaterialDetails();
+            tbl_issueslipdetails issueSlipMaterial = new tbl_issueslipdetails();
+            tbl_issueslipdetails issueSlipMaterials = new tbl_issueslipdetails();
             issueSlip_ = ObjManager.MultipleIssuePost(EntModel);
 
             if (issueSlip_ != null && issueSlip_.MultipleIssueSlipID != 0)
@@ -1534,10 +1534,10 @@ namespace MMS.Web.Controllers.JobWork
                 MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
                 MaterialCategoryMaster materialCategoryMaster = new MaterialCategoryMaster();
                 MaterialGroupManager materialGroupManager = new MaterialGroupManager();
-                MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
+                materialgroupmaster materialGroupMaster = new materialgroupmaster();
                 MaterialMaster materialMaster = new MaterialMaster();
                 MaterialManager materialManager = new MaterialManager();
-                MaterialNameMaster materialNameMaster = new MaterialNameMaster();
+                tbl_materialnamemaster materialNameMaster = new tbl_materialnamemaster();
                 MaterialNameManager materialNameManager = new MaterialNameManager();
                 ColorManager colorManager = new ColorManager();
                 ColorMaster colorMaster = new ColorMaster();
@@ -1546,7 +1546,7 @@ namespace MMS.Web.Controllers.JobWork
                 storeMaster = storeMasterManager.GetStoreMasterId(Convert.ToInt32(Model.StoreName));
                 grnTypeMaster = grnTypeManager.GetIssueTypeMasterId(Model.IssueType);
                 materialCategoryMaster = materialCategoryManager.GetMaterialCategoryMaster(Convert.ToInt32(Model.CategoryName));
-                materialGroupMaster = materialGroupManager.GetMaterialGroupMaster_Id(Convert.ToInt32(Model.GroupName));
+                materialGroupMaster = materialGroupManager.GetmaterialgroupmasterId(Convert.ToInt32(Model.GroupName));
                 materialMaster = materialManager.GetMaterialMasterId(Convert.ToInt32(Model.MaterialDescription));
                 if (materialMaster != null && materialMaster.MaterialMasterId != 0)
                 {
@@ -1632,9 +1632,9 @@ namespace MMS.Web.Controllers.JobWork
                 issueSlipMaterials.ColourId = colorMaster.Color;
                 issueSlipMaterials.Jobworktype_Id = Model.Jobworktype_Id;
                 issueSlipMaterials.Jw_Name = Model.Jw_Name;
-                issueSlipMaterials.sheet = Model.sheet;
+                issueSlipMaterials.Sheet = Model.sheet;
                 issueSlipMaterials.TotalQty = Model.TotalQty;
-                issueSlipMaterials.jobsheet_pair_Code_id = Model.jobsheet_pair_Code_id.ToString();
+                issueSlipMaterials.Jobsheet_pair_Code_id = Model.jobsheet_pair_Code_id.ToString();
                 issueSlipMaterials.ExcessApproval = Model.ExcessApproval;
                 issueSlip_MaterialDetails = issueSlipManager.Post(issueSlipMaterials);
                 issueSlipMaterialList = issueSlipManager.GetMultipleIssueid(EntModel.MultipleIssueSlipID);
@@ -1694,7 +1694,7 @@ namespace MMS.Web.Controllers.JobWork
             else
             {
                 string CategoryName = "";
-                List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+                List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
                 ColorManager colorManager = new ColorManager();
                 var items = (from x in materialManager.Get()
                              join y in materialNameManager.Get()

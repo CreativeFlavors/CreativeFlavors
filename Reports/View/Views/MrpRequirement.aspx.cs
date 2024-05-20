@@ -14,7 +14,8 @@ namespace Reports.View.Views
     {
         ReportDocument crystalReport = new ReportDocument();
         string strcon = ConfigurationManager.ConnectionStrings["EnsysConnectionString"].ConnectionString;
-        string MrpNo = "", IndentType = "", Buyer = "", Store = "", Group = "", Category = "", url = "";
+        //string MrpNo = "", IndentType = "", Buyer = "", Store = "", Group = "", Category = "", url = "";
+        string MrpNo = "4693", IndentType = "1", Buyer = "1", Store = "2", Group = "", Category = "Materials", url = "";
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)

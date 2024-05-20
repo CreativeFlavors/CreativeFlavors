@@ -15,7 +15,7 @@ namespace MMS.Repository.Managers.StockManager
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
         private Repository<GRN_EntityModelNew> GrnRepository;
-        private Repository<IssueSlip_MaterialDetails> IssueRepository;
+        private Repository<tbl_issueslipdetails> IssueRepository;
         private Repository<GRNSizeQuantityObjectNew> GRNSizeRangeRepository;
         #region Helper Method
 
@@ -143,7 +143,7 @@ namespace MMS.Repository.Managers.StockManager
         }
         public GRN_EntityModelNew GetGRNNewNO(int GRNNo)
         {
-          GRN_EntityModelNew GrnObjList = new GRN_EntityModelNew();
+            GRN_EntityModelNew GrnObjList = new GRN_EntityModelNew();
             try
             {
                 GrnObjList = GrnRepository.Table.Where(x => x.GrnNo == GRNNo).FirstOrDefault();
@@ -209,10 +209,10 @@ namespace MMS.Repository.Managers.StockManager
 
             return GrnObj;
         }
-        public GRN_EntityModelNew IsSupplierWithInvoice_production(string INVoiceNo,  string DC_No)
+        public GRN_EntityModelNew IsSupplierWithInvoice_production(string INVoiceNo, string DC_No)
         {
             GRN_EntityModelNew GrnObj = new GRN_EntityModelNew();
-            GrnObj = GrnRepository.Table.Where(x => x.INVoiceNo == INVoiceNo   && x.DC_No == DC_No).FirstOrDefault();
+            GrnObj = GrnRepository.Table.Where(x => x.INVoiceNo == INVoiceNo && x.DC_No == DC_No).FirstOrDefault();
 
             return GrnObj;
         }
@@ -267,7 +267,7 @@ namespace MMS.Repository.Managers.StockManager
             List<GRN_EntityModelNew> contactlist = new List<GRN_EntityModelNew>();
             try
             {
-               // contactlist = GrnRepository.SearchGrnList(GrnNo);
+                // contactlist = GrnRepository.SearchGrnList(GrnNo);
             }
             catch (Exception ex)
             {
@@ -302,7 +302,7 @@ namespace MMS.Repository.Managers.StockManager
                     model.BarCodeNo = arg.BarCodeNo;
                     model.Transporter = arg.Transporter;
                     model.GrnNo = arg.GrnNo;
-                  //  model.GateEntryNo = arg.GateEntryNo;
+                    //  model.GateEntryNo = arg.GateEntryNo;
                     model.Grn_MaterialID = arg.Grn_MaterialID;
                     model.FreightAmount = arg.FreightAmount;
                     model.IndentMaterialId = arg.IndentMaterialId;
@@ -336,7 +336,7 @@ namespace MMS.Repository.Managers.StockManager
                     model.Transporter = arg.Transporter;
                     model.INVoiceDate = arg.INVoiceDate;
                     model.ShipmentMode = arg.ShipmentMode;
-                    model.GeneralRemarks1 = arg.GeneralRemarks1;
+                    model.GeneralRemarks = arg.GeneralRemarks;
                     model.PoNO = arg.PoNO;
                     model.LOTNo = arg.LOTNo;
                     model.IndentNo = arg.IndentNo;
@@ -472,6 +472,23 @@ namespace MMS.Repository.Managers.StockManager
             }
 
             return result;
+        }
+
+        public GRN_EntityModelNew Get(int id)
+        {
+            GRN_EntityModelNew GRNEntityModelNew = new GRN_EntityModelNew();
+            if (id != 0)
+            {
+                try
+                {
+                    GRNEntityModelNew = GrnRepository.Table.Where(x => x.GrnNo == id).FirstOrDefault();
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+            }
+            return GRNEntityModelNew;
         }
     }
 }

@@ -52,7 +52,7 @@ namespace MMS.Web.Controllers.Stock
 
         public ActionResult FillPoBasedMaterialName(string PoNo)
         {
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             MaterialNameManager materialNameManager = new MaterialNameManager();
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
             PurchaseOrderManager purchaseOrderManager = new PurchaseOrderManager();
@@ -133,7 +133,7 @@ namespace MMS.Web.Controllers.Stock
             GRN_EntityModel grn = new GRN_EntityModel();
             StoreMasterManager storeMasterManager = new StoreMasterManager();
             StoreMaster storeMaster = new StoreMaster();
-            InternalOrderEntryForm internalOrderEntryForm = new InternalOrderEntryForm();
+            OrderEntry internalOrderEntryForm = new OrderEntry();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             CurrencyManager currencyManager = new CurrencyManager();
             IspurchaseOrder = purchaseOrderManager.GetPoOrderId(IndentMaterialID);
@@ -206,7 +206,7 @@ namespace MMS.Web.Controllers.Stock
             }
             else
             {
-                InternalOrderEntryForm internalOrderEntryFormLotno = new InternalOrderEntryForm();
+                OrderEntry internalOrderEntryFormLotno = new OrderEntry();
                 IndentMaterials indentMaterials = new IndentMaterials();
                 List<PurchaseOrderSizeRangeQuantity> listPurchaseOrderSizeRangeQuantity = new List<PurchaseOrderSizeRangeQuantity>();
                 if (purchaseOrder != null && purchaseOrder.IONO != null && indentMaterial != null)
@@ -250,7 +250,7 @@ namespace MMS.Web.Controllers.Stock
             StoreMaster storeMaster = new StoreMaster();
             List<ApprovedPriceList> approvedPriceList = new List<ApprovedPriceList>();
             ApprovedPriceListManager approvedPricelistManager = new ApprovedPriceListManager();
-            InternalOrderEntryForm internalOrderEntryForm = new InternalOrderEntryForm();
+            OrderEntry internalOrderEntryForm = new OrderEntry();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             List<GRN_EntityModel> GrnObjList = new List<GRN_EntityModel>();
 
@@ -354,7 +354,7 @@ namespace MMS.Web.Controllers.Stock
             EntObj = Manager.GetGRNSelectedRow(GrnID);
             PurchaseOrder purchaseOrder = new PurchaseOrder();
             PurchaseOrderManager purchaseOrderManager = new PurchaseOrderManager();
-            MaterialNameMaster materialNameMaster = new MaterialNameMaster();
+            tbl_materialnamemaster materialNameMaster = new tbl_materialnamemaster();
             MaterialNameManager materialnameManager = new MaterialNameManager();
             IndentMaterialManager indentMaterialManager = new IndentMaterialManager();
             MaterialManager materialManager = new MaterialManager();
@@ -468,14 +468,14 @@ namespace MMS.Web.Controllers.Stock
                 {
                     GRN_Details_Model modellist = new GRN_Details_Model();
                     MaterialNameManager materialNameManager = new MaterialNameManager();
-                    MaterialNameMaster materialNamemaster = new MaterialNameMaster();
+                    tbl_materialnamemaster materialNamemaster = new tbl_materialnamemaster();
                     MaterialMaster materialMaster_ = new MaterialMaster();
                     GrnTypeMaster grnTypeMaster_ = new GrnTypeMaster();
                     StoreMaster storeMaster_ = new StoreMaster();
                     UOMManager uomManager = new UOMManager();
                     UomMaster uomMaster = new UomMaster();
                     MaterialGroupManager materialGroupManager = new MaterialGroupManager();
-                    MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
+                    materialgroupmaster materialGroupMaster = new materialgroupmaster();
                     MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
                     MaterialCategoryMaster materialCategoryMaster = new MaterialCategoryMaster();
                     SupplierMasterManager supplierMasterManager = new SupplierMasterManager();
@@ -603,7 +603,7 @@ namespace MMS.Web.Controllers.Stock
                     {
                         modellist.GroupName = "";
                     }
-                    materialGroupMaster = materialGroupManager.GetMaterialGroupMaster_Id(item.GroupID);
+                    materialGroupMaster = materialGroupManager.GetmaterialgroupmasterId(item.GroupID);
                     if (materialGroupMaster != null && materialGroupMaster.MaterialGroupMasterId != 0)
                     {
                         modellist.GroupName = materialGroupMaster.GroupName;
@@ -809,7 +809,7 @@ namespace MMS.Web.Controllers.Stock
 
         public ActionResult isExistGRNMaterialNameBasedonGRNNO(int? MaterialNameID, int? GrnNO)
         {
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             MaterialNameManager materialNameManager = new MaterialNameManager();
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
             MaterialManager materialManager = new MaterialManager();
@@ -961,7 +961,7 @@ namespace MMS.Web.Controllers.Stock
             bool Result = false;
             MaterialMaster materialMaster = new MaterialMaster();
             MaterialManager materialManage_ = new MaterialManager();
-            MaterialNameMaster materialNameMaster = new MaterialNameMaster();
+            tbl_materialnamemaster materialNameMaster = new tbl_materialnamemaster();
             materialMaster = materialManage_.GetMaterialMasterId(GrnModel.Grn_MaterialID);
             if (materialMaster != null && materialMaster.MaterialMasterId != 0)
             {
@@ -1152,7 +1152,7 @@ namespace MMS.Web.Controllers.Stock
             openingStockModelList = openingStockModelList.Where(x => x.materialmasterid == GrnModel_.Grn_MaterialID).OrderByDescending(x => x.OpeningStockDate).ToList();
             foreach (var item in openingStockModelList)
             {
-                IssueSlip_MaterialDetails issueSlip_MaterialDetails = new IssueSlip_MaterialDetails();
+                tbl_issueslipdetails issueSlip_MaterialDetails = new tbl_issueslipdetails();
                 OpeningStockPinCard openingStockPinCard = new OpeningStockPinCard();
                 openingStockPinCard.materialmasterid = item.materialmasterid;
                 openingStockPinCard.MaterialDescription = item.MaterialDescription;

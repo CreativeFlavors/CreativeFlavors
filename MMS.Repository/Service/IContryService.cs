@@ -14,5 +14,5 @@ namespace MMS.Repository.Service
         bool Delete(int id);
         CountryMaster Get(int id);
         List<CountryMaster> Get();
-    }
+    }   
 }

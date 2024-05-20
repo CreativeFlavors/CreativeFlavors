@@ -16,7 +16,7 @@ namespace MMS.Data.Mapping.StockMap
             HasKey(t => t.PurchaseSizeRangeID);
             Property(t => t.PurchaseSizeRangeID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             Property(t => t.Size);
-            Property(t => t.quantity);
+            Property(t => t.Quantity);
             Property(t => t.Rate);
             Property(t => t.PoOrderID);
             Property(t => t.CreatedDate);

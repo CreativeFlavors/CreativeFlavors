@@ -1,26 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MMS.Core.Entities.Stock
 {
-   public class EmpGrade:BaseEntity2
+    [Table("empgrate", Schema = "public")]
+    public class EmpGrade : BaseEntity2
     {
-       public Guid EmpGradeCodePK { get; set; }
-       //public DateTime? CreatedDate { get; set; }
-       //public DateTime? LastUpdatedDate { get; set; }
-       public int GradeCode { get; set; }
-       public string FromEfficiency { get; set; }
-       public string ToEfficiency { get; set; }
-       public Guid? CompanyCodeFK { get; set; }
-       public Guid? EmpCategoryCodeFK { get; set; }
-       public Guid? EmpDepartmentCodeFK { get; set; }
-       public Guid? EmpDesignationCodeFK { get; set; }
-       public Guid? UnitCodeFK { get; set; }
-       public Guid? DivisionCodeFK { get; set; }
-       public string GradeName { get; set; }
-      
+        [System.ComponentModel.DataAnnotations.Key]
+        [Column("empgradecodepk")]
+        public Guid EmpGradeCodePK { get; set; }
+        //public DateTime? CreatedDate { get; set; }
+        //public DateTime? LastUpdatedDate { get; set; }
+        [Column("gradecode")]
+        public int GradeCode { get; set; }
+        [Column("fromefficiency")]
+        public string FromEfficiency { get; set; }
+        [Column("toefficiency")]
+        public string ToEfficiency { get; set; }
+        [Column("companycodefk")]
+        public Guid? CompanyCodeFK { get; set; }
+        [Column("empcategorycodefk")]
+        public Guid? EmpCategoryCodeFK { get; set; }
+        [Column("empdepartmentcodefk")]
+        public Guid? EmpDepartmentCodeFK { get; set; }
+        [Column("empdesignationcodefk")]
+        public Guid? EmpDesignationCodeFK { get; set; }
+        [Column("unitcodefk")]
+        public Guid? UnitCodeFK { get; set; }
+        [Column("divisioncodefk")]
+        public Guid? DivisionCodeFK { get; set; }
+        [Column("gratename")]
+        public string GradeName { get; set; }
+
     }
 }

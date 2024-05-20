@@ -140,7 +140,10 @@
                     </div>
                 </div>
                 <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
-                    @Html.DropDownListFor(m => m.LotNO, MMS.Web.ExtensionMethod.HtmlHelper.LOtNowihSeason(), new { @class = "select-style text-field" })
+                    @*@Html.DropDownListFor(m => m.LotNO, MMS.Web.ExtensionMethod.HtmlHelper.LOtNowihSeason(), new { @class = "select-style text-field" })*@
+                    @Html.DropDownListFor(m => m.LotNO,
+                       new SelectList(MMS.Web.ExtensionMethod.HtmlHelper.LOtNowihSeason(), "Value", "Text", Model.LotNO),
+                       new { @class = "select-style text-field" })
                 </div>
             </div>
         </div>
@@ -183,7 +186,7 @@
                     </div>
                 </div>
                 <div class="frm-tx2 col-sm-8 col-xs-12" style="padding-left: 0;">
-                    @Html.TextBoxFor(m => m.TotalOrderCount, new { @class = "form-control text-field",@disabled=true })
+                    @Html.TextBoxFor(m => m.TotalOrderCount, new { @class = "form-control text-field", @disabled = true })
                 </div>
             </div>
         </div>
@@ -205,10 +208,7 @@
 
                     <div class="form-group">
                         <input type="submit" value="Upload" onclick="return ValidateExtension()" class="btn btn-default btn-style" />
-
-
                     </div>
-
                 </div>
             </div>
             <div class="col-lg-9 col-sm-9">
@@ -216,11 +216,11 @@
                     <div class="col-xs-5">
                         @if (Model != null && Model.IOS != null)
                         {
-                        @Html.ListBoxFor(model => model.SelectedCities, new MultiSelectList(Model.IOS, "Value", "Text"), new { size = "10", @style = "width: 125px;" })
+                            @Html.ListBoxFor(model => model.SelectedCities, new MultiSelectList(Model.IOS, "Value", "Text"), new { size = "10", @style = "width: 125px;" })
                         }
                         else
                         {
-                        @Html.ListBoxFor(m => m.MoveSelectedIOS, Model.selectlist ?? new List<SelectListItem>())
+                            @Html.ListBoxFor(m => m.MoveSelectedIOS, Model.selectlist ?? new List<SelectListItem>())
                         }
 
                     </div>
@@ -233,11 +233,11 @@
                     <div class="col-xs-5" id="SelectedItems">
                         @if (Model != null && Model.IOS != null && Model.selectlist != null)
                         {
-                        @Html.ListBoxFor(model => model.MoveSelectedIOS, new MultiSelectList(Model.selectlist, "Value", "Text"), new { @class = "SelectedValue", size = "10", @style = "width: 125px;" })
+                            @Html.ListBoxFor(model => model.MoveSelectedIOS, new MultiSelectList(Model.selectlist, "Value", "Text"), new { @class = "SelectedValue", size = "10", @style = "width: 125px;" })
                         }
                         else
                         {
-                        @Html.ListBoxFor(m => m.IOS, Model.selectlist ?? new List<SelectListItem>())
+                            @Html.ListBoxFor(m => m.IOS, Model.selectlist ?? new List<SelectListItem>())
                         }
                     </div>
 
@@ -253,7 +253,8 @@
                     <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
                         <input type="button" onclick="Cancel()" style="cursor: pointer;" title="Back" value="Back" class="btn btn-default btn-style">
                         @if (Model != null && Model.SimpleMRPID != 0)
-                {
+                        {
+                            <input type="text" style="display:none;" class="form-control text-field" id="SimpleMRPID" value="@Model.SimpleMRPID">
                             <input type="button" onclick="Save()" class="btn btn-default btn-style" id="CountryMasterId" title="Update" value="Update">
                             <input type="button" id="BtnCalculte" onclick="Calculate()" class="btn btn-default btn-style" style="cursor:pointer;" title="Calculate" value="Calculate">
                         }
@@ -297,7 +298,6 @@
                                                     <td>Rate</td>
                                                     <td>UOM</td>
                                                     <td>Value</td>
-
                                                 </tr>
                                             </thead>
                                             <tbody></tbody>
@@ -310,8 +310,6 @@
                     </div>
                 </div>
             </div>
-
-
 
         </div>
 
@@ -328,16 +326,19 @@
     $(window).load(function () {
         $('.loader-overlay').fadeOut('fast');
     });
+
     $("#MRPDate").datepicker({ dateFormat: "dd/mm/yy" ,maxDate :new Date()});
     $("#From").datepicker({ dateFormat: "dd/mm/yy", maxDate: new Date() });
     $("#TO").datepicker({ dateFormat: "dd/mm/yy"});
     $("#BtnDisplay").click(function () {
         var MRPNO = $("#MRPCode").val();
+        
         $.ajax({
-            url: '/Indent/GETMRPMaterialList',
+            url: '/Indent/subGETMRPMaterialList',
             type: 'GET',
             data: { MRPNO: $("#SimpleMRPID").val() },
             success: function (data) {
+                console.log(data);
                 $("#BtnCalculte").hide();
                 $("#CountryMasterId").hide();
                 $("#list-amended-material tbody").html("");
@@ -365,32 +366,33 @@
                         // + "<td><input type='button' value='Edit' onclick='RowClick(" + item.IndentMaterialID + "," + item.BOMID + ")' class='' />" + "</td>"
                                  + "<td id='BOMMaterialID' style='display:none' class='BOMMaterialID' value=''>" + item.BOMMaterialID + "</td>"
                                  + "<td id='MRPNO' style='display:none' class='MRPNO' value=''>" + item.MRPNO + "</td>"
-                                   + "<td id='CategoryName'  class='CategoryName' value=''>" + item.CategoryName + "</td>"
-                                     + "<td id='GroupName'  class='GroupName' value=''>" + item.GroupName + "</td>"
-                                      + "<td id='SubstanceRange'  class='SubstanceRange' value=''>" + item.SubstanceRange + "</td>"
-                                         + "<td id='BuyerPoNo'  class='BuyerPoNo' value=''>" + item.BuyerPoNo + "</td>"
-                                 + "<td id='MaterialDescription'  class='MaterialDescription' value=''>" + item.MaterialDescription + "</td>"
-                                 + "<td id='Color'  class='Color' value=''>" + item.Color + "</td>"
-                                + "<td id='RequiredQty' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
-                           + "<td id='IndentQTY'  class='IndentQTY' value=''>" + item.IndentQTY + "</td>"
-                            + "<td id='Price'  class='Price' value=''>" + item.Price + "</td>"
-                            + "<td id='WastageName'  class='WastageName' value=''>" + item.WastageName + "</td>"
+                                 + "<td id='CategoryName'  class='CategoryName' value=''>" + item.categoryname + "</td>"
+                                 + "<td id='GroupName'  class='GroupName' value=''>" + item.groupname + "</td>"
+                                      + "<td id='SubstanceRange'  class='SubstanceRange' value=''>" + item.substancerange + "</td>"
+                                         + "<td id='BuyerPoNo'  class='BuyerPoNo' value=''>" + item.buyerpono + "</td>"
+                                 + "<td id='MaterialDescription'  class='MaterialDescription' value=''>" + item.materialdescription + "</td>"
+                                 + "<td id='Color'  class='Color' value=''>" + item.color + "</td>"
+                                + "<td id='RequiredQty' class='RequiredQty' value=''>" + item.requiredqty + "</td>"
+                           + "<td id='IndentQTY'  class='IndentQTY' value=''>" + item.indentqty + "</td>"
+                            + "<td id='Price'  class='Price' value=''>" + item.price + "</td>"
+                            + "<td id='WastageName'  class='WastageName' value=''>" + item.wastagename + "</td>"
                             + "<td id='Value'  class='Value' value=''>" + value + "</td>"
-                                    + "<td id='TotalNorms' style='display:none' class='TotalNorms' value=''>" + item.TotalNorms + "</td>"
-                                    + "<td id='MaterialCategoryMasterId' style='display:none' class='MaterialCategoryMasterId' value=''>" + item.MaterialCategoryMasterId + "</td>"
-                                    + "<td id='MaterialGroupMasterId' style='display:none' class='MaterialGroupMasterId' value=''>" + item.MaterialGroupMasterId + "</td>"
-                                    + "<td id='ColorMasterId' style='display:none'  class='ColorMasterId' value=''>" + item.ColorMasterId + "</td>"
-                                    + "<td id='SubstanceMasterId' style='display:none' class='SubstanceMasterId' value=''>" + item.SubstanceMasterId + "</td>"
-                                    + "<td id='BuyerSeason' style='display:none' class='BuyerSeason' value=''>" + item.BuyerSeason + "</td>"
-                                    + "<td id='SeasonName' style='display:none' class='SeasonName' value=''>" + item.SeasonName + "</td>"
-                                    + "<td id='RequiredQty' style='display:none' class='RequiredQty' value=''>" + item.RequiredQty + "</td>"
-                                      + "<td id='Rate' style='display:none' class='Rate' value=''>" + item.Rate + "</td>"
-                                        + "<td id='UomMasterId' style='display:none' class='UomMasterId' value=''>" + item.WastageQtyUOM + "</td>"
-                                          + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierId + "</td>"
-                                          + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.SupplierName + "</td>"
-                                            + "<td id='BuyerFullName' style='display:none' class='BuyerFullName' value=''>" + item.BuyerFullName + "</td>"
-                                              + "<td id='BuyerMasterId' style='display:none' class='BuyerMasterId' value=''>" + item.BuyerMasterId + "</td>"
-                                    + "<td id='OrderEntryId' style='display:none' class='OrderEntryId' value=''>" + item.OrderEntryId + "</td></tr>");
+                                    + "<td id='TotalNorms' style='display:none' class='TotalNorms' value=''>" + item.totalnorms + "</td>"
+                                    + "<td id='MaterialCategoryMasterId' style='display:none' class='MaterialCategoryMasterId' value=''>" + item.materialcategorymasterid + "</td>"
+                                    + "<td id='MaterialGroupMasterId' style='display:none' class='MaterialGroupMasterId' value=''>" + item.materialgroupmasterid + "</td>"
+                                    + "<td id='ColorMasterId' style='display:none'  class='ColorMasterId' value=''>" + item.colormasterid + "</td>"
+                                    + "<td id='SubstanceMasterId' style='display:none' class='SubstanceMasterId' value=''>" + item.substancemasterId + "</td>"
+                                    + "<td id='BuyerSeason' style='display:none' class='BuyerSeason' value=''>" + item.buyerseason + "</td>"
+                                    + "<td id='SeasonName' style='display:none' class='SeasonName' value=''>" + item.seasonname + "</td>"
+                                    + "<td id='RequiredQty' style='display:none' class='RequiredQty' value=''>" + item.requiredqty + "</td>"
+                                      + "<td id='Rate' style='display:none' class='Rate' value=''>" + item.rate + "</td>"
+                                        + "<td id='UomMasterId' style='display:none' class='UomMasterId' value=''>" + item.wastageqtyuom + "</td>"
+                                          + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.supplierid + "</td>"
+                                          + "<td id='SupplierId' style='display:none' class='SupplierId' value=''>" + item.suppliername + "</td>"
+                                            + "<td id='BuyerFullName' style='display:none' class='BuyerFullName' value=''>" + item.buyerfullname + "</td>"
+                                              + "<td id='BuyerMasterId' style='display:none' class='BuyerMasterId' value=''>" + item.buyermasterid + "</td>"
+                                    + "<td id='OrderEntryId' style='display:none' class='OrderEntryId' value=''>" + item.orderentryid + "</td></tr>");
+
                 });
             }
         });
@@ -588,7 +590,6 @@
                     $("#WeekNO").append(
                         $('<option></option>').val(item.Value).html(item.Text));
                 });
-
             }
         });
     });
@@ -606,28 +607,29 @@
                     $("#LotNO").append(
                         $('<option></option>').val(item.Text).html(item.Text));
                 });
-
             }
         });
     });
     $("#LotNO").change(function () {
-        var lotno = $("#LotNO option:selected").text();
-        var SeasonID = $("#SeasonID").val();
-        var buyer = $("#BuyerNameid").val();
-        $.ajax({
-            url: ' @Url.Action("GetLotWithOrderNO", "SimpleMRP")',
-            type: "GET",
-            dataType: "JSON",
-            data: { LotNo: lotno, SeasonID, buyer },
-            success: function (cities) {
-                $('#TotalOrderCount').val(cities.Count);
-                $("#MoveSelectedIOS").html("");
-                $.each(cities.lotNoList_, function (i, item) {
-                    $("#MoveSelectedIOS").append(
-                        $('<option></option>').val(item.Value).html(item.Text));
-                });
-            }
-        });
+        if ($("#SeasonID").val() != "" && $("#SeasonID").val() != null) {
+            var lotno = $("#LotNO option:selected").text();
+            var SeasonID = $("#SeasonID").val();
+            var buyer = $("#BuyerNameid").val();
+            $.ajax({
+                url: ' @Url.Action("GetLotWithOrderNO", "SimpleMRP")',
+                type: "GET",
+                dataType: "JSON",
+                data: { LotNo: lotno, SeasonID, buyer },
+                success: function (cities) {
+                    $('#TotalOrderCount').val(cities.Count);
+                    $("#MoveSelectedIOS").html("");
+                    $.each(cities.lotNoList_, function (i, item) {
+                        $("#MoveSelectedIOS").append(
+                            $('<option></option>').val(item.Value).html(item.Text));
+                    });
+                }
+            });
+        }
     });
 
 

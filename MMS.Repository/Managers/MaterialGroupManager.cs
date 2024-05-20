@@ -1,5 +1,6 @@
 ﻿using MMS.Common;
 using MMS.Core.Entities;
+using MMS.Core.Entities.Stock;
 using MMS.Data;
 using MMS.Data.Context;
 using System;
@@ -13,14 +14,14 @@ namespace MMS.Repository.Managers
     public class MaterialGroupManager
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-        private Repository<MaterialGroupMaster_> MaterialGroupMasterRepository;
+        private Repository<materialgroupmaster> MaterialGroupMasterRepository;
 
         #region Add/Update/Delete Operation
 
-        public MaterialGroupMaster_ Post(MaterialGroupMaster_ arg)
+        public materialgroupmaster Post(materialgroupmaster arg)
         {
             bool result = false;
-            MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
+            materialgroupmaster materialGroupMaster = new materialgroupmaster();
             try
             {
                 string username = HttpContext.Current.Session["UserName"].ToString();
@@ -39,12 +40,12 @@ namespace MMS.Repository.Managers
             return materialGroupMaster;
 
         }
-        public bool Put(MaterialGroupMaster_ arg)
+        public bool Put(materialgroupmaster arg)
         {
             bool result = false;
             try
             {
-                MaterialGroupMaster_ model = MaterialGroupMasterRepository.Table.Where(p => p.MaterialGroupMasterId == arg.MaterialGroupMasterId).FirstOrDefault();
+                materialgroupmaster model = MaterialGroupMasterRepository.Table.Where(p => p.MaterialGroupMasterId == arg.MaterialGroupMasterId).FirstOrDefault();
                 if (model != null)
                 {
                     model.GroupCode = arg.GroupCode;
@@ -88,7 +89,7 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                MaterialGroupMaster_ model = MaterialGroupMasterRepository.GetById(id);
+                materialgroupmaster model = MaterialGroupMasterRepository.GetById(id);
                 model.IsDeleted = true;
                 model.DeletedBy = HttpContext.Current.Session["UserName"].ToString();
                 model.DeletedDate = DateTime.Now;
@@ -111,12 +112,12 @@ namespace MMS.Repository.Managers
 
         public MaterialGroupManager()
         {
-            MaterialGroupMasterRepository = unitOfWork.Repository<MaterialGroupMaster_>();
+            MaterialGroupMasterRepository = unitOfWork.Repository<materialgroupmaster>();
         }
 
-        public MaterialGroupMaster_ GetGroupName(string GroupName)
+        public materialgroupmaster GetGroupName(string GroupName)
         {
-            MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
+            materialgroupmaster materialGroupMaster = new materialgroupmaster();
             if (GroupName != "" && GroupName != null)
             {
                 materialGroupMaster = MaterialGroupMasterRepository.Table.Where(x => x.GroupName == GroupName).FirstOrDefault();
@@ -124,9 +125,9 @@ namespace MMS.Repository.Managers
             return materialGroupMaster;
         }
 
-        public MaterialGroupMaster_ GetMaterialGroupMaster_Id(int? MaterialGroupMasterId)
+        public materialgroupmaster GetmaterialgroupmasterId(int? MaterialGroupMasterId)
         {
-            MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
+            materialgroupmaster materialGroupMaster = new materialgroupmaster();
             if (MaterialGroupMasterId != 0)
             {
                 materialGroupMaster = MaterialGroupMasterRepository.Table.Where(x => x.MaterialGroupMasterId == MaterialGroupMasterId).SingleOrDefault();
@@ -139,12 +140,12 @@ namespace MMS.Repository.Managers
             return null;
         }
 
-        public List<MaterialGroupMaster_> Get()
+        public List<materialgroupmaster> Get()
         {
-            List<MaterialGroupMaster_> materialGroupMaster = new List<MaterialGroupMaster_>();
+            List<materialgroupmaster> materialGroupMaster = new List<materialgroupmaster>();
             try
             {
-                materialGroupMaster = MaterialGroupMasterRepository.Table.Where(X => X.IsDeleted == false || X.IsDeleted == null).ToList<MaterialGroupMaster_>();
+                materialGroupMaster = MaterialGroupMasterRepository.Table.Where(X => X.IsDeleted == false || X.IsDeleted == null).ToList<materialgroupmaster>();
             }
             catch (Exception ex)
             {
@@ -161,24 +162,24 @@ namespace MMS.Repository.Managers
             }
         }
 
-        public MaterialGroupMaster_ getCategoryCode(int? CategoryId)
+        public materialgroupmaster getCategoryCode(int? CategoryId)
         {
-            MaterialGroupMaster_ materialGroupMaster_ = new MaterialGroupMaster_();
+            materialgroupmaster materialgroupmaster = new materialgroupmaster();
             if (CategoryId != 0)
             {
-                materialGroupMaster_ = MaterialGroupMasterRepository.Table.Where(x => x.MaterialGroupMasterId == CategoryId).SingleOrDefault();
+                materialgroupmaster = MaterialGroupMasterRepository.Table.Where(x => x.MaterialGroupMasterId == CategoryId).SingleOrDefault();
             }
-            return materialGroupMaster_;
+            return materialgroupmaster;
         }
 
-        public MaterialGroupMaster_ GetMaterialGroupName(string MaterialGroup)
+        public materialgroupmaster GetMaterialGroupName(string MaterialGroup)
         {
-            MaterialGroupMaster_ materialGroupMaster_ = new MaterialGroupMaster_();
+            materialgroupmaster materialgroupmaster = new materialgroupmaster();
             if (MaterialGroup !=  "")
             {
-                materialGroupMaster_ = MaterialGroupMasterRepository.Table.Where(x => x.GroupName == MaterialGroup).SingleOrDefault();
+                materialgroupmaster = MaterialGroupMasterRepository.Table.Where(x => x.GroupName == MaterialGroup).SingleOrDefault();
             }
-            return materialGroupMaster_;
+            return materialgroupmaster;
         }
 
         #endregion

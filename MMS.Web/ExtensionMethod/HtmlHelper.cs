@@ -256,7 +256,7 @@ namespace MMS.Web.ExtensionMethod
         public static string getAutoGenerateSimpleMRPID_code()
         {
             SimpleMRPManager simpleMRPManager = new SimpleMRPManager();
-           var SID = simpleMRPManager.GetAutoMRPNO().Where(x=>x.MRPNO != null).LastOrDefault();
+            var SID = simpleMRPManager.GetAutoMRPNO().Where(x => x.MRPNO != null).LastOrDefault();
             return Convert.ToString(SID.MRPNO);
         }
         public static int getAutoSizeMatchingID()
@@ -291,6 +291,98 @@ namespace MMS.Web.ExtensionMethod
             LeatherTypeManager leatherTypeManager = new LeatherTypeManager();
             int? SID = leatherTypeManager.Get().Max(u => (int?)u.LeatherTypeID);
             return Convert.ToInt32(SID);
+        }
+        public static string getAutoGenerateProduct_TypeID()
+        {
+            Product_TypeManger productTypeManager = new Product_TypeManger();
+            int? SID = productTypeManager.Get().Max(u => (int?)u.ProductTypeID);
+            return Convert.ToString(SID);
+        }
+        public static SelectList countryListdata()
+        {
+            countryListmanager Manager = new countryListmanager();
+            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.Name).Select(
+                                                  item => new System.Web.Mvc.SelectListItem()
+                                                  {
+                                                      Text = item.Name,
+                                                      Value = item.Id.ToString()
+                                                  }).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }
+        public static SelectList invoisenoListdata()
+        {
+            InvoiceManager Manager = new InvoiceManager();
+            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.Id).Select(
+                                                  item => new System.Web.Mvc.SelectListItem()
+                                                  {
+                                                      Text = item.Id.ToString(),
+                                                      Value = item.Id.ToString()
+                                                  }).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }
+
+        public static SelectList Paymentmethodlist()
+        {
+            paymentmethodmanager Manager = new paymentmethodmanager();
+            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.Paymentstype).Select(
+                                                  item => new System.Web.Mvc.SelectListItem()
+                                                  {
+                                                      Text = item.Paymentstype,
+                                                      Value = item.Id.ToString()
+                                                  }).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select Payment Method"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }
+        public static SelectList StateListdata()
+        {
+            StatelistManager Manager = new StatelistManager();
+            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.Statename).Select(
+                                                  item => new System.Web.Mvc.SelectListItem()
+                                                  {
+                                                      Text = item.Statename,
+                                                      Value = item.Id.ToString()
+                                                  }).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }
+        public static SelectList CityListdata()
+        {
+            CitylistManager Manager = new CitylistManager();
+            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.Id).Select(
+                                                  item => new System.Web.Mvc.SelectListItem()
+                                                  {
+                                                      Text = item.Cityname,
+                                                      Value = item.Id.ToString()
+                                                  }).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
         }
         public static int getIndentTypeMasterId()
         {
@@ -388,6 +480,8 @@ namespace MMS.Web.ExtensionMethod
         #endregion
 
         #region DropDown Methods
+
+
         public static SelectList ShortUnitName()
         {
             UOMManager uOMManager = new UOMManager();
@@ -490,7 +584,7 @@ namespace MMS.Web.ExtensionMethod
         {
             SeasonManager seasonManager = new SeasonManager();
             BuyerOrderEntryManager uOMManager = new BuyerOrderEntryManager();
-            List<InternalOrderEntryForm> BuyerOrderEntryList = new List<InternalOrderEntryForm>();
+            List<InternalOrderForm> BuyerOrderEntryList = new List<InternalOrderForm>();
             List<SelectListItem> lotNoList = new List<SelectListItem>();
             var items_ = (from x in uOMManager.GetInternalIO()
                           join y in seasonManager.Get()
@@ -582,7 +676,7 @@ namespace MMS.Web.ExtensionMethod
             var ShotName = new System.Web.Mvc.SelectListItem()
             {
                 Value = "",
-                Text = "Please Select"
+                Text = "Select Taxtype"
             };
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
@@ -709,7 +803,7 @@ namespace MMS.Web.ExtensionMethod
             var ShotName = new System.Web.Mvc.SelectListItem()
             {
                 Value = "",
-                Text = "Please Select"
+                Text = "Select Category"
             };
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
@@ -824,7 +918,7 @@ namespace MMS.Web.ExtensionMethod
         public static SelectList ColourName_()
         {
             ColorManager Manager = new ColorManager();
-            string Proeeuct = "";
+            //string Proeeuct = "";
             List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.Color).Select(
                                                  item => new System.Web.Mvc.SelectListItem()
                                                  {
@@ -923,7 +1017,7 @@ namespace MMS.Web.ExtensionMethod
             var ShotName = new System.Web.Mvc.SelectListItem()
             {
                 Value = "",
-                Text = "Please Select"
+                Text = "Please Select Store"
             };
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
@@ -1104,7 +1198,7 @@ namespace MMS.Web.ExtensionMethod
             var ShotName = new System.Web.Mvc.SelectListItem()
             {
                 Value = "",
-                Text = "Please Select"
+                Text = "Select UOM"
             };
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
@@ -1428,7 +1522,7 @@ namespace MMS.Web.ExtensionMethod
             List<MultipleIssueSlip> list = new List<MultipleIssueSlip>();
             var list_ = Manager.GetMultipleIssueSlip();
 
-            var distinctList = list_.Where(X=>X.IsJobWork == true).GroupBy(x => x.IssueSlipNo).Select(g => g.First()).ToList();
+            var distinctList = list_.Where(X => X.IsJobWork == true).GroupBy(x => x.IssueSlipNo).Select(g => g.First()).ToList();
             distinctList = distinctList.ToList();
             List<System.Web.Mvc.SelectListItem> items_ = distinctList.Select(
                                                   item => new System.Web.Mvc.SelectListItem()
@@ -1451,7 +1545,7 @@ namespace MMS.Web.ExtensionMethod
             List<MultipleIssueSlip> list = new List<MultipleIssueSlip>();
             var list_ = Manager.GetMultipleIssueSlip();
 
-            var distinctList = list_.Where(X => X.IsJobWork == true && X.GateOut_No!="" && X.GateOut_No != null).GroupBy(x => x.IssueSlipNo).Select(g => g.First()).ToList();
+            var distinctList = list_.Where(X => X.IsJobWork == true && X.GateOut_No != "" && X.GateOut_No != null).GroupBy(x => x.IssueSlipNo).Select(g => g.First()).ToList();
             distinctList = distinctList.ToList();
             List<System.Web.Mvc.SelectListItem> items_ = distinctList.Select(
                                                   item => new System.Web.Mvc.SelectListItem()
@@ -1649,7 +1743,24 @@ namespace MMS.Web.ExtensionMethod
             var ShotName = new System.Web.Mvc.SelectListItem()
             {
                 Value = "",
-                Text = "Please Select"
+                Text = "Please Select Buyer"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }
+        public static SelectList ProductName()
+        {
+            ProductManager Manager = new ProductManager();
+            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.ProductName).Select(
+                                                  item => new System.Web.Mvc.SelectListItem()
+                                                  {
+                                                      Text = item.ProductName,
+                                                      Value = item.ProductId.ToString()
+                                                  }).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select Product"
             };
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
@@ -1810,7 +1921,7 @@ namespace MMS.Web.ExtensionMethod
                 Text = "Please Select"
             };
 
-            
+
 
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
@@ -1909,6 +2020,87 @@ namespace MMS.Web.ExtensionMethod
 
             return new SelectList(items, "Value", "Text");
         }
+        //public static SelectList GetBuyerOrderlist()
+        //{
+        //    BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
+        //    List<System.Web.Mvc.SelectListItem> items = buyerOrderEntryManager.GetBuyerOrderlist().OrderBy(x => x.buyerorderslno).Select(
+        //                            item => new System.Web.Mvc.SelectListItem()
+        //                            {
+        //                                Text = item.buyerorderslno.ToString(),
+        //                                Value = item.orderid.ToString()
+        //                            }
+        //                            ).ToList();
+
+        //    var ShotName = new System.Web.Mvc.SelectListItem()
+        //    {
+        //        Value = "",
+        //        Text = "Please Select"
+        //    };
+        //    items.Insert(0, ShotName);
+
+        //    return new SelectList(items, "Value", "Text");
+        //}
+
+        //public static SelectList GetBuyerOrderAddress1list(int orderid)
+        //{
+        //    BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
+        //    List<System.Web.Mvc.SelectListItem> items = buyerOrderEntryManager.getbuyerorderaddressdetails(orderid).OrderBy(x => x.orderid).Select(
+        //                            item => new System.Web.Mvc.SelectListItem()
+        //                            {
+        //                                Text = item.add1.ToString(),
+        //                                Value = item.orderid.ToString()
+        //                            }
+        //                            ).ToList();
+
+        //    var ShotName = new System.Web.Mvc.SelectListItem()
+        //    {
+        //        Value = "",
+        //        Text = "Please Select"
+        //    };
+        //    items.Insert(0, ShotName);
+
+        //    return new SelectList(items, "Value", "Text");
+        //}
+        //public static SelectList GetBuyerOrderAddress2list(int orderid)
+        //{
+        //    BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
+        //    List<System.Web.Mvc.SelectListItem> items = buyerOrderEntryManager.getbuyerorderaddressdetails(orderid).OrderBy(x => x.orderid).Select(
+        //                            item => new System.Web.Mvc.SelectListItem()
+        //                            {
+        //                                Text = item.add2.ToString(),
+        //                                Value = item.orderid.ToString()
+        //                            }
+        //                            ).ToList();
+
+        //    var ShotName = new System.Web.Mvc.SelectListItem()
+        //    {
+        //        Value = "",
+        //        Text = "Please Select"
+        //    };
+        //    items.Insert(0, ShotName);
+
+        //    return new SelectList(items, "Value", "Text");
+        //}
+        //public static SelectList GetBuyerOrderAddress3list(int orderid)
+        //{
+        //    BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
+        //    List<System.Web.Mvc.SelectListItem> items = buyerOrderEntryManager.getbuyerorderaddressdetails(orderid).OrderBy(x => x.orderid).Select(
+        //                            item => new System.Web.Mvc.SelectListItem()
+        //                            {
+        //                                Text = item.add3.ToString(),
+        //                                Value = item.orderid.ToString()
+        //                            }
+        //                            ).ToList();
+
+        //    var ShotName = new System.Web.Mvc.SelectListItem()
+        //    {
+        //        Value = "",
+        //        Text = "Please Select"
+        //    };
+        //    items.Insert(0, ShotName);
+
+        //    return new SelectList(items, "Value", "Text");
+        //}
         public static SelectList GetInternalOrderIONOForListBox()
         {
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
@@ -2069,7 +2261,7 @@ namespace MMS.Web.ExtensionMethod
             var ShotName = new System.Web.Mvc.SelectListItem()
             {
                 Value = "",
-                Text = "Please Select"
+                Text = "Select BOM No"
             };
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
@@ -2086,7 +2278,24 @@ namespace MMS.Web.ExtensionMethod
             var ShotName = new System.Web.Mvc.SelectListItem()
             {
                 Value = "",
-                Text = "Please Select"
+                Text = "Select BOM No"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }
+        public static SelectList GetBomNovalue()
+        {
+            BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
+            List<System.Web.Mvc.SelectListItem> items = billOfMaterialManager.Get().Where(x => x.BomNo != null).OrderBy(x => x.BomNo).Select(
+                                                  item => new System.Web.Mvc.SelectListItem()
+                                                  {
+                                                      Text = item.BomNo,
+                                                      Value = item.BomNo
+                                                  }).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Select BOM No"
             };
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
@@ -2202,13 +2411,30 @@ namespace MMS.Web.ExtensionMethod
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
         }
+        //public static SelectList BomColor()
+        //{
+        //    Product_BuyerStyleManager product_BuyerStyleManager = new Product_BuyerStyleManager();
+        //    List<System.Web.Mvc.SelectListItem> items = product_BuyerStyleManager.Get().OrderBy(x => x.BomNo).Select(
+        //                                          item => new System.Web.Mvc.SelectListItem()
+        //                                          {
+        //                                              Text = item.BomNo.Substring(9, 4),
+        //                                              Value = item.ProductOrBuyerStyleId.ToString()
+        //                                          }).ToList();
+        //    var ShotName = new System.Web.Mvc.SelectListItem()
+        //    {
+        //        Value = "",
+        //        Text = "Please Select"
+        //    };
+        //    items.Insert(0, ShotName);
+        //    return new SelectList(items, "Value", "Text");
+        //}
         public static SelectList BomColor()
         {
             Product_BuyerStyleManager product_BuyerStyleManager = new Product_BuyerStyleManager();
             List<System.Web.Mvc.SelectListItem> items = product_BuyerStyleManager.Get().OrderBy(x => x.BomNo).Select(
                                                   item => new System.Web.Mvc.SelectListItem()
                                                   {
-                                                      Text = item.BomNo.Substring(9, 4),
+                                                      Text = item.BomNo.Length >= 13 ? item.BomNo.Substring(9, 4) : "",
                                                       Value = item.ProductOrBuyerStyleId.ToString()
                                                   }).ToList();
             var ShotName = new System.Web.Mvc.SelectListItem()
@@ -2267,7 +2493,7 @@ namespace MMS.Web.ExtensionMethod
         }
         public static SelectList ProductType()
         {
-            ProductTypeManager productTypeManager = new ProductTypeManager();
+            Product_TypeManger productTypeManager = new Product_TypeManger();
             List<System.Web.Mvc.SelectListItem> items = productTypeManager.Get().OrderBy(x => x.ProductTypeName).Select(
                                                   item => new System.Web.Mvc.SelectListItem()
                                                   {
@@ -2277,7 +2503,7 @@ namespace MMS.Web.ExtensionMethod
             var ShotName = new System.Web.Mvc.SelectListItem()
             {
                 Value = "",
-                Text = "Please Select"
+                Text = "Please Select Product Type"
             };
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
@@ -2564,18 +2790,18 @@ namespace MMS.Web.ExtensionMethod
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
         }
-        public static PermissionSettingMaster GetPermissionIdList()
+        public static tbl_PermissionSetting GetPermissionIdList()
         {
             int UserTypeID = Convert.ToInt32(HttpContext.Current.Session["UserType"]);
             PermissionSettingManager Manager = new PermissionSettingManager();
-            PermissionSettingMaster PermissionSetList = new PermissionSettingMaster();
+            tbl_PermissionSetting PermissionSetList = new tbl_PermissionSetting();
             PermissionSetList = Manager.GetByID(UserTypeID);
             return PermissionSetList;
         }
-        public static List<PermissionMaster> GetPermissionList(string PageName, string PermissionListIDs)
+        public static List<tbl_Permission> GetPermissionList(string PageName, string PermissionListIDs)
         {
             PermissionManager Manager = new PermissionManager();
-            List<PermissionMaster> PermissionSetList = new List<PermissionMaster>();
+            List<tbl_Permission> PermissionSetList = new List<tbl_Permission>();
             PermissionSetList = Manager.GetPermissionList(PageName, PermissionListIDs);
             return PermissionSetList;
         }
@@ -2960,7 +3186,7 @@ namespace MMS.Web.ExtensionMethod
                 Text = "Please Select"
             };
             items.Insert(0, cname);
-            ///
+
 
             return new SelectList(items, "Value", "Text");
         }
@@ -3170,8 +3396,82 @@ namespace MMS.Web.ExtensionMethod
             return new SelectList(items, "Value", "Text");
         }
 
-
+        public static SelectList AddressTypebind()
+        {
+            CustAddressMangers AddressTypeManager = new CustAddressMangers();
+            List<System.Web.Mvc.SelectListItem> items = AddressTypeManager.GetAddtype().OrderBy(x => x.AddTypeName).Select(
+                                    item => new System.Web.Mvc.SelectListItem()
+                                    {
+                                        Text = item.AddTypeName,
+                                        Value = item.AddTypeID.ToString()
+                                    }
+                                    ).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }
+        public static SelectList ProductProcessTypebind()
+        {
+            InvoiceManager oManager = new InvoiceManager();
+            List<System.Web.Mvc.SelectListItem> items = oManager.GetProductProcess().OrderBy(x => x.process).Select(
+                                    item => new System.Web.Mvc.SelectListItem()
+                                    {
+                                        Text = item.process,
+                                        Value = item.ProcessID.ToString()
+                                    }
+                                    ).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }
+        public static SelectList getbuyOrderListdropdown()
+        {
+            BuyerOrderEntryManager oManager = new BuyerOrderEntryManager();
+            List<System.Web.Mvc.SelectListItem> items = oManager.getbuyOrderListdropdown().OrderBy(x => x.orderid).Select(
+                                    item => new System.Web.Mvc.SelectListItem()
+                                    {
+                                        Text = item.buyerorderslno,
+                                        Value = item.orderid.ToString()
+                                    }
+                                    ).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }
+        public static SelectList GetProductName()
+        {
+            SubAssemblyMasterManagers Manager = new SubAssemblyMasterManagers();
+            List<System.Web.Mvc.SelectListItem> _items = new List<System.Web.Mvc.SelectListItem>();
+            List<System.Web.Mvc.SelectListItem> items = Manager.GetSubAssemblyMaster().OrderBy(x => x.Id).Select(
+                                    item => new System.Web.Mvc.SelectListItem()
+                                    {
+                                        Text = item.ProductName.ToString(),
+                                        Value = item.ProductId.ToString()
+                                    }
+                                    ).ToList();
+            items = items.GroupBy(x => x.Text).Select(x => x.First()).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select Product"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }
         #endregion
+
         public class DropdownViewModel
         {
             [Display(Name = "Choose indent no")]
@@ -3182,6 +3482,7 @@ namespace MMS.Web.ExtensionMethod
 
         public static int getProcessCodeId()
         {
+
             ProcessManager Processmanager = new ProcessManager();
             int? SID = Processmanager.Get().Max(u => (int?)u.ProcessId);
             return Convert.ToInt32(SID);
@@ -3274,7 +3575,7 @@ namespace MMS.Web.ExtensionMethod
         public static SelectList Stage_ordertype()
         {
             List<SelectListItem> listItems = new List<SelectListItem>();
-           
+
 
             var ShotName = new System.Web.Mvc.SelectListItem()
             {
@@ -3302,7 +3603,7 @@ namespace MMS.Web.ExtensionMethod
         public static SelectList Io_Based()
         {
             BuyerOrderEntryManager BuyerOrderEntryManager = new BuyerOrderEntryManager();
-            List<System.Web.Mvc.SelectListItem> items = BuyerOrderEntryManager.Get().OrderBy(x => x.OurStyle).Where(X => X.IsInternal == true).GroupBy(x => new { x.OurStyle ,x.BuyerOrderSlNo }).Select(
+            List<System.Web.Mvc.SelectListItem> items = BuyerOrderEntryManager.Get().OrderBy(x => x.OurStyle).Where(X => X.IsInternal == true).GroupBy(x => new { x.OurStyle, x.BuyerOrderSlNo }).Select(
                                                  item => new System.Web.Mvc.SelectListItem()
                                                  {
                                                      Text = item.Key.BuyerOrderSlNo,
@@ -3526,7 +3827,7 @@ namespace MMS.Web.ExtensionMethod
                 Value = "0",
                 Text = "Please Select"
             };
-          
+
             items.Add(ShotName);
 
             return new SelectList(items, "Value", "Text");

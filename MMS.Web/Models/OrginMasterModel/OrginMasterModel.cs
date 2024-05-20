@@ -15,6 +15,6 @@ namespace MMS.Web.Models.OrginMasterModel
         public DateTime? UpdatedDate { get; set; }
         public string CreatedBy { get; set; }
         public string UpdatedBy { get; set; }
-        public List<OrginMaster> OrginMasterlist { get; set; }
+        public List<OriginMaster> OrginMasterlist { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MMS.Core.Entities;
+using MMS.Core.Entities.Stock;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,8 +37,8 @@ namespace MMS.Web.Models.MaterialGroupMaster
 
         public IEnumerable<SelectListItem> SubGroupList { get; set; }
         public IEnumerable<string> SelectedItemId { get; set; }
-        
-        public List<MaterialGroupMaster_> MaterialGrouplist { get; set; }
-      
+        //public List<MaterialGroupMaster_> MaterialGrouplist { get; set; }
+        public List<materialgroupmaster> MaterialGrouplist { get; set; }
+
     }
 }

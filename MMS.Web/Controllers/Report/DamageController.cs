@@ -21,7 +21,7 @@ namespace MMS.Web.Controllers.Report
         {
             OrderEntryModel model = new OrderEntryModel();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
-            List<InternalOrderEntryForm> _items = new List<InternalOrderEntryForm>();
+            List<OrderEntry> _items = new List<OrderEntry>();
             _items = buyerOrderEntryManager.Get().Where(x => x.IsInternal == true).OrderBy(x => x.BuyerOrderSlNo).ToList();
             model.OrderEntryList = _items;
             return View("Damage", model);
@@ -43,7 +43,7 @@ namespace MMS.Web.Controllers.Report
 
         public ActionResult FillSeason(int Buyer)
         {
-            List<OrderEntryForm> OrderEntryList_ = new List<OrderEntryForm>();
+            List<OrderEntry> OrderEntryList_ = new List<OrderEntry>();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             SeasonManager seasonmanager = new SeasonManager();
             var items = (from x in buyerOrderEntryManager.Get()
@@ -60,7 +60,7 @@ namespace MMS.Web.Controllers.Report
 
         public ActionResult FillLotNo(string Season)
         {
-            List<OrderEntryForm> OrderEntryList_ = new List<OrderEntryForm>();
+            List<OrderEntry> OrderEntryList_ = new List<OrderEntry>();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             SeasonManager seasonmanager = new SeasonManager();
 

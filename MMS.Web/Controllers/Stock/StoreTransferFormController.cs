@@ -160,7 +160,7 @@ namespace MMS.Web.Controllers.Stock
             List<MaterialCategoryMaster> materialCategoryMasterList = new List<MaterialCategoryMaster>();
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
 
-            List<MaterialGroupMaster_> materialGroupMasterList = new List<MaterialGroupMaster_>();
+            List<materialgroupmaster> materialGroupMasterList = new List<materialgroupmaster>();
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
             storeTransferlist = storeTransferManager.Get();
             materialCategoryMasterList = materialCategoryManager.Get();

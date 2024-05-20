@@ -10,11 +10,11 @@ namespace MMS.Repository.Service.StockService
 {
     public interface IBOMGridService
     {
-        bool Post(BillOfMaterial arg);
-        bool Put(BillOfMaterial arg);
+        bool Post(Bom arg);
+        bool Put(Bom arg);
         bool BOMMaterialListPost(BOMMaterialList arg);
         
         bool Delete(int id);
-        BillOfMaterial Get(int id);
+        Bom Get(int id);
     }
 }

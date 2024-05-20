@@ -14,15 +14,15 @@ namespace MMS.Repository.Managers
     public class MaterialNameManager
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-        private Repository<MaterialNameMaster> MaterialNameMasterRepository;
+        private Repository<tbl_materialnamemaster> MaterialNameMasterRepository;
         //private Repository<MaterialNameMaster> MaterialNameMasterRepository;
 
         #region Add/Update/Delete Operation
 
-        public MaterialNameMaster Post(MaterialNameMaster arg)
+        public tbl_materialnamemaster Post(tbl_materialnamemaster arg)
         {
             bool result = false;
-            MaterialNameMaster materialNameMaster = new MaterialNameMaster();
+            tbl_materialnamemaster materialNameMaster = new tbl_materialnamemaster();
             try
             {
                 string username = HttpContext.Current.Session["UserName"].ToString();
@@ -40,12 +40,12 @@ namespace MMS.Repository.Managers
             }
             return materialNameMaster;
         }
-        public bool Put(MaterialNameMaster arg)
+        public bool Put(tbl_materialnamemaster arg)
         {
             bool result = false;
             try
             {
-                MaterialNameMaster model = MaterialNameMasterRepository.Table.Where(p => p.MaterialMasterID == arg.MaterialMasterID).FirstOrDefault();
+                tbl_materialnamemaster model = MaterialNameMasterRepository.Table.Where(p => p.MaterialMasterID == arg.MaterialMasterID).FirstOrDefault();
                 if (model != null)
                 {
                     model.MaterialMasterID = arg.MaterialMasterID;
@@ -79,7 +79,7 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                MaterialNameMaster model = MaterialNameMasterRepository.GetById(id);
+                tbl_materialnamemaster model = MaterialNameMasterRepository.GetById(id);
                 model.IsDeleted = true;
                 model.DeletedBy = HttpContext.Current.Session["UserName"].ToString();
                 model.DeletedDate = DateTime.Now;
@@ -101,13 +101,13 @@ namespace MMS.Repository.Managers
 
         public MaterialNameManager()
         {
-            MaterialNameMasterRepository = unitOfWork.Repository<MaterialNameMaster>();
+            MaterialNameMasterRepository = unitOfWork.Repository<tbl_materialnamemaster>();
             //MaterialNameMasterRepository = unitOfWork.Repository<MaterialNameMaster>();
         }
 
-        public MaterialNameMaster GetMaterialNameMasterId(int? MaterialNameMasterId)
+        public tbl_materialnamemaster GetMaterialNameMasterId(int? MaterialNameMasterId)
         {
-            MaterialNameMaster MaterialNameMaster = new MaterialNameMaster();
+            tbl_materialnamemaster MaterialNameMaster = new tbl_materialnamemaster();
             if (MaterialNameMasterId != 0)
             {
                 MaterialNameMaster = MaterialNameMasterRepository.Table.Where(x => x.MaterialMasterID == MaterialNameMasterId &&x.IsDeleted==false).FirstOrDefault();
@@ -115,18 +115,18 @@ namespace MMS.Repository.Managers
             return MaterialNameMaster;
         }
 
-        public MaterialNameMaster GetMaterialNameMaterial(int MaterialMasterID)
+        public tbl_materialnamemaster GetMaterialNameMaterial(int MaterialMasterID)
         {
-            MaterialNameMaster MaterialNameMaster = new MaterialNameMaster();
+            tbl_materialnamemaster MaterialNameMaster = new tbl_materialnamemaster();
             if (MaterialMasterID != 0)
             {
                 MaterialNameMaster = MaterialNameMasterRepository.Table.Where(x => x.MaterialMasterID == MaterialMasterID).SingleOrDefault();
             }
             return MaterialNameMaster;
         }
-        public MaterialNameMaster GetMaterialName(string MaterialDescription)
+        public tbl_materialnamemaster GetMaterialName(string MaterialDescription)
         {
-            MaterialNameMaster MaterialNameMaster = new MaterialNameMaster();
+            tbl_materialnamemaster MaterialNameMaster = new tbl_materialnamemaster();
             if (MaterialDescription != "")
             {
                 MaterialNameMaster = MaterialNameMasterRepository.Table.Where(x => x.MaterialDescription.Trim() == MaterialDescription.Trim() && x.IsDeleted==false).FirstOrDefault();
@@ -135,9 +135,9 @@ namespace MMS.Repository.Managers
             }
             return MaterialNameMaster;
         }
-        public MaterialNameMaster GetLeatherMaterialName(string LeatherMaterilFirstValue, string LeatherMaterilLastValue, int? LeatherMaterialName, int MaterialGroupMasterId)
+        public tbl_materialnamemaster GetLeatherMaterialName(string LeatherMaterilFirstValue, string LeatherMaterilLastValue, int? LeatherMaterialName, int MaterialGroupMasterId)
         {
-            MaterialNameMaster MaterialNameMaster = new MaterialNameMaster();
+            tbl_materialnamemaster MaterialNameMaster = new tbl_materialnamemaster();
             if (LeatherMaterilLastValue != null && LeatherMaterilFirstValue != null && LeatherMaterialName != null)
             {
                 MaterialNameMaster = MaterialNameMasterRepository.Table.Where(x => x.LeatherMaterilFirstValue == LeatherMaterilFirstValue && x.LeatherMaterilLastValue == LeatherMaterilLastValue && x.LeatherMaterialName == LeatherMaterialName && x.MaterialGroupMasterId == MaterialGroupMasterId).SingleOrDefault();
@@ -151,12 +151,12 @@ namespace MMS.Repository.Managers
 
             return MaterialNameMaster;
         }
-        public List<MaterialNameMaster> Get()
+        public List<tbl_materialnamemaster> Get()
         {
-            List<MaterialNameMaster> MaterialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> MaterialNameMasterList = new List<tbl_materialnamemaster>();
             try
             {
-                MaterialNameMasterList = MaterialNameMasterRepository.Table.Where(X => X.IsDeleted == false).ToList<MaterialNameMaster>();
+                MaterialNameMasterList = MaterialNameMasterRepository.Table.Where(X => X.IsDeleted == false).ToList<tbl_materialnamemaster>();
             }
             catch (Exception ex)
             {

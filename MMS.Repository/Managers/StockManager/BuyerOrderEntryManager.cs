@@ -16,31 +16,34 @@ namespace MMS.Repository.Managers.StockManager
     public class BuyerOrderEntryManager
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-        private Repository<InternalOrderEntryForm> BuyerOrdeEntryrRepository;
+        private Repository<OrderEntry> BuyerOrdeEntryrRepository;
         private Repository<OePackingDetails> OePackingDetailsRepository;
         private Repository<OeShipmentDetails> OeShipmentDetailsRepository;
         private Repository<OeOtherDetails> OeOtherDetailsRepository;
+        //private Repository<InvoiceDetails> InvoiceDetailsRepository;
+
         EmailTemplateManager emailTemplateManager = new EmailTemplateManager();
 
         #region Helper Method
         public BuyerOrderEntryManager()
         {
-            BuyerOrdeEntryrRepository = unitOfWork.Repository<InternalOrderEntryForm>();
+            BuyerOrdeEntryrRepository = unitOfWork.Repository<OrderEntry>();
             OeOtherDetailsRepository = unitOfWork.Repository<OeOtherDetails>();
             OePackingDetailsRepository = unitOfWork.Repository<OePackingDetails>();
             OeShipmentDetailsRepository = unitOfWork.Repository<OeShipmentDetails>();
+            //InvoiceDetailsRepository = unitOfWork.Repository<InvoiceDetails>();
         }
         public PurchaseOrder Get(int id)
         {
             return null;
         }
-        public List<InternalOrderEntryForm> GetInternalIO()
+        public List<OrderEntry> GetInternalIO()
         {
-            List<InternalOrderEntryForm> BuyerOrderEntryList = new List<InternalOrderEntryForm>();
+            List<OrderEntry> BuyerOrderEntryList = new List<OrderEntry>();
             try
             {
 
-                BuyerOrderEntryList = BuyerOrdeEntryrRepository.Table.ToList<InternalOrderEntryForm>().Where(x => x.IsDeleted == false && x.IsInternal == true).ToList();
+                BuyerOrderEntryList = BuyerOrdeEntryrRepository.Table.ToList<OrderEntry>().Where(x => x.IsDeleted == false && x.IsInternal == true).ToList();
             }
             catch (Exception ex)
             {
@@ -74,12 +77,12 @@ namespace MMS.Repository.Managers.StockManager
             }
             return SizeRangeQtyRatelist;
         }
-        public List<InternalOrderEntryForm> GetInternalIOWeek(string WeekNo)
+        public List<OrderEntry> GetInternalIOWeek(string WeekNo)
         {
-            List<InternalOrderEntryForm> BuyerOrderEntryList = new List<InternalOrderEntryForm>();
+            List<OrderEntry> BuyerOrderEntryList = new List<OrderEntry>();
             try
             {
-                BuyerOrderEntryList = BuyerOrdeEntryrRepository.Table.ToList<InternalOrderEntryForm>().Where(x => x.IsDeleted == false && x.IsInternal == true && x.WeekNo == WeekNo).ToList();
+                BuyerOrderEntryList = BuyerOrdeEntryrRepository.Table.ToList<OrderEntry>().Where(x => x.IsDeleted == false && x.IsInternal == true && x.WeekNo == WeekNo).ToList();
             }
             catch (Exception ex)
             {
@@ -87,12 +90,12 @@ namespace MMS.Repository.Managers.StockManager
             }
             return BuyerOrderEntryList;
         }
-        public List<InternalOrderEntryForm> GetInternalIOSeason(string WeekNo)
+        public List<OrderEntry> GetInternalIOSeason(string WeekNo)
         {
-            List<InternalOrderEntryForm> BuyerOrderEntryList = new List<InternalOrderEntryForm>();
+            List<OrderEntry> BuyerOrderEntryList = new List<OrderEntry>();
             try
             {
-                BuyerOrderEntryList = BuyerOrdeEntryrRepository.Table.ToList<InternalOrderEntryForm>().Where(x => x.IsDeleted == false && x.IsInternal == true && x.WeekNo == WeekNo).ToList();
+                BuyerOrderEntryList = BuyerOrdeEntryrRepository.Table.ToList<OrderEntry>().Where(x => x.IsDeleted == false && x.IsInternal == true && x.WeekNo == WeekNo).ToList();
             }
             catch (Exception ex)
             {
@@ -100,12 +103,12 @@ namespace MMS.Repository.Managers.StockManager
             }
             return BuyerOrderEntryList;
         }
-        public List<InternalOrderEntryForm> Get()
+        public List<OrderEntry> Get()
         {
-            List<InternalOrderEntryForm> BuyerOrderEntryList = new List<InternalOrderEntryForm>();
+            List<OrderEntry> BuyerOrderEntryList = new List<OrderEntry>();
             try
             {
-                BuyerOrderEntryList = BuyerOrdeEntryrRepository.Table.ToList<InternalOrderEntryForm>().Where(x => x.IsDeleted == false).ToList();
+                BuyerOrderEntryList = BuyerOrdeEntryrRepository.Table.ToList<OrderEntry>().Where(x => x.IsDeleted == false).ToList();
             }
             catch (Exception ex)
             {
@@ -114,73 +117,91 @@ namespace MMS.Repository.Managers.StockManager
             return BuyerOrderEntryList;
         }
 
-        public InternalOrderEntryForm GetOrderEntryId(int OrderEntryId)
+        public OrderEntry GetOrderEntryId(int OrderEntryId)
         {
-            InternalOrderEntryForm model = new InternalOrderEntryForm();
+            OrderEntry model = new OrderEntry();
             if (OrderEntryId != 0)
             {
-                model = BuyerOrdeEntryrRepository.Table.Where(x => x.OrderEntryId == OrderEntryId && x.IsDeleted == false).FirstOrDefault();
+                model = BuyerOrdeEntryrRepository.GetOrderEntryId(OrderEntryId);
+            }
+            return model;
+        }
+        public OrderEntry GetOrderEntryIdbyFilter(int OrderEntryId, int processstatus)
+        {
+            OrderEntry model = new OrderEntry();
+            if (OrderEntryId != 0)
+            {
+                model = BuyerOrdeEntryrRepository.GetOrderEntryIdbyFilter(OrderEntryId, processstatus);
             }
             return model;
         }
 
-        public InternalOrderEntryForm GetInteranlOrderEntryId(int OrderEntryId)
+        //public InternalOrderForm GetInteranlOrderEntryId(int OrderEntryId)
+        //{
+        //    InternalOrderForm model = new InternalOrderForm();
+        //    if (OrderEntryId != 0)
+        //    {
+        //        model = BuyerorderIntenalDetailsRepository.Table.Where(x => x.OrderEntryId == OrderEntryId && x.IsDeleted == false && x.IsInternal == true).FirstOrDefault();
+        //    }
+        //    return model;
+        //}
+        //public InternalOrderForm GetIntenalBuyerOderSlNo(string BuyerPONo)
+        //{
+        //    InternalOrderForm model = new InternalOrderForm();
+        //    if (BuyerPONo != "" && BuyerPONo != null)
+        //    {
+        //        model = BuyerorderIntenalDetailsRepository.Table.Where(x => x.BuyerOrderSlNo == BuyerPONo && x.IsInternal == true && x.IsDeleted == false).FirstOrDefault();
+        //    }
+        //    return model;
+        //}
+        public OrderEntry GetBuyerOrderSlNo(string BuyerOrderSlNo)
         {
-            InternalOrderEntryForm model = new InternalOrderEntryForm();
-            if (OrderEntryId != 0)
-            {
-                model = BuyerOrdeEntryrRepository.Table.Where(x => x.OrderEntryId == OrderEntryId && x.IsDeleted == false && x.IsInternal == true).FirstOrDefault();
-            }
-            return model;
-        }
-        public InternalOrderEntryForm GetBuyerOrderSlNo(string BuyerOrderSlNo)
-        {
-            InternalOrderEntryForm model = new InternalOrderEntryForm();
+            OrderEntry model = new OrderEntry();
             if (BuyerOrderSlNo != "")
             {
                 model = BuyerOrdeEntryrRepository.Table.Where(x => x.BuyerOrderSlNo == BuyerOrderSlNo && x.IsBuyer == true && x.IsDeleted == false).FirstOrDefault();
             }
             return model;
         }
-        public InternalOrderEntryForm GetBuyerOrderSlNoWihLot(string BuyerOrderSlNo, string LotNo)
+        public OrderEntry GetBuyerOrderSlNoWihLot(string BuyerOrderSlNo, string LotNo)
         {
-            InternalOrderEntryForm model = new InternalOrderEntryForm();
+            OrderEntry model = new OrderEntry();
             if (BuyerOrderSlNo != "")
             {
                 model = BuyerOrdeEntryrRepository.Table.Where(x => x.BuyerOrderSlNo == BuyerOrderSlNo && x.IsBuyer == true && x.IsDeleted == false && x.LotNo == LotNo).FirstOrDefault();
             }
             return model;
         }
-        public InternalOrderEntryForm GetBuyerOrderDetails(string BuyerOrderSlNo, int? Season, int? Buyername)
+        public OrderEntry GetBuyerOrderDetails(string BuyerOrderSlNo, int? Season, int? Buyername)
         {
-            InternalOrderEntryForm model = new InternalOrderEntryForm();
+            OrderEntry model = new OrderEntry();
             if (BuyerOrderSlNo != "")
             {
                 model = BuyerOrdeEntryrRepository.Table.Where(x => x.BuyerOrderSlNo == BuyerOrderSlNo && x.IsBuyer == true && x.IsDeleted == false && x.BuyerSeason == Season && x.BuyerName == Buyername).FirstOrDefault();
             }
             return model;
         }
-        public InternalOrderEntryForm BuyerOrderExitNo(string BuyerOrderSlNo, string Season, string Buyer)
+        public OrderEntry BuyerOrderExitNo(string BuyerOrderSlNo, string Season, string Buyer)
         {
-            InternalOrderEntryForm model_ = new InternalOrderEntryForm();
+            OrderEntry model_ = new OrderEntry();
             if (BuyerOrderSlNo != "")
             {
                 model_ = BuyerOrdeEntryrRepository.Table.ToList().Where(x => x.BuyerOrderSlNo == BuyerOrderSlNo && x.IsDeleted == false && x.IsBuyer == true && x.BuyerSeason == Convert.ToInt32(Season) && x.BuyerName == Convert.ToInt32(Buyer)).FirstOrDefault();
             }
             return model_;
         }
-        public InternalOrderEntryForm InternalOrderExitNo(string BuyerOrderSlNo, string Season, string Buyer)
+        public OrderEntry InternalOrderExitNo(string BuyerOrderSlNo, string Season, string Buyer)
         {
-            InternalOrderEntryForm model_ = new InternalOrderEntryForm();
+            OrderEntry model_ = new OrderEntry();
             if (BuyerOrderSlNo != "")
             {
                 model_ = BuyerOrdeEntryrRepository.Table.ToList().Where(x => x.BuyerOrderSlNo == BuyerOrderSlNo && x.IsDeleted == false && x.IsInternal == true && x.BuyerSeason == Convert.ToInt32(Season) && x.BuyerName == Convert.ToInt32(Buyer)).FirstOrDefault();
             }
             return model_;
         }
-        public List<InternalOrderEntryForm> isExistBuyerOrderSlNo(string BuyerOrderSlNo)
+        public List<OrderEntry> isExistBuyerOrderSlNo(string BuyerOrderSlNo)
         {
-            List<InternalOrderEntryForm> model_ = new List<InternalOrderEntryForm>();
+            List<OrderEntry> model_ = new List<OrderEntry>();
             if (BuyerOrderSlNo != "")
             {
 
@@ -218,18 +239,18 @@ namespace MMS.Repository.Managers.StockManager
             }
             return model;
         }
-        public InternalOrderEntryForm GetBuyerOderPoNo(string BuyerPONo)
+        public OrderEntry GetBuyerOderPoNo(string BuyerPONo)
         {
-            InternalOrderEntryForm model = new InternalOrderEntryForm();
+            OrderEntry model = new OrderEntry();
             if (BuyerPONo != "")
             {
                 model = BuyerOrdeEntryrRepository.Table.Where(x => x.BuyerOrderSlNo == BuyerPONo).FirstOrDefault();
             }
             return model;
         }
-        public InternalOrderEntryForm GetBuyerOderSlNo(string BuyerPONo)
+        public OrderEntry GetBuyerOderSlNo(string BuyerPONo)
         {
-            InternalOrderEntryForm model = new InternalOrderEntryForm();
+            OrderEntry model = new OrderEntry();
             if (BuyerPONo != "" && BuyerPONo != null)
             {
                 model = BuyerOrdeEntryrRepository.Table.Where(x => x.BuyerOrderSlNo == BuyerPONo && x.IsInternal == true && x.IsDeleted == false).FirstOrDefault();
@@ -237,15 +258,15 @@ namespace MMS.Repository.Managers.StockManager
             return model;
         }
 
-        public List<InternalOrderEntryForm> GetBuyer_Production_style()
+        public List<OrderEntry> GetBuyer_Production_style()
         {
 
-            List<InternalOrderEntryForm> model = new List<InternalOrderEntryForm>();
+            List<OrderEntry> model = new List<OrderEntry>();
             try
             {
-                
-                    model = BuyerOrdeEntryrRepository.Table.Where(x => x.IsBuyer == true && x.IsInternal == true && x.IsDeleted == false).ToList();
-             
+
+                model = BuyerOrdeEntryrRepository.Table.Where(x => x.IsBuyer == true && x.IsInternal == true && x.IsDeleted == false).ToList();
+
             }
             catch (Exception ex)
             {
@@ -253,18 +274,18 @@ namespace MMS.Repository.Managers.StockManager
             }
             return model;
         }
-        public InternalOrderEntryForm GetBuyerOderSlNo_withSeason(string BuyerPONo, string Lotno, int? season)
+        public OrderEntry GetBuyerOderSlNo_withSeason(string BuyerPONo, string Lotno, int? season)
         {
-            InternalOrderEntryForm model = new InternalOrderEntryForm();
+            OrderEntry model = new OrderEntry();
             if (BuyerPONo != "" && BuyerPONo != null)
             {
                 model = BuyerOrdeEntryrRepository.Table.Where(x => x.BuyerOrderSlNo == BuyerPONo && x.IsInternal == true && x.BuyerSeason == season && x.LotNo == Lotno && x.IsDeleted == false).FirstOrDefault();
             }
             return model;
         }
-        public List<InternalOrderEntryForm> LotNumberWithOrder(string LotNo, string Season)
+        public List<OrderEntry> LotNumberWithOrder(string LotNo, string Season)
         {
-            List<InternalOrderEntryForm> model_ = new List<InternalOrderEntryForm>();
+            List<OrderEntry> model_ = new List<OrderEntry>();
             if (LotNo != "")
             {
 
@@ -272,9 +293,9 @@ namespace MMS.Repository.Managers.StockManager
             }
             return model_;
         }
-        public List<InternalOrderEntryForm> GetLotNumberWithBuyer(string LotNo)
+        public List<OrderEntry> GetLotNumberWithBuyer(string LotNo)
         {
-            List<InternalOrderEntryForm> model_ = new List<InternalOrderEntryForm>();
+            List<OrderEntry> model_ = new List<OrderEntry>();
             if (LotNo != "")
             {
 
@@ -282,9 +303,9 @@ namespace MMS.Repository.Managers.StockManager
             }
             return model_;
         }
-        public List<InternalOrderEntryForm> GetLotNumberWithSeason(string LotNo, string Season)
+        public List<OrderEntry> GetLotNumberWithSeason(string LotNo, string Season)
         {
-            List<InternalOrderEntryForm> model_ = new List<InternalOrderEntryForm>();
+            List<OrderEntry> model_ = new List<OrderEntry>();
             if (LotNo != "")
             {
 
@@ -292,9 +313,9 @@ namespace MMS.Repository.Managers.StockManager
             }
             return model_;
         }
-        public InternalOrderEntryForm GetBuyerOderSlNoWithmaterial(string BuyerPONo, int Material)
+        public OrderEntry GetBuyerOderSlNoWithmaterial(string BuyerPONo, int Material)
         {
-            InternalOrderEntryForm model = new InternalOrderEntryForm();
+            OrderEntry model = new OrderEntry();
             if (BuyerPONo != "")
             {
                 model = BuyerOrdeEntryrRepository.Table.Where(x => x.BuyerOrderSlNo == BuyerPONo && x.IsInternal == true && x.IsDeleted == false && x.LeatherDescription == Material.ToString()).SingleOrDefault();
@@ -302,11 +323,19 @@ namespace MMS.Repository.Managers.StockManager
             return model;
         }
         #endregion
-
-
-        public List<InternalOrderEntryForm> GetIntenalOrderGrid(string BuyerSlipperNo)
+        public OrderEntry GetBuyersino(int Buyersino)
         {
-            List<InternalOrderEntryForm> contactlist = new List<InternalOrderEntryForm>();
+            OrderEntry buyerMaster = new OrderEntry();
+            if (Buyersino > 0)
+            {
+                buyerMaster = BuyerOrdeEntryrRepository.Table.Where(x => x.OrderEntryId == Buyersino).FirstOrDefault();
+            }
+            return buyerMaster;
+        }
+
+        public List<OrderEntry> GetIntenalOrderGrid(string BuyerSlipperNo)
+        {
+            List<OrderEntry> contactlist = new List<OrderEntry>();
             try
             {
                 contactlist = BuyerOrdeEntryrRepository.SearchInternalOrderList(BuyerSlipperNo);
@@ -318,9 +347,19 @@ namespace MMS.Repository.Managers.StockManager
             return contactlist;
         }
 
-        public List<InternalOrderEntryForm> GetBuyerOrderGrid(string BuyerSlipperNo)
+        //public InternalOrderForm GetIntenalBuyerOrderDetails(string BuyerOrderSlNo, int? Season, int? Buyername)
+        //{
+        //    InternalOrderForm model = new InternalOrderForm();
+        //    if (BuyerOrderSlNo != "")
+        //    {
+        //        model = BuyerorderIntenalDetailsRepository.Table.Where(x => x.BuyerOrderSlNo == BuyerOrderSlNo && x.IsBuyer == true && x.IsDeleted == false && x.BuyerSeason == Season && x.BuyerName == Buyername).FirstOrDefault();
+        //    }
+        //    return model;
+        //}
+
+        public List<OrderEntry> GetBuyerOrderGrid(string BuyerSlipperNo)
         {
-            List<InternalOrderEntryForm> contactlist = new List<InternalOrderEntryForm>();
+            List<OrderEntry> contactlist = new List<OrderEntry>();
             try
             {
                 contactlist = BuyerOrdeEntryrRepository.SearchBuyerOrderList(BuyerSlipperNo);
@@ -332,10 +371,48 @@ namespace MMS.Repository.Managers.StockManager
             return contactlist;
         }
 
-
+        public List<GetBuyerOrderlist> GetBuyerOrderlist(int buyername)
+        {
+            List<GetBuyerOrderlist> contactlist = new List<GetBuyerOrderlist>();
+            try
+            {
+                contactlist = BuyerOrdeEntryrRepository.getbuyOrderList(buyername);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return contactlist;
+        }
+        public List<GetBuyerOrderlist> getbuyOrderListdropdown()
+        {
+            List<GetBuyerOrderlist> contactlist = new List<GetBuyerOrderlist>();
+            try
+            {
+                contactlist = BuyerOrdeEntryrRepository.getbuyOrderListdropdown();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return contactlist;
+        }
+        public List<getbuyerorderaddressdetails> getbuyerorderaddressdetails(int orderid)
+        {
+            List<getbuyerorderaddressdetails> contactlist = new List<getbuyerorderaddressdetails>();
+            try
+            {
+                contactlist = BuyerOrdeEntryrRepository.getbuyerorderaddressdetails(orderid);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return contactlist;
+        }
         #region Curd Operation
 
-        public int Post(InternalOrderEntryForm arg)
+        public int Post(OrderEntry arg)
         {
             int result = 0;
             try
@@ -351,7 +428,7 @@ namespace MMS.Repository.Managers.StockManager
                 }
                 else
                 {
-                    InternalOrderEntryForm model = BuyerOrdeEntryrRepository.Table.Where(m => m.OrderEntryId == arg.OrderEntryId).FirstOrDefault();
+                    OrderEntry model = BuyerOrdeEntryrRepository.Table.Where(m => m.OrderEntryId == arg.OrderEntryId).FirstOrDefault();
                     model.OrderEntryId = arg.OrderEntryId;
                     model.BuyerOrderSlNo = arg.BuyerOrderSlNo;
                     model.LotNo = arg.LotNo;
@@ -421,7 +498,7 @@ namespace MMS.Repository.Managers.StockManager
                     result = arg.OrderEntryId;
                     MMS.Data.StoredProcedureModel.ItemMaterial ItesmaterialName = new MMS.Data.StoredProcedureModel.ItemMaterial();
                     // ItesmaterialName = GetMaterial(model.MaterialMasterId);
-                    EmailTempate emailTemplate = new EmailTempate();
+                    EmailTemplate emailTemplate = new EmailTemplate();
                     CompanyManager companyManager = new CompanyManager();
                     StoreMasterManager storeManager = new StoreMasterManager();
                     StoreMaster storeMaster = new StoreMaster();
@@ -447,6 +524,118 @@ namespace MMS.Repository.Managers.StockManager
             }
             return result;
         }
+        //public int InternalPost(InternalOrderForm arg)
+        //{
+        //    int result = 0;
+        //    try
+        //    {
+        //        if (arg.OrderEntryId == 0)
+        //        {
+        //            string username = HttpContext.Current.Session["UserName"].ToString();
+        //            arg.CreatedBy = username;
+        //            //arg.UpdatedBy = "";                    
+        //            BuyerorderIntenalDetailsRepository.Insert(arg);
+
+        //            result = arg.OrderEntryId;
+        //        }
+        //        else
+        //        {
+        //            InternalOrderForm model = BuyerorderIntenalDetailsRepository.Table.Where(m => m.OrderEntryId == arg.OrderEntryId).FirstOrDefault();
+        //            model.OrderEntryId = arg.OrderEntryId;
+        //            model.BuyerOrderSlNo = arg.BuyerOrderSlNo;
+        //            model.LotNo = arg.LotNo;
+        //            model.Count = arg.Count;
+        //            //model.FreightAmtCurrency = arg.FreightAmtCurrency;
+        //            model.WeekNo = arg.WeekNo;
+        //            model.Date = arg.Date;
+        //            model.BuyerSeason = arg.BuyerSeason;
+        //            model.BuyerName = arg.BuyerName;
+        //            model.OrderProjectionNo = arg.OrderProjectionNo;
+        //            model.BuyerPoNo = arg.BuyerPoNo;
+        //            model.OurStyle = arg.OurStyle;
+        //            model.LeatherDescription = arg.LeatherDescription;
+        //            model.DiscountPer = arg.DiscountPer;
+        //            model.QuoteNo = arg.QuoteNo;
+        //            model.CountryStamp = arg.CountryStamp;
+        //            model.CustomerPlan = arg.CustomerPlan;
+        //            model.CustomerDate = arg.CustomerDate;
+        //            model.AgentMasterId = arg.AgentMasterId;
+        //            model.CommPer = arg.CommPer;
+        //            if (arg.ExFactoryDate.ToString() == "1/1/0001 12:00:00 AM")
+        //            {
+        //                model.ExFactoryDate = null;
+        //            }
+        //            else if (arg.ExFactoryDate.ToString() == "01-01-0001 00:00:00")
+        //            {
+        //                model.ExFactoryDate = null;
+
+        //            }
+        //            else
+        //            {
+        //                model.ExFactoryDate = arg.ExFactoryDate;
+        //            }
+
+        //            model.ShipmentMode = arg.ShipmentMode;
+        //            model.SampleReqNo = arg.SampleReqNo;
+        //            model.Brand = arg.Brand;
+        //            model.BuyerStyleNo = arg.BuyerStyleNo;
+        //            model.BarCodeNo = arg.BarCodeNo;
+        //            model.BomNo = arg.BomNo;
+        //            model.Last = arg.Last;
+        //            model.ColorMasterId = arg.ColorMasterId;
+        //            model.FinishedProdType = arg.FinishedProdType;
+        //            model.ProductTypeId = arg.ProductTypeId;
+        //            model.AmendmentNoWithDate = arg.AmendmentNoWithDate;
+        //            model.TotalOrderForWeek = arg.TotalOrderForWeek;
+        //            model.OrderType = arg.OrderType;
+        //            model.Currency = arg.Currency;
+        //            model.Parties = arg.Parties;
+        //            model.GradeMasterId = arg.GradeMasterId;
+        //            model.SizeRangeMasterId = arg.SizeRangeMasterId;
+        //            model.Remarks1 = arg.Remarks1;
+        //            model.Remarks2 = arg.Remarks2;
+        //            model.LineNo_1 = arg.LineNo_1;
+        //            model.PartiesAmount1 = arg.PartiesAmount1;
+        //            model.ShortUnitID = arg.ShortUnitID;
+        //            model.PartiesAmount2 = arg.PartiesAmount2;
+        //            model.LongUnitID = arg.LongUnitID;
+        //            model.IsBuyer = arg.IsBuyer;
+        //            model.IsInternal = arg.IsInternal;
+        //            model.CreatedDate = arg.CreatedDate;
+        //            model.UpdatedDate = DateTime.Now;
+        //            model.TotalAmount = arg.TotalAmount;
+        //            string username = HttpContext.Current.Session["UserName"].ToString();
+        //            model.UpdatedBy = username;
+        //            BuyerorderIntenalDetailsRepository.Update(model);
+        //            result = arg.OrderEntryId;
+        //            MMS.Data.StoredProcedureModel.ItemMaterial ItesmaterialName = new MMS.Data.StoredProcedureModel.ItemMaterial();
+        //            // ItesmaterialName = GetMaterial(model.MaterialMasterId);
+        //            EmailTemplate emailTemplate = new EmailTemplate();
+        //            CompanyManager companyManager = new CompanyManager();
+        //            StoreMasterManager storeManager = new StoreMasterManager();
+        //            StoreMaster storeMaster = new StoreMaster();
+        //            List<Company> listCompany = new List<Company>();
+        //            listCompany = companyManager.Get();
+        //            //emailTemplate = emailTemplateManager.GetTemplateName("Buyer Order Update");
+        //            //if (emailTemplate != null)
+        //            //{
+        //            //    string contents = emailTemplate.Body;
+        //            //    MaterialManager materialManager = new MaterialManager();
+        //            //    contents = contents.Replace("[[OrderNo]]", !string.IsNullOrEmpty(model.BuyerOrderSlNo) ? model.BuyerOrderSlNo : string.Empty);
+        //            //    contents = contents.Replace("[[UserName]]", HttpContext.Current.Session["UserName"].ToString());
+        //            //    contents = contents.Replace("[[CompanyName]]", listCompany != null ? listCompany.Count > 0 ? listCompany.LastOrDefault().CompanyName.ToString() : string.Empty : string.Empty);
+        //            //    emailTemplate.Body = contents;
+        //            //    MMS.Common.EmailHelper.SendEmail(emailTemplate);
+        //            //}
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+        //        result = 0;
+        //    }
+        //    return result;
+        //}
 
         public bool Delete(int OrderEntryId)
         {
@@ -459,12 +648,12 @@ namespace MMS.Repository.Managers.StockManager
                 List<Company> listCompany = new List<Company>();
                 listCompany = companyManager.Get();
 
-                InternalOrderEntryForm model = BuyerOrdeEntryrRepository.GetById(OrderEntryId);
+                OrderEntry model = BuyerOrdeEntryrRepository.GetById(OrderEntryId);
                 model.IsDeleted = true;
                 BuyerOrdeEntryrRepository.Update(model);
                 MMS.Data.StoredProcedureModel.ItemMaterial ItesmaterialName = new MMS.Data.StoredProcedureModel.ItemMaterial();
                 // ItesmaterialName = GetMaterial(model.MaterialMasterId);
-                EmailTempate emailTemplate = new EmailTempate();
+                EmailTemplate emailTemplate = new EmailTemplate();
                 emailTemplate = emailTemplateManager.GetTemplateName("Buyer Order Delete");
                 if (emailTemplate != null)
                 {
@@ -649,6 +838,116 @@ namespace MMS.Repository.Managers.StockManager
             }
 
             return result;
+        }
+        //public List<InvoiceDetails> GetnvoiceDetailslist()
+        //{
+        //    List<InvoiceDetails> InvoiceDetailslist = new List<InvoiceDetails>();
+        //    try
+        //    {
+        //        InvoiceDetailslist = InvoiceDetailsRepository.Table.Where(x => x.IsActive == true).ToList<InvoiceDetails>();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+        //    }
+        //    return InvoiceDetailslist;
+        //}
+
+        public List<OrderEntry> BuyerOrderforInvoiceList()
+        {
+            List<OrderEntry> contactlist = new List<OrderEntry>();
+            try
+            {
+                contactlist = BuyerOrdeEntryrRepository.BuyerOrderforInvoiceList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return contactlist;
+        }
+        public List<OrderEntry> BuyerOrderforBuyerList(int buyerid)
+        {
+            List<OrderEntry> contactlist = new List<OrderEntry>();
+            try
+            {
+                contactlist = BuyerOrdeEntryrRepository.BuyerOrderforBuyerList(buyerid);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return contactlist;
+        }
+        public List<OrderEntry> BuyerOrderforProcessList(int process)
+        {
+            List<OrderEntry> contactlist = new List<OrderEntry>();
+            try
+            {
+                contactlist = BuyerOrdeEntryrRepository.BuyerOrderforProcessList(process);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return contactlist;
+        }
+        public List<OrderEntry> BuyerOrderforbuyerandProcessList(int buyerid, int process)
+        {
+            List<OrderEntry> contactlist = new List<OrderEntry>();
+            try
+            {
+                contactlist = BuyerOrdeEntryrRepository.BuyerOrderforbuyerandProcessList(buyerid, process);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return contactlist;
+        }
+        public List<OrderEntry> GetOrderSingleEntryId(int OrderEntryId)
+        {
+            List<OrderEntry> model = new List<OrderEntry>();
+            if (OrderEntryId != 0)
+            {
+                model = BuyerOrdeEntryrRepository.GetOrderSingleEntryId(OrderEntryId);
+            }
+            return model;
+        }
+        public List<OrderEntry> GetbuyerOrderprocessEntryList(int buerid, int Process, int OrderEntryId, DateTime? from_date, DateTime? to_date)
+        {
+            List<OrderEntry> model = new List<OrderEntry>();
+            try
+            {
+                model = BuyerOrdeEntryrRepository.GetbuyerOrderprocessEntryList(buerid, Process, OrderEntryId, from_date, to_date);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return model;
+        }
+        public List<OrderEntry> GetOrderListEntryId(int OrderEntryId)
+        {
+            List<OrderEntry> model = new List<OrderEntry>();
+            if (OrderEntryId != 0)
+            {
+                model = BuyerOrdeEntryrRepository.GetOrderListEntryId(OrderEntryId);
+            }
+            return model;
+        }
+        public OrderEntry BuyerOrderstyleList()
+        {
+            OrderEntry contactlist = new OrderEntry();
+            try
+            {
+                contactlist = BuyerOrdeEntryrRepository.BuyerOrderstyleList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return contactlist;
         }
         #endregion
     }

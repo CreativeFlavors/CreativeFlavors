@@ -23,7 +23,7 @@ namespace MMS.Web.Controllers.Stock
         public ActionResult MultipleIssueGrid()
         {
             IssueSlip_SingleManager manager = new IssueSlip_SingleManager();
-            List<IssueSlip> issueSlipList = new List<IssueSlip>();
+            List<singleissueslip> issueSlipList = new List<singleissueslip>();
             issueSlipList = manager.GetMultipleIssue();
             var query = issueSlipList.GroupBy(x => x.InternalOderID).ToList();
 
@@ -41,7 +41,7 @@ namespace MMS.Web.Controllers.Stock
         public ActionResult SingleIssueSlipGrid()
         {
             IssueSlip_SingleManager manager = new IssueSlip_SingleManager();
-            List<IssueSlip> issueSlipList = new List<IssueSlip>();
+            List<singleissueslip> issueSlipList = new List<singleissueslip>();
             issueSlipList = manager.GetMultipleIssue();
             var query = issueSlipList.GroupBy(x => x.InternalOderID).ToList();
 
@@ -68,9 +68,9 @@ namespace MMS.Web.Controllers.Stock
         [HttpPost]
         public ActionResult SaveDetails(IssueSlip_SingleModel Model)
         {
-            IssueSlip EntModel = new IssueSlip();
+            singleissueslip EntModel = new singleissueslip();
             IssueSlip_SingleManager ObjManager = new IssueSlip_SingleManager();
-            bool Result = false;
+            //bool Result = false;
 
             EntModel.IssueSlipID = Model.IssueSlipID;
             EntModel.IssueSlipNo = Model.IssueSlipNo;
@@ -91,20 +91,20 @@ namespace MMS.Web.Controllers.Stock
             EntModel.InTransitType = Model.InTransitType;
             string username = Session["UserName"].ToString();
             EntModel.CreatedBy = username;
-            IssueSlip issueSlip = new IssueSlip();
-            IssueSlip issueSlip_ = new IssueSlip();
+            singleissueslip issueSlip = new singleissueslip();
+            singleissueslip issueSlip_ = new singleissueslip();
             issueSlip = ObjManager.GetorderNo(Model.InternalOderID);
             if (issueSlip != null)
             {
                 EntModel.IssueSlipID = issueSlip.IssueSlipID;
             }
             ObjManager.Post(EntModel);
-            IssueSlip_MaterialDetails issueSlip_MaterialDetails = new IssueSlip_MaterialDetails();
+            tbl_issueslipdetails issueSlip_MaterialDetails = new tbl_issueslipdetails();
             if (issueSlip != null)
             {
                 IssueSlipManager issueSlipManager = new IssueSlipManager();
-                IssueSlip_MaterialDetails issueSlipMaterial = new IssueSlip_MaterialDetails();
-                IssueSlip_MaterialDetails issueSlipMaterials = new IssueSlip_MaterialDetails();
+                tbl_issueslipdetails issueSlipMaterial = new tbl_issueslipdetails();
+                tbl_issueslipdetails issueSlipMaterials = new tbl_issueslipdetails();
                 issueSlipMaterials = issueSlipManager.GetGRNSelectedRow(Model.IssueSlipMaterialId);
                 if (issueSlipMaterials != null)
                 {
@@ -120,16 +120,16 @@ namespace MMS.Web.Controllers.Stock
         public ActionResult GetIssueDetails(int IssueSlipId)
         {
             IssueSlip_SingleModel model = new IssueSlip_SingleModel();
-            IssueSlip arg = new IssueSlip();
+            singleissueslip arg = new singleissueslip();
             IssueSlip_SingleManager Manager = new IssueSlip_SingleManager();
-            List<IssueSlip_MaterialDetails> issueSlipMaterials = new List<IssueSlip_MaterialDetails>();
+            List<tbl_issueslipdetails> issueSlipMaterials = new List<tbl_issueslipdetails>();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             IssueSlipManager issueSlipManager = new IssueSlipManager();
             if (IssueSlipId != 0)
             {
                 arg = Manager.GetGRNSelectedRow(IssueSlipId);
                 issueSlipMaterials = issueSlipManager.GetOrderNo(arg.InternalOderID);
-                InternalOrderEntryForm orderEntryForm = new InternalOrderEntryForm();
+                OrderEntry orderEntryForm = new OrderEntry();
                 orderEntryForm = buyerOrderEntryManager.GetBuyerOderSlNo(arg.InternalOderID);
                 model.OrderEntryId = orderEntryForm != null ? orderEntryForm.OrderEntryId : 0;
                 model.issueSlip_MaterialDetails = issueSlipMaterials;
@@ -170,7 +170,7 @@ namespace MMS.Web.Controllers.Stock
         }
         public JsonResult DeleteIssueDetails(int IssueSlipId)
         {
-            IssueSlip EntModel = new IssueSlip();
+            singleissueslip EntModel = new singleissueslip();
             IssueSlip_SingleManager ObjManager = new IssueSlip_SingleManager();
             string status = "";
             bool result = false;
@@ -185,14 +185,14 @@ namespace MMS.Web.Controllers.Stock
         }
         public ActionResult GetInternalBuyeSlNoWithMaterialName(string InternalOderID, string IssueType, string StoreName, string CategoryName)
         {
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             MaterialNameManager materialNameManager = new MaterialNameManager();
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             MaterialManager materialManager = new MaterialManager();
             BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
-            BillOfMaterial billOfMaterial = new BillOfMaterial();
-            InternalOrderEntryForm internalOrderEntryForm = new InternalOrderEntryForm();
+            Bom billOfMaterial = new Bom();
+            OrderEntry internalOrderEntryForm = new OrderEntry();
             Product_BuyerStyleManager productBuyerStyleManager = new Product_BuyerStyleManager();
             Product_BuyerStyleMaster productBuyerStyleMaster = new Product_BuyerStyleMaster();
             List<BOMMaterial> bomMaterialList = new List<BOMMaterial>();
@@ -218,14 +218,14 @@ namespace MMS.Web.Controllers.Stock
                 spBOMMaterialList = spBOMMaterialList.Where(x => x.CategoryName == CategoryName).ToList();
             }
 
-            List<IssueSlip_MaterialDetails> issueSlipMaterialList = new List<IssueSlip_MaterialDetails>();
+            List<tbl_issueslipdetails> issueSlipMaterialList = new List<tbl_issueslipdetails>();
             IssueSlipManager issueSlipManager = new IssueSlipManager();
             foreach (var item in spBOMMaterialList)
             {
-                IssueSlip_MaterialDetails issueSlip_MaterialDetails = new IssueSlip_MaterialDetails();
+                tbl_issueslipdetails issueSlip_MaterialDetails = new tbl_issueslipdetails();
 
-                IssueSlip_MaterialDetails issueSlipMaterial = new IssueSlip_MaterialDetails();
-                IssueSlip_MaterialDetails issueSlipMaterial_ = new IssueSlip_MaterialDetails();
+                tbl_issueslipdetails issueSlipMaterial = new tbl_issueslipdetails();
+                tbl_issueslipdetails issueSlipMaterial_ = new tbl_issueslipdetails();
                 issueSlipMaterial.IssueSlipFK = 0;
                 issueSlipMaterial.OrderNo = internalOrderEntryForm.BuyerOrderSlNo;
                 issueSlipMaterial.Style = string.Empty;
@@ -264,7 +264,7 @@ namespace MMS.Web.Controllers.Stock
 
         public ActionResult GetCategoryIDWithMaterialName(int CategoryID, int StoresID)
         {
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             MaterialNameManager materialNameManager = new MaterialNameManager();
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
@@ -298,7 +298,7 @@ namespace MMS.Web.Controllers.Stock
 
         public ActionResult GetStoredIDWithMaterialName(int StoredID)
         {
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             MaterialNameManager materialNameManager = new MaterialNameManager();
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
@@ -332,7 +332,7 @@ namespace MMS.Web.Controllers.Stock
         public ActionResult GetMaterialDetails(int Material, string InternalOrderNo)
         {
             BuyerOrderEntryManager buyerOrderManager = new BuyerOrderEntryManager();
-            InternalOrderEntryForm internalOrderEntryForm = new InternalOrderEntryForm();
+            OrderEntry internalOrderEntryForm = new OrderEntry();
             IssueSlip_SingleManager issueSlip_SingleManager = new IssueSlip_SingleManager();
             BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
             BOMMaterial bomMaterial = new BOMMaterial();
@@ -352,7 +352,7 @@ namespace MMS.Web.Controllers.Stock
         public ActionResult Search(string filter)
         {
             IssueSlip_SingleModel model = new IssueSlip_SingleModel();
-            IssueSlip EntObj = new IssueSlip();
+            singleissueslip EntObj = new singleissueslip();
             IssueSlip_SingleManager Manager = new IssueSlip_SingleManager();
             model.IssueSlip_SingleModelList = Manager.GetMultipleIssue();
             if (filter != null)

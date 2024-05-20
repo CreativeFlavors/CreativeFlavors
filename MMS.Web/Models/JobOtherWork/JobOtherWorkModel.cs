@@ -47,7 +47,7 @@ namespace MMS.Web.Models.JobOtherWork
         public List<BuyerMaster> buyerList { get; set; }
         public List<SeasonMaster> seasonList { get; set; }
         public List<StoreMaster> storesList { get; set; }
-        public List<MaterialGroupMaster_> materialGroupList { get; set; }
+        public List<materialgroupmaster> materialGroupList { get; set; }
         public List<MaterialCategoryMaster> materialCategoryList { get; set; }
         public List<MachineryMaster> machineryList { get; set; }
         public List<EmployDepartmentMaster> departmentList { get; set; }        

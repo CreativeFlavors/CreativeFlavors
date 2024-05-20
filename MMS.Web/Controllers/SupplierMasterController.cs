@@ -204,6 +204,8 @@ namespace MMS.Web.Controllers
                 model.IsDomestic = Convert.ToBoolean(supplierMaster.IsDomestic);
                 model.IsImport = Convert.ToBoolean(supplierMaster.IsImport);
                 model.SupplierGSTIN = supplierMaster.SupplierGSTIN;
+                model.CreditLimit = supplierMaster.CreditLimit;
+                model.CreditDays = supplierMaster.CreditDays;
             }
             return PartialView("Partial/SupplierMasterDetails", model);
         }
@@ -264,6 +266,8 @@ namespace MMS.Web.Controllers
                 supplierMasters.SupplierGSTIN = model.SupplierGSTIN;
                 supplierMasters.CreatedDate = DateTime.Now;
                 supplierMasters.CreatedBy = Session["UserName"].ToString();
+                supplierMasters.CreditLimit = model.CreditLimit;
+                supplierMasters.CreditDays = model.CreditDays;
                 string MaterialId = string.Empty;
                 string MaterialGroupMasterialId = string.Empty;
                 if (model.SelectedItemId != null)
@@ -347,6 +351,9 @@ namespace MMS.Web.Controllers
                 supplierMaster.SupplierGSTIN = model.SupplierGSTIN;
                 supplierMaster.UpdatedDate = DateTime.Now;
                 supplierMaster.UpdatedBy = Session["UserName"].ToString();
+                supplierMaster.UpdatedDate = DateTime.Now;
+                supplierMaster.CreditLimit = model.CreditLimit;
+                supplierMaster.CreditDays = model.CreditDays;
                 string MaterialId = string.Empty;
                 string MaterialGroupMasterialId = string.Empty;
                 foreach (var items in model.SelectedItemId)
@@ -532,7 +539,7 @@ namespace MMS.Web.Controllers
                 table_.Columns.Add("DeletedDate", typeof(DateTime));
                 table.Columns.Add("UpdatedDate").DefaultValue = null;
                 table.Columns.Add("DeletedDate").DefaultValue = null;
-                DataRow drowItem;
+                //DataRow drowItem;
                 foreach (DataRow dr in table.Rows)
                 {
                     dr["Country1"] = "";
@@ -742,16 +749,16 @@ namespace MMS.Web.Controllers
         public JsonResult MaterialGroupCheckboxeails(string MaterialGroupMasterId)
         {
             MaterialNameManager materialGroupManager = new MaterialNameManager();
-            MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
-            List<MaterialNameMaster> listMaterial = new List<MaterialNameMaster>();
-            List<MaterialNameMaster> listMaterial_ = new List<MaterialNameMaster>();
+            materialgroupmaster materialGroupMaster = new materialgroupmaster();
+            List<tbl_materialnamemaster> listMaterial = new List<tbl_materialnamemaster>();
+            List<tbl_materialnamemaster> listMaterial_ = new List<tbl_materialnamemaster>();
             if (MaterialGroupMasterId != null && MaterialGroupMasterId != "")
             {
                 string[] splitanme = MaterialGroupMasterId.Split(',');
                 foreach (var item in splitanme)
                 {
                     int GroupID = Convert.ToInt32(item);
-                    MaterialNameMaster materialGroup = new MaterialNameMaster();
+                    tbl_materialnamemaster materialGroup = new tbl_materialnamemaster();
                     listMaterial = materialGroupManager.Get();
                     listMaterial = listMaterial.Where(x => x.MaterialGroupMasterId == GroupID).ToList();
                     if (listMaterial.Count > 0)

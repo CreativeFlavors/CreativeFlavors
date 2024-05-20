@@ -36,7 +36,7 @@ namespace MMS.Data.Mapping.StockMap
             Property(t => t.SizeScheduleMasterId); 
             Property(t => t.SizeRangeMasterID);
             Property(t => t.BuyerNorms);
-            Property(t => t.NoofSets);
+            Property(t => t.NoofSets4);
             Property(t => t.ParentBOMID);
             Property(t => t.OurNorms);
             Property(t => t.OurNormsPercent);            
@@ -50,7 +50,7 @@ namespace MMS.Data.Mapping.StockMap
             Property(t => t.Description);
             Property(t => t.BuyerMasterId);
             Property(t => t.BuyerModel);
-            Property(t => t.date);
+            Property(t => t.Date);
             Property(t => t.ParentBomNo);
             Property(t => t.LastBomNoEntered);
             Property(t => t.LinkBomNo);

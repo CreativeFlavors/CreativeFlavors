@@ -3,8 +3,10 @@ using MMS.Core.Entities;
 using MMS.Data;
 using MMS.Data.Context;
 using MMS.Repository.Service;
+using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -71,8 +73,8 @@ namespace MMS.Repository.Managers
                 List<Users> user = new List<Users>();
                 string PasswordSalt = Encryptdata(Password);
                 string Password_ = Decryptdata(PasswordSalt);
-                //Password = Cryptography.GetChecksum(Password);
-                user = userRepository.Table.Where(P => P.Email.ToLower() == UserName.ToLower() && P.Password == Password_).ToList<Users>();
+
+                user = userRepository.Table.Where(P => P.Email.ToLower() == UserName.ToLower() && P.Password == Password_).ToList<Users>();              
                 if (user.Count > 0)
                 {
                     HttpContext.Current.Session["UserEmail"] = user.FirstOrDefault().Email;
@@ -109,7 +111,7 @@ namespace MMS.Repository.Managers
                 Users model = userRepository.Table.Where(p => p.Email == arg.Email).FirstOrDefault();
                 if (model != null)
                 {
-                    if (HttpContext.Current.Session["UserName"]!=null)
+                    if (HttpContext.Current.Session["UserName"] != null)
                     {
                         string username = HttpContext.Current.Session["UserName"].ToString();
                         model.UpdatedBy = username;
@@ -129,7 +131,7 @@ namespace MMS.Repository.Managers
                     {
                         string urername = model.FirstName + model.LastName;
                         string host = HttpContext.Current.Request.Url.Host;
-                        EmailHelper.SendResetPasswordEmailMsg("test@gmail.com", "New Password from Enco Shoes", model.Password,urername,host);
+                        EmailHelper.SendResetPasswordEmailMsg("test@gmail.com", "New Password from Enco Shoes", model.Password, urername, host);
                     }
                     //EmailHelper.SendMessageWithAttachment("", "Karthikpalanisamy90@gmail.com","New Password from Enco Shoes", "Password : " + model.Password + "","","","");
 
@@ -237,7 +239,7 @@ namespace MMS.Repository.Managers
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }

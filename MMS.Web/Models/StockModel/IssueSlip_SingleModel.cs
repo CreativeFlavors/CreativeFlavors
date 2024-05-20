@@ -79,14 +79,14 @@ namespace MMS.Web.Models.StockModel
         public string Type { get; set; }
 
         public int? Component_Id { get; set; }
-        public List<IssueSlip> IssueSlip_SingleModelList { get; set; }
+        public List<singleissueslip> IssueSlip_SingleModelList { get; set; }
         public List<MultipleIssueSlip> multipleIssueSlipModelList { get; set; }
-        public List<IssueSlip_MaterialDetails> issueSlip_MaterialDetails { get; set; }
+        public List<tbl_issueslipdetails> issueSlip_MaterialDetails { get; set; }
         public List<SizeRangeQtyRate> sizeRangeQtyRateList { get; set; }
         public List<SizeItemsIssueSlip> sizeItemsIssueSlipList { get; set; }
         // public IEnumerable<string> SelectedItemId { get; set; }
         public string SelectedItemId { get; set; }
-        public List<InternalOrderEntryForm> orderList { get; set; }
+        public List<OrderEntry> orderList { get; set; }
         public List<SPBomMaterialList> SPBomMaterialList { get; set; }
         public string PiecesRequiredQTY { get; set; }
         public string PiecesAlreadyIssue { get; set; }

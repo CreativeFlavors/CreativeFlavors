@@ -56,7 +56,7 @@ namespace MMS.Repository.Managers
                 arg.UpdatedDate = null;
                 simpleRepository.Insert(arg);
                 EmailTemplateManager emailTemplateManager = new EmailTemplateManager();
-                EmailTempate emailTemplate = new EmailTempate();
+                EmailTemplate emailTemplate = new EmailTemplate();
                 emailTemplate = emailTemplateManager.GetTemplateName("MRP Update");
                 CompanyManager companyManager = new CompanyManager();
                 StoreMasterManager storeManager = new StoreMasterManager();
@@ -183,7 +183,7 @@ namespace MMS.Repository.Managers
                     model.MRPDate = (arg.MRPDate);
                     simpleRepository.Update(model);
                     //EmailTemplateManager emailTemplateManager = new EmailTemplateManager();
-                    //EmailTempate emailTemplate = new EmailTempate();
+                    //EmailTemplate emailTemplate = new EmailTemplate();
                     //emailTemplate = emailTemplateManager.GetTemplateName("MRP Update");
                     CompanyManager companyManager = new CompanyManager();
                     StoreMasterManager storeManager = new StoreMasterManager();
@@ -243,7 +243,7 @@ namespace MMS.Repository.Managers
                 model.DeletedOn = DateTime.Now;
                 simpleRepository.Delete(model);
                 //EmailTemplateManager emailTemplateManager = new EmailTemplateManager();
-                //EmailTempate emailTemplate = new EmailTempate();
+                //EmailTemplate emailTemplate = new EmailTemplate();
                 //emailTemplate = emailTemplateManager.GetTemplateName("MRP Delete");
                 CompanyManager companyManager = new CompanyManager();
                 StoreMasterManager storeManager = new StoreMasterManager();
@@ -460,7 +460,7 @@ namespace MMS.Repository.Managers
                 }
             }
         }
-        public MRPRequirement IsGroupSize(MRPRequirement mrpRequirement,BOMMaterial each,MaterialMaster materialMaster,List<SizeRangeQtyRate> listOfSizeRange,string consString,InternalOrderEntryForm order)
+        public MRPRequirement IsGroupSize(MRPRequirement mrpRequirement,BOMMaterial each,MaterialMaster materialMaster,List<SizeRangeQtyRate> listOfSizeRange,string consString, OrderEntry order)
         {
             try
             {

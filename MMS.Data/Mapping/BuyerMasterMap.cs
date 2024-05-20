@@ -47,7 +47,7 @@ namespace MMS.Data.Mapping
             Property(t => t.ShipmentTo).IsRequired();
             Property(t => t.ShimentMode).IsRequired();
             Property(t => t.CountryStamp).IsRequired();
-
+            Property(t => t.accountypeid);
             Property(t => t.CreatedDate);
             Property(t => t.UpdatedDate);
             Property(t => t.CreatedBy);
@@ -55,6 +55,8 @@ namespace MMS.Data.Mapping
             Property(t => t.IsDeleted);
             Property(t => t.DeletedBy);
             Property(t => t.DeletedDate);
+            Property(t => t.CreditExposure);
+            Property(t => t.CreditDays);
             ToTable("BuyerMaster");
           
         }

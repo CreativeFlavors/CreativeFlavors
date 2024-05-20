@@ -326,7 +326,7 @@ namespace MMS.Web.Controllers.JobWork
                 else
                 {
                     string CategoryName = "";
-                    List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+                    List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
                     ColorManager colorManager = new ColorManager();
                     var items = (from x in materialManager.Get()
                                  join y in materialNameManager.Get()

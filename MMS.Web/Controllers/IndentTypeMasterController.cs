@@ -33,7 +33,7 @@ namespace MMS.Web.Controllers
         public ActionResult IndentTypeMasterDetails(int IndentMasterId)
         {
             IndentTypeManager indentManager = new IndentTypeManager();
-            IndentTypeMaster indentMaster = new IndentTypeMaster();
+            IndentMaster indentMaster = new IndentMaster();
             IndentTypeMasterModel model = new IndentTypeMasterModel();
             indentMaster = indentManager.GetIndentMasterID(IndentMasterId);
             int ID = Web.ExtensionMethod.HtmlHelper.getIndentTypeMasterId();
@@ -63,8 +63,8 @@ namespace MMS.Web.Controllers
         [HttpPost]
         public ActionResult IndentTypeMaster(IndentTypeMasterModel model)
         {
-            IndentTypeMaster IndentMasters = new IndentTypeMaster();
-            IndentTypeMaster indentMaster = new IndentTypeMaster();
+            IndentMaster IndentMasters = new IndentMaster();
+            IndentMaster indentMaster = new IndentMaster();
             if (ModelState.IsValid)
             {
              
@@ -98,8 +98,8 @@ namespace MMS.Web.Controllers
         [HttpPost]
         public ActionResult Update(IndentTypeMasterModel model)
         {
-            IndentTypeMaster IndentMasters = new IndentTypeMaster();
-            IndentTypeMaster indentMaster = new IndentTypeMaster();
+            IndentMaster IndentMasters = new IndentMaster();
+            IndentMaster indentMaster = new IndentMaster();
             if (ModelState.IsValid)
             {
                 IndentTypeManager indentManager = new IndentTypeManager();
@@ -121,7 +121,7 @@ namespace MMS.Web.Controllers
         }
         public ActionResult Delete(int IndentMasterID)
         {
-            IndentTypeMaster indentMaster = new IndentTypeMaster();
+            IndentMaster indentMaster = new IndentMaster();
             string status = "";
             IndentTypeManager indentManager = new IndentTypeManager();
             indentMaster = indentManager.GetIndentMasterID(IndentMasterID);
@@ -137,7 +137,7 @@ namespace MMS.Web.Controllers
         #region Helper Method
         public ActionResult Search(string filter)
         {
-            List<IndentTypeMaster> indentMasterList = new List<IndentTypeMaster>();
+            List<IndentMaster> indentMasterList = new List<IndentMaster>();
             IndentTypeManager indentManager = new IndentTypeManager();
             indentMasterList = indentManager.Get();
             indentMasterList = indentMasterList.Where(x => x.IndentTypeCode.ToLower().Trim().Contains(filter.ToLower().Trim()) || x.IndentTypeName.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();

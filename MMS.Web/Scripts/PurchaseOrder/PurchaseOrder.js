@@ -173,7 +173,7 @@ $(document).ready(function () {
 
         });
         $('#ExciseDuty').change(function () {
-            debugger;
+            
             var qty = $('#ExciseDuty').val();
             var exrate = $('#ExRate').val();
             var Value = ((parseFloat(qty) / 100) * parseFloat(exrate));
@@ -770,7 +770,7 @@ $(document).ready(function () {
 
             select: function () {
 
-                debugger;
+                
                 if ($("#OrderType option:selected").text() != "Direct Po") {
                     var MaterialNameId = $('#Material').val();
                     var SupplierNameId = $('#Supplier').val();
@@ -994,7 +994,7 @@ $(document).ready(function () {
     $(function () {
         $("#Supplier").combobox({
             select: function (event, ui) {
-                debugger;
+                
                 if ($('#OrderType option:selected').text() == "Direct Po") {
                     if (($('#Supplier').val() == "" || $('#Supplier').val() == 0)) {
                         alert("Please select supplier name");
@@ -1041,7 +1041,7 @@ $(document).ready(function () {
                         dataType: "JSON",
                         data: { Indentid: IndentNo, Supplierid: supplierid_ },
                         success: function (data) {
-                            debugger;
+                            
                             if (data.pono != "") {
                                 $("#PoNo").val(data.pono);
                             }
@@ -1155,12 +1155,12 @@ function isNumberKey(evt) {
     return true;
 }
 function RowClick(arg, arg1, arg2, arg3) {
-    debugger;
+    
     $('#list-amended-material tr#' + arg + '').remove()
     var pono = $('#PoNo').val();
     // var indentno = $('#IndentNo').val()   
     var supplier = $("#Supplier").val();
-    debugger;
+    
     var mrpSelectedText = ""; 
     var Indentid = "";  
     var chkArray = [];
@@ -1215,9 +1215,9 @@ function RowClick(arg, arg1, arg2, arg3) {
                     {
                         $('#Rate_').val(data.approvedPriceList.PriceRs);
                     }                  
-                    if (data.InternalOrderEntryForm != null)
+                    if (data.InternalOrderForm != null)
                     {
-                        $('#IONO').val(data.InternalOrderEntryForm.OrderEntryId);
+                        $('#IONO').val(data.InternalOrderForm.OrderEntryId);
                         $("#IONO").combobox('destroy');
                         $("#IONO").combobox();
                     }   
@@ -1270,7 +1270,7 @@ function RowClick(arg, arg1, arg2, arg3) {
             url: '/Indent/GeneralPurchaseOrderRowClickMaterialList',
             data: { IndentMaterialID: arg, BOMID: 0, IndentId: Indentid },
             success: function (data) {
-                debugger;
+                
                 if (data != null & data.Message != null) {
                     alert(data.Message);
                     return false;
@@ -1318,7 +1318,7 @@ function RowClick(arg, arg1, arg2, arg3) {
                         $('#BuyerMasterId').val(data.indent.BuyerMasterId);
                         $('#StoreStock').val(data.indent.StoreStock);
                         $('#SeasonId').val(data.indent.BuyerSeason);
-                        $('#IONO').val(data.InternalOrderEntryForm.OrderEntryId);
+                        $('#IONO').val(data.InternalOrderForm.OrderEntryId);
                         $("#IONO").combobox('destroy');
                         $("#IONO").combobox();
                         $('#FreeStock').val(data.indent.FreeStock);
@@ -1432,7 +1432,7 @@ function RowClick(arg, arg1, arg2, arg3) {
     }
 }
 function PO_RowClick(arg) {
-    debugger;
+    
 
     $('#list-amended-material tr#' + arg + '').remove()
     var pono = $('#PoNo').val();
@@ -1607,7 +1607,7 @@ function PO_RowClick(arg) {
             url: '/PurchaseOrder/GetPurchaseOrderDetails',
             data: { PoOrderID: arg },
             success: function (data) {
-                debugger;
+                
                 if (data != null & data.Message != null) {
                     alert(data.Message);
                     return false;
@@ -2055,7 +2055,7 @@ function Save(obj) {
 
             },
             error: function (ex) {
-                debugger;
+                
                 alert('Error Please contact Administrator.');
                 return false;
             }
@@ -2268,7 +2268,7 @@ function Validation() {
 
 }
 function poQtyChange(arg) {
-    debugger;
+    
     var pending_total = 0;
     var indentQty = $("#Qty").val();
     var poQty = $("#PoQty").val();
@@ -2289,7 +2289,7 @@ function poQtyChange(arg) {
     var IndentNo = "";
     IndentNo = selected;
     //Indentid = IndentNo;
-    debugger;
+    
     if ($('#OrderType option:selected').text() != "Direct Po") {  
         $.ajax({          
             url: '/PurchaseOrder/GetIndentPOQty',
@@ -2297,7 +2297,7 @@ function poQtyChange(arg) {
             dataType: "JSON",
             data: { Indentid: IndentNo, MaterialID: materialID },
             success: function (data) {
-                debugger;
+                
                 $("#PendingQty").val(data.PoPending);
                 pending_total = data.PoPending;
                 $("#PendingQty").prop("disabled", true);
@@ -2453,7 +2453,7 @@ function calulationtotal() {
 
 }
 function Indentshow() {
-    debugger;
+    
     if ($('#OrderType option:selected').text() == "Direct Po") {
         var chkArray = [];
         $(".chkProduct:checked").each(function () {
@@ -2571,7 +2571,7 @@ function Indentshow() {
             contentType: 'application/json; charset=utf-8',
             data: { Indentid: IndentNo, Supplierid: supplierid_ },
             success: function (data) {
-                debugger;
+                
                 if (data.pono != "") {
                     $("#PoNo").val(data.pono);
                 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,12 +41,23 @@ namespace MMS.Core.Entities.Stock
         public string Size { get; set; }
         public decimal? quantity { get; set; }
     }
+
+    [Table("approvedprice", Schema = "public")]
     public class ApprovedPrice
     {
-        public string POExcessPercentage { get; set; }
+        [Column("poexcesspercentage")]
+        public decimal? POExcessPercentage { get; set; }
+
+        [Column("pricers")]
         public decimal? PriceRs { get; set; }
+
+        [Column("materialid")]
         public int? MaterialID { get; set; }
+
+        [Column("supplierid")]
         public int? SupplierId { get; set; }
+
+        [Column("createddate")]
         public DateTime? CreatedDate { get; set; }
     }
 }

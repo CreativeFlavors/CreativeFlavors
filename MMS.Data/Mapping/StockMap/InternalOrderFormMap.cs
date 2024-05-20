@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MMS.Data.Mapping.StockMap
 {
-  public  class InternalOrderFormMap : EntityTypeConfiguration<OrderEntryForm>
+  public  class InternalOrderFormMap : EntityTypeConfiguration<InternalOrderForm>
     {
         public InternalOrderFormMap()
         {

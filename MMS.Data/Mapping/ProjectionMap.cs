@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MMS.Data.Mapping
 {
-    public class ProjectionMap :EntityTypeConfiguration<ProjectionMaster>
+    public class ProjectionMap :EntityTypeConfiguration<Projection>
     {
         public ProjectionMap()
         {

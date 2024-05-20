@@ -310,7 +310,7 @@ namespace MMS.Web.Controllers
             bool Result = false;
 
             PermissionManager PermissionManager = new PermissionManager();
-            PermissionMaster Model = new PermissionMaster();
+            tbl_Permission Model = new tbl_Permission();
             Model.PermissionID = Convert.ToInt32(data["PermissionID"]);
             Model.PermissionName = data["PermissionName"];
             Model.PermissionDesc = data["PermissionDesc"];
@@ -334,7 +334,7 @@ namespace MMS.Web.Controllers
         {
             bool Result = false;
             PermissionSettingManager PermissionSetManager = new PermissionSettingManager();
-            PermissionSettingMaster Model = new PermissionSettingMaster();
+            tbl_PermissionSetting Model = new tbl_PermissionSetting();
             Model.PermissionID = PermissionIDs;
             Model.UserTypeID = UserTypeId;
             Result = PermissionSetManager.Post(Model);
@@ -345,7 +345,7 @@ namespace MMS.Web.Controllers
         public JsonResult GetPermissionSettingIDs(int UserTypeId)
         {
             PermissionSettingManager PermissionSetManager = new PermissionSettingManager();
-            PermissionSettingMaster Model = PermissionSetManager.GetByID(UserTypeId);
+            tbl_PermissionSetting Model = PermissionSetManager.GetByID(UserTypeId);
             if (Model != null)
             {
                 return Json(Model.PermissionID, JsonRequestBehavior.AllowGet);

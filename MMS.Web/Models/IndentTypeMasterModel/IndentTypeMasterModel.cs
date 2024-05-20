@@ -21,7 +21,7 @@ namespace MMS.Web.Models.IndentTypeMasterModel
         public DateTime? DeletedDate { get; set; }
         public string DeletedBy { get; set; }
 
-        public List<IndentTypeMaster> IndentMasterList { get; set; }
+        public List<IndentMaster> IndentMasterList { get; set; }
 
     }
 }

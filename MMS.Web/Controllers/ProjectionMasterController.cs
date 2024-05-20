@@ -37,7 +37,7 @@ namespace MMS.Web
         public ActionResult ProjectionMasterDetails(int ProjectionId)
         {
             ProjectionManager projectionManager = new ProjectionManager();
-            ProjectionMaster projectionMaster = new ProjectionMaster();
+            Projection projectionMaster = new Projection();
             ProjectionMasterModel model = new ProjectionMasterModel();
 
             projectionMaster = projectionManager.GetProjectionMasterId(ProjectionId);
@@ -67,11 +67,11 @@ namespace MMS.Web
         [HttpPost]
         public ActionResult ProjectionMaster(ProjectionMasterModel model)
         {
-            ProjectionMaster projectionMasters = new ProjectionMaster();
+            Projection projectionMasters = new Projection();
             if (ModelState.IsValid)
             {
                 ProjectionManager projectionManager = new ProjectionManager();
-                ProjectionMaster projectionMaster = new ProjectionMaster();
+                Projection projectionMaster = new Projection();
                 projectionMaster = projectionManager.GetOrderIndicationNo(model.OrderIndicationNo);
                 if (projectionMaster == null)
                 {
@@ -104,11 +104,11 @@ namespace MMS.Web
         [HttpPost]
         public ActionResult Update(ProjectionMasterModel model)
         {
-            ProjectionMaster projectionMasters = new ProjectionMaster();
+            Projection projectionMasters = new Projection();
             if (ModelState.IsValid)
             {
                 ProjectionManager projectionManager = new ProjectionManager();
-                ProjectionMaster projectionMaster = new ProjectionMaster();
+                Projection projectionMaster = new Projection();
 
                 projectionMaster = projectionManager.GetProjectionMasterId(model.ProjectionId);
                 if (projectionMaster != null)
@@ -139,7 +139,7 @@ namespace MMS.Web
         }
         public ActionResult Delete(int ProjectionId)
         {
-            ProjectionMaster projectionMaster = new ProjectionMaster();
+            Projection projectionMaster = new Projection();
             string status = "";
             ProjectionManager projectionManager = new ProjectionManager();
             projectionMaster = projectionManager.GetProjectionMasterId(ProjectionId);
@@ -155,7 +155,7 @@ namespace MMS.Web
         #region Helper Method
         public ActionResult Search(string filter)
         {
-            List<ProjectionMaster> projectmasterList = new List<ProjectionMaster>();
+            List<Projection> projectmasterList = new List<Projection>();
             ProjectionManager projectionManager = new ProjectionManager();
             projectmasterList = projectionManager.Get();
             projectmasterList = projectmasterList.Where(x => x.OrderIndicationNo.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();

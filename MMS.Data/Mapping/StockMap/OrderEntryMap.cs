@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.ModelConfiguration;
 using MMS.Core.Entities.Stock;
+using System.Web;
 
 namespace MMS.Data.Mapping.StockMap
 {
-    public class OrderEntryMap : EntityTypeConfiguration<InternalOrderEntryForm>
+    public class OrderEntryMap : EntityTypeConfiguration<OrderEntry>
     {
         public OrderEntryMap()
         {
@@ -73,6 +74,7 @@ namespace MMS.Data.Mapping.StockMap
             Property(t => t.Stage4);
             Property(t => t.Stage5);
             Property(t => t.Stage6);
+            Property(t => t.ProcessStatus);
             
             ToTable("OrderEntry");
         }

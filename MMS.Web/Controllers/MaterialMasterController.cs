@@ -428,21 +428,21 @@ namespace MMS.Web.Controllers
         public JsonResult MaterialGroupCheckboxeails(int MaterialGroupMasterId)
         {
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
-            MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
-            materialGroupMaster = materialGroupManager.GetMaterialGroupMaster_Id(MaterialGroupMasterId);
+            materialgroupmaster materialGroupMaster = new materialgroupmaster();
+            materialGroupMaster = materialGroupManager.GetmaterialgroupmasterId(MaterialGroupMasterId);
             return Json(materialGroupMaster, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
         public JsonResult MaterialGroup(int MaterialGroupMasterId)
         {
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
-            MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
-            materialGroupMaster = materialGroupManager.GetMaterialGroupMaster_Id(MaterialGroupMasterId);
+            materialgroupmaster materialGroupMaster = new materialgroupmaster();
+            materialGroupMaster = materialGroupManager.GetmaterialgroupmasterId(MaterialGroupMasterId);
             return Json(materialGroupMaster, JsonRequestBehavior.AllowGet);
         }
         public ActionResult FillMaterialCateogoryid(int StoreMasterId)
         {
-            List<MaterialGroupMaster_> materialGroupMasterList_ = new List<MaterialGroupMaster_>();
+            List<materialgroupmaster> materialGroupMasterList_ = new List<materialgroupmaster>();
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
             materialGroupMasterList_ = materialGroupManager.Get().Where(x => x.StoreName == StoreMasterId).ToList();
@@ -458,7 +458,7 @@ namespace MMS.Web.Controllers
         [HttpGet]
         public ActionResult FillCateogory(string StoreMasterId)
         {
-            List<MaterialGroupMaster_> materialGroupMasterList_ = new List<MaterialGroupMaster_>();
+            List<materialgroupmaster> materialGroupMasterList_ = new List<materialgroupmaster>();
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
             int storeID = 0;
@@ -475,7 +475,7 @@ namespace MMS.Web.Controllers
         }
         public ActionResult FillCateogoryid(int MaterialCategoryMasterId)
         {
-            List<MaterialGroupMaster_> materialGroupMasterList_ = new List<MaterialGroupMaster_>();
+            List<materialgroupmaster> materialGroupMasterList_ = new List<materialgroupmaster>();
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
             var items = (from x in materialGroupManager.Get().Where(x => x.MaterialCategoryMasterId == MaterialCategoryMasterId)
@@ -501,7 +501,7 @@ namespace MMS.Web.Controllers
         }
         public ActionResult FillMaterialMasterNamebasedCategory(int MaterialCategoryMasterId)
         {
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             MaterialNameManager materialNameManager = new MaterialNameManager();
 
             MaterialManager materialManager = new MaterialManager();
@@ -522,7 +522,7 @@ namespace MMS.Web.Controllers
 
         public ActionResult FillMaterialMasterNamebasedgroup(int MaterialGroupMasterId)
         {
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
 
             MaterialNameManager materialNameManager = new MaterialNameManager();
 
@@ -536,7 +536,7 @@ namespace MMS.Web.Controllers
         }
         public ActionResult FillUOMbasedmaterialname(int materialmasterid)
         {
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             MaterialNameManager materialNameManager = new MaterialNameManager();
             MaterialManager materialManager = new MaterialManager();
             var items = (from x in materialNameManager.Get().Where(x => x.MaterialGroupMasterId == materialmasterid)
@@ -560,7 +560,7 @@ namespace MMS.Web.Controllers
         public ActionResult FillUOMBasedonMaterialName(int MaterialNameID)
         {
 
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             MaterialNameManager materialNameManager = new MaterialNameManager();
 
             MaterialManager materialManager = new MaterialManager();
@@ -590,7 +590,7 @@ namespace MMS.Web.Controllers
         }
         public ActionResult FillMaterialMasterName(int MaterialGroupMasterId)
         {
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             MaterialNameManager materialNameManager = new MaterialNameManager();
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
             MaterialManager materialManager = new MaterialManager();
@@ -625,7 +625,7 @@ namespace MMS.Web.Controllers
         }
         public ActionResult FillMaterialName(int MaterialGroupMasterId)
         {
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             MaterialNameManager materialNameManager = new MaterialNameManager();
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
             MaterialManager materialManager = new MaterialManager();
@@ -648,9 +648,9 @@ namespace MMS.Web.Controllers
                 Text = "Please Select"
             };
             items_.Insert(0, ShotName);
-            MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
+            materialgroupmaster materialGroupMaster = new materialgroupmaster();
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
-            materialGroupMaster = materialGroupManager.GetMaterialGroupMaster_Id(MaterialGroupMasterId);
+            materialGroupMaster = materialGroupManager.GetmaterialgroupmasterId(MaterialGroupMasterId);
             string host = System.Web.HttpContext.Current.Request.Url.Host.ToString();
             NormsManager normsManager = new NormsManager();
             Norms norms = new Norms();
@@ -678,7 +678,7 @@ namespace MMS.Web.Controllers
         public ActionResult FillMaterialNameBasedonColor(int MaterialNameID, string buyername)
         {
 
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             MaterialNameManager materialNameManager = new MaterialNameManager();
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
             MaterialCategoryMaster materialCategoryMaster = new MaterialCategoryMaster();
@@ -687,7 +687,7 @@ namespace MMS.Web.Controllers
             NormsManager normsManager = new NormsManager();
             Norms norms = new Norms();
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
-            MaterialGroupMaster_ materialGroupMater = new MaterialGroupMaster_();
+            materialgroupmaster materialGroupMater = new materialgroupmaster();
             var items = (from x in materialManager.Get()
                          join y in materialNameManager.Get()
                           on x.MaterialName equals y.MaterialMasterID
@@ -709,7 +709,7 @@ namespace MMS.Web.Controllers
         public ActionResult PurchaseOrderFillMaterialNameBasedonColor(int MaterialNameID, int? SupplierNameId)
         {
 
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             MaterialNameManager materialNameManager = new MaterialNameManager();
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
             MaterialManager materialManager = new MaterialManager();
@@ -766,7 +766,7 @@ namespace MMS.Web.Controllers
         [HttpGet]
         public ActionResult DirectPoPurchaseOrderFillMaterialNameBasedonColor(int MaterialNameID,string PONO)
         {
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             MaterialNameManager materialNameManager = new MaterialNameManager();
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
             MaterialManager materialManager = new MaterialManager();
@@ -885,8 +885,8 @@ namespace MMS.Web.Controllers
         public JsonResult GetMaterialCode(int MaterialGroupMasterId)
         {
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
-            MaterialGroupMaster_ materialGroupMaster = new MaterialGroupMaster_();
-            materialGroupMaster = materialGroupManager.GetMaterialGroupMaster_Id(MaterialGroupMasterId);
+            materialgroupmaster materialGroupMaster = new materialgroupmaster();
+            materialGroupMaster = materialGroupManager.GetmaterialgroupmasterId(MaterialGroupMasterId);
             string name = materialGroupMaster.GroupCode.Remove(0, 3);
             MaterialManager materialManager = new MaterialManager();
             List<MaterialMaster> materialMasterlist = new List<MaterialMaster>();
@@ -944,11 +944,11 @@ namespace MMS.Web.Controllers
         {
             //IEnumerable<Item> items = dbMedica.Items.Where(fun => fun.LatinName.Contains(query));
             //return dbMedica.Items.Where(fun => fun.LatinName.Contains(query));
-            List<MaterialNameMaster> materialMaster = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialMaster = new List<tbl_materialnamemaster>();
             MaterialNameManager materialManager = new MaterialNameManager();
             materialMaster = materialManager.Get();
-            List<MaterialNameMaster> items = materialManager.Get().OrderBy(x => x.MaterialDescription).Select(
-                                    item => new MaterialNameMaster()
+            List<tbl_materialnamemaster> items = materialManager.Get().OrderBy(x => x.MaterialDescription).Select(
+                                    item => new tbl_materialnamemaster()
                                     {
                                         MaterialDescription = item.MaterialDescription,
                                         MaterialMasterID = item.MaterialMasterID

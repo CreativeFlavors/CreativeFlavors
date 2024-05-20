@@ -9,7 +9,7 @@ using MMS.Core.Entities.Stock;
 
 namespace MMS.Data.Mapping.StockMap
 {
-    public class IssueSlipMap : EntityTypeConfiguration<IssueSlip_MaterialDetails>
+    public class IssueSlipMap : EntityTypeConfiguration<tbl_issueslipdetails>
     {
         public IssueSlipMap()
         {
@@ -68,8 +68,8 @@ namespace MMS.Data.Mapping.StockMap
             Property(t => t.MaterialTypes);
             Property(t => t.Jobworktype_Id);
             Property(t => t.Jw_Name);
-            Property(t => t.sheet);
-            Property(t => t.jobsheet_pair_Code_id);
+            Property(t => t.Sheet);
+            Property(t => t.Jobsheet_pair_Code_id);
             Property(t => t.SupplierNameId);
             Property(t => t.SupplierName_Lotno);
             Property(t => t.Finished_Material);

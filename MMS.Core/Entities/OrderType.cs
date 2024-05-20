@@ -1,20 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MMS.Core.Entities
 {
-   public class OrderType:BaseEntity
+    [Table("ordertype", Schema = "public")]
+    public class OrderType : BaseEntity
     {
-       public int OrderTypeID { get; set; }
-       public string OrderTypeCode { get; set; }
-       public string OrderTypeName { get; set; }     
-       public string CreatedBy { get; set; }
-       public string UpdatedBy { get; set; }
-       public bool? IsDeleted { get; set; }
-       public string DeletedBy { get; set; }
-       public DateTime? DeletedDate { get; set; }
+        [System.ComponentModel.DataAnnotations.Key]
+        [Column("ordertypeid")]
+        public int OrderTypeID { get; set; }
+
+        [Column("ordertypecode")]
+        public string OrderTypeCode { get; set; }
+
+        [Column("ordertypename")]
+        public string OrderTypeName { get; set; }
+        [Column("createddate")]
+        public DateTime? CreatedDate { get; set; }
+        [Column("updateddate")]
+        public DateTime? UpdatedDate { get; set; }
+        [Column("createdby")]
+        public string CreatedBy { get; set; }
+
+        [Column("updatedby")]
+        public string UpdatedBy { get; set; }
+
+        [Column("isdeleted")]
+        public bool? IsDeleted { get; set; }
+
+        [Column("deletedby")]
+        public string DeletedBy { get; set; }
+
+        [Column("deleteddate")]
+        public DateTime? DeletedDate { get; set; }
     }
 }

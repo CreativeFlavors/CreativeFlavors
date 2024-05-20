@@ -11,6 +11,7 @@ using System.Data;
 using System.Data.Entity.Core.Objects;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -20,7 +21,7 @@ namespace MMS.Repository.Managers.StockManager
     public class BOMMaterialListManager
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-
+        private Repository<BOMMaterial> repository;
         private Repository<BOMMaterialList> BOMMaterialListRepository = null;
         private Repository<MRPRequirement> MRPRequirementRepository = null;
         private Repository<DisplaySizeMaterial> DisplaySizeMaterialRepository = null;
@@ -28,6 +29,7 @@ namespace MMS.Repository.Managers.StockManager
 
         public BOMMaterialListManager()
         {
+            repository = unitOfWork.Repository<BOMMaterial>();
             BOMMaterialListRepository = unitOfWork.Repository<BOMMaterialList>();
             MRPRequirementRepository = unitOfWork.Repository<MRPRequirement>();
             DisplaySizeMaterialRepository = unitOfWork.Repository<DisplaySizeMaterial>();
@@ -79,7 +81,7 @@ namespace MMS.Repository.Managers.StockManager
                     BOMMaterialListRepository.Update(model);
                     MMS.Data.StoredProcedureModel.ItemMaterial ItesmaterialName = new MMS.Data.StoredProcedureModel.ItemMaterial();
                     ItesmaterialName = GetMaterial(arg.MaterialMasterId);
-                    EmailTempate emailTemplate = new EmailTempate();
+                    EmailTemplate emailTemplate = new EmailTemplate();
                     emailTemplate = emailTemplateManager.GetTemplateName("BOM Update");
                     if (emailTemplate != null)
                     {
@@ -196,6 +198,17 @@ namespace MMS.Repository.Managers.StockManager
             return result;
         }
         #endregion
+     public List<BOMMaterial> BOMMaterialID(int bomId)
+{
+    List<BOMMaterial> materialOpeningMaster = new List<BOMMaterial>();
+    if (bomId != 0)
+    {
+        materialOpeningMaster = repository.Table.Where(x => x.BOMID == bomId && x.IsDeleted == false).ToList();
+    }
+    return materialOpeningMaster;
+}
+
+
         public List<MRPRequirement> GetMRPMaterialList()
         {
             List<MRPRequirement> mOMMaterialList = new List<MRPRequirement>();

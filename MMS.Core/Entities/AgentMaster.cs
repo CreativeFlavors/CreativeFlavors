@@ -1,32 +1,59 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MMS.Core.Entities
 {
-   public class AgentMaster:BaseEntity
+    [Table("agentmaster", Schema = "public")]
+    public class AgentMaster : BaseEntity
     {
-       public int AgentMasterId { get; set; }
-       public string AgentCode { get; set; }
-       public string AgentFullName { get; set; }
-       public string AgentShortName { get; set; }
-       public int Currency { get; set; }
-       public int CommisionCriteriaId { get; set; }
-       public string AddressLine1 { get; set; }
-       public string AddressLine2 { get; set; }
-       public string AddressLine3 { get; set; }
-       public string Pincode { get; set; }     
-       public string CreatedBy { get; set; }
-       public string UpdatedBy { get; set; }
-       public string ContactPerson { get; set; }
-       public string MobileNo { get; set; }
-       public string EmailID { get; set; }
-       public int CountryMasterId { get; set; }
-       public int CommisionPercentage { get; set; }
-       public bool? IsDeleted { get; set; }
-       public string DeletedBy { get; set; }
-       public DateTime? DeletedDate { get; set; }
+        [System.ComponentModel.DataAnnotations.Key]
+        [Column("agentmasterid")]
+        public int AgentMasterId { get; set; }
+        [Column("agentcode")]
+        public string AgentCode { get; set; }
+        [Column("agentfullname")]
+        public string AgentFullName { get; set; }
+        [Column("agentshortname")]
+        public string AgentShortName { get; set; }
+        [Column("currency")]
+        public int Currency { get; set; }
+        [Column("commisioncriteriaid")]
+        public int CommisionCriteriaId { get; set; }
+        [Column("addressline1")]
+        public string AddressLine1 { get; set; }
+        [Column("addressline2")]
+        public string AddressLine2 { get; set; }
+        [Column("addressline3")]
+        public string AddressLine3 { get; set; }
+        [Column("pincode")]
+        public string Pincode { get; set; }
+        [Column("createddate")]
+        public DateTime? CreatedDate { get; set; }
+        [Column("updateddate")]
+        public DateTime? UpdatedDate { get; set; }
+        [Column("createdby")]
+        public string CreatedBy { get; set; }
+        [Column("updatedby")]
+        public string UpdatedBy { get; set; }
+        [Column("contactperson")]
+        public string ContactPerson { get; set; }
+        [Column("mobileno")]
+        public string MobileNo { get; set; }
+        [Column("emailid")]
+        public string EmailID { get; set; }
+        [Column("countrymasterid")]
+        public int CountryMasterId { get; set; }
+        [Column("commisionpercentage")]
+        public int CommisionPercentage { get; set; }
+        [Column("isdeleted")]
+        public bool? IsDeleted { get; set; }
+        [Column("deletedby")]
+        public string DeletedBy { get; set; }
+        [Column("deleteddate")]
+        public DateTime? DeletedDate { get; set; }
     }
 }

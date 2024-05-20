@@ -8,9 +8,9 @@
     int parkingTypeCount = 1;
 }
 @{
-    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    tbl_PermissionSetting PermissionSettingModel = new MMS.Core.Entities.tbl_PermissionSetting();
     PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
-    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
+    List<tbl_Permission> PermissionModel = new List<tbl_Permission>();
     PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("BuyerOrderEntryForm", PermissionSettingModel.PermissionID);
 
     bool AddMultiSchedule = false; bool PackageTypeAdd = false; bool ExcelforPL = false; bool NotifyMsgMSS = false;
@@ -248,6 +248,7 @@
                                             <label for="text" class="form-label">Customer Plan</label>
                                         </div>
                                         <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+
                                             @Html.DropDownListFor(m => m.CustomerPlan, new SelectList(
                   new List<Object>{
                        new { value = 0 , text = "AsPlanned"  },
@@ -1249,9 +1250,45 @@
         $("#OurStyle").combobox();
         $(".hasDatepicker2").datepicker({ dateFormat: "dd/mm/yy" });
     });
-    $(document).on('change', '#BuyerOrderSlNo', function () {     
-     
-        var BuyerOrderSlNo = $('#BuyerOrderSlNo').val();
+    $("#BuyerOrderSlNo").change(function () {
+         var BuyerOrderSlNo = "";
+ BuyerOrderSlNo = $('#BuyerOrderSlNo').val();
+ var buyerSeason = $("#BuyerSeason").val();
+ var buyerName = $("#BuyerName").val();
+ if (buyerSeason == "") {
+     $('#BuyerOrderSlNo').val("");
+     $("#AddBtn").hide();
+     alert("Please select the buyer season.");
+     return false;
+ }
+ else if (buyerName == "") {
+     $("#AddBtn").hide();
+     $('#BuyerOrderSlNo').val("");
+     alert("Please select the buyer name.");
+     return false;
+ }
+ $.ajax({
+     type: 'POST',
+     url: ' @Url.Action("isExistBuyerOrderSlNO", "BuyerOrderEntryForm")',
+     data: { BuyerOrderSlNo: BuyerOrderSlNo, BuyerSeason: buyerSeason, BuyerName: buyerName },
+     success: function (Message) {
+         
+         if (Message == "Already Existed") {
+             alert("Already Existed please enter another no.");
+             $('#BuyerOrderSlNo').val('');
+             return false;
+         }
+         else {
+             $("#AddBtn").show();
+             return false;
+         }
+     },
+ });
+    });
+    @*$(document).on('change', '#BuyerOrderSlNo', function () {
+
+        var BuyerOrderSlNo = "";
+        BuyerOrderSlNo = $('#BuyerOrderSlNo').val();
         var buyerSeason = $("#BuyerSeason").val();
         var buyerName = $("#BuyerName").val();
         if (buyerSeason == "") {
@@ -1271,17 +1308,20 @@
             url: ' @Url.Action("isExistBuyerOrderSlNO", "BuyerOrderEntryForm")',
             data: { BuyerOrderSlNo: BuyerOrderSlNo, BuyerSeason: buyerSeason, BuyerName: buyerName },
             success: function (Message) {
+                
                 if (Message == "Already Existed") {
                     alert("Already Existed please enter another no.");
+                    $('#BuyerOrderSlNo').val('');
                     return false;
                 }
                 else {
                     $("#AddBtn").show();
+                    return false;
                 }
             },
         });
 
-    });
+    });*@
     function isNumberKey(evt) {
         var charCode = (evt.which) ? evt.which : evt.keyCode;
         if (charCode != 46 && charCode > 31
@@ -1334,8 +1374,11 @@
                     $("#sizeRangeTable tbody").append("<tr><td class='sizeVal'>" + data[i].SizeRangeRefValue + "</td><td><input class='qty_Total' type='text'  id='qtyId" + count + "' style='width:50px;' value='0' onchange='CalculateTotal(this)' /></td><td><input type='text' class='sizeRate' id='Rate" + count + "' value='0' style='width:50px;' /></td></tr>");
                     count++;
                 }
+                return false;
             }
         });
+
+        return false;
     });
     function CalculateTotal(agr1) {
 
@@ -1478,7 +1521,7 @@
             var wholeJsonList = [];
 
             $('#list-amended-material tbody tr').each(function () {
-                alert('Total Amount:' + $(this).find('#TotalAmount').text());
+               // alert('Total Amount:' + $(this).find('#TotalAmount').text());
                 wholeJsonList.push(
                     {
                         BuyerOrderSlNo: $(this).find('span').html(),
@@ -1820,6 +1863,7 @@
     function AddTextBoxForMultipleSchedule() {
         var scheduleCount = $("#multipleScheduleTable tbody tr").length + 1;
         $("#multipleScheduleTable tbody").append("<tr><td>" + scheduleCount + "</td><td><input type='text' id='sizeId' style='width:50px;' /></td><td><input type='text' id='qtyId' style='width:50px;' /></td><td><input type='text' id='factoryDateId' style='width:75px;' /></td><td><input type='button' value='Remove' class='removeSchedule btn btn-default btn-style' /></td></tr>");
+        return true;
     }
     $(document).on('click', '.removeSchedule', function () {
         $(this).closest("tr").remove();
@@ -1827,17 +1871,16 @@
     var sizeRangeArr = [];
     var multipleScheduleArr = [];
     var packingDetailList = [];
-    $(document).on('click', '#AddBtn', function () {
-        alert(1);
+    /*$(document).on('click', '#AddBtn', function () {*/
+    $("#AddBtn").click(function () {
+        //alert(1);
         debugger
-        if (validation()) {
-
+       /* if (validation()) {*/
             sizeRangeArr = [];
             multipleScheduleArr = [];
             packingDetailList = [];
 
             $('#multipleScheduleTable tbody tr').each(function () {
-
                 multipleScheduleArr.push(
                         {
                             Io: $(this).find('td:first').html(),
@@ -1850,7 +1893,6 @@
 
 
             $('#sizeRangeTable tbody tr').each(function () {
-
                 sizeRangeArr.push(
                         {
                             Size: $(this).find('td:first').html(),
@@ -1862,7 +1904,6 @@
 
 
             $("#packingDetailsTable tbody tr").each(function () {
-
                 packingDetailList.push(
                     {
                         PackingType: $(this).find('.PackingType').html(),
@@ -1873,69 +1914,76 @@
             });
 
 
-
+        if (multipleScheduleArr.length > 0 && sizeRangeArr.length > 0) {
+            
             $('#list-amended-material tbody').append("<tr><td class='BuyerOrderSlNo'><span>" + $('#BuyerOrderSlNo').val() + "</span><input type='hidden' class='orderEntry' value='" + $("#OrderEntryId").val() + "'><input class='multisch' type='hidden' value='" + JSON.stringify(multipleScheduleArr) + "'><input class='sizerange' type='hidden' value='" + JSON.stringify(sizeRangeArr) + "'><input class='packingType' type='hidden' value='" + JSON.stringify(packingDetailList) + "'></td>" +
-                                                        "<td class='Date'>" + $('#Date').val() + "</td>" +
-                                                        "<td class='BuyerSeason'>" + $('#BuyerSeason').val() + "</td>" +
-                                                        "<td class='BuyerName'>" + $('#BuyerName').val() + "</td>" +
-                                                        "<td class='OrderProjectionNo'>" + $('#OrderProjectionNo').val() + "</td>" +
-                                                        "<td class='BuyerPoNo'>" + $('#BuyerPoNo').val() + "</td>" +
-                                                        "<td class='OurStyle'>" + $('#OurStyle').val() + "</td>" +
-                                                        "<td class='LeatherDescription'>" + $('#LeatherDescription').val() + "</td>" +
-                                                        "<td class='DiscountPer'>" + $('#DiscountPer').val() + "</td>" +
-                                                        "<td class='QuoteNo'>" + $('#QuoteNo').val() + "</td>" +
-                                                        "<td class='CountryStamp'>" + $('#CountryStamp').val() + "</td>" +
-                                                        "<td class='CustomerPlan'>" + $('#CustomerPlan').val() + "</td>" +
-                                                        "<td class='CustomerDate'>" + $('#CustomerDate').val() + "</td>" +
-                                                        "<td class='AgentMasterId'>" + $('#AgentMasterId').val() + "</td>" +
-                                                        "<td class='CommPer'>" + $('#CommPer').val() + "</td>" +
-                                                        "<td class='ExFactoryDate'>" + $('#ExFactoryDate').val() + "</td>" +
-                                                        "<td class='ShipmentMode'>" + $('#ShipmentMode').val() + "</td>" +
-                                                        "<td class='Remarks1'>" + $('#Remarks1').val() + "</td>" +
-                                                        "<td class='Remarks2'>" + $('#Remarks2').val() + "</td>" +
-                                                        "<td class='LotNo'>" + $('#LotNo').val() + "</td>" +
-                                                        "<td class='Count'>" + $('#Count').val() + "</td>" +
-                                                        "<td class='WeekNo'>" + $('#WeekNo').val() + "</td>" +
-                                                        "<td class='SampleReqNo'>" + $('#SampleReqNo').val() + "</td>" +
-                                                        "<td class='Brand'>" + $('#Brand').val() + "</td>" +
-                                                        "<td class='BuyerStyleNo'>" + $('#BuyerStyleNo').val() + "</td>" +
-                                                        "<td class='BarCodeNo'>" + $('#BarCodeNo').val() + "</td>" +
-                                                        "<td class='BomNo'>" + $('#BomNo').val() + "</td>" +
-                                                        "<td class='Last'>" + $('#Last').val() + "</td>" +
-                                                        "<td class='ColorMasterId'>" + $('#ColorMasterId').val() + "</td>" +
-                                                        "<td class='FinishedProdType'>" + $('#FinishedProdType').val() + "</td>" +
-                                                        "<td class='ProductTypeId'>" + $('#ProductTypeId').val() + "</td>" +
-                                                        "<td class='packType'>" + $('#packType').val() + "</td>" +
-                                                        "<td class='noOfCarton'>" + $('#noOfCarton').val() + "</td>" +
-                                                        "<td class='AmendmentNoWithDate'>" + $('#AmendmentNoWithDate').val() + "</td>" +
-                                                        "<td class='TotalOrderForWeek'>" + $('#TotalOrderForWeek').val() + "</td>" +
-                                                        "<td class='OrderType'>" + $('#OrderType').val() + "</td>" +
-                                                        "<td class='Currency'>" + $('#Currency').val() + "</td>" +
-                                                        "<td class='Rs'>" + $('#Rs').val() + "</td>" +
-                                                        "<td class='Parties'>" + $('#Parties').val() + "</td>" +
+                "<td class='Date'>" + $('#Date').val() + "</td>" +
+                "<td class='BuyerSeason'>" + $('#BuyerSeason').val() + "</td>" +
+                "<td class='BuyerName'>" + $('#BuyerName').val() + "</td>" +
+                "<td class='OrderProjectionNo'>" + $('#OrderProjectionNo').val() + "</td>" +
+                "<td class='BuyerPoNo'>" + $('#BuyerPoNo').val() + "</td>" +
+                "<td class='OurStyle'>" + $('#OurStyle').val() + "</td>" +
+                "<td class='LeatherDescription'>" + $('#LeatherDescription').val() + "</td>" +
+                "<td class='DiscountPer'>" + $('#DiscountPer').val() + "</td>" +
+                "<td class='QuoteNo'>" + $('#QuoteNo').val() + "</td>" +
+                "<td class='CountryStamp'>" + $('#CountryStamp').val() + "</td>" +
+                "<td class='CustomerPlan'>" + $('#CustomerPlan').val() + "</td>" +
+                "<td class='CustomerDate'>" + $('#CustomerDate').val() + "</td>" +
+                "<td class='AgentMasterId'>" + $('#AgentMasterId').val() + "</td>" +
+                "<td class='CommPer'>" + $('#CommPer').val() + "</td>" +
+                "<td class='ExFactoryDate'>" + $('#ExFactoryDate').val() + "</td>" +
+                "<td class='ShipmentMode'>" + $('#ShipmentMode').val() + "</td>" +
+                "<td class='Remarks1'>" + $('#Remarks1').val() + "</td>" +
+                "<td class='Remarks2'>" + $('#Remarks2').val() + "</td>" +
+                "<td class='LotNo'>" + $('#LotNo').val() + "</td>" +
+                "<td class='Count'>" + $('#Count').val() + "</td>" +
+                "<td class='WeekNo'>" + $('#WeekNo').val() + "</td>" +
+                "<td class='SampleReqNo'>" + $('#SampleReqNo').val() + "</td>" +
+                "<td class='Brand'>" + $('#Brand').val() + "</td>" +
+                "<td class='BuyerStyleNo'>" + $('#BuyerStyleNo').val() + "</td>" +
+                "<td class='BarCodeNo'>" + $('#BarCodeNo').val() + "</td>" +
+                "<td class='BomNo'>" + $('#BomNo').val() + "</td>" +
+                "<td class='Last'>" + $('#Last').val() + "</td>" +
+                "<td class='ColorMasterId'>" + $('#ColorMasterId').val() + "</td>" +
+                "<td class='FinishedProdType'>" + $('#FinishedProdType').val() + "</td>" +
+                "<td class='ProductTypeId'>" + $('#ProductTypeId').val() + "</td>" +
+                "<td class='packType'>" + $('#packType').val() + "</td>" +
+                "<td class='noOfCarton'>" + $('#noOfCarton').val() + "</td>" +
+                "<td class='AmendmentNoWithDate'>" + $('#AmendmentNoWithDate').val() + "</td>" +
+                "<td class='TotalOrderForWeek'>" + $('#TotalOrderForWeek').val() + "</td>" +
+                "<td class='OrderType'>" + $('#OrderType').val() + "</td>" +
+                "<td class='Currency'>" + $('#Currency').val() + "</td>" +
+                "<td class='Rs'>" + $('#Rs').val() + "</td>" +
+                "<td class='Parties'>" + $('#Parties').val() + "</td>" +
 
-                                                         "<td class='PartiesAmount1'>" + $('#PartiesAmount1').val() + "</td>" +
-                                                         "<td class='ShortUnitID'>" + $('#ShortUnitID').val() + "</td>" +
-                                                         "<td class='PartiesAmount2'>" + $('#PartiesAmount2').val() + "</td>" +
-                                                          "<td class='LongUnitID'>" + $('#LongUnitID').val() + "</td>" +
+                "<td class='PartiesAmount1'>" + $('#PartiesAmount1').val() + "</td>" +
+                "<td class='ShortUnitID'>" + $('#ShortUnitID').val() + "</td>" +
+                "<td class='PartiesAmount2'>" + $('#PartiesAmount2').val() + "</td>" +
+                "<td class='LongUnitID'>" + $('#LongUnitID').val() + "</td>" +
 
 
-                                                        "<td class='GradeMasterId'>" + $('#GradeMasterId').val() + "</td>" +
-                                                        "<td class='SizeRangeMasterId'>" + $('#SizeRangeMasterId').val() + "</td>" +
-                                                        "<td class='ShipmentCountryStamp'>" + $("#ShipmentCountryStamp").val() + "</td>" +
-                                                        "<td class='ShipmentFrom'>" + $("#ShipmentFrom").val() + "</td>" +
-                                                        "<td class='ShipmentTo'>" + $("#ShipmentTo").val() + "</td>" +
-                                                        "<td class='OtherInstruction'>" + $("#OtherInstruction").val() + "</td>" +
-                                                        "<td class='PaymentTerms'>" + $("#PaymentTerms").val() + "</td>" +
-                                                        "<td class='DeliveryTerms'>" + $("#DeliveryTerms").val() + "</td>" +
-                                                        "<td class='Insurance'>" + $("#Insurance").val() + "</td>" +
-                                                        "<td class='DeliveryTo'>" + $("#DeliveryTo").val() + "</td>" +
-                                                        "<td class='SpecialInstruction'>" + $("#SpecialInstruction").val() + "</td>" +
+                "<td class='GradeMasterId'>" + $('#GradeMasterId').val() + "</td>" +
+                "<td class='SizeRangeMasterId'>" + $('#SizeRangeMasterId').val() + "</td>" +
+                "<td class='ShipmentCountryStamp'>" + $("#ShipmentCountryStamp").val() + "</td>" +
+                "<td class='ShipmentFrom'>" + $("#ShipmentFrom").val() + "</td>" +
+                "<td class='ShipmentTo'>" + $("#ShipmentTo").val() + "</td>" +
+                "<td class='OtherInstruction'>" + $("#OtherInstruction").val() + "</td>" +
+                "<td class='PaymentTerms'>" + $("#PaymentTerms").val() + "</td>" +
+                "<td class='DeliveryTerms'>" + $("#DeliveryTerms").val() + "</td>" +
+                "<td class='Insurance'>" + $("#Insurance").val() + "</td>" +
+                "<td class='DeliveryTo'>" + $("#DeliveryTo").val() + "</td>" +
+                "<td class='SpecialInstruction'>" + $("#SpecialInstruction").val() + "</td>" +
 
-                                                        "<td class='TotalAmount'>" + $("#TotalAmount").text() + "</td>" +
-                                                        "<td class='sizerange' style='display:none'>" + JSON.stringify(sizeRangeArr) + "</td>" +
-                                                        "<td class='PackingLabeling'>" + $("#PackingLabeling").val() + "</td></tr>");
-
+                "<td class='TotalAmount'>" + $("#TotalAmount").text() + "</td>" +
+                "<td class='sizerange' style='display:none'>" + JSON.stringify(sizeRangeArr) + "</td>" +
+                "<td class='PackingLabeling'>" + $("#PackingLabeling").val() + "</td></tr>");
+        }
+        else if (multipleScheduleArr.length == 0) {
+            alert("Please add the Scheduler grid");
+        }
+        else {
+            alert("Please add the Size Range");
+        }
             setTimeout(function () {
                 $('#list-amended-material tbody tr.curChangeableRow td input').remove();
                 $('#list-amended-material tbody tr.curChangeableRow td:first-child').append("<input type='hidden' class='orderEntry' value='" + $("#OrderEntryId").val() + "'><input class='multisch' type='hidden' value='" + JSON.stringify(multipleScheduleArr) + "'><input class='sizerange' type='hidden' value='" + JSON.stringify(sizeRangeArr) + "'>");
@@ -1943,7 +1991,7 @@
             }, 200);
             $("input[type='text'],textarea").val("");
             $("select option:first-child").prop("selected", "selected");
-        }
+       /* }*/
     });
     $(document).on('click', '#list-amended-material tbody tr', function () {
 

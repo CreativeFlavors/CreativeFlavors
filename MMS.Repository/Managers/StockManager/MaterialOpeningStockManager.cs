@@ -164,7 +164,7 @@ namespace MMS.Repository.Managers
                         model.CreatedDate = arg.CreatedDate;
                         model.UpdatedDate = DateTime.Now;
                         string username_ = HttpContext.Current.Session["UserName"].ToString();
-                        model.UpdatedBY = username_;
+                        model.UpdatedBy = username_;
                         MaterialOpeningSizeQtyRateRepository.Update(model);
                         result = true;
                     }

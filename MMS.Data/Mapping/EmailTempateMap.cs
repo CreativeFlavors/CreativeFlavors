@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MMS.Data.Mapping
 {
-    public class EmailTempateMap : EntityTypeConfiguration<EmailTempate>
+    public class EmailTempateMap : EntityTypeConfiguration<EmailTemplate>
     {
         public EmailTempateMap()
         {

@@ -13,13 +13,13 @@ namespace MMS.Repository.Managers
     public class PermissionManager
     {
           private UnitOfWork unitOfWork = new UnitOfWork();
-          private Repository<PermissionMaster> PermissionMasterRepository;
+          private Repository<tbl_Permission> tbl_PermissionRepository;
 
         public PermissionManager()
         {
-            PermissionMasterRepository = unitOfWork.Repository<PermissionMaster>();
+            tbl_PermissionRepository = unitOfWork.Repository<tbl_Permission>();
         }
-        public bool Post(PermissionMaster arg)
+        public bool Post(tbl_Permission arg)
         {
             bool result = false;
             try
@@ -30,18 +30,18 @@ namespace MMS.Repository.Managers
                     arg.UpdatedBy = "Admin";
                     arg.CreatedDate = DateTime.Now;
                     arg.UpdatedDate = DateTime.Now;
-                    PermissionMasterRepository.Insert(arg);
+                    tbl_PermissionRepository.Insert(arg);
                 }
                 else
                 {
-                    PermissionMaster model = PermissionMasterRepository.Table.Where(p => p.PermissionID == arg.PermissionID).FirstOrDefault();
+                    tbl_Permission model = tbl_PermissionRepository.Table.Where(p => p.PermissionID == arg.PermissionID).FirstOrDefault();
                     if (model != null)
                     {
                         model.PermissionName = arg.PermissionName;
                         model.PermissionDesc = arg.PermissionDesc;
                         model.UpdatedDate = DateTime.Now;
                         model.UpdatedBy = "Admin";
-                        PermissionMasterRepository.Update(model);
+                        tbl_PermissionRepository.Update(model);
                     }
                 }
                 result = true;
@@ -54,31 +54,31 @@ namespace MMS.Repository.Managers
             return result;
 
         }
-        public List<PermissionMaster> Get()
+        public List<tbl_Permission> Get()
         {
-            List<PermissionMaster> PermissionMaster = new List<PermissionMaster>();
+            List<tbl_Permission> tbl_Permission = new List<tbl_Permission>();
 
             try
             {
-                PermissionMaster = PermissionMasterRepository.Table.OrderBy(x=>x.PermissionName).ToList<PermissionMaster>();
+                tbl_Permission = tbl_PermissionRepository.Table.OrderBy(x=>x.PermissionName).ToList<tbl_Permission>();
             }
             catch (Exception ex)
             {
                 Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
-            return PermissionMaster;
+            return tbl_Permission;
         }
 
-        public List<PermissionMaster> GetPermissionList(string PageName, string PermissionListIDs)
+        public List<tbl_Permission> GetPermissionList(string PageName, string PermissionListIDs)
         {
-            List<PermissionMaster> PermissionSetList = new List<PermissionMaster>();
+            List<tbl_Permission> PermissionSetList = new List<tbl_Permission>();
             if (!string.IsNullOrEmpty(PermissionListIDs))
             {
                 int[] obj = PermissionListIDs.Split(',').Select(n => Convert.ToInt32(n)).ToArray();
 
                 PermissionManager Manager = new PermissionManager();
                
-                PermissionSetList = PermissionMasterRepository.Table.Where(x => x.PermissionName == PageName && obj.Contains(x.PermissionID)).ToList();
+                PermissionSetList = tbl_PermissionRepository.Table.Where(x => x.PermissionName == PageName && obj.Contains(x.PermissionID)).ToList();
             }
             return PermissionSetList;
         }

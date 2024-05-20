@@ -51,6 +51,16 @@ namespace MMS.Repository.Managers.StockManager
             }
             return bomMaterialList;
         }
+        public List<MMS.Web.Models.subspbommateriallist> subGetBOMMaterial(string MRPNO)
+        {
+            List<MMS.Web.Models.subspbommateriallist> bomMaterialList = new List<MMS.Web.Models.subspbommateriallist>();
+            if (MRPNO != "")
+            {
+                bomMaterialList = IndentRepository.subBomMaterialList(MRPNO);
+
+            }
+            return bomMaterialList;
+        }
         public List<IndentMaterials> IndentMaterialLists(string MRPNO)
         {
             List<IndentMaterials> indentMaterials = new List<IndentMaterials>();

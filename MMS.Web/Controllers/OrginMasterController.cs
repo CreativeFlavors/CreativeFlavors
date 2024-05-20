@@ -33,7 +33,7 @@ namespace MMS.Web.Controllers
         public ActionResult OrginDetails(int OriginMasterId)
         {
             OrgingMasterManager orgingMasterManager = new OrgingMasterManager();
-            OrginMaster orginMaster = new OrginMaster();
+            OriginMaster orginMaster = new OriginMaster();
             OrginMasterModel model = new OrginMasterModel();
             orginMaster = orgingMasterManager.GetOriginMasterId(OriginMasterId);
             string autoId = GetAutoid();
@@ -63,8 +63,8 @@ namespace MMS.Web.Controllers
         [HttpPost]
         public ActionResult OrginMaster(OrginMasterModel model)
         {
-            OrginMaster orginMasters = new OrginMaster();
-            OrginMaster orginMaster = new OrginMaster();
+            OriginMaster orginMasters = new OriginMaster();
+            OriginMaster orginMaster = new OriginMaster();
             OrgingMasterManager orgingMasterManager = new OrgingMasterManager();
             orginMaster = orgingMasterManager.GetOriginName(model.OriginName);
             if (orginMaster == null)
@@ -85,10 +85,10 @@ namespace MMS.Web.Controllers
         [HttpPost]
         public ActionResult Update(OrginMasterModel model)
         {
-            OrginMaster orginMasters = new OrginMaster();
+            OriginMaster orginMasters = new OriginMaster();
             if (ModelState.IsValid)
             {
-                OrginMaster orginMaster = new OrginMaster();
+                OriginMaster orginMaster = new OriginMaster();
                 OrgingMasterManager orgingMasterManager = new OrgingMasterManager();
                 orginMaster = orgingMasterManager.GetOriginMasterId(model.OriginMasterId);
                 if (orginMaster != null)
@@ -111,7 +111,7 @@ namespace MMS.Web.Controllers
         }
         public ActionResult Delete(int OriginMasterId)
         {
-            OrginMaster orginMaster = new OrginMaster();
+            OriginMaster orginMaster = new OriginMaster();
             string status = "";
             OrgingMasterManager orgingMasterManager = new OrgingMasterManager();
             orginMaster = orgingMasterManager.GetOriginMasterId(OriginMasterId);
@@ -127,7 +127,7 @@ namespace MMS.Web.Controllers
         #region Helper Method
         public ActionResult Search(string filter)
         {
-            List<OrginMaster> manufacturerMasterlsit = new List<OrginMaster>();
+            List<OriginMaster> manufacturerMasterlsit = new List<OriginMaster>();
             OrgingMasterManager orgingMasterManager = new OrgingMasterManager();
             manufacturerMasterlsit = orgingMasterManager.Get();
             manufacturerMasterlsit = manufacturerMasterlsit.Where(x => x.OriginName.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();

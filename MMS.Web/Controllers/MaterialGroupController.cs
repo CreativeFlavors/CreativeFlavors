@@ -1,5 +1,6 @@
 ﻿using MMS.Common;
 using MMS.Core.Entities;
+using MMS.Core.Entities.Stock;
 using MMS.Repository.Managers;
 using MMS.Web.Models.MaterialGroupMaster;
 using System;
@@ -63,7 +64,7 @@ namespace MMS.Web.Controllers
         public ActionResult MaterialGroupDetails(int MaterialGroupMasterId)
         {
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
-            MaterialGroupMaster_ materialGroupMaster_ = new MaterialGroupMaster_();
+            materialgroupmaster materialgroupmaster = new materialgroupmaster();
             MaterialGroupMasterModel model = new MaterialGroupMasterModel();
             MaterialCategoryManager CategoryManager = new MaterialCategoryManager();
             SubGroupManager Manager = new SubGroupManager();
@@ -82,29 +83,29 @@ namespace MMS.Web.Controllers
             };
             items.Insert(0, ShotName);
             model.SubGroupList = items;
-            materialGroupMaster_ = materialGroupManager.GetMaterialGroupMaster_Id(MaterialGroupMasterId);
-            if (materialGroupMaster_.MaterialGroupMasterId != 0)
+            materialgroupmaster = materialGroupManager.GetmaterialgroupmasterId(MaterialGroupMasterId);
+            if (materialgroupmaster.MaterialGroupMasterId != 0)
             {
 
-                materialCategoryMaster = CategoryManager.GetMaterialCategoryMaster(materialGroupMaster_.MaterialCategoryMasterId);
-                model.GroupName = materialGroupMaster_.GroupName;
-                model.StoreName = materialGroupMaster_.StoreName;
-                model.MaterialGroupMasterId = materialGroupMaster_.MaterialGroupMasterId;
-                model.SubGroupName = materialGroupMaster_.SubGroup;
-                model.MaterialCategoryMasterId = materialGroupMaster_.MaterialCategoryMasterId;
-                model.IsSubstance = materialGroupMaster_.IsSubstance;
-                model.IsSize = materialGroupMaster_.IsSize;
-                model.IsColor = materialGroupMaster_.IsColor;
+                materialCategoryMaster = CategoryManager.GetMaterialCategoryMaster(materialgroupmaster.MaterialCategoryMasterId);
+                model.GroupName = materialgroupmaster.GroupName;
+                model.StoreName = materialgroupmaster.StoreName;
+                model.MaterialGroupMasterId = materialgroupmaster.MaterialGroupMasterId;
+                model.SubGroupName = materialgroupmaster.SubGroup;
+                model.MaterialCategoryMasterId = materialgroupmaster.MaterialCategoryMasterId;
+                model.IsSubstance = materialgroupmaster.IsSubstance;
+                model.IsSize = materialgroupmaster.IsSize;
+                model.IsColor = materialgroupmaster.IsColor;
                 model.CateogoryCode = materialCategoryMaster.CategoryCode;
-                model.IsConsumption = materialGroupMaster_.IsConsumption;
-                model.IsInspection = materialGroupMaster_.IsInspection;
-                model.IsReservation = materialGroupMaster_.IsReservation;
-                model.IsDisplay = materialGroupMaster_.IsDisplay;
-                model.IsBatchcode = materialGroupMaster_.IsBatchcode;
-                model.IsMultipleUnits = materialGroupMaster_.IsMultipleUnits;
-                model.IsLeatherType = materialGroupMaster_.IsLeatherType;
-                model.CreatedDate = materialGroupMaster_.CreatedDate;
-                model.UpdatedDate = materialGroupMaster_.UpdatedDate;
+                model.IsConsumption = materialgroupmaster.IsConsumption;
+                model.IsInspection = materialgroupmaster.IsInspection;
+                model.IsReservation = materialgroupmaster.IsReservation;
+                model.IsDisplay = materialgroupmaster.IsDisplay;
+                model.IsBatchcode = materialgroupmaster.IsBatchcode;
+                model.IsMultipleUnits = materialgroupmaster.IsMultipleUnits;
+                model.IsLeatherType = materialgroupmaster.IsLeatherType;
+                model.CreatedDate = materialgroupmaster.CreatedDate;
+                model.UpdatedDate = materialgroupmaster.UpdatedDate;
                 model.CreatedBy = string.Empty;
                 model.UpdatedBy = string.Empty;
             }
@@ -129,10 +130,10 @@ namespace MMS.Web.Controllers
         [HttpPost]
         public ActionResult MaterialGroup(MaterialGroupMasterModel model, FormCollection collection)
         {
-            MaterialGroupMaster_ materialGroupMasters_ = new MaterialGroupMaster_();
+            materialgroupmaster materialGroupMasters_ = new materialgroupmaster();
             if (ModelState.IsValid)
             {
-                MaterialGroupMaster_ materialCategoryMaster = new MaterialGroupMaster_();
+                materialgroupmaster materialCategoryMaster = new materialgroupmaster();
                 MaterialGroupManager materialGroupManager = new MaterialGroupManager();
                 materialCategoryMaster = materialGroupManager.GetGroupName(model.GroupName);
                 if (materialCategoryMaster==null)
@@ -172,11 +173,11 @@ namespace MMS.Web.Controllers
         [HttpPost]
         public ActionResult Update(MaterialGroupMasterModel model)
         {
-            MaterialGroupMaster_ materialGroupMasters_ = new MaterialGroupMaster_();
-            MaterialGroupMaster_ materialGroupMaster_ = new MaterialGroupMaster_();
+            materialgroupmaster materialGroupMasters_ = new materialgroupmaster();
+            materialgroupmaster materialgroupmaster = new materialgroupmaster();
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
-            materialGroupMaster_ = materialGroupManager.GetMaterialGroupMaster_Id(model.MaterialGroupMasterId);
-            if (materialGroupMaster_ != null)
+            materialgroupmaster = materialGroupManager.GetmaterialgroupmasterId(model.MaterialGroupMasterId);
+            if (materialgroupmaster != null)
             {
                 materialGroupMasters_.GroupCode = model.GroupCode;
                 materialGroupMasters_.GroupName = model.GroupName;
@@ -207,14 +208,14 @@ namespace MMS.Web.Controllers
         }
         public ActionResult Delete(int MaterialGroupMasterId)
         {
-            MaterialGroupMaster_ materialGroupMaster_ = new MaterialGroupMaster_();
+            materialgroupmaster materialgroupmaster = new materialgroupmaster();
             string status = "";
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
-            materialGroupMaster_ = materialGroupManager.GetMaterialGroupMaster_Id(MaterialGroupMasterId);
-            if (materialGroupMaster_ != null)
+            materialgroupmaster = materialGroupManager.GetmaterialgroupmasterId(MaterialGroupMasterId);
+            if (materialgroupmaster != null)
             {
                 status = "Success";
-                materialGroupManager.Delete(materialGroupMaster_.MaterialGroupMasterId);
+                materialGroupManager.Delete(materialgroupmaster.MaterialGroupMasterId);
             }
             return Json(status, JsonRequestBehavior.AllowGet);
         }
@@ -223,12 +224,12 @@ namespace MMS.Web.Controllers
         #region Helper Method
         public ActionResult Search(string filter)
         {
-            List<MaterialGroupMaster_> materialGroupMaster_ = new List<MaterialGroupMaster_>();
+            List<materialgroupmaster> materialgroupmaster = new List<materialgroupmaster>();
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
-            materialGroupMaster_ = materialGroupManager.Get();
-            materialGroupMaster_ = materialGroupMaster_.Where(x => x.GroupName.ToLower().Trim().Contains(filter.ToLower().Trim()) || x.GroupCode.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
+            materialgroupmaster = materialGroupManager.Get();
+            materialgroupmaster = materialgroupmaster.Where(x => x.GroupName.ToLower().Trim().Contains(filter.ToLower().Trim()) || x.GroupCode.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
             MaterialGroupMasterModel model = new MaterialGroupMasterModel();
-            model.MaterialGrouplist = materialGroupMaster_;
+            model.MaterialGrouplist = materialgroupmaster;
             return PartialView("Partial/MaterialGroupGrid", model);
         }
         public JsonResult GetMaterialName(int MaterialGroupMasterId)

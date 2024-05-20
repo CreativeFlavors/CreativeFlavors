@@ -1,0 +1,317 @@
+﻿@model MMS.Web.Models.CustomerTransaction.Customertransaction
+@using MMS.Repository.Managers
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <style>
+        .alert {
+            position: relative;
+            padding: 5px 1rem;
+        }
+
+        .alert-danger {
+            color: #842029;
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+            width: 119%;
+        }
+
+        strong#close {
+            margin-left: 16%;
+            cursor: pointer;
+        }
+
+        #alert {
+            margin-left: 24%;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="edit-section">
+        <div class="d-flex justify-content-end">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Payment Information</h1>
+
+        <div class="customers-details-header">
+            <div class="customers-details">
+                <div class="customers-details-inner">
+                    <p class="font-16">Buyer Name</p>
+                    <p class="font-16">@Model.customer </p>
+                </div>
+                <div class="customers-details-inner">
+                    <p class="font-16">Buyer Code</p>
+                    <p class="font-16">@Model.buyercode</p>
+                </div>
+                <div class="customers-details-inner">
+                    <p class="font-16">Quote Number</p>
+                    <p class="font-16"></p>
+                </div>
+                <div class="customers-details-inner">
+                    <p class="font-16">Quote Date</p>
+                    <p class="font-16"></p>
+                </div>
+                <div class="customers-details-inner">
+                    <p class="font-16">So Number</p>
+                    <p class="font-16">@Model.Sonumber</p>
+                </div>
+                <div class="customers-details-inner">
+                    <p class="font-16">So Date</p>
+                    <p class="font-16">@Model.SoDate</p>
+                </div>
+                <div class="customers-details-inner">
+                    <p class="font-16">Invoice Number</p>
+                    <p class="font-16">@Model.InvRefNumber</p>
+                </div>
+            </div>
+            <div class="customers-details">
+                <div class="customers-details-inner">
+                    <p class="font-16">Invoice Date</p>
+                    <p class="font-16">@Model.InvDate.ToString("dd/MM/yyyy")</p>
+                </div>
+                <div class="customers-details-inner">
+                    <p class="font-16">Invoice Item / Quantity</p>
+                    <p class="font-16">@Model.RefItems <b> / </b> @Model.RefQuantity</p>
+                </div>
+                <div class="customers-details-inner">
+                    <p class="font-16">Invoice Value</p>
+                    <p class="font-16">@Model.InvAmount</p>
+                </div>
+                <div class="customers-details-inner">
+                    <p class="font-16">Amount Paid</p>
+                    <p class="font-16">@Model.InvPaidAmount</p>
+                </div>
+                <div class="customers-details-inner">
+                    <p class="font-16">Balance Amount</p>
+                    <p class="font-16">@Model.InvBalanceAmount</p>
+                </div>
+                <div class="customers-details-inner">
+                    <p class="font-16">Payment Due Date</p>
+                    <p class="font-16">@Model.PaymentDate.ToString("dd/MM/yyyy")</p>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="edit-section">
+            <div class="d-flex">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Ledger</h1>
+                <div id="alert">
+
+                </div>
+            </div>
+
+            @*<div class="radioSection">
+                    <label for="add"> <input type="radio" name="yes" id="add" checked> Credit Note</label>
+                    <label for="add1"><input type="radio" name="yes" id="add1">Online </label>
+                </div>*@
+            <div class="edit-merchant-inner-section">
+                <div class="input-part">
+                    @Html.DropDownListFor(m => m.paymentid, MMS.Web.ExtensionMethod.HtmlHelper.Paymentmethodlist(), new { @class = " sel-dropdown" })
+                </div>
+            </div>
+
+            <div class="edit-merchant">
+                <div class="edit-merchant-inner-section">
+                    <div class="input-part" id="one">
+                        @Html.LabelFor(m => m.CreditNoteRef, "Debit Note Number :")
+                        @Html.TextBoxFor(m => m.CreditNoteRef, new { @class = "form-control text-field", placeholder = "Enter Credit Number" })
+                    </div>
+                </div>
+                <div class="edit-merchant-inner-section">
+                    <div class="input-part" id="one1">
+                        @Html.LabelFor(m => m.CreditNoteDate, "Debit Note Date :")
+                        @Html.TextBoxFor(m => m.CreditNoteDate, new { @class = "form-control", type = "date" })
+                    </div>
+                </div>
+                <div class="edit-merchant-inner-section">
+                    <div class="input-part" id="one2">
+                        @Html.LabelFor(m => m.CreditNoteValue, "Debit Note Value :")
+                        @Html.TextBoxFor(m => m.CreditNoteValue, new { @class = "form-control text-field", placeholder = "Enter Credit Value" })
+                    </div>
+                </div>
+                <div class="edit-merchant-inner-section">
+                    <div class="input-part" id="two">
+                        @Html.LabelFor(m => m.PaymentAmount, "Payment Amount:")
+                        @Html.TextBoxFor(m => m.PaymentAmount, new { @class = "form-control text-field", placeholder = "Enter Amount" })
+                    </div>
+                </div>
+                <div class="edit-merchant-inner-section">
+                    <div class="input-part" id="two1">
+                        @Html.LabelFor(m => m.PaymentRefNo, "Payment Ref No :")
+                        @Html.TextBoxFor(m => m.PaymentRefNo, new { @class = "form-control text-field", placeholder = "Enter Payment RefNo" })
+                    </div>
+                </div>
+
+            </div>
+            <div class="edit-merchant-inner-section">
+                <div class="input-part" id="Three">
+                    @Html.LabelFor(m => m.Cash, "Cash")
+                    @Html.TextBoxFor(m => m.Cash, new { @class = "form-control text-field", placeholder = "Enter Payment RefNo" })
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <button class="btn btn-success" id="makepayment" onclick="Save()">Make Payment</button>
+
+        </div>
+
+    </div>
+
+
+    <script src="~/Content/js/custom.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#two").hide();
+            $("#two1").hide();
+            $("#one").hide();
+            $("#one1").hide();
+            $("#one2").hide();
+            $("#Three").hide();
+            $(document).on("click", "#paymentid", function () {
+                var data = $("#paymentid").val();
+                if (data == 2) {
+                    $("#one").show();
+                    $("#one1").show();
+                    $("#one2").show();
+                    $("#two").hide();
+                    $("#two1").hide();
+                    $("#Three").hide();
+                }
+                else if (data == 1 || data == 4 || data == 5 || data == 6) {
+                    $("#two").show();
+                    $("#two1").show();
+                    $("#one").hide();
+                    $("#one1").hide();
+                    $("#one2").hide();
+                    $("#Three").hide();
+                }
+                else if (data == 3) {
+                    $("#Three").show();
+                    $("#two").hide();
+                    $("#two1").hide();
+                    $("#one").hide();
+                    $("#one1").hide();
+                    $("#one2").hide();
+                }
+                else {
+                    $("#two").hide();
+                    $("#two1").hide();
+                    $("#one").hide();
+                    $("#one1").hide();
+                    $("#one2").hide();
+                    $("#Three").hide();
+                }
+            });
+        });
+        function Save() {
+            var Cash = $("#Cash").val();
+            var PaymentAmount = $("#PaymentAmount").val();
+            var CreditNoteValue = $("#CreditNoteValue").val();
+            if (Cash != "" || PaymentAmount != "" || CreditNoteValue != "") {
+
+            if (@Model.InvBalanceAmount == "0.00") {
+                alert("Full payment done already");
+            }
+            else {
+                var buyerid ="@Model.buyerid";
+var PaymentDate ="@Model.PaymentDate";
+var PaymentAmount = $("#PaymentAmount").val();
+var InvRefNumber = "@Model.InvRefNumber";
+var InvDate ="@Model.InvDate";
+var InvDueDate = "@Model.InvDueDate";
+var InvAmount = "@Model.InvAmount";
+var InvPaidAmount = "@Model.InvPaidAmount";
+var InvBalanceAmount = "@Model.InvBalanceAmount";
+var IsCustomerOnHold = $("#IsCustomerOnHold").val();
+var PaymentRefNo = $("#PaymentRefNo").val();
+                var CreditNoteRef = $("#CreditNoteRef").val();
+var CreditNoteValue = $("#CreditNoteValue").val();
+var CreditNoteDate = $("#CreditNoteDate").val();
+var paymentid = $("#paymentid").val();
+var Cash = $("#Cash").val();
+var Id = "@Model.Id";
+
+var formdata = new FormData();
+formdata.append("buyerid", buyerid);
+formdata.append("PaymentDate", PaymentDate);
+formdata.append("PaymentAmount", PaymentAmount);
+formdata.append("InvRefNumber", InvRefNumber);
+formdata.append("InvDate", InvDate);
+formdata.append("InvDueDate", InvDueDate);
+formdata.append("InvAmount", InvAmount);
+formdata.append("InvPaidAmount", InvPaidAmount);
+formdata.append("InvBalanceAmount", InvBalanceAmount);
+formdata.append("IsCustomerOnHold", IsCustomerOnHold);
+formdata.append("PaymentRefNo", PaymentRefNo);
+                formdata.append("CreditNoteRef", CreditNoteRef);
+formdata.append("CreditNoteValue", CreditNoteValue);
+formdata.append("CreditNoteDate", CreditNoteDate);
+formdata.append("paymentid", paymentid);
+formdata.append("Cash", Cash);
+formdata.append("Id", Id);
+$.ajax({
+    type: 'POST',
+    url: '/CustomerTransaction/Transactiondata',
+    contentType: false,
+    processData: false,
+    dataType: 'html',
+    data: formdata,
+    success: function (data) {
+
+        Swal.fire({
+            title: 'Success!!',
+            text: 'Your Payment has Done Successful!',
+            icon: 'success',
+            timer: 2000,
+            timerProgressBar: true,
+            showConfirmButton: false
+        });
+        setTimeout(function () {
+            location.href = "/CustomerTransaction/Customermaster";
+            return false;
+        }, 1500);
+    }
+
+});
+            }
+            }
+            else {
+                $("#alert").append(
+                    '<div class="alert alert-danger">' +
+                    '<strong>Alert!</strong> Please enter ledger amount ' +
+                    '<strong id="close">x</strong>' +
+                    '</div>'
+                );
+                $(document).on('click', '#close', function () {
+                    $(".alert-danger").hide();
+                });
+            }
+
+
+
+        }
+
+    </script>
+</body>
+
+</html>

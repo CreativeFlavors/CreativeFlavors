@@ -1,4 +1,5 @@
 ﻿using Excel;
+using Microsoft.Ajax.Utilities;
 using MMS.Common;
 using MMS.Core.Entities;
 using MMS.Core.Entities.Stock;
@@ -29,7 +30,7 @@ namespace MMS.Web.Controllers.Stock
 
         public ActionResult BuyerOrderEntryFormView(int? page)
         {
-            List<InternalOrderEntryForm> orderEntryEntityModellist = new List<InternalOrderEntryForm>();
+            List<OrderEntry> orderEntryEntityModellist = new List<OrderEntry>();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             orderEntryEntityModellist = buyerOrderEntryManager.GetBuyerOrderGrid("");
             var pager = new Pager(orderEntryEntityModellist.Count(), page);
@@ -48,7 +49,7 @@ namespace MMS.Web.Controllers.Stock
         [HttpGet]
         public ActionResult BuyerOrderEntryFormGrid(int? page)
         {
-            List<InternalOrderEntryForm> orderEntryEntityModellist = new List<InternalOrderEntryForm>();
+            List<OrderEntry> orderEntryEntityModellist = new List<OrderEntry>();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             orderEntryEntityModellist = buyerOrderEntryManager.GetBuyerOrderGrid("");
             var pager = new Pager(orderEntryEntityModellist.Count(), page);
@@ -93,7 +94,7 @@ namespace MMS.Web.Controllers.Stock
             MultipleScheduleDetailsManager multipleScheduleDetailsManager = new MultipleScheduleDetailsManager();
             CartonDetailsManager cartonDetailsManager = new CartonDetailsManager();
 
-            InternalOrderEntryForm arg = new InternalOrderEntryForm();
+            OrderEntry arg = new OrderEntry();
             OeOtherDetails arg1 = new OeOtherDetails();
             List<OePackingDetails> arg2 = new List<OePackingDetails>();
             OeShipmentDetails arg3 = new OeShipmentDetails();
@@ -217,10 +218,10 @@ namespace MMS.Web.Controllers.Stock
             }
             return PartialView("~/Views/Stock/BuyerOrderEntryForm/Partial/BuyerOrderEntryFormDetails.cshtml", model);
         }
-        public ActionResult isExistBuyerOrderSlNO(string BuyerOrderSlNo,string BuyerSeason, string BuyerName)
+        public ActionResult isExistBuyerOrderSlNO(string BuyerOrderSlNo, string BuyerSeason, string BuyerName)
         {
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
-            InternalOrderEntryForm arg_ = new InternalOrderEntryForm();
+            OrderEntry arg_ = new OrderEntry();
             arg_ = buyerOrderEntryManager.BuyerOrderExitNo(BuyerOrderSlNo, BuyerSeason, BuyerName);
             string Message = "";
             if (arg_ != null)
@@ -229,17 +230,17 @@ namespace MMS.Web.Controllers.Stock
             }
             return Json(Message, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult BuyerOrderSlNOChange(string BuyerOrderSlNo,string BuyerSeason, string BuyerName,string LotNo)
+        public ActionResult BuyerOrderSlNOChange(string BuyerOrderSlNo, string BuyerSeason, string BuyerName, string LotNo)
         {
             OrderEntryModel model = new OrderEntryModel();
-          
+
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
-            InternalOrderEntryForm arg_ = new InternalOrderEntryForm();
-            InternalOrderEntryForm buyerOrderEntryForm = new InternalOrderEntryForm();
+            OrderEntry arg_ = new OrderEntry();
+            OrderEntry buyerOrderEntryForm = new OrderEntry();
             arg_ = buyerOrderEntryManager.InternalOrderExitNo(BuyerOrderSlNo, BuyerSeason, BuyerName);
             //buyerOrderEntryForm = buyerOrderEntryManager.GetBuyerOrderSlNo(BuyerOrderSlNo);
             buyerOrderEntryForm = buyerOrderEntryManager.GetBuyerOrderSlNoWihLot(BuyerOrderSlNo, LotNo);
-            BillOfMaterial billOfMaterial = new BillOfMaterial();
+            Bom billOfMaterial = new Bom();
             BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
             if (buyerOrderEntryForm != null)
             {
@@ -250,7 +251,7 @@ namespace MMS.Web.Controllers.Stock
             {
                 Message = "Already Existed";
                 ViewBag.ExistsRecord = "Record Already Exists";
-                
+                model.BOMErrorMessage = "Record Already Exists";
                 model.Date = Convert.ToDateTime(DateTime.Now).Date.ToString();
                 model.CustomerDate = Convert.ToDateTime(DateTime.Now).Date.ToString();
                 model.ExFactoryDate = Convert.ToDateTime(DateTime.Now).Date.ToString();
@@ -259,7 +260,8 @@ namespace MMS.Web.Controllers.Stock
                 CultureInfo ciCurr = CultureInfo.CurrentCulture;
                 int weekNum_ = ciCurr.Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
                 model.WeekNo = weekNum_.ToString();
-                return PartialView("~/Views/Stock/InternalOrderForm/Partial/InternalOrderEntryFormDetails.cshtml", model);
+                //return PartialView("~/Views/Stock/InternalOrderForm/Partial/InternalOrderFormDetails.cshtml", model);
+                return Json(model, JsonRequestBehavior.AllowGet);
             }
             else if (arg_ == null && (billOfMaterial == null || billOfMaterial.BomId == 0))
             {
@@ -274,14 +276,15 @@ namespace MMS.Web.Controllers.Stock
                 int weekNum_ = ciCurr.Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
                 model.WeekNo = weekNum_.ToString();
                 model.BOMErrorMessage = Message + " " + BuyerOrderSlNo;
-                return PartialView("~/Views/Stock/InternalOrderForm/Partial/InternalOrderEntryFormDetails.cshtml", model);
+                // return PartialView("~/Views/Stock/InternalOrderForm/Partial/InternalOrderFormDetails.cshtml", model);
+                return Json(model, JsonRequestBehavior.AllowGet);
             }
             else
             {
                 SizeRangeQtyRateManager sizeRangeQtyRateManager = new SizeRangeQtyRateManager();
                 MultipleScheduleDetailsManager multipleScheduleDetailsManager = new MultipleScheduleDetailsManager();
                 CartonDetailsManager cartonDetailsManager = new CartonDetailsManager();
-                InternalOrderEntryForm arg = new InternalOrderEntryForm();
+                OrderEntry arg = new OrderEntry();
                 OeOtherDetails arg1 = new OeOtherDetails();
                 List<OePackingDetails> arg2 = new List<OePackingDetails>();
                 OeShipmentDetails arg3 = new OeShipmentDetails();
@@ -289,7 +292,7 @@ namespace MMS.Web.Controllers.Stock
                 List<MultipleScheduleDetails> arg5 = new List<MultipleScheduleDetails>();
                 CartonDetails arg6 = new CartonDetails();
                 arg_ = buyerOrderEntryManager.GetBuyerOrderDetails(BuyerOrderSlNo, Convert.ToInt32(BuyerSeason), Convert.ToInt32(BuyerName));
-    
+
                 if (arg_ == null)
                 {
                     model.OrderEntryList = null;
@@ -385,7 +388,7 @@ namespace MMS.Web.Controllers.Stock
 
                     if (arg2 != null)
                     {
-                       
+
                         model.PackingDetailsList = arg2;
                     }
 
@@ -415,7 +418,7 @@ namespace MMS.Web.Controllers.Stock
 
                     model.Edit = true;
                 }
-                return PartialView("~/Views/Stock/InternalOrderForm/Partial/InternalOrderEntryFormDetails.cshtml", model);
+                return PartialView("~/Views/Stock/InternalOrderForm/Partial/InternalOrderFormDetails.cshtml", model);
             }
 
         }
@@ -423,11 +426,11 @@ namespace MMS.Web.Controllers.Stock
         public ActionResult InternalLotChange(string LotNo, string Season)
         {
             OrderEntryModel model = new OrderEntryModel();
-          
+
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
-            InternalOrderEntryForm arg_ = new InternalOrderEntryForm();
-            List<InternalOrderEntryForm> buyerOrderList = new List<InternalOrderEntryForm>();
-            List<InternalOrderEntryForm> internalOrderList = new List<InternalOrderEntryForm>();
+            OrderEntry arg_ = new OrderEntry();
+            List<OrderEntry> buyerOrderList = new List<OrderEntry>();
+            List<OrderEntry> internalOrderList = new List<OrderEntry>();
             buyerOrderList = buyerOrderEntryManager.GetLotNumberWithSeason(LotNo, Season);
             internalOrderList = buyerOrderEntryManager.LotNumberWithOrder(LotNo, Season).Where(x => x.IsInternal == true).ToList();
             string Message = "";
@@ -436,191 +439,196 @@ namespace MMS.Web.Controllers.Stock
                 Message = "Lot no already existed";
                 ViewBag.ExistsRecord = "Record Already Exists";
                 return Json(new { Message = Message }, JsonRequestBehavior.AllowGet);
-              
+
             }
             else
             {
                 buyerOrderList = buyerOrderList.OrderByDescending(x => x.BuyerOrderSlNo).ToList();
-            
-                string error = "";
-                foreach (var iteration in buyerOrderList)
+                if (buyerOrderList != null && buyerOrderList.Count > 0)
                 {
-                   
-                    BillOfMaterial billOfMaterial = new BillOfMaterial();
-                    BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
-                    InternalOrderEntryForm orderEntryForm = new InternalOrderEntryForm();
-                    orderEntryForm = buyerOrderEntryManager.GetBuyerOderSlNo_withSeason(iteration.BuyerOrderSlNo,iteration.LotNo,iteration.BuyerSeason);
-                    if (orderEntryForm != null && orderEntryForm.BuyerOrderSlNo != "")
+                    string error = "";
+                    foreach (var iteration in buyerOrderList)
                     {
-                        error += orderEntryForm.BuyerOrderSlNo + " " + " Already Existed! Please delete and try again";
-                    }
-                    billOfMaterial = billOfMaterialManager.getLinkBomNumber(iteration.OurStyle);
-                    if (billOfMaterial == null || billOfMaterial.BomId == 0)
-                    {
-                        error += "BOM is not created this order no" + " " + iteration.BuyerOrderSlNo + ",";
-                    }
 
-                }
-                if (string.IsNullOrEmpty(error))
-                {
-                    try
-                    {
-                        foreach (var item in buyerOrderList)
+                        Bom billOfMaterial = new Bom();
+                        BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
+                        OrderEntry orderEntryForm = new OrderEntry();
+                        orderEntryForm = buyerOrderEntryManager.GetBuyerOderSlNo_withSeason(iteration.BuyerOrderSlNo, iteration.LotNo, iteration.BuyerSeason);
+                        if (orderEntryForm != null && orderEntryForm.BuyerOrderSlNo != "")
                         {
-                            int orderEntryId = 0;
-                            SizeRangeQtyRateManager sizeRangeQtyRateManager = new SizeRangeQtyRateManager();
-                            MultipleScheduleDetailsManager multipleScheduleDetailsManager = new MultipleScheduleDetailsManager();
-                            CartonDetailsManager cartonDetailsManager = new CartonDetailsManager();
-                            List<InternalOrderEntryForm> iExistBuyerEntry = new List<InternalOrderEntryForm>();
-                            InternalOrderEntryForm BuyerEntry = new InternalOrderEntryForm();
-                            OeShipmentDetails oeShipmentDetails = new OeShipmentDetails();
-                            OeOtherDetails oeOtherDetails = new OeOtherDetails();
-                            CartonDetails cartonDetails = new CartonDetails();
-                            BuyerEntry.BuyerOrderSlNo = item.BuyerOrderSlNo;
-                            BuyerEntry.LotNo = item.LotNo;
-                            BuyerEntry.Count = item.Count;
-                            BuyerEntry.WeekNo = item.WeekNo;
-                            var format = "dd/MM/yyyy";
-                            BuyerEntry.Date = item.Date;
-                            BuyerEntry.IsInternal = true;
-                            BuyerEntry.IsBuyer = false;
-                            BuyerEntry.BuyerSeason = item.BuyerSeason;
-                            BuyerEntry.BuyerName = item.BuyerName;
-                            BuyerEntry.OrderProjectionNo = item.OrderProjectionNo;
-                            BuyerEntry.BuyerPoNo = item.BuyerPoNo;
-                            BuyerEntry.OurStyle = item.OurStyle;
-                            BuyerEntry.LeatherDescription = item.LeatherDescription;
-                            BuyerEntry.DiscountPer = item.DiscountPer;
-                            BuyerEntry.QuoteNo = item.QuoteNo;
-                            BuyerEntry.CountryStamp = item.CountryStamp;
-                            BuyerEntry.CustomerPlan = item.CustomerPlan;
-                            BuyerEntry.CustomerDate = item.CustomerDate;
-                            BuyerEntry.AgentMasterId = item.AgentMasterId;
-                            BuyerEntry.CommPer = item.CommPer;
-                            BuyerEntry.ExFactoryDate = item.ExFactoryDate;
-                            BuyerEntry.ShipmentMode = item.ShipmentMode;
-                            BuyerEntry.SampleReqNo = item.SampleReqNo;
-                            BuyerEntry.OrderType = item.OrderType;
-                            BuyerEntry.Brand = item.Brand;
-                            BuyerEntry.BuyerStyleNo = item.BuyerStyleNo;
-                            BuyerEntry.BarCodeNo = item.BarCodeNo;
-                            BuyerEntry.BomNo = item.BomNo;
-
-                            BuyerEntry.SEASON = model.SEASON;
-                            BuyerEntry.Purchase = model.Purchase;
-                            if (item.Last == "undefined")
-                            {
-                                BuyerEntry.Last = "";
-                            }
-                            else
-                            {
-                                BuyerEntry.Last = item.Last;
-                            }
-
-                            BuyerEntry.ColorMasterId = item.ColorMasterId;
-                            BuyerEntry.FinishedProdType = item.FinishedProdType;
-                            BuyerEntry.ProductTypeId = item.ProductTypeId;
-                            BuyerEntry.AmendmentNoWithDate = item.AmendmentNoWithDate;
-                            BuyerEntry.TotalOrderForWeek = item.TotalOrderForWeek;
-                            BuyerEntry.Currency = item.Currency;
-                            BuyerEntry.Rs = item.Rs;
-                            BuyerEntry.Parties = item.Parties;
-                            BuyerEntry.GradeMasterId = item.GradeMasterId;
-                            BuyerEntry.SizeRangeMasterId = item.SizeRangeMasterId;
-                            BuyerEntry.Remarks1 = item.Remarks1;
-                            BuyerEntry.Remarks2 = item.Remarks2;
-                            BuyerEntry.IsBuyer = item.IsBuyer;
-                            BuyerEntry.IsInternal = true;
-                            BuyerEntry.CreatedDate = DateTime.Now;
-                            BuyerEntry.PartiesAmount1 = item.PartiesAmount1;
-                            BuyerEntry.ShortUnitID = item.ShortUnitID;
-                            BuyerEntry.PartiesAmount2 = item.PartiesAmount2;
-                            BuyerEntry.LongUnitID = item.LongUnitID;
-                            BuyerEntry.TotalAmount = item.TotalAmount;
-
-                            BuyerEntry.SEASON = model.SEASON;
-                            BuyerEntry.Purchase = model.Purchase;
-                            orderEntryId = buyerOrderEntryManager.Post(BuyerEntry);
-
-                            //SizeRange Save                        
-                            SizeRangeQtyRateManager sizeItemManager = new SizeRangeQtyRateManager();
-                            List<SizeRangeQtyRate> SizeQuantityRateList = new List<SizeRangeQtyRate>();
-                            SizeQuantityRateList = sizeItemManager.GetSizeRangeByOrderEntryId(item.OrderEntryId);
-                            foreach (var SizeQuantityRateitem in SizeQuantityRateList)
-                            {
-                                SizeRangeQtyRate SizeRangeQtyRateDetails = new SizeRangeQtyRate();
-                                SizeRangeQtyRateDetails.SizeRange = SizeQuantityRateitem.SizeRange;
-                                SizeRangeQtyRateDetails.Qty = Convert.ToDecimal(SizeQuantityRateitem.Qty);
-                                SizeRangeQtyRateDetails.Rate = Convert.ToDecimal(SizeQuantityRateitem.Rate);
-                                SizeRangeQtyRateDetails.OrderEntryId = orderEntryId;
-                                SizeRangeQtyRateDetails.CreatedDate = DateTime.Now;
-                                sizeRangeQtyRateManager.Post(SizeRangeQtyRateDetails);
-                            }
-
-                            //Multiple Schedule Size
-                            MultipleScheduleDetailsManager multipleDetailsManager = new MultipleScheduleDetailsManager();
-                            List<MultipleScheduleDetails> multipleScheduleDetails = new List<MultipleScheduleDetails>();
-                            multipleScheduleDetails = multipleScheduleDetailsManager.GetMultipleScheduleDetailsByOrderEntryId(item.OrderEntryId);
-                            foreach (var items in multipleScheduleDetails)
-                            {
-                                MultipleScheduleDetails schedule = new MultipleScheduleDetails();
-                                schedule.Io = items.Io;
-                                schedule.Size = items.Size;
-                                schedule.Qty = items.Qty;
-                                schedule.ExFDt = items.ExFDt;
-                                schedule.OrderEntryId = orderEntryId;
-                                schedule.CreatedDate = DateTime.Now;
-                                multipleScheduleDetailsManager.Post(schedule);
-                            }
-                            //Single PackType & noOfCarton Save
-                            if (model.packType != null && model.noOfCarton != null)
-                            {
-                                cartonDetails.PackType = model.packType;
-                                cartonDetails.NoOfCarton = model.noOfCarton;
-                                cartonDetails.OrderEntryId = orderEntryId;
-                                cartonDetails.CreatedDate = DateTime.Now;
-                                // cartonDetails.UpdatedDate = DateTime.Now;
-                                cartonDetailsManager.Post(cartonDetails);
-                            }
-
-                            //oePacking Details save
-
-                            InternalOrderFormManager internalOrderFormManager = new InternalOrderFormManager();
-                            List<OePackingDetails> oePackingDetailsList = new List<OePackingDetails>();
-                            oePackingDetailsList = internalOrderFormManager.GetOePackingDetails(item.OrderEntryId);
-                            foreach (var itemoePackingDetailsList in oePackingDetailsList)
-                            {
-                                OePackingDetails oePackingDetails = new OePackingDetails();
-                                oePackingDetails.PackingType = itemoePackingDetailsList.PackingType;
-                                oePackingDetails.SizeRangeMasterId = Convert.ToInt32(itemoePackingDetailsList.SizeRangeMasterId);
-                                oePackingDetails.Size = itemoePackingDetailsList.Size;
-                                oePackingDetails.OrderEntryId = orderEntryId;
-                                buyerOrderEntryManager.Post_OePackingDetails(oePackingDetails);
-                            }
-
-                       
-
+                            error += orderEntryForm.BuyerOrderSlNo + " " + " Already Existed! Please delete and try again";
                         }
-                        return Json(new { Message = "Saved successfully" }, JsonRequestBehavior.AllowGet);
+                        billOfMaterial = billOfMaterialManager.getLinkBomNumber(iteration.OurStyle);
+                        if (billOfMaterial == null || billOfMaterial.BomId == 0)
+                        {
+                            error += "BOM is not created this order no" + " " + iteration.BuyerOrderSlNo + ",";
+                        }
+
                     }
-                    catch (Exception ex)
+                    if (string.IsNullOrEmpty(error))
                     {
-                        error += ex.Message.ToString();
+                        try
+                        {
+                            foreach (var item in buyerOrderList)
+                            {
+                                int orderEntryId = 0;
+                                SizeRangeQtyRateManager sizeRangeQtyRateManager = new SizeRangeQtyRateManager();
+                                MultipleScheduleDetailsManager multipleScheduleDetailsManager = new MultipleScheduleDetailsManager();
+                                CartonDetailsManager cartonDetailsManager = new CartonDetailsManager();
+                                List<OrderEntry> iExistBuyerEntry = new List<OrderEntry>();
+                                OrderEntry BuyerEntry = new OrderEntry();
+                                OeShipmentDetails oeShipmentDetails = new OeShipmentDetails();
+                                OeOtherDetails oeOtherDetails = new OeOtherDetails();
+                                CartonDetails cartonDetails = new CartonDetails();
+                                BuyerEntry.BuyerOrderSlNo = item.BuyerOrderSlNo;
+                                BuyerEntry.LotNo = item.LotNo;
+                                BuyerEntry.Count = item.Count;
+                                BuyerEntry.WeekNo = item.WeekNo;
+                                var format = "dd/MM/yyyy";
+                                BuyerEntry.Date = item.Date;
+                                BuyerEntry.IsInternal = true;
+                                BuyerEntry.IsBuyer = false;
+                                BuyerEntry.BuyerSeason = item.BuyerSeason;
+                                BuyerEntry.BuyerName = item.BuyerName;
+                                BuyerEntry.OrderProjectionNo = item.OrderProjectionNo;
+                                BuyerEntry.BuyerPoNo = item.BuyerPoNo;
+                                BuyerEntry.OurStyle = item.OurStyle;
+                                BuyerEntry.LeatherDescription = item.LeatherDescription;
+                                BuyerEntry.DiscountPer = item.DiscountPer;
+                                BuyerEntry.QuoteNo = item.QuoteNo;
+                                BuyerEntry.CountryStamp = item.CountryStamp;
+                                BuyerEntry.CustomerPlan = item.CustomerPlan;
+                                BuyerEntry.CustomerDate = item.CustomerDate;
+                                BuyerEntry.AgentMasterId = item.AgentMasterId;
+                                BuyerEntry.CommPer = item.CommPer;
+                                BuyerEntry.ExFactoryDate = item.ExFactoryDate;
+                                BuyerEntry.ShipmentMode = item.ShipmentMode;
+                                BuyerEntry.SampleReqNo = item.SampleReqNo;
+                                BuyerEntry.OrderType = item.OrderType;
+                                BuyerEntry.Brand = item.Brand;
+                                BuyerEntry.BuyerStyleNo = item.BuyerStyleNo;
+                                BuyerEntry.BarCodeNo = item.BarCodeNo;
+                                BuyerEntry.BomNo = item.BomNo;
+
+                                BuyerEntry.SEASON = model.SEASON;
+                                BuyerEntry.Purchase = model.Purchase;
+                                if (item.Last == "undefined")
+                                {
+                                    BuyerEntry.Last = "";
+                                }
+                                else
+                                {
+                                    BuyerEntry.Last = item.Last;
+                                }
+
+                                BuyerEntry.ColorMasterId = item.ColorMasterId;
+                                BuyerEntry.FinishedProdType = item.FinishedProdType;
+                                BuyerEntry.ProductTypeId = item.ProductTypeId;
+                                BuyerEntry.AmendmentNoWithDate = item.AmendmentNoWithDate;
+                                BuyerEntry.TotalOrderForWeek = item.TotalOrderForWeek;
+                                BuyerEntry.Currency = item.Currency;
+                                BuyerEntry.Rs = item.Rs;
+                                BuyerEntry.Parties = item.Parties;
+                                BuyerEntry.GradeMasterId = item.GradeMasterId;
+                                BuyerEntry.SizeRangeMasterId = item.SizeRangeMasterId;
+                                BuyerEntry.Remarks1 = item.Remarks1;
+                                BuyerEntry.Remarks2 = item.Remarks2;
+                                BuyerEntry.IsBuyer = item.IsBuyer;
+                                BuyerEntry.IsInternal = true;
+                                BuyerEntry.CreatedDate = DateTime.Now;
+                                BuyerEntry.PartiesAmount1 = item.PartiesAmount1;
+                                BuyerEntry.ShortUnitID = item.ShortUnitID;
+                                BuyerEntry.PartiesAmount2 = item.PartiesAmount2;
+                                BuyerEntry.LongUnitID = item.LongUnitID;
+                                BuyerEntry.TotalAmount = item.TotalAmount;
+
+                                BuyerEntry.SEASON = model.SEASON;
+                                BuyerEntry.Purchase = model.Purchase;
+                                orderEntryId = buyerOrderEntryManager.Post(BuyerEntry);
+
+                                //SizeRange Save                        
+                                SizeRangeQtyRateManager sizeItemManager = new SizeRangeQtyRateManager();
+                                List<SizeRangeQtyRate> SizeQuantityRateList = new List<SizeRangeQtyRate>();
+                                SizeQuantityRateList = sizeItemManager.GetSizeRangeByOrderEntryId(item.OrderEntryId);
+                                foreach (var SizeQuantityRateitem in SizeQuantityRateList)
+                                {
+                                    SizeRangeQtyRate SizeRangeQtyRateDetails = new SizeRangeQtyRate();
+                                    SizeRangeQtyRateDetails.SizeRange = SizeQuantityRateitem.SizeRange;
+                                    SizeRangeQtyRateDetails.Qty = Convert.ToDecimal(SizeQuantityRateitem.Qty);
+                                    SizeRangeQtyRateDetails.Rate = Convert.ToDecimal(SizeQuantityRateitem.Rate);
+                                    SizeRangeQtyRateDetails.OrderEntryId = orderEntryId;
+                                    SizeRangeQtyRateDetails.CreatedDate = DateTime.Now;
+                                    sizeRangeQtyRateManager.Post(SizeRangeQtyRateDetails);
+                                }
+
+                                //Multiple Schedule Size
+                                MultipleScheduleDetailsManager multipleDetailsManager = new MultipleScheduleDetailsManager();
+                                List<MultipleScheduleDetails> multipleScheduleDetails = new List<MultipleScheduleDetails>();
+                                multipleScheduleDetails = multipleScheduleDetailsManager.GetMultipleScheduleDetailsByOrderEntryId(item.OrderEntryId);
+                                foreach (var items in multipleScheduleDetails)
+                                {
+                                    MultipleScheduleDetails schedule = new MultipleScheduleDetails();
+                                    schedule.Io = items.Io;
+                                    schedule.Size = items.Size;
+                                    schedule.Qty = items.Qty;
+                                    schedule.ExFDt = items.ExFDt;
+                                    schedule.OrderEntryId = orderEntryId;
+                                    schedule.CreatedDate = DateTime.Now;
+                                    multipleScheduleDetailsManager.Post(schedule);
+                                }
+                                //Single PackType & noOfCarton Save
+                                if (model.packType != null && model.noOfCarton != null)
+                                {
+                                    cartonDetails.PackType = model.packType;
+                                    cartonDetails.NoOfCarton = model.noOfCarton;
+                                    cartonDetails.OrderEntryId = orderEntryId;
+                                    cartonDetails.CreatedDate = DateTime.Now;
+                                    // cartonDetails.UpdatedDate = DateTime.Now;
+                                    cartonDetailsManager.Post(cartonDetails);
+                                }
+
+                                //oePacking Details save
+
+                                InternalOrderFormManager internalOrderFormManager = new InternalOrderFormManager();
+                                List<OePackingDetails> oePackingDetailsList = new List<OePackingDetails>();
+                                oePackingDetailsList = internalOrderFormManager.GetOePackingDetails(item.OrderEntryId);
+                                foreach (var itemoePackingDetailsList in oePackingDetailsList)
+                                {
+                                    OePackingDetails oePackingDetails = new OePackingDetails();
+                                    oePackingDetails.PackingType = itemoePackingDetailsList.PackingType;
+                                    oePackingDetails.SizeRangeMasterId = Convert.ToInt32(itemoePackingDetailsList.SizeRangeMasterId);
+                                    oePackingDetails.Size = itemoePackingDetailsList.Size;
+                                    oePackingDetails.OrderEntryId = orderEntryId;
+                                    buyerOrderEntryManager.Post_OePackingDetails(oePackingDetails);
+                                }
+
+
+
+                            }
+                            return Json(new { Message = "Saved successfully" }, JsonRequestBehavior.AllowGet);
+                        }
+                        catch (Exception ex)
+                        {
+                            error += ex.Message.ToString();
+                            return Json(new { Message = error }, JsonRequestBehavior.AllowGet);
+                        }
+                    }
+                    else
+                    {
                         return Json(new { Message = error }, JsonRequestBehavior.AllowGet);
                     }
+                    //return PartialView("~/Views/Stock/InternalOrderForm/Partial/InternalOrderFormDetails.cshtml", model);
                 }
                 else
                 {
-                    return Json(new { Message = error }, JsonRequestBehavior.AllowGet);
+                    return Json(new { }, JsonRequestBehavior.AllowGet);
                 }
-                //return PartialView("~/Views/Stock/InternalOrderForm/Partial/InternalOrderEntryFormDetails.cshtml", model);
             }
-
         }
         public ActionResult Search(string filter, int? page)
         {
 
-            List<InternalOrderEntryForm> orderEntryEntityModellist = new List<InternalOrderEntryForm>();
+            List<OrderEntry> orderEntryEntityModellist = new List<OrderEntry>();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             orderEntryEntityModellist = buyerOrderEntryManager.GetBuyerOrderGrid(filter);
             orderEntryEntityModellist = orderEntryEntityModellist.Where(x => x.IsBuyer == true).ToList();
@@ -658,7 +666,8 @@ namespace MMS.Web.Controllers.Stock
                          on x.OrderEntryId equals y.OrderEntryId
                          where x.BuyerSeason == BuyerSeasonId && x.WeekNo == currentWeek.ToString()
                          select new { x.BuyerSeason, x.WeekNo, y.Qty, x.TotalAmount });
-            decimal totalOrder = items.Sum(x => x.TotalAmount.Value);
+            // decimal totalOrder = items.Sum(x => x.TotalAmount.Value);
+            decimal totalOrder = items.Sum(x => x.TotalAmount ?? 0);
             var TotalweekOrders = items.ToList();
 
             return Json(totalOrder, JsonRequestBehavior.AllowGet);
@@ -704,7 +713,8 @@ namespace MMS.Web.Controllers.Stock
                          on x.OrderEntryId equals y.OrderEntryId
                          where x.BuyerSeason == BuyerSeasonId && x.WeekNo == currentWeek.ToString() && x.BuyerName == buyerName
                          select new { x.BuyerSeason, x.WeekNo, y.Qty, x.TotalAmount });
-            decimal totalOrder = items.Sum(x => x.TotalAmount.Value);
+            //decimal totalOrder = items.Sum(x => x.TotalAmount.Value);
+            decimal totalOrder = items.Sum(x => x.TotalAmount ?? 0);
             var TotalweekOrders = items.ToList();
 
             return Json(totalOrder, JsonRequestBehavior.AllowGet);
@@ -722,21 +732,24 @@ namespace MMS.Web.Controllers.Stock
             SizeRangeQtyRateManager sizeRangeQtyRateManager = new SizeRangeQtyRateManager();
             MultipleScheduleDetailsManager multipleScheduleDetailsManager = new MultipleScheduleDetailsManager();
             CartonDetailsManager cartonDetailsManager = new CartonDetailsManager();
-            InternalOrderEntryForm BuyerEntry = new InternalOrderEntryForm();
-            InternalOrderEntryForm iExistBuyerEntry = new InternalOrderEntryForm();
+            OrderEntry BuyerEntry = new OrderEntry();
+            OrderEntry iExistBuyerEntry = new OrderEntry();
             OeShipmentDetails oeShipmentDetails = new OeShipmentDetails();
             OeOtherDetails oeOtherDetails = new OeOtherDetails();
             CartonDetails cartonDetails = new CartonDetails();
-            iExistBuyerEntry = buyerOrderEntryManager.BuyerOrderExitNo(model.BuyerOrderSlNo,model.BuyerSeason.ToString(),model.BuyerName.ToString());
+            iExistBuyerEntry = buyerOrderEntryManager.BuyerOrderExitNo(model.BuyerOrderSlNo, model.BuyerSeason.ToString(), model.BuyerName.ToString());
 
-            if (model.OrderEntryId == 0 && iExistBuyerEntry==null)
+            if (model.OrderEntryId == 0 && iExistBuyerEntry == null)
             {
                 BuyerEntry.OrderEntryId = model.OrderEntryId;
                 BuyerEntry.BuyerOrderSlNo = model.BuyerOrderSlNo;
                 BuyerEntry.LotNo = model.LotNo;
                 BuyerEntry.Count = model.Count;
                 BuyerEntry.WeekNo = model.WeekNo;
-
+                if (model.ExFactoryDate == null)
+                {
+                    model.ExFactoryDate = model.Date;
+                }
                 var format = "dd/MM/yyyy";
                 DateTime Date = DateTime.ParseExact(model.Date, format, CultureInfo.InvariantCulture);
                 DateTime CustomerDate = DateTime.ParseExact(model.CustomerDate, format, CultureInfo.InvariantCulture);
@@ -781,12 +794,12 @@ namespace MMS.Web.Controllers.Stock
                 BuyerEntry.IsBuyer = true;
                 BuyerEntry.IsInternal = false;
                 BuyerEntry.CreatedDate = DateTime.Now;
-             
+
                 BuyerEntry.PartiesAmount1 = model.PartiesAmount1;
                 BuyerEntry.ShortUnitID = model.ShortUnitID;
                 BuyerEntry.PartiesAmount2 = model.PartiesAmount2;
                 BuyerEntry.LongUnitID = model.LongUnitID;
-                BuyerEntry.TotalAmount = model.TotalAmount;
+                BuyerEntry.TotalAmount = Convert.ToInt32(model.TotalAmount);
 
                 BuyerEntry.SEASON = model.SEASON;
                 BuyerEntry.Purchase = model.Purchase;
@@ -936,7 +949,7 @@ namespace MMS.Web.Controllers.Stock
                 BuyerEntry.ShortUnitID = model.ShortUnitID;
                 BuyerEntry.PartiesAmount2 = model.PartiesAmount2;
                 BuyerEntry.LongUnitID = model.LongUnitID;
-                BuyerEntry.TotalAmount = model.TotalAmount;
+                BuyerEntry.TotalAmount = Convert.ToInt32(model.TotalAmount);
                 BuyerEntry.CreatedDate = DateTime.Now;
                 BuyerEntry.SEASON = model.SEASON;
                 BuyerEntry.Purchase = model.Purchase;
@@ -1101,7 +1114,7 @@ namespace MMS.Web.Controllers.Stock
         {
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             string status = "";
-            InternalOrderEntryForm orderEntryEntityModel = new InternalOrderEntryForm();
+            OrderEntry orderEntryEntityModel = new OrderEntry();
             List<OePackingDetails> oePackingDetails = new List<OePackingDetails>();
             OeShipmentDetails oeShipmentDetails = new OeShipmentDetails();
             OeOtherDetails oeOtherDetails = new OeOtherDetails();
@@ -1236,7 +1249,7 @@ namespace MMS.Web.Controllers.Stock
                 table_.Columns.Add("LongUnitID", typeof(int));
                 table_.Columns.Add("TotalAmount", typeof(int));
                 table_.Columns.Add("IsDeleted", typeof(bool));
-                List<InternalOrderEntryForm> listOrderEntryForm = new List<InternalOrderEntryForm>();
+                List<InternalOrderForm> listOrderEntryForm = new List<InternalOrderForm>();
                 int lotCount = 1;
                 string BOMError = "";
                 foreach (DataRow dr in table.Rows)
@@ -1244,7 +1257,7 @@ namespace MMS.Web.Controllers.Stock
 
                     if (dr.ItemArray[0].ToString() != "" && dr.ItemArray[0].ToString() != "Buyer")
                     {
-                        InternalOrderEntryForm orderEntryForm = new InternalOrderEntryForm();
+                        InternalOrderForm orderEntryForm = new InternalOrderForm();
                         BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
                         BuyerManager buyerManager = new BuyerManager();
                         BuyerMaster buyermaster = new BuyerMaster();
@@ -1264,7 +1277,7 @@ namespace MMS.Web.Controllers.Stock
                         MaterialManager materialManager = new MaterialManager();
                         MaterialMaster materialMaster = new MaterialMaster();
                         MaterialNameManager materialNameManager = new MaterialNameManager();
-                        MaterialNameMaster materialNameMaster = new MaterialNameMaster();
+                        tbl_materialnamemaster materialNameMaster = new tbl_materialnamemaster();
                         var BomID = dr[7].ToString();
                         if (BomID == "2028 208 7066 N17")
                         {
@@ -1275,7 +1288,7 @@ namespace MMS.Web.Controllers.Stock
                             ID++;
 
                             orderEntryForm.BuyerOrderSlNo = dr[5].ToString();
-                            InternalOrderEntryForm orderentry = new InternalOrderEntryForm();
+                            OrderEntry orderentry = new OrderEntry();
                             orderentry = buyerOrderEntryManager.BuyerOrderExitNo(dr[5].ToString(), seasonMaster.SeasonMasterId.ToString(), buyermaster.BuyerMasterId.ToString());
                             if (orderentry != null && orderentry.BuyerOrderSlNo != "")
                             {
@@ -1373,13 +1386,13 @@ namespace MMS.Web.Controllers.Stock
                 if (string.IsNullOrEmpty(BOMError))
                 {
                     Session["SuccessOrder"] = "Excel data imported Successfully";
-                    List<InternalOrderEntryForm> listOrderEntryFormList = new List<InternalOrderEntryForm>();
+                    List<OrderEntry> listOrderEntryFormList = new List<OrderEntry>();
                     foreach (DataRow dr in table.Rows)
                     {
 
                         if (dr.ItemArray[0].ToString() != "" && dr.ItemArray[0].ToString() != "Buyer")
                         {
-                            InternalOrderEntryForm orderEntryForm = new InternalOrderEntryForm();
+                            OrderEntry orderEntryForm = new OrderEntry();
                             BuyerManager buyerManager = new BuyerManager();
                             BuyerMaster buyermaster = new BuyerMaster();
                             buyermaster = buyerManager.GetBuyerFullName(dr[0].ToString());
@@ -1398,7 +1411,7 @@ namespace MMS.Web.Controllers.Stock
                             MaterialManager materialManager = new MaterialManager();
                             MaterialMaster materialMaster = new MaterialMaster();
                             MaterialNameManager materialNameManager = new MaterialNameManager();
-                            MaterialNameMaster materialNameMaster = new MaterialNameMaster();
+                            tbl_materialnamemaster materialNameMaster = new tbl_materialnamemaster();
                             var BomID = dr[7].ToString();
                             if (buyermaster != null && seasonMaster != null && sizeRangeMaster != null && uomMaster != null && productStyleMaster != null)
                             {
@@ -1483,7 +1496,7 @@ namespace MMS.Web.Controllers.Stock
                                 SizeRangeQtyRateManager sizeRangeQtyRateManager = new SizeRangeQtyRateManager();
                                 MultipleScheduleDetailsManager multipleScheduleDetailsManager = new MultipleScheduleDetailsManager();
                                 CartonDetailsManager cartonDetailsManager = new CartonDetailsManager();
-                                InternalOrderEntryForm internalOrderEntryForm = new InternalOrderEntryForm();
+                                OrderEntry internalOrderEntryForm = new OrderEntry();
                                 int orderEntryid = buyerOrderEntryManager.Post(orderEntryForm);
                                 int i = 12;
                                 while (i <= 38)
@@ -1506,9 +1519,9 @@ namespace MMS.Web.Controllers.Stock
                                     sizeRangeQtyRateManager.Post_(SizeRangeQtyRateDetails);
                                     i++;
                                 }
-                                InternalOrderEntryForm internalOrderForm_ = new InternalOrderEntryForm();
+                                OrderEntry internalOrderForm_ = new OrderEntry();
                                 internalOrderForm_ = buyerOrderEntryManager.GetOrderEntryId(orderEntryid);
-                                internalOrderForm_.TotalAmount = Convert.ToDecimal(dr[11].ToString());
+                                internalOrderForm_.TotalAmount = Convert.ToInt32(dr[11].ToString());
                                 buyerOrderEntryManager.Post(internalOrderForm_);
 
                             }

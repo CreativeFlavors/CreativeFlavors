@@ -517,7 +517,7 @@ namespace MMS.Web.Controllers.JobWork
             ApprovedPriceListManager approvedPricelistManager = new ApprovedPriceListManager();
             List<ApprovedPriceList> approvedPriceList = new List<ApprovedPriceList>();
 
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             ColorManager colorManager = new ColorManager();
             var items = (from x in materialManager.Get()
                          join y in materialNameManager.Get()
@@ -545,7 +545,7 @@ namespace MMS.Web.Controllers.JobWork
             ApprovedPriceListManager approvedPricelistManager = new ApprovedPriceListManager();
             List<ApprovedPriceList> approvedPriceList = new List<ApprovedPriceList>();
 
-            List<MaterialNameMaster> materialNameMasterList = new List<MaterialNameMaster>();
+            List<tbl_materialnamemaster> materialNameMasterList = new List<tbl_materialnamemaster>();
             ColorManager colorManager = new ColorManager();
             var items = (from x in materialManager.Get()
                          join y in materialNameManager.Get()

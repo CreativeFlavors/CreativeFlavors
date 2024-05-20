@@ -16,11 +16,11 @@
         Order = true;
     }
 
-    PermissionSettingMaster PermissionSettingModel = new MMS.Core.Entities.PermissionSettingMaster();
+    tbl_PermissionSetting PermissionSettingModel = new MMS.Core.Entities.tbl_PermissionSetting();
     PermissionSettingModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionIdList();
 
-    List<PermissionMaster> PermissionModel = new List<PermissionMaster>();
-    if(PermissionSettingModel!=null)
+    List<tbl_Permission> PermissionModel = new List<tbl_Permission>();
+    if (PermissionSettingModel != null)
     {
         PermissionModel = MMS.Web.ExtensionMethod.HtmlHelper.GetPermissionList("Indent", PermissionSettingModel.PermissionID);
     }
@@ -65,17 +65,21 @@
     .veh-tablecont1 {
         margin: 16px -75px -16px !important;
     }
+
     #ui-id-2 {
         width: 500px !important;
         height: 300px;
         overflow: auto;
     }
+
     .not-allowed input {
         cursor: not-allowed !important;
     }
+
     .not-allowed {
         cursor: not-allowed !important;
     }
+
     #ui-id-3, #ui-id-4 {
         width: 163px !important;
         height: 150px;
@@ -198,8 +202,8 @@
                                             }
                                             else
                                             {
-                                                @Html.ListBox("InternalOderID_", new SelectList(Model.MRPList, "SimpleMRPID", "MRPNO", Model.MRPList), new { multiple = "multiple", placeholder = "Please select filter type", @class = "multipleOrder_", @style = "width:172px;",id = "multipleOrder_" , required = "required" })
-                                               
+                                                @Html.ListBox("InternalOderID_", new SelectList(Model.MRPList, "SimpleMRPID", "MRPNO", Model.MRPList), new { multiple = "multiple", placeholder = "Please select filter type", @class = "multipleOrder_", @style = "width:172px;", id = "multipleOrder_", required = "required" })
+
                                             }
                                             <input type="button" value="click" id="MRPNO_CHANGE">
                                         }
@@ -583,12 +587,12 @@
                                         decimal total = 0;
                                         if (Model.PurchaseOrderSizeRangeQuantityList != null && Model.PurchaseOrderSizeRangeQuantityList.Count > 0)
                                         {
-                                            total = Model.PurchaseOrderSizeRangeQuantityList.Sum(x => x.quantity);
+                                            total = Model.PurchaseOrderSizeRangeQuantityList.Sum(x => x.Quantity);
                                             foreach (var item in Model.PurchaseOrderSizeRangeQuantityList)
                                             {
                                                 <tr>
                                                     <td>@item.Size</td>
-                                                    <td><input type="text" value="@item.quantity" style="width: 50px;" /></td>
+                                                    <td><input type="text" value="@item.Quantity" style="width: 50px;" /></td>
                                                     <td><input type="text" value="@item.Rate" style="width: 50px;" /></td>
                                                 </tr>
                                             }
@@ -625,7 +629,7 @@
                                         <table id="list-amended-material" class="table">
                                             <thead>
                                                 <tr>
-                                                    @if (Model != null && Model.IndentNo != "" && Model.MRPNO == string.Empty || Model.MRPNO == "0")
+                                                    @if (Model != null && Model.IndentNo != "" && string.IsNullOrEmpty(Model.MRPNO) || string.IsNullOrEmpty(Model.MRPNO) || Model.MRPNO == "0")
                                                     {
                                                         <td>Remove</td>
                                                         <td>Edit</td>
@@ -787,10 +791,10 @@
                                                     string UOMName = string.Empty;
                                                     string MaterialName = string.Empty;
                                                     MaterialCategoryMaster materialCategroyMaster = new MaterialCategoryMaster();
-                                                    MaterialGroupMaster_ groupMaster = new MaterialGroupMaster_();
+                                                    materialgroupmaster groupMaster = new materialgroupmaster();
                                                     SupplierMaster supplierMaster = new SupplierMaster();
                                                     UomMaster uomMaster = new UomMaster();
-                                                    MaterialNameMaster materialNameMaster = new MaterialNameMaster();
+                                                    tbl_materialnamemaster materialNameMaster = new tbl_materialnamemaster();
                                                     MaterialMaster materialMaster = new MaterialMaster();
                                                     MMS.Repository.Managers.MaterialManager materialManager = new MMS.Repository.Managers.MaterialManager();
                                                     MMS.Repository.Managers.MaterialNameManager materialNameManager = new MMS.Repository.Managers.MaterialNameManager();
@@ -798,7 +802,7 @@
                                                     MMS.Repository.Managers.SupplierMasterManager supplierMasterManager = new MMS.Repository.Managers.SupplierMasterManager();
                                                     supplierMaster = supplierMasterManager.GetSupplierMasterId(item.SupplierId);
                                                     MMS.Repository.Managers.MaterialGroupManager groupManager = new MMS.Repository.Managers.MaterialGroupManager();
-                                                    groupMaster = groupManager.GetMaterialGroupMaster_Id(item.MaterialGrpId);
+                                                    groupMaster = groupManager.GetmaterialgroupmasterId(item.MaterialGrpId);
                                                     MMS.Repository.Managers.MaterialCategoryManager CatergoryManager = new MMS.Repository.Managers.MaterialCategoryManager();
                                                     materialCategroyMaster = CatergoryManager.GetMaterialCategoryMaster(item.MaterialCatId);
                                                     ColorMaster colorMaster = new ColorMaster();
@@ -934,7 +938,7 @@
 
 
 
-                    @{                       
+                    @{
                         if (Model.IndentId == 0)
                         {
                             if (Save == true)
@@ -979,7 +983,7 @@
                 <ul class="mater_listers">
                     @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName().Where(x => x.Value != ""))
                     {
-                    <li id="@item.Value">@item.Text</li>
+                        <li id="@item.Value">@item.Text</li>
                     }
                 </ul>
             </div>
@@ -1054,7 +1058,7 @@
             return false;
         }
         if(rowCount>=0)
-        {           
+        {
             if ($('#IndentType').val() == "") {
                 alert("Please Select Indent Type.")
                 $('#IndentType').css('border-color', 'red');
@@ -1155,7 +1159,7 @@
             });
 
         }
-        else{          
+        else{
 
             if ($('#IndentType').val() == "") {
                 alert("Please Select Indent Type.")
@@ -1220,16 +1224,16 @@
             var myDropDownListValues = $(".multipleOrder_").multiselect("getChecked").map(function()
             {
                 return this.value;
-            }).get();           
+            }).get();
             var InternalOrderid = "";
             for (i = 0; i < myDropDownListValues.length; i++) {
                 if(myDropDownListValues[i].startsWith(","))
-                {                   
+                {
                 }
                 else{
                     InternalOrderid += myDropDownListValues[i] + ",";
                 }
-            }           
+            }
             $.ajax({
                 type: 'POST',
                 url: '/Indent/Indent',
@@ -1283,7 +1287,7 @@
         $('#list-amended-material tr#' + arg + '').remove();
         if($('.issueTypecls option:selected').text()=="General")
         {
-            debugger;
+            
             mrpNO=$('#MRPNO').val();
             $.ajax({
                 type: 'POST',
@@ -1382,7 +1386,7 @@
                                 totalQty += parseInt(data.indentSizeRange[i].quantity);
                             }
                         }
-                        else{                          
+                        else{
                             $("#sizeRangeTable tbody").html("");
                             for (var i = 0; i <= data.MaterialSizeRange.length - 1; i++) {
                                 if(data.MaterialSizeRange[i].Qty==null)
@@ -1473,7 +1477,7 @@
                     });
                     var count = 1;
                     var totalQty = 0;
-                    $("#sizeRangeTable tbody").html("");                  
+                    $("#sizeRangeTable tbody").html("");
                     if(data.indentSizeRange.length>0)
                     {
                         for (var i = 0; i <= data.indentSizeRange.length - 1; i++) {
@@ -1590,17 +1594,20 @@
                     InternalOrderid += myDropDownListValues[i] + ",";
                 }
             }
+            let dsvalue = 0;
             $.ajax({
                 url: '/Indent/ShowMaterialList',
                 type: 'GET',
                 data: { MRPNO: InternalOrderid},
                 success: function (data) {
+                    console.log(data);
                     if(data.Satus=="AlredayExist")
                     {
                         $("#AUtoDisplay").hide();
                         $("#BtnSave").hide();
                         $("#list-amended-material tbody").html("");
                         $.each(data.Indent, function (i, item) {
+                             dsvalue = item.Value ?? 0
                             $("#RemoveHead").css("display","block");
                             $("#EditHead").css("display","block");
                             $("#list-amended-material tbody").append("<tr id=" + item.IndentMaterialID + "> <td id='BOMID' style='display:none' class='BOMID' value=''>" + item.BOMID + "</td>"
@@ -1618,7 +1625,7 @@
                                    + "<td id='IndentQTY'  class='IndentQTY' value=''>" + item.RequiredQty + "</td>"
                                     + "<td id='Price'  class='Price' value=''>" + item.Price + "</td>"
                                     + "<td id='WastageName'  class='WastageName' value=''>" + item.WastageName + "</td>"
-                                    + "<td id='Value'  class='Value' value=''>" + item.Value + "</td>"
+                                + "<td id='Value'  class='Value' value=''>" + dsvalue + "</td>"
                                             + "<td id='TotalNorms' style='display:none' class='TotalNorms' value=''>" + item.TotalNorms + "</td>"
                                             + "<td id='MaterialCategoryMasterId' style='display:none' class='MaterialCategoryMasterId' value=''>" + item.MaterialCategoryMasterId + "</td>"
                                             + "<td id='MaterialGroupMasterId' style='display:none' class='MaterialGroupMasterId' value=''>" + item.MaterialGroupMasterId + "</td>"
@@ -1728,7 +1735,7 @@
     });
 
     $(function () {
-        debugger;
+        
         $('.issueTypecls').change(function () {
             if ($('#OrderType option:selected').text() == "General") {
                 $("#MRPID").hide();
@@ -1786,7 +1793,7 @@
                     }
                 }
                 var SeasonId = $('#SeasonId').val();
-                var categoryID=$("#MaterialCatId").val();              
+                var categoryID=$("#MaterialCatId").val();
                 var storeId= $('#StoreId').val();
 
                 $.ajax({
@@ -1801,7 +1808,7 @@
                         $("#MaterialName").append("<option value='0'>--Select--</option>");
                         $.each(cities, function (i, city) {
                             $("#MaterialName").append('<option value=' + city.MaterialMasterId + '>' + city.MaterialDescription + '</option>');
-                        });                      
+                        });
                     }
                 });
                 $.ajax({
@@ -1906,7 +1913,8 @@
 
     $(function(){
         $("#StoreId").change(function(){
-            var mrpSelectedText="";
+            var mrpSelectedText = "";
+            let value = 0;
             var myDropDownListValues = $(".multipleOrder_").multiselect("getChecked").map(function()
             {
                 return this.value;
@@ -1923,7 +1931,7 @@
             }
             var storeid=$("#StoreId").val();
             var SeasonId = $('#SeasonId').val();
-            var categoryID=$("#MaterialCatId").val(); 
+            var categoryID=$("#MaterialCatId").val();
             $.ajax({
                 url: '/Indent/ShowMaterialList',
                 type: 'GET',
@@ -1935,6 +1943,8 @@
                 success: function (data) {
                     $("#list-amended-material tbody").html("");
                     $.each(data, function (i, item) {
+                        console.log("data", data);
+                         value = item.Value ?? 0;
                         $("#RemoveHead").css("display","block");
                         $("#EditHead").css("display","block");
                         $("#list-amended-material tbody").append("<tr id=" + item.IndentMaterialID + "> <td id='BOMID' style='display:none' class='BOMID' value=''>" + item.BOMID + "</td>"
@@ -1952,7 +1962,7 @@
                                + "<td id='IndentQTY'  class='IndentQTY' value=''>" + item.RequiredQty + "</td>"
                                 + "<td id='Price'  class='Price' value=''>" + item.Price + "</td>"
                                 + "<td id='WastageName'  class='WastageName' value=''>" + item.WastageName + "</td>"
-                                + "<td id='Value'  class='Value' value=''>" + item.Value + "</td>"
+                            + "<td id='Value'  class='Value' value=''>" + value + "</td>"
                                         + "<td id='TotalNorms' style='display:none' class='TotalNorms' value=''>" + item.TotalNorms + "</td>"
                                         + "<td id='MaterialCategoryMasterId' style='display:none' class='MaterialCategoryMasterId' value=''>" + item.MaterialCategoryMasterId + "</td>"
                                         + "<td id='MaterialGroupMasterId' style='display:none' class='MaterialGroupMasterId' value=''>" + item.MaterialGroupMasterId + "</td>"
@@ -1982,7 +1992,7 @@
     $(function () {
         debugger
         $("#MaterialName").combobox({
-            select: function() {               
+            select: function() {
                 var materialName = $('#MaterialName').val();
                 $("#MaterialName").append("<option value='0'>Please Select </option>");
                 $.ajax({
@@ -1990,7 +2000,7 @@
                     type: "GET",
                     dataType: "JSON",
                     data: { MaterialNameID: materialName },
-                    success: function (cities) {                      
+                    success: function (cities) {
                         if (cities.BalanceStock != null&&cities.BalanceStock !="") {
                             $("#StoreStock").val(cities.BalanceStock);
                         }
@@ -2046,7 +2056,7 @@
         $('#TotalCount').text(add);
     }
     var decimal=0;
-    $('#AUtoDisplay').click(function () {      
+    $('#AUtoDisplay').click(function () {
         if ($('#IndentType').val() == "") {
             alert("Please Select Indent Type.")
             $('#IndentType').css('border-color', 'red');
@@ -2182,7 +2192,7 @@
         else {
             $('#MaterialName').css('border-color', '');
         }
-        debugger;
+        
         if ($('#OrderType option:selected').text() != 'General' && $('#OrderTypeID option:selected').text() != 'General')
         {
             if ($('#ReqQty').val() == "") {
@@ -2435,7 +2445,7 @@
                         $('#FreeStock').val('');
                         $('#Remarks').val('');
                         $("#TotalAmount").val(data.TotalAmount);
-                        $.each(data.indentMaterials, function (i, item) {                            
+                        $.each(data.indentMaterials, function (i, item) {
                             $("#RemoveHead").css("display","block");
                             $("#EditHead").css("display","block");
                             $("#list-amended-material tbody").append("<tr id=" + item.IndentMaterialID + "> <td id='BOMID' style='display:none' class='BOMID' value=''>" + item.BOMID + "</td>"
@@ -2490,7 +2500,7 @@
     //for MRP NO with Category filter
     $(function(){
         $("#MaterialCatId").combobox({
-            select: function() {     
+            select: function() {
                 var mrpSelectedText="";
                 var myDropDownListValues = $(".multipleOrder_").multiselect("getChecked").map(function()
                 {
@@ -2621,7 +2631,7 @@
 
                     }
                 });
-               
+
 
             }
         });

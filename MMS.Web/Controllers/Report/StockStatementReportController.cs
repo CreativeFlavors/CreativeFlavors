@@ -4,8 +4,11 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using MMS.Repository.Managers;
-using MMS.Core.Entities;
 using MMS.Repository.Managers.StockManager;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Data;
+using System.Globalization;
 
 namespace MMS.Web.Controllers.Report
 {
@@ -59,6 +62,7 @@ namespace MMS.Web.Controllers.Report
         [HttpPost]
         public ActionResult RedirectToAspx(string storeNo, string group, string from, string to,string category,string materialType,string material)
         {
+
             string MaterialName = HttpUtility.UrlEncode(MMS.Web.ExtensionMethod.HtmlHelper.Encrypt(material.Trim()));
             string MaterialTypes = HttpUtility.UrlEncode(MMS.Web.ExtensionMethod.HtmlHelper.Encrypt(materialType.Trim()));
             string CategoryName = HttpUtility.UrlEncode(MMS.Web.ExtensionMethod.HtmlHelper.Encrypt(category.Trim()));

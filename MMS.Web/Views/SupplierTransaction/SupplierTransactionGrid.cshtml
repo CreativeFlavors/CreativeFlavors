@@ -1,0 +1,332 @@
+﻿@model IEnumerable<MMS.Web.Models.SupplierTransaction.SupplierTransaction>
+@using MMS.Repository.Managers
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+
+</head>
+<body>
+
+    <div class="main-page">
+        <div id="transaction_report" class="reports common_Manage_subMerchant">
+            <nav class="reports_customers_head" aria-label="breadcrumb">
+                <ol class="breadcrumb font-20">
+                    <li class="breadcrumb-item " aria-current="page">Account Payable</li>
+                </ol>
+            </nav>
+
+            <div class="table-responsive reports_table_responsive">
+                <div class="d-flex justify-content-evenly">
+
+                    <div class="form-floating">
+                        <select id="supplierid" class="form-select">
+                            @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.SupplierName())
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                        <label for="floatingSelectGrid">Supplier Name</label>
+                    </div>
+                    <div class="form-floating">
+                        <select id="CreditNoteRef" class="form-select">
+                            <option value="0">Please Select</option>
+                            <option value="1">Open</option>
+                            <option value="2">Partial</option>
+                            <option value="3">Full-Fill</option>
+                        </select>
+
+                        <label for="floatingSelectGrid">Status</label>
+                    </div>
+
+                    <div class="form-floating">
+                        <input type="date" class="form-control" id="Grndate" />
+                        <label for="Grndate">From Date</label>
+                    </div>
+
+                    <div class="form-floating">
+                        <input type="date" class="form-control" id="GrnDueDate" />
+                        <label for="GrnDueDate">To Date</label>
+                    </div>
+                    @*<div class="form-floating">
+                            @Html.DropDownListFor(m => m.CreditNoteRef, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "form-select" })
+                            <label for="floatingSelectGrid">Grn Number</label>
+                        </div>*@
+                    <div id="transaction_reports_search4_container" class="reports_search_container_btn">
+                        <button type="button" class="manage_customers_btn font-15">
+                            <a href="##" id="supplierid" onclick="filterSupplierTransactions()">FILTER</a>
+                        </button>
+                    </div>
+                </div>
+                <div class="manage_customers_table_in_responsive">
+                    <table class="table table-striped text-center">
+                        <thead>
+                            <tr class="font-16">
+                                <th scope="col">
+                                    <span>Si.No</span>
+                                    <span>
+                                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Supplier Name</span>
+                                    <span>
+                                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Grn NO</span>
+                                    <span>
+                                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Grn Date</span>
+                                    <span>
+                                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Grn Value</span>
+                                    <span>
+                                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Amount Paid</span>
+                                    <span>
+                                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Balance Amount</span>
+                                    <span>
+                                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                    </span>
+                                </th>
+                                @*<th scope="col">
+                                        <span>Payment Due Date</span>
+                                        <span>
+                                            <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                        </span>
+                                    </th>*@
+
+                                <th scope="col">
+                                    <span>Grn Qty</span>
+                                    <span>
+                                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                    </span>
+                                </th>
+                                <th scope="col"><span>Payments</span></th>
+                            </tr>
+                        </thead>
+                        @if (Model != null && Model.Count() > 0)
+                        {
+                            int count = 1;
+                            <tbody>
+                                @foreach (var i in Model)
+                                {
+
+                                    <tr class="font-14">
+                                        <td>@count</td>
+                                        <td>@(i.SupplierMaster != null ? i.SupplierMaster.SupplierName : "")</td>
+
+
+
+                                        @*<td class="veh1-5" style="width: 12%;">@item.SupplierMaster.SupplierName</td>*@
+                                        <td>@i.GrnRefNumber</td>
+                                        <td>@i.GrnDate</td>
+                                        <td>@i.GrnAmount</td>
+                                        @if (i.suppliertransaction == null)
+                                        {
+                                            <td>0</td>
+                                            <td>@i.GrnAmount</td>
+                                        }
+                                        else if (i.suppliertransaction != null)
+                                        {
+                                            <td>@(i.suppliertransaction.GrnPaidAmount ?? 0)</td>
+                                            <td>@(i.suppliertransaction.GrnBalanceAmount ?? 0)</td>
+                                        }
+                                        <!--<-->@*td>abcd</td>*@
+                                        <td>@i.Grnqty </td>
+                                        <td><button class="btn btn-success" id="paynow" onclick="paynow('@i.Id')" title="PayNow">Pay Now</button></td>
+
+                                    </tr>
+                                    count++;
+                                }
+
+                            </tbody>
+
+                        }
+                    </table>
+                </div>
+
+                <tfoot class="footer-pager">
+                    <tr>
+                        <td colspan="4">
+                            <!-- pager -->
+                            @if (ViewBag.TotalCount > ViewBag.PageSize)
+                            {
+                                <ul class="pagination">
+                                    @if (ViewBag.CurrentPage > 1)
+                                    {
+                                        <li>
+                                            <a href="@Url.Action("SupplierTransactionGrid", "SupplierTransaction", new { page = 1 })">First</a>
+                                        </li>
+                                        <li>
+                                            <a href="@Url.Action("SupplierTransactionGrid", "SupplierTransaction", new { page = ViewBag.CurrentPage - 1 })">Previous</a>
+                                        </li>
+                                    }
+
+                                    @for (var page = ViewBag.StartPage; page <= ViewBag.EndPage; page++)
+                                    {
+                                        <li class="@(page == ViewBag.CurrentPage ? "active" : "")">
+                                            <a href="@Url.Action("SupplierTransactionGrid", "SupplierTransaction", new { page = page })">@page</a>
+                                        </li>
+                                    }
+
+                                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                                    {
+                                        <li>
+                                            <a href="@Url.Action("SupplierTransactionGrid", "SupplierTransaction", new { page = ViewBag.CurrentPage + 1 })">Next</a>
+                                        </li>
+                                        <li>
+                                            <a href="@Url.Action("SupplierTransactionGrid", "SupplierTransaction", new { page = ViewBag.TotalPages })">Last</a>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </td>
+                    </tr>
+                </tfoot>
+
+
+                <div class="row manage_customer_show">
+                    <div class="font-14 manage_customer_show_I col-xl-6">
+                        <span>Showing </span>
+                        <select class="form-select font-16" name="manage_customer_show_content"
+                                id="list_report_show_no" aria-label="select example">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                        </select>
+                        <span>per page of 120 customers</span>
+                    </div>
+
+                    <div class="col-xl-6 manage_customer_show_II">
+                        <nav class="float-xl-end">
+                            <ul class="pagination font-14">
+                                <li class="page-item">
+                                    <a href="##" class="page-link">Previous</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="##">1</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="##">2</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="##">3</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="##">4</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="##">5</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="##">6</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="##">7</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="##">8</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="##">...</a>
+                                </li>
+                                <li class=" page-item">
+                                    <a class="page-link" href="##">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id='myModal' class='modal'>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div id='details' class="myModalContent"></div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <script src="~/Content/js/custom.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function paynow(arg) {
+            $.ajax({
+                type: 'GET',
+                url: '/SupplierTransaction/SupplierTransaction',
+                data: { Id: arg },
+                success: function (values) {
+                    $('#details').html(values);
+
+                    var options = {
+                        backdrop: 'static',
+                        keyboard: false
+                    };
+
+                    $('#myModal').modal(options);
+                    $('#myModal').modal('show');
+
+                }
+            });
+        }
+
+    </script>
+
+    <script>
+    function filterSupplierTransactions() {
+        var selectedSupplierId = document.getElementById('supplierid').value;
+        // Perform AJAX call to retrieve filtered records
+        $.ajax({
+            url: '@Url.Action("SupplierTransactionSearch", "SupplierTransaction")',
+            type: 'GET',
+            data: { supplierId: selectedSupplierId },
+            success: function(data) {
+                // Handle success, e.g., update UI with filtered records
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                // Handle error
+            }
+        });
+    }
+    </script>
+
+</body>
+</html>

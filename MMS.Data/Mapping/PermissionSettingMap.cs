@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 
 namespace MMS.Data.Mapping
 {
-  public  class PermissionSettingMap:EntityTypeConfiguration<PermissionSettingMaster>
+    [Table("tbl_PermissionSetting", Schema = "public")]
+    public  class PermissionSettingMap:EntityTypeConfiguration<tbl_PermissionSetting>
     {
       public PermissionSettingMap()
       {

@@ -15,15 +15,15 @@ namespace MMS.Repository.Managers
   public  class IndentTypeManager :IIndentTypeService,IDisposable
     {
           private UnitOfWork unitOfWork = new UnitOfWork();
-        private Repository<IndentTypeMaster> indentMasterRepository;
+        private Repository<IndentMaster> indentMasterRepository;
 
         public IndentTypeManager()
         {
-            indentMasterRepository = unitOfWork.Repository<IndentTypeMaster>();
+            indentMasterRepository = unitOfWork.Repository<IndentMaster>();
         }
 
 
-        public bool Post(IndentTypeMaster arg)
+        public bool Post(IndentMaster arg)
         {
             bool result = false;
             try
@@ -43,24 +43,24 @@ namespace MMS.Repository.Managers
             return result;
         }
 
-        public IndentTypeMaster GetIndentMasterID(int IndentMasterID)
+        public IndentMaster GetIndentMasterID(int IndentMasterID)
         {
-            IndentTypeMaster indentMaster = new IndentTypeMaster();
+            IndentMaster indentMaster = new IndentMaster();
             indentMaster = indentMasterRepository.Table.Where(x => x.IndentMasterID == IndentMasterID).SingleOrDefault();
             return indentMaster;
         }
-        public IndentTypeMaster GetIndentTypeName(string IndentTypeName)
+        public IndentMaster GetIndentTypeName(string IndentTypeName)
         {
-            IndentTypeMaster indentMaster = new IndentTypeMaster();
+            IndentMaster indentMaster = new IndentMaster();
             indentMaster = indentMasterRepository.Table.Where(x => x.IndentTypeName == IndentTypeName).SingleOrDefault();
             return indentMaster;
         }
-        public bool Put(IndentTypeMaster arg)
+        public bool Put(IndentMaster arg)
         {
             bool result = false;
             try
             {
-                IndentTypeMaster model = indentMasterRepository.Table.Where(p => p.IndentMasterID == arg.IndentMasterID).FirstOrDefault();
+                IndentMaster model = indentMasterRepository.Table.Where(p => p.IndentMasterID == arg.IndentMasterID).FirstOrDefault();
                 if (model != null)
                 {
                     model.IndentTypeCode = arg.IndentTypeCode;
@@ -99,7 +99,7 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                IndentTypeMaster model = indentMasterRepository.GetById(id);
+                IndentMaster model = indentMasterRepository.GetById(id);
                 model.IsDeleted = true;
                 model.DeletedBy = HttpContext.Current.Session["UserName"].ToString();
                 model.DeletedDate = DateTime.Now;
@@ -115,17 +115,17 @@ namespace MMS.Repository.Managers
             return result;
         }
 
-        public IndentTypeMaster Get(int id)
+        public IndentMaster Get(int id)
         {
             return null;
         }
 
-        public List<IndentTypeMaster> Get()
+        public List<IndentMaster> Get()
         {
-            List<IndentTypeMaster> indentMaster = new List<IndentTypeMaster>();
+            List<IndentMaster> indentMaster = new List<IndentMaster>();
             try
             {
-                indentMaster = indentMasterRepository.Table.Where(X => X.IsDeleted == false || X.IsDeleted == null).ToList<IndentTypeMaster>();
+                indentMaster = indentMasterRepository.Table.Where(X => X.IsDeleted == false || X.IsDeleted == null).ToList<IndentMaster>();
             }
             catch (Exception ex)
             {

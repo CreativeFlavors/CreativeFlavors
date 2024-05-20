@@ -10,6 +10,8 @@ using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI;
+using InternalOrderForm = MMS.Core.Entities.Stock.InternalOrderForm;
 
 namespace MMS.Web.Controllers.Stock
 {
@@ -24,13 +26,19 @@ namespace MMS.Web.Controllers.Stock
         public ActionResult InternalOrderEntryFormGrid()
         {
 
-            List<InternalOrderEntryForm> orderEntryEntityModellist = new List<InternalOrderEntryForm>();
+            List<OrderEntry> orderEntryEntityModellist = new List<OrderEntry>();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             orderEntryEntityModellist = buyerOrderEntryManager.GetIntenalOrderGrid("");
 
             OrderEntryModel model = new OrderEntryModel();
-            model.OrderEntryList = orderEntryEntityModellist;
-            return PartialView("~/Views/Stock/InternalOrderForm/Partial/InternalOrderEntryFormGrid.cshtml", model);
+            var pager = new Pager(orderEntryEntityModellist.Count(), 1);
+            var viewModel = new OrderEntryModel
+            {
+                OrderEntryList = orderEntryEntityModellist.Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize).ToList(),
+                Pager = pager
+            };
+            //return PartialView("~/Views/Stock/InternalOrderForm/Partial/InternalOrderFormGrid.cshtml", model);
+            return PartialView("~/Views/Stock/InternalOrderForm/Partial/InternalOrderEntryFormGrid.cshtml", viewModel);
         }
 
         public ActionResult FindWeekNo()
@@ -56,7 +64,7 @@ namespace MMS.Web.Controllers.Stock
             MultipleScheduleDetailsManager multipleScheduleDetailsManager = new MultipleScheduleDetailsManager();
             CartonDetailsManager cartonDetailsManager = new CartonDetailsManager();
 
-            InternalOrderEntryForm arg = new InternalOrderEntryForm();
+            OrderEntry arg = new OrderEntry();
             OeOtherDetails arg1 = new OeOtherDetails();
             List<OePackingDetails> arg2 = new List<OePackingDetails>();
             OeShipmentDetails arg3 = new OeShipmentDetails();
@@ -177,17 +185,20 @@ namespace MMS.Web.Controllers.Stock
             }
             return PartialView("~/Views/Stock/InternalOrderForm/Partial/InternalOrderEntryFormDetails.cshtml", model);
         }
-        public ActionResult Search(string filter)
+        public ActionResult Search(string filter, int? page)
         {
-
-           
-            
-            List<InternalOrderEntryForm> orderEntryEntityModellist = new List<InternalOrderEntryForm>();
+            List<OrderEntry> orderEntryEntityModellist = new List<OrderEntry>();
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             orderEntryEntityModellist = buyerOrderEntryManager.GetIntenalOrderGrid(filter);
             OrderEntryModel model = new OrderEntryModel();
-            model.OrderEntryList = orderEntryEntityModellist;
-            return PartialView("~/Views/Stock/InternalOrderForm/Partial/InternalOrderEntryFormGrid.cshtml", model);
+            //model.OrderEntryList = orderEntryEntityModellist;
+            var pager = new Pager(orderEntryEntityModellist.Count(), page);
+            var viewModel = new OrderEntryModel
+            {
+                OrderEntryList = orderEntryEntityModellist.Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize).ToList(),
+                Pager = pager
+            };
+            return PartialView("~/Views/Stock/InternalOrderForm/Partial/InternalOrderFormGrid.cshtml", viewModel);
         }
         public ActionResult GetSizeRange(int SizeRangeMasterId)
         {
@@ -214,7 +225,7 @@ namespace MMS.Web.Controllers.Stock
                          on x.OrderEntryId equals y.OrderEntryId
                          where x.BuyerSeason == BuyerSeasonId && x.WeekNo == currentWeek.ToString()
                          select new { x.BuyerSeason, x.WeekNo, y.Qty, x.TotalAmount });
-            decimal totalOrder = items.Sum(x => x.TotalAmount.Value);
+            decimal totalOrder = items.Sum(x => x.TotalAmount ?? 0);
             var TotalweekOrders = items.ToList();
 
             return Json(totalOrder, JsonRequestBehavior.AllowGet);
@@ -222,7 +233,7 @@ namespace MMS.Web.Controllers.Stock
         public ActionResult isExistBuyerOrderSlNO(string OrderSlNo)
         {
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
-            InternalOrderEntryForm arg_ = new InternalOrderEntryForm();
+            OrderEntry arg_ = new OrderEntry();
             arg_ = buyerOrderEntryManager.GetBuyerOderSlNo(OrderSlNo);
             string Message = "";
             if (arg_ != null)
@@ -271,7 +282,7 @@ namespace MMS.Web.Controllers.Stock
                          on x.OrderEntryId equals y.OrderEntryId
                          where x.BuyerSeason == BuyerSeasonId && x.WeekNo == currentWeek.ToString() && x.BuyerName == buyerName
                          select new { x.BuyerSeason, x.WeekNo, y.Qty, x.TotalAmount });
-            decimal totalOrder = items.Sum(x => x.TotalAmount.Value);
+            decimal totalOrder = items.Sum(x => x.TotalAmount ?? 0);
             var TotalweekOrders = items.ToList();
 
             return Json(totalOrder, JsonRequestBehavior.AllowGet);
@@ -289,13 +300,13 @@ namespace MMS.Web.Controllers.Stock
             SizeRangeQtyRateManager sizeRangeQtyRateManager = new SizeRangeQtyRateManager();
             MultipleScheduleDetailsManager multipleScheduleDetailsManager = new MultipleScheduleDetailsManager();
             CartonDetailsManager cartonDetailsManager = new CartonDetailsManager();
-            InternalOrderEntryForm iExistBuyerEntry = new InternalOrderEntryForm();
-            InternalOrderEntryForm BuyerEntry = new InternalOrderEntryForm();
+            OrderEntry iExistBuyerEntry = new OrderEntry();
+            OrderEntry BuyerEntry = new OrderEntry();
             OeShipmentDetails oeShipmentDetails = new OeShipmentDetails();
             OeOtherDetails oeOtherDetails = new OeOtherDetails();
             CartonDetails cartonDetails = new CartonDetails();
-            iExistBuyerEntry = buyerOrderEntryManager.GetBuyerOrderDetails(model.BuyerOrderSlNo,model.BuyerSeason,model.BuyerName);
-            if (model.OrderEntryId == 0 && (iExistBuyerEntry==null|| iExistBuyerEntry.IsInternal == false))
+            iExistBuyerEntry = buyerOrderEntryManager.GetBuyerOrderDetails(model.BuyerOrderSlNo, model.BuyerSeason, model.BuyerName);
+            if (model.OrderEntryId == 0 && (iExistBuyerEntry == null || iExistBuyerEntry.IsInternal == false))
             {
                 BuyerEntry.OrderEntryId = model.OrderEntryId;
                 BuyerEntry.BuyerOrderSlNo = model.BuyerOrderSlNo;
@@ -667,7 +678,7 @@ namespace MMS.Web.Controllers.Stock
         {
             BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
             string status = "";
-            InternalOrderEntryForm orderEntryEntityModel = new InternalOrderEntryForm();
+            OrderEntry orderEntryEntityModel = new OrderEntry();
             List<OePackingDetails> oePackingDetails = new List<OePackingDetails>();
             OeShipmentDetails oeShipmentDetails = new OeShipmentDetails();
             OeOtherDetails oeOtherDetails = new OeOtherDetails();
