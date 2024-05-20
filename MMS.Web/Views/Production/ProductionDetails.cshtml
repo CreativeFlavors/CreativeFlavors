@@ -1,0 +1,277 @@
+﻿@model MMS.Web.Models.Production.ProductionModel
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table, th, td {
+            border: 1px solid #C9C9C9;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        td {
+            padding: 1px;
+        }
+
+        th {
+            padding: 22px 25px;
+            font-size: 14px;
+            font-family: 'Poppins';
+            color: #292b2c;
+        }
+
+        .salesOrder td input {
+            border: navajowhite;
+            width: 100px;
+            text-align: center;
+        }
+
+        .salesOrder {
+            margin-left: 11px;
+            margin-top: 7%;
+        }
+
+        div#billingadd {
+            margin-top: -8%;
+        }
+
+        .form-group.col-3.mt-4 {
+            margin-left: 9px;
+        }
+
+        p#Grandtotal {
+            padding: 15%;
+        }
+
+        .alert {
+            position: relative;
+            padding: 5px 1rem;
+        }
+
+        .alert-danger {
+            color: #842029;
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+            width: 118%;
+        }
+
+        strong#close {
+            margin-left: 16%;
+            cursor: pointer;
+        }
+
+        #alert {
+            margin-left: 24%;
+        }
+
+        /* Style the container for a clean and well-organized layout */
+        .currency-selector {
+            display: flex;
+            margin: 10px auto; /* Add some margin for spacing */
+        }
+
+            /* Style the radio buttons for improved appearance */
+            .currency-selector input[type="radio"] {
+                display: none; /* Hide the default radio buttons */
+            }
+
+            /* Style the labels for visual representation of options */
+            .currency-selector label {
+                position: relative;
+                padding: 10px 45px;
+                cursor: pointer; /* Indicate interactivity */
+                border: 1px solid #ccc; /* Add a border for definition */
+                border-radius: 5px; /* Round corners for a softer look */
+                margin-right: 10px; /* Add spacing between options */
+                font-weight: bold; /* Make text slightly bolder */
+            }
+
+                /* Style the radio button indicator (pseudo-element) */
+                .currency-selector label::after {
+                    content: "";
+                    display: block;
+                    width: 15px;
+                    height: 15px;
+                    border: 2px solid #ccc; /* Match border style of label */
+                    border-radius: 50%; /* Create a circle for the indicator */
+                    position: absolute;
+                    top: 50%;
+                    left: 10px; /* Adjust horizontal position if needed */
+                    transform: translateY(-50%); /* Center the indicator vertically */
+                    transition: background-color 0.2s ease-in-out; /* Smooth transition on hover */
+                }
+
+            /* Style the checked radio button indicator */
+            .currency-selector input[type="radio"]:checked + label::after {
+                background-color: #4CAF50; /* Green color when selected */
+            }
+
+            /* Style the label text on hover (optional) */
+            .currency-selector label:hover {
+                background-color: #f2f2f2; /* Lighten background on hover */
+            }
+    </style>
+</head>
+
+<body>
+    <div class="main-page">
+        <!-- page-contents here -->
+        <section class="inner-section">
+            <div class="edit-customer">
+                <a href="/Production/ProductionMaster">
+                    <div class="back-button"><img src="~/Content/assets/images/choose-plan.png" alt="back arrow"></div>
+                </a>
+                <h2 class=" font-20">Production Details</h2>
+                <div id="alert">
+
+                </div>
+            </div>
+
+            <div class="edit-section">
+                @*<h3 class="font-20">Basic Information</h3>*@
+                <div class="row">
+
+                    <div class="dashboard-content radio-option col-xs-12">
+                    <form action="#">
+                        <span>
+                            @Html.RadioButtonFor(model => model.Production, "0", new { @id = "0", @class = "with-gap" })
+                            <label for="0">Production</label>
+                        </span>
+                        <span>
+
+                            @Html.RadioButtonFor(model => model.Production, "1", new { @id = "1", @class = "with-gap" })
+                            <label for="1">Sub Assembly</label>
+                        </span>
+                        <span>
+                            @Html.RadioButtonFor(model => model.Production, "2", new { @id = "2", @class = "with-gap" })
+                            <label for="2">Inprogress</label>
+                        </span>
+                    </form>
+                </div>
+
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="form-floating">
+                            <input type="date" class="form-control" id="InvDate" style="margin-top:42px" />
+                            <label for="InvDate">Date</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#ProductId">Product Name</label>
+                            @Html.DropDownListFor(m => m.ProductId, MMS.Web.ExtensionMethod.HtmlHelper.ProductName(), new { @class = "sel-dropdown form-control" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#ProductionCode">Production Code</label>
+                            @Html.TextBoxFor(m => m.ProductionCode, new { @class = "form-control text-field" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#ProductionQty">Production Qty</label>
+                            @Html.TextBoxFor(m => m.ProductionQty, new { @class = "form-control text-field" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#ProductionStatus">Production Status</label>
+                            @Html.DropDownListFor(m => m.ProductionStatus, MMS.Web.ExtensionMethod.HtmlHelper.ProductType(), new { @class = "select-style text-field" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#StoreCode">Store Code</label>
+                            @Html.DropDownListFor(m => m.StoreCode, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#MinQty">Min Qty</label>
+                            @Html.TextBoxFor(m => m.MinQty, new { @class = "form-control text-field" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#MaxQty">Max Qty</label>
+                            @Html.TextBoxFor(m => m.MaxQty, new { @class = "form-control text-field" })
+                        </div>
+                    </div>
+                    <!--<div class="col-lg-4 col-md-6 col-sm-12">
+    <div class="input-part" style="width: 26%; text-align: center; display: inline-flex; margin-top: 10%;">-->
+                    @*<input type="radio" id="DivComponents" name="currency" checked value="Components">
+        <label for="zar" class="currency-option">Components</label>
+        <input type="radio" id="DivMaterial" name="currency" value="Material">
+        <label for="usd" class="currency-option">Material</label>*@
+                    <!--<div class="currency-selector">
+                <input type="radio" id="DivMaterial" name="currency" value="Material">
+                <label for="DivMaterial" class="currency-option">Material</label>
+
+                <input type="radio" id="DivComponents" name="currency" value="Components">
+                <label for="DivComponents" class="currency-option">Components</label>
+            </div>
+        </div>
+    </div>-->
+                    </dv>
+                    <div class="row" id="DivMaterialLiest" style="display:none;">
+                        <br />
+                        <h3>Material List</h3>
+                        <table class="table table-striped text-center" id="tblMaterialList" style="width: 50%;">
+                            <tr>
+                                <th>
+                                    Sno.
+                                </th>
+
+
+                                <th>
+                                    Material List
+                                </th>
+                            </tr>
+                            <tbody id="tbodymaterialList">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="inner-section-button mt-4">
+
+                        <button class="fill-color font-15" type="submit" onclick="Save()">
+                            SAVE
+                        </button>
+
+                        <a href="/AddressDetails/AddressMaster">
+                            <button class="border-color font-15">
+                                <a href="/Production/ProductionGrid"></a>
+                                CANCEL
+                            </button>
+                        </a>
+                    </div>
+                </div>
+        </section>
+    </div>
+
+
+    <!-- page-contents end -->
+    <script src="~/Content/js/custom.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>*@
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+
+    @*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>*@
+   
+
