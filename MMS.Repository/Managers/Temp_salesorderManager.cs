@@ -52,5 +52,28 @@ namespace MMS.Repository.Managers
             }
             return salesorder;
         }
+
+        public Temp_salesorder GetStockRequiredForMaterial(int MaterialNameID)
+        {
+            Temp_salesorder temp_Salesorder = new Temp_salesorder();
+            try
+            {
+                if (MaterialNameID != 0)
+                {
+                    temp_Salesorder = tempsalesorderrep.Table.Where(x => x.MaterialId == MaterialNameID).FirstOrDefault();
+                    if (temp_Salesorder == null)
+                    {
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+
+            }
+
+            return temp_Salesorder;
+        }
     }
 }

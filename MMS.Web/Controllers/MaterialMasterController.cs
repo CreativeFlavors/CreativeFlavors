@@ -716,7 +716,8 @@ namespace MMS.Web.Controllers
             ColorManager colorManager = new ColorManager();
             Company company = new Company();
             IssueSlipManager issueSlip = new IssueSlipManager();
-            CompanyManager companyManager = new CompanyManager();          
+            CompanyManager companyManager = new CompanyManager();
+
             var items = (from x in materialManager.Get()
                          join y in materialNameManager.Get()
                           on x.MaterialName equals y.MaterialMasterID
@@ -729,7 +730,7 @@ namespace MMS.Web.Controllers
 
             List<ApprovedPriceList> approvedPriceList = new List<ApprovedPriceList>();
             List<ApprovedPriceList> approvedPriceLists = new List<ApprovedPriceList>();
-            if (MaterialNameID != null&& MaterialNameID!=0)
+            if (MaterialNameID != null && MaterialNameID != 0)
             {
                 ApprovedPriceListHistoryModel approvedPriceListHistory = new ApprovedPriceListHistoryModel();
                 ApprovedPriceListManager approvedPriceListManager = new ApprovedPriceListManager();
@@ -761,7 +762,27 @@ namespace MMS.Web.Controllers
             }
             List<MMS.Web.Models.PendingQty> ListOfPendingStockList = new List<PendingQty>();
             ListOfPendingStockList = issueSlip.MaterialOpeningStock(MaterialNameID);
-            return Json(new { Material = distinctList, SizeRange = listSizeItemMaterial, store = storeMaster, approvedPrice = approvedPriceLists, company = company, BalanceStock = ListOfPendingStockList.Select(x => x.BalanceStock) }, JsonRequestBehavior.AllowGet);
+
+            Temp_salesorderManager temp_SalesorderManager = new Temp_salesorderManager();
+            Temp_salesorder temp_Salesorders = new Temp_salesorder();
+            temp_Salesorders = temp_SalesorderManager.GetStockRequiredForMaterial(MaterialNameID);
+            decimal? stockRequiredData = null;
+            if (temp_Salesorders != null)
+            {
+                stockRequiredData = temp_Salesorders.stockRequired;
+            }
+
+
+            return Json(new
+            {
+                Material = distinctList,
+                SizeRange = listSizeItemMaterial,
+                store = storeMaster,
+                approvedPrice = approvedPriceLists,
+                company = company,
+                BalanceStock = ListOfPendingStockList.Select(x => x.BalanceStock),
+                StockRequired = stockRequiredData
+            }, JsonRequestBehavior.AllowGet);
         }
         [HttpGet]
         public ActionResult DirectPoPurchaseOrderFillMaterialNameBasedonColor(int MaterialNameID,string PONO)
