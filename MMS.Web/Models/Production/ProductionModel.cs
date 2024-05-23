@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MMS.Core.Entities;
+using MMS.Core.Entities.JobWork;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -15,7 +17,7 @@ namespace MMS.Web.Models.Production
         public int ProductId { get; set; }
         public decimal MinQty { get; set; }
         public decimal MaxQty { get; set; }
-        public decimal TempProductionQty { get; set; }
+        public decimal RequiredQty { get; set; }
         public int StoreCode { get; set; }
         public DateTime? ProductionDueDate { get; set; }
         public DateTime? ProductionFullfillDate { get; set; }
@@ -36,11 +38,11 @@ namespace MMS.Web.Models.Production
         public string CreatedBy { get; set; }
         public string UpdatedBy { get; set; }
         public string DeletedBy { get; set; }
-        public bool Production { get; set; }
+        public bool Productions { get; set; }
         public bool SubAssembly { get; set; }
         public bool Inprogress { get; set; }
-
-
+        public product product { get; set; }
+        public ProductionJobwork_Code_Master code { get; set; }
 
     }
 }

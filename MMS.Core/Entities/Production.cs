@@ -34,8 +34,8 @@ namespace MMS.Core.Entities
             [Column("maxqty")]
             public decimal MaxQty { get; set; }
 
-            [Column("tempproductionqty")]
-            public decimal TempProductionQty { get; set; }
+            [Column("requiredqty")]
+            public decimal RequiredQty { get; set; }
 
             [Column("storecode")]
             public int StoreCode { get; set; }
@@ -96,7 +96,16 @@ namespace MMS.Core.Entities
 
             [Column("deletedby")]
             public string DeletedBy { get; set; }
-        }
+
+        [Column("productions")]
+        public bool Productions { get; set; }
+
+        [Column("subassembly")]
+        public bool SubAssembly { get; set; }
+
+        [Column("inprogress")]
+        public bool Inprogress { get; set; }
+    }
 
     }
 

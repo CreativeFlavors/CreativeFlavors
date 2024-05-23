@@ -28,7 +28,7 @@ namespace MMS.Data.Mapping.JobWork
             Property(t => t.component_Pairs);
             Property(t => t.Upper_Fullshoes);
             Property(t => t.Production_Type);
-            ToTable("Job_Production_Master_tbl");
+            ToTable("productionjobwork_code_master");
         }
     }
 }

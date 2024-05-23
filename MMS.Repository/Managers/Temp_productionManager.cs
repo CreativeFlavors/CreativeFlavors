@@ -68,5 +68,28 @@ namespace MMS.Repository.Managers
                 tempproductionrep.Update(model);
             }
         }
+
+        public temp_production GetbomproductionMaterial(int productid)
+        {
+            temp_production temp_productions = new temp_production();
+            try
+            {
+                if (productid != 0)
+                {
+                    temp_productions = tempproductionrep.Table.Where(x => x.ProductId == productid).FirstOrDefault();
+                    if (temp_productions == null)
+                    {
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+
+            }
+
+            return temp_productions;
+        }
     }
 }

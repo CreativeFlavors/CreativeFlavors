@@ -11,6 +11,9 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link href="~/Content/css1/jquery-ui.css" rel="stylesheet" />
+    <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
+    <script src="~/Content/js/dropdown.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         table, th, td {
@@ -120,6 +123,28 @@
             .currency-selector label:hover {
                 background-color: #f2f2f2; /* Lighten background on hover */
             }
+
+        /* Define colors for the stripes */
+        .table-striped tbody tr:nth-child(odd) {
+            background-color: #f2f2f2; /* Light gray */
+        }
+
+        .table-striped tbody tr:nth-child(even) {
+            background-color: #ffffff; /* White */
+        }
+
+        /* Additional styling */
+        .table-striped th, .table-striped td {
+            padding: 8px; /* Adjust as needed */
+            border: 1px solid #dddddd; /* Add borders */
+        }
+
+        /* Optional: Hover effect */
+        .table-striped tbody tr:hover {
+            background-color: #d9edf7; /* Light blue */
+        }
+
+   
     </style>
 </head>
 
@@ -140,37 +165,46 @@
             <div class="edit-section">
                 @*<h3 class="font-20">Basic Information</h3>*@
                 <div class="row">
-
                     <div class="dashboard-content radio-option col-xs-12">
-                    <form action="#">
-                        <span>
-                            @Html.RadioButtonFor(model => model.Production, "0", new { @id = "0", @class = "with-gap" })
-                            <label for="0">Production</label>
-                        </span>
-                        <span>
+                        <form action="#" style="margin-bottom: 26px;">
+                            <div class="row">
+                                <div class="col-lg-2 col-md-2 col-sm-12">
+                                    @Html.RadioButtonFor(model => model.Productions, "0", new { @id = "0", @class = "with-gap" })
+                                    <label for="0">Productions</label>
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-sm-12">
+                                    @Html.RadioButtonFor(model => model.Productions, "1", new { @id = "1", @class = "with-gap" })
+                                    <label for="1">Sub Assembly</label>
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-sm-12">
+                                    @Html.RadioButtonFor(model => model.Productions, "2", new { @id = "2", @class = "with-gap" })
+                                    <label for="2">Inprogress</label>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12" style="margin-top:-17px;margin-left:204px">
+                                    <div class="input-part">
+                                        <label class="font-14" for="#StoreCode">Store Code</label>
+                                        @Html.DropDownListFor(m => m.StoreCode, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
 
-                            @Html.RadioButtonFor(model => model.Production, "1", new { @id = "1", @class = "with-gap" })
-                            <label for="1">Sub Assembly</label>
-                        </span>
-                        <span>
-                            @Html.RadioButtonFor(model => model.Production, "2", new { @id = "2", @class = "with-gap" })
-                            <label for="2">Inprogress</label>
-                        </span>
-                    </form>
-                </div>
+
 
 
                     <div class="col-lg-4 col-md-6 col-sm-12">
-                        <div class="form-floating">
-                            <input type="date" class="form-control" id="InvDate" style="margin-top:42px" />
-                            <label for="InvDate">Date</label>
+                        <div class="input-part">
+                            <label class="font-14" for="#ProductionDate">Production Date</label>
+                            @Html.TextBoxFor(m => m.ProductionDate, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field" })
                         </div>
                     </div>
+
 
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="#ProductId">Product Name</label>
-                            @Html.DropDownListFor(m => m.ProductId, MMS.Web.ExtensionMethod.HtmlHelper.ProductName(), new { @class = "sel-dropdown form-control" })
+                            @Html.DropDownListFor(m => m.ProductId, MMS.Web.ExtensionMethod.HtmlHelper.ProductName(), new { @class = "select-style text-field" })
                         </div>
                     </div>
 
@@ -178,9 +212,32 @@
                         <div class="input-part">
                             <label class="font-14" for="#ProductionCode">Production Code</label>
                             @Html.TextBoxFor(m => m.ProductionCode, new { @class = "form-control text-field" })
+                            @*@Html.HiddenFor(x => x.ProductionCode)
+                @Html.TextBoxFor(m => m.code.ProductionJobwork_Code, new { @class = "form-control" })*@
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
+
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#RequiredQty">Required Qty</label>
+                            @Html.TextBoxFor(m => m.RequiredQty, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#MinQty">Min Qty</label>
+                            @Html.TextBoxFor(m => m.MinQty, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#MaxQty">Max Qty</label>
+                            @Html.TextBoxFor(m => m.MaxQty, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="#ProductionQty">Production Qty</label>
                             @Html.TextBoxFor(m => m.ProductionQty, new { @class = "form-control text-field" })
@@ -189,60 +246,8 @@
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="#ProductionStatus">Production Status</label>
-                            @Html.DropDownListFor(m => m.ProductionStatus, MMS.Web.ExtensionMethod.HtmlHelper.ProductType(), new { @class = "select-style text-field" })
+                            @Html.DropDownListFor(m => m.ProductionStatus, MMS.Web.ExtensionMethod.HtmlHelper.StatusProduction(), new { @class = "select-style text-field" })
                         </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
-                        <div class="input-part">
-                            <label class="font-14" for="#StoreCode">Store Code</label>
-                            @Html.DropDownListFor(m => m.StoreCode, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
-                        <div class="input-part">
-                            <label class="font-14" for="#MinQty">Min Qty</label>
-                            @Html.TextBoxFor(m => m.MinQty, new { @class = "form-control text-field" })
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
-                        <div class="input-part">
-                            <label class="font-14" for="#MaxQty">Max Qty</label>
-                            @Html.TextBoxFor(m => m.MaxQty, new { @class = "form-control text-field" })
-                        </div>
-                    </div>
-                    <!--<div class="col-lg-4 col-md-6 col-sm-12">
-    <div class="input-part" style="width: 26%; text-align: center; display: inline-flex; margin-top: 10%;">-->
-                    @*<input type="radio" id="DivComponents" name="currency" checked value="Components">
-        <label for="zar" class="currency-option">Components</label>
-        <input type="radio" id="DivMaterial" name="currency" value="Material">
-        <label for="usd" class="currency-option">Material</label>*@
-                    <!--<div class="currency-selector">
-                <input type="radio" id="DivMaterial" name="currency" value="Material">
-                <label for="DivMaterial" class="currency-option">Material</label>
-
-                <input type="radio" id="DivComponents" name="currency" value="Components">
-                <label for="DivComponents" class="currency-option">Components</label>
-            </div>
-        </div>
-    </div>-->
-                    </dv>
-                    <div class="row" id="DivMaterialLiest" style="display:none;">
-                        <br />
-                        <h3>Material List</h3>
-                        <table class="table table-striped text-center" id="tblMaterialList" style="width: 50%;">
-                            <tr>
-                                <th>
-                                    Sno.
-                                </th>
-
-
-                                <th>
-                                    Material List
-                                </th>
-                            </tr>
-                            <tbody id="tbodymaterialList">
-                            </tbody>
-                        </table>
                     </div>
 
                     <div class="inner-section-button mt-4">
@@ -251,15 +256,37 @@
                             SAVE
                         </button>
 
-                        <a href="/AddressDetails/AddressMaster">
+                        <a href="/Production/ProductionMaster">
                             <button class="border-color font-15">
-                                <a href="/Production/ProductionGrid"></a>
+
                                 CANCEL
                             </button>
                         </a>
                     </div>
                 </div>
+
+
         </section>
+        <div class="sheet_pair_2 mob_padding col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <!-- <div class="col-xs-12 block-section"> -->
+            <div id="no-more-tables" class="col-xs-12 no-padding hole_table">
+                <h5 style="margin-left:31px">Material List</h5>
+                <br />
+                <table style="margin-left:31px" id="table_grid" class="col-md-8 table-striped table-condensed cf table-change home_dahboard color_table">
+                    <thead>
+                        <tr>
+                            <th>S NO</th>
+                            <th>Material Name</th>
+                        </tr>
+                    </thead>
+                    <tbody ID="table_grid_ROW" class="common-table-head">
+                    </tbody>
+                </table>
+            </div>
+            <!-- </div> -->
+
+        </div>
+
     </div>
 
 
@@ -271,7 +298,137 @@
     @*<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>*@
 
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
-
     @*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>*@
    
+
+
+    <script>
+        $('#ProductId').on('change', function () {
+            var productId = $(this).val();
+
+            // Make an AJAX request to fetch materials based on product ID
+            $.ajax({
+                url: '/Production/GetBomMaterialForProduction',
+                type: 'GET',
+                data: { productid: productId },
+                // Inside the success function
+                success: function (response) {
+                    console.log("Response:", typeof (response['bomdata']), response['bomdata']);
+                    $('#table_grid_ROW').empty(); // Clear previous data
+                    // Calculate the sum of quantities
+                    var sum = 0;
+                    $.each(response.requiredqty, function (index, value) {
+                        sum += parseFloat(value);
+                    });
+
+                    // Display the sum in the readonly textbox
+                    $('#RequiredQty').val(sum).prop('readonly', true);
+                    $('#MinQty').val(response.Minstock).prop('readonly', true);
+                    $('#MaxQty').val(response.Maxstock).prop('readonly', true);
+
+                    if (response['bomdata'] && response['bomdata'].length > 0) {
+                        $.each(response['bomdata'], function (i, val) {
+                            var id = parseInt(i, 10) + parseInt(1, 10);
+                            console.log(i);
+
+                            $('#table_grid_ROW').append('<tr><td class="veh-1">' + id + '</td><td class="veh-1">' + val + '</td></tr>');
+                        });
+                    } else {
+                        $('#table_grid_ROW').append('<tr><td class="veh-1">No data found</td><td class="veh-1"></td></tr>');
+                    }
+                },
+                error: function () {
+                    $('#table_grid_ROW').empty();
+                    $('#table_grid_ROW').append('<tr><td class="veh-1" onclick="">Error retrieving data</td><td class="veh-1" onclick=""></td></tr>');
+                }
+            });
+        });
+    </script>
+
+    <script>
+        function Save() {
+            var bool = $("input[name='Productions']:checked").val(); // Get the selected radio button value
+            var productionValue = false;
+            var subassemblyValue = false;
+            var inprogressValue = false;
+
+            // Set the boolean values based on the selected radio button value
+            if (bool == "0") {
+                productionValue = true;
+            } else if (bool == "1") {
+                subassemblyValue = true;
+            } else if (bool == "2") {
+                inprogressValue = true;
+            }
+
+            var ProductionDate = $("#ProductionDate").val();
+            var ProductId = $("#ProductId").val();
+            var ProductionCode = $("#ProductionCode").val();
+            var ProductionQty = $("#ProductionQty").val();
+            var ProductionStatus = $("#ProductionStatus").val();
+            var StoreCode = $("#StoreCode").val();
+            var MinQty = $("#MinQty").val();
+            var MaxQty = $("#MaxQty").val();
+            var Requiredqty = $('#RequiredQty').val();
+
+            $(".alert-danger").hide();
+            if (ProductionDate != "" && ProductId != "" && ProductionCode != "" && ProductionQty != "" && ProductionStatus != "" && StoreCode != "" && MinQty != "" && MaxQty != "") {
+                var formdata = new FormData();
+                formdata.append("ProductionDate", ProductionDate);
+                formdata.append("ProductId", ProductId);
+                formdata.append("ProductionCode", ProductionCode);
+                formdata.append("ProductionQty", ProductionQty);
+                formdata.append("ProductionStatus", ProductionStatus);
+                formdata.append("StoreCode", StoreCode);
+                formdata.append("MinQty", MinQty);
+                formdata.append("MaxQty", MaxQty);
+                formdata.append("Requiredqty", Requiredqty);
+                formdata.append("Productions", productionValue); // Append the boolean value
+                formdata.append("SubAssembly", subassemblyValue); // Append the boolean value
+                formdata.append("Inprogress", inprogressValue); // Append the boolean value
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Production/SaveProduction',
+                    contentType: false,
+                    processData: false,
+                    dataType: 'JSON',
+                    data: formdata,
+                    success: function (data) {
+                        console.log(data);
+                        if (data.includes("Inserted")) {
+                            alert("Production Saved successfully");
+                            location.reload();
+                        } else if (data.includes("Updated")) {
+                            alert("Production Updated successfully");
+                            location.reload();
+                        } else {
+                            alert('Operation failed. Please try again.');
+                        }
+                    },
+                    error: function (ex) {
+                        alert('Already Exist in the database.');
+                    }
+                });
+            } else {
+                $("#alert").append(
+                    '<div class="alert alert-danger">' +
+                    '<strong>Alert!</strong>Production details not added ' +
+                    '<strong id="close">x</strong>' +
+                    '</div>'
+                );
+                $(document).on('click', '#close', function () {
+                    $(".alert-danger").hide();
+                });
+            }
+        }
+
+    </script>
+    <script>
+        function initializeTomSelect(selectors, options) {            selectors.forEach(selector => {                new TomSelect(selector, options);            });        }        initializeTomSelect([            "#ProductId",            "#ProductionStatus",            "#StoreCode"        ], {            create: false,            sortField: {                field: "value",                direction: "asc"            }        });
+    </script>
+
+ </body>
+</html>
+
 

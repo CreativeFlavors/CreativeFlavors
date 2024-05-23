@@ -22,7 +22,7 @@ namespace MMS.Data.Mapping
             Property(t => t.ProductId).HasColumnName("productid");
             Property(t => t.MinQty).HasColumnName("minqty");
             Property(t => t.MaxQty).HasColumnName("maxqty");
-            Property(t => t.TempProductionQty).HasColumnName("tempproductionqty");
+            Property(t => t.RequiredQty).HasColumnName("requiredqty");
             Property(t => t.StoreCode).HasColumnName("storecode");
             Property(t => t.ProductionDueDate).HasColumnName("productionduedate");
             Property(t => t.ProductionFullfillDate).HasColumnName("productionfullfilldate");
@@ -43,6 +43,9 @@ namespace MMS.Data.Mapping
             Property(t => t.CreatedBy).HasColumnName("createdby");
             Property(t => t.UpdatedBy).HasColumnName("updatedby");
             Property(t => t.DeletedBy).HasColumnName("deletedby");
+            Property(t => t.Productions).HasColumnName("productions");
+            Property(t => t.SubAssembly).HasColumnName("subassembly");
+            Property(t => t.Inprogress).HasColumnName("inprogress");
             ToTable("production");
         }
     }
