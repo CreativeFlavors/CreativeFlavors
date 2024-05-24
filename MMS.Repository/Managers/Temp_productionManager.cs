@@ -15,10 +15,11 @@ namespace MMS.Repository.Managers
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
         private Repository<temp_production> tempproductionrep;
+        private Repository<preproduction> preproductionrepos;
         public Temp_productionManager()
         {
             tempproductionrep = unitOfWork.Repository<temp_production>();
-
+            preproductionrepos = unitOfWork.Repository<preproduction>();
         }
 
         public void Dispose()
@@ -69,14 +70,14 @@ namespace MMS.Repository.Managers
             }
         }
 
-        public temp_production GetbomproductionMaterial(int productid)
+        public List<temp_production> GetbomproductionMaterial(int productid)
         {
-            temp_production temp_productions = new temp_production();
+           List <temp_production> temp_productions = new List<temp_production>();
             try
             {
                 if (productid != 0)
                 {
-                    temp_productions = tempproductionrep.Table.Where(x => x.ProductId == productid).FirstOrDefault();
+                    temp_productions = tempproductionrep.Table.Where(x => x.ProductId == productid).ToList();
                     if (temp_productions == null)
                     {
 
@@ -90,6 +91,29 @@ namespace MMS.Repository.Managers
             }
 
             return temp_productions;
+        }
+
+        public preproduction Getproductionqty(int productid)
+        {
+            preproduction preproduction = new preproduction();
+            try
+            {
+                if (productid != 0)
+                {
+                    preproduction = preproductionrepos.Table.Where(x => x.ProductId == productid).FirstOrDefault();
+                    if (preproduction == null)
+                    {
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+
+            }
+
+            return preproduction;
         }
     }
 }

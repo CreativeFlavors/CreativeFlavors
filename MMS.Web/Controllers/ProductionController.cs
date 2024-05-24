@@ -25,7 +25,7 @@ namespace MMS.Web.Controllers
             return View();
         }
         [HttpGet]
-        public ActionResult ProductionGrid(int page = 1, int pageSize = 5)
+        public ActionResult ProductionGrid(int page = 1, int pageSize = 8)
         {
             try
             {
@@ -212,7 +212,7 @@ namespace MMS.Web.Controllers
 
             // Fetch the temp_production data for the given productid
             Temp_productionManager temp_ProductionManager = new Temp_productionManager();
-            temp_production temp_Productions = new temp_production();
+            List<temp_production> temp_Productions = new List<temp_production>();
             temp_Productions = temp_ProductionManager.GetbomproductionMaterial(productid);
 
             SalesorderManager salesorderManager = new SalesorderManager();
@@ -223,23 +223,36 @@ namespace MMS.Web.Controllers
             product product = new product();
             product = productManager.GetId(productid);
 
+            Temp_productionManager temp_preproductionManager = new Temp_productionManager();
+            preproduction preproduction = new preproduction();
+            preproduction = temp_preproductionManager.Getproductionqty(productid);
+
 
             int BomData = 0; // Default value in case temp_Productions is null
             decimal? Consume = 0;
 
             if (temp_Productions != null)
             {
-                BomData = temp_Productions.Bomid;
-                Consume= temp_Productions.Consume;
+                BomData = temp_Productions[0].Bomid;
+                Consume= temp_Productions[0].Consume;
             }
 
             decimal? minstock = 0;
             decimal? maxstock = 0;
+            decimal? productionperday= 0;
 
             if(product != null)
             {
                 minstock = product.MinStock;
                 maxstock = product.MaxStock;
+                productionperday= product.ProductionPerDay;
+            }
+
+            decimal? quantity = 0;
+
+            if(preproduction != null)
+            {
+                quantity = preproduction.Qty;
             }
 
             // Fetch BOM material based on Bomid
@@ -253,32 +266,32 @@ namespace MMS.Web.Controllers
             MaterialNameManager MaterialNameManager = new MaterialNameManager();
 
             List<string> materialNames = new List<string>();
-            List<decimal> quantities = new List<decimal>();
-            foreach (var bomMaterialItem in bOMMaterials)
+            List<decimal> consumes = new List<decimal>();
+            foreach (var tempProductionItem in temp_Productions)
             {
                 // Call the GetMaterialName method to retrieve the tbl_materialnamemaster object
-                tbl_materialnamemaster materialInfo = MaterialNameManager.GetMaterialNameMaterial(bomMaterialItem.MaterialName);
+                tbl_materialnamemaster materialInfo = MaterialNameManager.GetMaterialNameMaterial(tempProductionItem.MaterialId);
 
                 // Extract the material name from the retrieved object
                 string materialName = null;
-                decimal? quantity = 0;
+                decimal? consume = tempProductionItem.Consume;
                 if (materialInfo != null)
                 {
                     materialName = materialInfo.MaterialDescription;
-                    quantity = salesorder.quantity;
                 }
 
                 if (!string.IsNullOrEmpty(materialName))
                 {
                     materialNames.Add(materialName);
-                    quantities.Add((decimal)quantity);
+                    consumes.Add((decimal)consume);
                 }
             }
 
+            ViewBag.Productionperday = productionperday;
             // materialNames now contains the list of material names corresponding to the material IDs in bOMMaterials
 
 
-            return Json(new { bomdata = materialNames, requiredqty = quantities,Minstock= minstock,Maxstock=maxstock }, JsonRequestBehavior.AllowGet);
+            return Json(new { bomdata = materialNames,Consumeqty= consumes, Minstock= minstock,Maxstock=maxstock,RequiredQty= quantity }, JsonRequestBehavior.AllowGet);
 
         }
 

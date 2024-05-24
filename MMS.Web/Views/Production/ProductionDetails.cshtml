@@ -15,6 +15,13 @@
     <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
     <script src="~/Content/js/dropdown.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    @*<link href="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.css" rel="stylesheet" />
+    <link href="~/Content/css1/jquery-ui.css" rel="stylesheet" />
+    <script src="~/Content/js/jquery-3.6.0.min.js"></script>
+    <script src="~/Content/js/jquery-ui.min.js"></script>
+    <script src="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.js"></script>*@
+
+
     <style>
         table, th, td {
             border: 1px solid #C9C9C9;
@@ -143,8 +150,10 @@
         .table-striped tbody tr:hover {
             background-color: #d9edf7; /* Light blue */
         }
-
-   
+        .font-bold {
+            font-weight: bold !important;
+            font-size:large;
+        }
     </style>
 </head>
 
@@ -168,19 +177,19 @@
                     <div class="dashboard-content radio-option col-xs-12">
                         <form action="#" style="margin-bottom: 26px;">
                             <div class="row">
-                                <div class="col-lg-2 col-md-2 col-sm-12">
+                                <div class="col-lg-3 col-md-2 col-sm-12">
                                     @Html.RadioButtonFor(model => model.Productions, "0", new { @id = "0", @class = "with-gap" })
                                     <label for="0">Productions</label>
                                 </div>
-                                <div class="col-lg-2 col-md-2 col-sm-12">
+                                <div class="col-lg-3 col-md-2 col-sm-12">
                                     @Html.RadioButtonFor(model => model.Productions, "1", new { @id = "1", @class = "with-gap" })
                                     <label for="1">Sub Assembly</label>
                                 </div>
-                                <div class="col-lg-2 col-md-2 col-sm-12">
+                                <div class="col-lg-3 col-md-2 col-sm-12">
                                     @Html.RadioButtonFor(model => model.Productions, "2", new { @id = "2", @class = "with-gap" })
                                     <label for="2">Inprogress</label>
                                 </div>
-                                <div class="col-lg-4 col-md-6 col-sm-12" style="margin-top:-17px;margin-left:204px">
+                                <div class="col-lg-3 col-md-6 col-sm-12" style="margin-top:-15px">
                                     <div class="input-part">
                                         <label class="font-14" for="#StoreCode">Store Code</label>
                                         @Html.DropDownListFor(m => m.StoreCode, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
@@ -196,7 +205,7 @@
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="#ProductionDate">Production Date</label>
-                            @Html.TextBoxFor(m => m.ProductionDate, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field" })
+                            @Html.TextBoxFor(m => m.ProductionDate, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field", @id = "ProductionDate" })
                         </div>
                     </div>
 
@@ -210,10 +219,10 @@
 
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="input-part">
-                            <label class="font-14" for="#ProductionCode">Production Code</label>
+                            <label class="font-14" for="#ProductionCode">Batch Code</label>
                             @Html.TextBoxFor(m => m.ProductionCode, new { @class = "form-control text-field" })
                             @*@Html.HiddenFor(x => x.ProductionCode)
-                @Html.TextBoxFor(m => m.code.ProductionJobwork_Code, new { @class = "form-control" })*@
+                                @Html.TextBoxFor(m => m.code.ProductionJobwork_Code, new { @class = "form-control" })*@
                         </div>
                     </div>
 
@@ -243,10 +252,18 @@
                             @Html.TextBoxFor(m => m.ProductionQty, new { @class = "form-control text-field" })
                         </div>
                     </div>
+
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#ProductionDueDate">Production Duedate</label>
+                            @Html.TextBoxFor(m => m.ProductionDueDate, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
+                        </div>
+                    </div>
+
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="input-part">
-                            <label class="font-14" for="#ProductionStatus">Production Status</label>
-                            @Html.DropDownListFor(m => m.ProductionStatus, MMS.Web.ExtensionMethod.HtmlHelper.StatusProduction(), new { @class = "select-style text-field" })
+                            <label class="font-14 font-bold" for="#ProductionStatus">Production Status</label>
+                            @Html.DropDownListFor(m => m.ProductionStatus, MMS.Web.ExtensionMethod.HtmlHelper.StatusProduction(), new { @class = "select-style text-field font-bold" })
                         </div>
                     </div>
 
@@ -277,6 +294,7 @@
                         <tr>
                             <th>S NO</th>
                             <th>Material Name</th>
+                            <th>Qty</th>
                         </tr>
                     </thead>
                     <tbody ID="table_grid_ROW" class="common-table-head">
@@ -289,7 +307,6 @@
 
     </div>
 
-
     <!-- page-contents end -->
     <script src="~/Content/js/custom.js"></script>
 
@@ -299,8 +316,63 @@
 
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
     @*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>*@
-   
 
+
+    <script>
+    //for productionqty changed materiallist grid qty change function
+        $(document).ready(function () {
+            var prevProductionQty = ""; // Variable to store the previous value of ProductionQty
+            var prevConsumeqty = {}; // Object to store previous consumption values for eac h row
+
+            // Add event listener to ProductionQty textbox
+            $('#ProductionQty').on('input', function () {
+                // Get the current value of ProductionQty
+                var productionQty = $(this).val();
+
+                // Check if the productionQty has changed
+                if (productionQty !== prevProductionQty) {
+                    // Update the grid only if productionQty is not empty
+                    if (productionQty !== "") {
+                        // Update the consumption quantity in the grid based on the new productionQty
+                        updateConsumeqty(productionQty);
+                    } else {
+                        // If productionQty is empty, revert to the previous consumption quantity for each row
+                        $('#table_grid_ROW tr').each(function (index) {
+                            $(this).find('.veh-1:eq(2)').text(prevConsumeqty[index]);
+                        });
+                    }
+
+                    // Update prevProductionQty to the current value
+                    prevProductionQty = productionQty;
+                }
+            });
+
+            // Function to update the consumption quantity in the grid based on the productionQty
+            function updateConsumeqty(productionQty) {
+                // Iterate over each row in the table
+                $('#table_grid_ROW tr').each(function (index) {
+                    // Get the current row
+                    var $row = $(this);
+
+                    // Get the previous consumption quantity from the current row
+                    var consumeqty = parseFloat($row.find('.veh-1:eq(2)').text());
+
+                    // Store the previous consumption quantity for each row
+                    if (!prevConsumeqty[index]) {
+                        prevConsumeqty[index] = consumeqty;
+                    }
+
+                    // Calculate the new consumption quantity based on the productionQty
+                    var newConsumeqty = parseFloat(productionQty) * consumeqty;
+
+                    // Update the consumption quantity in the current row
+                    $row.find('.veh-1:eq(2)').text(newConsumeqty.toFixed(2));
+                });
+            }
+        });
+
+
+    </script>
 
     <script>
         $('#ProductId').on('change', function () {
@@ -316,13 +388,13 @@
                     console.log("Response:", typeof (response['bomdata']), response['bomdata']);
                     $('#table_grid_ROW').empty(); // Clear previous data
                     // Calculate the sum of quantities
-                    var sum = 0;
-                    $.each(response.requiredqty, function (index, value) {
-                        sum += parseFloat(value);
-                    });
+                    //var sum = 0;
+                    //$.each(response.requiredqty, function (index, value) {
+                    //    sum += parseFloat(value);
+                    //});
 
                     // Display the sum in the readonly textbox
-                    $('#RequiredQty').val(sum).prop('readonly', true);
+                    $('#RequiredQty').val(response.RequiredQty).prop('readonly', true);
                     $('#MinQty').val(response.Minstock).prop('readonly', true);
                     $('#MaxQty').val(response.Maxstock).prop('readonly', true);
 
@@ -330,8 +402,10 @@
                         $.each(response['bomdata'], function (i, val) {
                             var id = parseInt(i, 10) + parseInt(1, 10);
                             console.log(i);
+                            var consumeqty = response['Consumeqty'] && response['Consumeqty'][i] ? response['Consumeqty'][i] : '';
 
-                            $('#table_grid_ROW').append('<tr><td class="veh-1">' + id + '</td><td class="veh-1">' + val + '</td></tr>');
+
+                            $('#table_grid_ROW').append('<tr><td class="veh-1">' + id + '</td><td class="veh-1">' + val + '</td><td class="veh-1">' + consumeqty + '</td></tr>');
                         });
                     } else {
                         $('#table_grid_ROW').append('<tr><td class="veh-1">No data found</td><td class="veh-1"></td></tr>');
@@ -425,10 +499,60 @@
 
     </script>
     <script>
-        function initializeTomSelect(selectors, options) {            selectors.forEach(selector => {                new TomSelect(selector, options);            });        }        initializeTomSelect([            "#ProductId",            "#ProductionStatus",            "#StoreCode"        ], {            create: false,            sortField: {                field: "value",                direction: "asc"            }        });
+        function initializeTomSelect(selectors, options) {
+            selectors.forEach(selector => {
+                new TomSelect(selector, options);
+            });
+        }
+
+        initializeTomSelect([
+            "#ProductId",
+            "#ProductionStatus",
+            "#StoreCode"
+        ], {
+            create: false,
+            sortField: {
+                field: "value",
+                direction: "asc"
+            }
+        });
     </script>
 
- </body>
+    <script>
+    $(document).ready(function () {
+        $('#ProductionQty').on('input', function () {
+            debugger;
+            var productionQty = $(this).val();
+            var productionPerDay;
+if ('@ViewBag.ProductionPerday') { // Check if ViewBag value is not empty
+    productionPerDay = parseFloat('@ViewBag.ProductionPerday');
+} else {
+    // Handle empty value: Set a default value or take appropriate action
+    productionPerDay = 0; // Default value
+}
+
+            console.log(productionPerDay)
+            if (productionQty !== "" && !isNaN(productionPerDay)) { // Check if productionPerDay is a valid number
+                var currentDate = new Date();
+                var daysToAdd = Math.ceil(parseFloat(productionQty) / productionPerDay);
+                var productionDueDate = new Date(currentDate.setDate(currentDate.getDate() + daysToAdd));
+
+                // Format the productionDueDate as desired (e.g., "YYYY-MM-DD")
+                var formattedProductionDueDate = productionDueDate.toISOString().split('T')[0];
+                console.log(formattedProductionDueDate)
+
+                $('#ProductionDueDate').val(formattedProductionDueDate);
+            }
+        });
+
+        // Trigger the input event when the ProductionPerDay value changes
+        $('#ProductionPerDay').on('input', function () {
+            $('#ProductionQty').trigger('input');
+        });
+    });
+    </script>
+
+</body>
 </html>
 
 
