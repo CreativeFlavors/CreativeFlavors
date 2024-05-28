@@ -58,6 +58,16 @@ namespace MMS.Repository.Managers
             }
             return salesorder;
         }
+
+        public salesorder Getproductqty(int productid)
+        {
+            salesorder salesorder = new salesorder();
+            if (productid != null)
+            {
+                salesorder = salesorderrep.Table.Where(x => x.ProductNameid == productid).FirstOrDefault();
+            }
+            return salesorder;
+        }
         public salesorder GettypeId(int id)
         {
             throw new NotImplementedException();

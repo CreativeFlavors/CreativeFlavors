@@ -1,0 +1,558 @@
+﻿@model MMS.Web.Models.Production.ProductionModel
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link href="~/Content/css1/jquery-ui.css" rel="stylesheet" />
+    <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
+    <script src="~/Content/js/dropdown.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    @*<link href="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.css" rel="stylesheet" />
+    <link href="~/Content/css1/jquery-ui.css" rel="stylesheet" />
+    <script src="~/Content/js/jquery-3.6.0.min.js"></script>
+    <script src="~/Content/js/jquery-ui.min.js"></script>
+    <script src="~/jquery-ui-timepicker-0.3.3/jquery.ui.timepicker.js"></script>*@
+
+
+    <style>
+        table, th, td {
+            border: 1px solid #C9C9C9;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        td {
+            padding: 1px;
+        }
+
+        th {
+            padding: 22px 25px;
+            font-size: 14px;
+            font-family: 'Poppins';
+            color: #292b2c;
+        }
+
+        .salesOrder td input {
+            border: navajowhite;
+            width: 100px;
+            text-align: center;
+        }
+
+        .salesOrder {
+            margin-left: 11px;
+            margin-top: 7%;
+        }
+
+        div#billingadd {
+            margin-top: -8%;
+        }
+
+        .form-group.col-3.mt-4 {
+            margin-left: 9px;
+        }
+
+        p#Grandtotal {
+            padding: 15%;
+        }
+
+        .alert {
+            position: relative;
+            padding: 5px 1rem;
+        }
+
+        .alert-danger {
+            color: #842029;
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+            width: 118%;
+        }
+
+        strong#close {
+            margin-left: 16%;
+            cursor: pointer;
+        }
+
+        #alert {
+            margin-left: 24%;
+        }
+
+        /* Style the container for a clean and well-organized layout */
+        .currency-selector {
+            display: flex;
+            margin: 10px auto; /* Add some margin for spacing */
+        }
+
+            /* Style the radio buttons for improved appearance */
+            .currency-selector input[type="radio"] {
+                display: none; /* Hide the default radio buttons */
+            }
+
+            /* Style the labels for visual representation of options */
+            .currency-selector label {
+                position: relative;
+                padding: 10px 45px;
+                cursor: pointer; /* Indicate interactivity */
+                border: 1px solid #ccc; /* Add a border for definition */
+                border-radius: 5px; /* Round corners for a softer look */
+                margin-right: 10px; /* Add spacing between options */
+                font-weight: bold; /* Make text slightly bolder */
+            }
+
+                /* Style the radio button indicator (pseudo-element) */
+                .currency-selector label::after {
+                    content: "";
+                    display: block;
+                    width: 15px;
+                    height: 15px;
+                    border: 2px solid #ccc; /* Match border style of label */
+                    border-radius: 50%; /* Create a circle for the indicator */
+                    position: absolute;
+                    top: 50%;
+                    left: 10px; /* Adjust horizontal position if needed */
+                    transform: translateY(-50%); /* Center the indicator vertically */
+                    transition: background-color 0.2s ease-in-out; /* Smooth transition on hover */
+                }
+
+            /* Style the checked radio button indicator */
+            .currency-selector input[type="radio"]:checked + label::after {
+                background-color: #4CAF50; /* Green color when selected */
+            }
+
+            /* Style the label text on hover (optional) */
+            .currency-selector label:hover {
+                background-color: #f2f2f2; /* Lighten background on hover */
+            }
+
+        /* Define colors for the stripes */
+        .table-striped tbody tr:nth-child(odd) {
+            background-color: #f2f2f2; /* Light gray */
+        }
+
+        .table-striped tbody tr:nth-child(even) {
+            background-color: #ffffff; /* White */
+        }
+
+        /* Additional styling */
+        .table-striped th, .table-striped td {
+            padding: 8px; /* Adjust as needed */
+            border: 1px solid #dddddd; /* Add borders */
+        }
+
+        /* Optional: Hover effect */
+        .table-striped tbody tr:hover {
+            background-color: #d9edf7; /* Light blue */
+        }
+        .font-bold {
+            font-weight: bold !important;
+            font-size:large;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-page">
+        <!-- page-contents here -->
+        <section class="inner-section">
+            <div class="edit-customer">
+                <a href="/Production/ProductionMaster">
+                    <div class="back-button"><img src="~/Content/assets/images/choose-plan.png" alt="back arrow"></div>
+                </a>
+                <h2 class=" font-20">Production Details</h2>
+                <div id="alert">
+
+                </div>
+            </div>
+
+            <div class="edit-section">
+                @*<h3 class="font-20">Basic Information</h3>*@
+                <div class="row">
+                    <div class="dashboard-content radio-option col-xs-12">
+                        <form action="#" style="margin-bottom: 26px;">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-2 col-sm-12">
+                                    @Html.RadioButtonFor(model => model.Productions, "0", new { @id = "0", @class = "with-gap" })
+                                    <label for="0">Productions</label>
+                                </div>
+                                <div class="col-lg-3 col-md-2 col-sm-12">
+                                    @Html.RadioButtonFor(model => model.Productions, "1", new { @id = "1", @class = "with-gap" })
+                                    <label for="1">Sub Assembly</label>
+                                </div>
+                                <div class="col-lg-3 col-md-2 col-sm-12">
+                                    @Html.RadioButtonFor(model => model.Productions, "2", new { @id = "2", @class = "with-gap" })
+                                    <label for="2">Inprogress</label>
+                                </div>
+                                <div class="col-lg-3 col-md-6 col-sm-12" style="margin-top:-15px">
+                                    <div class="input-part">
+                                        <label class="font-14" for="#StoreCode">Store Code</label>
+                                        @Html.DropDownListFor(m => m.StoreCode, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field" })
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+
+
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#ProductionDate">Production Date</label>
+                            @Html.TextBoxFor(m => m.ProductionDate, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field", @id = "ProductionDate" })
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#ProductId">Product Name</label>
+                            @Html.DropDownListFor(m => m.ProductId, MMS.Web.ExtensionMethod.HtmlHelper.ProductName(), new { @class = "select-style text-field" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#ProductionCode">Batch Code</label>
+                            @Html.TextBoxFor(m => m.ProductionCode, new { @class = "form-control text-field" })
+                            @*@Html.HiddenFor(x => x.ProductionCode)
+                                @Html.TextBoxFor(m => m.code.ProductionJobwork_Code, new { @class = "form-control" })*@
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#RequiredQty">Required Qty</label>
+                            @Html.TextBoxFor(m => m.RequiredQty, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#MinQty">Min Qty</label>
+                            @Html.TextBoxFor(m => m.MinQty, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#MaxQty">Max Qty</label>
+                            @Html.TextBoxFor(m => m.MaxQty, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#ProductionQty">Production Qty</label>
+                            @Html.TextBoxFor(m => m.ProductionQty, new { @class = "form-control text-field" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#ProductionDueDate">Production Duedate</label>
+                            @Html.TextBoxFor(m => m.ProductionDueDate, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14 font-bold" for="#ProductionStatus">Production Status</label>
+                            @Html.DropDownListFor(m => m.ProductionStatus, MMS.Web.ExtensionMethod.HtmlHelper.StatusProduction(), new { @class = "select-style text-field font-bold" })
+                        </div>
+                    </div>
+
+                    <div class="inner-section-button mt-4">
+
+                        <button class="fill-color font-15" type="submit" onclick="Save()">
+                            SAVE
+                        </button>
+
+                        <a href="/Production/ProductionMaster">
+                            <button class="border-color font-15">
+
+                                CANCEL
+                            </button>
+                        </a>
+                    </div>
+                </div>
+
+
+        </section>
+        <div class="sheet_pair_2 mob_padding col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <!-- <div class="col-xs-12 block-section"> -->
+            <div id="no-more-tables" class="col-xs-12 no-padding hole_table">
+                <h5 style="margin-left:31px">Material List</h5>
+                <br />
+                <table style="margin-left:31px" id="table_grid" class="col-md-8 table-striped table-condensed cf table-change home_dahboard color_table">
+                    <thead>
+                        <tr>
+                            <th>S NO</th>
+                            <th>Material Name</th>
+                            <th>Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody ID="table_grid_ROW" class="common-table-head">
+                    </tbody>
+                </table>
+            </div>
+            <!-- </div> -->
+
+        </div>
+
+    </div>
+
+    <!-- page-contents end -->
+    <script src="~/Content/js/custom.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>*@
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    @*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>*@
+
+
+    <script>
+    //for productionqty changed materiallist grid qty change function
+        $(document).ready(function () {
+            var prevProductionQty = ""; // Variable to store the previous value of ProductionQty
+            var prevConsumeqty = {}; // Object to store previous consumption values for eac h row
+
+            // Add event listener to ProductionQty textbox
+            $('#ProductionQty').on('input', function () {
+                // Get the current value of ProductionQty
+                var productionQty = $(this).val();
+
+                // Check if the productionQty has changed
+                if (productionQty !== prevProductionQty) {
+                    // Update the grid only if productionQty is not empty
+                    if (productionQty !== "") {
+                        // Update the consumption quantity in the grid based on the new productionQty
+                        updateConsumeqty(productionQty);
+                    } else {
+                        // If productionQty is empty, revert to the previous consumption quantity for each row
+                        $('#table_grid_ROW tr').each(function (index) {
+                            $(this).find('.veh-1:eq(2)').text(prevConsumeqty[index]);
+                        });
+                    }
+
+                    // Update prevProductionQty to the current value
+                    prevProductionQty = productionQty;
+                }
+            });
+
+            // Function to update the consumption quantity in the grid based on the productionQty
+            function updateConsumeqty(productionQty) {
+                // Iterate over each row in the table
+                $('#table_grid_ROW tr').each(function (index) {
+                    // Get the current row
+                    var $row = $(this);
+
+                    // Get the previous consumption quantity from the current row
+                    var consumeqty = parseFloat($row.find('.veh-1:eq(2)').text());
+
+                    // Store the previous consumption quantity for each row
+                    if (!prevConsumeqty[index]) {
+                        prevConsumeqty[index] = consumeqty;
+                    }
+
+                    // Calculate the new consumption quantity based on the productionQty
+                    var newConsumeqty = parseFloat(productionQty) * consumeqty;
+
+                    // Update the consumption quantity in the current row
+                    $row.find('.veh-1:eq(2)').text(newConsumeqty.toFixed(2));
+                });
+            }
+        });
+
+
+    </script>
+
+    <script>
+        $('#ProductId').on('change', function () {
+            var productId = $(this).val();
+
+            // Make an AJAX request to fetch materials based on product ID
+            $.ajax({
+                url: '/Production/GetBomMaterialForProduction',
+                type: 'GET',
+                data: { productid: productId },
+                // Inside the success function
+                success: function (response) {
+                    console.log("Response:", typeof (response['bomdata']), response['bomdata']);
+                    $('#table_grid_ROW').empty(); // Clear previous data
+                    // Calculate the sum of quantities
+                    //var sum = 0;
+                    //$.each(response.requiredqty, function (index, value) {
+                    //    sum += parseFloat(value);
+                    //});
+
+                    // Display the sum in the readonly textbox
+                    $('#RequiredQty').val(response.RequiredQty).prop('readonly', true);
+                    $('#MinQty').val(response.Minstock).prop('readonly', true);
+                    $('#MaxQty').val(response.Maxstock).prop('readonly', true);
+
+                    if (response['bomdata'] && response['bomdata'].length > 0) {
+                        $.each(response['bomdata'], function (i, val) {
+                            var id = parseInt(i, 10) + parseInt(1, 10);
+                            console.log(i);
+                            var consumeqty = response['Consumeqty'] && response['Consumeqty'][i] ? response['Consumeqty'][i] : '';
+
+
+                            $('#table_grid_ROW').append('<tr><td class="veh-1">' + id + '</td><td class="veh-1">' + val + '</td><td class="veh-1">' + consumeqty + '</td></tr>');
+                        });
+                    } else {
+                        $('#table_grid_ROW').append('<tr><td class="veh-1">No data found</td><td class="veh-1"></td></tr>');
+                    }
+                },
+                error: function () {
+                    $('#table_grid_ROW').empty();
+                    $('#table_grid_ROW').append('<tr><td class="veh-1" onclick="">Error retrieving data</td><td class="veh-1" onclick=""></td></tr>');
+                }
+            });
+        });
+    </script>
+
+    <script>
+        function Save() {
+            var bool = $("input[name='Productions']:checked").val(); // Get the selected radio button value
+            var productionValue = false;
+            var subassemblyValue = false;
+            var inprogressValue = false;
+
+            // Set the boolean values based on the selected radio button value
+            if (bool == "0") {
+                productionValue = true;
+            } else if (bool == "1") {
+                subassemblyValue = true;
+            } else if (bool == "2") {
+                inprogressValue = true;
+            }
+
+            var ProductionDate = $("#ProductionDate").val();
+            var ProductId = $("#ProductId").val();
+            var ProductionCode = $("#ProductionCode").val();
+            var ProductionQty = $("#ProductionQty").val();
+            var ProductionStatus = $("#ProductionStatus").val();
+            var StoreCode = $("#StoreCode").val();
+            var MinQty = $("#MinQty").val();
+            var MaxQty = $("#MaxQty").val();
+            var Requiredqty = $('#RequiredQty').val();
+
+            $(".alert-danger").hide();
+            if (ProductionDate != "" && ProductId != "" && ProductionCode != "" && ProductionQty != "" && ProductionStatus != "" && StoreCode != "" && MinQty != "" && MaxQty != "") {
+                var formdata = new FormData();
+                formdata.append("ProductionDate", ProductionDate);
+                formdata.append("ProductId", ProductId);
+                formdata.append("ProductionCode", ProductionCode);
+                formdata.append("ProductionQty", ProductionQty);
+                formdata.append("ProductionStatus", ProductionStatus);
+                formdata.append("StoreCode", StoreCode);
+                formdata.append("MinQty", MinQty);
+                formdata.append("MaxQty", MaxQty);
+                formdata.append("Requiredqty", Requiredqty);
+                formdata.append("Productions", productionValue); // Append the boolean value
+                formdata.append("SubAssembly", subassemblyValue); // Append the boolean value
+                formdata.append("Inprogress", inprogressValue); // Append the boolean value
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Production/SaveProduction',
+                    contentType: false,
+                    processData: false,
+                    dataType: 'JSON',
+                    data: formdata,
+                    success: function (data) {
+                        console.log(data);
+                        if (data.includes("Inserted")) {
+                            alert("Production Saved successfully");
+                            location.reload();
+                        } else if (data.includes("Updated")) {
+                            alert("Production Updated successfully");
+                            location.reload();
+                        } else {
+                            alert('Operation failed. Please try again.');
+                        }
+                    },
+                    error: function (ex) {
+                        alert('Already Exist in the database.');
+                    }
+                });
+            } else {
+                $("#alert").append(
+                    '<div class="alert alert-danger">' +
+                    '<strong>Alert!</strong>Production details not added ' +
+                    '<strong id="close">x</strong>' +
+                    '</div>'
+                );
+                $(document).on('click', '#close', function () {
+                    $(".alert-danger").hide();
+                });
+            }
+        }
+
+    </script>
+    <script>
+        function initializeTomSelect(selectors, options) {
+            selectors.forEach(selector => {
+                new TomSelect(selector, options);
+            });
+        }
+
+        initializeTomSelect([
+            "#ProductId",
+            "#ProductionStatus",
+            "#StoreCode"
+        ], {
+            create: false,
+            sortField: {
+                field: "value",
+                direction: "asc"
+            }
+        });
+    </script>
+
+    <script>
+    $(document).ready(function () {
+        $('#ProductionQty').on('input', function () {
+            debugger;
+            var productionQty = $(this).val();
+            var productionPerDay;
+if ('@ViewBag.ProductionPerday') { // Check if ViewBag value is not empty
+    productionPerDay = parseFloat('@ViewBag.ProductionPerday');
+} else {
+    // Handle empty value: Set a default value or take appropriate action
+    productionPerDay = 0; // Default value
+}
+
+            console.log(productionPerDay)
+            if (productionQty !== "" && !isNaN(productionPerDay)) { // Check if productionPerDay is a valid number
+                var currentDate = new Date();
+                var daysToAdd = Math.ceil(parseFloat(productionQty) / productionPerDay);
+                var productionDueDate = new Date(currentDate.setDate(currentDate.getDate() + daysToAdd));
+
+                // Format the productionDueDate as desired (e.g., "YYYY-MM-DD")
+                var formattedProductionDueDate = productionDueDate.toISOString().split('T')[0];
+                console.log(formattedProductionDueDate)
+
+                $('#ProductionDueDate').val(formattedProductionDueDate);
+            }
+        });
+
+        // Trigger the input event when the ProductionPerDay value changes
+        $('#ProductionPerDay').on('input', function () {
+            $('#ProductionQty').trigger('input');
+        });
+    });
+    </script>
+
+</body>
+</html>
+
+

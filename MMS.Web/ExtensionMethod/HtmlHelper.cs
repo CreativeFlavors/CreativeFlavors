@@ -2508,6 +2508,25 @@ namespace MMS.Web.ExtensionMethod
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
         }
+
+        public static SelectList StatusProduction()
+        {
+            StatusProductionManager statusProductionManager = new StatusProductionManager();
+            List<System.Web.Mvc.SelectListItem> items = statusProductionManager.Get().OrderBy(x => x.StatusId).Select(
+                                                  item => new System.Web.Mvc.SelectListItem()
+                                                  {
+                                                      Text = item.Status,
+                                                      Value = item.StatusId.ToString()
+                                                  }).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select Production Status"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }
+
         public static SelectList BuyerProductType()
         {
             BuyerModelManager buyerManager = new BuyerModelManager();
@@ -3732,6 +3751,13 @@ namespace MMS.Web.ExtensionMethod
             int? SID = ProductionJobworkMasterManager.Get_byCode(1).Max(u => (int?)u.ProductionJobwork_code_id);
             return Convert.ToInt32(SID);
         }
+        public static int GetJob_production_code_id1()
+        {
+            ProductionManager productionManager = new ProductionManager();
+            int? SID = productionManager.Get_byCodes(1).Max(u => (int?)u.ProductionId);
+            return Convert.ToInt32(SID);
+        }
+
         public static int GetJob_production_Qc_code_id()
         {
             ProductionQcManager ProductionQcManager = new ProductionQcManager();

@@ -522,6 +522,16 @@ namespace MMS.Repository.Managers.StockManager
             return billOfMaterial;
         }
 
+        public List<BOMMaterial> Getbom(int BomId)
+        {
+            List<BOMMaterial> billOfMaterial = new List<BOMMaterial>();
+            if (BomId != 0)
+            {
+                billOfMaterial = BBOMMaterialRepository.Table.Where(x => x.BOMID == BomId && x.IsDeleted == false).ToList();
+            }
+            return billOfMaterial;
+        }
+
         public Bom GetBomNO(string BomNO)
         {
             Bom billOfMaterial = new Bom();
