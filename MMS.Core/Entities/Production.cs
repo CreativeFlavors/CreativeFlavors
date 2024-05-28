@@ -105,6 +105,9 @@ namespace MMS.Core.Entities
 
         [Column("inprogress")]
         public bool Inprogress { get; set; }
+
+        [Column("productionperday")]
+        public decimal? ProductionPerDay { get; set; }
     }
 
     }

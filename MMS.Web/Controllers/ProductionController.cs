@@ -31,8 +31,9 @@ namespace MMS.Web.Controllers
             {
                 ProductionManager productionManager = new ProductionManager();
                 ProductManager productManager = new ProductManager();
-                //List<Production> productions = productionManager.GetProductions();
-               
+                //List<Production> productions = productionManager.Get();
+
+
                 var totaldata = from P in productionManager.GetProductions()
                                 join pr in productManager.Get() on P.ProductId equals pr.ProductId
                                 select new ProductionModel
@@ -68,52 +69,16 @@ namespace MMS.Web.Controllers
         [HttpGet]
         public ActionResult ProductionDetails()
         {
-            //ProductionManager productionManager = new ProductionManager();
-            //Production production = new Production();
-            //ProductionModel productionModel = new ProductionModel();
-
-            //int ID = MMS.Web.ExtensionMethod.HtmlHelper.GetJob_production_code_id1();
-
-            //production = productionManager.Getproductionid(Productionid);
-
-           
-            //if (production != null && production.ProductionId != 0)
-            //{
-            //    productionModel.ProductionId = production.ProductionId;
-            //    productionModel.ProductionDate = production.ProductionDate;
-            //    productionModel.ProductionCode = production.ProductionCode;
-            //    productionModel.ProductionQty = production.ProductionQty;
-            //    productionModel.ProductionStatus = production.ProductionStatus;
-            //    productionModel.ProductId = production.ProductId;
-            //    productionModel.MinQty = production.MinQty;
-            //    productionModel.MaxQty = production.MaxQty;
-            //    productionModel.Temp_ProductionQty = production.Temp_ProductionQty;
-            //    productionModel.StoreCode = production.StoreCode;
-            //    productionModel.ProductionDueDate = production.ProductionDueDate;
-            //    productionModel.ProductionFullfillDate = production.ProductionFullfillDate;
-            //    productionModel.RefDocDate = production.RefDocDate;
-            //    productionModel.RefDocNo = production.RefDocNo;
-            //    productionModel.Status1Code = production.Status1Code;
-            //    productionModel.Status1Date = production.Status1Date;
-            //    productionModel.Status1By = production.Status1By;
-            //    productionModel.Status2Code = production.Status2Code;
-            //    productionModel.Status2Date = production.Status2Date;
-            //    productionModel.Status2By = production.Status2By;
-            //    productionModel.Status3Code = production.Status3Code;
-            //    productionModel.Status3Date = production.Status3Date;
-            //    productionModel.Status3By = production.Status3By;
-            //    productionModel.Productions = production.Productions;
-            //    productionModel.SubAssembly = production.SubAssembly;
-            //    productionModel.Inprogress = production.Inprogress;
-            //}
-            //else
-            //{
-            //    ID++;
-            //    string year = DateTime.Now.Year.ToString();
-            //    productionModel.code = new ProductionJobwork_Code_Master() 
-            //                           { ProductionJobwork_Code = "PROD" + '/' + ID + '/' + year }; 
-            //}
+            
+            string ProductionCode = GenerateBatchCode(); /// Generate the batch code
+            ViewBag.ProductionCode = ProductionCode;
             return View();
+        }
+
+        public JsonResult GetProductionCode()
+        {
+            string productionCode = GenerateBatchCode(); // Generate the batch code
+            return Json(new { success = true, productionCode = productionCode }, JsonRequestBehavior.AllowGet);
         }
 
         #region Curd Operation
@@ -124,10 +89,11 @@ namespace MMS.Web.Controllers
             {
                 Production production = new Production();
                 string status = "";
+                
                 if (model.ProductionId == 0)
                 {
-                    ProductionManager productionManager = new ProductionManager();
-
+                    ProductionManager productionManager = new ProductionManager();    
+                    
                     production.ProductionId = model.ProductionId;
                     production.ProductionDate = model.ProductionDate;
                     production.ProductionCode = model.ProductionCode;
@@ -138,6 +104,7 @@ namespace MMS.Web.Controllers
                     production.MaxQty = model.MaxQty;
                     production.RequiredQty = model.RequiredQty;
                     production.StoreCode = model.StoreCode;
+                    production.ProductionPerDay = model.ProductionPerDay;
                     production.ProductionDueDate = model.ProductionDueDate;
                     production.ProductionFullfillDate = model.ProductionFullfillDate;
                     production.RefDocNo = model.RefDocNo;
@@ -167,6 +134,37 @@ namespace MMS.Web.Controllers
                 Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
                 return Json(status, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        public string GenerateBatchCode()
+        {
+            Production production = new Production();
+            ProductionManager productionManager = new ProductionManager();
+
+            // Get current year and month
+            string yearMonth = DateTime.Now.ToString("yyMM");
+
+            // Retrieve the last generated batch code from the database or any storage
+            string lastBatchCode = productionManager.GetLatestBatchNumberFromDatabase();
+
+            // If there's no last batch code, start from 0001
+            int nextSequentialNumber = 1;
+            if (!string.IsNullOrEmpty(lastBatchCode))
+            {
+                // Extract the sequential number part and increment it
+                int lastIndex = lastBatchCode.LastIndexOf('/');
+                string sequentialPart = lastBatchCode.Substring(lastIndex + 1);
+                int lastSequentialNumber = int.Parse(sequentialPart);
+                nextSequentialNumber = lastSequentialNumber + 1;
+            }
+            // Format the next sequential number
+            string formattedSequentialNumber = nextSequentialNumber.ToString("0000");
+
+            // Combine yearMonth and formattedSequentialNumber to create the batch code
+            string ProductionCode = $"{yearMonth}/{formattedSequentialNumber}";
+
+            // Return the generated batch code
+            return ProductionCode;
         }
 
         [HttpGet]
@@ -239,14 +237,15 @@ namespace MMS.Web.Controllers
 
             decimal? minstock = 0;
             decimal? maxstock = 0;
-            decimal? productionperday= 0;
+            decimal? productionperday = 0;// Retrieve the productionperday value from your data source
 
-            if(product != null)
+            if (product != null)
             {
                 minstock = product.MinStock;
                 maxstock = product.MaxStock;
                 productionperday= product.ProductionPerDay;
             }
+            //ViewBag.ProductionPerDay = productionperday;
 
             decimal? quantity = 0;
 
@@ -287,13 +286,14 @@ namespace MMS.Web.Controllers
                 }
             }
 
-            ViewBag.Productionperday = productionperday;
+                       
             // materialNames now contains the list of material names corresponding to the material IDs in bOMMaterials
 
 
-            return Json(new { bomdata = materialNames,Consumeqty= consumes, Minstock= minstock,Maxstock=maxstock,RequiredQty= quantity }, JsonRequestBehavior.AllowGet);
+            return Json(new { bomdata = materialNames,Consumeqty= consumes, Minstock= minstock,Maxstock=maxstock,RequiredQty= quantity, ProductionperDay = productionperday }, JsonRequestBehavior.AllowGet);
 
         }
 
+    
     }
 }

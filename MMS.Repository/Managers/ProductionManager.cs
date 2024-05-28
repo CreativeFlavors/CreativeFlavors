@@ -7,6 +7,7 @@ using MMS.Data.Mapping;
 using MMS.Repository.Service;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -94,6 +95,21 @@ namespace MMS.Repository.Managers
                 Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
             return productions;
+        }
+
+      
+        public string GetLatestBatchNumberFromDatabase()
+        {
+            string latestBatchNumber = null; // Initialize with a default value
+            try
+            {
+                latestBatchNumber = productionrep.Table.Max(p => p.ProductionCode);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return latestBatchNumber;
         }
     }
 }
