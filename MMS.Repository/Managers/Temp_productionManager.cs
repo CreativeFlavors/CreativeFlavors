@@ -16,6 +16,7 @@ namespace MMS.Repository.Managers
         private UnitOfWork unitOfWork = new UnitOfWork();
         private Repository<temp_production> tempproductionrep;
         private Repository<preproduction> preproductionrepos;
+
         public Temp_productionManager()
         {
             tempproductionrep = unitOfWork.Repository<temp_production>();
@@ -26,7 +27,24 @@ namespace MMS.Repository.Managers
         {
             throw new NotImplementedException();
         }
-
+        public bool Postpreproduction(preproduction arg)
+        {
+            bool result = false;
+            try
+            {
+                string username = "admin";
+                arg.CreatedBy = username;
+                arg.CreatedDate = DateTime.Now;
+                preproductionrepos.Insert(arg);
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                result = false;
+            }
+            return result;
+        }
         public bool Post(temp_production arg)
         {
             bool result = false;

@@ -20,11 +20,9 @@ using MMS.Data.StoredProcedureModel;
 using System.Data.SqlClient;
 namespace MMS.Web.Controllers
 {
-    [CustomFilter]
+    
     public class MaterialMasterController : Controller
     {
-        //
-        // GET: /MaterialMaster/
 
         #region MaterialMaster View
         public ActionResult Index()
@@ -473,6 +471,7 @@ namespace MMS.Web.Controllers
             var distinctList = items.GroupBy(x => x.MaterialCategoryMasterId).Select(g => g.First()).ToList();
             return Json(distinctList, JsonRequestBehavior.AllowGet);
         }
+        [HttpGet]
         public ActionResult FillCateogoryid(int MaterialCategoryMasterId)
         {
             List<materialgroupmaster> materialGroupMasterList_ = new List<materialgroupmaster>();
@@ -570,11 +569,11 @@ namespace MMS.Web.Controllers
                           on x.MaterialName equals y.MaterialMasterID
                          join z in uomManager.Get()
                          on x.Uom equals z.UomMasterId
-                         where x.MaterialMasterId == MaterialNameID
+                         where y.MaterialMasterID == MaterialNameID
                          select new
                          {
                              UomName = z.LongUnitName,
-                             MaterialMasterID = x.MaterialMasterId
+                             uomid=z.UomMasterId,
                          });
 
             var distinctList = items.GroupBy(x => x.UomName).Select(g => g.First()).ToList();
@@ -656,7 +655,7 @@ namespace MMS.Web.Controllers
             Norms norms = new Norms();
             norms = normsManager.GetGroupID(MaterialGroupMasterId);
 
-            return Json(new { Material = items_, IsSize = materialGroupMaster.IsSize, normDetails = norms, IsSubstance = materialGroupMaster.IsSubstance, host = host }, JsonRequestBehavior.AllowGet);
+            return Json(items_, JsonRequestBehavior.AllowGet);
         }
         public ActionResult MaterialNameJoinType(int MaterialGroupMasterId)
         {
@@ -716,8 +715,7 @@ namespace MMS.Web.Controllers
             ColorManager colorManager = new ColorManager();
             Company company = new Company();
             IssueSlipManager issueSlip = new IssueSlipManager();
-            CompanyManager companyManager = new CompanyManager();
-
+            CompanyManager companyManager = new CompanyManager();          
             var items = (from x in materialManager.Get()
                          join y in materialNameManager.Get()
                           on x.MaterialName equals y.MaterialMasterID
@@ -730,7 +728,7 @@ namespace MMS.Web.Controllers
 
             List<ApprovedPriceList> approvedPriceList = new List<ApprovedPriceList>();
             List<ApprovedPriceList> approvedPriceLists = new List<ApprovedPriceList>();
-            if (MaterialNameID != null && MaterialNameID != 0)
+            if (MaterialNameID != null&& MaterialNameID!=0)
             {
                 ApprovedPriceListHistoryModel approvedPriceListHistory = new ApprovedPriceListHistoryModel();
                 ApprovedPriceListManager approvedPriceListManager = new ApprovedPriceListManager();
@@ -762,27 +760,7 @@ namespace MMS.Web.Controllers
             }
             List<MMS.Web.Models.PendingQty> ListOfPendingStockList = new List<PendingQty>();
             ListOfPendingStockList = issueSlip.MaterialOpeningStock(MaterialNameID);
-
-            Temp_salesorderManager temp_SalesorderManager = new Temp_salesorderManager();
-            Temp_salesorder temp_Salesorders = new Temp_salesorder();
-            temp_Salesorders = temp_SalesorderManager.GetStockRequiredForMaterial(MaterialNameID);
-            decimal? stockRequiredData = null;
-            if (temp_Salesorders != null)
-            {
-                stockRequiredData = temp_Salesorders.stockRequired;
-            }
-
-
-            return Json(new
-            {
-                Material = distinctList,
-                SizeRange = listSizeItemMaterial,
-                store = storeMaster,
-                approvedPrice = approvedPriceLists,
-                company = company,
-                BalanceStock = ListOfPendingStockList.Select(x => x.BalanceStock),
-                StockRequired = stockRequiredData
-            }, JsonRequestBehavior.AllowGet);
+            return Json(new { Material = distinctList, SizeRange = listSizeItemMaterial, store = storeMaster, approvedPrice = approvedPriceLists, company = company, BalanceStock = ListOfPendingStockList.Select(x => x.BalanceStock) }, JsonRequestBehavior.AllowGet);
         }
         [HttpGet]
         public ActionResult DirectPoPurchaseOrderFillMaterialNameBasedonColor(int MaterialNameID,string PONO)
