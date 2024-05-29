@@ -13,7 +13,7 @@ namespace MMS.Data.Mapping
     {
         public ProductionMap()
         {
-            HasKey(t => t.ProductId);
+            HasKey(t => t.ProductionId);
             Property(t => t.ProductionId).HasColumnName("productionid").HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             Property(t => t.ProductionDate).HasColumnName("productiondate");
             Property(t => t.ProductionCode).HasColumnName("productioncode");
@@ -46,6 +46,7 @@ namespace MMS.Data.Mapping
             Property(t => t.Productions).HasColumnName("productions");
             Property(t => t.SubAssembly).HasColumnName("subassembly");
             Property(t => t.Inprogress).HasColumnName("inprogress");
+            Property(t => t.ProductionPerDay).HasColumnName("productionperday");
             ToTable("production");
         }
     }
