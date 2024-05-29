@@ -122,13 +122,11 @@ namespace MMS.Web.Controllers
                                                             PrimaryUomMasterId = m.PrimaryUomMasterId,
                                                             Qty = m.Qty,
                                                             MaterialNames = mm.MaterialDescription,
-                                                            UOMName = uom.LongUnitName
+                                                            UOMName = uom.LongUnitName,
                                                         }).ToList().FirstOrDefault();
 
                 totalList.Add(availablestock);
             }
-
-            ViewBag.TotalList = totalList;
 
             var totaldata = (from s in salesorderManager.Get()
                              join p in productManager.Get() on s.ProductNameid equals p.ProductId
@@ -150,6 +148,7 @@ namespace MMS.Web.Controllers
                                      BomNo = p.BomNo,
                                  },
                              }).FirstOrDefault();
+            totaldata.bOMMaterialListModels = totalList;
 
 
             return PartialView("partial/SalesOrderQtycheck", totaldata);
@@ -218,12 +217,14 @@ namespace MMS.Web.Controllers
             var list = billOfMaterialManager.GetbomId(product.BomNo);
             var bommaterial = bOMMaterialListManager.BOMMaterialID(list.BomId);
             temp_production temp_production = new temp_production();
+            preproduction preproduction = new preproduction();
             foreach (var item in bommaterial)
             {
                 MaterialOpeningStockManager materialOpeningStockManager = new MaterialOpeningStockManager();
                 Temp_productionManager Temp_productionManagers = new Temp_productionManager();
                 var MaterialOpeningMaster = materialOpeningStockManager.GetmaterialOpeningMaterialID(item.MaterialName);
                 temp_production.SalesOrderId = id;
+                preproduction.SalesOrderNo = id;
                 temp_production.BuyerId = st.customerid;
                 temp_production.ProductId = product.ProductId;
                 temp_production.ProductItem = st.quantity;
@@ -236,9 +237,14 @@ namespace MMS.Web.Controllers
                     var consume = st.quantity * item.RequiredQty;
                     temp_production.Consume = consume;
                     temp_production.ConsumeUnitId = MaterialOpeningMaster.PrimaryUomMasterId;
-
+                    preproduction.ProductId = product.ProductId;
+                    preproduction.SalesOrderDate = st.salesorderdate;
+                    preproduction.BuyerId = st.customerid;
+                    preproduction.Qty = st.quantity;
+                    preproduction.Materialid = MaterialOpeningMaster.MaterialMasterId;
+                    Temp_productionManagers.Postpreproduction(preproduction);
                     Temp_productionManagers.Post(temp_production);
-                    
+
                 }
             }
             var data = "Success";
@@ -394,6 +400,18 @@ namespace MMS.Web.Controllers
                 return Json(status, JsonRequestBehavior.AllowGet);
             }
 
+        }
+
+        #endregion
+        #region filter
+        public ActionResult buyernamesearch(string filter)
+        {
+            List<BuyerMaster> buyerMasters = new List<BuyerMaster>();
+            BuyerManager buyerManager = new BuyerManager();
+            var data = buyerManager.Get();
+            buyerMasters = data.Where(x => x.BuyerFullName.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
+            var Addressdetailslist = buyerMasters;
+            return Json(Addressdetailslist, JsonRequestBehavior.AllowGet);
         }
 
         #endregion

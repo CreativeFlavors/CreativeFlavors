@@ -1,6 +1,8 @@
 ﻿using MMS.Core;
 using MMS.Core.Entities;
 using MMS.Core.Entities.Stock;
+using MMS.Web.Models.StockModel;
+using Org.BouncyCastle.Asn1.Mozilla;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -13,6 +15,7 @@ namespace MMS.Web.Models
     {
         public int SalesorderId { get; set; }
         public int customerid { get; set; }
+        public int MaterialCategoryMasterId { get; set; }
         public string ProductCode { get; set; }
         public string ProductName { get; set; }
         public int ProductID { get; set; }
@@ -45,5 +48,7 @@ namespace MMS.Web.Models
         public TaxTypeMaster TaxTypeMaster { get; set; }
         public product product { get; set; }
         public BuyerMaster BuyerMaster { get; set; }
+
+        public List<BOMMaterialListModel>  bOMMaterialListModels { get; set; }
     }
 }
