@@ -42,8 +42,9 @@ namespace MMS.Web.Models.Production
         public bool SubAssembly { get; set; }
         public bool Inprogress { get; set; }
         public decimal? ProductionPerDay { get; set; }
+        public string ProductCode { get; set; }
         public product product { get; set; }
-        public ProductionJobwork_Code_Master code { get; set; }
+        
 
     }
 }

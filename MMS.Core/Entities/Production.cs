@@ -108,6 +108,9 @@ namespace MMS.Core.Entities
 
         [Column("productionperday")]
         public decimal? ProductionPerDay { get; set; }
+
+        [Column("productcode")]
+        public string ProductCode { get; set; }
     }
 
     }
