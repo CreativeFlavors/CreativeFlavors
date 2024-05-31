@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace MMS.Repository.Service
 {
-    public interface IProductionServices
+    public interface IFinishedGoodService
     {
-        bool Post(Production arg);
-        bool Put(Production arg);
-        Production Getproductionid(int? productionid);
+        bool Post(FinishedGood arg);
+        bool Put(FinishedGood arg);
+        //Production Getproductionid(int? productionid);
     }
 }

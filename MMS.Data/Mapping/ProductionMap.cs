@@ -47,6 +47,7 @@ namespace MMS.Data.Mapping
             Property(t => t.SubAssembly).HasColumnName("subassembly");
             Property(t => t.Inprogress).HasColumnName("inprogress");
             Property(t => t.ProductionPerDay).HasColumnName("productionperday");
+            Property(t => t.ProductCode).HasColumnName("productcode");
             ToTable("production");
         }
     }

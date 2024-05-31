@@ -38,12 +38,13 @@ namespace MMS.Web.Controllers
                                 join pr in productManager.Get() on P.ProductId equals pr.ProductId
                                 select new ProductionModel
                                 {
-                                    ProductionCode=P.ProductionCode,
-                                    ProductionQty=P.ProductionQty,
-                                    RequiredQty=P.RequiredQty,
-                                    product=new product
+                                    ProductionId = P.ProductionId,
+                                    ProductionCode = P.ProductionCode,
+                                    ProductionQty = P.ProductionQty,
+                                    RequiredQty = P.RequiredQty,
+                                    product = new product
                                     {
-                                        ProductName=pr.ProductName,
+                                        ProductName = pr.ProductName,
                                     }
                                 };
                 var totalCount = totaldata.Count();
@@ -67,19 +68,30 @@ namespace MMS.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult ProductionDetails()
+        public ActionResult ProductionDetails(int? productionId)
         {
-            
-            string ProductionCode = GenerateBatchCode(); /// Generate the batch code
-            ViewBag.ProductionCode = ProductionCode;
-            return View();
+            ProductionModel model = new ProductionModel();
+
+            // Check if productionId is null, indicating a new entry
+            if (productionId == null)
+            {
+                // Generate production code for new entry
+                string productionCode = GenerateBatchCode();
+                model.ProductionCode = productionCode;
+
+                // For new entry, set ProductionDate to current date
+                model.ProductionDate = DateTime.Today;
+            }
+          
+            return View(model);
         }
 
-        public JsonResult GetProductionCode()
-        {
-            string productionCode = GenerateBatchCode(); // Generate the batch code
-            return Json(new { success = true, productionCode = productionCode }, JsonRequestBehavior.AllowGet);
-        }
+        //public JsonResult GetProductionCode()
+        //{
+        //    // This method should only be used for generating a production code for new entries
+        //    string productionCode = GenerateBatchCode();
+        //    return Json(new { success = true, productionCode = productionCode }, JsonRequestBehavior.AllowGet);
+        //}
 
         #region Curd Operation
         [HttpPost]
@@ -89,11 +101,78 @@ namespace MMS.Web.Controllers
             {
                 Production production = new Production();
                 string status = "";
-                
+
                 if (model.ProductionId == 0)
                 {
-                    ProductionManager productionManager = new ProductionManager();    
-                    
+                    ProductionManager productionManager = new ProductionManager();
+
+                    production.ProductionId = model.ProductionId;
+                    production.ProductionDate = model.ProductionDate;
+                    production.ProductCode = model.ProductCode;
+                    production.ProductionCode = model.ProductionCode;
+                    production.ProductionQty = model.ProductionQty;
+                    production.ProductionStatus = model.ProductionStatus;
+                    production.ProductId = model.ProductId;
+                    production.MinQty = model.MinQty;
+                    production.MaxQty = model.MaxQty;
+                    production.RequiredQty = model.RequiredQty;
+                    production.StoreCode = model.StoreCode;
+                    production.ProductionPerDay = model.ProductionPerDay;
+                    production.ProductionDueDate = model.ProductionDueDate;
+                    production.ProductionFullfillDate = model.ProductionFullfillDate;
+                    production.RefDocNo = model.RefDocNo;
+                    production.RefDocDate = model.RefDocDate;
+                    production.Status1Code = model.Status1Code;
+                    production.Status1Date = model.Status1Date;
+                    production.Status1By = model.Status1By;
+                    production.Status2Code = model.Status2Code;
+                    production.Status2Date = model.Status2Date;
+                    production.Status2By = model.Status2By;
+                    production.Status3Code = model.Status3Code;
+                    production.Status3Date = model.Status3Date;
+                    production.Status3By = model.Status3By;
+                    production.Productions = model.Productions;
+                    production.SubAssembly = model.SubAssembly;
+                    production.Inprogress = model.Inprogress;
+
+                    productionManager.Post(production);
+                    status = "Inserted";
+                }
+                else
+                {
+                    ProductionManager productionManager = new ProductionManager();
+                    production = productionManager.Getproductionid(model.ProductionId);
+
+
+                    // Check if the production status has changed to "packing" means update the finishedgood table
+                    if (model.ProductionStatus == 7)
+                    {
+                        // Update the FinishedGood table with relevant data from Production table
+                        FinishedGoodManager finishedGoodManager = new FinishedGoodManager();
+                        FinishedGood existingFinishedGood = finishedGoodManager.GetByProductCode(model.ProductCode);
+                        if (existingFinishedGood != null)
+                        {
+                            // Update quantity to finishedgood table
+                            existingFinishedGood.Quantity += model.ProductionQty;
+                            finishedGoodManager.Put(existingFinishedGood);
+                        }
+                        else
+                        {
+                            //insert new record to finishedgood table
+                            FinishedGood finishedGood = new FinishedGood
+                            {
+                                Batchcode = production.ProductionCode,
+                                StoreCode = production.StoreCode,
+                                Quantity = production.ProductionQty,
+                                ProductCode = production.ProductCode,
+                                // Add other properties as needed
+                            };
+
+                            finishedGoodManager.Post(finishedGood);
+                        }
+
+                    }
+
                     production.ProductionId = model.ProductionId;
                     production.ProductionDate = model.ProductionDate;
                     production.ProductionCode = model.ProductionCode;
@@ -116,14 +195,14 @@ namespace MMS.Web.Controllers
                     production.Status2Date = model.Status2Date;
                     production.Status2By = model.Status2By;
                     production.Status3Code = model.Status3Code;
-                    production.Status3Date = model.Status3Date; 
+                    production.Status3Date = model.Status3Date;
                     production.Status3By = model.Status3By;
                     production.Productions = model.Productions;
                     production.SubAssembly = model.SubAssembly;
                     production.Inprogress = model.Inprogress;
 
-                    productionManager.Post(production);
-                    status = "Inserted";
+                    productionManager.Put(production);
+                    status = "Updated";
                 }
 
                 return Json(status, JsonRequestBehavior.AllowGet);
@@ -134,6 +213,48 @@ namespace MMS.Web.Controllers
                 Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
                 return Json(status, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        [HttpGet]
+        public ActionResult ProductionEdit(int productionid)
+        { 
+            ProductionModel model = new ProductionModel();
+
+            ProductionManager manager = new ProductionManager();
+
+            var data = manager.Getproductionid(productionid);
+
+            model.ProductionId = data.ProductionId;
+            model.ProductionDate = data.ProductionDate;
+            model.ProductCode = data.ProductCode;
+            model.ProductionCode = data.ProductionCode;
+            model.ProductionQty = data.ProductionQty;
+            model.ProductionStatus = data.ProductionStatus;
+            model.ProductId = data.ProductId;
+            model.MinQty = data.MinQty;
+            model.MaxQty = data.MaxQty;
+            model.RequiredQty = data.RequiredQty;
+            model.StoreCode = data.StoreCode;
+            model.ProductionPerDay = data.ProductionPerDay;
+            model.ProductionDueDate = data.ProductionDueDate;
+            model.ProductionFullfillDate = data.ProductionFullfillDate;
+            model.RefDocNo = data.RefDocNo;
+            model.RefDocDate = data.RefDocDate;
+            model.Status1Code = data.Status1Code;
+            model.Status1Date = data.Status1Date;
+            model.Status1By = data.Status1By;
+            model.Status2Code = data.Status2Code;
+            model.Status2Date = data.Status2Date;
+            model.Status2By = data.Status2By;
+            model.Status3Code = data.Status3Code;
+            model.Status3Date = data.Status3Date;
+            model.Status3By = data.Status3By;
+            model.Productions = data.Productions;
+            model.SubAssembly = data.SubAssembly;
+            model.Inprogress = data.Inprogress;
+
+            return View("~/Views/Production/ProductionDetails.cshtml", model);
+
         }
 
         public string GenerateBatchCode()
@@ -226,24 +347,26 @@ namespace MMS.Web.Controllers
             preproduction = temp_preproductionManager.Getproductionqty(productid);
 
 
-            int BomData = 0; // Default value in case temp_Productions is null
-            decimal? Consume = 0;
+            //int BomData = 0; // Default value in case temp_Productions is null
+            //decimal? Consume = 0;
 
-            if (temp_Productions != null)
-            {
-                BomData = temp_Productions[0].Bomid;
-                Consume= temp_Productions[0].Consume;
-            }
+            //if (temp_Productions != null)
+            //{
+            //    BomData = temp_Productions[0].Bomid;
+            //    Consume= temp_Productions[0].Consume;
+            //}
 
             decimal? minstock = 0;
             decimal? maxstock = 0;
             decimal? productionperday = 0;// Retrieve the productionperday value from your data source
+            string productcode = null;
 
             if (product != null)
             {
                 minstock = product.MinStock;
                 maxstock = product.MaxStock;
                 productionperday= product.ProductionPerDay;
+                productcode= product.ProductCode;
             }
             //ViewBag.ProductionPerDay = productionperday;
 
@@ -254,12 +377,12 @@ namespace MMS.Web.Controllers
                 quantity = preproduction.Qty;
             }
 
-            // Fetch BOM material based on Bomid
-            BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
-            Bom bom = billOfMaterialManager.GetbomId(BomData);
+            //// Fetch BOM material based on Bomid
+            //BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
+            //Bom bom = billOfMaterialManager.GetbomId(BomData);
 
-            BillOfMaterialManager billOfMaterialManagers = new BillOfMaterialManager();
-            List<BOMMaterial> bOMMaterials = billOfMaterialManagers.Getbom(bom.BomId);
+            //BillOfMaterialManager billOfMaterialManagers = new BillOfMaterialManager();
+            //List<BOMMaterial> bOMMaterials = billOfMaterialManagers.Getbom(bom.BomId);
 
             // Fetch material names based on material ids from bOMMaterials
             MaterialNameManager MaterialNameManager = new MaterialNameManager();
@@ -290,7 +413,7 @@ namespace MMS.Web.Controllers
             // materialNames now contains the list of material names corresponding to the material IDs in bOMMaterials
 
 
-            return Json(new { bomdata = materialNames,Consumeqty= consumes, Minstock= minstock,Maxstock=maxstock,RequiredQty= quantity, ProductionperDay = productionperday }, JsonRequestBehavior.AllowGet);
+            return Json(new { bomdata = materialNames,Consumeqty= consumes, Minstock= minstock,Maxstock=maxstock,RequiredQty= quantity, ProductionperDay = productionperday, ProductCode= productcode }, JsonRequestBehavior.AllowGet);
 
         }
 

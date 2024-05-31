@@ -103,22 +103,31 @@
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
                                 </th>
+                                <th scope="col"><span>STATUS</span></th>
                             </tr>
                         </thead>
                         @if (ViewBag.Productions != null)
                         {
-                            int count = 1;
                             <tbody>
+                                @{
+                                    int currentPage = ViewBag.CurrentPage ?? 1;
+                                    int pageSize = ViewBag.PageSize ?? 8;
+                                    int totalItems = ViewBag.Productions.Count;
+                                    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+                                }
                                 @foreach (var item in ViewBag.Productions)
                                 {
                                     <tr class="font-14">
-                                        <td>@count</td>
+                                        <td>@startSerialNumber</td>
                                         <td>@item.product.ProductName</td>
                                         <td>@item.ProductionCode</td>
                                         <td>@item.ProductionQty</td>
                                         <td>@item.RequiredQty</td>
+                                        <td class="veh-1 edit-del-wrap">
+                                            <a href="javascript:void(0)" onclick="Edit('@item.ProductionId')" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
+                                        </td>
                                     </tr>
-                                    count++;
+                                    startSerialNumber++;
                                 }
                             </tbody>
                         }
@@ -166,13 +175,6 @@
     </div>
 
 
-    <div id='myModal' class='modal'>
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div id='details' class="myModalContent"></div>
-            </div>
-        </div>
-    </div>
 
 
 
@@ -183,7 +185,7 @@
 
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
 
- <script>
+    <script>
   $(document).ready(function() {
     $('#manage_customer_show_no').change(function() {
         var pageSize = parseInt($(this).val());
@@ -209,7 +211,7 @@
         }
     });
 });
-</script>
+    </script>
 
     <script>
         function Search() {
@@ -228,6 +230,11 @@
                              <td>${item.product.ProductName}</td>
                              <td>${item.ProductionCode}</td>
                              <td>${item.ProductionQty}</td>
+                             <td class="veh-1 edit-del-wrap">
+                                 <a href="javascript:void(0)" onclick="Edit('${item.ProductionId}')" class="watchlist-edit" title="Edit">
+                                 <img src="/Content/assets/images/edit-icon.png" />
+                                 </a>
+                             </td>
                          </tr>
                      `);
                         count++;
@@ -237,6 +244,10 @@
                     console.error("Error occurred:", status, error);
                 }
             });
+        }
+
+        function Edit(arg) {
+            window.location.href = "/Production/ProductionEdit?productionid=" + arg;
         }
     </script>
 

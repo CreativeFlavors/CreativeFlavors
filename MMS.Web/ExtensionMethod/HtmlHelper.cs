@@ -2518,12 +2518,18 @@ namespace MMS.Web.ExtensionMethod
                                                       Text = item.Status,
                                                       Value = item.StatusId.ToString()
                                                   }).ToList();
-            var ShotName = new System.Web.Mvc.SelectListItem()
+            // Find the index of "initiated" status
+            int initiatedIndex = items.FindIndex(item => item.Text.ToLower() == "Initiated");
+
+            // Move the "initiated" status to the beginning of the list
+            if (initiatedIndex != -1)
             {
-                Value = "",
-                Text = "Please Select Production Status"
-            };
-            items.Insert(0, ShotName);
+                var initiatedItem = items[initiatedIndex];
+                items.RemoveAt(initiatedIndex);
+                items.Insert(0, initiatedItem);
+            }
+          
+
             return new SelectList(items, "Value", "Text");
         }
 
