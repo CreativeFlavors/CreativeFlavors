@@ -58,6 +58,42 @@ namespace MMS.Repository.Managers
             }
             return parentbom_Material;
         }
+        public bool Put(parentbom_material arg)
+        {
+            bool result = false;
+            try
+            {
+                parentbom_material model = parentbom_materialRepository.Table.Where(p => p.BomMaterialId == arg.BomMaterialId).FirstOrDefault();
+                if (model != null)
+                {
+                    model.BomMaterialId = arg.BomMaterialId;
+                    model.IsActive = arg.IsActive;
+                    model.BomID = arg.BomID;
+                    model.ProductId = arg.ProductId;
+                    model.MaterialCategory=arg.MaterialCategory;
+                    model.MaterialGroupId = arg.MaterialGroupId;
+                    model.MaterialMasterId = arg.MaterialMasterId;
+                    model.UomId = arg.UomId;
+                    model.RequiredQty = arg.RequiredQty;
+                    model.UpdatedDate = DateTime.Now;
+                    string username = "admin";
+                    model.UpdatedBy = username;
+                    parentbom_materialRepository.Update(model);
+                    result = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                result = false;
+            }
+
+            return result;
+        }
         public List<parentbom_material> GetMaterialList(int BOMID)
         {
             List<parentbom_material> billOfMaterial = new List<parentbom_material>();
@@ -112,10 +148,6 @@ namespace MMS.Repository.Managers
             }
 
             return result;
-        }
-        public bool Put(parentbom_material arg)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -84,14 +84,15 @@
                     <input type="text" id="Material_Search" placeholder="Material Search" style="width: 35%;" class="form-control" />
                     <input type="button" value="Search" title="Title" class="search-input btn btn-info" style=" color: #fbf5f5;" id="MaterialSearch" />
                 </div>
-                <div class="manage_customers_table_in_responsive mt-3" style="height:230px; overflow: auto;" id="form">
+                @Html.HiddenFor(m => m.Bomid)
+                <div class="manage_customers_table_in_responsive mt-3" style="height: 300px; overflow: auto;" id="form">
                     <div id="table-wrapper">
                         <div id="table-scroll">
                             <table class="table table-bordered table-fixed" style="text-align: center; width: 100%;">
                                 <thead>
                                     <tr style="position: -webkit-sticky; position: sticky; top: 0; background-color: gray; color: #fff;">
                                         <th scope="col">
-                                            <span>SNO</span>
+                                            <span>Type</span>
                                             <span>
                                                 <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                             </span>
@@ -101,6 +102,12 @@
                                         </th>
                                         <th scope="col">
                                             <span>Product</span>
+                                            <span>
+                                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                            </span>
+                                        </th>
+                                        <th scope="col">
+                                            <span>Req Qty</span>
                                             <span>
                                                 <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                             </span>
@@ -132,38 +139,64 @@
                                                 <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                             </span>
                                         </th>
-                                        <th scope="col">
-                                            <span>Req Qty</span>
-                                            <span>
-                                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                            </span>
-                                        </th>
 
                                     </tr>
                                 </thead>
                                 @if (Model.bomMaterialGridList != null)
                                 {
                                     int count = 1;
-                                    <tbody>
+                                    <tbody id="materialgrid">
                                         @foreach (var i in Model.bomMaterialGridList)
                                         {
 
                                             <tr class="font-14">
-                                                <td class="veh1-5">@count</td>
+                                                @*<td class="veh1-5">@count</td>*@
+                                                <td class="veh1-5">MA</td>
                                                 <td class="veh-4" style="width:12%;">
                                                     <span class="table_icons">
-                                                        <img src="~/Content/assets/images/edit-icon.png" onclick="Edit('@i.Bommaterialid')" />
+                                                        <img src="~/Content/assets/images/edit-icon.png" onclick="Editmat('@i.Bommaterialid')" />
                                                     </span>
                                                     <span class="table_icons">
-                                                        <img src="~/Content/assets/images/delete-icon.png" onclick="Delete('@i.Bommaterialid')" />
+                                                        <img src="~/Content/assets/images/delete-icon.png" onclick="Deletemat('@i.Bommaterialid')" />
                                                     </span>
                                                 </td>
                                                 <td class="veh1-5" style="width: 12%;">@i.productname</td>
+                                                <td class="veh1-5" style="width: 12%;">@i.Requiredqty</td>
                                                 <td class="veh1-5" style="width: 12%;">@i.MaterialNames</td>
                                                 <td class="veh1-5" style="width: 12%;">@i.materialcategory</td>
                                                 <td class="veh1-5" style="width: 12%;">@i.materialgroup</td>
                                                 <td class="veh1-5" style="width: 12%;">@i.UOMName</td>
+                                            </tr>
+                                            count++;
+                                        }
+
+                                    </tbody>
+
+                                }
+                                @if (Model.bomsubassemblyGridList != null)
+                                {
+                                    int count = 1;
+                                    <tbody id="subassemblygrid">
+                                        @foreach (var i in Model.bomsubassemblyGridList)
+                                        {
+
+                                            <tr class="font-14">
+                                                @*<td class="veh1-5" style="width:11%">@count</td>*@
+                                                <td class="veh1-5">SA</td>
+                                                <td class="veh-4" style="width:12%;">
+                                                    <span class="table_icons">
+                                                        <img src="~/Content/assets/images/edit-icon.png" onclick="Editass('@i.subassemblyid')" />
+                                                    </span>
+                                                    <span class="table_icons">
+                                                        <img src="~/Content/assets/images/delete-icon.png" onclick="Deleteass('@i.subassemblyid')" />
+                                                    </span>
+                                                </td>
+                                                <td class="veh1-5" style="width: 12%;">@i.productname</td>
                                                 <td class="veh1-5" style="width: 12%;">@i.Requiredqty</td>
+                                                <td class="veh1-5" style="width: 12%;">-</td>
+                                                <td class="veh1-5" style="width: 12%;">-</td>
+                                                <td class="veh1-5" style="width: 12%;">-</td>
+                                                <td class="veh1-5" style="width: 12%;">-</td>
                                             </tr>
                                             count++;
                                         }
@@ -183,18 +216,84 @@
     </div>
 
 
-    <script src="~/Content/js/custom.js"></script>
-    <link href="~/Content/css1/sweetalert.css" rel="stylesheet" />
 
+    <script src="~/Content/js/custom.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+
     <script>
-             function Delete(arg) {
+        function Deletemat(arg) {
+            $.ajax({
+                type: "DELETE",
+                url: '/BillOfMaterial/BOMMaterialDelete',
+                data: { BOMMaterialID: arg },
+                success: function (values) {
+                    if (values === "Success") {
+                        alert("Deleted Successfully.");
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        alert("Failed to delete.");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert("An error occurred: " + xhr.responseText);
+                }
+            });
+        }
+
+
+
+        function Editmat(arg) {
+            var bomid ="@Model.Bomid";
+           $.ajax({
+                type: "PUT",
+               url: '/BillOfMaterial/EditBOMmaterialDetails',
+               data: { BOMMaterialID: arg, BOMID: bomid },
+               success: function (data) {
+                   $(".main-page").html(data);
+                   $(".main-page").show();
+                   $("#mat").show();
+                   //$("#MaterialListGrid").show();
+                   //$("#subassemblyGrid").hide();
+                   $("#sub").hide();
+                   $("#a1").show();
+                   $("#a2").show();
+                   $("#a3").show();
+                   $("#a4").show();
+                   $("#add1").on("click", function () {
+                       $("#mat").hide();
+                       //$("#MaterialListGrid").hide();
+                       //$("#subassemblyGrid").show();
+                       $("#sub").show();
+                       $("#a1").hide();
+                       $("#a2").hide();
+                       $("#a3").hide();
+                       $("#a4").hide();
+                   });
+                   $("#add").on("click", function () {
+                       $("#mat").show();
+                       //$("#MaterialListGrid").show();
+                       //$("#subassemblyGrid").hide();
+                       $("#sub").hide();
+                       $("#a1").show();
+                       $("#a2").show();
+                       $("#a3").show();
+                       $("#a4").show();
+                   });
+                }
+            });
+        }
+    </script>
+
+    <script>
+        function Deleteass(arg) {
     $.ajax({
         type: "DELETE",
-        url: ' @Url.Action("BOMMaterialDelete", "BillOfMaterial")',
-        data: { BOMMaterialID: arg },
+        url: ' @Url.Action("BOMsubassemblyDelete", "BillOfMaterial")',
+        data: { BOMsubassemblyid: arg },
         success: function (values) {
             if (values === "Success") {
                 alert("Deleted Successfully.");
@@ -204,7 +303,44 @@
             }
         }
     });
-}
+        }
+
+        function Editass(arg) {
+            var bomid ="@Model.Bomid";
+           $.ajax({
+                type: "PUT",
+               url: '/BillOfMaterial/EditSubassemblyDetails',
+               data: { BOMsubassemblyID: arg, BOMID: bomid },
+               success: function (data) {
+                   $(".main-page").html(data);
+                   $(".main-page").show();
+                   $('#add').prop('checked', false);
+                   $('#add1').prop('checked', true);
+                   $("#mat").hide();
+                   $("#sub").show();
+                   $("#a1").hide();
+                   $("#a2").hide();
+                   $("#a3").hide();
+                   $("#a4").hide();
+                   $("#add1").on("click", function () {
+                       $("#mat").hide();
+                       $("#sub").show();
+                       $("#a1").hide();
+                       $("#a2").hide();
+                       $("#a3").hide();
+                       $("#a4").hide();
+                   });
+                   $("#add").on("click", function () {
+                       $("#mat").show();
+                       $("#sub").hide();
+                       $("#a1").show();
+                       $("#a2").show();
+                       $("#a3").show();
+                       $("#a4").show();
+                   });
+                }
+            });
+        }
     </script>
 
     <script>
@@ -212,20 +348,18 @@
                 $("#MaterialSearch").click(function () {
                     var bomno = "@Model.Bomid";
                     var bomsearch = $("#Material_Search").val();
-                    debugger;
                     $.ajax({
                         type: 'GET',
                         url: '/BillOfMaterial/BOMmaterialSearch',
                         data: { filter: bomsearch, bomid: bomno },
                         contentType: 'application/json',
                         success: function (values) {
-                            $("tbody").empty();
+                            $("#materialgrid").empty();
                             var count = 1;
                             $.each(values, function (i, item) {
-                                const formattedDate = convertToReadableDate(item.Date);
-                                $("tbody").append(`
+                                $("#materialgrid").append(`
                       <tr class="font-14">
-                      <td class="veh1-5">${count}</td>
+                      <td class="veh1-5">MA</td>
                       <td class="veh-4" style="width:12%;">
                         <span class="table_icons">
                             <img src="/Content/assets/images/edit-icon.png" onclick="Edit('${item.Bommaterialid}')" />
@@ -235,11 +369,12 @@
                         </span>
                       </td>
                       <td class="veh1-5" style="width: 12%;">${item.productname}</td>
+                      <td class="veh1-5" style="width: 12%;">${item.Requiredqty}</td>
                       <td class="veh1-5" style="width: 12%;">${item.MaterialNames}</td>
                       <td class="veh1-5" style="width: 12%;">${item.materialcategory}</td>
                        <td class="veh1-5" style="width: 12%;">${item.materialgroup}</td>
                        <td class="veh1-5" style="width: 12%;">${item.UOMName}</td>
-                        <td class="veh1-5" style="width: 12%;">${item.Requiredqty}</td>
+
 
                       </tr>
                        `);
@@ -253,3 +388,4 @@
 
 </body>
 </html>
+@*<td class="veh1-5">${count}</td>*@

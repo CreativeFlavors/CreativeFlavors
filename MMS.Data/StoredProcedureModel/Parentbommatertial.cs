@@ -24,5 +24,9 @@ namespace MMS.Data.StoredProcedureModel
         public int Requiredqty { get; set; }
         [Column("bommaterialid")]
         public int Bommaterialid { get; set; }
+        [Column("bomid")]
+        public int Bomid { get; set; }
+        [Column("materialmasterid")]
+        public int materialmasterid { get; set; }
     }
 }

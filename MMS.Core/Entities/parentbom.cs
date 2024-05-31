@@ -11,6 +11,7 @@ namespace MMS.Core.Entities
     [Table("parentbom", Schema = "public")]
     public class parentbom : BaseEntity
     {
+        [System.ComponentModel.DataAnnotations.Key]
         [Column("bomid")]
         public int BomId { get; set; }
         [Column("bomno")]
