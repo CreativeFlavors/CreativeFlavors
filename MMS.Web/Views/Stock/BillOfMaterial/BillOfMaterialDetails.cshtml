@@ -112,7 +112,9 @@
                         </div>
                         <div class="edit-merchant">
                             <div class="edit-merchant-inner-section">
-                                <div class="input-part ">
+                                <div class="input-part">
+                                    @Html.HiddenFor(m => m.Bommaterialid)
+                                    @Html.HiddenFor(m => m.subassemblyid)
                                     <label class="font-14" for="produzct">Product</label>
                                     @Html.DropDownListFor(m => m.Productid, MMS.Web.ExtensionMethod.HtmlHelper.ProductName(), new { @class = "select-style text-field " })
                                 </div>
@@ -150,14 +152,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="d-flex justify-content-end" >
+                        <div class="d-flex justify-content-end">
                             <div class="botton-section" id="mat">
                                 <button type="button" class="button" value="AddMaterial" id="add-Material" onclick="Save()">Add Material</button>
                             </div>
                         </div>
-                        <div class="d-flex justify-content-end" >
+                        <div class="d-flex justify-content-end">
                             <div class="botton-section" id="sub">
-                                <button type="button" class="button" value="AddMaterial" id="add-Material">Add Sub_Assembly</button>
+                                <button type="button" class="button" value="AddMaterial" id="Sub_Assembly" onclick="addsubass()">Add Sub_Assembly</button>
                             </div>
                         </div>
                     </div>
@@ -167,9 +169,9 @@
                     <div class="" id="MaterialListGrid">
                         @{Html.RenderPartial("~/Views/Stock/BillOfMaterial/PartialView/_MaterialGrid.cshtml", Model);}
                     </div>
-                    <div class="subassemblyGrid" id="subassemblyGrid">
+                    @*<div class="subassemblyGrid" id="subassemblyGrid">
                         @{Html.RenderPartial("~/Views/Stock/BillOfMaterial/PartialView/subassembly.cshtml", Model);}
-                    </div>
+                    </div>*@
                 </div>
         </section>
     </div>
@@ -181,7 +183,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#BOM").attr('checked', true);
 
+        });
+    </script>
     <script>
         function initializeTomSelect(selectors, options) {
             selectors.forEach(selector => {
@@ -209,11 +217,13 @@
             var MaterialGroupid = $("#MaterialGroupid").val();
             var MaterialMasterid = $("#MaterialMasterid").val();
             var Uomid = $("#Uomid").val();
+            var Bommaterialid = $("#Bommaterialid").val();
             var Requiredqty = $("#Requiredqty").val();
             var formdata = new FormData();
             formdata.append("Bomno", Bomno);
             formdata.append("Bomid", Bomid);
             formdata.append("Description", Description);
+            formdata.append("Bommaterialid", Bommaterialid);
             formdata.append("Date", date);
             formdata.append("Lastbom", Lastbom);
             formdata.append("Productid", Productid);
@@ -222,71 +232,262 @@
             formdata.append("MaterialMasterid", MaterialMasterid);
             formdata.append("Uomid", Uomid);
             formdata.append("Requiredqty", Requiredqty);
-            if (Bomno != "" && Productid != "" && MaterialCategoryid != "" && MaterialMasterid != "" && Requiredqty != "") {
-                if (Bomid == "0") {
-                    $.ajax({
-                        type: 'POST',
-                        url: '/BillOfMaterial/BillOfMaterialDetails',
-                        contentType: false,
-                        processData: false,
-                        dataType: 'html',
-                        data: formdata,
-                        success: function (values) {
-                            var data = JSON.parse(values);
-                            if (data.AlertMessage === "Saved Successfully") {
-                                alert("Saved Successfully.");
-                                window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.bomids;
-                            }
-                            else if (data == "Already Existed") {
-                                alert("BOM no Already  Existed");
-                                return false;
-                            }
-                            else {
-                                alert('Save process Failed.');
+            if (Bommaterialid == "") {
+                if (Bomno != "" && Productid != "" && MaterialCategoryid != "" && MaterialMasterid != "" && Requiredqty != "") {
+                    if (Bomid == "0") {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/BillOfMaterial/BillOfMaterialDetails',
+                            contentType: false,
+                            processData: false,
+                            dataType: 'html',
+                            data: formdata,
+                            success: function (values) {
+                                var data = JSON.parse(values);
+                                if (data.AlertMessage === "Saved Successfully") {
+                                    alert("Saved Successfully.");
+                                    window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.bomids;
+                                }
+                                else if (data == "Already Existed") {
+                                    alert("BOM no Already  Existed");
+                                    return false;
+                                }
+                                else {
+                                    alert('Save process Failed.');
+                                }
+
                             }
 
-                        }
+                        });
+                    }
+                    else {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/BillOfMaterial/BillOfMaterialDetails',
+                            contentType: false,
+                            processData: false,
+                            dataType: 'html',
+                            data: formdata,
+                            success: function (values) {
+                                var data = JSON.parse(values);
+                                if (data.AlertMessage === "Updated Successfully") {
+                                    alert("Saved Successfully.");
 
-                    });
+                                    window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.update;
+                                }
+                                else if (data == "Already Existed") {
+                                    alert("BOM no Already  Existed");
+                                    return false;
+                                }
+
+                            }
+
+                        });
+                    }
                 }
                 else {
-                    $.ajax({
-                        type: 'POST',
-                        url: '/BillOfMaterial/BillOfMaterialDetails',
-                        contentType: false,
-                        processData: false,
-                        dataType: 'html',
-                        data: formdata,
-                        success: function (values) {
-                            var data = JSON.parse(values);
-                            if (data.AlertMessage === "Updated Successfully") {
-                                alert("Updated Successfully.");
-                                window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.update;
-                            }
-                            else if (data == "Already Existed") {
-                                alert("BOM no Already  Existed");
-                                return false;
-                            }
-
-                        }
-                       
-                    });
+                    alert("Please select All field");
                 }
             }
             else {
-                alert("Please select All field");
+                if (Bomno != "" && Productid != "" && MaterialCategoryid != "" && MaterialMasterid != "" && Requiredqty != "") {
+                    if (Bomid == "0") {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/BillOfMaterial/BillOfMaterialDetails',
+                            contentType: false,
+                            processData: false,
+                            dataType: 'html',
+                            data: formdata,
+                            success: function (values) {
+                                var data = JSON.parse(values);
+                                if (data.AlertMessage === "Saved Successfully") {
+                                    alert("Updated Successfully.");
+                                    window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.bomids;
+                                }
+                                else if (data == "Already Existed") {
+                                    alert("BOM no Already  Existed");
+                                    return false;
+                                }
+                                else {
+                                    alert('Save process Failed.');
+                                }
+
+                            }
+
+                        });
+                    }
+                    else {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/BillOfMaterial/BillOfMaterialDetails',
+                            contentType: false,
+                            processData: false,
+                            dataType: 'html',
+                            data: formdata,
+                            success: function (values) {
+                                var data = JSON.parse(values);
+                                if (data.AlertMessage === "Updated Successfully") {
+                                    alert("Updated Successfully.");
+
+                                    window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.update;
+                                }
+                                else if (data == "Already Existed") {
+                                    alert("BOM no Already  Existed");
+                                    return false;
+                                }
+
+                            }
+
+                        });
+                    }
+                }
+                else {
+                    alert("Please select All field");
+                }
+            }
+
+        }
+        function addsubass() {
+            var Bomid = $("#Bomid").val();
+            var Bomno = $("#Bomno").val();
+            var Description = $("#Description").val();
+            var date = $("#Date").val();
+            var subassemblyid = $("#subassemblyid").val();
+            var Lastbom = $("#Lastbom").val();
+            var Productid = $("#Productid").val();
+            var Requiredqty = $("#Requiredqty").val();
+            var formdata = new FormData();
+            formdata.append("Bomno", Bomno);
+            formdata.append("Bomid", Bomid);
+            formdata.append("subassemblyid", subassemblyid);
+            formdata.append("Description", Description);
+            formdata.append("Date", date);
+            formdata.append("Lastbom", Lastbom);
+            formdata.append("Productid", Productid);
+            formdata.append("Requiredqty", Requiredqty);
+            if (subassemblyid == "") {
+                if (Bomno != "" && Productid != "" && Requiredqty != "") {
+                    if (Bomid == "0") {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/BillOfMaterial/SubAssemblyDetails',
+                            contentType: false,
+                            processData: false,
+                            dataType: 'html',
+                            data: formdata,
+                            success: function (values) {
+                                var data = JSON.parse(values);
+                                if (data.AlertMessage === "Saved Successfully") {
+                                    alert("Updated Successfully.");
+                                    window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.bomids;
+                                }
+                                else if (data == "Already Existed") {
+                                    alert("BOM no Already  Existed");
+                                    return false;
+                                }
+                                else {
+                                    alert('Save process Failed.');
+                                }
+
+                            }
+
+                        });
+                    }
+                    else {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/BillOfMaterial/SubAssemblyDetails',
+                            contentType: false,
+                            processData: false,
+                            dataType: 'html',
+                            data: formdata,
+                            success: function (values) {
+                                var data = JSON.parse(values);
+                                if (data.AlertMessage === "Updated Successfully") {
+                                    alert("Updated Successfully.");
+                                    window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.update;
+                                }
+                                else if (data == "Already Existed") {
+                                    alert("BOM no Already  Existed");
+                                    return false;
+                                }
+
+                            }
+
+                        });
+                    }
+                }
+                else {
+                    alert("Please select All field");
+                }
+            }
+            else {
+                if (Bomno != "" && Productid != "" && Requiredqty != "") {
+                    if (Bomid == "0") {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/BillOfMaterial/SubAssemblyDetails',
+                            contentType: false,
+                            processData: false,
+                            dataType: 'html',
+                            data: formdata,
+                            success: function (values) {
+                                var data = JSON.parse(values);
+                                if (data.AlertMessage === "Saved Successfully") {
+                                    alert("Saved Successfully.");
+                                    window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.bomids;
+                                }
+                                else if (data == "Already Existed") {
+                                    alert("BOM no Already  Existed");
+                                    return false;
+                                }
+                                else {
+                                    alert('Save process Failed.');
+                                }
+
+                            }
+
+                        });
+                    }
+                    else {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/BillOfMaterial/SubAssemblyDetails',
+                            contentType: false,
+                            processData: false,
+                            dataType: 'html',
+                            data: formdata,
+                            success: function (values) {
+                                var data = JSON.parse(values);
+                                if (data.AlertMessage === "Updated Successfully") {
+                                    alert("Updated Successfully.");
+                                    window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.update;
+                                }
+                                else if (data == "Already Existed") {
+                                    alert("BOM no Already  Existed");
+                                    return false;
+                                }
+
+                            }
+
+                        });
+                    }
+                }
+                else {
+                    alert("Please select All field");
+                }
             }
         }
-
     </script>
     <script>
         $(document).ready(function () {
             $("#sub").hide();
-            $("#subassemblyGrid").hide();
+            //$("#subassemblyGrid").hide();
             $("#add1").on("click", function () {
                 $("#mat").hide();
-                $("#MaterialListGrid").hide();
-                $("#subassemblyGrid").show();
+                //$("#MaterialListGrid").hide();
+                //$("#subassemblyGrid").show();
                 $("#sub").show();
                 $("#a1").hide();
                 $("#a2").hide();
@@ -295,8 +496,8 @@
             });
             $("#add").on("click", function () {
                 $("#mat").show();
-                $("#MaterialListGrid").show();
-                $("#subassemblyGrid").hide();
+                //$("#MaterialListGrid").show();
+                //$("#subassemblyGrid").hide();
                 $("#sub").hide();
                 $("#a1").show();
                 $("#a2").show();
@@ -305,7 +506,8 @@
             });
         });
     </script>
-    <script>  
+    <script>
+
  $(document).ready(function () {
      $("#MaterialCategoryid").change(function () {
                 var MaterialCategoryMasterId_ = $('#MaterialCategoryid').val();
@@ -316,10 +518,6 @@
             data: { MaterialCategoryMasterId: MaterialCategoryMasterId_ },
             success: function (cities) {
                 var $materialGroup = $("#MaterialGroupid");
-
-                //if ($materialGroup[0].tomselect) {
-                //    $materialGroup[0].tomselect.destroy();
-                //}
                 $materialGroup.empty();
                 $materialGroup.append(
                     $('<option></option>').val('').html("please select")
@@ -329,13 +527,6 @@
                             $('<option></option>').val(city.MaterialGroupMasterId).html(city.GroupName)
                         );
                     });
-                //new TomSelect("#MaterialGroupMasterId", {
-                //    create: false,
-                //    sortField: {
-                //        field: "text",
-                //        direction: "asc"
-                //    }
-                //});
             }
 
         });

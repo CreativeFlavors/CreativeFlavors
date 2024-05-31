@@ -10,7 +10,6 @@ namespace MMS.Web.Models.StockModel
     public class ParentBillofMaterial
     {
         public int Bomid { get; set; }
-
         public string Bomno { get; set; }
 
         public string Description { get; set; }
@@ -21,6 +20,7 @@ namespace MMS.Web.Models.StockModel
         public string materialgroup { get; set; }
         public DateTime? Date { get; set; }
         public List<Parentbommatertial> bomMaterialGridList { get; set; }
+        public List<subassemblydata> bomsubassemblyGridList { get; set; }
         public string Lastbom { get; set; }
 
         public bool IsActive { get; set; } = true;
@@ -37,7 +37,7 @@ namespace MMS.Web.Models.StockModel
 
         public DateTime? Deleteddate { get; set; }
         public int Bommaterialid { get; set; }
-
+        public int subassemblyid { get; set; }
         public int Productid { get; set; }
 
         public int MaterialCategoryid { get; set; }

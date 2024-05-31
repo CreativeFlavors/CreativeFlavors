@@ -286,6 +286,18 @@ namespace MMS.Data
                 throw;
             }
         }
+        public List<MMS.Data.StoredProcedureModel.subassemblydata> SearchsubassemblyList(int bom_id)
+        {
+            try
+            {
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.subassemblydata>("SELECT * FROM get_subassembly_materials(@p0)", bom_id).ToList();
+                return ResultList;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
         public List<MMS.Core.Entities.Stock.StockAdjustmentGridDetails> SearchBookStockList(int Store, DateTime From, int Category, int Group, int MaterialType)
         {
             var ResultList = context.Database.SqlQuery<MMS.Core.Entities.Stock.StockAdjustmentGridDetails>("Execute spStockStatementwithSizeRange28 @StoreNo={0}, @From ={1},@Category ={2},@Group ={3},@MaterialType ={4}", Store, From, Category, Group, MaterialType).ToList();

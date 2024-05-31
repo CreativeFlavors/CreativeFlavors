@@ -2,9 +2,12 @@
 using MMS.Common;
 using MMS.Core.Entities;
 using MMS.Core.Entities.Stock;
+using MMS.Data.StoredProcedureModel;
 using MMS.Repository.Managers;
 using MMS.Repository.Managers.StockManager;
 using MMS.Web.Models.Addressdetails;
+using MMS.Web.Models.CustomerTransaction;
+using MMS.Web.Models.Material;
 using MMS.Web.Models.StockModel;
 using System;
 using System.Collections.Generic;
@@ -76,34 +79,21 @@ namespace MMS.Web.Controllers.Stock
 
             return Json(ParentBillofMaterial, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult BOMmaterialSearch(string filter,int bomid)
+        public ActionResult BOMmaterialSearch(string filter, int bomid)
         {
-            List<parentbom_material> ParentBillofMaterial = new List<parentbom_material>();
-            Parentbom_materialManager ParentbomManager = new Parentbom_materialManager();
-            MaterialNameManager MaterialNameManager = new MaterialNameManager();
-            var name = MaterialNameManager.Get();
-            var namelist=name.Where(x=>x.MaterialDescription.ToLower().Trim() == filter.ToLower().Trim()).ToList();
+            Parentbom_materialManager parentbom_MaterialManager = new Parentbom_materialManager();
+            var datas = parentbom_MaterialManager.GetBomList(bomid);
 
+            var namelist = datas.Where(x => x.MaterialNames != null && x.MaterialNames.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
+            return Json(namelist, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult BOMsubassemblySearch(string filter, int bomid)
+        {
+            subassemblyManager subassemblyManager = new subassemblyManager();
+            var datas = subassemblyManager.GetBomList(bomid);
 
-
-
-
-
-            //var data = ParentbomManager.Get();
-            //var list = data.Where(x => x.BomNo.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
-            //var Addressdetailslist = list;
-            //foreach (var i in Addressdetailslist)
-            //{
-            //    ParentBillofMaterial parentBillofMaterial = new ParentBillofMaterial();
-            //    parentBillofMaterial.Bomid = i.BomId;
-            //    parentBillofMaterial.Bomno = i.BomNo;
-            //    parentBillofMaterial.Description = i.Description;
-            //    parentBillofMaterial.Date = i.Date;
-            //    ParentBillofMaterial.Add(parentBillofMaterial);
-            //}
-
-
-            return Json(ParentBillofMaterial, JsonRequestBehavior.AllowGet);
+            var namelist = datas.Where(x => x.productname != null && x.productname.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
+            return Json(namelist, JsonRequestBehavior.AllowGet);
         }
         public ActionResult BillOfMaterialDetails()
         {
@@ -126,46 +116,75 @@ namespace MMS.Web.Controllers.Stock
 
         #region Curd Operation
         [HttpPost]
-        public ActionResult BillOfMaterialDetails(ParentBillofMaterial model)
+        public ActionResult SubAssemblyDetails(ParentBillofMaterial model)
         {
-            if (model.Bomid == 0)
+            if (model.subassemblyid == 0)
             {
-                parentbom parentboms = new parentbom();
-                parentbom parentbomsexists = new parentbom();
-
-                ParentbomManager manager = new ParentbomManager();
-                parentboms.BomNo = model.Bomno;
-                parentboms.Description = model.Description;
-                parentboms.Date = model.Date;
-                parentboms.LastBom = model.Lastbom;
-                string AlertMessage = "";
-                parentbomsexists = manager.GetBomNO(model.Bomno);
-                if (parentbomsexists == null && model.Bomid == 0)
+                if (model.Bomid == 0)
                 {
-                    parentboms = manager.Post(parentboms);
-                    AlertMessage = "Saved Successfully";
+                    parentbom parentboms = new parentbom();
+                    parentbom parentbomsexists = new parentbom();
+
+                    ParentbomManager manager = new ParentbomManager();
+                    parentboms.BomNo = model.Bomno;
+                    parentboms.Description = model.Description;
+                    parentboms.Date = model.Date;
+                    parentboms.LastBom = model.Lastbom;
+                    string AlertMessage = "";
+                    parentbomsexists = manager.GetBomNO(model.Bomno);
+                    if (parentbomsexists == null && model.Bomid == 0)
+                    {
+                        parentboms = manager.Post(parentboms);
+                        AlertMessage = "Saved Successfully";
+                    }
+                    else if (parentbomsexists != null && parentboms.BomId == 0)
+                    {
+                        AlertMessage = "Already Existed";
+                        return Json(AlertMessage, JsonRequestBehavior.AllowGet);
+                    }
+
+                    subassembly subassembly = new subassembly();
+                    subassemblyManager subassemblyManager = new subassemblyManager();
+                    subassembly.BomId = parentboms.BomId;
+                    subassembly.ProductId = model.Productid;
+                    subassembly.RequiredQty = model.Requiredqty;
+                    var bOMMaterial = subassemblyManager.Post(subassembly);
+                    return Json(new { bomid = parentboms.BomId, AlertMessage = AlertMessage, bomids = parentboms.BomId }, JsonRequestBehavior.AllowGet);
                 }
-                else if (parentbomsexists != null && parentboms.BomId == 0)
+
+                else
                 {
-                    AlertMessage = "Already Existed";
-                    return Json(AlertMessage, JsonRequestBehavior.AllowGet);
+                    parentbom parentboms = new parentbom();
+                    parentbom parentbomsexists = new parentbom();
+
+                    ParentbomManager manager = new ParentbomManager();
+                    parentboms.BomNo = model.Bomno;
+                    parentboms.Description = model.Description;
+                    parentboms.Date = model.Date;
+                    parentboms.LastBom = model.Lastbom;
+                    string AlertMessage = "";
+                    parentbomsexists = manager.GetBomNO(model.Bomno);
+                    if (parentbomsexists == null && model.Bomid == 0)
+                    {
+                        parentboms = manager.Post(parentboms);
+                        AlertMessage = "Saved Successfully";
+                    }
+                    else if (parentbomsexists != null && parentboms.BomId != 0)
+                    {
+                        AlertMessage = "Already Existed";
+                        return Json(AlertMessage, JsonRequestBehavior.AllowGet);
+                    }
+                    subassembly subassembly = new subassembly();
+                    subassemblyManager subassemblyManager = new subassemblyManager();
+                    subassembly.BomId = model.Bomid;
+                    subassembly.ProductId = model.Productid;
+                    subassembly.RequiredQty = model.Requiredqty;
+                    var bOMMaterial = subassemblyManager.Post(subassembly);
+                    AlertMessage = "Updated Successfully";
+                    return Json(new { bomid = parentboms.BomId, AlertMessage = AlertMessage, update = model.Bomid }, JsonRequestBehavior.AllowGet);
+
                 }
-
-
-                parentbom_material parentbom_Material = new parentbom_material();
-                Parentbom_materialManager parentbom_materialManager = new Parentbom_materialManager();
-
-                parentbom_Material.BomID = parentboms.BomId;
-                parentbom_Material.ProductId = model.Productid;
-                parentbom_Material.MaterialCategory = model.MaterialCategoryid;
-                parentbom_Material.MaterialGroupId = model.MaterialGroupid;
-                parentbom_Material.MaterialMasterId = model.MaterialMasterid;
-                parentbom_Material.UomId = model.Uomid;
-                parentbom_Material.RequiredQty = model.Requiredqty;
-                var bOMMaterial = parentbom_materialManager.Post(parentbom_Material);
-                return Json(new { bomid = parentboms.BomId, AlertMessage = AlertMessage, bomids = parentboms.BomId }, JsonRequestBehavior.AllowGet);
             }
-
             else
             {
                 parentbom parentboms = new parentbom();
@@ -188,11 +207,128 @@ namespace MMS.Web.Controllers.Stock
                     AlertMessage = "Already Existed";
                     return Json(AlertMessage, JsonRequestBehavior.AllowGet);
                 }
+                subassembly subassembly = new subassembly();
+                subassemblyManager subassemblyManager = new subassemblyManager();
+                subassembly.BomId = model.Bomid;
+                subassembly.ProductId = model.Productid;
+                subassembly.RequiredQty = model.Requiredqty;
+                subassembly.SubassemblyId = model.subassemblyid;
+                var bOMMaterial = subassemblyManager.Put(subassembly);
+                AlertMessage = "Updated Successfully";
+                return Json(new { bomid = parentboms.BomId, AlertMessage = AlertMessage, update = model.Bomid }, JsonRequestBehavior.AllowGet);
+            }
+
+        }
+        [HttpPost]
+        public ActionResult BillOfMaterialDetails(ParentBillofMaterial model)
+        {
+            if (model.Bommaterialid == 0)
+            {
+                if (model.Bomid == 0)
+                {
+                    parentbom parentboms = new parentbom();
+                    parentbom parentbomsexists = new parentbom();
+
+                    ParentbomManager manager = new ParentbomManager();
+                    parentboms.BomNo = model.Bomno;
+                    parentboms.Description = model.Description;
+                    parentboms.Date = model.Date;
+                    parentboms.LastBom = model.Lastbom;
+                    string AlertMessage = "";
+                    parentbomsexists = manager.GetBomNO(model.Bomno);
+                    if (parentbomsexists == null && model.Bomid == 0)
+                    {
+                        parentboms = manager.Post(parentboms);
+                        AlertMessage = "Saved Successfully";
+                    }
+                    else if (parentbomsexists != null && parentboms.BomId == 0)
+                    {
+                        AlertMessage = "Already Existed";
+                        return Json(AlertMessage, JsonRequestBehavior.AllowGet);
+                    }
+
+
+                    parentbom_material parentbom_Material = new parentbom_material();
+                    Parentbom_materialManager parentbom_materialManager = new Parentbom_materialManager();
+
+                    parentbom_Material.BomID = parentboms.BomId;
+                    parentbom_Material.ProductId = model.Productid;
+                    parentbom_Material.MaterialCategory = model.MaterialCategoryid;
+                    parentbom_Material.MaterialGroupId = model.MaterialGroupid;
+                    parentbom_Material.MaterialMasterId = model.MaterialMasterid;
+                    parentbom_Material.UomId = model.Uomid;
+                    parentbom_Material.RequiredQty = model.Requiredqty;
+                    var bOMMaterial = parentbom_materialManager.Post(parentbom_Material);
+                    return Json(new { bomid = parentboms.BomId, AlertMessage = AlertMessage, bomids = parentboms.BomId }, JsonRequestBehavior.AllowGet);
+                }
+
+                else
+                {
+                    parentbom parentboms = new parentbom();
+                    parentbom parentbomsexists = new parentbom();
+
+                    ParentbomManager manager = new ParentbomManager();
+                    parentboms.BomNo = model.Bomno;
+                    parentboms.Description = model.Description;
+                    parentboms.Date = model.Date;
+                    parentboms.LastBom = model.Lastbom;
+                    string AlertMessage = "";
+                    parentbomsexists = manager.GetBomNO(model.Bomno);
+                    if (parentbomsexists == null && model.Bomid == 0)
+                    {
+                        parentboms = manager.Post(parentboms);
+                        AlertMessage = "Saved Successfully";
+                    }
+                    else if (parentbomsexists != null && parentboms.BomId != 0)
+                    {
+                        AlertMessage = "Already Existed";
+                        return Json(AlertMessage, JsonRequestBehavior.AllowGet);
+                    }
+
+
+                    parentbom_material parentbom_Material = new parentbom_material();
+                    Parentbom_materialManager parentbom_materialManager = new Parentbom_materialManager();
+
+                    parentbom_Material.BomID = model.Bomid;
+                    parentbom_Material.ProductId = model.Productid;
+                    parentbom_Material.MaterialCategory = model.MaterialCategoryid;
+                    parentbom_Material.MaterialGroupId = model.MaterialGroupid;
+                    parentbom_Material.MaterialMasterId = model.MaterialMasterid;
+                    parentbom_Material.UomId = model.Uomid;
+                    parentbom_Material.RequiredQty = model.Requiredqty;
+                    var bOMMaterial = parentbom_materialManager.Post(parentbom_Material);
+                    AlertMessage = "Updated Successfully";
+                    return Json(new { bomid = parentboms.BomId, AlertMessage = AlertMessage, update = model.Bomid }, JsonRequestBehavior.AllowGet);
+
+                }
+            }
+            else
+            {
+                parentbom parentboms = new parentbom();
+                parentbom parentbomsexists = new parentbom();
+
+                ParentbomManager manager = new ParentbomManager();
+                parentboms.BomNo = model.Bomno;
+                parentboms.Description = model.Description;
+                parentboms.Date = model.Date;
+                parentboms.LastBom = model.Lastbom;
+                string AlertMessage = "";
+                parentbomsexists = manager.GetBomNO(model.Bomno);
+                if (parentbomsexists != null && parentboms.BomId != 0)
+                {
+                    parentboms = manager.Post(parentboms);
+                    AlertMessage = "Saved Successfully";
+                }
+                else if (parentbomsexists != null && parentboms.BomId != 0)
+                {
+                    AlertMessage = "Already Existed";
+                    return Json(AlertMessage, JsonRequestBehavior.AllowGet);
+                }
 
 
                 parentbom_material parentbom_Material = new parentbom_material();
                 Parentbom_materialManager parentbom_materialManager = new Parentbom_materialManager();
-
+                parentbom_Material.BomMaterialId = model.Bommaterialid;
                 parentbom_Material.BomID = model.Bomid;
                 parentbom_Material.ProductId = model.Productid;
                 parentbom_Material.MaterialCategory = model.MaterialCategoryid;
@@ -200,11 +336,12 @@ namespace MMS.Web.Controllers.Stock
                 parentbom_Material.MaterialMasterId = model.MaterialMasterid;
                 parentbom_Material.UomId = model.Uomid;
                 parentbom_Material.RequiredQty = model.Requiredqty;
-                var bOMMaterial = parentbom_materialManager.Post(parentbom_Material);
+                var bOMMaterial = parentbom_materialManager.Put(parentbom_Material);
                 AlertMessage = "Updated Successfully";
                 return Json(new { bomid = parentboms.BomId, AlertMessage = AlertMessage, update = model.Bomid }, JsonRequestBehavior.AllowGet);
 
             }
+
         }
         public ActionResult EditBOMDetails(int BOMID)
         {
@@ -216,11 +353,12 @@ namespace MMS.Web.Controllers.Stock
             MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
             MaterialNameManager materialNameManager = new MaterialNameManager();
             MaterialGroupManager materialGroupManager = new MaterialGroupManager();
+            subassemblyManager subassemblyManager = new subassemblyManager();
             UOMManager uomManager = new UOMManager();
 
             parentboms = manager.Getbomid(BOMID);
             var datas = parentbom_MaterialManager.GetBomList(BOMID);
-
+            var sunassembly = subassemblyManager.GetBomList(BOMID);
             if (parentboms != null)
             {
                 model.Bomid = parentboms.BomId;
@@ -229,9 +367,79 @@ namespace MMS.Web.Controllers.Stock
                 model.Description = parentboms.Description;
                 model.Lastbom = parentboms.LastBom;
                 model.bomMaterialGridList = datas;
+                model.bomsubassemblyGridList = sunassembly;
 
             }
             return View("~/Views/Stock/BillOfMaterial/BillOfMaterialDetails.cshtml", model);
+        }
+        public ActionResult EditBOMmaterialDetails(int BOMID, int BOMMaterialID)
+        {
+            ParentbomManager manager = new ParentbomManager();
+            parentbom parentboms = new parentbom();
+            Parentbom_materialManager parentbom_MaterialManager = new Parentbom_materialManager();
+            ParentBillofMaterial model = new ParentBillofMaterial();
+            ProductManager productManager = new ProductManager();
+            MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
+            MaterialNameManager materialNameManager = new MaterialNameManager();
+            MaterialGroupManager materialGroupManager = new MaterialGroupManager();
+            subassemblyManager subassemblyManager = new subassemblyManager();
+            UOMManager uomManager = new UOMManager();
+
+            parentboms = manager.Getbomid(BOMID);
+            var datas = parentbom_MaterialManager.GetBomList(BOMID);
+            var subassembly = subassemblyManager.GetBomList(BOMID);
+            var material = parentbom_MaterialManager.Getbommaterialid(BOMMaterialID);
+            var namematerial = materialNameManager.GetMaterialNameMaterial(material.MaterialMasterId);
+
+            if (parentboms != null)
+            {
+                model.Bomid = parentboms.BomId;
+                model.Bomno = parentboms.BomNo;
+                model.Date = parentboms.Date;
+                model.Description = parentboms.Description;
+                model.Lastbom = parentboms.LastBom;
+                model.Productid = material.ProductId;
+                model.MaterialCategoryid = material.MaterialCategory;
+                model.MaterialGroupid = material.MaterialGroupId;
+                model.MaterialMasterid = namematerial.MaterialMasterID;
+                model.Uomid = material.UomId;
+                model.Requiredqty = material.RequiredQty;
+                model.Bommaterialid = material.BomMaterialId;
+                model.bomMaterialGridList = datas;
+                model.bomsubassemblyGridList = subassembly;
+
+            }
+            return PartialView("~/Views/Stock/BillOfMaterial/BillOfMaterialDetails.cshtml", model);
+        }
+        public ActionResult EditSubassemblyDetails(int BOMID, int BOMsubassemblyID)
+        {
+            ParentbomManager manager = new ParentbomManager();
+            parentbom parentboms = new parentbom();
+            Parentbom_materialManager parentbom_MaterialManager = new Parentbom_materialManager();
+            ParentBillofMaterial model = new ParentBillofMaterial();
+            MaterialNameManager materialNameManager = new MaterialNameManager();
+            subassemblyManager subassemblyManager = new subassemblyManager();
+
+            parentboms = manager.Getbomid(BOMID);
+            var datas = parentbom_MaterialManager.GetBomList(BOMID);
+            var subassembly = subassemblyManager.GetBomList(BOMID);
+            var material = subassemblyManager.Getbommaterialid(BOMsubassemblyID);
+
+            if (parentboms != null)
+            {
+                model.Bomid = parentboms.BomId;
+                model.Bomno = parentboms.BomNo;
+                model.Date = parentboms.Date;
+                model.Description = parentboms.Description;
+                model.Lastbom = parentboms.LastBom;
+                model.Productid = material.ProductId;
+                model.Requiredqty = material.RequiredQty;
+                model.subassemblyid = material.SubassemblyId;
+                model.bomMaterialGridList = datas;
+                model.bomsubassemblyGridList = subassembly;
+
+            }
+            return PartialView("~/Views/Stock/BillOfMaterial/BillOfMaterialDetails.cshtml", model);
         }
         [HttpDelete]
         public ActionResult BOMGridDelete(int BomId)
@@ -258,6 +466,20 @@ namespace MMS.Web.Controllers.Stock
             {
                 status = "Success";
                 ParentbomManager.Delete(parentbom.BomMaterialId);
+            }
+            return Json(status, JsonRequestBehavior.AllowGet);
+        }
+        [HttpDelete]
+        public ActionResult BOMsubassemblyDelete(int BOMsubassemblyid)
+        {
+            subassemblyManager subassemblyManager = new subassemblyManager();
+            string status = "";
+            subassembly subassembly = new subassembly();
+            subassembly = subassemblyManager.Getsubassemblyid(BOMsubassemblyid);
+            if (subassembly != null)
+            {
+                status = "Success";
+                subassemblyManager.Delete(subassembly.SubassemblyId);
             }
             return Json(status, JsonRequestBehavior.AllowGet);
         }
