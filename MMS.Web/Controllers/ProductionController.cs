@@ -59,7 +59,7 @@ namespace MMS.Web.Controllers
                 ViewBag.TotalPages = totalPages;
                 ViewBag.CurrentPage = page;
                 ViewBag.PageSize = pageSize;
-                return PartialView("partial/ProductionGrid");
+                return PartialView("~/Views/Production/Partial/ProductionGrid.cshtml");
             }
             catch (Exception ex)
             {
@@ -142,11 +142,13 @@ namespace MMS.Web.Controllers
                 {
                     ProductionManager productionManager = new ProductionManager();
                     production = productionManager.Getproductionid(model.ProductionId);
-
+                    ProductManager productManager = new ProductManager();
+                    product products = new product();
+                    products = productManager.GetId(model.ProductId);
 
                     // Check if the production status has changed to "packing" means update the finishedgood table
                     if (model.ProductionStatus == 7)
-                    {
+                     {
                         // Update the FinishedGood table with relevant data from Production table
                         FinishedGoodManager finishedGoodManager = new FinishedGoodManager();
                         FinishedGood existingFinishedGood = finishedGoodManager.GetByProductCode(model.ProductCode);
@@ -165,12 +167,79 @@ namespace MMS.Web.Controllers
                                 StoreCode = production.StoreCode,
                                 Quantity = production.ProductionQty,
                                 ProductCode = production.ProductCode,
+                                UpdatedDate=DateTime.Now,
+                                Price= products.Price,
+                                ProductType=products.ProductType
                                 // Add other properties as needed
                             };
 
                             finishedGoodManager.Post(finishedGood);
                         }
 
+                    }
+                      // Update status history table when status changes from 2 Inprogress
+                      else if (model.ProductionStatus == 2)
+                        {
+                            StatusHistoryManager statusHistoryManager = new StatusHistoryManager();
+                            StatusHistory statusHistory = new StatusHistory
+                            {
+                                ProductCode = production.ProductCode,
+                                InProgressCode = production.ProductionStatus,
+                                InProgressDate = DateTime.Now, 
+                                InProgressBy = production.CreatedBy,
+                                ProductId= production.ProductId 
+                                                          
+                            };
+
+                        statusHistoryManager.Post(statusHistory);
+                        }
+                    // Update status history table when status changes from 3 pending
+                    else if (model.ProductionStatus == 3)
+                    {
+                        StatusHistoryManager statusHistoryManager = new StatusHistoryManager();
+                        StatusHistory statusHistory = new StatusHistory
+                        {
+                            ProductCode = production.ProductCode,
+                            PendingCode = production.ProductionStatus,
+                            PendingDate = DateTime.Now,
+                            PendingBy = production.CreatedBy,
+                            ProductId = production.ProductId
+
+                        };
+
+                        statusHistoryManager.Post(statusHistory);
+                    }
+                    // Update status history table when status changes from 4 qualitychecking
+                    else if (model.ProductionStatus == 4)
+                    {
+                        StatusHistoryManager statusHistoryManager = new StatusHistoryManager();
+                        StatusHistory statusHistory = new StatusHistory
+                        {
+                            ProductCode = production.ProductCode,
+                            QualityCheckingCode = production.ProductionStatus,
+                            QualityCheckingDate = DateTime.Now,
+                            QualityCheckingBy = production.CreatedBy,
+                            ProductId = production.ProductId
+
+                        };
+
+                        statusHistoryManager.Post(statusHistory);
+                    }
+                    // Update status history table when status changes from 6 sequence
+                    else if (model.ProductionStatus == 6)
+                    {
+                        StatusHistoryManager statusHistoryManager = new StatusHistoryManager();
+                        StatusHistory statusHistory = new StatusHistory
+                        {
+                            ProductCode = production.ProductCode,
+                            SequenceCode = production.ProductionStatus,
+                            SequenceDate = DateTime.Now,
+                            SequenceBy = production.CreatedBy,
+                            ProductId = production.ProductId
+
+                        };
+
+                        statusHistoryManager.Post(statusHistory);
                     }
 
                     production.ProductionId = model.ProductionId;
@@ -276,7 +345,7 @@ namespace MMS.Web.Controllers
                 int lastIndex = lastBatchCode.LastIndexOf('/');
                 string sequentialPart = lastBatchCode.Substring(lastIndex + 1);
                 int lastSequentialNumber = int.Parse(sequentialPart);
-                nextSequentialNumber = lastSequentialNumber + 1;
+                 nextSequentialNumber = lastSequentialNumber + 1;
             }
             // Format the next sequential number
             string formattedSequentialNumber = nextSequentialNumber.ToString("0000");

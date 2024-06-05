@@ -182,17 +182,19 @@
                         <form action="#" style="margin-bottom: 26px;">
                             <div class="row">
                                 <div class="col-lg-3 col-md-2 col-sm-12">
-                                    @Html.RadioButtonFor(model => model.Productions, "0", new { @id = "0", @class = "with-gap" })
-                                    <label for="0">Productions</label>
+                                    @Html.RadioButtonFor(model => model.Productions,true, new { @class = "with-gap", id = "productions" })
+                                    <label for="productions">Productions</label>
                                 </div>
                                 <div class="col-lg-3 col-md-2 col-sm-12">
-                                    @Html.RadioButtonFor(model => model.Productions, "1", new { @id = "1", @class = "with-gap" })
-                                    <label for="1">Sub Assembly</label>
+                                    @Html.RadioButtonFor(model => model.SubAssembly, true, new { @class = "with-gap", id = "subassembly" })
+                                    <label for="subassembly">Sub Assembly</label>
                                 </div>
                                 <div class="col-lg-3 col-md-2 col-sm-12">
-                                    @Html.RadioButtonFor(model => model.Productions, "2", new { @id = "2", @class = "with-gap" })
-                                    <label for="2">Inprogress</label>
+                                    @Html.RadioButtonFor(model => model.Inprogress, true, new { @class = "with-gap", id = "inprogress" })
+                                    <label for="inprogress">In Progress</label>
                                 </div>
+
+
                                 <div class="col-lg-3 col-md-6 col-sm-12" style="margin-top:-15px">
                                     <div class="input-part">
                                         <label class="font-14" for="#StoreCode">Store Code</label>
@@ -336,6 +338,33 @@
     @*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>*@
 
     <script>
+        $(document).ready(function () {
+            // Click event handler for the "Productions" radio button
+            $("#productions").click(function () {
+                // Uncheck the other two radio buttons
+                $("#subassembly").prop("checked", false);
+                $("#inprogress").prop("checked", false);
+            });
+
+            // Click event handler for the "Sub Assembly" radio button
+            $("#subassembly").click(function () {
+                // Uncheck the other two radio buttons
+                $("#productions").prop("checked", false);
+                $("#inprogress").prop("checked", false);
+            });
+
+            // Click event handler for the "In Progress" radio button
+            $("#inprogress").click(function () {
+                // Uncheck the other two radio buttons
+                $("#productions").prop("checked", false);
+                $("#subassembly").prop("checked", false);
+            });
+        });
+
+
+    </script>
+
+    <script>
         //for productionqty changed materiallist grid qty change function
         $(document).ready(function () {
             var prevProductionQty = ""; // Variable to store the previous value of ProductionQty
@@ -443,19 +472,10 @@
             @{
     var ProductionId = Model != null ? Model.ProductionId.ToString() : ""; // Check if Model is not null before accessing its properties
 }
-            var bool = $("input[name='Productions']:checked").val(); // Get the selected radio button value
-            var productionValue = false;
-            var subassemblyValue = false;
-            var inprogressValue = false;
-
-            // Set the boolean values based on the selected radio button value
-            if (bool == "0") {
-                productionValue = true;
-            } else if (bool == "1") {
-                subassemblyValue = true;
-            } else if (bool == "2") {
-                inprogressValue = true;
-            }
+            var productionValue = $("input[name='Productions']").is(":checked");
+            var subassemblyValue = $("input[name='SubAssembly']").is(":checked");
+            var inprogressValue = $("input[name='Inprogress']").is(":checked");
+            
 
             var ProductionDate = $("#ProductionDate").val();
             var ProductCode = $("#ProductCode").val();
