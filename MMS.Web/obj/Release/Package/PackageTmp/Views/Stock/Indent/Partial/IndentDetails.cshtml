@@ -1287,7 +1287,7 @@
         $('#list-amended-material tr#' + arg + '').remove();
         if($('.issueTypecls option:selected').text()=="General")
         {
-            
+            debugger;
             mrpNO=$('#MRPNO').val();
             $.ajax({
                 type: 'POST',
@@ -1600,6 +1600,7 @@
                 type: 'GET',
                 data: { MRPNO: InternalOrderid},
                 success: function (data) {
+                    debugger;
                     console.log(data);
                     if(data.Satus=="AlredayExist")
                     {
@@ -1735,7 +1736,7 @@
     });
 
     $(function () {
-        
+        debugger;
         $('.issueTypecls').change(function () {
             if ($('#OrderType option:selected').text() == "General") {
                 $("#MRPID").hide();
@@ -1990,56 +1991,53 @@
     })
 
     $(function () {
-        debugger
         $("#MaterialName").combobox({
-            select: function() {
+            select: function () {
+                debugger;
                 var materialName = $('#MaterialName').val();
-                $("#MaterialName").append("<option value='0'>Please Select </option>");
                 $.ajax({
                     url: '/MaterialMaster/PurchaseOrderFillMaterialNameBasedonColor',
                     type: "GET",
                     dataType: "JSON",
                     data: { MaterialNameID: materialName },
-                    success: function (cities) {
-                        if (cities.BalanceStock != null&&cities.BalanceStock !="") {
-                            $("#StoreStock").val(cities.BalanceStock);
-                        }
-                        else{
+                    success: function (data) {
+                        if (data.BalanceStock != null && data.BalanceStock != "") {
+                            $("#StoreStock").val(data.BalanceStock);
+                        } else {
                             $("#StoreStock").val(0);
                         }
                         $("#StoreStock").prop("disabled", true);
-                        $.each(cities.Material, function (i, city) {
-                            $('.colorval').val(city.ColorMasterId);
-                            document.getElementById("ColourId").readOnly = true;
 
+                        // Populate intendqty field
+                        $('#IntendQty').val(data.StockRequired);
+
+                        // Populate other fields
+                        $.each(data.Material, function (i, city) {
+                            $('.colorval').val(city.ColorMasterId);
                             $('#ColourId').val(city.ColorMasterId);
                             $('#UOMId').val(city.Uom);
                             $('#StoreId').val(city.StoreMasterId);
                             $('#Rate').val(city.Price);
                             $('#MaterialCatId').val(city.MaterialCategoryMasterId);
-                            $("#MaterialCatId").combobox('destroy') ;
-                            $("#MaterialCatId").combobox() ;
                             $('#MaterialGrpId').val(city.MaterialGroupMasterId);
-                            $("#MaterialGrpId").combobox('destroy') ;
-                            $("#MaterialGrpId").combobox();
                             $('#SizeRangeID').val(city.SizeRangeMasterId);
                             $('#SubstanceMasterID').val(city.SubstanceMasterId);
                             document.getElementById("ColourId").disabled = true;
-                            var count = 1;
-                            var totalQty = 0;
-                            $("#sizeRangeTable tbody").html("");
-                            for (var i = 0; i <= cities.SizeRange.length - 1; i++) {
-                                $("#sizeRangeTable tbody").append("<tr><td class='sizeVal'>" + cities.SizeRange[i].SizeRange + "</td><td><input class='qty_Total' type='text'  id='qtyId" + cities.SizeRange[i].Qty + "' style='width:50px;' onchange='CalculateTotal(this)' /></td><td><input type='text' class='sizeRate' id='Rate" + cities.SizeRange[i].Rate + "' value='" + cities.SizeRange[i].Rate + "' style='width:50px;' /></td></tr>");
-                                count++;
-                                totalQty += parseInt(totalQty);
-                            }
-                            $("#TotalCount").val(totalQty);
+
+                            // Populate size range table
+                            var sizeRangeTable = $("#sizeRangeTable tbody");
+                            sizeRangeTable.empty();
+                            $.each(city.SizeRange || [], function (j, sizeRange) {
+                                sizeRangeTable.append("<tr><td class='sizeVal'>" + sizeRange.SizeRange + "</td><td><input class='qty_Total' type='text'  id='qtyId" + sizeRange.Qty + "' style='width:50px;' onchange='CalculateTotal(this)' /></td><td><input type='text' class='sizeRate' id='Rate" + sizeRange.Rate + "' value='" + sizeRange.Rate + "' style='width:50px;' /></td></tr>");
+                            });
+
                         });
                     }
                 });
             }
         });
     });
+
     function CalculateTotal(agr1) {
 
         var buyerTotalcnt = 0;
@@ -2192,7 +2190,7 @@
         else {
             $('#MaterialName').css('border-color', '');
         }
-        
+        debugger;
         if ($('#OrderType option:selected').text() != 'General' && $('#OrderTypeID option:selected').text() != 'General')
         {
             if ($('#ReqQty').val() == "") {

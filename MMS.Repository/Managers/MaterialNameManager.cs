@@ -115,7 +115,7 @@ namespace MMS.Repository.Managers
             return MaterialNameMaster;
         }
 
-        public tbl_materialnamemaster GetMaterialNameMaterial(int MaterialMasterID)
+        public tbl_materialnamemaster GetMaterialNameMaterial(int? MaterialMasterID)
         {
             tbl_materialnamemaster MaterialNameMaster = new tbl_materialnamemaster();
             if (MaterialMasterID != 0)

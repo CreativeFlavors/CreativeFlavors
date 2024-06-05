@@ -10,8 +10,8 @@ namespace MMS.Core
     public abstract class BaseEntity
     {
         [Column("createddate")]
-        public DateTime? CreatedDate { get; set; } = DateTime.Now;
+        public DateTime? CreatedDate { get; set; } 
         [Column("updateddate")]
-        public DateTime? UpdatedDate { get; set; } = DateTime.Now;
+        public DateTime? UpdatedDate { get; set; } 
     }
 }
