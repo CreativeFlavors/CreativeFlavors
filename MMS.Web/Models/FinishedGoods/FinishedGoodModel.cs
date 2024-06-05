@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MMS.Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -9,7 +10,7 @@ namespace MMS.Web.Models.FinishedGoods
     {
         public int Id { get; set; }
         public string ProductCode { get; set; }
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
         public decimal Cost { get; set; }
         public int StoreCode { get; set; }
         public decimal Quantity { get; set; }
@@ -26,5 +27,7 @@ namespace MMS.Web.Models.FinishedGoods
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
         public string Batchcode { get; set; }
+        public int ProductType { get; set; }
+        public product products { get; set; }
     }
 }

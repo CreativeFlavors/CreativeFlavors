@@ -73,6 +73,9 @@ namespace MMS.Data.Mapping
             Property(t => t.Batchcode)
                 .HasColumnName("batchcode");
 
+            Property(t => t.ProductType)
+                .HasColumnName("producttype");
+
             ToTable("finishedgood");
         }    
     }
