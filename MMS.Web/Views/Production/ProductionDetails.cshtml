@@ -182,7 +182,7 @@
                         <form action="#" style="margin-bottom: 26px;">
                             <div class="row">
                                 <div class="col-lg-3 col-md-2 col-sm-12">
-                                    @Html.RadioButtonFor(model => model.Productions,true, new { @class = "with-gap", id = "productions" })
+                                    @Html.RadioButtonFor(model => model.Productions, true, new { @class = "with-gap", id = "productions" })
                                     <label for="productions">Productions</label>
                                 </div>
                                 <div class="col-lg-3 col-md-2 col-sm-12">
@@ -285,7 +285,14 @@
                         </div>
                     </div>
 
-                    <div class="inner-section-button mt-4">
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#ProductionDueDate">Production Duedate</label>
+                            @Html.TextBoxFor(m => m.ProductionDueDate, "{0:dd-MM-yyyy}", new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
+                        </div>
+                    </div>
+
+                    <div class="inner-section-button mt-4" id="productions1">
 
                         <button class="fill-color font-15" type="submit" onclick="Save('@(Model != null ? Model.ProductionId.ToString() : "")')">
                             SAVE
@@ -298,30 +305,47 @@
                             </button>
                         </a>
                     </div>
+
+                    <div class="inner-section-button mt-4" id="subassembly1">
+
+                        <button class="fill-color font-15" type="submit" onclick="Save('@(Model != null ? Model.ProductionId.ToString() : "")')">
+                            ADD
+                        </button>
+
+                        <a href="/Production/ProductionMaster">
+                            <button class="border-color font-15">
+
+                                CANCEL
+                            </button>
+                        </a>
+                    </div>
+
+                </div>
+                <br />
+                <br />
+                <div class="sheet_pair_2 mob_padding col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <!-- <div class="col-xs-12 block-section"> -->
+                    <div id="no-more-tables" class="col-xs-12 no-padding hole_table">
+                        <h5 style="margin-left:31px">Material List</h5>
+                        <br />
+                        <table style="margin-left:31px" id="table_grid" class="col-md-8 table-striped table-condensed cf table-change home_dahboard color_table">
+                            <thead>
+                                <tr>
+                                    <th>S NO</th>
+                                    <th>Material Name</th>
+                                    <th>Qty</th>
+                                </tr>
+                            </thead>
+                            <tbody ID="table_grid_ROW" class="common-table-head">
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- </div> -->
+
                 </div>
 
-
-        </section>
-        <div class="sheet_pair_2 mob_padding col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <!-- <div class="col-xs-12 block-section"> -->
-            <div id="no-more-tables" class="col-xs-12 no-padding hole_table">
-                <h5 style="margin-left:31px">Material List</h5>
-                <br />
-                <table style="margin-left:31px" id="table_grid" class="col-md-8 table-striped table-condensed cf table-change home_dahboard color_table">
-                    <thead>
-                        <tr>
-                            <th>S NO</th>
-                            <th>Material Name</th>
-                            <th>Qty</th>
-                        </tr>
-                    </thead>
-                    <tbody ID="table_grid_ROW" class="common-table-head">
-                    </tbody>
-                </table>
-            </div>
-            <!-- </div> -->
-
-        </div>
+</section>
+       
 
     </div>
 
@@ -339,8 +363,11 @@
 
     <script>
         $(document).ready(function () {
+            $("#subassembly1").hide();
             // Click event handler for the "Productions" radio button
             $("#productions").click(function () {
+                $("#subassembly1").hide();
+                $("#productions1").show();
                 // Uncheck the other two radio buttons
                 $("#subassembly").prop("checked", false);
                 $("#inprogress").prop("checked", false);
@@ -348,6 +375,8 @@
 
             // Click event handler for the "Sub Assembly" radio button
             $("#subassembly").click(function () {
+                $("#subassembly1").show();
+                $("#productions1").hide();
                 // Uncheck the other two radio buttons
                 $("#productions").prop("checked", false);
                 $("#inprogress").prop("checked", false);
@@ -524,10 +553,32 @@
                         if (data.includes("Inserted")) {
                             alert("Production Saved successfully");
                             location.href = "/Production/ProductionGrid";
-                        } else if (data.includes("Updated")) {
+                        }
+                        else if (data.includes("Updated")) {
+                            alert("Production updated successfully");
+                            location.href = "/Production/ProductionGrid";
+                        } 
+                        else if (data.includes("Packing")) {
                             alert("Product Moved to packing successfully");
                             location.href = "/Production/ProductionGrid";
-                        } else {
+                        } 
+                        else if (data.includes("Inprogress")) {
+                            alert("Product Moved to Inprogress");
+                            location.href = "/Production/ProductionGrid";
+                        }
+                        else if (data.includes("Pending")) {
+                            alert("Product Moved to pending");
+                            location.href = "/Production/ProductionGrid";
+                        }
+                        else if (data.includes("qualitychecking")) {
+                            alert("Product Moved to qualitychecking");
+                            location.href = "/Production/ProductionGrid";
+                        }
+                        else if (data.includes("Sequence")) {
+                            alert("Product Moved to sequence");
+                            location.href = "/Production/ProductionGrid";
+                        }
+                        else {
                             alert('Operation failed. Please try again.');
                         }
                     },
