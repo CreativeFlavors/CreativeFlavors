@@ -101,11 +101,14 @@ namespace MMS.Web.Controllers
             {
                 Production production = new Production();
                 string status = "";
+                ProductionManager productionManager = new ProductionManager();
+                production = productionManager.Getproductionid(model.ProductionId);
+                ProductManager productManager = new ProductManager();
+                product products = new product();
+                products = productManager.GetId(model.ProductId);
 
                 if (model.ProductionId == 0)
                 {
-                    ProductionManager productionManager = new ProductionManager();
-
                     production.ProductionId = model.ProductionId;
                     production.ProductionDate = model.ProductionDate;
                     production.ProductCode = model.ProductCode;
@@ -140,107 +143,6 @@ namespace MMS.Web.Controllers
                 }
                 else
                 {
-                    ProductionManager productionManager = new ProductionManager();
-                    production = productionManager.Getproductionid(model.ProductionId);
-                    ProductManager productManager = new ProductManager();
-                    product products = new product();
-                    products = productManager.GetId(model.ProductId);
-
-                    // Check if the production status has changed to "packing" means update the finishedgood table
-                    if (model.ProductionStatus == 7)
-                     {
-                        // Update the FinishedGood table with relevant data from Production table
-                        FinishedGoodManager finishedGoodManager = new FinishedGoodManager();
-                        FinishedGood existingFinishedGood = finishedGoodManager.GetByProductCode(model.ProductCode);
-                        if (existingFinishedGood != null)
-                        {
-                            // Update quantity to finishedgood table
-                            existingFinishedGood.Quantity += model.ProductionQty;
-                            finishedGoodManager.Put(existingFinishedGood);
-                        }
-                        else
-                        {
-                            //insert new record to finishedgood table
-                            FinishedGood finishedGood = new FinishedGood
-                            {
-                                Batchcode = production.ProductionCode,
-                                StoreCode = production.StoreCode,
-                                Quantity = production.ProductionQty,
-                                ProductCode = production.ProductCode,
-                                UpdatedDate=DateTime.Now,
-                                Price= products.Price,
-                                ProductType=products.ProductType
-                                // Add other properties as needed
-                            };
-
-                            finishedGoodManager.Post(finishedGood);
-                        }
-
-                    }
-                      // Update status history table when status changes from 2 Inprogress
-                      else if (model.ProductionStatus == 2)
-                        {
-                            StatusHistoryManager statusHistoryManager = new StatusHistoryManager();
-                            StatusHistory statusHistory = new StatusHistory
-                            {
-                                ProductCode = production.ProductCode,
-                                InProgressCode = production.ProductionStatus,
-                                InProgressDate = DateTime.Now, 
-                                InProgressBy = production.CreatedBy,
-                                ProductId= production.ProductId 
-                                                          
-                            };
-
-                        statusHistoryManager.Post(statusHistory);
-                        }
-                    // Update status history table when status changes from 3 pending
-                    else if (model.ProductionStatus == 3)
-                    {
-                        StatusHistoryManager statusHistoryManager = new StatusHistoryManager();
-                        StatusHistory statusHistory = new StatusHistory
-                        {
-                            ProductCode = production.ProductCode,
-                            PendingCode = production.ProductionStatus,
-                            PendingDate = DateTime.Now,
-                            PendingBy = production.CreatedBy,
-                            ProductId = production.ProductId
-
-                        };
-
-                        statusHistoryManager.Post(statusHistory);
-                    }
-                    // Update status history table when status changes from 4 qualitychecking
-                    else if (model.ProductionStatus == 4)
-                    {
-                        StatusHistoryManager statusHistoryManager = new StatusHistoryManager();
-                        StatusHistory statusHistory = new StatusHistory
-                        {
-                            ProductCode = production.ProductCode,
-                            QualityCheckingCode = production.ProductionStatus,
-                            QualityCheckingDate = DateTime.Now,
-                            QualityCheckingBy = production.CreatedBy,
-                            ProductId = production.ProductId
-
-                        };
-
-                        statusHistoryManager.Post(statusHistory);
-                    }
-                    // Update status history table when status changes from 6 sequence
-                    else if (model.ProductionStatus == 6)
-                    {
-                        StatusHistoryManager statusHistoryManager = new StatusHistoryManager();
-                        StatusHistory statusHistory = new StatusHistory
-                        {
-                            ProductCode = production.ProductCode,
-                            SequenceCode = production.ProductionStatus,
-                            SequenceDate = DateTime.Now,
-                            SequenceBy = production.CreatedBy,
-                            ProductId = production.ProductId
-
-                        };
-
-                        statusHistoryManager.Post(statusHistory);
-                    }
 
                     production.ProductionId = model.ProductionId;
                     production.ProductionDate = model.ProductionDate;
@@ -273,6 +175,109 @@ namespace MMS.Web.Controllers
                     productionManager.Put(production);
                     status = "Updated";
                 }
+
+                // Check if the production status has changed to "packing" means update the finishedgood table
+                if (model.ProductionStatus == 7)
+                     {
+                        // Update the FinishedGood table with relevant data from Production table
+                        FinishedGoodManager finishedGoodManager = new FinishedGoodManager();
+                        FinishedGood existingFinishedGood = finishedGoodManager.GetByProductCode(model.ProductCode);
+                        if (existingFinishedGood != null)
+                        {
+                            // Update quantity to finishedgood table
+                            existingFinishedGood.Quantity += model.ProductionQty;
+                            finishedGoodManager.Put(existingFinishedGood);
+                            status = "Packing";
+                        }
+                        else
+                        {
+                            //insert new record to finishedgood table
+                            FinishedGood finishedGood = new FinishedGood
+                            {
+                                Batchcode = production.ProductionCode,
+                                StoreCode = production.StoreCode,
+                                Quantity = production.ProductionQty,
+                                ProductCode = production.ProductCode,
+                                UpdatedDate=DateTime.Now,
+                                Price= products.Price,
+                                ProductType=products.ProductType
+                                // Add other properties as needed
+                            };
+
+                            finishedGoodManager.Post(finishedGood);
+                            status = "Packing";
+                        }
+
+                    }
+                      // Update status history table when status changes from 2 Inprogress
+                      else if (model.ProductionStatus == 2)
+                        {
+                            StatusHistoryManager statusHistoryManager = new StatusHistoryManager();
+                            StatusHistory statusHistory = new StatusHistory
+                            {
+                                ProductCode = production.ProductCode,
+                                InProgressCode = production.ProductionStatus,
+                                InProgressDate = DateTime.Now, 
+                                InProgressBy = production.CreatedBy,
+                                ProductId= production.ProductId 
+                                                          
+                            };
+
+                        statusHistoryManager.Post(statusHistory);
+                        status = "Inprogress";  
+                       }
+                    // Update status history table when status changes from 3 pending
+                    else if (model.ProductionStatus == 3)
+                    {
+                        StatusHistoryManager statusHistoryManager = new StatusHistoryManager();
+                        StatusHistory statusHistory = new StatusHistory
+                        {
+                            ProductCode = production.ProductCode,
+                            PendingCode = production.ProductionStatus,
+                            PendingDate = DateTime.Now,
+                            PendingBy = production.CreatedBy,
+                            ProductId = production.ProductId
+
+                        };
+
+                        statusHistoryManager.Post(statusHistory);
+                        status = "Pending";
+                    }
+                    // Update status history table when status changes from 4 qualitychecking
+                    else if (model.ProductionStatus == 4)
+                    {
+                        StatusHistoryManager statusHistoryManager = new StatusHistoryManager();
+                        StatusHistory statusHistory = new StatusHistory
+                        {
+                            ProductCode = production.ProductCode,
+                            QualityCheckingCode = production.ProductionStatus,
+                            QualityCheckingDate = DateTime.Now,
+                            QualityCheckingBy = production.CreatedBy,
+                            ProductId = production.ProductId
+
+                        };
+
+                        statusHistoryManager.Post(statusHistory);
+                        status = "qualitychecking";
+                    }
+                    // Update status history table when status changes from 6 sequence
+                    else if (model.ProductionStatus == 6)
+                    {
+                        StatusHistoryManager statusHistoryManager = new StatusHistoryManager();
+                        StatusHistory statusHistory = new StatusHistory
+                        {
+                            ProductCode = production.ProductCode,
+                            SequenceCode = production.ProductionStatus,
+                            SequenceDate = DateTime.Now,
+                            SequenceBy = production.CreatedBy,
+                            ProductId = production.ProductId
+
+                        };
+
+                        statusHistoryManager.Post(statusHistory);
+                        status = "Sequence";
+                    }
+
 
                 return Json(status, JsonRequestBehavior.AllowGet);
             }
