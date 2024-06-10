@@ -182,17 +182,19 @@
                         <form action="#" style="margin-bottom: 26px;">
                             <div class="row">
                                 <div class="col-lg-3 col-md-2 col-sm-12">
-                                    @Html.RadioButtonFor(model => model.Productions, "0", new { @id = "0", @class = "with-gap" })
-                                    <label for="0">Productions</label>
+                                    @Html.RadioButtonFor(model => model.Productions, true, new { @class = "with-gap", id = "productions" })
+                                    <label for="productions">Productions</label>
                                 </div>
                                 <div class="col-lg-3 col-md-2 col-sm-12">
-                                    @Html.RadioButtonFor(model => model.Productions, "1", new { @id = "1", @class = "with-gap" })
-                                    <label for="1">Sub Assembly</label>
+                                    @Html.RadioButtonFor(model => model.SubAssembly, true, new { @class = "with-gap", id = "subassembly" })
+                                    <label for="subassembly">Sub Assembly</label>
                                 </div>
                                 <div class="col-lg-3 col-md-2 col-sm-12">
-                                    @Html.RadioButtonFor(model => model.Productions, "2", new { @id = "2", @class = "with-gap" })
-                                    <label for="2">Inprogress</label>
+                                    @Html.RadioButtonFor(model => model.Inprogress, true, new { @class = "with-gap", id = "inprogress" })
+                                    <label for="inprogress">In Progress</label>
                                 </div>
+
+
                                 <div class="col-lg-3 col-md-6 col-sm-12" style="margin-top:-15px">
                                     <div class="input-part">
                                         <label class="font-14" for="#StoreCode">Store Code</label>
@@ -283,7 +285,14 @@
                         </div>
                     </div>
 
-                    <div class="inner-section-button mt-4">
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#ProductionDueDate">Production Duedate</label>
+                            @Html.TextBoxFor(m => m.ProductionDueDate, "{0:dd-MM-yyyy}", new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
+                        </div>
+                    </div>
+
+                    <div class="inner-section-button mt-4" id="productions1">
 
                         <button class="fill-color font-15" type="submit" onclick="Save('@(Model != null ? Model.ProductionId.ToString() : "")')">
                             SAVE
@@ -296,30 +305,47 @@
                             </button>
                         </a>
                     </div>
+
+                    <div class="inner-section-button mt-4" id="subassembly1">
+
+                        <button class="fill-color font-15" type="submit" onclick="Save('@(Model != null ? Model.ProductionId.ToString() : "")')">
+                            ADD
+                        </button>
+
+                        <a href="/Production/ProductionMaster">
+                            <button class="border-color font-15">
+
+                                CANCEL
+                            </button>
+                        </a>
+                    </div>
+
+                </div>
+                <br />
+                <br />
+                <div class="sheet_pair_2 mob_padding col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <!-- <div class="col-xs-12 block-section"> -->
+                    <div id="no-more-tables" class="col-xs-12 no-padding hole_table">
+                        <h5 style="margin-left:31px">Material List</h5>
+                        <br />
+                        <table style="margin-left:31px" id="table_grid" class="col-md-8 table-striped table-condensed cf table-change home_dahboard color_table">
+                            <thead>
+                                <tr>
+                                    <th>S NO</th>
+                                    <th>Material Name</th>
+                                    <th>Qty</th>
+                                </tr>
+                            </thead>
+                            <tbody ID="table_grid_ROW" class="common-table-head">
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- </div> -->
+
                 </div>
 
-
-        </section>
-        <div class="sheet_pair_2 mob_padding col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <!-- <div class="col-xs-12 block-section"> -->
-            <div id="no-more-tables" class="col-xs-12 no-padding hole_table">
-                <h5 style="margin-left:31px">Material List</h5>
-                <br />
-                <table style="margin-left:31px" id="table_grid" class="col-md-8 table-striped table-condensed cf table-change home_dahboard color_table">
-                    <thead>
-                        <tr>
-                            <th>S NO</th>
-                            <th>Material Name</th>
-                            <th>Qty</th>
-                        </tr>
-                    </thead>
-                    <tbody ID="table_grid_ROW" class="common-table-head">
-                    </tbody>
-                </table>
-            </div>
-            <!-- </div> -->
-
-        </div>
+</section>
+       
 
     </div>
 
@@ -334,6 +360,38 @@
 
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
     @*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>*@
+
+    <script>
+        $(document).ready(function () {
+            $("#subassembly1").hide();
+            // Click event handler for the "Productions" radio button
+            $("#productions").click(function () {
+                $("#subassembly1").hide();
+                $("#productions1").show();
+                // Uncheck the other two radio buttons
+                $("#subassembly").prop("checked", false);
+                $("#inprogress").prop("checked", false);
+            });
+
+            // Click event handler for the "Sub Assembly" radio button
+            $("#subassembly").click(function () {
+                $("#subassembly1").show();
+                $("#productions1").hide();
+                // Uncheck the other two radio buttons
+                $("#productions").prop("checked", false);
+                $("#inprogress").prop("checked", false);
+            });
+
+            // Click event handler for the "In Progress" radio button
+            $("#inprogress").click(function () {
+                // Uncheck the other two radio buttons
+                $("#productions").prop("checked", false);
+                $("#subassembly").prop("checked", false);
+            });
+        });
+
+
+    </script>
 
     <script>
         //for productionqty changed materiallist grid qty change function
@@ -443,19 +501,10 @@
             @{
     var ProductionId = Model != null ? Model.ProductionId.ToString() : ""; // Check if Model is not null before accessing its properties
 }
-            var bool = $("input[name='Productions']:checked").val(); // Get the selected radio button value
-            var productionValue = false;
-            var subassemblyValue = false;
-            var inprogressValue = false;
-
-            // Set the boolean values based on the selected radio button value
-            if (bool == "0") {
-                productionValue = true;
-            } else if (bool == "1") {
-                subassemblyValue = true;
-            } else if (bool == "2") {
-                inprogressValue = true;
-            }
+            var productionValue = $("input[name='Productions']").is(":checked");
+            var subassemblyValue = $("input[name='SubAssembly']").is(":checked");
+            var inprogressValue = $("input[name='Inprogress']").is(":checked");
+            
 
             var ProductionDate = $("#ProductionDate").val();
             var ProductCode = $("#ProductCode").val();
@@ -504,10 +553,32 @@
                         if (data.includes("Inserted")) {
                             alert("Production Saved successfully");
                             location.href = "/Production/ProductionGrid";
-                        } else if (data.includes("Updated")) {
+                        }
+                        else if (data.includes("Updated")) {
+                            alert("Production updated successfully");
+                            location.href = "/Production/ProductionGrid";
+                        } 
+                        else if (data.includes("Packing")) {
                             alert("Product Moved to packing successfully");
                             location.href = "/Production/ProductionGrid";
-                        } else {
+                        } 
+                        else if (data.includes("Inprogress")) {
+                            alert("Product Moved to Inprogress");
+                            location.href = "/Production/ProductionGrid";
+                        }
+                        else if (data.includes("Pending")) {
+                            alert("Product Moved to pending");
+                            location.href = "/Production/ProductionGrid";
+                        }
+                        else if (data.includes("qualitychecking")) {
+                            alert("Product Moved to qualitychecking");
+                            location.href = "/Production/ProductionGrid";
+                        }
+                        else if (data.includes("Sequence")) {
+                            alert("Product Moved to sequence");
+                            location.href = "/Production/ProductionGrid";
+                        }
+                        else {
                             alert('Operation failed. Please try again.');
                         }
                     },

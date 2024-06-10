@@ -18,7 +18,7 @@ namespace MMS.Core.Entities
         public string ProductCode { get; set; }
 
         [Column("price")]
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
 
         [Column("cost")]
         public decimal Cost { get; set; }
@@ -60,12 +60,15 @@ namespace MMS.Core.Entities
         public string UpdatedBy { get; set; }
 
         [Column("createddate")]
-        public DateTime CreatedDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
 
         [Column("updateddate")]
-        public DateTime UpdatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
 
         [Column("batchcode")]
         public string Batchcode { get; set; }
+
+        [Column("producttype")]
+        public int ProductType { get; set; }
     }
 }
