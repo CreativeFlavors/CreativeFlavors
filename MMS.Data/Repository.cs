@@ -274,6 +274,11 @@ namespace MMS.Data
             var ResultList = context.Database.SqlQuery<MMS.Core.Entities.Stock.Bom>("SELECT * FROM spSearchBom(@p0)", MaterialDescription).ToList();
             return ResultList;
         }
+        public List<MMS.Data.StoredProcedureModel.MRP_Details> MRP_DetailsList()
+        {
+            var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.MRP_Details>("SELECT * FROM get_mrp_details()").ToList();
+            return ResultList;
+        }
         public List<MMS.Data.StoredProcedureModel.Parentbommatertial> SearchBomMaterialList1(int bom_id)
         {
             try

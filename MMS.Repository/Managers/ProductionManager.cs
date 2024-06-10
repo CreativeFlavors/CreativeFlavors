@@ -50,7 +50,12 @@ namespace MMS.Repository.Managers
             }
             return result;
         }
-
+        public List<Production> Get()
+        {
+            List<Production> obj = new List<Production>();
+            obj = productionrep.Table.ToList<Production>();
+            return obj;
+        }
         public bool Put(Production arg)
         {
             bool result = false;

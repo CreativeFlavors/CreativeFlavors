@@ -63,6 +63,8 @@ namespace MMS.Core.Entities
         public string createdby { get; set; }
         [Column("updatedby")]
         public string Updatedby { get; set; }
+        [Column("status")]
+        public string Status { get; set; }
 
     }
 }

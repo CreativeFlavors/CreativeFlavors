@@ -65,8 +65,8 @@ namespace MMS.Web.Controllers.Stock
             ParentbomManager ParentbomManager = new ParentbomManager();
             var data = ParentbomManager.Get();
             var list = data.Where(x => x.BomNo.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
-            var Addressdetailslist = list;
-            foreach (var i in Addressdetailslist)
+            var detailslist = list;
+            foreach (var i in detailslist)
             {
                 ParentBillofMaterial parentBillofMaterial = new ParentBillofMaterial();
                 parentBillofMaterial.Bomid = i.BomId;

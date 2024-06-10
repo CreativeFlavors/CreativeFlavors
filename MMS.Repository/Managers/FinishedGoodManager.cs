@@ -29,6 +29,12 @@ namespace MMS.Repository.Managers
                 context.Dispose();
             }
         }
+        public List<FinishedGood> Get()
+        {
+            List<FinishedGood> obj = new List<FinishedGood>();
+            obj = finishedgoodrep.Table.ToList<FinishedGood>();
+            return obj;
+        }
         public bool Post(FinishedGood arg)
         {
             bool result = false;
