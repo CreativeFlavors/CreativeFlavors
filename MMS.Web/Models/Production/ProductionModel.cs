@@ -1,5 +1,6 @@
 ﻿using MMS.Core.Entities;
 using MMS.Core.Entities.JobWork;
+using MMS.Repository.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +38,7 @@ namespace MMS.Web.Models.Production
         public DateTime? DeletedDate { get; set; }
         public string CreatedBy { get; set; }
         public string UpdatedBy { get; set; }
+        public List<StatusProduction> statusproductions { get; set; }
         public string DeletedBy { get; set; }
         public bool Productions { get; set; }
         public bool SubAssembly { get; set; }

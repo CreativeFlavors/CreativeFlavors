@@ -68,12 +68,12 @@
                     <p class="font-16">@Model.GrnAmount</p>
                 </div>
                 <div class="customers-details-inner">
-                    <p class="font-16">Amount Paid</p>
-                    <p class="font-16"></p>
+                    <p class="font-16">GrnPaidAmount</p>
+                    <p class="font-16">@Model.GrnPaidAmount</p>
                 </div>
                 <div class="customers-details-inner">
-                    <p class="font-16">Balance Amount</p>
-                    <p class="font-16"></p>
+                    <p class="font-16">BalanceAmount</p>
+                    <p class="font-16">@Model.GrnBalanceAmount</p>
                 </div>
                 <div class="customers-details-inner">
                     <p class="font-16">Payment Due Date</p>
@@ -193,64 +193,73 @@
             });
         });
 
-      function Save() {
-      debugger;
-          var Supplier = "@Model.Supplier";
-          var Supplierid = "@Model.SupplierId";
-          var PaymentDate = "@Model.PaymentDate"
-          var PaymentAmount = "@Model.PaymentAmount"
-          var GrnRefNumber = "@Model.GrnRefNumber"
-          var GrnDate = "@Model.GrnDate"
-          var GrnDueDate = "@Model.GrnDueDate"
-          var GrnAmount = "@Model.GrnAmount"
-          var GrnPaidAmount = $("#GrnPaidAmount").val();
-          var GrnBalanceAmount = $("#GrnBalanceAmount").val();
-          var IsTransactionOnHold = $("#IsTransactionOnHold").val();
-          var PaymentRefNo = $("#PaymentRefNo").val();
-          var CreditNoteRef = $("#CreditNoteRef").val();
-          var CreditNoteValue = $("#CreditNoteValue").val();
-          var CreditNoteDate = $("#paymentid").val();
-          var paymentid = $("#paymentid").val();
-          var Cash = $("#Cash").val();
+        function Save() {
+            debugger;
+            if (@Model.GrnBalanceAmount == "0.00") {
+                alert("Full payment done already");
+            }
+            else {
 
-      var formdata = new FormData();
-          formdata.append("Supplier", Supplier);
-          formdata.append("Supplierid", Supplierid);
-          formdata.append("PaymentDate", PaymentDate);
-          formdata.append("PaymentAmount", PaymentAmount);
-          formdata.append("GrnRefNumber", GrnRefNumber);
-          formdata.append("GrnDate", GrnDate);
-          formdata.append("GrnDueDate", GrnDueDate);
-          formdata.append("GrnAmount", GrnAmount);
-          formdata.append("GrnPaidAmount", GrnPaidAmount);
-          formdata.append("GrnBalanceAmount", GrnBalanceAmount);
-          formdata.append("IsTransactionOnHold", IsTransactionOnHold);
-          formdata.append("PaymentRefNo", PaymentRefNo);
-          formdata.append("CreditNoteRef", CreditNoteRef);
-          formdata.append("CreditNoteValue", CreditNoteValue);
-          formdata.append("CreditNoteDate", CreditNoteDate);
-          formdata.append("paymentid", paymentid);
-          formdata.append("Cash", Cash);
+                var Supplier = "@Model.Supplier";
+                var Supplierid = "@Model.SupplierId";
+                var PaymentDate = "@Model.PaymentDate";
+                var PaymentAmount = $("#PaymentAmount").val();
+                var GrnRefNumber = "@Model.GrnRefNumber";
+                var GrnDate = "@Model.GrnDate";
+                var GrnDueDate = "@Model.GrnDueDate";
+                var GrnAmount = "@Model.GrnAmount";
+                var GrnPaidAmount = "@Model.GrnPaidAmount";
+                var GrnBalanceAmount = "@Model.GrnBalanceAmount";
+                var IsTransactionOnHold = $("#IsTransactionOnHold").val();
+                var PaymentRefNo = $("#PaymentRefNo").val();
+                var CreditNoteRef = $("#CreditNoteRef").val();
+                var CreditNoteValue = $("#CreditNoteValue").val();
+                var CreditNoteDate = $("#paymentid").val();
+                var paymentid = $("#paymentid").val();
+                var Cash = $("#Cash").val();
+                var Id = "@Model.Id";
 
-      $.ajax({
-          type: 'POST',
-          url: '/SupplierTransaction/SupplierTransactionDataInsert',
-          contentType: false,
-          processData: false,
-          dataType: 'html',
-          data: formdata,
-          success: function (data) {
+                var formdata = new FormData();
+                formdata.append("Supplier", Supplier);
+                formdata.append("Supplierid", Supplierid);
+                formdata.append("PaymentDate", PaymentDate);
+                formdata.append("PaymentAmount", PaymentAmount);
+                formdata.append("GrnRefNumber", GrnRefNumber);
+                formdata.append("GrnDate", GrnDate);
+                formdata.append("GrnDueDate", GrnDueDate);
+                formdata.append("GrnAmount", GrnAmount);
+                formdata.append("GrnPaidAmount", GrnPaidAmount);
+                formdata.append("GrnBalanceAmount", GrnBalanceAmount);
+                formdata.append("IsTransactionOnHold", IsTransactionOnHold);
+                formdata.append("PaymentRefNo", PaymentRefNo);
+                formdata.append("CreditNoteRef", CreditNoteRef);
+                formdata.append("CreditNoteValue", CreditNoteValue);
+                formdata.append("CreditNoteDate", CreditNoteDate);
+                formdata.append("paymentid", paymentid);
+                formdata.append("Cash", Cash);
+                formdata.append("Id", Id);
+                debugger;
 
-              alert('Saved Successfully.');
+                $.ajax({
+                    type: 'POST',
+                    url: '/SupplierTransaction/SupplierTransactionDataInsert',
+                    contentType: false,
+                    processData: false,
+                    dataType: 'html',
+                    data: formdata,
+                    success: function (data) {
 
-              location.href = "/SupplierTransaction/SupplierTransactionGrid";
-              return false;
+                        alert('Saved Successfully.');
 
-          }
+                        location.href = "/SupplierTransaction/SupplierTransactionGrid";
+                        return false;
 
-      });
+                    }
 
-  }
+                });
+
+            }
+        }
     </script>
 </body>
 

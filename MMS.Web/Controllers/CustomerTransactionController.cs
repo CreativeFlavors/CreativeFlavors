@@ -39,7 +39,6 @@ namespace MMS.Web.Controllers
             foreach (var item in Customertransactionlist)
             {
                 Customertransaction customertransaction = new Customertransaction();
-
                 customertransaction.InvDate = item.DocDate;
                 customertransaction.InvAmount = item.DocNetValue;
                 customertransaction.InvRefNumber = item.Id;

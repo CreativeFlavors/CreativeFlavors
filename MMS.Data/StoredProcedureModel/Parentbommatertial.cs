@@ -21,7 +21,7 @@ namespace MMS.Data.StoredProcedureModel
         [Column("materialgroup")]
         public string materialgroup { get; set; }
         [Column("requiredqty")]
-        public int Requiredqty { get; set; }
+        public decimal Requiredqty { get; set; }
         [Column("bommaterialid")]
         public int Bommaterialid { get; set; }
         [Column("bomid")]

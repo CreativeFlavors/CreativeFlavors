@@ -3,6 +3,7 @@ using MMS.Core.Entities;
 using MMS.Core.Entities.Stock;
 using MMS.Data;
 using MMS.Data.Mapping;
+using MMS.Data.StoredProcedureModel;
 using MMS.Repository.Service;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,20 @@ namespace MMS.Repository.Managers
         public void Dispose()
         {
             throw new NotImplementedException();
+        }
+        public List<MRP_Details> GetmrpList()
+        {
+            List<MRP_Details> MRP_Details = new List<MRP_Details>();
+            try
+            {
+                MRP_Details = salesorderrep.MRP_DetailsList();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return MRP_Details;
         }
         public bool Post(salesorder arg)
         {

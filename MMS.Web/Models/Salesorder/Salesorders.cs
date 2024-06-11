@@ -1,6 +1,8 @@
 ﻿using MMS.Core;
 using MMS.Core.Entities;
 using MMS.Core.Entities.Stock;
+using MMS.Data.StoredProcedureModel;
+using MMS.Web.Models.Production;
 using MMS.Web.Models.StockModel;
 using Org.BouncyCastle.Asn1.Mozilla;
 using System;
@@ -42,13 +44,17 @@ namespace MMS.Web.Models
         public bool taxinclusive { get; set; }
         public bool isactive { get; set; }
         public int createdby { get; set; }
+        public decimal SalesQuantity { get; set; }
+        public decimal AvailableStock { get; set; }
+        public DateTime ProductionDueDate { get; set; }
+        public decimal ProductionQty { get; set; }
+        public string Status { get; set; }
         public DateTime createddate { get; set; }
-
         public UomMaster UomMaster { get; set; }
         public TaxTypeMaster TaxTypeMaster { get; set; }
         public product product { get; set; }
         public BuyerMaster BuyerMaster { get; set; }
-
+        public List<MRP_Details> MRP_Detail { get; set; }
         public List<BOMMaterialListModel>  bOMMaterialListModels { get; set; }
     }
 }

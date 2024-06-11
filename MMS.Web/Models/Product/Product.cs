@@ -35,6 +35,7 @@ namespace MMS.Web.Models.Product
         public int MaterialCategoryMasterId { get; set; }
         public int ProductType { get; set; }
         public List<product> product { get; set; }
+        public List<Salesorders> salesorder { get; set; }
         public int StoreId { get; set; }
         public DateTime? productiontime { get; set; }
         public decimal MinStock { get; set; } = 0;

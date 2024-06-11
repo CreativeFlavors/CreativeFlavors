@@ -1,7 +1,9 @@
 ﻿@model MMS.Web.Models.Salesorders
 @using MMS.Repository.Managers
+@using Newtonsoft.Json
 
 @{
+    var bomlist = JsonConvert.SerializeObject(Model.bOMMaterialListModels);
     int a = 0;
 }
 <!DOCTYPE html>
@@ -19,9 +21,9 @@
         .modal-content {
             position: relative;
             display: flex;
-            margin-left: -59%;
+            margin-left: -70%;
             flex-direction: column;
-            width: 211%;
+            width: 240%;
             pointer-events: auto;
             background-color: #fff;
             background-clip: padding-box;
@@ -39,23 +41,18 @@
         }
 
         #table-scroll {
-            height: 247px;
+            height: 257px;
             overflow: auto;
-            /*            margin-top: 20px;
-        */
         }
 
         #table-wrapper table {
             width: 100%;
         }
-        /*    #table-wrapper table thead th .text {
-                        position: absolute;
-                        top: -20px;
-                        z-index: 2;
-                        height: 20px;
-                        width: 35%;
-                        border: 2px solid black;
-                    }*/
+
+        table td {
+            text-align: center;
+            color: #000;
+        }
     </style>
 
 </head>
@@ -91,12 +88,24 @@
                 </tr>
             </table>
         </div>
-        <p class="modal-title fs-4" id="list2">Material List</p>
-        <div id="table-wrapper">
+        <div class="d-flex justify-content-between">
+            <div>
+                <p class="modal-title fs-4" id="list2">Material List</p>
+            </div>
+            <div class="d-flex justify-content-end">
+                <img src="~/Content/assets/images/right arrow.png" width="6%" />
+                <div class="checkbox-wrapper-8">
+                    <input class="tgl tgl-skewed" id="cb3-8" type="checkbox" onclick="Filter()" />
+                    <label class="tgl-btn" data-tg-off="Show Details" data-tg-on="All Material" for="cb3-8" id="toggleBtn"></label>
+                </div>
+            </div>
+
+        </div>
+        <div id="table-wrapper" class="mt-4">
             <div id="table-scroll">
-                <table class="table table-bordered table-fixed" style="text-align: center; ">
+                <table class="table table-bordered table-fixed" style="text-align: center; width: 100%;">
                     <thead>
-                        <tr>
+                        <tr style="position: -webkit-sticky; position: sticky; top: 0; background-color: gray; color: #fff;">
                             <th><span class="text">S.No</span></th>
                             <th><span class="text">Material Item</span></th>
                             <th><span class="text">Type</span></th>
@@ -109,17 +118,18 @@
                             <th><span class="text">ETA</span></th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="sales">
 
 
-                        @if (ViewBag.TotalList != null)
+                        @if (Model.bOMMaterialListModels != null)
                         {
                             int count = 1;
-                            foreach (var i in ViewBag.TotalList)
+                            foreach (var i in Model.bOMMaterialListModels)
                             {
 
                                 if (i.MaterialOpeningMaster != null)
                                 {
+
                                     <tr>
                                         <td>@count</td>
                                         <td>@i.MaterialOpeningMaster.MaterialNames</td>
@@ -128,13 +138,11 @@
                                         <td>@i.MaterialOpeningMaster.UOMName</td>
                                         @if (i.MaterialOpeningMaster.Qty >= (i.RequiredQty * Model.quantity))
                                         {
-                                            <td>@( (i.RequiredQty * Model.quantity).ToString("0.00") )</td>
-
-
+                                            <td>@string.Format("{0:0.00}", (i.RequiredQty * Model.quantity))</td>
                                         }
                                         else
                                         {
-                                            <td style="color:red"><u>@((i.RequiredQty * Model.quantity))</u></td>
+                                            <td style="color:red"><u>@string.Format("{0:0.00}", (i.RequiredQty * Model.quantity))</u></td>
                                             a++;
 
                                         }
@@ -151,27 +159,12 @@
                                         <td>@i.MaterialOpeningMaster.UOMName </td>
                                         <td style="color: #b9b1b1">Null</td>
                                         <td style="color: #b9b1b1">Null</td>
-
-                                        @*@if (i.MaterialOpeningMaster.Qty <= (i.RequiredQty * Model.quantity))
-                                            {
-                                                <td>  <button class="btn btn-danger" id="Invoice">Raise Po</button></td>
-                                                                                        <td style="color:red"><u>@((i.RequiredQty * Model.quantity ?? 0).ToString("0.00"))</u></td>
-
-                                            }
-                                            else
-                                            {
-                                                <td style="color: #b9b1b1">Null</td>
-
-                                            }*@
                                     </tr>
                                     count++;
+
                                 }
 
                             }
-                        }
-                        else
-                        {
-                            <tr><td colspan="5">No data available</td></tr>
                         }
 
 
@@ -204,8 +197,102 @@
 
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
     <script>
+       var bomMaterialList = JSON.parse('@Html.Raw(bomlist)');
+
+function onFilterClick() {
+    $("#sales").empty();
+    var count = 1;
+    bomMaterialList.forEach(function (item) {
+        if (item.MaterialOpeningMaster != null) {
+            var consume = (item.RequiredQty * @Model.quantity).toFixed(2);
+            var shortage = ((item.RequiredQty * @Model.quantity) - item.MaterialOpeningMaster.Qty).toFixed(2);
+            if (item.MaterialOpeningMaster.Qty <= (item.RequiredQty * @Model.quantity)) {
+                $("#sales").append(`
+                    <tr>
+                        <td class="veh1-5">${count}</td>
+                        <td class="veh1-5">${item.MaterialOpeningMaster.MaterialNames}</td>
+                        <td class="veh1-5">MAT</td>
+                        <td class="veh1-5">${item.MaterialOpeningMaster.Qty}</td>
+                        <td class="veh1-5">${item.MaterialOpeningMaster.UOMName}</td>
+                        <td class="veh1-5" style="color:red"><u>${consume}</u></td>
+                        <td class="veh1-5" style="color:red"><u>${shortage}</u></td>
+                        <td class="veh1-5">${item.MaterialOpeningMaster.UOMName}</td>
+                        <td class="veh1-5" style="color: #b9b1b1">Null</td>
+                        <td class="veh1-5" style="color: #b9b1b1">Null</td>
+                    </tr>
+                `);
+                count++;
+            }
+        }
+    });
+}
+
+        function data() {
+            $("#sales").empty();
+            var count = 1;
+
+            bomMaterialList.forEach(function (item) {
+                if (item.MaterialOpeningMaster != null) {
+                    var consume = (item.RequiredQty * @Model.quantity).toFixed(2);
+                    var shortage;
+
+                    if (item.MaterialOpeningMaster.Qty <= consume) {
+                        shortage = (consume - item.MaterialOpeningMaster.Qty).toFixed(2);
+                    } else {
+                        shortage = 0;
+                    }
+
+                    var rowHtml = `
+                <tr>
+                    <td class="veh1-5">${count}</td>
+                    <td class="veh1-5">${item.MaterialOpeningMaster.MaterialNames}</td>
+                    <td class="veh1-5">MAT</td>
+                    <td class="veh1-5">${item.MaterialOpeningMaster.Qty}</td>
+                    <td class="veh1-5">${item.MaterialOpeningMaster.UOMName}</td>`;
+
+                    if (item.MaterialOpeningMaster.Qty <= consume) {
+                        rowHtml += `
+                    <td class="veh1-5" style="color:red">${consume}</td>
+                    <td class="veh1-5" style="color:red">${shortage}</td>`;
+                    } else {
+                        rowHtml += `
+                    <td class="veh1-5">${consume}</td>
+                    <td class="veh1-5">${shortage}</td>`;
+                    }
+
+                    rowHtml += `
+                    <td class="veh1-5">${item.MaterialOpeningMaster.UOMName}</td>
+                    <td class="veh1-5" style="color: #b9b1b1">Null</td>
+                    <td class="veh1-5" style="color: #b9b1b1">Null</td>
+                </tr>`;
+
+                    $("#sales").append(rowHtml);
+                    count++;
+                }
+            });
+        }
+
+
+
+    document.getElementById('toggleBtn').addEventListener('click', function() {
+        var toggleState = this.getAttribute('data-tg-off');
+        if (toggleState === "Show Details") {
+            onFilterClick();
+            this.setAttribute('data-tg-off', 'All Material');
+
+        } else {
+            this.setAttribute('data-tg-on', 'All Material');
+            this.setAttribute('data-tg-off', 'Show Details');
+            data();
+        }
+    });
+
+
+
+
         function Raise() {
             var salesorderid = @Model.SalesorderId;
+
             $.ajax({
                 type: 'POST',
                 url: '/SalesOrder/Tempsalesorder',
@@ -245,7 +332,7 @@ function RaiseProduction() {
             if (data == 'Success') {
                 Swal.fire({
                     title: 'Success!!',
-                    text: 'Fineshed Goods Successfully Moved To Production !',
+                    text: 'Move to Prod Queue !',
                     icon: 'success',
                     timer: 3000,
                     timerProgressBar: true,
@@ -259,7 +346,7 @@ function RaiseProduction() {
 
             }
             else {
-                Swal.fire("Alert", "Already This Material Moved to Production!", "error");
+                Swal.fire("Alert", "Already This Material Moved to Prod Queue!", "error");
             }
 
         }
