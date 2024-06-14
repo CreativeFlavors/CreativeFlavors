@@ -31,8 +31,6 @@ namespace MMS.Web.Controllers
             {
                 ProductionManager productionManager = new ProductionManager();
                 ProductManager productManager = new ProductManager();
-                //List<Production> productions = productionManager.Get();
-
 
                 var totaldata = from P in productionManager.GetProductions()
                                 join pr in productManager.Get() on P.ProductId equals pr.ProductId
@@ -85,13 +83,6 @@ namespace MMS.Web.Controllers
           
             return View(model);
         }
-
-        //public JsonResult GetProductionCode()
-        //{
-        //    // This method should only be used for generating a production code for new entries
-        //    string productionCode = GenerateBatchCode();
-        //    return Json(new { success = true, productionCode = productionCode }, JsonRequestBehavior.AllowGet);
-        //}
 
         #region Curd Operation
         [HttpPost]
@@ -184,7 +175,7 @@ namespace MMS.Web.Controllers
                         FinishedGood existingFinishedGood = finishedGoodManager.GetByProductCode(model.ProductCode);
                         if (existingFinishedGood != null)
                         {
-                            // Update quantity to finishedgood table
+                            //already quantity is there Update the stock quantity increased to finishedgood table
                             existingFinishedGood.Quantity += model.ProductionQty;
                             finishedGoodManager.Put(existingFinishedGood);
                             status = "Packing";

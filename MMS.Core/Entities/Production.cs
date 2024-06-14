@@ -43,7 +43,7 @@ namespace MMS.Core.Entities
             [Column("productionduedate")]
             public DateTime? ProductionDueDate { get; set; }
 
-            [Column("productionfullfilldate")]
+           [Column("productionfullfilldate")]
             public DateTime? ProductionFullfillDate { get; set; }
 
             [Column("refdocno")]

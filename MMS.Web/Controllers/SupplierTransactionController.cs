@@ -4,6 +4,8 @@ using MMS.Repository.Managers;
 using MMS.Repository.Managers.StockManager;
 using MMS.Repository.Service;
 using MMS.Web.Models.CustomerTransaction;
+using MMS.Web.Models.Product;
+using MMS.Web.Models.Production;
 using MMS.Web.Models.StockModel;
 using MMS.Web.Models.SupplierTransaction;
 using System;
@@ -18,7 +20,7 @@ namespace MMS.Web.Controllers
     public class SupplierTransactionController : Controller
     {
         [HttpGet]
-        public ActionResult SupplierTransactionGrid()
+        public ActionResult SupplierTransactionGrid(int page = 1, int pageSize = 8)
         {
             SupplierTransaction model = new SupplierTransaction();
 
@@ -53,34 +55,23 @@ namespace MMS.Web.Controllers
                 totalList.Add(supplierTransaction);
 
             }
-            totalList = totalList.OrderByDescending(x => x.Id).ToList();
+            var totalCount = totalList.Count();
+            int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+            int startIndex = (page - 1) * pageSize;
+            int endIndex = Math.Min(startIndex + pageSize - 1, totalCount - 1);
+            totalList = totalList.OrderByDescending(x => x.Id)
+                        .Skip(startIndex)
+                        .Take(pageSize)
+                        .ToList();
+            int startSerialNumber = startIndex + 1;
+            int endSerialNumber = startSerialNumber + totalList.Count - 1;
             ViewBag.TotalList = totalList;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
             return View(totalList);
-
-            //var totalList = (from d in suppliertransactionlist
-            //                 join b in supplierMasterManager.Get() on d.SupplierNameId equals b.SupplierMasterId
-            //                 select new SupplierTransaction
-            //                 {
-
-            //                     GrnAmount = d.TotalCost,
-            //                     GrnRefNumber = d.GrnNo,
-            //                     GrnDate = d.GrnDate,
-            //                     Grnqty = d.QtyAsPerDc,
-            //                     Id = d.GrnID,
-
-            //                     SupplierMaster = new SupplierMaster
-            //                     {
-            //                         SupplierName = b.SupplierName
-            //                     }
-
-            //                 })
-            //                 .OrderByDescending(x => x.GrnDate)
-            //                 .ToList();
-
-            //ViewBag.TotalLists = totalList;
-
-            //return View(model);
         }
+
         [HttpGet]
         public ActionResult SupplierTransaction(int id)
         {
@@ -130,49 +121,7 @@ namespace MMS.Web.Controllers
             return PartialView("SupplierTransaction", model);
         }
 
-        //public ActionResult SupplierTransactionGrid(int? page)
-        //{
-        //    int pageSize = 10; // Number of items per page
-        //    int pageNumber = page ?? 1; // Default to page 1 if no page number is specified
-
-        //    GrnManagerNew manager = new GrnManagerNew();
-        //    var suppliertransactionlist = manager.Get();
-        //    SupplierMasterManager supplierMasterManager = new SupplierMasterManager();
-
-        //    var paginatedList = (from d in suppliertransactionlist
-        //                         join b in supplierMasterManager.Get() on d.SupplierNameId equals b.SupplierMasterId
-        //                         select new SupplierTransaction
-        //                         {
-        //                             GrnAmount = d.TotalCost,
-        //                             GrnRefNumber = d.GrnNo,
-        //                             GrnDate = d.GrnDate,
-        //                             Grnqty = d.QtyAsPerDc,
-        //                             Id = d.GrnID,
-
-        //                             SupplierMaster = new SupplierMaster
-        //                             {
-        //                                 SupplierName = b.SupplierName
-        //                             }
-        //                         }).ToList()
-        //                         .Skip((pageNumber - 1) * pageSize)
-        //                         .Take(pageSize)
-        //                         .ToList();
-
-        //    int totalCount = suppliertransactionlist.Count;
-        //    int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
-        //    int startPage = Math.Max(1, pageNumber - 5);
-        //    int endPage = Math.Min(startPage + 9, totalPages);
-
-        //    ViewBag.CurrentPage = pageNumber;
-        //    ViewBag.PageSize = pageSize;
-        //    ViewBag.TotalCount = totalCount;
-        //    ViewBag.StartPage = startPage;
-        //    ViewBag.EndPage = endPage;
-
-        //    return View(paginatedList);
-        //}
-
-
+       
         [HttpPost]
         public ActionResult SupplierTransactionDataInsert(SupplierTransaction model)
         {
@@ -293,15 +242,54 @@ namespace MMS.Web.Controllers
         }
 
 
-        public ActionResult SupplierTransactionSearch(int supplierid)
+        [HttpGet]
+        public ActionResult SupplierTransactionSearch(string filter)
         {
-            List<supplierTransaction> supplierlist = new List<supplierTransaction>();
-            SupplierTransactionManager manager = new SupplierTransactionManager();
+            try
+            {
+                SupplierTransaction model = new SupplierTransaction();
 
-            // Assuming supplierId is the foreign key linking to the Supplier table
-            supplierlist = manager.Get().Where(x => x.Id == supplierid).ToList();
+                GrnManagerNew manager = new GrnManagerNew();
+                var suppliertransactionlist = manager.Get();
 
-            return Json(supplierlist, JsonRequestBehavior.AllowGet);
+                SupplierMasterManager supplierMasterManager = new SupplierMasterManager();
+                var data1 = supplierMasterManager.Get();
+
+                SupplierTransactionManager supplierTransactionManager = new SupplierTransactionManager();
+                var data2 = supplierTransactionManager.Get();
+
+                paymentmethodmanager paymentmethodmanager = new paymentmethodmanager();
+                var data3 = paymentmethodmanager.Get();
+
+                List<SupplierTransaction> totalList = new List<SupplierTransaction>();
+
+
+                foreach (var item in suppliertransactionlist)
+                {
+                    SupplierTransaction supplierTransaction = new SupplierTransaction();
+
+                    supplierTransaction.GrnDate = item.GrnDate;
+                    supplierTransaction.GrnAmount = item.TotalCost;
+                    supplierTransaction.GrnRefNumber = item.GrnNo;
+                    supplierTransaction.Grnqty = item.QtyAsPerDc;
+                    supplierTransaction.Id = item.GrnNo;
+                    supplierTransaction.SupplierMaster = data1.Where(W => W.SupplierMasterId == item.SupplierNameId).ToList().FirstOrDefault();
+                    supplierTransaction.suppliertransaction = data2.Where(W => W.GrnRefNumber == item.GrnNo).ToList().FirstOrDefault();
+
+
+                    totalList.Add(supplierTransaction);
+
+                }
+                // Filter productions based on the provided filter parameter
+                totalList = totalList.Where(x => x.SupplierMaster.SupplierName.ToLower().Contains(filter.ToLower())).ToList();
+
+                return Json(totalList, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions
+                return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
         }
 
 

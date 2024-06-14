@@ -126,7 +126,7 @@ namespace MMS.Core.Entities
         public string CreditDays { get; set; }
 
         [Column("accounttypeid")]
-        public int accounttypeid { get; set; }
+        public int? accounttypeid { get; set; }
 
     }
 }
