@@ -25,7 +25,7 @@ namespace MMS.Repository.Managers
         {
             throw new NotImplementedException();
         }
-        public accounttype GettypeId(int id)
+        public accounttype GettypeId(int? id)
         {
             accounttype accounttype = new accounttype();
             try
@@ -55,6 +55,11 @@ namespace MMS.Repository.Managers
                 Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
             return paymentList;
+        }
+
+        public accounttype GettypeId(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }
