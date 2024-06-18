@@ -243,7 +243,7 @@ namespace MMS.Web.Controllers
 
 
         [HttpGet]
-        public ActionResult SupplierTransactionSearch(string filter)
+        public ActionResult SupplierTransactionSearch(int Supplierid)
         {
             try
             {
@@ -266,23 +266,20 @@ namespace MMS.Web.Controllers
 
                 foreach (var item in suppliertransactionlist)
                 {
-                    SupplierTransaction supplierTransaction = new SupplierTransaction();
+                    if (item.SupplierNameId == Supplierid)
+                    {
+                        SupplierTransaction supplierTransaction = new SupplierTransaction();
 
-                    supplierTransaction.GrnDate = item.GrnDate;
-                    supplierTransaction.GrnAmount = item.TotalCost;
-                    supplierTransaction.GrnRefNumber = item.GrnNo;
-                    supplierTransaction.Grnqty = item.QtyAsPerDc;
-                    supplierTransaction.Id = item.GrnNo;
-                    supplierTransaction.SupplierMaster = data1.Where(W => W.SupplierMasterId == item.SupplierNameId).ToList().FirstOrDefault();
-                    supplierTransaction.suppliertransaction = data2.Where(W => W.GrnRefNumber == item.GrnNo).ToList().FirstOrDefault();
-
-
-                    totalList.Add(supplierTransaction);
-
+                        supplierTransaction.GrnDate = item.GrnDate;
+                        supplierTransaction.GrnAmount = item.TotalCost;
+                        supplierTransaction.GrnRefNumber = item.GrnNo;
+                        supplierTransaction.Grnqty = item.QtyAsPerDc;
+                        supplierTransaction.Id = item.GrnNo;
+                        supplierTransaction.SupplierMaster = data1.Where(W => W.SupplierMasterId == item.SupplierNameId).ToList().FirstOrDefault();
+                        supplierTransaction.suppliertransaction = data2.Where(W => W.GrnRefNumber == item.GrnNo).ToList().FirstOrDefault();
+                        totalList.Add(supplierTransaction);
+                    }
                 }
-                // Filter productions based on the provided filter parameter
-                totalList = totalList.Where(x => x.SupplierMaster.SupplierName.ToLower().Contains(filter.ToLower())).ToList();
-
                 return Json(totalList, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)

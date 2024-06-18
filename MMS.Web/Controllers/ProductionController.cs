@@ -147,7 +147,14 @@ namespace MMS.Web.Controllers
                     production.StoreCode = model.StoreCode;
                     production.ProductionPerDay = model.ProductionPerDay;
                     production.ProductionDueDate = model.ProductionDueDate;
-                    production.ProductionFullfillDate = model.ProductionFullfillDate;
+                    if (model.ProductionStatus == 7)
+                    {
+                       production.ProductionFullfillDate = DateTime.Now;
+                    }
+                    else
+                    {
+                       production.ProductionFullfillDate = model.ProductionFullfillDate;
+                    }
                     production.RefDocNo = model.RefDocNo;
                     production.RefDocDate = model.RefDocDate;
                     production.Status1Code = model.Status1Code;
@@ -191,8 +198,8 @@ namespace MMS.Web.Controllers
                                 ProductCode = production.ProductCode,
                                 UpdatedDate=DateTime.Now,
                                 Price= products.Price,
-                                ProductType=products.ProductType
-                                // Add other properties as needed
+                                ProductType=products.ProductType,
+                                
                             };
 
                             finishedGoodManager.Post(finishedGood);
@@ -392,9 +399,6 @@ namespace MMS.Web.Controllers
         #endregion
         public ActionResult GetBomMaterialForProduction(int productid)
         {
-
-
-            // Fetch the temp_production data for the given productid
             Temp_productionManager temp_ProductionManager = new Temp_productionManager();
             List<temp_production> temp_Productions = new List<temp_production>();
             temp_Productions = temp_ProductionManager.GetbomproductionMaterial(productid);
@@ -411,19 +415,9 @@ namespace MMS.Web.Controllers
             preproduction preproduction = new preproduction();
             preproduction = temp_preproductionManager.Getproductionqty(productid);
 
-
-            //int BomData = 0; // Default value in case temp_Productions is null
-            //decimal? Consume = 0;
-
-            //if (temp_Productions != null)
-            //{
-            //    BomData = temp_Productions[0].Bomid;
-            //    Consume= temp_Productions[0].Consume;
-            //}
-
             decimal? minstock = 0;
             decimal? maxstock = 0;
-            decimal? productionperday = 0;// Retrieve the productionperday value from your data source
+            decimal? productionperday = 0;
             string productcode = null;
 
             if (product != null)
@@ -433,7 +427,6 @@ namespace MMS.Web.Controllers
                 productionperday= product.ProductionPerDay;
                 productcode= product.ProductCode;
             }
-            //ViewBag.ProductionPerDay = productionperday;
 
             decimal? quantity = 0;
 
@@ -473,13 +466,7 @@ namespace MMS.Web.Controllers
                     consumes.Add((decimal)consume);
                 }
             }
-
-                       
-            // materialNames now contains the list of material names corresponding to the material IDs in bOMMaterials
-
-
             return Json(new { bomdata = materialNames,Consumeqty= consumes, Minstock= minstock,Maxstock=maxstock,RequiredQty= quantity, ProductionperDay = productionperday, ProductCode= productcode }, JsonRequestBehavior.AllowGet);
-
         }
 
     

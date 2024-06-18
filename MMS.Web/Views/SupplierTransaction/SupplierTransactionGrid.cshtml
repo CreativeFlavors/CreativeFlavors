@@ -66,7 +66,7 @@
 
                     <div id="transaction_reports_search4_container" class="reports_search_container_btn">
                         <button type="button" class="manage_customers_btn font-15">
-                            <a href="##" id="supplierid" onclick="Search()">FILTER</a>
+                            <a href="##" id="SearchID" onclick="Search()">FILTER</a>
                         </button>
                     </div>
                 </div>
@@ -274,40 +274,34 @@
             });
         }
 
-</script>
+    </script>
+
     <script>
         function Search() {
+            var supplierid = $("#supplierid").val();
             $.ajax({
                 type: "GET",
                 url: '/SupplierTransaction/SupplierTransactionSearch',
-                data: { filter: $('#SeaarchID').val() },
+                data: { Supplierid: supplierid },  
                 dataType: 'json',
                 success: function (data) {
                     $("tbody").empty();
-                    var count = 1;
-                    $.each(data, function (i, item) {
+                    var startSerialNumber = 1;
+                    $.each(data, function (index, i) { 
                         $("tbody").append(`
-                             <tr class="font-14">
-                                 <td>${count}</td>
-                                 <td>${item.MaterialCategoryMasterId}</td>
-                                 <td>${item.ProductCode}</td>
-                                 <td>${item.ProductName}</td>
-                                 <td>${item.ProductDesc}</td>
-                                 <td>${item.TaxMasterId}</td>
-                                 <td>${item.UomMasterId}</td>
-                                 <td>${item.Price}</td>
-                                 <td>${item.BomNo}</td>
-                                 <td class="veh-1 edit-del-wrap">
-                                     <a href="javascript:void(0)" onclick="Edit('${item.ProductId}')" class="watchlist-edit" title="Edit">
-                                         <img src="/Content/assets/images/edit-icon.png" />
-                                     </a>
-                                     <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('${item.ProductId}')" class="watchlist-delete" title="Delete">
-                                         <img src="/Content/assets/images/delete-icon.png" />
-                                     </a>
-                                 </td>
-                             </tr>
-                         `);
-                        count++;
+                            <tr class="font-14">
+                                <td>${startSerialNumber}</td>
+                                <td>${i.SupplierMaster != null ? i.SupplierMaster.SupplierName : ""}
+                                <td>${i.GrnRefNumber}</td>
+                                <td>${i.GrnDate}</td>
+                                <td>${i.GrnAmount}</td>
+                                <td>${i.suppliertransaction == null ? '0' : i.suppliertransaction.GrnPaidAmount ?? '0'}</td>  
+                                <td>${i.suppliertransaction == null ? i.GrnAmount : i.suppliertransaction.GrnBalanceAmount ?? '0'}</td>
+                                <td>${i.Grnqty}</td>
+                                <td><button class="btn btn-success" onclick="paynow('${i.Id}')" title="Pay Now">Pay Now</button></td>
+                            </tr>
+                        `);
+                        startSerialNumber++;
                     });
                 },
                 error: function (xhr, status, error) {
@@ -316,6 +310,7 @@
             });
         }
     </script>
+
 
 </body>
 </html>
