@@ -229,7 +229,7 @@ namespace MMS.Repository.Managers
             }
             return materialOpeningMaster;
         }
-        public MaterialOpeningMaster GetmaterialOpeningMaterialID(int MaterialId)
+        public MaterialOpeningMaster GetmaterialOpeningMaterialID(int? MaterialId)
         {
             MaterialOpeningMaster materialOpeningMaster = new MaterialOpeningMaster();
             if (MaterialId != 0)

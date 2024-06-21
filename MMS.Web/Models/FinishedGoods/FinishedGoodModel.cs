@@ -28,6 +28,7 @@ namespace MMS.Web.Models.FinishedGoods
         public DateTime UpdatedDate { get; set; }
         public string Batchcode { get; set; }
         public int ProductType { get; set; }
+        public int ProductId { get; set; }
         public product products { get; set; }
     }
 }

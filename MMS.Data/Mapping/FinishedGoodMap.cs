@@ -76,6 +76,9 @@ namespace MMS.Data.Mapping
             Property(t => t.ProductType)
                 .HasColumnName("producttype");
 
+            Property(t => t.ProductId)
+                .HasColumnName("productid");
+
             ToTable("finishedgood");
         }    
     }

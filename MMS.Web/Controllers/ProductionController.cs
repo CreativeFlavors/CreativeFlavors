@@ -2,6 +2,7 @@
 using MMS.Core.Entities;
 using MMS.Core.Entities.JobWork;
 using MMS.Core.Entities.Stock;
+using MMS.Data.StoredProcedureModel;
 using MMS.Repository.Managers;
 using MMS.Repository.Managers.JobWork;
 using MMS.Repository.Managers.StockManager;
@@ -185,7 +186,7 @@ namespace MMS.Web.Controllers
                             //already quantity is there Update the stock quantity increased to finishedgood table
                             existingFinishedGood.Quantity += model.ProductionQty;
                             finishedGoodManager.Put(existingFinishedGood);
-                            status = "Packing";
+                            status = "Packing"; 
                         }
                         else
                         {
@@ -199,6 +200,7 @@ namespace MMS.Web.Controllers
                                 UpdatedDate=DateTime.Now,
                                 Price= products.Price,
                                 ProductType=products.ProductType,
+                                ProductId=products.ProductId,
                                 
                             };
 
@@ -398,77 +400,139 @@ namespace MMS.Web.Controllers
 
         #endregion
         public ActionResult GetBomMaterialForProduction(int productid)
-        {
-            Temp_productionManager temp_ProductionManager = new Temp_productionManager();
-            List<temp_production> temp_Productions = new List<temp_production>();
-            temp_Productions = temp_ProductionManager.GetbomproductionMaterial(productid);
-
-            SalesorderManager salesorderManager = new SalesorderManager();
-            salesorder salesorder = new salesorder();
-            salesorder = salesorderManager.Getproductqty(productid);
-
-            ProductManager productManager = new ProductManager();
-            product product = new product();
-            product = productManager.GetId(productid);
-
-            Temp_productionManager temp_preproductionManager = new Temp_productionManager();
-            preproduction preproduction = new preproduction();
-            preproduction = temp_preproductionManager.Getproductionqty(productid);
-
+          {
+            // Initialize variables
             decimal? minstock = 0;
             decimal? maxstock = 0;
             decimal? productionperday = 0;
             string productcode = null;
+            decimal? quantity = 0;
 
+            // Retrieve data from managers
+            Temp_productionManager temp_ProductionManager = new Temp_productionManager();
+            List<temp_production> temp_Productions = temp_ProductionManager.GetbomproductionMaterial(productid);
+
+            ProductManager productManager = new ProductManager();
+            product product = productManager.GetId(productid);
+
+            Temp_productionManager temp_preproductionManager = new Temp_productionManager();
+            preproduction preproduction = temp_preproductionManager.Getproductionqty(productid);
+
+            // Populate variables based on retrieved data
             if (product != null)
             {
                 minstock = product.MinStock;
                 maxstock = product.MaxStock;
-                productionperday= product.ProductionPerDay;
-                productcode= product.ProductCode;
+                productionperday = product.ProductionPerDay;
+                productcode = product.ProductCode;
             }
 
-            decimal? quantity = 0;
-
-            if(preproduction != null)
+            if (preproduction != null)
             {
                 quantity = preproduction.Qty;
             }
 
-            //// Fetch BOM material based on Bomid
-            //BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
-            //Bom bom = billOfMaterialManager.GetbomId(BomData);
-
-            //BillOfMaterialManager billOfMaterialManagers = new BillOfMaterialManager();
-            //List<BOMMaterial> bOMMaterials = billOfMaterialManagers.Getbom(bom.BomId);
-
-            // Fetch material names based on material ids from bOMMaterials
-            MaterialNameManager MaterialNameManager = new MaterialNameManager();
-
+            // Fetch material names and consumption quantities  
             List<string> materialNames = new List<string>();
             List<decimal> consumes = new List<decimal>();
+
             foreach (var tempProductionItem in temp_Productions)
             {
-                // Call the GetMaterialName method to retrieve the tbl_materialnamemaster object
-                tbl_materialnamemaster materialInfo = MaterialNameManager.GetMaterialNameMaterial(tempProductionItem.MaterialId);
+                MaterialNameManager materialNameManager = new MaterialNameManager();
+                tbl_materialnamemaster materialInfo = materialNameManager.GetMaterialNameMaterial(tempProductionItem.MaterialId);
 
-                // Extract the material name from the retrieved object
-                string materialName = null;
-                decimal? consume = tempProductionItem.Consume;
                 if (materialInfo != null)
                 {
-                    materialName = materialInfo.MaterialDescription;
-                }
-
-                if (!string.IsNullOrEmpty(materialName))
-                {
-                    materialNames.Add(materialName);
-                    consumes.Add((decimal)consume);
+                    materialNames.Add(materialInfo.MaterialDescription);
+                    consumes.Add((decimal)tempProductionItem.Consume);
                 }
             }
-            return Json(new { bomdata = materialNames,Consumeqty= consumes, Minstock= minstock,Maxstock=maxstock,RequiredQty= quantity, ProductionperDay = productionperday, ProductCode= productcode }, JsonRequestBehavior.AllowGet);
+
+            List<string> Bommaterialname = new List<string>();
+            List<decimal?> requiredqty = new List<decimal?>();
+            List<string> uom=new List<string>();
+            List<decimal> stockqty = new List<decimal>();
+            ProductManager productManagers = new ProductManager();
+            product products = productManager.GetId(productid);
+            Parentbom_materialManager parentbom_MaterialManager = new Parentbom_materialManager();
+            List<parentbom_material> parentbom_Material = parentbom_MaterialManager.GetMaterialList(products.BomNo);
+
+            foreach (var parentBomMaterial in parentbom_Material)
+            {
+                MaterialNameManager materialNameManager = new MaterialNameManager();
+                tbl_materialnamemaster materialname = materialNameManager.GetMaterialNameMaterial(parentBomMaterial.MaterialMasterId);
+                if (materialname != null)
+                {
+                    Bommaterialname.Add(materialname.MaterialDescription);
+                    requiredqty.Add(parentBomMaterial.RequiredQty);
+                }
+
+                UOMManager uOMManager = new UOMManager();
+                UomMaster uomname = uOMManager.GetUomMasterId(parentBomMaterial.UomId);
+                if (uomname != null)
+                {
+                    uom.Add(uomname.ShortUnitName);
+                }
+
+                MaterialOpeningStockManager materialOpeningStockManager = new MaterialOpeningStockManager();
+                MaterialOpeningMaster materialOpeningstock = materialOpeningStockManager.GetmaterialOpeningMaterialID(parentBomMaterial.MaterialMasterId);
+                if (materialOpeningstock != null)
+                {
+                    stockqty.Add(materialOpeningstock.Qty);
+                }
+
+            }
+
+            List<string> Subassmblyname = new List<string>();
+            List<decimal?> Subassmblyrequiredqty = new List<decimal?>();
+            //List<string> Subassmblyuom = new List<string>();
+            List<decimal> Subassmblystockqty = new List<decimal>();
+            subassemblyManager subassemblyManager = new subassemblyManager();
+            List<subassembly> subassemblylist = subassemblyManager.GetsubassemblyList(products.BomNo);
+
+            foreach (var subassemblyitem in subassemblylist)
+            {
+                product product1 = productManager.GetId(subassemblyitem.ProductId);
+                if (product1 != null)
+                {
+                    Subassmblyname.Add(product1.ProductName);
+                    Subassmblyrequiredqty.Add(subassemblyitem.RequiredQty);
+                }
+
+                //UOMManager uOMManager = new UOMManager();
+                //UomMaster uomname = uOMManager.GetUomMasterId(subassemblyitem.uomid);
+                //if (uomname != null)
+                //{
+                //    uom.Add(uomname.ShortUnitName);
+                //}
+
+                FinishedGoodManager finishedGoodManager = new FinishedGoodManager();
+                FinishedGood finishedGood = finishedGoodManager.GetByfinsihedgoodqty(subassemblyitem.ProductId);
+                if (finishedGood != null)
+                {
+                    Subassmblystockqty.Add(finishedGood.Quantity);
+                }
+
+            }
+            return Json(new
+            {
+                bomdata = materialNames,
+                Consumeqty = consumes,
+                Minstock = minstock,
+                Maxstock = maxstock,
+                producttotalitems = quantity,
+                ProductionperDay = productionperday,
+                ProductCode = productcode,
+                BomMaterialNames = Bommaterialname,
+                BomRequiredQtys = requiredqty,
+                UOMs = uom,
+                StockOnHand = stockqty,
+                subassemblyname = Subassmblyname,
+                subassemblyrequiredqty = Subassmblyrequiredqty,
+                subassemblystockqty = Subassmblystockqty
+            }, JsonRequestBehavior.AllowGet);
         }
 
-    
+
     }
 }

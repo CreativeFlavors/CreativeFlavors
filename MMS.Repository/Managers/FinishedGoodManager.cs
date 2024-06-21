@@ -77,6 +77,8 @@ namespace MMS.Repository.Managers
                     model.LastTransQty = arg.LastTransQty;
                     model.LastTransDate = arg.LastTransDate;
                     model.Batchcode = arg.Batchcode;
+                    model.ProductType = arg.ProductType;
+                    model.ProductId = arg.ProductId;
                     model.CreatedDate = arg.CreatedDate;
                     model.UpdatedDate = DateTime.Now;
                     //model.CreatedBy = "";
@@ -111,6 +113,23 @@ namespace MMS.Repository.Managers
                 try
                 {
                     finishedgoodlist = finishedgoodrep.Table.Where(x => x.ProductCode == productcode).FirstOrDefault();
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+            }
+            return finishedgoodlist;
+        }
+
+        public FinishedGood GetByfinsihedgoodqty(int productid)
+        {
+            FinishedGood finishedgoodlist = new FinishedGood();
+            if (productid != null)
+            {
+                try
+                {
+                    finishedgoodlist = finishedgoodrep.Table.Where(x => x.ProductId == productid).FirstOrDefault();
                 }
                 catch (Exception ex)
                 {
