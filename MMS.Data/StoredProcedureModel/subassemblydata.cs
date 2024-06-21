@@ -12,7 +12,7 @@ namespace MMS.Data.StoredProcedureModel
         [Column("productname")]
         public string productname { get; set; }
         [Column("requiredqty")]
-        public int Requiredqty { get; set; }
+        public decimal? Requiredqty { get; set; }
         [Column("subassemblyid")]
         public int subassemblyid { get; set; }
         [Column("bomid")]

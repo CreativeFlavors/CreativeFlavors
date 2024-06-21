@@ -7,32 +7,34 @@ using System.Threading.Tasks;
 
 namespace MMS.Core.Entities
 {
-    [Table("Salesorder", Schema = "public")]
-    public class salesorder : BaseEntity
+    [Table("Salesorder_dt", Schema = "public")]
+    public class Salesorder_dt : BaseEntity
     {
         [System.ComponentModel.DataAnnotations.Key]
-        [Column("salesorderid")]
-        public int SalesorderId { get; set; }
+        [Column("salesorderid_dt")]
+        public int Salesorderid_dt { get; set; }
+        [Column("salesorderid_hd")]
+        public int Salesorderid_hd { get; set; }
         [Column("customerid")]
-        public int customerid { get; set; }
+        public int Customerid { get; set; }
         [Column("productcode")]
         public string ProductCode { get; set; }
-        [Column("productnameid")]
-        public int ProductNameid { get; set; }
+        [Column("productid")]
+        public int productid { get; set; }
         [Column("uommasterid")]
         public int UomMasterId { get; set; }
         [Column("taxperid")]
         public int Taxperid { get; set; }
         [Column("taxvalue")]
         public decimal? TaxValue { get; set; }
-        [Column("price")]
-        public decimal? Price { get; set; }
+        [Column("unitprice")]
+        public decimal? unitprice { get; set; }
         [Column("quantity")]
         public decimal? quantity { get; set; } = 0;
         [Column("subtotal")]
         public decimal? Subtotal { get; set; }
-        [Column("grandtotal")]
-        public decimal? Grandtotal { get; set; }
+        [Column("totalprice")]
+        public decimal? totalprice { get; set; }
         [Column("discountperid")]
         public decimal? Discountperid { get; set; }
         [Column("discountvalue")]
@@ -41,6 +43,8 @@ namespace MMS.Core.Entities
         public string Specialinstruction { get; set; }
         [Column("additionalcommends")]
         public string Additionalcommends { get; set; }
+        [Column("currencyid")]
+        public int currencyid { get; set; }
         [Column("quoteref")]
         public string quoteref { get; set; }
         [Column("quotedate")]
@@ -64,13 +68,6 @@ namespace MMS.Core.Entities
         [Column("updatedby")]
         public string Updatedby { get; set; }
         [Column("status")]
-        public int Status { get; set; }
-        [Column("isdeleted")]
-        public bool isdeleted { get; set; } = true;  
-        [Column("deletedby")]
-        public string Deletedby { get; set; }
-        [Column("Deleteddate")]
-        public DateTime? Deleteddate { get; set; } 
-
+        public string Status { get; set; }
     }
 }

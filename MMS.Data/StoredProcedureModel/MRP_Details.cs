@@ -10,10 +10,16 @@ namespace MMS.Data.StoredProcedureModel
     [Table("get_mrp_details", Schema = "public")]
     public class MRP_Details
     {
+        [Column("product_id")]
+        public int Product_id { get; set; }
         [Column("productname")]
         public string ProductName { get; set; }
-        [Column("salesquantity")]
-        public decimal? SalesQuantity { get; set; }
+        [Column("subassemblyproid")]
+        public int? Subassemblyproid { get; set; }
+        [Column("sub_quantity")]
+        public decimal? Sub_quantity { get; set; }
+        [Column("salesorderquantity")]
+        public decimal? salesorderquantity { get; set; }
         [Column("availablestock")]
         public decimal? AvailableStock { get; set; }
         [Column("productionduedate")]

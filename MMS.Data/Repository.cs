@@ -279,6 +279,23 @@ namespace MMS.Data
             var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.MRP_Details>("SELECT * FROM get_mrp_details()").ToList();
             return ResultList;
         }
+        public List<MMS.Data.StoredProcedureModel.Salesorder_Grid> Get_Salesorder_Grid()
+        {
+            var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.Salesorder_Grid>("SELECT * FROM salesorder_Grid()").ToList();
+            return ResultList;
+        }
+        public MMS.Data.StoredProcedureModel.Salesorder_Grid salesorder_gridSearch(int SOid)
+        {
+            try
+            {
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.Salesorder_Grid>("SELECT * FROM salesorder_gridSearch(@p0)", SOid).FirstOrDefault();
+                return ResultList;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
         public List<MMS.Data.StoredProcedureModel.Parentbommatertial> SearchBomMaterialList1(int bom_id)
         {
             try
@@ -287,6 +304,42 @@ namespace MMS.Data
                 return ResultList;
             }
           catch(Exception ex)   
+            {
+                throw;
+            }
+        }
+        public List<MMS.Data.StoredProcedureModel.SalesorderCart> SearchSalesordercart(int customerid)
+        {
+            try
+            {
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.SalesorderCart>("SELECT * FROM get_salesorders_cart(@p0)", customerid).ToList();
+                return ResultList;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+        public List<MMS.Data.StoredProcedureModel.mrp_material_list> mrpMaterialList1(int? productid)
+        {
+            try
+            {
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.mrp_material_list>("SELECT * FROM get_mrp_material_list(@p0)", productid).ToList();
+                return ResultList;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+        public List<MMS.Data.StoredProcedureModel.mrp_subassembly_list> get_mrp_subassembly_list(int? productid)
+        {
+            try
+            {
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.mrp_subassembly_list>("SELECT * FROM get_mrp_subassembly_list(@p0)", productid).ToList();
+                return ResultList;
+            }
+            catch (Exception ex)
             {
                 throw;
             }
