@@ -23,7 +23,7 @@
             display: flex;
             margin-left: -70%;
             flex-direction: column;
-            width: 240%;
+            width: 257%;
             pointer-events: auto;
             background-color: #fff;
             background-clip: padding-box;
@@ -71,6 +71,7 @@
                     <th>Buyer Name</th>
                     <th>Product Item</th>
                     <th>Product Name</th>
+                    <th>Product Code</th>
                     <th>Product Price</th>
                     <th>Order Date</th>
                     <th>Order Time</th>
@@ -78,13 +79,14 @@
                 </tr>
                 <tr>
                     <td>@Model.SalesorderId</td>
-                    <td>@Model.BuyerMaster.BuyerFullName</td>
-                    <td>@Model.quantity</td>
-                    <td>@Model.product.ProductName</td>
-                    <td>@Model.Grandtotal</td>
+                    <td>@Model.BuyerNames</td>
+                    <td>@string.Format("{0:0.00}", Model.quantity)</td>
+                    <td>@Model.ProductName</td>
+                    <td>@Model.ProductCode</td>
+                    <td>@string.Format("{0:0.00}", Model.Total_Price)</td>
                     <td>@Model.salesorderdate.ToString("dd/MM/yyyy")</td>
                     <td>@Model.salesorderdate.ToString("hh:mm tt")</td>
-                    <td>@Model.product.BomNo</td>
+                    <td>@Model.Bomno</td>
                 </tr>
             </table>
         </div>
@@ -95,7 +97,7 @@
             <div class="d-flex justify-content-end">
                 <img src="~/Content/assets/images/right arrow.png" width="6%" />
                 <div class="checkbox-wrapper-8">
-                    <input class="tgl tgl-skewed" id="cb3-8" type="checkbox" onclick="Filter()" />
+                    <input class="tgl tgl-skewed" id="cb3-8" type="checkbox" onclick="Filter()" style="display: none; " />
                     <label class="tgl-btn" data-tg-off="Show Details" data-tg-on="All Material" for="cb3-8" id="toggleBtn"></label>
                 </div>
             </div>
@@ -126,43 +128,53 @@
                             int count = 1;
                             foreach (var i in Model.bOMMaterialListModels)
                             {
+                                <tr>
+                                    <td>@count</td>
+                                    <td>@i.MaterialNames</td>
+                                    <td>MAT</td>
+                                    @if (i.availablestock != null)
+                                    {
+                                        <td>@i.availablestock </td>
+                                    }
+                                    else
+                                    {
+                                        <td>Not Added</td>
+                                    }
+                                    <td>@i.UOMName</td>
+                                    @if (i.availablestock >= (i.Requiredqty * Model.quantity))
+                                    {
+                                        <td>@string.Format("{0:0.00}", (i.Requiredqty * Model.quantity))</td>
+                                    }
+                                    else
+                                    {
+                                        <td style="color:red"><u>@string.Format("{0:0.00}", (i.Requiredqty * Model.quantity))</u></td>
+                                        a++;
 
-                                if (i.MaterialOpeningMaster != null)
-                                {
+                                    }
+                                    @if (i.availablestock <= (i.Requiredqty * Model.quantity))
+                                    {
 
-                                    <tr>
-                                        <td>@count</td>
-                                        <td>@i.MaterialOpeningMaster.MaterialNames</td>
-                                        <td>MAT</td>
-                                        <td>@i.MaterialOpeningMaster.Qty </td>
-                                        <td>@i.MaterialOpeningMaster.UOMName</td>
-                                        @if (i.MaterialOpeningMaster.Qty >= (i.RequiredQty * Model.quantity))
-                                        {
-                                            <td>@string.Format("{0:0.00}", (i.RequiredQty * Model.quantity))</td>
-                                        }
-                                        else
-                                        {
-                                            <td style="color:red"><u>@string.Format("{0:0.00}", (i.RequiredQty * Model.quantity))</u></td>
-                                            a++;
+                                        <td style="color:red"><u>@string.Format("{0:0.00}", (i.Requiredqty * Model.quantity) - (i.availablestock))</u></td>
 
-                                        }
-                                        @if (i.MaterialOpeningMaster.Qty >= (i.RequiredQty * Model.quantity))
+                                    }
+                                    else
+                                    {
+                                        if (i.availablestock != null)
                                         {
                                             <td style="color: #b9b1b1">0</td>
                                         }
                                         else
                                         {
-                                            <td style="color:red"><u>@((i.RequiredQty * Model.quantity ) - (i.MaterialOpeningMaster.Qty) )</u></td>
-
+                                            <td style="color:red"><u>@string.Format("{0:0.00}", (i.Requiredqty * Model.quantity))</u></td>
                                         }
 
-                                        <td>@i.MaterialOpeningMaster.UOMName </td>
-                                        <td style="color: #b9b1b1">Null</td>
-                                        <td style="color: #b9b1b1">Null</td>
-                                    </tr>
-                                    count++;
+                                    }
 
-                                }
+                                    <td>@i.UOMName </td>
+                                    <td style="color: #b9b1b1">Null</td>
+                                    <td style="color: #b9b1b1">Null</td>
+                                </tr>
+                                count++;
 
                             }
                         }
@@ -199,24 +211,24 @@
     <script>
        var bomMaterialList = JSON.parse('@Html.Raw(bomlist)');
 
-function onFilterClick() {
+        function onFilterClick() {
     $("#sales").empty();
     var count = 1;
     bomMaterialList.forEach(function (item) {
-        if (item.MaterialOpeningMaster != null) {
-            var consume = (item.RequiredQty * @Model.quantity).toFixed(2);
-            var shortage = ((item.RequiredQty * @Model.quantity) - item.MaterialOpeningMaster.Qty).toFixed(2);
-            if (item.MaterialOpeningMaster.Qty <= (item.RequiredQty * @Model.quantity)) {
+        if (item != null) {
+            var consume = (item.Requiredqty * @Model.quantity).toFixed(2);
+            var shortage = ((item.Requiredqty * @Model.quantity) - item.availablestock).toFixed(2);
+            if (item.availablestock <= (item.Requiredqty * @Model.quantity)) {
                 $("#sales").append(`
                     <tr>
                         <td class="veh1-5">${count}</td>
-                        <td class="veh1-5">${item.MaterialOpeningMaster.MaterialNames}</td>
+                        <td class="veh1-5">${item.MaterialNames}</td>
                         <td class="veh1-5">MAT</td>
-                        <td class="veh1-5">${item.MaterialOpeningMaster.Qty}</td>
-                        <td class="veh1-5">${item.MaterialOpeningMaster.UOMName}</td>
+                        <td class="veh1-5">${item.availablestock}</td>
+                        <td class="veh1-5">${item.UOMName}</td>
                         <td class="veh1-5" style="color:red"><u>${consume}</u></td>
                         <td class="veh1-5" style="color:red"><u>${shortage}</u></td>
-                        <td class="veh1-5">${item.MaterialOpeningMaster.UOMName}</td>
+                        <td class="veh1-5">${item.UOMName}</td>
                         <td class="veh1-5" style="color: #b9b1b1">Null</td>
                         <td class="veh1-5" style="color: #b9b1b1">Null</td>
                     </tr>
@@ -232,12 +244,12 @@ function onFilterClick() {
             var count = 1;
 
             bomMaterialList.forEach(function (item) {
-                if (item.MaterialOpeningMaster != null) {
-                    var consume = (item.RequiredQty * @Model.quantity).toFixed(2);
+                if (item != null) {
+                    var consume = (item.Requiredqty * @Model.quantity).toFixed(2);
                     var shortage;
 
-                    if (item.MaterialOpeningMaster.Qty <= consume) {
-                        shortage = (consume - item.MaterialOpeningMaster.Qty).toFixed(2);
+                    if (item.availablestock <= consume) {
+                        shortage = (consume - item.availablestock).toFixed(2);
                     } else {
                         shortage = 0;
                     }
@@ -245,15 +257,15 @@ function onFilterClick() {
                     var rowHtml = `
                 <tr>
                     <td class="veh1-5">${count}</td>
-                    <td class="veh1-5">${item.MaterialOpeningMaster.MaterialNames}</td>
+                    <td class="veh1-5">${item.MaterialNames}</td>
                     <td class="veh1-5">MAT</td>
-                    <td class="veh1-5">${item.MaterialOpeningMaster.Qty}</td>
-                    <td class="veh1-5">${item.MaterialOpeningMaster.UOMName}</td>`;
+                    <td class="veh1-5">${item.availablestock}</td>
+                    <td class="veh1-5">${item.UOMName}</td>`;
 
-                    if (item.MaterialOpeningMaster.Qty <= consume) {
+                    if (item.availablestock <= consume) {
                         rowHtml += `
-                    <td class="veh1-5" style="color:red">${consume}</td>
-                    <td class="veh1-5" style="color:red">${shortage}</td>`;
+                    <td class="veh1-5" style="color:red"><u>${consume}</u></td>
+                    <td class="veh1-5" style="color:red"><u>${shortage}</u></td>`;
                     } else {
                         rowHtml += `
                     <td class="veh1-5">${consume}</td>
@@ -261,7 +273,7 @@ function onFilterClick() {
                     }
 
                     rowHtml += `
-                    <td class="veh1-5">${item.MaterialOpeningMaster.UOMName}</td>
+                    <td class="veh1-5">${item.UOMName}</td>
                     <td class="veh1-5" style="color: #b9b1b1">Null</td>
                     <td class="veh1-5" style="color: #b9b1b1">Null</td>
                 </tr>`;
@@ -291,7 +303,7 @@ function onFilterClick() {
 
 
         function Raise() {
-            var salesorderid = @Model.SalesorderId;
+            var salesorderid = @Model.SalesorderId_DT;
 
             $.ajax({
                 type: 'POST',
@@ -323,7 +335,7 @@ function onFilterClick() {
 
         }
 function RaiseProduction() {
-    var salesorderid = @Model.SalesorderId;
+    var salesorderid = @Model.SalesorderId_DT;
     $.ajax({
         type: 'POST',
         url: '/SalesOrder/TempProductionstock',

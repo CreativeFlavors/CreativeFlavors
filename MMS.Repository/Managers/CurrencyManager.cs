@@ -16,12 +16,15 @@ namespace MMS.Repository.Managers
 
             private UnitOfWork unitOfWork = new UnitOfWork();
             private Repository<CurrencyMaster> CurrencyRepository;
+              private Repository<currency> CurrencyRepository1;
 
-            public CurrencyManager()
+        public CurrencyManager()
             {
                 CurrencyRepository = unitOfWork.Repository<CurrencyMaster>();
-            }
-            public bool Post(CurrencyMaster arg)
+            CurrencyRepository1 = unitOfWork.Repository<currency>();
+
+        }
+        public bool Post(CurrencyMaster arg)
             {
                 bool result = false;
                 try
@@ -70,6 +73,15 @@ namespace MMS.Repository.Managers
             if (LongForm != "" && LongForm != null)
             {
                 currencyMaster = CurrencyRepository.Table.Where(x => x.ShortForm.ToLower().Contains(LongForm.ToLower())).FirstOrDefault();
+            }
+            return currencyMaster;
+        }
+        public currency GetContainCurrencyid(string currencycode)
+        {
+            currency currencyMaster = new currency();
+            if (currencycode != "" && currencycode != null)
+            {
+                currencyMaster = CurrencyRepository1.Table.Where(x => x.currencycode.ToLower().Contains(currencycode.ToLower())).FirstOrDefault();
             }
             return currencyMaster;
         }

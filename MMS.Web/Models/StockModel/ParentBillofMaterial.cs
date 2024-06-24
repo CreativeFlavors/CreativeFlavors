@@ -21,6 +21,8 @@ namespace MMS.Web.Models.StockModel
         public DateTime? Date { get; set; }
         public List<Parentbommatertial> bomMaterialGridList { get; set; }
         public List<subassemblydata> bomsubassemblyGridList { get; set; }
+        public MaterialOpeningModel MaterialOpeningMaster { get; set; }
+
         public string Lastbom { get; set; }
 
         public bool IsActive { get; set; } = true;
@@ -47,6 +49,7 @@ namespace MMS.Web.Models.StockModel
         public int? MaterialMasterid { get; set; }
 
         public int? Uomid { get; set; }
+        public decimal? availablestock { get; set; }
 
         public decimal? Requiredqty { get; set; }
     }

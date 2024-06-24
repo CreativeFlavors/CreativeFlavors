@@ -332,7 +332,23 @@ namespace MMS.Web.ExtensionMethod
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
         }
-
+        public static SelectList salesorderno()
+        {
+            SalesorderHD_Manager Manager = new SalesorderHD_Manager();
+            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.salesorderid_hd).Select(
+                                                  item => new System.Web.Mvc.SelectListItem()
+                                                  {
+                                                      Text = item.salesorderid_hd.ToString(),
+                                                      Value = item.salesorderid_hd.ToString()
+                                                  }).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }
         public static SelectList Paymentmethodlist()
         {
             paymentmethodmanager Manager = new paymentmethodmanager();
@@ -2270,6 +2286,23 @@ namespace MMS.Web.ExtensionMethod
         {
             BillOfMaterialManager billOfMaterialManager = new BillOfMaterialManager();
             List<System.Web.Mvc.SelectListItem> items = billOfMaterialManager.Get().Where(x => x.BomNo != null).OrderBy(x => x.BomNo).Select(
+                                                  item => new System.Web.Mvc.SelectListItem()
+                                                  {
+                                                      Text = item.BomNo,
+                                                      Value = item.BomId.ToString()
+                                                  }).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Select BOM No"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }
+        public static SelectList GetBomno()
+        {
+            ParentbomManager parentbom = new ParentbomManager();
+            List<System.Web.Mvc.SelectListItem> items = parentbom.Get().Where(x => x.BomNo != null).OrderBy(x => x.BomNo).Select(
                                                   item => new System.Web.Mvc.SelectListItem()
                                                   {
                                                       Text = item.BomNo,
