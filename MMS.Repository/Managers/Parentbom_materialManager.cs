@@ -129,6 +129,43 @@ namespace MMS.Repository.Managers
             }
             return customertransaction;
         }
+        public parentbom_material Getbom()
+        {
+
+            parentbom_material customertransaction = new parentbom_material();
+            try
+            {
+                customertransaction = parentbom_materialRepository.Table.SingleOrDefault();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return customertransaction;
+        }
+
+        public List<parentbom_material> Get(int productid)
+        {
+
+            List<parentbom_material> customertransaction = new List<parentbom_material>();
+            try
+            {
+                if (productid != 0)
+                {
+                    customertransaction = parentbom_materialRepository.Table.Where(x => x.ProductId == productid).ToList();
+                    if (customertransaction == null)
+                    {
+
+                    }
+                }
+               
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return customertransaction;
+        }
         public bool Delete(int id)
         {
             bool result = false;

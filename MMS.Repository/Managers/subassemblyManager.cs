@@ -72,6 +72,17 @@ namespace MMS.Repository.Managers
             }
             return subassemblydata;
         }
+
+        public List<subassembly> GetsubassemblyList(int BOMID)
+        {
+            List<subassembly> subassemblylist = new List<subassembly>();
+            if (BOMID != null)
+            {
+                subassemblylist = subassemblyRepository.Table.Where(x => x.BomId == BOMID).ToList();
+            }
+            return subassemblylist;
+        }
+
         public List<subassemblydata> GetBomList(int bom_id)
         {
             List<subassemblydata> billOfMaterial = new List<subassemblydata>();

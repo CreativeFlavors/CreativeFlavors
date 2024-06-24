@@ -124,6 +124,17 @@ namespace MMS.Repository.Managers
             }
             return MaterialNameMaster;
         }
+
+        public List<tbl_materialnamemaster> GetMaterialName(int? MaterialMasterID)
+        {
+            List<tbl_materialnamemaster> MaterialNameMaster = new List<tbl_materialnamemaster>();
+            if (MaterialMasterID != 0)
+            {
+                MaterialNameMaster = MaterialNameMasterRepository.Table.Where(x => x.MaterialMasterID == MaterialMasterID).ToList();
+            }
+            return MaterialNameMaster;
+        }
+
         public tbl_materialnamemaster GetMaterialName(string MaterialDescription)
         {
             tbl_materialnamemaster MaterialNameMaster = new tbl_materialnamemaster();

@@ -128,6 +128,25 @@ namespace MMS.Repository.Managers
             return products;
         }
 
+        public List<product> Get(int productid)
+        {
+            List<product> products = new List<product>();
+
+            try
+            {
+                if (productid != 0)
+                {
+                    products = productrep.Table.Where(x => x.ProductId == productid).ToList();
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return products;
+        }
+
         public product GetId(int productid)
         {
             product productlist = new product();
