@@ -2566,6 +2566,29 @@ namespace MMS.Web.ExtensionMethod
             return new SelectList(items, "Value", "Text");
         }
 
+        public static SelectList StatusProductionSubassembly()
+        {
+            StatusProductionSubassemblyManager statusProductionManager = new StatusProductionSubassemblyManager();
+            List<System.Web.Mvc.SelectListItem> items = statusProductionManager.Get().OrderBy(x => x.StatusId).Select(
+                                                  item => new System.Web.Mvc.SelectListItem()
+                                                  {
+                                                      Text = item.Status,
+                                                      Value = item.StatusId.ToString()
+                                                  }).ToList();
+            // Find the index of "initiated" status
+            int initiatedIndex = items.FindIndex(item => item.Text.ToLower() == "Started");
+
+            // Move the "initiated" status to the beginning of the list
+            if (initiatedIndex != -1)
+            {
+                var initiatedItem = items[initiatedIndex];
+                items.RemoveAt(initiatedIndex);
+                items.Insert(0, initiatedItem);
+            }
+
+
+            return new SelectList(items, "Value", "Text");
+        }
         public static SelectList BuyerProductType()
         {
             BuyerModelManager buyerManager = new BuyerModelManager();

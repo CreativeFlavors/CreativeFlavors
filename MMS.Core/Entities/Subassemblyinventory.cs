@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace MMS.Core.Entities
 {
-    [Table("finishedgood", Schema = "public")]
-    public class FinishedGood : BaseEntity
+    [Table("subassemblyinventory", Schema = "public")]
+    public class Subassemblyinventory : BaseEntity
     {
         [Key]
         [Column("id")]
