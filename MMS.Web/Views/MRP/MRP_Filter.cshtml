@@ -1,0 +1,448 @@
+﻿@model IEnumerable<MMS.Web.Models.Salesorders>
+@using MMS.Web.Models
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link href="~/Content/css1/mrp.css" rel="stylesheet" />
+    <style>
+        li.hidden-content {
+            display: none;
+        }
+
+        img#plus {
+            width: 29%;
+            margin-top: -7%;
+        }
+
+        div#Name {
+            text-align: left;
+        }
+
+        .table > :not(:last-child) > :last-child > * {
+            border-bottom-color: #d5d5d5;
+        }
+
+        li.hidden-content {
+            margin-top: -2%;
+            background-color: #fbfbff;
+            box-shadow: 0px 16px 35px -25px rgba(0, 0, 0, 1.1);
+        }
+
+        .page-item.active .page-link {
+            z-index: 3;
+            color: white;
+            background-color: #4472C4;
+            border-color: #4472C4;
+        }
+
+        .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
+            padding: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div id="filter">
+        <div class="container mt-5">
+            <ul class="responsive-table table text-center header ">
+                <li class="table-header">
+                    <div class="col col-1">SI.NO</div>
+                    <div class="col col-1">Product</div>
+                    <div class="col col-1">Sales_Qty / SubAss_Qty</div>
+                    <div class="col col-1">Available Stock</div>
+                    <div class="col col-1">procurement</div>
+                    <div class="col col-1">Duedate</div>
+                    <div class="col col-1">Production</div>
+                    <div class="col col-1">Pro_Duedate</div>
+                    <div class="col col-1">Status</div>
+                    <div class="col col-1">Check</div>
+                </li>
+                @if (Model != null)
+                {
+                    int count = 1;
+                    foreach (var i in Model)
+                    {
+                        <li class="table-row header">
+                            <div class="col col-1 ">@count</div>
+                            <div class="col col-1" id="Name">@i.ProductName</div>
+
+                            @if (i.subassemblyqty != null)
+                            {
+                                <div class="col col-1">@string.Format("{0:0.00}", (i.SalesQuantity)) / @i.subassemblyqty</div>
+                            }
+                            else
+                            {
+                                <div class="col col-1">@i.SalesQuantity / - </div>
+                            }
+                            <div class="col col-1">@i.AvailableStock</div>
+                            @if (i.SalesQuantity >= i.AvailableStock)
+                            {
+                                <div class="col col-1">@string.Format("{0:0.00}", (i.SalesQuantity - i.AvailableStock))</div>
+                            }
+                            else
+                            {
+                                <div class="col col-1">0</div>
+                            }
+                            <div class="col col-1"></div>
+                            <div class="col col-1">@i.ProductionQty</div>
+                            @if (@i.ProductionDueDate != null)
+                            {
+                                <div class="col col-1">
+                                    @i.ProductionDueDate.Value.ToString("dd/MM/yyyy")
+
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col col-1" style="color: #b9b1b1">Null</div>
+                            }
+                            <div class="col col-1" id="Name">@i.Status</div>
+                            <div class="col col-1" colspan="2">
+                                <img src="~/Content/assets/images/plus1.png" id="plus" class="toggle-image" />
+                            </div>
+                        </li>
+                        count++;
+                        <li class="hidden-content">
+                            <div class="manage_customers_table_in_responsive mt-3" style="height:230px; overflow: auto;" id="form">
+                                <div id="table-wrapper">
+                                    <div id="table-scroll">
+                                        <table class="table table-bordered table-fixed" style="text-align: center; width: 100%;">
+                                            <thead>
+                                                <tr style="position: -webkit-sticky; position: sticky; top: 0; background-color: #cbcbcb; color: #fff;">
+                                                    <th>Material</th>
+                                                    <th>Type</th>
+                                                    <th>Unit Qty</th>
+                                                    <th><span class="text">On Hand</span></th>
+                                                    <th><span class="text"> Req_Oty</span></th>
+                                                    <th><span class="text">Shortage</span></th>
+                                                    <th>UOM</th>
+                                                    <th><span class="text">Lead time</span></th>
+                                                    <th><span class="text">Min Lot</span></th>
+                                                    <th><span class="text">Status</span></th>
+                                                </tr>
+                                            </thead>
+                                            @if (i.mrp_Material_Lists != null)
+                                            {
+                                                <tbody>
+                                                    @foreach (var j in i.mrp_Material_Lists)
+                                                    {
+                                                        if (j.AvailableStock <= Math.Round((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()), 2) || j.AvailableStock == null)
+                                                        {
+                                                            <tr>
+                                                                <td class="underline1" style=" text-align: left; width: 1%;">@j.MaterialNames</td>
+                                                                <td class="underline1" style=" text-align: center; width: 2%;"><span id="ma">Mat</span></td>
+                                                                <td class="underline1" style=" text-align: right; width: 2%;">@string.Format("{0:0.00}", (j.RequiredQty))</td>
+
+
+                                                                @if (j.AvailableStock != null)
+                                                                {
+                                                                    <td class="underline1" style="text-align: right; width: 2%; ">@j.AvailableStock</td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td class="underline1" style=" text-align: right; width: 2%;">Not added</td>
+                                                                }
+                                                                @if (j.AvailableStock != null)
+                                                                {
+
+                                                                    if (j.AvailableStock <= Math.Round((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()), 2))
+                                                                    {
+                                                                        <td class="underline1" style=" width: 1%; text-align: right; color:red">@Math.Round((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()), 2)</td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td class="underline1" style=" width: 1%; text-align: right;">@Math.Round((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()), 2)</td>
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td class="underline1" style=" width: 1%; text-align: right; color:red">@Math.Round((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()), 2)</td>
+                                                                }
+
+
+                                                                @if (j.AvailableStock != null)
+                                                                {
+
+                                                                    if (j.AvailableStock <= Math.Round((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()), 2))
+                                                                    {
+                                                                        <td class="underline1" style=" width: 1%; text-align: right; color:red">@string.Format("{0:0.00}", ((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()) - (j.AvailableStock)))</td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td style="color: #b9b1b1;  width: 1%; text-align: right;">0</td>
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td class="underline1" style=" width: 1%; text-align: right; color:red">@Math.Round((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()), 2)</td>
+                                                                }
+
+                                                                <td class="underline1" style=" text-align: center; width: 2%;">@j.UOMName</td>
+                                                                <td class="underline1" style=" text-align: center; width:2%; ">-</td>
+                                                                <td class="underline1" style=" text-align: center; width:2%; ">-</td>
+
+
+                                                                @if (j.AvailableStock == null || j.AvailableStock.GetValueOrDefault() == 0.00m)
+                                                                {
+                                                                    <td style=" text-align: center; width: 2%;"><span id="nostock">No stock</span></td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    if (j.AvailableStock >= Math.Round((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()), 2))
+                                                                    {
+                                                                        <td style=" text-align: center; width: 2%;"><span id="ready">Ready</span></td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td style=" text-align: center; width: 2%;"><span id="stockadd">Less stock</span></td>
+                                                                    }
+
+                                                                }
+
+                                                            </tr>
+                                                        }
+
+                                                    }
+                                                    @if (i.mrp_subassembly_Lists != null)
+                                                    {
+                                                        foreach (var k in i.mrp_subassembly_Lists)
+                                                        {
+
+                                                            if (k.AvailableStock <= Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()), 2) || k.AvailableStock == null)
+                                                            {
+
+                                                                <tr>
+                                                                    <td class="underline" style="text-align: left; width: 1%;">@k.MaterialNames</td>
+                                                                    <td class="underline" style="text-align: center; width: 2%;"><span id="subassem">Sub</span></td>
+                                                                    <td class="underline" style="text-align: right; width: 2%;">@string.Format("{0:0.00}", (k.RequiredQty))</td>
+
+                                                                    @if (k.AvailableStock != null)
+                                                                    {
+                                                                        <td class="underline" style="text-align: right; width: 2%;">@k.AvailableStock</td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td class="underline" style="text-align: right; width: 2%;">Not added</td>
+                                                                    }
+                                                                    @if (k.AvailableStock != null)
+                                                                    {
+                                                                        if (k.AvailableStock <= Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()), 2))
+                                                                        {
+                                                                            <td class="underline1" style=" width: 1%; text-align: right; color:red">@Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()), 2)</td>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <td class="underline1" style=" width: 1%; text-align: right;">@Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()), 2)</td>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td class="underline1" style=" width: 1%; text-align: right; color:red">@Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()), 2)</td>
+                                                                    }
+
+                                                                    @if (k.AvailableStock != null)
+                                                                    {
+                                                                        if (k.AvailableStock <= Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()), 2))
+                                                                        {
+                                                                            <td class="underline" style="text-align: right; width:2%; color:red">
+                                                                                @Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()) - (k.AvailableStock ?? 0))
+                                                                            </td>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <td style="color: #b9b1b1;  width: 1%; text-align: right;">0</td>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td class="underline1" style=" width: 1%; text-align: right; color:red">@Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()), 2)</td>
+                                                                    }
+
+                                                                    <td class="underline" style="text-align: center; width: 2%;">@k.UOMName</td>
+                                                                    <td class="underline" style="text-align: center; width:2%;">-</td>
+                                                                    <td class="underline" style="text-align: center; width:2%;">-</td>
+
+                                                                    @if (k.AvailableStock == null || k.AvailableStock.GetValueOrDefault() == 0.00m)
+                                                                    {
+                                                                        <td style=" text-align: center; width: 2%;"><span id="nostock">No stock</span></td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        if (k.AvailableStock >= Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()), 2))
+                                                                        {
+                                                                            <td style=" text-align: center; width: 2%;"><span id="ready">Ready</span></td>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <td style=" text-align: center; width: 2%;"><span id="stockadd">Less stock</span></td>
+                                                                        }
+
+                                                                    }
+                                                                </tr>
+
+                                                            }
+
+
+                                                        }
+                                                    }
+
+                                                </tbody>
+
+                                            }
+                                            <tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                }
+
+            </ul>
+        </div>
+        <div class="row manage_customer_show">
+            <div class="font-14 manage_customer_show_I col-xl-6">
+                <span>Showing </span>
+                <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
+                    <option value="6" @(ViewBag.PageSize == 6 ? "selected" : "")>6</option>
+                    <option value="12" @(ViewBag.PageSize == 12 ? "selected" : "")>12</option>
+                    <option value="18" @(ViewBag.PageSize == 18 ? "selected" : "")>18</option>
+                    <option value="24" @(ViewBag.PageSize == 24 ? "selected" : "")>24</option>
+                </select>
+
+
+            </div>
+
+            <div class="col-xl-6 manage_customer_show_II">
+                <nav class="float-xl-end">
+                    <ul class="pagination font-14">
+                        <li class="page-item">
+                            <a href="##" id="previousPage" class="page-link">Previous</a>
+                        </li>
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a href="#" class="page-link" data-page="@i">@i</a>
+                            </li>
+                        }
+                        <li class="page-item">
+                            <a class="page-link" id="nextPage" href="##">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <script src="~/Content/js/custom.js"></script>
+    <link href="~/Content/css1/sweetalert.css" rel="stylesheet" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $('.push').click(function () {
+            $(this).find('div').toggleClass('active').toggleClass('non');
+        });
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#mrp").attr('checked', true);
+
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('.toggle-image').on('click', function () {
+                const $this = $(this);
+                const $parentLi = $this.closest('li');
+                const $nextLi = $parentLi.next('.hidden-content');
+
+                $nextLi.slideToggle(100, function () {
+                    if ($nextLi.is(':visible')) {
+                        $this.attr('src', '/Content/assets/images/minus.png');
+                    } else {
+                        $this.attr('src', '/Content/assets/images/plus1.png');
+                    }
+                });
+            });
+
+
+  $('#manage_customer_show_no').change(function() {
+     var PageSize = parseInt($(this).val());
+     $.ajax({
+         url: '/MRP/MRP_Filter',
+         type: "GET",
+         dataType: "JSON",
+         data: { pageSize: PageSize },
+         success: function (values) {
+             $("#filter").html(values).show();
+         }
+     });
+ });
+   $(".page-link").click(function(e){
+         var page = $(this).data("page");
+
+         $.ajax({
+             url: "@Url.Action("MRP_Filter", "MRP")",
+             type: "GET",
+             data: { page: page },
+             success: function(data){
+                 $("#filter").html(data).show();
+             }
+         });
+     });
+ $('#previousPage').click(function(e) {
+     var currentPage = parseInt('@ViewBag.CurrentPage');
+     if (currentPage > 1) {
+         var previousPage = currentPage - 1;
+         $.ajax({
+             url: "@Url.Action("MRP_Filter", "MRP")",
+             type: "GET",
+             dataType: "JSON",
+             data: { page: previousPage, pageSize: totalPages },
+             success: function (values) {
+                 $("#filter").html(values).show();
+             }
+         });
+     }
+ });
+
+ $('#nextPage').click(function () {
+    var currentPage = parseInt('@ViewBag.CurrentPage');
+    var totalPages = parseInt('@ViewBag.TotalPages');
+    if (currentPage < totalPages) {
+        var nextPage = currentPage + 1;
+        $.ajax({
+            url: "@Url.Action("MRP_Filter", "MRP")",
+            type: "GET",
+            data: { page: nextPage, pageSize: totalPages },
+            dataType: "json",
+            success: function (values) {
+                $("#filter").html(values).show();
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX Error: ', error);
+            }
+        });
+    }
+});
+
+
+
+
+        });
+    </script>
+
+</body>
+</html>

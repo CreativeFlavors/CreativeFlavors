@@ -73,6 +73,53 @@
         #alert {
             margin-left: 24%;
         }
+
+        /* Style the container for a clean and well-organized layout */
+        .currency-selector {
+            display: flex;
+            margin: 10px auto; /* Add some margin for spacing */
+        }
+
+            /* Style the radio buttons for improved appearance */
+            .currency-selector input[type="radio"] {
+                display: none; /* Hide the default radio buttons */
+            }
+
+            /* Style the labels for visual representation of options */
+            .currency-selector label {
+                position: relative;
+                padding: 10px 45px;
+                cursor: pointer; /* Indicate interactivity */
+                border: 1px solid #ccc; /* Add a border for definition */
+                border-radius: 5px; /* Round corners for a softer look */
+                margin-right: 10px; /* Add spacing between options */
+                font-weight: bold; /* Make text slightly bolder */
+            }
+
+                /* Style the radio button indicator (pseudo-element) */
+                .currency-selector label::after {
+                    content: "";
+                    display: block;
+                    width: 15px;
+                    height: 15px;
+                    border: 2px solid #ccc; /* Match border style of label */
+                    border-radius: 50%; /* Create a circle for the indicator */
+                    position: absolute;
+                    top: 50%;
+                    left: 10px; /* Adjust horizontal position if needed */
+                    transform: translateY(-50%); /* Center the indicator vertically */
+                    transition: background-color 0.2s ease-in-out; /* Smooth transition on hover */
+                }
+
+            /* Style the checked radio button indicator */
+            .currency-selector input[type="radio"]:checked + label::after {
+                background-color: #4CAF50; /* Green color when selected */
+            }
+
+            /* Style the label text on hover (optional) */
+            .currency-selector label:hover {
+                background-color: #f2f2f2; /* Lighten background on hover */
+            }
     </style>
 </head>
 
@@ -129,16 +176,31 @@
                             @Html.DropDownListFor(m => m.UomIdMaster, MMS.Web.ExtensionMethod.HtmlHelper.LongUnitName(), new { @class = "select-style text-field" })
                         </div>
                     </div>
-                    @*<div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="input-part">
-                                <label class="font-14" for="#Consume">Consume Qty</label>
-                                @Html.TextBoxFor(m => m.Consume, new { @class = "form-control text-field" })
-                            </div>
-                        </div>*@
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#Qty">Qty</label>
+                            @Html.TextBoxFor(m => m.Qty, new { @class = "form-control text-field" })
+                        </div>
+                    </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="#Description">Description</label>
                             @Html.TextAreaFor(m => m.Description, new { @class = "form-control text-field" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part" style="width: 26%; text-align: center; display: inline-flex; margin-top: 10%;">
+                            @*<input type="radio" id="DivComponents" name="currency" checked value="Components">
+                                <label for="zar" class="currency-option">Components</label>
+                                <input type="radio" id="DivMaterial" name="currency" value="Material">
+                                <label for="usd" class="currency-option">Material</label>*@
+                            <div class="currency-selector">
+                                <input type="radio" id="DivMaterial" name="currency" value="Material">
+                                <label for="DivMaterial" class="currency-option">Material</label>
+
+                                <input type="radio" id="DivComponents" name="currency" value="Components">
+                                <label for="DivComponents" class="currency-option">Components</label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -160,9 +222,26 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="row" id="DivComponentsList" style="display:none;">
+                    <br />
+                    <h3>Components List</h3>
+                    <table class="table table-striped text-center" id="tblComponentsList" style="width: 50%;">
+                        <tr>
+                            <th>
+                                Sno.
+                            </th>
+
+                            <th>
+                                Components List
+                            </th>
+                        </tr>
+                        <tbody id="tbodyComponentsList">
+                        </tbody>
+                    </table>
+                </div>
                 <div class="inner-section-button mt-4">
 
-                    <button class="fill-color font-15" onclick="Save()">
+                    <button class="fill-color font-15" type="submit" onclick="Save()">
                         SAVE
                     </button>
 
@@ -187,7 +266,8 @@
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
     <script>
         $('#Bomid').change(function () {
-            if ($("#Bomid").val() != "0" && $("#Bomid").val() != null && $("#Bomid").val() != "") {
+            if ($('#Bomid').val() != "" && $('#DivMaterial').prop('checked')) {
+                $("#tbodymaterialList").html('');
                 $(".alert-danger").hide();
                 $.ajax({
                     url: '/ProductionBOM/GetBOMMaterialList',
@@ -199,21 +279,144 @@
                         var tbl = "";
                         var count = 1;
                         $.each(data, function (i, dat) {
-                            if (tbl == "") {
-                                tbl = "<tr><td class='veh-1' style='text-align:center'>" + count + "</td><td class='veh-1' style='width:85%;text-align:center'><div class='form-check'><input class='form-check-input' type='checkbox' value='" + dat.MaterialMasterID + "' id='" + dat.MaterialMasterID + "'><label style='margin-left:-50%;' class='form-check-label' for='" + dat.MaterialDescription + "'>" + dat.MaterialDescription + "</label></div></td></tr>";
+                            if (dat.MaterialMasterID != 0) {
+                                if (tbl == "") {
+                                    tbl = "<tr><td class='veh-1' style='text-align:center'>" + count + "</td><td class='veh-1' style='width:85%;text-align:center'><div class='form-check'><input class='form-control text-field' type='text' value='" + dat.Consume + "' style='display:none;'><input class='form-check-input' type='checkbox' value='" + dat.MaterialMasterID + "' id='" + dat.MaterialMasterID + "'><label style='margin-left:-50%;' class='form-check-label' for='" + dat.MaterialDescription + "'>" + dat.MaterialDescription + "</label></div></td></tr>";
+                                }
+                                else {
+                                    tbl = tbl + "<tr><td class='veh-1' style='text-align:center'>" + count + "</td><td class='veh-1' style='width:85%;text-align:center'><div class='form-check'><input class='form-control text-field' type='text' value='" + dat.Consume + "' style='display:none;'><input class='form-check-input' type='checkbox' value='" + dat.MaterialMasterID + "' id='" + dat.MaterialMasterID + "'><label style='margin-left:-50%;' class='form-check-label' for='" + dat.MaterialDescription + "'>" + dat.MaterialDescription + "</label></div></td></tr>";
+                                }
+                                count++;
                             }
                             else {
-                                tbl = tbl + "<tr><td class='veh-1' style='text-align:center'>" + count + "</td><td class='veh-1' style='width:85%;text-align:center'><div class='form-check'><input class='form-check-input' type='checkbox' value='" + dat.MaterialMasterID + "' id='" + dat.MaterialMasterID + "'><label style='margin-left:-50%;' class='form-check-label' for='" + dat.MaterialDescription + "'>" + dat.MaterialDescription + "</label></div></td></tr>";
+                                tbl = "<tr><td colspan='2'>NO RESULTS FOUND!...</td></tr>"
                             }
-                            count++;
                         });
 
                         $("#tbodymaterialList").html(tbl);
-                        $("#DivMaterialLiest").css("display", "block")
+                        $("#DivMaterialLiest").css("display", "block");
+                        $("#DivComponentsList").css("display", "none");
+                    }
+                });
+            }
+            if ($('#Bomid').val() != "" && $('#DivMaterial').prop('checked')) {
+                $("#DivComponentsList").html('');
+                $(".alert-danger").hide();
+                $.ajax({
+                    url: '/ProductionBOM/GetSubassemblyMasterList',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: {},
+                    success: function (data) {
+                        console.log(data);
+                        var tbl = "";
+                        var count = 1;
+                        $.each(data, function (i, dat) {
+                            if (dat.Id != 0) {
+                                if (tbl == "") {
+                                    tbl = "<tr><td class='veh-1' style='text-align:center'>" + count + "</td><td class='veh-1' style='width:85%;text-align:center'><div class='form-check'><input class='form-check-input' type='checkbox' value='" + dat.Id + "' id='" + dat.Id + "'><label style='margin-left:-50%;' class='form-check-label' for='" + dat.ProductName + "'>" + dat.ProductName + "</label></div></td></tr>";
+                                }
+                                else {
+                                    tbl = tbl + "<tr><td class='veh-1' style='text-align:center'>" + count + "</td><td class='veh-1' style='width:85%;text-align:center'><div class='form-check'><input class='form-check-input' type='checkbox' value='" + dat.Id + "' id='" + dat.Id + "'><label style='margin-left:-50%;' class='form-check-label' for='" + dat.ProductName + "'>" + dat.ProductName + "</label></div></td></tr>";
+                                }
+                                count++;
+                            }
+                            else {
+                                tbl = "<tr><td colspan='2'>NO RESULTS FOUND!...</td></tr>"
+                            }
+                        });
+
+                        $("#tbodyComponentsList").html(tbl);
+                        $("#DivMaterialLiest").css("display", "none");
+                        $("#DivComponentsList").css("display", "block");
+
+                    }
+                });
+            }
+        });
+        $('#DivMaterial').change(function () {
+            if ($("#Bomid").val() != "") {
+                $(".alert-danger").hide();
+                $.ajax({
+                    url: '/ProductionBOM/GetBOMMaterialList',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { BomId: $('#Bomid').val() },
+                    success: function (data) {
+                        console.log(data);
+                        var tbl = "";
+                        var count = 1;
+                        $.each(data, function (i, dat) {
+                            if (dat.MaterialMasterID != 0) {
+                                if (tbl == "") {
+                                    tbl = "<tr><td class='veh-1' style='text-align:center'>" + count + "</td><td class='veh-1' style='width:85%;text-align:center'><div class='form-check'><input class='form-control text-field' type='text' value='" + dat.Consume + "' style='display:none;'><input class='form-check-input' type='checkbox' value='" + dat.MaterialMasterID + "' id='" + dat.MaterialMasterID + "'><label style='margin-left:-50%;' class='form-check-label' for='" + dat.MaterialDescription + "'>" + dat.MaterialDescription + "</label></div></td></tr>";
+                                }
+                                else {
+                                    tbl = tbl + "<tr><td class='veh-1' style='text-align:center'>" + count + "</td><td class='veh-1' style='width:85%;text-align:center'><div class='form-check'><input class='form-control text-field' type='text' value='" + dat.Consume + "' style='display:none;'><input class='form-check-input' type='checkbox' value='" + dat.MaterialMasterID + "' id='" + dat.MaterialMasterID + "'><label style='margin-left:-50%;' class='form-check-label' for='" + dat.MaterialDescription + "'>" + dat.MaterialDescription + "</label></div></td></tr>";
+                                }
+                                count++;
+                            }
+                            else {
+                                tbl = "<tr><td colspan='2'>NO RESULTS FOUND!...</td></tr>"
+                            }
+                        });
+
+                        $("#tbodymaterialList").html(tbl);
+                        $("#DivMaterialLiest").css("display", "block");
+                        $("#DivComponentsList").css("display", "none");
                     }
                 });
             }
             else {
+                $("#DivMaterial").prop("checked", false);
+                $("#DivMaterialLiest").css("display", "none")
+                $("#alert").append(
+                    '<div class="alert alert-danger">' +
+                    '<strong>Alert!</strong> BOM not selected ' +
+                    '<strong id="close">x</strong>' +
+                    '</div>'
+                );
+                $(document).on('click', '#close', function () {
+                    $(".alert-danger").hide();
+                });
+            }
+        });
+        $('#DivComponents').change(function () {
+            if ($("#Bomid").val() != "") {
+                $(".alert-danger").hide();
+                $.ajax({
+                    url: '/ProductionBOM/GetSubassemblyMasterList',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: {},
+                    success: function (data) {
+                        console.log(data);
+                        var tbl = "";
+                        var count = 1;
+                        $.each(data, function (i, dat) {
+                            if (dat.Id != 0) {
+                                if (tbl == "") {
+                                    tbl = "<tr><td class='veh-1' style='text-align:center'>" + count + "</td><td class='veh-1' style='width:85%;text-align:center'><div class='form-check'><input class='form-check-input' type='checkbox' value='" + dat.Id + "' id='" + dat.Id + "'><label style='margin-left:-50%;' class='form-check-label' for='" + dat.ProductName + "'>" + dat.ProductName + "</label></div></td></tr>";
+                                }
+                                else {
+                                    tbl = tbl + "<tr><td class='veh-1' style='text-align:center'>" + count + "</td><td class='veh-1' style='width:85%;text-align:center'><div class='form-check'><input class='form-check-input' type='checkbox' value='" + dat.Id + "' id='" + dat.Id + "'><label style='margin-left:-50%;' class='form-check-label' for='" + dat.ProductName + "'>" + dat.ProductName + "</label></div></td></tr>";
+                                }
+                                count++;
+                            }
+                            else {
+                                tbl = "<tr><td colspan='2'>NO RESULTS FOUND!...</td></tr>"
+                            }
+                        });
+
+                        $("#tbodyComponentsList").html(tbl);
+                        $("#DivMaterialLiest").css("display", "none");
+                        $("#DivComponentsList").css("display", "block");
+
+                    }
+                });
+            }
+            else {
+                $("#DivMaterial").prop("checked", false);
                 $("#DivMaterialLiest").css("display", "none")
                 $("#alert").append(
                     '<div class="alert alert-danger">' +
@@ -227,6 +430,10 @@
             }
         });
         function Save() {
+            var checkboxValues = [];
+            var ComponentsValues = [];
+            var Process = 0;
+
             if ($("#Bomid").val() == null && $("#Bomid").val() == '') {
                 $("#DivMaterialLiest").css("display", "none");
                 $("#alert").append(
@@ -294,35 +501,93 @@
                     $(".alert-danger").hide();
                 });
             }
-            $('#tblMaterialList tbody tr input[type="checkbox"]').each(function () {
-                var checkboxValues = [];
-                console.log($(this).val());
-                var isEmpty = $(this).find('td:empty').length > 0;
-                if ($(this).prop('checked')) {
-                    checkboxValues.push($(this).val());
-                }
-                if (checkboxValues.length === 0) {
-                    $("#alert").append(
-                        '<div class="alert alert-danger">' +
-                        '<strong>Alert!</strong> Material List not selected ' +
-                        '<strong id="close">x</strong>' +
-                        '</div>'
-                    );
-                    $(document).on('click', '#close', function () {
-                        $(".alert-danger").hide();
-                    });
-                    return false;
-                }
-            });
+            if ($('#DivMaterial').prop('checked')) {
+                $('#tblMaterialList tbody tr input[type="checkbox"]').each(function () {
+                    console.log($(this).val());
+                    var isEmpty = $(this).find('td:empty').length > 0;
+                    if ($(this).prop('checked')) {
+                        checkboxValues.push($(this).val());
+                    }
+                    if (checkboxValues.length === 0) {
+                    }
+                });
+                Process = 1;
+            }
+            if ($('#DivComponents').prop('checked')) {
+                $('#tblComponentsList tbody tr input[type="checkbox"]').each(function () {
+                    console.log($(this).val());
+                    var isEmpty = $(this).find('td:empty').length > 0;
+                    if ($(this).prop('checked')) {
+                        ComponentsValues.push($(this).val());
+                    }
+                    if (ComponentsValues.length === 0) {
+                    }
+                });
+                Process = 2;
+            }
+            /*var Id = $("#ObjOrderEntry_Id").val();*/
+            var materiallist = checkboxValues;
+            var consumelist = ComponentsValues;
+            var MaterialId = 0;
+            var BOMProductName = $("#BOMProductName").val();
+            var BOMProductCode = $("#BOMProductCode").val();
+            var MaterialCategoryMasterid = $("#MaterialCategoryMasterid").val();
+            var ProductType = $("#ProductType").val()
+            var UomIdMaster = $("#UomIdMaster").val();
+            var Description = $("#Description").val();
+            var Qty = $("#Qty").val();
+            var Bomid = $("#Bomid").val();
+            var formdata = new FormData();
+            formdata.append("materiallist", materiallist);
+            formdata.append("MaterialId", MaterialId);
+            formdata.append("BOMProductName", BOMProductName);
+            formdata.append("BOMProductCode", BOMProductCode);
+            formdata.append("MaterialCategoryMasterid", MaterialCategoryMasterid);
+            formdata.append("ProductType", ProductType);
+            formdata.append("UomIdMaster", UomIdMaster);
+            formdata.append("Description", Description);
+            formdata.append("Qty", Qty);
+            formdata.append("Process", Process);
+            formdata.append("consumelist", consumelist);
+            formdata.append("Bomid", Bomid);
             $.ajax({
-                url: '/ProductionBOM/GetBOMMaterialList',
-                type: "GET",
-                dataType: "JSON",
-                data: { BomId: $('#Bomid').val() },
+                type: 'POST',
+                url: '/ProductionBOM/ProductionBOMDetailsDataInsert',
+                contentType: false,
+                processData: false,
+                dataType: 'html',
+                data: formdata,
                 success: function (data) {
-
+                    console.log(data);
+                    if (data.includes("Inserted")) {
+                        Swal.fire({
+                            title: 'Success!!',
+                            text: 'Saved Successfully !',
+                            icon: 'success',
+                            timer: 4000,
+                            timerProgressBar: true,
+                            showConfirmButton: false
+                        });
+                        setTimeout(function () {
+                            location.href = "/ProductionBOM/ProductionBOMDetails";
+                            return false;
+                        }, 4000);
+                    }
+                    else {
+                        $("#alert").append(
+                            '<div class="alert alert-danger">' +
+                            '<strong>Alert!</strong> Saved Not Successfully ' +
+                            '<strong id="close">x</strong>' +
+                            '</div>'
+                        );
+                        $(document).on('click', '#close', function () {
+                            $(".alert-danger").hide();
+                        });
+                    }
                 }
             });
+
+
         }
     </script>
 </body>

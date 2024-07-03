@@ -1,0 +1,383 @@
+﻿@model IEnumerable<MMS.Web.Models.Salesorders>
+@using MMS.Repository.Managers
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <style>
+
+        .page-item.active .page-link {
+            z-index: 3;
+            color: #fff;
+            background-color: #4472C4;
+            border-color: #0d6efd;
+        }
+
+        .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
+            padding: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="summery">
+        <ol class="breadcrumb font-20 d-flex justify-content-center">
+            <li class="breadcrumb-item " aria-current="page" style=" font-size: 112%;">SalesOrder Summery</li>
+        </ol>
+        <div class="d-flex justify-content-evenly mt-4">
+            <div class="form-floating">
+                <select id="buyerid" class="form-select">
+                    @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.BuyerName())
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+                <label for="floatingSelectGrid">Customer Name</label>
+            </div>
+
+            <div class="form-floating">
+                <select id="salesorderno" class="form-select">
+                    @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.salesorderno())
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+                <label for="floatingSelectGrid">SO Number</label>
+            </div>
+            <div class="form-floating">
+                <input type="date" class="form-control" id="InvDate" />
+                <label for="InvDate">From Date</label>
+            </div>
+            <div class="form-floating">
+                <input type="date" class="form-control" id="InvDueDate" />
+                <label for="InvDueDate">To Date</label>
+            </div>
+
+            <div id="transaction_reports_search4_container" class="reports_search_container_btn">
+                <button type="button" class="manage_customers_btn font-15" id="Search">
+                    FILTER
+                </button>
+            </div>
+
+            <div id="transaction_reports_search4_container" class="reports_search_container_btn">
+                <a href="/SalesOrder/SalesOrderDetails">
+                    <button type="button" class="manage_customers_btn font-15" id="add">
+                        ADD
+                    </button>
+                </a>
+            </div>
+        </div>
+        <div class="manage_customers_table_in_responsive mt-3" id="form">
+            <table class="table table-striped text-center">
+                <thead>
+                    <tr class="font-16">
+                        <th scope="col">
+                            <span id="add">Si.No</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>Order No</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>Order Date</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>Buyer Name</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+
+                        <th scope="col">
+                            <span>Items</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>Quantity</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>Total_Price</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>Total_DisValue</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>Sub Total</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+
+                        <th scope="col">
+                            <span>Tax Amount</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>Grand Price</span>  <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                    </tr>
+                </thead>
+                @if (Model != null && Model.Count() > 0)
+                {
+                    int count = 1;
+                    <tbody>
+                        @foreach (var i in Model)
+                        {
+
+                            <tr class="font-14">
+                                <td class="veh1-5">@count</td>
+                                <td class="veh1-5" style="width: 3%; text-align:center;">@i.SalesorderId</td>
+                                <td class="veh1-5" style="width: 2%; text-align:center;">@i.salesorderdate.ToString("dd/MM/yyyy")</td>
+                                <td class="veh1-5" style="width: 12%; text-align:left;">@i.BuyerMaster.BuyerFullName</td>
+                                <td class="veh1-5" style="width: 12%; text-align: center;">@i.item</td>
+                                <td class="veh1-5" style="width: 12%; text-align: right;">@string.Format("{0:0.00}", i.quantity)</td>
+                                <td class="veh1-5" style="width: 12%; text-align:right;"> @string.Format("{0:0.00}", i.Total_Price)</td>
+                                @if (@i.Total_discountval != null)
+                                {
+                                    <td class="veh1-5" style="width: 12%; text-align: right;">@string.Format("{0:0.00}", i.Total_discountval)</td>
+                                }
+                                else
+                                {
+                                    <td class="veh1-5" style="width: 12%; text-align: right;">0.00</td>
+                                }
+                                <td class="veh1-5" style="width: 12%; text-align: right;">@string.Format("{0:0.00}", i.Total_Subtotal)</td>
+                                <td class="veh1-5" style="width: 12%; text-align: right;">@string.Format("{0:0.00}", i.Total_TaxValue)</td>
+                                <td class="veh1-5" style="width: 12%; text-align: right;">@string.Format("{0:0.00}", i.Total_Grandtotal)</td>
+
+                            </tr>
+                            count++;
+                        }
+
+                    </tbody>
+
+                }
+            </table>
+        </div>
+        <div class="row manage_customer_show">
+            <div class="font-14 manage_customer_show_I col-xl-6">
+                <span>Showing </span>
+                <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
+                    <option value="8" @(ViewBag.PageSize == 8 ? "selected" : "")>8</option>
+                    <option value="16" @(ViewBag.PageSize == 16 ? "selected" : "")>16</option>
+                    <option value="24" @(ViewBag.PageSize == 24 ? "selected" : "")>24</option>
+                    <option value="32" @(ViewBag.PageSize == 32 ? "selected" : "")>32</option>
+                </select>
+            </div>
+
+            <div class="col-xl-6 manage_customer_show_II">
+                <nav class="float-xl-end">
+                    <ul class="pagination font-14">
+                        <li class="page-item">
+                            <a href="##" id="previousPage" class="page-link">Previous</a>
+                        </li>
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a href="#" class="page-link" data-page="@i">@i</a>
+                            </li>
+                        }
+                        <li class="page-item">
+                            <a class="page-link" id="nextPage" href="##">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+
+    <script src="~/Content/js/custom.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script>
+  $(document).ready(function() {
+    $('#manage_customer_show_no').change(function() {
+        var PageSize = parseInt($(this).val());
+        $.ajax({
+            url: '/SalesOrder/salesorderheader',
+            type: "GET",
+            dataType: "JSON",
+            data: { pageSize: PageSize },
+            success: function (values) {
+                $("#summery").html(values).show();
+            }
+        });
+    });
+      $(".page-link").click(function(e){
+            e.preventDefault();
+            var page = $(this).data("page");
+
+            $.ajax({
+                url: "@Url.Action("salesorderheader", "SalesOrder")",
+                type: "GET",
+                data: { page: page },
+                success: function(data){
+                    $("#summery").html(data).show();
+                }
+            });
+        });
+    $('#previousPage').click(function(e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        if (currentPage > 1) {
+            var previousPage = currentPage - 1;
+            $.ajax({
+                url: '/SalesOrder/salesorderheader',
+                type: "GET",
+                dataType: "JSON",
+                data: { page: previousPage, pageSize:parseInt('@ViewBag.PageSize') },
+                success: function (values) {
+                    $("#summery").html(values).show();
+                }
+            });
+        }
+    });
+
+    $('#nextPage').click(function(e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        var totalPages = parseInt('@ViewBag.TotalPages');
+        if (currentPage < totalPages) {
+            var nextPage = currentPage + 1;
+             $.ajax({
+                  url: '/SalesOrder/salesorderheader',
+                  type: "GET",
+                  dataType: "JSON",
+                   data: { page: nextPage, pageSize:parseInt('@ViewBag.PageSize') },
+                  success: function (values) {
+                       $("#summery").html(values).show();
+                  }
+             });
+
+        }
+    });
+
+});
+
+    </script>
+
+    <script>
+
+        $("#buyerid").change(function () {
+            var buyerid = $('#buyerid').val();
+            $.ajax({
+                url: '/SalesOrder/Getbuyerorderno',
+                type: "GET",
+                dataType: "JSON",
+                data: { id: buyerid },
+                success: function (values) {
+                    $("#salesorderno").html("");
+                    $("#salesorderno").append(
+                        $('<option></option>').val(0).html("Please Select")
+                    );
+                    $.each(values, function (i, order) {
+                        $("#salesorderno").append(
+                            $('<option></option>').val(order.salesorderid_hd).html(order.salesorderid_hd)
+                        );
+                    });
+                }
+            });
+        });
+        $(document).on("click", "#Search", function () {
+            var buyerid = $("#buyerid").val();
+            var salesorderno = $("#salesorderno").val();
+            $.ajax({
+                type: 'GET',
+                url: '/SalesOrder/search',
+                data: { customerid: buyerid, SOid: salesorderno },
+                contentType: 'application/json',
+                success: function (data) {
+                    $("tbody").empty();
+                    var count = 1;
+
+                    $.each(data, function (i, item) {
+                        var date = new Date(item.salesorderdate);
+                        const formattedDate = convertToReadableDate(item.salesorderdate);
+                        var formattedQuantity = (item.quantity).toFixed(2);
+                        var Total_Price = (item.Total_Price).toFixed(2);
+                        var formattedDiscountValue = (item.Total_discountval).toFixed(2);
+                        var formattedSubtotal = (item.Total_Subtotal).toFixed(2);
+                        var formattedTaxValue = (item.Total_TaxValue).toFixed(2);
+                        var formattedGrandtotal = (item.Total_Grandtotal).toFixed(2);
+
+                        $("tbody").append(`
+                                                        <tr class="font-14">
+                                                            <td class="veh1-5">${count}</td>
+                                                            <td class="veh1-5" style="width: 12%;">${item.SalesorderId}</td>
+                                                            <td class="veh1-5" style="width: 12%;">${formattedDate}</td>
+                                                            <td class="veh1-5" style="width: 12%;">${item.BuyerMaster.BuyerFullName}</td>
+                                                            <td class="veh1-5" style="width: 12%;">${item.item}</td>
+                                                            <td class="veh1-5" style="width: 12%;">${formattedQuantity}</td>
+                                                            <td class="veh1-5" style="width: 12%;">${Total_Price}</td>
+                                                            <td class="veh1-5" style="width: 12%;">${formattedDiscountValue}</td>
+                                                            <td class="veh1-5" style="width: 12%;">${formattedSubtotal}</td>
+                                                            <td class="veh1-5" style="width: 12%;">${formattedTaxValue}</td>
+                                                            <td class="veh1-5" style="width: 12%;">${formattedGrandtotal}</td>
+
+                                                        </tr>
+                                                    `);
+                        count++;
+                    });
+                }
+
+            });
+        });
+        function convertToReadableDate(dateString) {
+            const match = dateString.match(/\d+/);
+            if (match) {
+                const timestamp = parseInt(match[0], 10);
+                const date = new Date(timestamp);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+            return "Invalid Date";
+        }
+    </script>
+    <script>
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#order").attr('checked', true);
+        });
+    </script>
+
+
+</body>
+</html>

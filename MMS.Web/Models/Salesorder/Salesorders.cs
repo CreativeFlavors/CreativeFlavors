@@ -17,17 +17,21 @@ namespace MMS.Web.Models
     {
         public int SalesorderId { get; set; }
         public int SalesorderId_DT { get; set; }
+        public int SalesorderId_HD { get; set; }
         public int BuyerName { get; set; }
         public string BuyerNames { get; set; }
         public int materialname { get; set; }
         public int MaterialCategoryMasterId { get; set; }
         public string ProductCode { get; set; }
         public string ProductName { get; set; }
+        public string shippingadd { get; set; }
+        public string Billingadd { get; set; }
         public int ProductID { get; set; }
         public string Bomno { get; set; }
         public int buyerid { get; set; }
         public int UomMasterId { get; set; }
         public int TaxMasterID { get; set; }
+        public string Taxper { get; set; }
         public decimal? TaxValue { get; set; }
         public decimal? Price { get; set; }
         public decimal? quantity { get; set; } 
@@ -41,6 +45,7 @@ namespace MMS.Web.Models
         public decimal? discountperid { get; set; }
         public decimal? subassemblyqty { get; set; }
         public decimal? discountvalue { get; set; }
+        public double? discountval { get; set; }
         public string Specialinstruction { get; set; }
         public string Additionalcommends { get; set; }
         public string quoteref { get; set; }
@@ -72,8 +77,16 @@ namespace MMS.Web.Models
         public List<mrp_material_list> mrp_Material_Lists { get; set; }
         public List<mrp_subassembly_list> mrp_subassembly_Lists { get; set; }
         public List<SalesorderCart> salesorderList { get; set; }
+        public List<Salesorders> salesorderLists { get; set; }
+        public List<SalesOrderItem> SalesOrderData { get; set; }
 
 
-
+    }
+    public class SalesOrderItem
+    {
+        public string SalesorderId_DT { get; set; }
+        public string ProductCode { get; set; }
+        public string ProductID { get; set; }
+        public int Quantity { get; set; }
     }
 }

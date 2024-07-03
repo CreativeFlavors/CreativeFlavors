@@ -9,7 +9,7 @@ namespace MMS.Repository.Service
 {
     public interface ITemp_salesorderServices
     {
-        bool Post(Temp_salesorder arg);
+        bool Post(Temp_Indent arg);
       
     }
 }
