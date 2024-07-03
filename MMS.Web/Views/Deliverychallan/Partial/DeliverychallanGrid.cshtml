@@ -1,0 +1,607 @@
+﻿@model IEnumerable<MMS.Web.Models.Salesorders>
+@using MMS.Repository.Managers
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link href="~/Content/css1/mrp.css" rel="stylesheet" />
+    <style>
+    </style>
+</head>
+
+<body>
+
+    <div class="main-page">
+        <div id="transaction_report" class="reports common_Manage_subMerchant">
+
+            <div class="table-responsive reports_table_responsive">
+                <div class=" align-items-center manage_customers_head">
+                    <div class="d-flex justify-content-center">
+                        <h2>Delivery Challan</h2>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-evenly mt-4">
+                    <div class="form-floating">
+                        <select id="buyerid" class="form-select">
+                            @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.BuyerName())
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                        <label for="floatingSelectGrid">Customer Name</label>
+                    </div>
+
+                    <div class="form-floating">
+                        <select id="salesorderno" class="form-select">
+                            @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.salesorderno())
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                        <label for="floatingSelectGrid">SO Number</label>
+                    </div>
+                    <div class="form-floating">
+                        <input type="date" class="form-control" id="InvDate" />
+                        <label for="InvDate">From Date</label>
+                    </div>
+                    <div class="form-floating">
+                        <input type="date" class="form-control" id="InvDueDate" />
+                        <label for="InvDueDate">To Date</label>
+                    </div>
+
+                    <div id="transaction_reports_search4_container" class="reports_search_container_btn">
+                        <button type="button" class="manage_customers_btn font-15" id="Search">
+                            FILTER
+                        </button>
+                    </div>
+
+                    <div id="transaction_reports_search4_container" class="reports_search_container_btn">
+                        <a href="/Deliverychallan/DeliverychallanDetails">
+                            <button type="button" class="manage_customers_btn font-15" id="add">
+                                ADD
+                            </button>
+                        </a>
+
+                    </div>
+                </div>
+                <div class="manage_customers_table_in_responsive" id="form">
+                    <div class="container1 mt-4">
+                        @if (Model != null && Model.Count() > 0)
+                        {
+                            int count = 1;
+                            foreach (var i in Model)
+                            {
+                                var className = "";
+                                switch (count)
+                                {
+                                    case 1:
+                                    case 5:
+                                        className = "basic";
+                                        break;
+                                    case 2:
+                                        className = "echo";
+                                        break;
+                                    case 3:
+                                        className = "pro";
+                                        break;
+                                    case 4:
+                                        className = "business";
+                                        break;
+                                }
+                                <div class="column">
+                                    <div class="pricing-card  @className">
+                                        <div class="pricing-header">
+                                            <span class="plan-title">@i.BuyerMaster.BuyerFullName</span>
+                                            <div class="price-circle">
+                                                <span class="price-title">
+                                                    <span>@string.Format("{0:0.00}", i.quantity)</span>
+                                                </span>
+                                                <span class="info">Total-Qty</span>
+                                            </div>
+                                        </div>
+                                        <div class="badge-box">
+                                            <span>Order no & Date <br /><b style="color:olivedrab">@i.SalesorderId / @i.salesorderdate.ToString("dd/MM/yyyy")</b> </span>
+                                        </div>
+                                        <ul id="ul">
+                                            <li>
+                                                Items --> <strong>@i.item / @i.item </strong>
+                                            </li>
+                                            <li>
+                                                DC-Items  --> <strong>0</strong>
+                                            </li>
+                                            <li>
+                                                Unit Price  --> <strong>@string.Format("{0:0.00}", i.Total_Price)</strong>
+                                            </li>
+                                            @if (@i.Total_discountval != null)
+                                            {
+                                                <li>
+                                                    Discount --> <strong>@string.Format("{0:0.00}", i.Total_discountval)</strong>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li>
+                                                    Discount --> <strong>0.00</strong>
+                                                </li>
+                                            }
+                                            <li>
+                                                Sub Total --> <strong>@string.Format("{0:0.00}", i.Total_Subtotal)</strong>
+                                            </li>
+                                            <li>
+                                                Tax Amount --> <strong>@string.Format("{0:0.00}", i.Total_TaxValue)</strong>
+                                            </li>
+                                            <li>
+                                                Grand Price --> <strong>@string.Format("{0:0.00}", i.Total_Grandtotal)</strong>
+                                            </li>
+                                        </ul>
+                                        <div class="d-flex justify-content-between">
+                                            <div class="buy-button-box" onclick="Edit('@i.SalesorderId')">
+                                                <b class="buy-nows" id="DCapply">Issue DC</b>
+                                            </div>
+                                            <div class="buy-button-box" onclick="Edits('@i.SalesorderId')">
+                                                <b class="buy-now" id="DCapply">Raise Invoice</b>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                count++;
+                            }
+                        }
+                    </div>
+
+                </div>
+
+                <div class="row manage_customer_show">
+                    <div class="font-14 manage_customer_show_I col-xl-6">
+                        <span>Showing </span>
+                        <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
+                            <option value="5" @(ViewBag.PageSize == 5 ? "selected" : "")>5</option>
+                            <option value="10" @(ViewBag.PageSize == 10 ? "selected" : "")>10</option>
+                            <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
+                            <option value="20" @(ViewBag.PageSize == 20 ? "selected" : "")>20</option>
+                        </select>
+                    </div>
+
+                    <div class="col-xl-6 manage_customer_show_II">
+                        <nav class="float-xl-end">
+                            <ul class="pagination font-14">
+                                <li class="page-item">
+                                    <a href="##" id="previousPage" class="page-link">Previous</a>
+                                </li>
+                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                        <a href="#" class="page-link" data-page="@i">@i</a>
+                                    </li>
+                                }
+                                <li class="page-item">
+                                    <a class="page-link" id="nextPage" href="##">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script src="~/Content/js/custom.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#dc").attr('checked', true);
+
+        });
+    </script>
+    <script>
+
+  function Edit(arg) {
+            $('.main-page').hide();
+       $.ajax({
+           type: "Post",
+           url: ' @Url.Action("EditDeliverychallanDetails", "Deliverychallan")',
+           data: { SOId: arg },
+           success: function (data) {
+               $(".main-page").html(data);
+               $(".main-page").show();
+           }
+       });
+   }
+    </script>
+    <script>
+        $(document).ready(function () {
+
+
+      $('#manage_customer_show_no').change(function () {
+          $('.main-page').hide();
+        var PageSize = parseInt($(this).val());
+        $.ajax({
+            url: '/Deliverychallan/DeliverychallanGrid',
+            type: "GET",
+            dataType: "JSON",
+            data: { pageSize: PageSize },
+            success: function (values) {
+                $(".main-page").html(values).show();
+            }
+        });
+    });
+      $(".page-link").click(function(){
+          $('.main-page').hide();
+            var page = $(this).data("page");
+
+            $.ajax({
+                url: "@Url.Action("DeliverychallanGrid", "Deliverychallan")",
+                type: "GET",
+                data: { page: page },
+                success: function(data){
+                    $(".main-page").html(data).show();
+                }
+            });
+        });
+    $('#previousPage').click(function(e) {
+
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        if (currentPage > 1) {
+            var previousPage = currentPage - 1;
+            $.ajax({
+                url: '/Deliverychallan/DeliverychallanGrid',
+                type: "GET",
+                dataType: "JSON",
+                data: { page: previousPage, pageSize:parseInt('@ViewBag.PageSize') },
+                success: function (values) {
+                    $(".main-page").html(values).show();
+                }
+            });
+        }
+    });
+
+    $('#nextPage').click(function(e) {
+
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        var totalPages = parseInt('@ViewBag.TotalPages');
+        if (currentPage < totalPages) {
+            var nextPage = currentPage + 1;
+             $.ajax({
+                 url: '/Deliverychallan/DeliverychallanGrid',
+                  type: "GET",
+                  dataType: "JSON",
+                   data: { page: nextPage, pageSize:parseInt('@ViewBag.PageSize') },
+                  success: function (values) {
+                      $(".main-page").html(values).show();
+                  }
+             });
+
+        }
+    });
+
+});
+
+    </script>
+    <script>
+        function confirmorder() {
+            var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+            var row = $(this).closest('tr');
+            var SalesorderId_HD = row.find('.SalesorderId_HD').text();
+            var buyerid = $("#BuyerName").val();
+            var totaltax = $("#Total_TaxValue").val();
+            var totaldis = $("#Total_discountval").val();
+            var totalsub = $("#Total_Subtotal").val();
+            var totaldgrand = $("#Total_Grandtotal").val();
+            var Total_Price = $("#Total_Price").val();
+            debugger;
+            var formdata = new FormData();
+            formdata.append("buyerid", buyerid);
+            formdata.append("SalesorderId_HD", SalesorderId_HD);
+            formdata.append("currencyOption", currencyOption);
+            formdata.append("Total_Price", Total_Price);
+            formdata.append("Total_Subtotal", totalsub);
+            formdata.append("Total_TaxValue", totaltax);
+            formdata.append("Total_discountval", totaldis);
+            formdata.append("Total_Grandtotal", totaldgrand);
+
+            var salesOrderData = [];
+            $('#salesOrderTable tr').each(function () {
+                var row = $(this);
+                var orderItem = {
+                    SalesorderId_DT: row.find('#SalesorderId_DT').text(),
+                    ProductCode: row.find('#productcode').text(),
+                    ProductID: row.find('#productid').text(),
+                    Quantity: parseInt(row.find('.quantityInput').val()),
+                };
+                salesOrderData.push(orderItem);
+            });
+
+            formdata.append("salesOrderData", JSON.stringify(salesOrderData));
+
+            $.ajax({
+                url: '/deliverychallan/DC_Post',
+                type: 'POST',
+                contentType: false,
+                processData: false,
+                dataType: 'html',
+                data: formdata,
+                success: function (response) {
+                    alert(" updated successfully!");
+                }
+            });
+        }
+    </script>
+
+    <script>
+
+        $(document).ready(function () {
+            $(document).on("click", ".decrementbtn", function () {
+                var $quantityInput = $(this).siblings('.quantityInput');
+                var quantityValue = parseInt($quantityInput.val(), 10);
+                if (quantityValue > 0) {
+                    $quantityInput.val(quantityValue - 1);
+
+                    var quantity = (quantityValue - 1);
+                    var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+                    var buyerid = $("#BuyerName").val();
+                    var row = $(this).closest('tr');
+                    var ProductID = row.find('#productid').text();
+                    var discountval = row.find('#discount').text();
+                    var totaltax = $("#Total_TaxValue").val();
+                    var totaldis = $("#Total_discountval").val();
+                    var totalsub = $("#Total_Subtotal").val();
+                    var totaldgrand = $("#Total_Grandtotal").val();
+                    var formdata = new FormData();
+                    formdata.append("buyerid", buyerid);
+                    formdata.append("ProductID", ProductID);
+                    formdata.append("discountval", discountval);
+                    formdata.append("quantity", quantity);
+                    formdata.append("currencyOption", currencyOption);
+
+                    formdata.append("Total_Subtotal", totalsub);
+                    formdata.append("Total_TaxValue", totaltax);
+                    formdata.append("Total_discountval", totaldis);
+                    formdata.append("Total_Grandtotal", totaldgrand);
+                    $.ajax({
+                        url: '/Deliverychallan/Dec_Calculationdetails',
+                        type: 'POST',
+                        contentType: false,
+                        processData: false,
+                        dataType: 'html',
+                        data: formdata,
+                        success: function (response) {
+                            row.find("#subtotal").text("");
+                            row.find("#TaxValue").text("");
+                            row.find("#totalprice").text("");
+                            row.find("#discountamount").text("");
+                            $("#Total_Subtotal").val("");
+                            $("#Total_discountval").val("");
+                            $("#Total_TaxValue").val("");
+                            $("#Total_Grandtotal").val("");
+                            var data = JSON.parse(response);
+                            row.find("#subtotal").text(data.Subtotal);
+                            row.find("#TaxValue").text(data.TaxValue);
+                            row.find("#totalprice").text(data.Grandtotal);
+                            row.find("#discountamount").text(data.discountvalue);
+
+                            $("#Total_discountval").val(data.Total_discountval);
+                            $("#Total_Subtotal").val(data.Total_Subtotal);
+                            $("#Total_TaxValue").val(data.Total_TaxValue);
+                            $("#Total_Grandtotal").val(data.Total_Grandtotal);
+                        }
+
+                    });
+                }
+
+            });
+
+            $(document).on("click", ".incrementbtn", function () {
+                var $quantityInput = $(this).siblings('.quantityInput');
+                var quantityValue = parseInt($quantityInput.val(), 10);
+
+                var maxQuantity = $(this).closest('td').data('max-quantity');
+                if (quantityValue < maxQuantity) {
+                    $quantityInput.val(quantityValue + 1);
+
+                    var quantity = (quantityValue + 1);
+                    var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+                    var buyerid = $("#BuyerName").val();
+                    var row = $(this).closest('tr');
+                    var ProductID = row.find('#productid').text();
+                    var discountperid = row.find('#discount').text();
+                    var totaltax = $("#Total_TaxValue").val();
+                    var totaldis = $("#Total_discountval").val();
+                    var totalsub = $("#Total_Subtotal").val();
+                    var totaldgrand = $("#Total_Grandtotal").val();
+                    var formdata = new FormData();
+                    formdata.append("buyerid", buyerid);
+                    formdata.append("ProductID", ProductID);
+                    formdata.append("discountval", discountperid);
+                    formdata.append("quantity", quantity);
+                    formdata.append("currencyOption", currencyOption);
+                    formdata.append("Total_Subtotal", totalsub);
+                    formdata.append("Total_TaxValue", totaltax);
+                    formdata.append("Total_discountval", totaldis);
+                    formdata.append("Total_Grandtotal", totaldgrand);
+                    $.ajax({
+                        url: '/Deliverychallan/Inc_Calculationdetails',
+                        type: 'POST',
+                        contentType: false,
+                        processData: false,
+                        dataType: 'html',
+                        data: formdata,
+                        success: function (response) {
+                            row.find("#subtotal").text("");
+                            row.find("#TaxValue").text("");
+                            row.find("#totalprice").text("");
+                            row.find("#discountamount").text("");
+                            $("#Total_Subtotal").val("");
+                            $("#Total_discountval").val("");
+                            $("#Total_TaxValue").val("");
+                            $("#Total_Grandtotal").val("");
+                            var data = JSON.parse(response);
+                            row.find("#subtotal").text(data.Subtotal);
+                            row.find("#TaxValue").text(data.TaxValue);
+                            row.find("#totalprice").text(data.Grandtotal);
+                            row.find("#discountamount").text(data.discountvalue);
+                            $("#Total_discountval").val(data.Total_discountval);
+                            $("#Total_Subtotal").val(data.Total_Subtotal);
+                            $("#Total_TaxValue").val(data.Total_TaxValue);
+                            $("#Total_Grandtotal").val(data.Total_Grandtotal);
+                        }
+
+                    });
+
+                }
+            });
+
+
+
+
+
+            //$(document).on("click", ".decrementbtn", function () {
+            //    var $discountInput = $(this).siblings('.discountInput');
+            //    var disValue = parseFloat($discountInput.val(), 10);
+
+            //    if (disValue > 0) {
+            //        $discountInput.val(disValue - 1);
+
+            //        var discountperid = (disValue - 1);
+            //        var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+            //        var buyerid = $("#BuyerName").val();
+            //        var row = $(this).closest('tr');
+            //        var ProductID = row.find('#productid').text();
+            //        var quantity = row.find('.quantityInput').val();
+
+            //        var formdata = new FormData();
+            //        formdata.append("buyerid", buyerid);
+            //        formdata.append("ProductID", ProductID);
+            //        formdata.append("discountval", discountperid);
+            //        formdata.append("quantity", quantity);
+            //        formdata.append("currencyOption", currencyOption);
+            //        $.ajax({
+            //            url: '/Deliverychallan/Calculationdetails',
+            //            type: 'POST',
+            //            contentType: false,
+            //            processData: false,
+            //            dataType: 'html',
+            //            data: formdata,
+            //            success: function (response) {
+            //                row.find("#subtotal").text("");
+            //                row.find("#TaxValue").text("");
+            //                row.find("#totalprice").text("");
+            //                row.find("#discountamount").text("");
+            //                var data = JSON.parse(response);
+            //                row.find("#subtotal").text(data.Subtotal);
+            //                row.find("#TaxValue").text(data.TaxValue);
+            //                row.find("#totalprice").text(data.Grandtotal);
+            //                row.find("#discountamount").text(data.discountvalue);
+            //            }
+
+            //        });
+            //    }
+            //});
+
+            //$(document).on("click", ".incrementbtn", function () {
+            //    var $discountInput = $(this).siblings('.discountInput');
+            //    var disValue = parseFloat($discountInput.val(), 10);
+
+            //    var maxQuantity = 100;
+            //    if (disValue < maxQuantity) {
+            //        $discountInput.val(disValue + 1);
+
+            //        var discountperid = (disValue + 1);
+            //        var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+            //        var buyerid = $("#BuyerName").val();
+            //        var row = $(this).closest('tr');
+            //        var ProductID = row.find('#productid').text();
+            //        var quantity = row.find('.quantityInput').val();
+
+            //        var formdata = new FormData();
+            //        formdata.append("buyerid", buyerid);
+            //        formdata.append("ProductID", ProductID);
+            //        formdata.append("discountval", discountperid);
+            //        formdata.append("quantity", quantity);
+            //        formdata.append("currencyOption", currencyOption);
+            //        $.ajax({
+            //            url: '/Deliverychallan/Calculationdetails',
+            //            type: 'POST',
+            //            contentType: false,
+            //            processData: false,
+            //            dataType: 'html',
+            //            data: formdata,
+            //            success: function (response) {
+            //                row.find("#subtotal").text("");
+            //                row.find("#TaxValue").text("");
+            //                row.find("#totalprice").text("");
+            //                row.find("#discountamount").text("");
+            //                var data = JSON.parse(response);
+            //                row.find("#subtotal").text(data.Subtotal);
+            //                row.find("#TaxValue").text(data.TaxValue);
+            //                row.find("#totalprice").text(data.Grandtotal);
+            //                row.find("#discountamount").text(data.discountvalue);
+            //            }
+
+            //        });
+            //    }
+            //});
+            //$(document).on('keyup', '.discountInput', function () {
+            //    var $discountInput = $(this);
+            //    var disValue = parseFloat($discountInput.val().trim());
+
+            //    var maxQuantity = 100.1;
+            //    if (disValue < maxQuantity) {
+            //        var discountperid = (disValue);
+            //        var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+            //        var buyerid = $("#BuyerName").val();
+            //        var row = $(this).closest('tr');
+            //        var ProductID = row.find('#productid').text();
+            //        var quantity = row.find('.quantityInput').val();
+
+            //        var formdata = new FormData();
+            //        formdata.append("buyerid", buyerid);
+            //        formdata.append("ProductID", ProductID);
+            //        formdata.append("discountval", discountperid);
+            //        formdata.append("quantity", quantity);
+            //        formdata.append("currencyOption", currencyOption);
+            //        $.ajax({
+            //            url: '/Deliverychallan/Calculationdetails',
+            //            type: 'POST',
+            //            contentType: false,
+            //            processData: false,
+            //            dataType: 'html',
+            //            data: formdata,
+            //            success: function (response) {
+            //                row.find("#subtotal").text("");
+            //                row.find("#TaxValue").text("");
+            //                row.find("#totalprice").text("");
+            //                row.find("#discountamount").text("");
+            //                var data = JSON.parse(response);
+            //                row.find("#subtotal").text(data.Subtotal);
+            //                row.find("#TaxValue").text(data.TaxValue);
+            //                row.find("#totalprice").text(data.Grandtotal);
+            //                row.find("#discountamount").text(data.discountvalue);
+            //            }
+
+            //        });
+            //    }
+            //});
+        });
+    </script>
+
+
+</body>
+</html>
+

@@ -128,7 +128,7 @@ $(".file-upload").each(function () {
 });
 
 
-//********* Rooban start*******/ 
+//********* Mohan start*******/ 
 $(document).ready(function () {
     $(".msg-frame-img-div").click(function () {
         $(".chat-poopup").toggleClass("chat-popup-show");
@@ -137,7 +137,7 @@ $(document).ready(function () {
         $(".msg-frame-img-div").toggleClass("active-img-cross");
     });
 });
-//********* Rooban end*******/
+//*********Mohan  end*******/
 
 
 
