@@ -202,7 +202,7 @@ namespace MMS.Web.Controllers
             var st = salesorderManager.GetSO(id);
             var product = productManager.GetId(st.productid);
             var bommaterial = bOMMaterialListManager.GetMaterialList(product.BomNo);
-            Temp_salesorder temp_Salesorder = new Temp_salesorder();
+            Temp_Indent temp_Salesorder = new Temp_Indent();
             foreach (var item in bommaterial)
             {
                 MaterialOpeningStockManager materialOpeningStockManager = new MaterialOpeningStockManager();

@@ -37,6 +37,11 @@
                 box-shadow: 0 6px #666;
                 transform: translateY(4px);
             }
+        .read-only-dropdown[disabled] {
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
     </style>
 </head>
 
@@ -70,19 +75,19 @@
                         </div>
                         <div class="input-part">
                             <label class="font-14" for="Description">Description</label>
-                            @Html.TextBoxFor(m => m.Description, new { @class = "form-control text-field", placeholder = "Enter Text" })
+                            @Html.TextBoxFor(m => m.Description, new { @class = "form-control text-field", placeholder = "Enter Text", @readonly = "true", style = "background-color: #eee !important;" })
                         </div>
                         <div class="input-part">
                             <label class="font-14" for="Date">Date</label>
                             @if (Model != null && Model.Bomid != 0)
                             {
                                 var from = Model.Date;
-                                @Html.TextBoxFor(m => m.Date, new { @Value = from, @class = "form-control text-field" })
+                                @Html.TextBoxFor(m => m.Date, new { @Value = from, @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
                             }
                             else
                             {
 
-                                @Html.TextBoxFor(m => m.Date, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field", @readonly = "true" })
+                                @Html.TextBoxFor(m => m.Date, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
                             }
                         </div>
                         @*<div class="input-part">
@@ -92,7 +97,7 @@
                             </div>*@
                         <div class="input-part">
                             <label class="font-14" for="LastBomNoEntered">Last BOM No. Entered</label>
-                            @Html.TextBoxFor(m => m.Lastbom, new { @class = "form-control text-field", @readonly = "true" })
+                            @Html.TextBoxFor(m => m.Lastbom, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
 
                         </div>
 
@@ -111,14 +116,14 @@
 
                         </div>
                         <div class="edit-merchant">
-                            <div class="edit-merchant-inner-section">
+                            <div class="edit-merchant-inner-section" id="product">
                                 <div class="input-part">
-                                    @Html.HiddenFor(m => m.Bommaterialid)
-                                    @Html.HiddenFor(m => m.subassemblyid)
-                                    <label class="font-14" for="produzct">Product</label>
-                                    @Html.DropDownListFor(m => m.Productid, MMS.Web.ExtensionMethod.HtmlHelper.ProductName(), new { @class = "select-style text-field " })
+                            @Html.HiddenFor(m => m.Bommaterialid)
+                            @Html.HiddenFor(m => m.subassemblyid)
+                            <label class="font-14" for="produzct">Product</label>
+                                        @Html.DropDownListFor(m => m.Productid, MMS.Web.ExtensionMethod.HtmlHelper.ProductName(), new { @class = "select-style text-field " })
+                                    </div>
                                 </div>
-                            </div>
                             <div class="edit-merchant-inner-section" id="a1">
                                 <div class="input-part">
                                     <label class="font-14" for="MaterialCategoryMasterId">Material Catogory</label>
@@ -142,7 +147,15 @@
                             <div class="edit-merchant-inner-section" id="a4">
                                 <div class="input-part">
                                     <label class="font-14" for="WastageQtyUOM">UOM</label>
-                                    @Html.DropDownListFor(m => m.Uomid, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "select-style text-field ", disable = "disable" })
+                                    @Html.DropDownListFor(
+       m => m.Uomid,
+       MMS.Web.ExtensionMethod.HtmlHelper.Uom(),
+       new
+{
+           @class = "select-style text-field read-only-dropdown",
+           style = "background-color: #eee !important;"
+       }
+   )
                                 </div>
                             </div>
                             <div class="edit-merchant-inner-section">
@@ -170,8 +183,8 @@
                         @{Html.RenderPartial("~/Views/Stock/BillOfMaterial/PartialView/_MaterialGrid.cshtml", Model);}
                     </div>
                     @*<div class="subassemblyGrid" id="subassemblyGrid">
-                        @{Html.RenderPartial("~/Views/Stock/BillOfMaterial/PartialView/subassembly.cshtml", Model);}
-                    </div>*@
+                            @{Html.RenderPartial("~/Views/Stock/BillOfMaterial/PartialView/subassembly.cshtml", Model);}
+                        </div>*@
                 </div>
         </section>
     </div>
@@ -232,8 +245,8 @@
             formdata.append("MaterialMasterid", MaterialMasterid);
             formdata.append("Uomid", Uomid);
             formdata.append("Requiredqty", Requiredqty);
-            if (Bommaterialid == "") {
-                if (Bomno != "" && Productid != "" && MaterialCategoryid != "" && MaterialMasterid != "" && Requiredqty != "") {
+            if (Bommaterialid != "") {
+                if (Bomno != "" && MaterialCategoryid != "" && MaterialMasterid != "" && Requiredqty != "") {
                     if (Bomid == "0") {
                         $.ajax({
                             type: 'POST',
@@ -245,7 +258,7 @@
                             success: function (values) {
                                 var data = JSON.parse(values);
                                 if (data.AlertMessage === "Saved Successfully") {
-                                    alert("Saved Successfully.");
+                                    alert("Added Successfully.");
                                     window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.bomids;
                                 }
                                 else if (data == "Already Existed") {
@@ -271,7 +284,7 @@
                             success: function (values) {
                                 var data = JSON.parse(values);
                                 if (data.AlertMessage === "Updated Successfully") {
-                                    alert("Saved Successfully.");
+                                    alert("Updated Successfully.");
 
                                     window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.update;
                                 }
@@ -290,7 +303,7 @@
                 }
             }
             else {
-                if (Bomno != "" && Productid != "" && MaterialCategoryid != "" && MaterialMasterid != "" && Requiredqty != "") {
+                if (Bomno != "" && MaterialCategoryid != "" && MaterialMasterid != "" && Requiredqty != "") {
                     if (Bomid == "0") {
                         $.ajax({
                             type: 'POST',
@@ -302,7 +315,7 @@
                             success: function (values) {
                                 var data = JSON.parse(values);
                                 if (data.AlertMessage === "Saved Successfully") {
-                                    alert("Updated Successfully.");
+                                    alert("Added Successfully.");
                                     window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.bomids;
                                 }
                                 else if (data == "Already Existed") {
@@ -367,7 +380,7 @@
             formdata.append("Productid", Productid);
             formdata.append("Requiredqty", Requiredqty);
             if (subassemblyid == "") {
-                if (Bomno != "" && Productid != "" && Requiredqty != "") {
+                if (Bomno != "" && Requiredqty != "") {
                     if (Bomid == "0") {
                         $.ajax({
                             type: 'POST',
@@ -379,7 +392,7 @@
                             success: function (values) {
                                 var data = JSON.parse(values);
                                 if (data.AlertMessage === "Saved Successfully") {
-                                    alert("Updated Successfully.");
+                                    alert("Added Successfully.");
                                     window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.bomids;
                                 }
                                 else if (data == "Already Existed") {
@@ -405,7 +418,7 @@
                             success: function (values) {
                                 var data = JSON.parse(values);
                                 if (data.AlertMessage === "Updated Successfully") {
-                                    alert("Updated Successfully.");
+                                    alert("Added Successfully.");
                                     window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.update;
                                 }
                                 else if (data == "Already Existed") {
@@ -423,7 +436,7 @@
                 }
             }
             else {
-                if (Bomno != "" && Productid != "" && Requiredqty != "") {
+                if (Bomno != "" && Requiredqty != "") {
                     if (Bomid == "0") {
                         $.ajax({
                             type: 'POST',
@@ -435,7 +448,7 @@
                             success: function (values) {
                                 var data = JSON.parse(values);
                                 if (data.AlertMessage === "Saved Successfully") {
-                                    alert("Saved Successfully.");
+                                    alert("Added Successfully.");
                                     window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.bomids;
                                 }
                                 else if (data == "Already Existed") {
@@ -461,7 +474,7 @@
                             success: function (values) {
                                 var data = JSON.parse(values);
                                 if (data.AlertMessage === "Updated Successfully") {
-                                    alert("Updated Successfully.");
+                                    alert("Added Successfully.");
                                     window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.update;
                                 }
                                 else if (data == "Already Existed") {
@@ -482,22 +495,21 @@
     </script>
     <script>
         $(document).ready(function () {
+            $(".read-only-dropdown").attr("disabled", "disabled");
             $("#sub").hide();
-            //$("#subassemblyGrid").hide();
+            $("#product").hide();
             $("#add1").on("click", function () {
                 $("#mat").hide();
-                //$("#MaterialListGrid").hide();
-                //$("#subassemblyGrid").show();
                 $("#sub").show();
+                $("#product").show();
                 $("#a1").hide();
                 $("#a2").hide();
                 $("#a3").hide();
                 $("#a4").hide();
             });
             $("#add").on("click", function () {
+                $("#product").hide();
                 $("#mat").show();
-                //$("#MaterialListGrid").show();
-                //$("#subassemblyGrid").hide();
                 $("#sub").hide();
                 $("#a1").show();
                 $("#a2").show();

@@ -79,7 +79,7 @@
     <div>
         <div id="transaction_report" class="reports common_Manage_subMerchant">
             <div class="table-responsive reports_table_responsive">
-                <h3 class="font-20">List of material and other items</h3>
+                <h3 class="font-20">List of material and Sub_assembly items</h3>
                 <div class="d-flex mt-3">
                     <input type="text" id="Material_Search" placeholder="Material Search" style="width: 35%;" class="form-control" />
                     <input type="button" value="Search" title="Title" class="search-input btn btn-info" style=" color: #fbf5f5;" id="MaterialSearch" />
@@ -91,23 +91,29 @@
                             <table class="table table-bordered table-fixed" style="text-align: center; width: 100%;">
                                 <thead>
                                     <tr style="position: -webkit-sticky; position: sticky; top: 0; background-color: gray; color: #fff;">
-                                        @*<th scope="col">
-                                            <span>SNO</span>
+                                        <th scope="col">
+                                            <span>Type</span>
                                             <span>
                                                 <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                             </span>
-                                        </th>*@
+                                        </th>
                                         <th scope="col">
                                             <span>Status</span>
                                         </th>
                                         <th scope="col">
-                                            <span>Product</span>
+                                            <span>Material_sub</span>
                                             <span>
                                                 <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                             </span>
                                         </th>
                                         <th scope="col">
                                             <span>Req Qty</span>
+                                            <span>
+                                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                            </span>
+                                        </th>
+                                        <th scope="col">
+                                            <span>UOM</span>
                                             <span>
                                                 <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                             </span>
@@ -133,12 +139,7 @@
                                             </span>
                                         </th>
 
-                                        <th scope="col">
-                                            <span>UOM</span>
-                                            <span>
-                                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                            </span>
-                                        </th>
+
 
                                     </tr>
                                 </thead>
@@ -151,6 +152,7 @@
 
                                             <tr class="font-14">
                                                 @*<td class="veh1-5">@count</td>*@
+                                                <td class="veh1-5">MA</td>
                                                 <td class="veh-4" style="width:12%;">
                                                     <span class="table_icons">
                                                         <img src="~/Content/assets/images/edit-icon.png" onclick="Editmat('@i.Bommaterialid')" />
@@ -159,12 +161,13 @@
                                                         <img src="~/Content/assets/images/delete-icon.png" onclick="Deletemat('@i.Bommaterialid')" />
                                                     </span>
                                                 </td>
-                                                <td class="veh1-5" style="width: 12%;">@i.productname</td>
+                                                <td class="veh1-5" style="width: 12%;">-</td>
                                                 <td class="veh1-5" style="width: 12%;">@i.Requiredqty</td>
+                                                <td class="veh1-5" style="width: 12%;">@i.UOMName</td>
                                                 <td class="veh1-5" style="width: 12%;">@i.MaterialNames</td>
                                                 <td class="veh1-5" style="width: 12%;">@i.materialcategory</td>
                                                 <td class="veh1-5" style="width: 12%;">@i.materialgroup</td>
-                                                <td class="veh1-5" style="width: 12%;">@i.UOMName</td>
+
                                             </tr>
                                             count++;
                                         }
@@ -181,6 +184,7 @@
 
                                             <tr class="font-14">
                                                 @*<td class="veh1-5" style="width:11%">@count</td>*@
+                                                <td class="veh1-5">SA</td>
                                                 <td class="veh-4" style="width:12%;">
                                                     <span class="table_icons">
                                                         <img src="~/Content/assets/images/edit-icon.png" onclick="Editass('@i.subassemblyid')" />
@@ -245,7 +249,8 @@
 
 
         function Editmat(arg) {
-            var bomid ="@Model.Bomid";
+            var bomid = "@Model.Bomid";
+
            $.ajax({
                 type: "PUT",
                url: '/BillOfMaterial/EditBOMmaterialDetails',
@@ -254,18 +259,16 @@
                    $(".main-page").html(data);
                    $(".main-page").show();
                    $("#mat").show();
-                   //$("#MaterialListGrid").show();
-                   //$("#subassemblyGrid").hide();
                    $("#sub").hide();
+                   $("#product").hide();
                    $("#a1").show();
                    $("#a2").show();
                    $("#a3").show();
                    $("#a4").show();
                    $("#add1").on("click", function () {
                        $("#mat").hide();
-                       //$("#MaterialListGrid").hide();
-                       //$("#subassemblyGrid").show();
                        $("#sub").show();
+                       $("#product").show();
                        $("#a1").hide();
                        $("#a2").hide();
                        $("#a3").hide();
@@ -273,9 +276,8 @@
                    });
                    $("#add").on("click", function () {
                        $("#mat").show();
-                       //$("#MaterialListGrid").show();
-                       //$("#subassemblyGrid").hide();
                        $("#sub").hide();
+                       $("#product").hide();
                        $("#a1").show();
                        $("#a2").show();
                        $("#a3").show();
@@ -286,7 +288,60 @@
         }
     </script>
 
+    <script>
+        function Deleteass(arg) {
+    $.ajax({
+        type: "DELETE",
+        url: ' @Url.Action("BOMsubassemblyDelete", "BillOfMaterial")',
+        data: { BOMsubassemblyid: arg },
+        success: function (values) {
+            if (values === "Success") {
+                alert("Deleted Successfully.");
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
+            }
+        }
+    });
+        }
 
+        function Editass(arg) {
+            var bomid ="@Model.Bomid";
+           $.ajax({
+                type: "PUT",
+               url: '/BillOfMaterial/EditSubassemblyDetails',
+               data: { BOMsubassemblyID: arg, BOMID: bomid },
+               success: function (data) {
+                   $(".main-page").html(data);
+                   $(".main-page").show();
+                   $('#add').prop('checked', false);
+                   $('#add1').prop('checked', true);
+                   $("#mat").hide();
+                   $("#sub").show();
+                   $("#a1").hide();
+                   $("#a2").hide();
+                   $("#a3").hide();
+                   $("#a4").hide();
+                   $("#add1").on("click", function () {
+                       $("#mat").hide();
+                       $("#sub").show();
+                       $("#a1").hide();
+                       $("#a2").hide();
+                       $("#a3").hide();
+                       $("#a4").hide();
+                   });
+                   $("#add").on("click", function () {
+                       $("#mat").show();
+                       $("#sub").hide();
+                       $("#a1").show();
+                       $("#a2").show();
+                       $("#a3").show();
+                       $("#a4").show();
+                   });
+                }
+            });
+        }
+    </script>
 
     <script>
             $(document).ready(function () {
@@ -304,7 +359,7 @@
                             $.each(values, function (i, item) {
                                 $("#materialgrid").append(`
                       <tr class="font-14">
-                      <td class="veh1-5">${count}</td>
+                      <td class="veh1-5">MA</td>
                       <td class="veh-4" style="width:12%;">
                         <span class="table_icons">
                             <img src="/Content/assets/images/edit-icon.png" onclick="Edit('${item.Bommaterialid}')" />
@@ -314,11 +369,12 @@
                         </span>
                       </td>
                       <td class="veh1-5" style="width: 12%;">${item.productname}</td>
+                      <td class="veh1-5" style="width: 12%;">${item.Requiredqty}</td>
                       <td class="veh1-5" style="width: 12%;">${item.MaterialNames}</td>
                       <td class="veh1-5" style="width: 12%;">${item.materialcategory}</td>
                        <td class="veh1-5" style="width: 12%;">${item.materialgroup}</td>
                        <td class="veh1-5" style="width: 12%;">${item.UOMName}</td>
-                        <td class="veh1-5" style="width: 12%;">${item.Requiredqty}</td>
+
 
                       </tr>
                        `);

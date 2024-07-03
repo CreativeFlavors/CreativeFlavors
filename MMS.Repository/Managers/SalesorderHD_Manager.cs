@@ -46,7 +46,12 @@ namespace MMS.Repository.Managers
             salesorder = salesorderhdrep.Table.Where(x => x.customerid == id).ToList();
             return salesorder;
         }
-
+        public Salesorder_hd GetSOId(int id)
+        {
+            Salesorder_hd salesorders = new Salesorder_hd();
+            salesorders = salesorderhdrep.Table.Where(x => x.salesorderid_hd == id).FirstOrDefault();
+            return salesorders;
+        }
         public Salesorder_hd POST(Salesorder_hd arg)
         {
             Salesorder_hd salesorder = new Salesorder_hd();

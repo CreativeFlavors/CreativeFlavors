@@ -20,5 +20,7 @@ namespace MMS.Data.StoredProcedureModel
         public decimal? RequiredQty { get; set; }
         [Column("uomname")]
         public string UOMName { get; set; }
+        [Column("total_indent_qty")]
+        public decimal? total_indent_qty { get; set; }
     }
 }

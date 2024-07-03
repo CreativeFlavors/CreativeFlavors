@@ -14,10 +14,10 @@ namespace MMS.Repository.Managers
     public class Temp_salesorderManager : ITemp_salesorderServices, IDisposable
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-        private Repository<Temp_salesorder> tempsalesorderrep;
+        private Repository<Temp_Indent> tempsalesorderrep;
         public Temp_salesorderManager()
         {
-            tempsalesorderrep = unitOfWork.Repository<Temp_salesorder>();
+            tempsalesorderrep = unitOfWork.Repository<Temp_Indent>();
 
         }
         public void Dispose()
@@ -25,7 +25,7 @@ namespace MMS.Repository.Managers
             throw new NotImplementedException();
         }
 
-        public bool Post(Temp_salesorder arg)
+        public bool Post(Temp_Indent arg)
         {
             bool result = false;
             try
@@ -43,9 +43,9 @@ namespace MMS.Repository.Managers
             }
             return result;
         }
-        public Temp_salesorder GetSO(int? id)
+        public Temp_Indent GetSO(int? id)
         {
-            Temp_salesorder salesorder = new Temp_salesorder();
+            Temp_Indent salesorder = new Temp_Indent();
             if (id != null)
             {
                 salesorder = tempsalesorderrep.Table.Where(x => x.SalesOrderId == id).FirstOrDefault();
@@ -53,9 +53,9 @@ namespace MMS.Repository.Managers
             return salesorder;
         }
 
-        public Temp_salesorder GetStockRequiredForMaterial(int MaterialNameID)
+        public Temp_Indent GetStockRequiredForMaterial(int MaterialNameID)
         {
-            Temp_salesorder temp_Salesorder = new Temp_salesorder();
+            Temp_Indent temp_Salesorder = new Temp_Indent();
             try
             {
                 if (MaterialNameID != 0)

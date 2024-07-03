@@ -1,0 +1,255 @@
+﻿@model MMS.Web.Models.Production.ProductionModel
+@using MMS.Repository.Managers
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    @*<link href="~/Content/css1/font-awesome.min.css" rel="stylesheet" />*@
+    <style>
+        input[type=text] {
+            padding: 12px;
+            font-size: 17px;
+            border: 1px solid grey;
+            width: 80%;
+        }
+
+        .buttonone {
+            float: right;
+            width: 20%;
+            padding: 12px;
+            background: #2196F3;
+            color: white;
+            font-size: 17px;
+            border: 1px solid grey;
+            border-left: none;
+            cursor: pointer;
+        }
+
+        .page-item.active .page-link {
+            z-index: 3;
+            color: #fff;
+            background-color: #4472C4;
+            border-color: #0d6efd;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="main-page">
+
+
+        <!-- page-contents here -->
+
+        <div class="manage_customers">
+            <div class="d-flex justify-content-between align-items-center manage_customers_head">
+                <div class="manage_customers_main_head">
+                    <h6 class="font-20">Production List</h6>
+                </div>
+                <div>
+                    <a href="/Production/ProductionDetails">
+                        <button class="btn btn-success" id="Addproduction" title="Add Production">
+                            ADD Production
+                        </button>
+                    </a>
+                </div>
+            </div>
+            <div class="table-responsive manage_customers_table_responsive">
+                <div class="customer_manage_search_containers" style="width:40%;">
+                    <input type="text" placeholder="Search by Product Name" id="SeaarchID" name="search2">
+                    <button class="buttonone" onclick="Search()" title="Filter" type="submit"><i class="fa fa-search"></i></button>
+
+                </div>
+                <div class="manage_customers_table_in_responsive">
+                    <table class="table table-striped text-center">
+                        <thead>
+                            <tr class="font-16">
+                                <th scope="col">
+                                    <span>S.No</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Product Name</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Batch Code</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Production Qty</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Required Qty</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col"><span>STATUS</span></th>
+                            </tr>
+                        </thead>
+                        @if (ViewBag.Productions != null)
+                        {
+                            <tbody>
+                                @{
+                                    int currentPage = ViewBag.CurrentPage ?? 1;
+                                    int pageSize = ViewBag.PageSize ?? 8;
+                                    int totalItems = ViewBag.Productions.Count;
+                                    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+                                }
+                                @foreach (var item in ViewBag.Productions)
+                                {
+                                    <tr class="font-14">
+                                        <td>@startSerialNumber</td>
+                                        <td>@item.product.ProductName</td>
+                                        <td>@item.ProductionCode</td>
+                                        <td>@item.ProductionQty</td>
+                                        <td>@item.RequiredQty</td>
+                                        <td class="veh-1 edit-del-wrap">
+                                            <a href="javascript:void(0)" onclick="Edit('@item.ProductionId')" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
+                                        </td>
+                                    </tr>
+                                    startSerialNumber++;
+                                }
+                            </tbody>
+                        }
+
+                    </table>
+                </div>
+                <div class="row manage_customer_show">
+                    <div class="font-14 manage_customer_show_I col-xl-6">
+                        <span>Showing </span>
+                        <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
+                            <option value="5" @(ViewBag.PageSize == 5 ? "selected" : "")>5</option>
+                            <option value="10" @(ViewBag.PageSize == 10 ? "selected" : "")>10</option>
+                            <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
+                            <option value="20" @(ViewBag.PageSize == 20 ? "selected" : "")>20</option>
+                        </select>
+
+
+                    </div>
+
+                    <div class="col-xl-6 manage_customer_show_II">
+                        <nav class="float-xl-end">
+                            <ul class="pagination font-14">
+                                <li class="page-item">
+                                    <a href="##" id="previousPage" class="page-link">Previous</a>
+                                </li>
+                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                        <a href="@Url.Action("ProductionGrid", "Production", new { page = i })" class="page-link">@i</a>
+                                    </li>
+                                }
+                                <li class="page-item">
+                                    <a class="page-link" id="nextPage" href="##">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+
+    <script src="~/Content/js/custom.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+  $(document).ready(function() {
+    $('#manage_customer_show_no').change(function() {
+        var pageSize = parseInt($(this).val());
+        window.location.href = "@Url.Action("ProductionGrid", "Production")?pageSize=" + pageSize;
+    });
+
+    $('#previousPage').click(function(e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        if (currentPage > 1) {
+            var previousPage = currentPage - 1;
+            window.location.href = "@Url.Action("ProductionGrid", "Production")?page=" + previousPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+        }
+    });
+
+    $('#nextPage').click(function(e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        var totalPages = parseInt('@ViewBag.TotalPages');
+        if (currentPage < totalPages) {
+            var nextPage = currentPage + 1;
+            window.location.href = "@Url.Action("ProductionGrid", "Production")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+        }
+    });
+});
+    </script>
+
+    <script>
+        function Search() {
+            $.ajax({
+                type: "GET",
+                url: '/Production/ProductionSearch',
+                data: { filter: $('#SeaarchID').val() },
+                dataType: 'json',
+                success: function (data) {
+                    $("tbody").empty();
+                    var count = 1;
+                    $.each(data, function (i, item) {
+                        $("tbody").append(`
+                         <tr class="font-14">
+                             <td>${count}</td>
+                             <td>${item.product.ProductName}</td>
+                             <td>${item.ProductionCode}</td>
+                             <td>${item.ProductionQty}</td>
+                             <td class="veh-1 edit-del-wrap">
+                                 <a href="javascript:void(0)" onclick="Edit('${item.ProductionId}')" class="watchlist-edit" title="Edit">
+                                 <img src="/Content/assets/images/edit-icon.png" />
+                                 </a>
+                             </td>
+                         </tr>
+                     `);
+                        count++;
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error occurred:", status, error);
+                }
+            });
+        }
+
+        function Edit(arg) {
+            window.location.href = "/Production/ProductionEdit?productionid=" + arg;
+        }
+    </script>
+
+</body>
+</html>

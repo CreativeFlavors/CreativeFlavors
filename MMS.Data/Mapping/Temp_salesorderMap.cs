@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MMS.Data.Mapping
 {
-    public class Temp_salesorderMap : EntityTypeConfiguration<Temp_salesorder>
+    public class Temp_salesorderMap : EntityTypeConfiguration<Temp_Indent>
     {
         public Temp_salesorderMap() {
             HasKey(t => t.Id);
@@ -28,7 +28,7 @@ namespace MMS.Data.Mapping
             Property(t => t.AvailableUnitId);
             Property(t => t.Consume);
             Property(t => t.ConsumeUnitId);
-            ToTable("Temp_salesorder");
+            ToTable("temp_indent");
         }
     }
 }

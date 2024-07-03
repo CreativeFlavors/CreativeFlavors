@@ -344,7 +344,7 @@ namespace MMS.Web.ExtensionMethod
             var ShotName = new System.Web.Mvc.SelectListItem()
             {
                 Value = "",
-                Text = "Please Select"
+                Text = "Please Select SO"
             };
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
