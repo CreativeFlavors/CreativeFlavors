@@ -13,6 +13,8 @@ namespace MMS.Repository.ViewModel
         public decimal ProductionQty { get; set; }
         public decimal RequiredQty { get; set; }
         public string ProductName { get; set; }
+        public string ProductCode { get; set; }
+        public string ProductionStatus { get; set; }
         public string ProductionType { get; set; } // Indicates whether it's "Production" or "Subassembly"
     }
 }
