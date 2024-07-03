@@ -1,27 +1,26 @@
 ﻿using MMS.Common;
 using MMS.Core.Entities;
-using MMS.Core.Entities.JobWork;
+using MMS.Core.Entities.Stock;
 using MMS.Data;
 using MMS.Data.Context;
 using MMS.Data.Mapping;
 using MMS.Repository.Service;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace MMS.Repository.Managers
+namespace MMS.Repository.Managers.StockManager
 {
-    public class ProductionManager : IProductionServices,IDisposable
+    public class ProductionSubassemblyManager : IProductionSubassemblyServices, IDisposable
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-        private Repository<Production> productionrep;
-        public ProductionManager()
+        private Repository<Productionsubassembly> productionsubassemblyrep;
+        public ProductionSubassemblyManager()
         {
-            productionrep = unitOfWork.Repository<Production>();
+            productionsubassemblyrep = unitOfWork.Repository<Productionsubassembly>();
 
         }
         public void Dispose()
@@ -31,8 +30,7 @@ namespace MMS.Repository.Managers
                 context.Dispose();
             }
         }
-
-        public bool Post(Production arg)
+        public bool Post(Productionsubassembly arg)
         {
             bool result = false;
             try
@@ -40,7 +38,7 @@ namespace MMS.Repository.Managers
                 string username = "admin";
                 arg.CreatedBy = username;
                 arg.CreatedDate = DateTime.Now;
-                productionrep.Insert(arg);
+                productionsubassemblyrep.Insert(arg);
                 result = true;
             }
             catch (Exception ex)
@@ -50,18 +48,12 @@ namespace MMS.Repository.Managers
             }
             return result;
         }
-        public List<Production> Get()
-        {
-            List<Production> obj = new List<Production>();
-            obj = productionrep.Table.ToList<Production>();
-            return obj;
-        }
-        public bool Put(Production arg)
+        public bool Put(Productionsubassembly arg)
         {
             bool result = false;
             try
             {
-                Production model = productionrep.Table.Where(p => p.ProductionId == arg.ProductionId).FirstOrDefault();
+                Productionsubassembly model = productionsubassemblyrep.Table.Where(p => p.ProductionId == arg.ProductionId).FirstOrDefault();
                 if (model != null)
                 {
                     model.ProductionId = arg.ProductionId;
@@ -69,7 +61,7 @@ namespace MMS.Repository.Managers
                     model.ProductCode = arg.ProductCode;
                     model.ProductionCode = arg.ProductionCode;
                     model.ProductionQty = arg.ProductionQty;
-                    model.ProductionStatus = arg.ProductionStatus;
+                    model.ProductionSubassemblyStatus = arg.ProductionSubassemblyStatus;
                     model.ProductId = arg.ProductId;
                     model.MinQty = arg.MinQty;
                     model.MaxQty = arg.MaxQty;
@@ -102,7 +94,7 @@ namespace MMS.Repository.Managers
                         model.UpdatedBy = username;
                     }
                     //model.UpdatedBy = username;
-                    productionrep.Update(model);
+                    productionsubassemblyrep.Update(model);
                     result = true;
                 }
                 else
@@ -118,16 +110,14 @@ namespace MMS.Repository.Managers
 
             return result;
         }
-
-
-        public Production Getproductionid(int? productionid)
+        public Productionsubassembly Getproductionid(int? productionid)
         {
-            Production productionlist = new Production();
-           if (productionid != 0)
+            Productionsubassembly productionlist = new Productionsubassembly();
+            if (productionid != 0)
             {
                 try
                 {
-                    productionlist = productionrep.Table.Where(x => x.ProductionId == productionid).FirstOrDefault();
+                    productionlist = productionsubassemblyrep.Table.Where(x => x.ProductionId == productionid).FirstOrDefault();
                 }
                 catch (Exception ex)
                 {
@@ -136,13 +126,13 @@ namespace MMS.Repository.Managers
             }
             return productionlist;
         }
-
-        public List<Production> Get_byCodes(int ProductionId)
+        public List<Productionsubassembly> GetProductions()
         {
-            List<Production> productions = new List<Production>();
+            List<Productionsubassembly> productions = new List<Productionsubassembly>();
+
             try
             {
-                productions = productionrep.Table.Where(X => X.ProductionId== ProductionId).ToList();
+                productions = productionsubassemblyrep.Table.ToList<Productionsubassembly>();
             }
             catch (Exception ex)
             {
@@ -150,29 +140,12 @@ namespace MMS.Repository.Managers
             }
             return productions;
         }
-
-        public List<Production> GetProductions()
-        {
-            List<Production> productions = new List<Production>();
-
-            try
-            {
-                productions = productionrep.Table.ToList<Production>();
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
-            }
-            return productions;
-        }
-
-      
         public string GetLatestBatchNumberFromDatabase()
         {
             string latestBatchNumber = null; // Initialize with a default value
             try
             {
-                latestBatchNumber = productionrep.Table.Max(p => p.ProductionCode);
+                latestBatchNumber = productionsubassemblyrep.Table.Max(p => p.ProductionCode);
             }
             catch (Exception ex)
             {

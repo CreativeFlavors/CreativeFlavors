@@ -116,7 +116,7 @@ namespace MMS.Web.Controllers.Stock
 
         #region Curd Operation
         [HttpPost]
-        public ActionResult SubAssemblyDetails(ParentBillofMaterial model)
+        public ActionResult SubAssemblyDetails(ParentBillofMaterial model) 
         {
             if (model.subassemblyid == 0)
             {

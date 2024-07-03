@@ -1,23 +1,16 @@
 ﻿using MMS.Core.Entities;
-using MMS.Core.Entities.JobWork;
-using MMS.Core.Entities.Stock;
-using MMS.Repository.Service;
-using MMS.Web.Models.ProductionSubassembly;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System;
 
-namespace MMS.Web.Models.Production
+namespace MMS.Repository.ViewModel
 {
-    public class ProductionModel
+    public class ProductionSubassemblyModels
     {
         public int ProductionId { get; set; }
         public DateTime? ProductionDate { get; set; }
         public string ProductionCode { get; set; }
         public decimal ProductionQty { get; set; }
-        public int ProductionStatus { get; set; }
-        public int ProductionSubassemblyStatus {  get; set; }
+        public int ProductionSubassemblyStatus { get; set; }
         public int ProductId { get; set; }
         public decimal MinQty { get; set; }
         public decimal MaxQty { get; set; }
@@ -50,6 +43,6 @@ namespace MMS.Web.Models.Production
         public decimal? QuantityToManufacture { get; set; }
         public decimal? AvailableToManufacture { get; set; }
         public string ProductCode { get; set; }
-        public product product { get; set; }       
+        public product product { get; set; }
     }
 }
