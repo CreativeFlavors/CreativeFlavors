@@ -8,6 +8,7 @@ using MMS.Web.Models.Addressdetails;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -27,12 +28,32 @@ namespace MMS.Web.Controllers
         {
             SalesorderHD_Manager salesorderManager = new SalesorderHD_Manager();
             BuyerManager BuyerManager = new BuyerManager();
+            SalesorderDT_Manager SalesorderDT_Manager = new SalesorderDT_Manager();
             var data1 = BuyerManager.Get();
             List<Salesorders> totalList = new List<Salesorders>();
             var data = salesorderManager.Get();
             foreach (var i in data)
             {
                 Salesorders model = new Salesorders();
+                var salesorderdt = SalesorderDT_Manager.GetSOIdS(i.salesorderid_hd);
+                var counts = 0;
+                var count = 0;
+                foreach (var k in salesorderdt)
+                {
+                    if (k.quantity == k.dc_qty)
+                    {
+                        counts++;
+                    }
+                }
+                foreach (var j in salesorderdt)
+                {
+                    if (j.quantity == j.Invoice_qty)
+                    {
+                        count++;
+                    }
+                }
+                model.itemInvoiced = count;
+                model.itemdc = counts;
                 model.SalesorderId = i.salesorderid_hd;
                 model.salesorderdate = i.Salesorderdate;
                 model.item = i.items;
@@ -84,6 +105,7 @@ namespace MMS.Web.Controllers
             }
             var product = productManager.GetId(model.ProductID);
             var tax = taxTypeManager.GetTaxMasterId(product.TaxMasterId);
+
             var taxper = tax.TaxValue;
             var qty = model.quantity;
             var discount = model.discountval;
@@ -179,68 +201,118 @@ namespace MMS.Web.Controllers
         {
             Salesorders models = new Salesorders();
             SalesorderHD_Manager salesorderManager = new SalesorderHD_Manager();
+            SalesorderDT_Manager SalesorderDT_Manager = new SalesorderDT_Manager();
             CustAddressMangers custAddressMangers = new CustAddressMangers();
             var headerdata = salesorderManager.GetSOId(SOId);
+            var salesorderdt = SalesorderDT_Manager.GetSOIdS(SOId);
+            var counts = 0;
+
+            foreach( var i in salesorderdt)
+            {
+                if(i.quantity == i.dc_qty)
+                {
+                    counts++;
+                }
+            }
             var custadd = custAddressMangers.GetCustAddressbuyerid(headerdata.customerid);
+            models.itemdc = counts;
             models.shippingadd = custadd.Add1;
             models.Billingadd = custadd.Add2;
             models.BuyerName = headerdata.customerid;
             models.SalesorderId = headerdata.salesorderid_hd;
             models.SalesorderId_HD = headerdata.salesorderid_hd;
-            models.Total_Price = headerdata.Total_price;
+            models.Total_Price = Math.Round((decimal)headerdata.Total_price, 2);
             models.salesorderdate = headerdata.Salesorderdate;
-            models.Total_Grandtotal = headerdata.grand_total;
             models.quantity = headerdata.quantity;
-            models.Total_discountval = headerdata.Total_disamount;
-            models.Total_TaxValue = headerdata.Total_taxamount;
-            models.Total_Subtotal = headerdata.Total_subtotal;
+
             models.item = headerdata.items;
-            SalesorderDT_Manager SalesorderDT_Manager = new SalesorderDT_Manager();
             List<Salesorders> totaldata = new List<Salesorders>();
             var totallist = SalesorderDT_Manager.salesorder_Grid();
-
             var filteredList = totallist.Where(i => i.salesorderid == SOId);
 
             foreach (var i in filteredList)
             {
                 Salesorders salesorder = new Salesorders();
-                salesorder.SalesorderId = i.salesorderid;
-                salesorder.SalesorderId_DT = i.salesorderid_dt;
-                salesorder.quantity = i.quantity;
-                salesorder.discountperid = i.discountper;
-                salesorder.discountvalue = i.discount_value;
-                salesorder.Price = i.unitprice;
-                salesorder.Subtotal = i.subtotal;
-                salesorder.TaxValue = i.taxvalue;
-                salesorder.Taxper = i.Taxper;
-                salesorder.Grandtotal = i.totalprice;
-                salesorder.Uomname = i.long_unit_name;
-                salesorder.ProductName = i.productname;
-                salesorder.ProductCode = i.productcode;
-                salesorder.ProductID = i.productid;
+                if (i.dc_qty != null)
+                {
+                    var qtys = (i.quantity) - (i.dc_qty);
+                    salesorder.quantity = qtys;
+                    salesorder.SalesorderId = i.salesorderid;
+                    salesorder.SalesorderId_DT = i.salesorderid_dt;
+                    salesorder.discountperid = i.discountper;
+                    salesorder.Price = i.unitprice;
+                    salesorder.Taxper = i.Taxper;
+                    salesorder.Uomname = i.long_unit_name;
+                    salesorder.ProductName = i.productname;
+                    salesorder.ProductCode = i.productcode;
+                    salesorder.ProductID = i.productid;
+                    salesorder.dc_qty = i.dc_qty;
+                    var subtotal = qtys * i.unitprice;
+                    var disamount = subtotal * i.discountper / 100;
+                    var subtotals = subtotal - disamount;
+                    var taxamount1 = subtotals * int.Parse(i.Taxper) / 100;
+                    var total = taxamount1 + subtotals;
+                    salesorder.Subtotal = subtotals;
+                    salesorder.TaxValue = taxamount1;
+                    salesorder.Grandtotal = total;
+                    salesorder.discountvalue = disamount;
+                }
+                else
+                {
+                    salesorder.quantity = i.quantity;
+                    salesorder.SalesorderId = i.salesorderid;
+                    salesorder.SalesorderId_DT = i.salesorderid_dt;
+                    salesorder.discountperid = i.discountper;
+                    salesorder.Price = i.unitprice;
+                    salesorder.Taxper = i.Taxper;
+                    salesorder.Uomname = i.long_unit_name;
+                    salesorder.ProductName = i.productname;
+                    salesorder.ProductCode = i.productcode;
+                    salesorder.ProductID = i.productid;
+                    salesorder.dc_qty = i.dc_qty;
 
+                    salesorder.discountvalue = i.discount_value;
+                    salesorder.Subtotal = i.subtotal;
+                    salesorder.TaxValue = i.taxvalue;
+                    salesorder.Grandtotal = i.totalprice;
+
+                }
                 totaldata.Add(salesorder);
             }
+            decimal? subtotals1 = 0;
+            decimal? discount = 0;
+            decimal? tax = 0;
+            decimal? grandtotal = 0;
+
+            foreach (var i in totaldata)
+            {   
+                subtotals1 += i.Subtotal;
+                discount += i.discountvalue;
+                tax += i.TaxValue;
+                grandtotal += i.Grandtotal;
+            }
+            models.Total_Subtotal = Math.Round((decimal)subtotals1, 2);
+            models.Total_discountval = Math.Round((decimal)discount, 2);
+            models.Total_TaxValue = Math.Round((decimal)tax, 2);
+            models.Total_Grandtotal = Math.Round((decimal)grandtotal, 2);
 
             models.salesorderLists = totaldata;
 
             return PartialView("Partial/DC_Details", models);
         }
         [HttpPost]
-        public JsonResult DC_Post(string buyerid, string SalesorderId_HD, string currencyOption, decimal Total_Price, decimal Total_Subtotal, decimal Total_TaxValue, decimal Total_discountval, decimal Total_Grandtotal, string salesOrderData)
+        public JsonResult DC_Post(string buyerid, string currencyOption, decimal Total_Price, decimal Total_Subtotal, decimal Total_TaxValue, decimal Total_discountval, decimal Total_Grandtotal, string salesOrderData)
         {
             var salesOrderList = JsonConvert.DeserializeObject<List<SalesOrderItem>>(salesOrderData);
-
             var AlertMessage = "";
-
+            DeliveryChallanHD_Manager deliveryChallanHD_Manager = new DeliveryChallanHD_Manager();
+            DeliveryChallanDt_Manager deliveryChallanDt_Manager = new DeliveryChallanDt_Manager();
             SalesorderManager salesorderManager = new SalesorderManager();
-            SalesorderHD_Manager salesorderHD_Manager = new SalesorderHD_Manager();
-            SalesorderDT_Manager salesorderDT = new SalesorderDT_Manager();
             CurrencyManager currencyManager = new CurrencyManager();
-            salesorder salesorder = new salesorder();
             ProductManager productManager = new ProductManager();
             TaxTypeManager taxTypeManager = new TaxTypeManager();
             BuyerManager buyerManager = new BuyerManager();
+            Salesorder_dt salesorder_Dt = new Salesorder_dt();
             Salesorders model = new Salesorders();
             SalesorderDT_Manager salesorderDT_manager = new SalesorderDT_Manager();
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
@@ -252,50 +324,67 @@ namespace MMS.Web.Controllers
             {
                 model.ConversionValue = 1;
             }
-            Salesorder_hd salesorder_Hd = new Salesorder_hd();
-            salesorder_Hd.customerid = (Convert.ToInt32(buyerid));
-            salesorder_Hd.items = salesOrderList.Count();
-            salesorder_Hd.Salesorderdate = DateTime.Now;
-            salesorder_Hd.Total_price = Total_Price;
-            salesorder_Hd.Total_subtotal = Total_Subtotal;
-            salesorder_Hd.Total_taxamount = Total_TaxValue;
-            salesorder_Hd.Total_disamount = Total_discountval;
-            salesorder_Hd.grand_total =Total_Grandtotal;
-            salesorder_Hd.isactive = true;
+            DeliveryChallan_hd DeliveryChallanHd = new DeliveryChallan_hd();
+            DeliveryChallanHd.CustomerId = (Convert.ToInt32(buyerid));
+            DeliveryChallanHd.DeliveryChallandate = DateTime.Now;
+            DeliveryChallanHd.TotalPrice = Total_Price;
+            DeliveryChallanHd.TotalSubtotal = Total_Subtotal;
+            DeliveryChallanHd.TotalTaxAmount = Total_TaxValue;
+            DeliveryChallanHd.TotalDisAmount = Total_discountval;
+            DeliveryChallanHd.GrandTotal =Total_Grandtotal;
+            DeliveryChallanHd.IsActive = true;
             decimal? quantity = 0;
+            var count = 0;
 
             foreach (var i in salesOrderList)
             {
-                quantity += (Convert.ToInt32(i.Quantity));
+                if ((Convert.ToInt32(i.Quantity)) != 0)
+                {
+                    quantity += (Convert.ToInt32(i.Quantity));
+                    count++;
+                }
             }
-            salesorder_Hd.quantity = quantity;
+            DeliveryChallanHd.ItemsDc = count;
+            DeliveryChallanHd.Quantity = quantity;
 
-            //var headerid = salesorderHD_Manager.POST(salesorder_Hd);
+            var headerid = deliveryChallanHD_Manager.POST(DeliveryChallanHd);
 
+            DeliveryChallan_dt deliveryChallanDt = new DeliveryChallan_dt();
+            var currencyid = currencyManager.GetContainCurrencyid(currencyOption);
             foreach (var i in salesOrderList)
             {
+                var dc_dt = deliveryChallanDt_Manager.GetSOId(Convert.ToInt32(i.SalesorderId_DT));
+                decimal? quantitys = 0;
+                foreach (var k in dc_dt)
+                {
+                    if (k.Quantity != 0)
+                    {
+                        quantitys += (k.Quantity);
+                        count++;
+                    }
+                }
                 var DT = salesorderDT_manager.GetSO(Convert.ToInt32(i.SalesorderId_DT));
                 var product = productManager.GetId(Convert.ToInt32(i.ProductID));
                 var tax = taxTypeManager.GetTaxMasterId(product.TaxMasterId);
                 var addreddcode = buyerManager.GetBuyerMasterId(Convert.ToInt32(buyerid));
 
-                salesorder.ProductNameid = (Convert.ToInt32(i.ProductID));
-                salesorder.ProductCode = product.ProductCode;
-                salesorder.customerid = (Convert.ToInt32(buyerid));
-                salesorder.UomMasterId = product.UomMasterId;
-                salesorder.Taxperid = product.TaxMasterId;
-                salesorder.quantity = (Convert.ToInt32(i.Quantity));
-                salesorder.Discountperid = DT.Discountperid;
-                salesorder.Price = product.Price;
-                salesorder.quotedate = DateTime.Now;
-                salesorder.salesorderdate = DateTime.Now;
-                salesorder.originalquotedate = DateTime.Now;
-                salesorder.custaddcode = addreddcode.BuyerCode;
-                salesorder.custbillcode = addreddcode.BuyerAddress1;
-                salesorder.custshipcode = addreddcode.BuyerAddress2;
+                deliveryChallanDt.DCid_hd = headerid.DCid_hd;
+                deliveryChallanDt.SalesOrderId_dt =(Convert.ToInt32(i.SalesorderId_DT));
+                deliveryChallanDt.ProductId = (Convert.ToInt32(i.ProductID));
+                deliveryChallanDt.ProductCode = product.ProductCode;
+                deliveryChallanDt.CustomerId = (Convert.ToInt32(buyerid));
+                deliveryChallanDt.UomMasterId = product.UomMasterId;
+                deliveryChallanDt.TaxPerId = product.TaxMasterId;
+                deliveryChallanDt.Quantity = (Convert.ToInt32(i.Quantity));
+                deliveryChallanDt.DiscountPer = DT.Discountperid;
+                deliveryChallanDt.UnitPrice = product.Price;
+                deliveryChallanDt.DCDate = DateTime.Now;
+                deliveryChallanDt.CurrencyId = currencyid.id;
+                deliveryChallanDt.CustAddCode = addreddcode.BuyerCode;
+                deliveryChallanDt.CustBillCode = addreddcode.BuyerAddress1;
+                deliveryChallanDt.CustShipCode = addreddcode.BuyerAddress2;
                 var unitprice = product.Price * model.ConversionValue;
-                salesorder.taxinclusive = true;
-                salesorder.isactive = true;
+                deliveryChallanDt.IsActive = true;
                 var taxper = tax.TaxValue;
                 var qty = (Convert.ToInt32(i.Quantity));
                 var discount = DT.Discountperid;
@@ -308,18 +397,30 @@ namespace MMS.Web.Controllers
                     var subtotals = subtotal - disamount;
                     var taxamount1 = subtotals * intVal / 100;
                     var total = taxamount1 + subtotals;
-                    salesorder.Subtotal = subtotals;
-                    salesorder.TaxValue = taxamount1;
-                    salesorder.Grandtotal = total;
-                    salesorder.Discountvalue = disamount;
+                    deliveryChallanDt.SubTotal = subtotals;
+                    deliveryChallanDt.TaxValue = taxamount1;
+                    deliveryChallanDt.TotalPrice = total;
+                    deliveryChallanDt.DiscountValue = disamount;
                 }
-                if(DT.quantity != qty)
+                if ((Convert.ToInt32(i.Quantity)) != 0 && dc_dt != null)
                 {
-                    //salesorder = salesorderManager.Post(salesorder);
+                    salesorder_Dt.dc_qty = (Convert.ToInt32(i.Quantity)) + quantitys;
+                    salesorder_Dt.Salesorderid_dt = (Convert.ToInt32(i.SalesorderId_DT));
+
+                    deliveryChallanDt_Manager.POST(deliveryChallanDt);
+                    salesorderDT_manager.Put(salesorder_Dt);
+                }
+                else if ((Convert.ToInt32(i.Quantity)) != 0)
+                {
+                    salesorder_Dt.dc_qty = (Convert.ToInt32(i.Quantity)) ;
+                    salesorder_Dt.Salesorderid_dt = (Convert.ToInt32(i.SalesorderId_DT));
+
+                    deliveryChallanDt_Manager.POST(deliveryChallanDt);
+                    salesorderDT_manager.Put(salesorder_Dt);
+                    AlertMessage = "Confirm Order";
                 }
             }
 
-            AlertMessage = "Confirm Order";
             return Json(new { AlertMessage = AlertMessage }, JsonRequestBehavior.AllowGet);
         }
 

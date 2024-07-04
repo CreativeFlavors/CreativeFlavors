@@ -106,14 +106,17 @@
                                             </div>
                                         </div>
                                         <div class="badge-box">
-                                            <span>Order no & Date <br /><b style="color:olivedrab">@i.SalesorderId / @i.salesorderdate.ToString("dd/MM/yyyy")</b> </span>
+                                            <span>Order no & Date <br /><b style="color:olivedrab"><b style="color:darkblue;">@i.SalesorderId </b>-- @i.salesorderdate.ToString("dd/MM/yyyy")</b> </span>
                                         </div>
                                         <ul id="ul">
                                             <li>
                                                 Items --> <strong>@i.item / @i.item </strong>
                                             </li>
                                             <li>
-                                                DC-Items  --> <strong>0</strong>
+                                                DC-Items  --> <strong>@i.itemdc</strong>
+                                            </li>
+                                            <li>
+                                                Invoice-Items  --> <strong>@i.itemInvoiced</strong>
                                             </li>
                                             <li>
                                                 Unit Price  --> <strong>@string.Format("{0:0.00}", i.Total_Price)</strong>
@@ -144,7 +147,7 @@
                                             <div class="buy-button-box" onclick="Edit('@i.SalesorderId')">
                                                 <b class="buy-nows" id="DCapply">Issue DC</b>
                                             </div>
-                                            <div class="buy-button-box" onclick="Edits('@i.SalesorderId')">
+                                            <div class="buy-button-box" onclick="InvoiceEdit('@i.SalesorderId')">
                                                 <b class="buy-now" id="DCapply">Raise Invoice</b>
                                             </div>
                                         </div>
@@ -223,7 +226,19 @@
                $(".main-page").show();
            }
        });
-   }
+        }
+    function InvoiceEdit(arg) {
+           $('.main-page').hide();
+      $.ajax({
+          type: "Post",
+          url: ' @Url.Action("InvoiceDetails", "InvoiceDetails")',
+          data: { SOId: arg },
+          success: function (data) {
+              $(".main-page").html(data);
+              $(".main-page").show();
+          }
+      });
+  }
     </script>
     <script>
         $(document).ready(function () {
@@ -297,18 +312,14 @@
     <script>
         function confirmorder() {
             var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
-            var row = $(this).closest('tr');
-            var SalesorderId_HD = row.find('.SalesorderId_HD').text();
             var buyerid = $("#BuyerName").val();
             var totaltax = $("#Total_TaxValue").val();
             var totaldis = $("#Total_discountval").val();
             var totalsub = $("#Total_Subtotal").val();
             var totaldgrand = $("#Total_Grandtotal").val();
             var Total_Price = $("#Total_Price").val();
-            debugger;
             var formdata = new FormData();
             formdata.append("buyerid", buyerid);
-            formdata.append("SalesorderId_HD", SalesorderId_HD);
             formdata.append("currencyOption", currencyOption);
             formdata.append("Total_Price", Total_Price);
             formdata.append("Total_Subtotal", totalsub);
@@ -338,7 +349,9 @@
                 dataType: 'html',
                 data: formdata,
                 success: function (response) {
-                    alert(" updated successfully!");
+                    alert("DC Applied successfully!");
+                    window.location.href = "/deliverychallan/DCMaster";
+
                 }
             });
         }

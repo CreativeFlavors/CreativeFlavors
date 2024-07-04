@@ -20,7 +20,6 @@ namespace MMS.Repository.Managers
         public SalesorderHD_Manager()
         {
             salesorderhdrep = unitOfWork.Repository<Salesorder_hd>();
-
         }
 
         public void Dispose()

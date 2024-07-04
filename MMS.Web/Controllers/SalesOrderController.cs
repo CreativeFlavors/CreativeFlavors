@@ -71,24 +71,39 @@ namespace MMS.Web.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
 
-            return PartialView("partial/SalesOrderDetailsGrid",totaldata);
+            return PartialView("partial/SalesOrderDetailsGrid", totaldata);
         }
         [HttpGet]
-        public ActionResult salesorderheader(int page = 1, int pageSize = 8) {
+        public ActionResult salesorderheader(int page = 1, int pageSize = 8)
+        {
             SalesorderHD_Manager salesorderManager = new SalesorderHD_Manager();
+            SalesorderDT_Manager SalesorderDT_Manager = new SalesorderDT_Manager();
             BuyerManager BuyerManager = new BuyerManager();
             var data1 = BuyerManager.Get();
             List<Salesorders> totalList = new List<Salesorders>();
             var data = salesorderManager.Get();
-            foreach(var i in data)
+            foreach (var i in data)
             {
                 Salesorders model = new Salesorders();
-                model.SalesorderId = i.salesorderid_hd;
+                var salesorderdt = SalesorderDT_Manager.GetSOIdS(i.salesorderid_hd);
+                var counts = 0;
+                decimal? dc_qty = 0;
+                foreach (var k in salesorderdt)
+                {
+                    if(k.dc_qty != null)
+                    {
+                        counts++;
+                        dc_qty += k.dc_qty;
+                    }
+                }
+                model.dc_qty = dc_qty;
+                model.itemdc = counts;
+                model.SalesorderId_HD = i.salesorderid_hd;
                 model.salesorderdate = i.Salesorderdate;
                 model.item = i.items;
                 model.quantity = i.quantity;
                 model.Total_Price = i.Total_price;
-                model.Total_discountval =i.Total_disamount;
+                model.Total_discountval = i.Total_disamount;
                 model.Total_Grandtotal = i.grand_total;
                 model.Total_Subtotal = i.Total_subtotal;
                 model.Total_TaxValue = i.Total_taxamount;
@@ -101,7 +116,7 @@ namespace MMS.Web.Controllers
 
             int startIndex = (page - 1) * pageSize;
             int endIndex = Math.Min(startIndex + pageSize - 1, totalCount - 1);
-            totalList = totalList.OrderByDescending(s => s.SalesorderId_DT)
+            totalList = totalList.OrderByDescending(s => s.SalesorderId_HD)
                          .Skip(startIndex)
                          .Take(pageSize)
                          .ToList();
@@ -606,7 +621,7 @@ namespace MMS.Web.Controllers
                 model.BuyerMaster = data1.Where(W => W.BuyerMasterId == i.customerid).ToList().FirstOrDefault();
                 totalList.Add(model);
             }
-            var filteredList = totalList.Where(J =>J.buyerid == customerid || J.SalesorderId == SOid);
+            var filteredList = totalList.Where(J => J.buyerid == customerid || J.SalesorderId == SOid);
             return Json(filteredList, JsonRequestBehavior.AllowGet);
         }
         public ActionResult Alreadychoosenproduct(int Buyerid, int productName)

@@ -86,5 +86,67 @@ namespace MMS.Repository.Managers
             }
             return salesorder;
         }
+        public bool Put(Salesorder_dt arg)
+        {
+            bool result = false;
+            try
+            {
+                Salesorder_dt model = salesorderhdrep.Table.Where(p => p.Salesorderid_dt == arg.Salesorderid_dt).FirstOrDefault();
+                if (model != null)
+                {
+                    model.dc_qty = arg.dc_qty;
+                    model.UpdatedDate = DateTime.Now;
+                    string username = "admin";
+                    model.Updatedby = username;
+                    salesorderhdrep.Update(model);
+                    result = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                result = false;
+            }
+
+            return result;
+        }
+        public bool update(Salesorder_dt arg)
+        {
+            bool result = false;
+            try
+            {
+                Salesorder_dt model = salesorderhdrep.Table.Where(p => p.Salesorderid_dt == arg.Salesorderid_dt).FirstOrDefault();
+                if (model != null)
+                {
+                    model.Invoice_qty = arg.Invoice_qty;
+                    model.UpdatedDate = DateTime.Now;
+                    string username = "admin";
+                    model.Updatedby = username;
+                    salesorderhdrep.Update(model);
+                    result = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                result = false;
+            }
+
+            return result;
+        }
+        public List<Salesorder_dt> GetSOIdS(int id)
+        {
+            List<Salesorder_dt> salesorders = new List<Salesorder_dt>();
+            salesorders = salesorderhdrep.Table.Where(x => x.Salesorderid_hd == id).ToList();
+            return salesorders;
+        }
     }
 }

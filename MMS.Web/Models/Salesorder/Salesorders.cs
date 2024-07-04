@@ -1,4 +1,5 @@
-﻿using MMS.Core;
+﻿using Microsoft.Ajax.Utilities;
+using MMS.Core;
 using MMS.Core.Entities;
 using MMS.Core.Entities.Stock;
 using MMS.Data.StoredProcedureModel;
@@ -16,6 +17,8 @@ namespace MMS.Web.Models
     public class Salesorders 
     {
         public int SalesorderId { get; set; }
+        public int itemdc { get; set; }
+        public int itemInvoiced { get; set; }
         public int SalesorderId_DT { get; set; }
         public int SalesorderId_HD { get; set; }
         public int BuyerName { get; set; }
@@ -32,6 +35,8 @@ namespace MMS.Web.Models
         public int UomMasterId { get; set; }
         public int TaxMasterID { get; set; }
         public string Taxper { get; set; }
+        public decimal? dc_qty { get; set; }
+        public decimal? invoice_qty { get; set; }
         public decimal? TaxValue { get; set; }
         public decimal? Price { get; set; }
         public decimal? quantity { get; set; } 

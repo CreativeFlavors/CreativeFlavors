@@ -1,318 +1,369 @@
-﻿@model MMS.Web.Models.InvoiceDetails.InvoiceDetails
-
+﻿@model MMS.Web.Models.Salesorders
 @using MMS.Repository.Managers
 @using MMS.Core.Entities
 
-<div class="right-form-section clearfix">
-    <form class="form-inline" role="form">
-        <div class="tab-content">
-            <div id="step1" class="tab-pane fade in active">
-                <div class="container-fluid">
-                    <div class="row" style="margin-top: 20px;">
-                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Buyer</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.DropDownListFor(m => m.BuyerName, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field" })
+<!DOCTYPE html>
+<html lang="en">
 
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">order No</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @*@Html.DropDownListFor(m => m.OrderId, MMS.Web.ExtensionMethod.HtmlHelper.GetBuyerOrderlist(), new { @class = "select-style text-field" })*@
-                                        @Html.DropDownListFor(m => m.OrderId, new SelectList(
-                                              new List<Object>{
-                                                   new { value = "" , text = "Please Select"  }
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
 
-                                                },
-                                              "value",
-                                              "text",
-                                               2), new { @class = "select-style text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Category Code</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+    <style>
+        table, th, td {
+            border: 1px solid #C9C9C9;
+            border-collapse: collapse;
+            text-align: center;
+        }
 
-                                        @Html.TextBoxFor(m => m.CCode, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Order Date</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+        td {
+            padding: 4px;
+        }
 
+        th {
+            padding: 18px 27px;
+            font-size: 14px;
+            font-family: 'Poppins';
+            color: #292b2c;
+        }
 
-                                        @Html.TextBoxFor(m => m.OrderDate, new { @class = "datepicker" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">OrderFullFill Date</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+        .dc td input {
+            border: navajowhite;
+            width: 142px;
+            text-align: center;
+        }
 
-                                        @Html.TextBoxFor(m => m.OrderFullFillDate, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Notes</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+        .dc {
+            margin-left: 11px;
+            margin-top: 27px;
+        }
 
-                                        @Html.TextAreaFor(m => m.Notes, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Company Address</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+        .table td, .table th {
+            padding: 10px;
+            border-color: #838181;
+        }
 
-                                        @*@Html.DropDownListFor(m => m.AddCode, MMS.Web.ExtensionMethod.HtmlHelper.GetBuyerOrderAddress1list(), new { @class = "select-style text-field" })*@
-                                        @Html.DropDownListFor(m => m.AddCode, new SelectList(
-                                              new List<Object>{
-                                                   new { value = "" , text = "Please Select"  }
+        .table th {
+            background-color: #94b8f9;
+            color: #ffffff;
+        }
+        .add-remove button {
+            min-width: 33px;
+            height: 40px;
+            background: #4472c4;
+            font-size: 21px;
+            border: navajowhite;
+            color: #fff;
+        }
 
-                                                },
-                                              "value",
-                                              "text",
-                                               2), new { @class = "select-style text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Shipping Address</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
+        #add-remove button {
+            min-width: 33px;
+            height: 40px;
+            background: #ffc107;
+            font-size: 21px;
+            border: navajowhite;
+            color: #000;
+        }
+    </style>
+</head>
 
-                                        @*@Html.DropDownListFor(m => m.ShipAddCode, MMS.Web.ExtensionMethod.HtmlHelper.AddressTypebind(), new { @class = "select-style text-field" })*@
-                                        @Html.DropDownListFor(m => m.ShipAddCode, new SelectList(
-                                                  new List<Object>{
-                                                       new { value = "" , text = "Please Select"  }
+<body>
+    <div class="main-page">
+        <section class="inner-section">
+            <div class="edit-customer">
+                <a href="/Deliverychallan/DCMaster">
+                    <div class="back-button"><img src="~/Content/assets/images/choose-plan.png" alt="back arrow"></div>
+                </a>
+                <h2 class=" font-20">Invoice Apply</h2>
+            </div>
 
-                                                    },
-                                                  "value",
-                                                  "text",
-                                                   2), new { @class = "select-style text-field" })
-                                    </div>
-                                </div>
-                            </div>
+            <div class="edit-section">
+                <div class="d-flex justify-content-start">
+                    <h3 class="font-20">Invoice Information</h3>
+                    <div id="alert" style="padding: 7px 19px;">
+
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="BuyerName">Buyer Name</label>
+                            @Html.DropDownListFor(m => m.BuyerName, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field " })
                         </div>
-                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
-
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Billing Address</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-
-                                        @*@Html.DropDownListFor(m => m.BillAddCode, MMS.Web.ExtensionMethod.HtmlHelper.AddressTypebind(), new { @class = "select-style text-field" })*@
-                                        @Html.DropDownListFor(m => m.BillAddCode, new SelectList(
-                                                  new List<Object>{
-                                                       new { value = "" , text = "Please Select"  }
-
-                                                    },
-                                                  "value",
-                                                  "text",
-                                                   2), new { @class = "select-style text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Total Amount</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-
-                                        @Html.TextBoxFor(m => m.TotalAmount, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Discount Amount</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-
-                                        @Html.TextBoxFor(m => m.DiscAmount, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Tax Amount</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-
-                                        @Html.TextBoxFor(m => m.TaxAmount, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Bill Amount</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-
-                                        @Html.TextBoxFor(m => m.BillAmount, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Freight Amount</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-
-                                        @Html.TextBoxFor(m => m.FreightAmount, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Is Quote</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-
-
-                                        @Html.DropDownListFor(m => m.IsQuote, new SelectList(
-                                              new List<Object>{
-                                                   new { value = "" , text = "Please Select"  },
-                                                   new { value = 0 , text = "Yes"  },
-                                                   new { value = 1 , text = "No" }
-
-                                                },
-                                              "value",
-                                              "text",
-                                               2), new { @class = "select-style text-field" })
-                                    </div>
-                                </div>
-                            </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="SalesorderId">SO Number</label>
+                            @Html.DropDownListFor(m => m.SalesorderId, MMS.Web.ExtensionMethod.HtmlHelper.salesorderno(), new { @class = "select-style text-field " })
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="form-footer">
-            <div class="row">
-                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
-                    <input type="button" onclick="Cancel()" style="cursor: pointer;" title="Back" value="Back" class="btn btn-default btn-style">
-                    @*@if (Model != null && Model.BuyerMasterId != 0)
-                        {
-                            <input type="hidden" id="BuyerMasterId" value="@Model.BuyerMasterId" />
-                            <input type="button" onclick="Update()" style="cursor: pointer;" id="BuyerMasterId" title="Update" value="Update" class="btn btn-default btn-style">
-                        }
-                        else
-                        {*@
-                    <input type="button" onclick="Save()" style="cursor: pointer;" title="Save" value="Save" class="btn btn-default btn-style">
-                    @*}*@
+                <div class="row mt-3">
+                    <div class="d-flex justify-content-between">
+                        <div style="width: 75%;">
+                            <table class="table table-striped-columns text-center">
+                                <tr>
+                                    <th>Order Number:</th>
+                                    <td class="SalesorderId_HD" style="text-align: center; width: 10%;">@Model.SalesorderId_HD</td>
+                                    <th>Order Date:</th>
+                                    <td id="DivpQuoteDate" style=" width: 10%;">@Model.salesorderdate.ToString("dd/MM/yyyy")</td>
+                                    <th>Order Valid Till:</th>
+                                    <td id="DivpQuotevailddate" style=" width: 10%;">@DateTime.Now.ToString("dd/MM/yyyy")</td>
+                                    <th style="text-align:center;">Total Price:</th>
+                                    <td id="DivpQuotevalue" style=" width: 10%;">@string.Format("{0:0.00}", Model.Total_Price)</td>
+                                    <th style="text-align:center;">Grand Total:</th>
+                                    <td id="DivpSodate" style=" width: 10%;">@string.Format("{0:0.00}", Model.Total_Grandtotal)</td>
+                                </tr>
+                                <tr>
+                                    <th style="text-align:center;">Payment Made:</th>
+                                    <td id="DivpPaymentMode" style=" width: 10%;">-</td>
+                                    <th style="text-align:center;">Pending Amount:</th>
+                                    <td id="DivPendingAmont" style=" width: 10%;">-</td>
+                                    <th style="text-align:center;">SO Quantity:</th>
+                                    <td id="DivpSoduedate" style=" width: 10%;">@string.Format("{0:0.00}", Model.quantity)</td>
+                                    <th style="text-align:center;">Total Item:</th>
+                                    <td id="DivpTotalItem" style=" width: 10%;">@Model.item</td>
+                                    <th style="text-align:center;">Item Invoiced:</th>
+                                    <td id="DivpItemInvoiced" style=" width: 10%;">@Model.itemInvoiced/@Model.item</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 d-flex justify-content-center">
+                            <div class="checkbox-wrapper-55" style=" margin-top: 6%;">
+                                <label class="rocker rocker-small">
+                                    <input type="checkbox" id="currencyToggle">
+                                    <span class="switch-left" value="USD">USD</span>
+                                    <span class="switch-right" value="ZAR">ZAR</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <hr />
+                    </div>
 
-                    <button type="submit" class="btn btn-default btn-style">Clear</button>
+                    <table style="width:100%" class="dc">
+                        <thead>
+                            <tr>
+                                <th>SI.No</th>
+                                <th>Product Name</th>
+                                <th>Product Code</th>
+                                <th>Unit Price</th>
+                                <th>Qty</th>
+                                <th>UOM</th>
+                                <th>Invoice_Qty</th>
+                                <th>Disc %</th>
+                                <th>Discount Amount</th>
+                                <th>Sub Total</th>
+                                <th>Tax Rate</th>
+                                <th>Tax Amount</th>
+                                <th>Total Price</th>
 
-                </div>
-            </div>
-        </div>
-    </form>
-</div>
-<link rel="stylesheet" href="/resources/demos/style.css">
-<link href="~/Scripts/EasyAutocomplete-1.3.5/comboStyles.css" rel="stylesheet" />
-<script src="~/Scripts/EasyAutocomplete-1.3.5/ComboBox.js"></script>
+                            </tr>
+                        </thead>
+                        <tbody id="salesOrderTable">
+                            @if (Model.salesorderLists != null)
+                            {
+                                var count = 1;
+                                foreach (var i in Model.salesorderLists)
+                                {
+                                    <tr>
+                                        <td style="background-color: #e9ecef" id="sino">@count</td>
+                                        <td style="width:10%; text-align:left; background-color: #e9ecef " id="productname">@i.ProductName</td>
+                                        <td style=" background-color: #e9ecef" id="productcode">@i.ProductCode</td>
+                                        <td id="productid" style="display:none;">@i.ProductID</td>
+                                        <td id="SalesorderId_DT" style="display:none;">@i.SalesorderId_DT</td>
+                                        <td style="background-color: #e9ecef" id="Price1">@string.Format("{0:0.00}", i.Price)</td>
+                                        @if (i.quantity == 0)
+                                        {
+                                            <td data-max-quantity="@i.quantity" style=" width: 10%;">
+                                                <div class="add-remove">
+                                                    <button class="decrementInbtn btn" disabled><span>-</span></button>
+                                                    <input type="text" class="quantityInput" style="width:50px;" disabled value="@string.Format("{0:0}", i.quantity)">
+                                                    <button class="incrementINbtn btn" disabled>+</button>
+                                                </div>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td data-max-quantity="@i.quantity" style=" width: 10%;">
+                                                <div class="add-remove">
+                                                    <button class="decrementInbtn btn"><span>-</span></button>
+                                                    <input type="text" class="quantityInput" style="width:50px;" disabled value="@string.Format("{0:0}", i.quantity)">
+                                                    <button class="incrementINbtn btn">+</button>
+                                                </div>
+                                            </td>
+                                        }
+
+                                        <td style="background-color: #e9ecef" id="uomtype">@i.Uomname</td>
+                                        @if (i.invoice_qty != null)
+                                        {
+                                            <td style="background-color: #e9ecef" id="uomtype">@string.Format("{0:0}", i.invoice_qty)</td>
+                                        }
+                                        else
+                                        {
+                                            <td style="background-color: #e9ecef; color: #b9b1b1; ">Null</td>
+                                        }
+                                        <td style="background-color: #e9ecef" id="discount">@string.Format("{0:0}", i.discountperid)</td>
+                                        <td style="background-color: #e9ecef" id="discountamount">@string.Format("{0:0.00}", i.discountvalue)</td>
+                                        <td style="background-color: #e9ecef" id="subtotal">@string.Format("{0:0.00}", i.Subtotal)</td>
+                                        <td style="background-color: #e9ecef" id="taxper">@i.Taxper</td>
+                                        <td style="background-color: #e9ecef" id="TaxValue">@string.Format("{0:0.00}", i.TaxValue)</td>
+                                        <td style="background-color: #e9ecef" id="totalprice">@string.Format("{0:0.00}", i.Grandtotal)</td>
+                                    </tr>
+                                    count++;
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+                    <div>
+                    </div>
+                    <div class="mt-3">
+                        <hr />
+                    </div>
+                    <div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <div class="row">
+
+                                <div class="col-lg-2 col-md-1 col-sm-10" id="billingadd">
+                                    <div class="input-part">
+                                        <h5 class="light-text">Billing-address</h5>
+                                        <ul class="mt-2">
+                                            @{
+                                                string billingAdd = Model.Billingadd;
+                                                if (billingAdd != null)
+                                                {
+                                                    var billingAddresses = billingAdd.Split(',');
+                                                    foreach (var address in billingAddresses)
+                                                    {
+                                                        <li id="libilingadd@billingIndex">@address</li>
+                                                    }
+
+                                                }
+                                                else
+                                                {
+                                                    <li>No billing addresses available.</li>
+                                                }
+                                            }
+
+                                        </ul>
 
 
-<script>
-    $('#OrderId').change(function () {
-        $.ajax({
-            url: '/InvoiceDetails/GetInvoiceAddressDetailbind',
-            type: "GET",
-            dataType: "JSON",
-            data: { orderid: $("#OrderId").val() },
-            success: function (data) {
-                debugger;
-                console.log(data);
-                $("#AddCode").html(""); // clear before appending new list
-                $("#ShipAddCode").html("");
-                $("#BillAddCode").html("");
-                $("#AddCode").prepend(
-                    $('<option></option>').val("").text("Please Select")
-                );
-                $("#ShipAddCode").prepend(
-                    $('<option></option>').val("").text("Please Select")
-                );
-                $("#BillAddCode").prepend(
-                    $('<option></option>').val("").text("Please Select")
-                );
-                $.each(data, function (i, da) {
-                    $("#AddCode").append(
-                        $('<option></option>').val(da.addressid).html(da.add1));
-                });
-                $.each(data, function (i, da) {
-                    $("#ShipAddCode").append(
-                        $('<option></option>').val(da.addressid).html(da.add2));
-                });
-                $.each(data, function (i, da) {
-                    $("#BillAddCode").append(
-                        $('<option></option>').val(da.addressid).html(da.add3));
-                });
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6 " id="billingadd">
+                                    <div class="input-part">
+                                        <h5 class="light-text">Shipping-Address</h5>
+                                        <ul class="mt-2">
+                                            @{
+                                                string shippingadd = Model.shippingadd;
+
+                                                if (shippingadd != null)
+                                                {
+                                                    var shippingAddresses = shippingadd.Split(',');
+
+                                                    foreach (var address in shippingAddresses)
+                                                    {
+                                                        <li id="libilingad@shippingIndex">@address</li>
+                                                    }
+
+                                                }
+                                                else
+                                                {
+                                                    <li>No Shipping addresses available.</li>
+                                                }
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class=" form-group col-3 mt-3">
+                                <div class="form-group row ">
+                                    <label for="inputEmail3" class="col-sm-4 col-form-label" id="price">Price</label>
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(m => m.Total_Price, new { @class = "form-control", disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="form-group row mt-3">
+                                    <label for="inputEmail3" class="col-sm-4 col-form-label">Discount</label>
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(m => m.Total_discountval, new { @class = "form-control", disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="form-group row mt-3">
+                                    <label for="subtotal" class="col-sm-4 col-form-label">Sub Total</label>
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(m => m.Total_Subtotal, new { @class = "form-control", disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="form-group row mt-3">
+                                    <label for="inputEmail3" class="col-sm-4 col-form-label">Total Tax</label>
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(m => m.Total_TaxValue, new { @class = "form-control", disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="form-group row mt-3">
+                                    <label for="inputEmail3" class="col-sm-4 col-form-label">Grand Total</label>
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(m => m.Total_Grandtotal, new { @class = "form-control", disabled = "disabled" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="inner-section-button">
+                            <button class="fill-color font-15" onclick="confirmInvoiceorder()">
+                                Raise Invoice
+                            </button>
+                            <a href="/Deliverychallan/DCMaster">
+                                <button class="border-color font-15">
+                                    CANCEL
+                                </button>
+                            </a>
+
+                        </div>
+                    </div>
+        </section>
+    </div>
+
+
+
+    <script src="~/Content/js/custom.js"></script>
+    <script src="~/Content/js/dropdown.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#dc").attr('checked', true);
+
+        });
+        new TomSelect("#SalesorderId", {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
             }
         });
-    });
-    $('#BuyerName').change(function () {
-        debugger;
-        if ($("#BuyerName").val() != "" && $("#BuyerName").val() != null) {
-            var buyername = parseInt($("#BuyerName").val());
-            $.ajax({
-                url: '/InvoiceDetails/GetBuyerOrderlist',
-                type: "GET",
-                dataType: "JSON",
-                data: { buyername: buyername },
-                success: function (data) {
-                    debugger;
-                    console.log(data);
-                    $("#OrderId").html(""); // clear before appending new list
-                    $("#OrderId").prepend(
-                        $('<option></option>').val("").text("Please Select")
-                    );
-                    $.each(data, function (i, da) {
-                        $("#OrderId").append(
-                            $('<option></option>').val(da.orderid).html(da.buyerorderslno));
-                    });
-                }
-            });
-        }
-    });
-</script>
+        new TomSelect("#BuyerName", {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            }
+        });
 
+    </script>
+   
 
-
+</body>
+</html>
