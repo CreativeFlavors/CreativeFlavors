@@ -126,5 +126,8 @@ namespace MMS.Web.Models.SupplierMasterModel
 
         [Column("creditdays")]
         public string CreditDays { get; set; }
+
+        [Column("accounttypeid")]
+        public int? accounttypeid { get; set; }
     }
 }

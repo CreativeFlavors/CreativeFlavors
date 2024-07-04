@@ -43,7 +43,7 @@ namespace MMS.Core.Entities
             [Column("productionduedate")]
             public DateTime? ProductionDueDate { get; set; }
 
-            [Column("productionfullfilldate")]
+           [Column("productionfullfilldate")]
             public DateTime? ProductionFullfillDate { get; set; }
 
             [Column("refdocno")]
@@ -111,6 +111,12 @@ namespace MMS.Core.Entities
 
         [Column("productcode")]
         public string ProductCode { get; set; }
+
+        [Column("quantitytomanufacture")]
+        public decimal? QuantityToManufacture { get; set; }
+
+        [Column("availabletomanufacture")]
+        public decimal? AvailableToManufacture { get; set; }
     }
 
     }

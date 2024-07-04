@@ -48,6 +48,8 @@ namespace MMS.Data.Mapping
             Property(t => t.Inprogress).HasColumnName("inprogress");
             Property(t => t.ProductionPerDay).HasColumnName("productionperday");
             Property(t => t.ProductCode).HasColumnName("productcode");
+            Property(t => t.QuantityToManufacture).HasColumnName("quantitytomanufacture");
+            Property(t => t.AvailableToManufacture).HasColumnName("availabletomanufacture");
             ToTable("production");
         }
     }

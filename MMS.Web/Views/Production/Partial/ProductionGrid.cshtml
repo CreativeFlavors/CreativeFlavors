@@ -1,4 +1,4 @@
-﻿@model MMS.Web.Models.Production.ProductionModel
+﻿@model MMS.Repository.ViewModel.ProductionViewModel
 @using MMS.Repository.Managers
 
 <!DOCTYPE html>
@@ -103,6 +103,12 @@
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
                                 </th>
+                                <th scope="col">
+                                    <span>Production Type</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
                                 <th scope="col"><span>STATUS</span></th>
                             </tr>
                         </thead>
@@ -119,12 +125,20 @@
                                 {
                                     <tr class="font-14">
                                         <td>@startSerialNumber</td>
-                                        <td>@item.product.ProductName</td>
+                                        <td>@item.ProductName</td>
                                         <td>@item.ProductionCode</td>
                                         <td>@item.ProductionQty</td>
                                         <td>@item.RequiredQty</td>
+                                        <td>@item.ProductionType</td>
                                         <td class="veh-1 edit-del-wrap">
-                                            <a href="javascript:void(0)" onclick="Edit('@item.ProductionId')" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
+                                            @if (@item.ProductionType == "Production")
+                                            {
+                                                <a href="javascript:void(0)" onclick="Edit('@item.ProductionId', true)" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
+                                            }
+                                            else if (@item.ProductionType == "Subassembly")
+                                            {
+                                                <a href="javascript:void(0)" onclick="Edit('@item.ProductionId', false)" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
+                                            }
                                         </td>
                                     </tr>
                                     startSerialNumber++;
@@ -246,8 +260,12 @@
             });
         }
 
-        function Edit(arg) {
-            window.location.href = "/Production/ProductionEdit?productionid=" + arg;
+        function Edit(productionId, isProduction) {
+            if (isProduction) {
+                window.location.href = "/Production/ProductionEdit?productionId=" + productionId;
+            } else {
+                window.location.href = "/Production/ProductionSubassemblyEdit?productionId=" + productionId;
+            }
         }
     </script>
 

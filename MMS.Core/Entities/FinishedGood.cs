@@ -12,6 +12,7 @@ namespace MMS.Core.Entities
     public class FinishedGood : BaseEntity
     {
         [Key]
+        [Column("id")]
         public int Id { get; set; }
 
         [Column("productcode")]
@@ -70,5 +71,8 @@ namespace MMS.Core.Entities
 
         [Column("producttype")]
         public int ProductType { get; set; }
+
+        [Column("productid")]
+        public int ProductId { get; set; }
     }
 }
