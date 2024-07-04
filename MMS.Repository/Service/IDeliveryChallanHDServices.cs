@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MMS.Repository.Service
 {
-    public interface ISalesorderHD_Services 
+    public interface IDeliveryChallanHDServices
     {
-        List<Salesorder_hd> Get();
+        salesorder GettypeId(int id);
     }
 }

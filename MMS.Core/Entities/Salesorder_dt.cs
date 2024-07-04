@@ -69,5 +69,9 @@ namespace MMS.Core.Entities
         public string Updatedby { get; set; }
         [Column("status")]
         public string Status { get; set; }
+        [Column("dc_qty")]
+        public decimal? dc_qty { get; set; }
+        [Column("invoice_qty")]
+        public decimal? Invoice_qty { get; set; }
     }
 }

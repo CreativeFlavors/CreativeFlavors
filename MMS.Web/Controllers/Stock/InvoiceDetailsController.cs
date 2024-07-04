@@ -10,100 +10,345 @@ using MMS.Repository.Managers.StockManager;
 using MMS.Web.Models.Addressdetails;
 using MMS.Repository.Managers;
 using static iTextSharp.text.pdf.AcroFields;
+using MMS.Web.Models;
+using Newtonsoft.Json;
 
 namespace MMS.Web.Controllers.Stock
 {
-    [CustomFilter]
     public class InvoiceDetailsController : Controller
     {
         #region Accounts View
-        [HttpGet]
-        public ActionResult InvoiceMaster()
+        [HttpPost]
+        public ActionResult InvoiceDetails(int SOId)
         {
-            InvoiceDetails model = new InvoiceDetails();
-            return View(model);
-        }
-        [HttpGet]
-        public ActionResult InvoiceDetailsGrid()
-        {
-            InvoiceDetails model = new InvoiceDetails();
-            InvoiceDetailsManages InvoiceDetailsManagesManager = new InvoiceDetailsManages();
-            //model.Invoicedetailslist = InvoiceDetailsManagesManager.Get();
-            CustAddressMangers oCustAddressMangers = new CustAddressMangers();
-            var custaddlist = oCustAddressMangers.Get();
-            model.Invoicedetailslist = InvoiceDetailsManagesManager.Get()
-               .Select(item => new InvoiceDetails
-               {
-                   Id = item.Id,
-                   OrderId = item.OrderId,
-                   CCode = item.CCode,
-                   OrderDate = item.OrderDate,
-                   OrderFullFillDate = item.OrderFullFillDate,
-                   Notes = item.Notes,
-                   AddCode = item.AddCode,
-                   ShipAddCode = item.ShipAddCode,
-                   BillAddCode = item.BillAddCode,
-                   TotalAmount = item.TotalAmount,
-                   DiscAmount = item.DiscAmount,
-                   TaxAmount = item.TaxAmount,
-                   BillAmount = item.BillAmount,
-                   FreightAmount = item.FreightAmount,
-                   IsQuote = item.IsQuote,
-                   IsActive = item.IsActive,
-                   //CreatedBy = item.CreatedBy,
-                   //CreatedDate = item.CreatedDate,
-                   TotalQty = item.TotalQty,
-                   TotalItems = item.TotalItems,
-                   ShipCode = item.ShipCode,
-                   ExpectedDeliveryDate = item.ExpectedDeliveryDate
-               })
-                    .ToList();
-            foreach (var item1 in model.Invoicedetailslist)
+            Salesorders models = new Salesorders();
+            SalesorderHD_Manager salesorderManager = new SalesorderHD_Manager();
+            SalesorderDT_Manager SalesorderDT_Manager = new SalesorderDT_Manager();
+            CustAddressMangers custAddressMangers = new CustAddressMangers();
+            var headerdata = salesorderManager.GetSOId(SOId);
+            var salesorderdt = SalesorderDT_Manager.GetSOIdS(SOId);
+            var counts = 0;
+
+            foreach (var i in salesorderdt)
             {
-                foreach (var item2 in custaddlist)
+                if (i.quantity == i.Invoice_qty)
                 {
-                    if (item1.AddCode == item2.AddressType)
+                    counts++;
+                }
+            }
+            var custadd = custAddressMangers.GetCustAddressbuyerid(headerdata.customerid);
+            models.itemInvoiced = counts;
+            models.shippingadd = custadd.Add1;
+            models.Billingadd = custadd.Add2;
+            models.BuyerName = headerdata.customerid;
+            models.SalesorderId = headerdata.salesorderid_hd;
+            models.SalesorderId_HD = headerdata.salesorderid_hd;
+            models.Total_Price = Math.Round((decimal)headerdata.Total_price, 2);
+            models.salesorderdate = headerdata.Salesorderdate;
+            models.quantity = headerdata.quantity;
+
+            models.item = headerdata.items;
+            List<Salesorders> totaldata = new List<Salesorders>();
+            var totallist = SalesorderDT_Manager.salesorder_Grid();
+            var filteredList = totallist.Where(i => i.salesorderid == SOId);
+
+            foreach (var i in filteredList)
+            {
+                Salesorders salesorder = new Salesorders();
+                if (i.invoiceqty != null)
+                {
+                    var qtys = (i.quantity) - (i.invoiceqty);
+                    salesorder.quantity = qtys;
+                    salesorder.SalesorderId = i.salesorderid;
+                    salesorder.SalesorderId_DT = i.salesorderid_dt;
+                    salesorder.discountperid = i.discountper;
+                    salesorder.Price = i.unitprice;
+                    salesorder.Taxper = i.Taxper;
+                    salesorder.Uomname = i.long_unit_name;
+                    salesorder.ProductName = i.productname;
+                    salesorder.ProductCode = i.productcode;
+                    salesorder.ProductID = i.productid;
+                    salesorder.invoice_qty = i.invoiceqty;
+                    var subtotal = qtys * i.unitprice;
+                    var disamount = subtotal * i.discountper / 100;
+                    var subtotals = subtotal - disamount;
+                    var taxamount1 = subtotals * int.Parse(i.Taxper) / 100;
+                    var total = taxamount1 + subtotals;
+                    salesorder.Subtotal = subtotals;
+                    salesorder.TaxValue = taxamount1;
+                    salesorder.Grandtotal = total;
+                    salesorder.discountvalue = disamount;
+                }
+                else
+                {
+                    salesorder.quantity = i.quantity;
+                    salesorder.SalesorderId = i.salesorderid;
+                    salesorder.SalesorderId_DT = i.salesorderid_dt;
+                    salesorder.discountperid = i.discountper;
+                    salesorder.Price = i.unitprice;
+                    salesorder.Taxper = i.Taxper;
+                    salesorder.Uomname = i.long_unit_name;
+                    salesorder.ProductName = i.productname;
+                    salesorder.ProductCode = i.productcode;
+                    salesorder.ProductID = i.productid;
+                    salesorder.invoice_qty = i.invoiceqty;
+
+                    salesorder.discountvalue = i.discount_value;
+                    salesorder.Subtotal = i.subtotal;
+                    salesorder.TaxValue = i.taxvalue;
+                    salesorder.Grandtotal = i.totalprice;
+
+                }
+                totaldata.Add(salesorder);
+            }
+            decimal? subtotals1 = 0;
+            decimal? discount = 0;
+            decimal? tax = 0;
+            decimal? grandtotal = 0;
+
+            foreach (var i in totaldata)
+            {
+                subtotals1 += i.Subtotal;
+                discount += i.discountvalue;
+                tax += i.TaxValue;
+                grandtotal += i.Grandtotal;
+            }
+            models.Total_Subtotal = Math.Round((decimal)subtotals1, 2);
+            models.Total_discountval = Math.Round((decimal)discount, 2);
+            models.Total_TaxValue = Math.Round((decimal)tax, 2);
+            models.Total_Grandtotal = Math.Round((decimal)grandtotal, 2);
+
+            models.salesorderLists = totaldata;
+            return PartialView("Partial/InvoiceDetails", models);
+        }
+        public ActionResult Dec_Calculation_Indetails(Salesorders model)
+        {
+            SalesorderManager salesorderManager = new SalesorderManager();
+            ProductManager productManager = new ProductManager();
+            TaxTypeManager taxTypeManager = new TaxTypeManager();
+            Salesorders salesorders = new Salesorders();
+            string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
+            if (model.currencyOption.ToUpper() != "ZAR")
+            {
+                model.ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "USD", dateOnly);
+            }
+            else
+            {
+                model.ConversionValue = 1;
+            }
+            var product = productManager.GetId(model.ProductID);
+            var tax = taxTypeManager.GetTaxMasterId(product.TaxMasterId);
+
+            var taxper = tax.TaxValue;
+            var qty = model.quantity;
+            var discount = model.discountval;
+            var discounts = Convert.ToDecimal(discount);
+            var unitprice = product.Price * model.ConversionValue;
+            int intVal = int.Parse(taxper);
+            var subtotal = qty * unitprice;
+            var disamount = subtotal * discounts / 100;
+            var subtotals = subtotal - disamount;
+            var taxamount1 = subtotals * intVal / 100;
+            var total = taxamount1 + subtotals;
+            salesorders.Subtotal = subtotals;
+            salesorders.TaxValue = taxamount1;
+            salesorders.Grandtotal = total;
+            salesorders.discountvalue = disamount;
+
+            var subtotal1 = (qty + 1) * unitprice;
+            var disamount1 = subtotal1 * discounts / 100;
+            var subtotals1 = subtotal1 - disamount1;
+            var taxamounts = subtotals1 * intVal / 100;
+            var total1 = taxamounts + subtotals1;
+
+            var subvalue = subtotals1 - subtotals;
+            var disvalue = disamount1 - disamount;
+            var taxvalue = taxamounts - taxamount1;
+            var totalvalue = total1 - total;
+
+            salesorders.Total_discountval = model.Total_discountval - disvalue;
+            salesorders.Total_Subtotal = model.Total_Subtotal - subvalue;
+            salesorders.Total_TaxValue = model.Total_TaxValue - taxvalue;
+            salesorders.Total_Grandtotal = model.Total_Grandtotal - totalvalue;
+
+            return Json(salesorders, JsonRequestBehavior.AllowGet);
+
+        }
+        [HttpPost]
+        public ActionResult Inc_Calculation_Indetails(Salesorders model)
+        {
+            SalesorderManager salesorderManager = new SalesorderManager();
+            ProductManager productManager = new ProductManager();
+            TaxTypeManager taxTypeManager = new TaxTypeManager();
+            Salesorders salesorders = new Salesorders();
+            string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
+            if (model.currencyOption.ToUpper() != "ZAR")
+            {
+                model.ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "USD", dateOnly);
+            }
+            else
+            {
+                model.ConversionValue = 1;
+            }
+            var product = productManager.GetId(model.ProductID);
+            var tax = taxTypeManager.GetTaxMasterId(product.TaxMasterId);
+            var taxper = tax.TaxValue;
+            var qty = model.quantity;
+            var discount = model.discountval;
+            var discounts = Convert.ToDecimal(discount);
+            var unitprice = product.Price * model.ConversionValue;
+            int intVal = int.Parse(taxper);
+            var subtotal = qty * unitprice;
+            var disamount = subtotal * discounts / 100;
+            var subtotals = subtotal - disamount;
+            var taxamount1 = subtotals * intVal / 100;
+            var total = taxamount1 + subtotals;
+            salesorders.Subtotal = subtotals;
+            salesorders.TaxValue = taxamount1;
+            salesorders.Grandtotal = total;
+            salesorders.discountvalue = disamount;
+
+            var subtotal1 = (qty + 1) * unitprice;
+            var disamount1 = subtotal1 * discounts / 100;
+            var subtotals1 = subtotal1 - disamount1;
+            var taxamounts = subtotals1 * intVal / 100;
+            var total1 = taxamounts + subtotals1;
+
+            var subvalue = subtotals1 - subtotals;
+            var disvalue = disamount1 - disamount;
+            var taxvalue = taxamounts - taxamount1;
+            var totalvalue = total1 - total;
+
+            salesorders.Total_discountval = model.Total_discountval + disvalue;
+            salesorders.Total_Subtotal = model.Total_Subtotal + subvalue;
+            salesorders.Total_TaxValue = model.Total_TaxValue + taxvalue;
+            salesorders.Total_Grandtotal = model.Total_Grandtotal + totalvalue;
+
+            return Json(salesorders, JsonRequestBehavior.AllowGet);
+
+        }
+        [HttpPost]
+        public JsonResult Invoice_Post(string buyerid, string currencyOption, decimal Total_Price, decimal Total_Subtotal, decimal Total_TaxValue, decimal Total_discountval, decimal Total_Grandtotal, string salesOrderData)
+        {
+            var salesOrderList = JsonConvert.DeserializeObject<List<SalesOrderItem>>(salesOrderData);
+            var AlertMessage = "";
+            OrderHeaderManager OrderHeaderManager = new OrderHeaderManager();
+            OrderDetailsManager OrderDetailsManager = new OrderDetailsManager();
+            SalesorderManager salesorderManager = new SalesorderManager();
+            CurrencyManager currencyManager = new CurrencyManager();
+            ProductManager productManager = new ProductManager();
+            TaxTypeManager taxTypeManager = new TaxTypeManager();
+            BuyerManager buyerManager = new BuyerManager();
+            Salesorder_dt salesorder_Dt = new Salesorder_dt();
+            Salesorders model = new Salesorders();
+            SalesorderDT_Manager salesorderDT_manager = new SalesorderDT_Manager();
+            string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
+            if (currencyOption.ToUpper() != "ZAR")
+            {
+                model.ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "USD", dateOnly);
+            }
+            else
+            {
+                model.ConversionValue = 1;
+            }
+            orderheader_hd orderheader = new orderheader_hd();
+            orderheader.CustomerId = (Convert.ToInt32(buyerid));
+            orderheader.invoicedate = DateTime.Now;
+            orderheader.TotalPrice = Total_Price;
+            orderheader.TotalSubtotal = Total_Subtotal;
+            orderheader.TotalTaxAmount = Total_TaxValue;
+            orderheader.TotalDisAmount = Total_discountval;
+            orderheader.GrandTotal = Total_Grandtotal;
+            orderheader.IsActive = true;
+            decimal? quantity = 0;
+            var count = 0;
+
+            foreach (var i in salesOrderList)
+            {
+                if ((Convert.ToInt32(i.Quantity)) != 0)
+                {
+                    quantity += (Convert.ToInt32(i.Quantity));
+                    count++;
+                }
+            }
+            orderheader.invoice_items = count;
+            orderheader.Quantity = quantity;
+
+            var headerid = OrderHeaderManager.POST(orderheader);
+
+            orderdetails orderdetails = new orderdetails();
+            var currencyid = currencyManager.GetContainCurrencyid(currencyOption);
+            foreach (var i in salesOrderList)
+            {
+                var dc_dt = OrderDetailsManager.GetSOId(Convert.ToInt32(i.SalesorderId_DT));
+                decimal? quantitys = 0;
+                foreach (var k in dc_dt)
+                {
+                    if (k.Quantity != 0)
                     {
-                        item1.add1 = item2.Add1;
+                        quantitys += (k.Quantity);
+                        count++;
                     }
-                    if (item1.ShipAddCode == item2.AddressType)
-                    {
-                        item1.add2 = item2.Add2;
-                    }
-                    if (item1.BillAddCode == item2.AddressType)
-                    {
-                        item1.add3 = item2.Add3;
-                    }
+                }
+                var DT = salesorderDT_manager.GetSO(Convert.ToInt32(i.SalesorderId_DT));
+                var product = productManager.GetId(Convert.ToInt32(i.ProductID));
+                var tax = taxTypeManager.GetTaxMasterId(product.TaxMasterId);
+                var addreddcode = buyerManager.GetBuyerMasterId(Convert.ToInt32(buyerid));
+
+                orderdetails.invoicehd_id = headerid.invoicehd_id;
+                orderdetails.SalesOrderId_dt = (Convert.ToInt32(i.SalesorderId_DT));
+                orderdetails.ProductId = (Convert.ToInt32(i.ProductID));
+                orderdetails.ProductCode = product.ProductCode;
+                orderdetails.CustomerId = (Convert.ToInt32(buyerid));
+                orderdetails.UomMasterId = product.UomMasterId;
+                orderdetails.TaxPerId = product.TaxMasterId;
+                orderdetails.Quantity = (Convert.ToInt32(i.Quantity));
+                orderdetails.DiscountPer = DT.Discountperid;
+                orderdetails.UnitPrice = product.Price;
+                orderdetails.invoicedate = DateTime.Now;
+                orderdetails.CurrencyId = currencyid.id;
+                orderdetails.CustAddCode = addreddcode.BuyerCode;
+                orderdetails.CustBillCode = addreddcode.BuyerAddress1;
+                orderdetails.CustShipCode = addreddcode.BuyerAddress2;
+                var unitprice = product.Price * model.ConversionValue;
+                orderdetails.IsActive = true;
+                var taxper = tax.TaxValue;
+                var qty = (Convert.ToInt32(i.Quantity));
+                var discount = DT.Discountperid;
+                int intVal = int.Parse(taxper);
+
+                if ((qty != null) && (discount != null))
+                {
+                    var subtotal = qty * unitprice;
+                    var disamount = subtotal * discount / 100;
+                    var subtotals = subtotal - disamount;
+                    var taxamount1 = subtotals * intVal / 100;
+                    var total = taxamount1 + subtotals;
+                    orderdetails.SubTotal = subtotals;
+                    orderdetails.TaxValue = taxamount1;
+                    orderdetails.TotalPrice = total;
+                    orderdetails.DiscountValue = disamount;
+                }
+                if ((Convert.ToInt32(i.Quantity)) != 0 && dc_dt != null)
+                {
+                    salesorder_Dt.Invoice_qty = (Convert.ToInt32(i.Quantity)) + quantitys;
+                    salesorder_Dt.Salesorderid_dt = (Convert.ToInt32(i.SalesorderId_DT));
+
+                    OrderDetailsManager.POST(orderdetails);
+                    salesorderDT_manager.update(salesorder_Dt);
+                }
+                else if ((Convert.ToInt32(i.Quantity)) != 0)
+                {
+                    salesorder_Dt.Invoice_qty = (Convert.ToInt32(i.Quantity));
+                    salesorder_Dt.Salesorderid_dt = (Convert.ToInt32(i.SalesorderId_DT));
+
+                    OrderDetailsManager.POST(orderdetails);
+                    salesorderDT_manager.update(salesorder_Dt);
                 }
             }
 
-            return PartialView("Partial/InvoiceDetailsGrid", model);
-        }
-        [HttpGet]
-        public ActionResult InvoiceDetails()
-        {
-            InvoiceDetails model = new InvoiceDetails();
-
-            return PartialView("Partial/InvoiceDetails", model);
-        }
-       
-        [HttpGet]
-        public ActionResult GetInvoiceAddressDetailbind(int orderid)
-        {
-            BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
-            List<Core.Entities.Stock.getbuyerorderaddressdetails> result = new List<Core.Entities.Stock.getbuyerorderaddressdetails>();
-            result = buyerOrderEntryManager.getbuyerorderaddressdetails(orderid);
-
-            return Json(result, JsonRequestBehavior.AllowGet);
-        }
-        [HttpGet]
-        public ActionResult GetBuyerOrderlist(string buyername)
-        {
-            BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
-            List<Core.Entities.Stock.GetBuyerOrderlist> result = new List<Core.Entities.Stock.GetBuyerOrderlist>();
-            result = buyerOrderEntryManager.GetBuyerOrderlist(Convert.ToInt32(buyername));
-
-            return Json(result, JsonRequestBehavior.AllowGet);
+            AlertMessage = "Confirm Order";
+            return Json(new { AlertMessage = AlertMessage }, JsonRequestBehavior.AllowGet);
         }
         #endregion
     }

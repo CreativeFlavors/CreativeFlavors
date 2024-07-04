@@ -1,6 +1,5 @@
 ﻿using MMS.Common;
 using MMS.Core.Entities;
-using MMS.Core.Entities.Stock;
 using MMS.Data;
 using MMS.Data.Mapping;
 using MMS.Repository.Service;
@@ -12,14 +11,14 @@ using System.Threading.Tasks;
 
 namespace MMS.Repository.Managers
 {
-    public class OrderDetailsManager : IOrderDetailsService, IDisposable
+    public class OrderHeaderManager : IOrderHeaderService, IDisposable
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-        private Repository<orderdetails> order_detailsRepository;
-
-        public OrderDetailsManager()
+        private Repository<orderheader_hd> OrderHeaderrep;
+        public OrderHeaderManager()
         {
-            order_detailsRepository = unitOfWork.Repository<orderdetails>();
+            OrderHeaderrep = unitOfWork.Repository<orderheader_hd>();
+
         }
 
         public void Dispose()
@@ -27,20 +26,21 @@ namespace MMS.Repository.Managers
             throw new NotImplementedException();
         }
 
-        public orderdetails GettypeId(int id)
+        public orderheader_hd GettypeId(int id)
         {
             throw new NotImplementedException();
         }
-        public orderdetails POST(orderdetails arg)
+        public orderheader_hd POST(orderheader_hd arg)
         {
-            orderdetails salesorder = new orderdetails();
+            orderheader_hd salesorder = new orderheader_hd();
             try
             {
                 string username = "admin";
                 arg.CreatedBy = username;
                 arg.CreatedDate = DateTime.Now;
                 arg.Status = 0;
-                order_detailsRepository.Insert(arg);
+                arg.IsDeleted = true;
+                OrderHeaderrep.Insert(arg);
                 salesorder = arg;
             }
             catch (Exception ex)
@@ -49,17 +49,19 @@ namespace MMS.Repository.Managers
             }
             return salesorder;
         }
-        public List<orderdetails> Get()
+        public List<orderheader_hd> Get()
         {
-            List<orderdetails> obj = new List<orderdetails>();
-            obj = order_detailsRepository.Table.ToList<orderdetails>();
+            List<orderheader_hd> obj = new List<orderheader_hd>();
+            obj = OrderHeaderrep.Table.ToList<orderheader_hd>();
             return obj;
         }
-        public List<orderdetails> GetSOId(int id)
+        public orderheader_hd GetSOId(int id)
         {
-            List<orderdetails> salesorders = new List<orderdetails>();
-            salesorders = order_detailsRepository.Table.Where(x => x.SalesOrderId_dt == id).ToList();
+            orderheader_hd salesorders = new orderheader_hd();
+            salesorders = OrderHeaderrep.Table.Where(x => x.invoicehd_id == id).FirstOrDefault();
             return salesorders;
         }
+
+
     }
 }

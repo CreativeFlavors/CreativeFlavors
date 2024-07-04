@@ -33,7 +33,11 @@ namespace MMS.Data.StoredProcedureModel
         [Column("discountper")]
         public decimal? discountper { get; set; }
         [Column("subtotal")]
-        public decimal? subtotal { get; set; }   
+        public decimal? subtotal { get; set; }
+        [Column("dc_qty")]
+        public decimal? dc_qty { get; set; }
+        [Column("invoiceqty")]
+        public decimal? invoiceqty { get; set; }
         [Column("taxvalue")]
         public decimal? taxvalue { get; set; }  
         [Column("totalprice")]
@@ -48,5 +52,6 @@ namespace MMS.Data.StoredProcedureModel
         public int productid { get; set; }
         [Column("bomno")]
         public string bomno { get; set; }
+
     }
 }

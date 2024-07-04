@@ -27,7 +27,7 @@
         }
 
         th {
-            padding: 31px 26px;
+            padding: 18px 27px;
             font-size: 14px;
             font-family: 'Poppins';
             color: #292b2c;
@@ -46,10 +46,19 @@
 
         .table td, .table th {
             padding: 10px;
+            border-color: #9d9d9d;
         }
-
+        .fill-color {
+            padding: 10px;
+            background: #7f54b3;
+            border-radius: 5px;
+            width: fit-content;
+            margin-right: 15px;
+            border: 1px solid #4472C4;
+            color: #FFFFFF;
+        }
         .table th {
-            background-color: #d7ffec;
+            background-color: #dbd7ff;
         }
 
         .add-remove button {
@@ -129,7 +138,7 @@
                                     <th style="text-align:center;">Total Item:</th>
                                     <td id="DivpTotalItem" style=" width: 10%;">@Model.item</td>
                                     <th style="text-align:center;">Item DC:</th>
-                                    <td id="DivpItemInvoiced" style=" width: 10%;">0/@Model.item</td>
+                                    <td id="DivpItemInvoiced" style=" width: 10%;">@Model.itemdc/@Model.item</td>
                                 </tr>
                             </table>
                         </div>
@@ -179,15 +188,36 @@
                                         <td id="productid" style="display:none;">@i.ProductID</td>
                                         <td id="SalesorderId_DT" style="display:none;">@i.SalesorderId_DT</td>
                                         <td style="background-color: #e9ecef" id="Price1">@string.Format("{0:0.00}", i.Price)</td>
-                                        <td data-max-quantity="@i.quantity" style=" width: 10%;">
-                                            <div class="add-remove">
-                                                <button class="decrementbtn btn"><span>-</span></button>
-                                                <input type="text" class="quantityInput" style="width:50px;" disabled value="@string.Format("{0:0}", i.quantity)">
-                                                <button class="incrementbtn btn">+</button>
-                                            </div>
-                                        </td>
+                                        @if (i.quantity == 0)
+                                        {
+                                            <td data-max-quantity="@i.quantity" style=" width: 10%;">
+                                                <div class="add-remove">
+                                                    <button class="decrementbtn btn" disabled><span>-</span></button>
+                                                    <input type="text" class="quantityInput" style="width:50px;" disabled value="@string.Format("{0:0}", i.quantity)">
+                                                    <button class="incrementbtn btn" disabled>+</button>
+                                                </div>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td data-max-quantity="@i.quantity" style=" width: 10%;">
+                                                <div class="add-remove">
+                                                    <button class="decrementbtn btn"><span>-</span></button>
+                                                    <input type="text" class="quantityInput" style="width:50px;" disabled value="@string.Format("{0:0}", i.quantity)">
+                                                    <button class="incrementbtn btn">+</button>
+                                                </div>
+                                            </td>
+                                        }
+
                                         <td style="background-color: #e9ecef" id="uomtype">@i.Uomname</td>
-                                        <td style="background-color: #e9ecef" id="uomtype"></td>
+                                        @if (i.dc_qty != null)
+                                        {
+                                            <td style="background-color: #e9ecef" id="uomtype">@string.Format("{0:0}", i.dc_qty)</td>
+                                        }
+                                        else
+                                        {
+                                            <td style="background-color: #e9ecef; color: #b9b1b1; ">Null</td>
+                                        }
                                         <td style="background-color: #e9ecef" id="discount">@string.Format("{0:0}", i.discountperid)</td>
                                         <td style="background-color: #e9ecef" id="discountamount">@string.Format("{0:0.00}", i.discountvalue)</td>
                                         <td style="background-color: #e9ecef" id="subtotal">@string.Format("{0:0.00}", i.Subtotal)</td>
