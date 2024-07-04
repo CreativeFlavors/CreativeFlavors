@@ -1,0 +1,333 @@
+﻿@model MMS.Web.Models.IndentMaterial.IndentMaterialModel
+@using MMS.Repository.Managers
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
+
+    <style>
+        table, th, td {
+            border: 1px solid #C9C9C9;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        td {
+            padding: 1px;
+        }
+
+        th {
+            padding: 22px 25px;
+            font-size: 14px;
+            font-family: 'Poppins';
+            color: #292b2c;
+        }
+
+        .Indent td input {
+            border: navajowhite;
+            width: 100px;
+            text-align: center;
+        }
+
+        .Indent {
+            margin-left: 11px;
+            margin-top: 7%;
+        }
+
+        div#billingadd {
+            margin-top: -8%;
+        }
+
+        .form-group.col-3.mt-4 {
+            margin-left: 9px;
+        }
+
+        p#Grandtotal {
+            padding: 15%;
+        }
+
+        .alert {
+            position: relative;
+            padding: 7px 19px;
+        }
+
+        .alert-danger {
+            color: #842029;
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+            width: 118%;
+        }
+
+        strong#close {
+            margin-left: 16%;
+            cursor: pointer;
+        }
+
+        #alert {
+            margin-left: 24%;
+        }
+        div#form {
+            border-style: solid;
+            border-color: #e9ecef;
+        }
+
+        .sub_merchants .merchant_btn, .manage_customers .manage_customers_btn, .common_Manage_subMerchant .manage_customers_btn {
+            background: #4472C4;
+            border-radius: 5px;
+            padding: 11px 61px;
+            border: 1px solid transparent;
+            font-style: normal;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-page">
+        <section class="inner-section">
+            <div class="edit-customer">
+                <div class="back-button" onclick="cancel()"><img src="~/Content/assets/images/choose-plan.png" alt="back arrow"></div>
+                <h2 class=" font-20">Indent</h2>
+            </div>
+
+            <div class="edit-section">
+                <div class="d-flex justify-content-start">
+                    <h3 class="font-20">Indent Information</h3>
+                    <div id="alert" style="padding: 7px 19px;">
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#IndentDate">Indent Date</label>
+                            @Html.TextBoxFor(m => m.IndentDate, "{0:dd-MM-yyyy}", new { @class = "form-control text-field", @id = "IndentDate" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#IndentNo">Indent No</label>
+                            @Html.TextBoxFor(m => m.IndentNo, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#MaterialId">Material Name</label>
+                            @Html.DropDownListFor(m => m.MaterialId, MMS.Web.ExtensionMethod.HtmlHelper.Material(), new { @class = "select-style text-field " })
+                        </div>
+                    </div>
+                    <br />
+                    <table style="width:100%" class="Indent">
+                        <thead>
+                            <tr>
+                                <th>Material Name</th>
+                                <th>Store Code</th>
+                                <th>Tax</th>
+                                <th>UOM</th>
+                                <th>Price</th>
+                                <th>Indent Qty</th>
+                                <th>Required Qty</th>
+                                <th>Add Products</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="background-color: #e9ecef" id="MaterialName"></td>
+                                <td style="background-color: #e9ecef" id="StoreCode"></td>
+                                <td style="background-color: #e9ecef" id="Tax"></td>
+                                <td style="background-color: #e9ecef" id="UOM"></td>
+                                <td style="background-color: #e9ecef" id="Price"></td>
+                                <td style="background-color: #e9ecef" id="Indent Qty"></td>
+                                <td>@Html.TextBoxFor(m => m.Quantity, new { @class = "form-control" })</td>
+                                <td style="background-color: #e9ecef">
+                                    <button class="fill-color font-15" onclick="Save()">Add</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div>
+                        <div class="table-responsive reports_table_responsive">
+                            <div class="manage_customers_table_in_responsive mt-3" style="height:230px; overflow: auto;" id="form">
+                                <div id="table-wrapper">
+                                    <div id="table-scroll">
+                                        <table class="table table-bordered table-fixed" style="text-align: center; width: 100%;">
+                                            <thead>
+                                                <tr style="position: -webkit-sticky; position: sticky; top: 0; background-color: #4472c4; ">
+                                                    <th scope="col">
+                                                        <span style="color:white">SNO</span>
+                                                        <span>
+                                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <span style="color:white">Material Name</span>
+                                                        <span>
+                                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <span style="color:white">Price</span>
+                                                        <span>
+                                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <span style="color:white">Store</span>
+                                                        <span>
+                                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <span style="color:white">UOM</span>
+                                                        <span>
+                                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <span style="color:white">Tax</span>
+                                                        <span>
+                                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <span style="color:white">Indent Qty</span>
+                                                        <span>
+                                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <span style="color:white">Required Qty</span>
+                                                        <span>
+                                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <span style="color:white">Status</span>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="inner-section-button" style="margin-bottom:-98px;">
+                        <button class="fill-color font-15" onclick="confirmorder()">
+                            Confirm Indent
+                        </button>
+                        <button class="border-color font-15" onclick="cancel()">
+                            CANCEL
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- page-contents end -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Content/js/dropdown.js"></script>
+    <script src="~/Content/js/custom.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script>
+        // for searchable dropdownlist
+        function initializeTomSelect(selectors, options) {
+            selectors.forEach(selector => {
+                new TomSelect(selector, options);
+            });
+        }
+
+        initializeTomSelect([
+            "#MaterialId"
+
+
+        ], {
+            create: false,
+            sortField: {
+                field: "value",
+                direction: "asc"
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#MaterialId').on('change', function () {
+                var materialId = $(this).val();
+                $.ajax({
+                    url: '/IndentMaterial/GetMaterialForIndent',
+                    type: 'GET',
+                    data: { materialId: materialId },
+                    success: function (response) {
+                        $('#MaterialName').text(response.MaterialName);
+                        $('#StoreCode').text(response.Store);
+                        $('#Tax').text(response.Tax);
+                        $('#UOM').text(response.Uom);
+                        $('#Price').text(response.Price);
+                        $('#IndentQty').text(response.IndentQty);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error fetching data:', error);
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+    function Save() {
+        var formData = {
+            IndentDate: $('#IndentDate').val(),
+            IndentNo: $('#IndentNo').val(),
+            MaterialId: $('#MaterialId').val(),
+            Quantity: $('#Quantity').val(),
+            MaterialName: $('#MaterialName').val(),
+            StoreCode: $('#StoreCode').val(),
+            Tax: $('#Tax').val(),
+            UOM: $('#UOM').val(),
+            Price: $('#Price').val(),
+            IndentQty: $('#IndentQty').val()
+        };
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("SaveIndentHeader", "IndentMaterial")', 
+            data: JSON.stringify(formData),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function(response) {
+
+                console.log('Save successful:', response);
+                if (data.includes("Inserted")) {
+                    alert("Indent added successfully");
+                    location.href = "/IndentMaterial/IndentMaterialGrid";
+                }
+                else if (data.includes("Updated")) {
+                    alert("Indent updated successfully");
+                    location.href = "/IndentMaterial/IndentMaterialGrid";
+                }
+
+            },
+            error: function(error) {
+
+                console.error('Error:', error);
+
+            }
+        });
+    }
+    </script>
+
+
+</body>
+</html>

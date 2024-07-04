@@ -24,7 +24,7 @@ namespace MMS.Repository.Managers
             List<StatusProduction> statusProductions = new List<StatusProduction>();
             try
             {
-                statusProductions = statusproductionRepository.Table.Where(X => X.IsDeleted == false).ToList<StatusProduction>();
+                statusProductions = statusproductionRepository.Table.Where(X => X.IsDeleted == false).ToList();
             }
             catch (Exception ex)
             {

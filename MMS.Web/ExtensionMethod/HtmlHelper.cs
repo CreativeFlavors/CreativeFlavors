@@ -2542,6 +2542,24 @@ namespace MMS.Web.ExtensionMethod
             return new SelectList(items, "Value", "Text");
         }
 
+        public static SelectList Material()
+        {
+            MaterialNewManager materialNewManager = new MaterialNewManager();
+            List<System.Web.Mvc.SelectListItem> items = materialNewManager.Get().OrderBy(x => x.MaterialName).Select(
+                                                  item => new System.Web.Mvc.SelectListItem()
+                                                  {
+                                                      Text = item.MaterialName,
+                                                      Value = item.MaterialId.ToString()
+                                                  }).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select Material Name"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }
+
         public static SelectList StatusProduction()
         {
             StatusProductionManager statusProductionManager = new StatusProductionManager();
