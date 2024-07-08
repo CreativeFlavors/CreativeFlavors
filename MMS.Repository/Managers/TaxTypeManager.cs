@@ -119,7 +119,7 @@ namespace MMS.Repository.Managers
             return taxMaster;
         }
 
-        public TaxTypeMaster GetTaxMasterId(int TaxMasterID)
+        public TaxTypeMaster GetTaxMasterId(int? TaxMasterID)
         {
             TaxTypeMaster taxMaster = new TaxTypeMaster();
             if (TaxMasterID != 0)

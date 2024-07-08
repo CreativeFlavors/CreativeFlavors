@@ -1,4 +1,4 @@
-﻿@model MMS.Web.Models.IndentMaterial.IndentMaterialModel
+﻿@model MMS.Data.StoredProcedureModel.IndentCartsp
 @using MMS.Repository.Managers
 
 <!DOCTYPE html>
@@ -65,7 +65,7 @@
             </div>
             <div class="table-responsive manage_customers_table_responsive">
                 <div class="customer_manage_search_containers" style="width:40%;">
-                    <input type="text" placeholder="Search by Product Name" id="SeaarchID" name="search2">
+                    <input type="text" placeholder="Search by Product Name" id="SearchID" name="search2">
                     <button class="buttonone" onclick="Search()" title="Filter" type="submit"><i class="fa fa-search"></i></button>
 
                 </div>
@@ -86,25 +86,31 @@
                                     </span>
                                 </th>
                                 <th scope="col">
-                                    <span>Batch Code</span>
+                                    <span>Store Code</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
                                 </th>
                                 <th scope="col">
-                                    <span>Production Qty</span>
+                                    <span>Uom</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
                                 </th>
                                 <th scope="col">
-                                    <span>Required Qty</span>
+                                    <span>Tax Type</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
                                 </th>
                                 <th scope="col">
-                                    <span>Production Type</span>
+                                    <span>Price</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Indent Number</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
@@ -112,11 +118,41 @@
                                 <th scope="col"><span>STATUS</span></th>
                             </tr>
                         </thead>
-                       <tbody>
+                        @if (ViewBag.Productslist != null)
+                        {
+                            <tbody>
+                                @{
+                                    int currentPage = ViewBag.CurrentPage ?? 1;
+                                    int pageSize = ViewBag.PageSize ?? 9;
+                                    int totalItems = ViewBag.Productslist.Count;
+                                    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+                                }
 
-                       </tbody>
-                        
+                                @foreach (var item in ViewBag.Productslist)
+                                {
 
+                                    <tr class="font-14">
+                                        <td>@startSerialNumber</td>
+                                        <td>@item.ProductName</td>
+                                        <td>@item.StoreName</td>
+                                        <td>@item.UomName</td>
+                                        <td>@item.TaxName</td>
+                                        <td>@item.Price</td>
+                                        <td>@item.IndentNumber</td>
+                                        <td class="veh-1 edit-del-wrap">
+                                            @*<a href="javascript:void(0)" onclick="Edit('@item.IndentCartId')" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>*@
+                                            <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.IndentCartId')" class="watchlist-delete" title="Delete"><img src="~/Content/assets/images/delete-icon.png" /></a>
+                                            @*<td><button class="btn btn-success" id="paynow" onclick="paynow('@item.Id')" title="PayNow">Pay Now</button></td>*@
+                                        </td>
+
+
+                                    </tr>
+                                    startSerialNumber++;
+                                }
+
+                            </tbody>
+
+                        }
                     </table>
                 </div>
                 <div class="row manage_customer_show">
@@ -141,7 +177,7 @@
                                 @for (int i = 1; i <= ViewBag.TotalPages; i++)
                                 {
                                     <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                        <a href="@Url.Action("ProductionGrid", "Production", new { page = i })" class="page-link">@i</a>
+                                        <a href="@Url.Action("IndentMaterialGrid", "IndentMaterial", new { page = i })" class="page-link">@i</a>
                                     </li>
                                 }
                                 <li class="page-item">
@@ -164,10 +200,104 @@
 
 
     <script src="~/Content/js/custom.js"></script>
-
+    
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
-    </body>
+
+    <script>
+  $(document).ready(function() {
+    $('#manage_customer_show_no').change(function() {
+        var pageSize = parseInt($(this).val());
+        window.location.href = "@Url.Action("IndentMaterialGrid", "IndentMaterial")?pageSize=" + pageSize;
+    });
+
+    $('#previousPage').click(function(e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        if (currentPage > 1) {
+            var previousPage = currentPage - 1;
+            window.location.href = "@Url.Action("IndentMaterialGrid", "IndentMaterial")?page=" + previousPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+        }
+    });
+
+    $('#nextPage').click(function(e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        var totalPages = parseInt('@ViewBag.TotalPages');
+        if (currentPage < totalPages) {
+            var nextPage = currentPage + 1;
+            window.location.href = "@Url.Action("IndentMaterialGrid", "IndentMaterial")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+        }
+    });
+});
+    </script>
+    <script>
+        function Search() {
+            $.ajax({
+                type: "GET",
+                url: '/IndentMaterial/IndentSearch',
+                data: { filter: $('#SearchID').val() }, 
+                dataType: 'json',
+                success: function (data) {
+                    $("tbody").empty();
+                    var count = 1;
+                    $.each(data, function (i, item) {
+                        $("tbody").append(`
+                            <tr class="font-14">
+                                <td>${count}</td>
+                                <td>${item.ProductName}</td>
+                                <td>${item.StoreName}</td>
+                                <td>${item.UomName}</td>
+                                <td>${item.TaxName}</td>
+                                <td>${item.Price}</td>
+                                <td>${item.IndentNumber}</td>
+                                <td class="veh-1 edit-del-wrap">
+                                    <a href="javascript:void(0)" onclick="Delete('${item.IndentCartId}')" class="watchlist-delete" title="Delete">
+                                        <img src="/Content/assets/images/delete-icon.png" />
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+                        count++;
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error occurred:", status, error);
+                }
+            });
+        }
+
+        function Delete(arg) {
+            var answer = confirm("Are you sure want to delete?");
+            if (answer) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/IndentMaterial/IndentDelete',
+                    data: { IndentCartId: arg },
+                    success: function (data) {
+                        if (data == "Success") {
+                            alert('Indent Deleted Successfully.');
+                            location.reload();
+                            return false;
+                        }
+                        else {
+                            alert('Product deletion failed.');
+                        }
+
+                    },
+                    error: function (ex) {
+                        alert('This product Already Exist in the database.');
+                    }
+                });
+            }
+            else {
+                return false;
+            }
+        }
+    </script>
+
+
+</body>
 </html>

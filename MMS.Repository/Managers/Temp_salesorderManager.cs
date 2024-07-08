@@ -75,5 +75,27 @@ namespace MMS.Repository.Managers
 
             return temp_Salesorder;
         }
+        public List<Temp_Indent> GetStockRequiredForMaterials(int MaterialNameID)
+        {
+            List<Temp_Indent> temp_Salesorder = new List<Temp_Indent>();
+            try
+            {
+                if (MaterialNameID != 0)
+                {
+                    temp_Salesorder = tempsalesorderrep.Table.Where(x => x.MaterialId == MaterialNameID).ToList();
+                    if (temp_Salesorder == null)
+                    {
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+
+            }
+
+            return temp_Salesorder;
+        }
     }
 }

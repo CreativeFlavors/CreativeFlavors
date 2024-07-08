@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MMS.Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -48,6 +49,18 @@ namespace MMS.Web.Models.IndentMaterial
         public decimal For_Total { get; set; }
         public decimal IndentQty { get; set; }
         public int IndentNo { get; set; }
+        public int IndentCartId { get; set; }
+        public string MaterialNameId { get; set; }
+        public string StoreNameId { get; set; }
+        public string TaxNameId { get; set; }
+        public string UomNameId { get; set; }
+        public decimal? Price { get; set; }
+        public decimal? IndentRequiredQty { get; set; }
+        public decimal? RequiredQty { get; set; }
+        public int? IndentNumber { get; set; }
+        public int? cartStatus { get; set; }
+
+        public product product { get; set; }
 
     }
 }

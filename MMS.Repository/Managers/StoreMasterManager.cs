@@ -113,7 +113,7 @@ namespace MMS.Repository.Managers
             return storeMaster;
         }
 
-        public StoreMaster GetStoreMasterId(int StoreMasterId)
+        public StoreMaster GetStoreMasterId(int? StoreMasterId)
         {
             StoreMaster storeMaster = new StoreMaster();
             if (StoreMasterId != 0)
