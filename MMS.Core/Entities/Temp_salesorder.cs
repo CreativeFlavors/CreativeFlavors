@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MMS.Core.Entities
 {
-    [Table("temp_indent", Schema = "public")]
-    public class Temp_Indent : BaseEntity
+    [Table("temp_salesorder", Schema = "public")]
+    public class Temp_salesorder : BaseEntity
     {
         [System.ComponentModel.DataAnnotations.Key]
         [Column("id")]
@@ -37,15 +37,5 @@ namespace MMS.Core.Entities
         public string CreatedBy { get; set; }
         [Column("updatedby")]
         public string UpdatedBy { get; set; }
-        [Column("status")]
-        public int? Status { get; set; }
-        [Column("indentnumber")]
-        public int? IndentNumber { get; set; }
-        [Column("indenton")]
-        public DateTime? IndentOn { get; set; }
-        [Column("indentby")]
-        public string IndentBy { get; set; }
-        [Column("indentstorecode")]
-        public int? IndentStoreCode { get; set; }
     }
 }
