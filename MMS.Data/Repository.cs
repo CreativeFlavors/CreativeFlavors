@@ -333,6 +333,19 @@ namespace MMS.Data
                 throw;
             }
         }
+
+        public List<MMS.Data.StoredProcedureModel.IndentPoMappingsp> GetindentPoMapping()
+        {
+            try
+            {
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.IndentPoMappingsp>("SELECT * FROM get_indentpomapping()").ToList();
+                return ResultList;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
         public List<MMS.Data.StoredProcedureModel.mrp_material_list> mrpMaterialList1(int? productid)
         {
             try

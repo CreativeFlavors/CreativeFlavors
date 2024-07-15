@@ -997,7 +997,7 @@ namespace MMS.Web.ExtensionMethod
             var ColorName = new System.Web.Mvc.SelectListItem()
             {
                 Value = "",
-                Text = "Please Select"
+                Text = "Please Select Supplier"
             };
             items.Insert(0, ColorName);
             return new SelectList(items, "Value", "Text");
@@ -1777,6 +1777,41 @@ namespace MMS.Web.ExtensionMethod
             {
                 Value = "",
                 Text = "Please Select Product"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }
+        //public static SelectList IndentNo()
+        //{
+        //    IndentNewMaterialManager Manager = new IndentNewMaterialManager();
+        //    List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.IndentNumber).Select(
+        //                                          item => new System.Web.Mvc.SelectListItem()
+        //                                          {
+        //                                              Text = item.IndentNumber.ToString(),
+        //                                              Value = item.IndentCartId.ToString()
+        //                                          }).ToList();
+        //    var ShotName = new System.Web.Mvc.SelectListItem()
+        //    {
+        //        Value = "",
+        //        Text = "Please Select IndentNo"
+        //    };
+        //    items.Insert(0, ShotName);
+        //    return new SelectList(items, "Value", "Text");
+        //}
+
+        public static SelectList IndentDetailNo()
+        {
+            IndentNewMaterialManager Manager = new IndentNewMaterialManager();
+            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.IndentHeaderId).Select(
+                                                  item => new System.Web.Mvc.SelectListItem()
+                                                  {
+                                                      Text = item.IndentHeaderId.ToString(),
+                                                      Value = item.IndentHeaderId.ToString()
+                                                  }).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select IndentNo"
             };
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
