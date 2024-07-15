@@ -23,64 +23,25 @@ namespace MMS.Core.Entities
         public DateTime? IndentDate { get; set; }
 
         [Column("storecode")]
-        public int StoreCode { get; set; }
-
-        [Column("suppliercode")]
-        public int SupplierCode { get; set; }
+        public int? StoreCode { get; set; }
 
         [Column("materialid")]
-        public int MaterialId { get; set; }
+        public int? MaterialId { get; set; }
 
         [Column("uomid")]
-        public int UomId { get; set; }
+        public int? UomId { get; set; }
 
         [Column("taxid")]
-        public int TaxId { get; set; }
+        public int? TaxId { get; set; }
 
         [Column("unitprice")]
-        public decimal UnitPrice { get; set; }
+        public decimal? UnitPrice { get; set; }
 
         [Column("quantity")]
-        public decimal Quantity { get; set; }
-
-        [Column("extendedprice")]
-        public decimal ExtendedPrice { get; set; }
-
-        [Column("discountvalue")]
-        public decimal DiscountValue { get; set; }
-
-        [Column("discountperc")]
-        public decimal DiscountPerc { get; set; }
-
-        [Column("subtotal")]
-        public decimal Subtotal { get; set; }
-
-        [Column("taxvalue")]
-        public decimal TaxValue { get; set; }
-
-        [Column("total")]
-        public decimal Total { get; set; }
+        public decimal? Quantity { get; set; }
 
         [Column("weight")]
         public decimal Weight { get; set; }
-
-        [Column("for_unitprice")]
-        public decimal ForUnitPrice { get; set; }
-
-        [Column("for_extendedprice")]
-        public decimal ForExtendedPrice { get; set; }
-
-        [Column("for_discountvalue")]
-        public decimal ForDiscountValue { get; set; }
-
-        [Column("for_subtotal")]
-        public decimal ForSubtotal { get; set; }
-
-        [Column("for_taxvalue")]
-        public decimal ForTaxValue { get; set; }
-
-        [Column("for_total")]
-        public decimal ForTotal { get; set; }
 
         [Column("createddate")]
         public DateTime? CreatedDate { get; set; }
@@ -104,6 +65,9 @@ namespace MMS.Core.Entities
         public string UpdatedBy { get; set; }
 
         [Column("indentqty")]
-        public decimal IndentQty { get; set; }
+        public decimal? IndentQty { get; set; }
+
+        [Column("indentno")]
+        public int? IndentNo { get; set; }
     }
 }

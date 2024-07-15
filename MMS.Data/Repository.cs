@@ -325,6 +325,19 @@ namespace MMS.Data
                 throw;
             }
         }
+
+        public List<MMS.Data.StoredProcedureModel.IndentCartsp> Getindentcart()
+        {
+            try
+            {
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.IndentCartsp>("SELECT * FROM get_indentcart()").ToList();
+                return ResultList;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
         public List<MMS.Data.StoredProcedureModel.mrp_material_list> mrpMaterialList1(int? productid)
         {
             try

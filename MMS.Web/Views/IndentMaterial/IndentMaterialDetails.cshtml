@@ -95,7 +95,9 @@
     <div class="main-page">
         <section class="inner-section">
             <div class="edit-customer">
-                <div class="back-button" onclick="cancel()"><img src="~/Content/assets/images/choose-plan.png" alt="back arrow"></div>
+                <a href="/IndentMaterial/IndentMaterialMaster">
+                    <div class="back-button"><img src="~/Content/assets/images/choose-plan.png" alt="back arrow"></div>
+                </a>                
                 <h2 class=" font-20">Indent</h2>
             </div>
 
@@ -116,14 +118,14 @@
 
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="input-part">
-                            <label class="font-14" for="#IndentNo">Indent No</label>
-                            @Html.TextBoxFor(m => m.IndentNo, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
+                            <label class="font-14" for="#IndentNumber">Indent No</label>
+                            @Html.TextBoxFor(m => m.IndentNumber, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;", id = "IndentNumber" })
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="#MaterialId">Material Name</label>
-                            @Html.DropDownListFor(m => m.MaterialId, MMS.Web.ExtensionMethod.HtmlHelper.Material(), new { @class = "select-style text-field " })
+                            @Html.DropDownListFor(m => m.MaterialId, MMS.Web.ExtensionMethod.HtmlHelper.ProductName(), new { @class = "select-style text-field " })
                         </div>
                     </div>
                     <br />
@@ -142,13 +144,15 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td style="background-color: #e9ecef" id="MaterialName"></td>
-                                <td style="background-color: #e9ecef" id="StoreCode"></td>
-                                <td style="background-color: #e9ecef" id="Tax"></td>
-                                <td style="background-color: #e9ecef" id="UOM"></td>
-                                <td style="background-color: #e9ecef" id="Price"></td>
-                                <td style="background-color: #e9ecef" id="Indent Qty"></td>
-                                <td>@Html.TextBoxFor(m => m.Quantity, new { @class = "form-control" })</td>
+                                <td>@Html.TextBoxFor(m => m.MaterialNameId, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "MaterialNameId" })</td>
+                                <td>@Html.TextBoxFor(m => m.StoreNameId, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "StoreNameId" })</td>
+                                <td>@Html.TextBoxFor(m => m.TaxNameId, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "TaxNameId" })</td>
+                                <td>@Html.TextBoxFor(m => m.UomNameId, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "UomNameId" })</td>
+                                <td>@Html.TextBoxFor(m => m.Price, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "Price" })</td>
+                                <td>
+                                    @Html.TextBoxFor(m => m.IndentRequiredQty, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "IndentRequiredQty" })
+                                </td>
+                                <td>@Html.TextBoxFor(m => m.RequiredQty, new { @class = "form-control text-field", style = "width:100%;", id = "RequiredQty" })</td>
                                 <td style="background-color: #e9ecef">
                                     <button class="fill-color font-15" onclick="Save()">Add</button>
                                 </td>
@@ -211,12 +215,9 @@
                                                             <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                                         </span>
                                                     </th>
-                                                    <th scope="col">
-                                                        <span style="color:white">Status</span>
-                                                    </th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody id="indentTableBody">
                                             </tbody>
                                         </table>
                                     </div>
@@ -228,9 +229,12 @@
                         <button class="fill-color font-15" onclick="confirmorder()">
                             Confirm Indent
                         </button>
-                        <button class="border-color font-15" onclick="cancel()">
-                            CANCEL
-                        </button>
+                        <a href="/IndentMaterial/IndentMaterialMaster">
+                            <button class="border-color font-15">
+
+                                CANCEL
+                            </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -270,14 +274,14 @@
                 $.ajax({
                     url: '/IndentMaterial/GetMaterialForIndent',
                     type: 'GET',
-                    data: { materialId: materialId },
+                    data: { productid: materialId },
                     success: function (response) {
-                        $('#MaterialName').text(response.MaterialName);
-                        $('#StoreCode').text(response.Store);
-                        $('#Tax').text(response.Tax);
-                        $('#UOM').text(response.Uom);
-                        $('#Price').text(response.Price);
-                        $('#IndentQty').text(response.IndentQty);
+                        $('#MaterialNameId').val(response.MaterialName);
+                        $('#StoreNameId').val(response.Store);
+                        $('#TaxNameId').val(response.Tax);
+                        $('#UomNameId').val(response.Uom);
+                        $('#Price').val(response.Price);
+                        $('#IndentRequiredQty').val(response.Indentstock);
                     },
                     error: function (xhr, status, error) {
                         console.error('Error fetching data:', error);
@@ -286,48 +290,125 @@
             });
         });
     </script>
+
     <script>
-    function Save() {
-        var formData = {
-            IndentDate: $('#IndentDate').val(),
-            IndentNo: $('#IndentNo').val(),
-            MaterialId: $('#MaterialId').val(),
-            Quantity: $('#Quantity').val(),
-            MaterialName: $('#MaterialName').val(),
-            StoreCode: $('#StoreCode').val(),
-            Tax: $('#Tax').val(),
-            UOM: $('#UOM').val(),
-            Price: $('#Price').val(),
-            IndentQty: $('#IndentQty').val()
-        };
-        $.ajax({
-            type: 'POST',
-            url: '@Url.Action("SaveIndentHeader", "IndentMaterial")', 
-            data: JSON.stringify(formData),
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function(response) {
+        function Save() {
+            var MaterialId = $('#MaterialId').val();
+            var Price = $('#Price').val();
+            var IndentRequiredQty = $('#IndentRequiredQty').val();
+            var RequiredQty = $('#RequiredQty').val();
+            var IndentNumber = $('#IndentNumber').val();
+            var IndentDate = $('#IndentDate').val();
 
-                console.log('Save successful:', response);
-                if (data.includes("Inserted")) {
-                    alert("Indent added successfully");
-                    location.href = "/IndentMaterial/IndentMaterialGrid";
+            var formData = new FormData();
+            formData.append("MaterialId", MaterialId);
+            formData.append("Price", Price);
+            formData.append("IndentRequiredQty", IndentRequiredQty);
+            formData.append("RequiredQty", RequiredQty);
+            formData.append("IndentNumber", IndentNumber);
+            formData.append("IndentDate", IndentDate);
+
+            $.ajax({
+                type: 'POST',
+                url: '/IndentMaterial/SaveIndentCart',
+                contentType: false,
+                processData: false,
+                dataType: 'json',
+                data: formData,
+                success: function (data) {
+                    console.log('Save successful:', data);
+
+                    if (data && data.Success) {
+                        if (data.message === "Inserted" || data.message === "Updated") {
+                            alert("Indent Added successful");
+                            // Update table with new indents for the current IndentNo
+                            updateIndentTable(data.Indents);
+                        }
+                        else {
+                            alert("Unknown response or operation failed.");
+                        }
+                    }
+                    else {
+                        alert("Unknown response or operation failed.");
+                    }
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                    alert("Error occurred while saving indent. Please try again.");
                 }
-                else if (data.includes("Updated")) {
-                    alert("Indent updated successfully");
-                    location.href = "/IndentMaterial/IndentMaterialGrid";
-                }
+            });
+        }
 
-            },
-            error: function(error) {
+        function updateIndentTable(indents) {
+            var tableBody = $('#indentTableBody');
+            tableBody.empty(); // Clear existing rows
 
-                console.error('Error:', error);
+            // Loop through indents and append rows to table
+            indents.forEach(function (indent, index) {
+                var newRow = '<tr>' +
+                    '<td>' + (index + 1) + '</td>' +
+                    '<td>' + indent.MaterialNameId + '</td>' +
+                    '<td>' + indent.Price + '</td>' +
+                    '<td>' + indent.StoreNameId + '</td>' +
+                    '<td>' + indent.UomNameId + '</td>' +
+                    '<td>' + indent.TaxNameId + '</td>' +
+                    '<td>' + indent.IndentRequiredQty + '</td>' +
+                    '<td>' + indent.RequiredQty + '</td>' +
+                    '</tr>';
 
-            }
-        });
-    }
+                tableBody.append(newRow);
+            });
+        }
+
     </script>
+    <script>
+        function confirmorder() {
+            debugger;
+            var IndentNumber = $('#IndentNumber').val();
+            var IndentDate = $('#IndentDate').val();
 
+            var formData = new FormData();
+            formData.append("IndentNumber", IndentNumber);
+            formData.append("IndentDate", IndentDate);
+
+            $.ajax({
+                type: 'POST',
+                url: '/IndentMaterial/SaveConfirmIndent',
+                contentType: false,
+                processData: false,
+                dataType: 'json',
+                data: formData,
+                success: function (data) {
+                    console.log('Save successful:', data);
+
+                    if (data && data.Success) {
+                        if (data.message === "Inserted" || data.message === "Updated") {
+                            alert("Indent confirmed successful");
+                            location.href = "/IndentMaterial/IndentMaterialGrid";
+                            // Clear form fields or reset as needed
+                            $('#MaterialId').val('');
+                            $('#Price').val('');
+                            $('#IndentRequiredQty').val('');
+                            $('#RequiredQty').val('');
+                            $('#IndentDate').val('');
+
+                        }
+                        else {
+                            alert("Unknown response or operation failed.");
+                        }
+                    }
+                    else {
+                        alert("Unknown response or operation failed.");
+                    }
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                    alert("Error occurred while saving indent. Please try again.");
+                }
+            });
+        }
+
+    </script>
 
 </body>
 </html>
