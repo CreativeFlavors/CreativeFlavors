@@ -1,0 +1,737 @@
+﻿﻿@model MMS.Web.Models.Po.PoModel
+@using MMS.Repository.Managers
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
+
+    <style>
+        table, th, td {
+            border: 1px solid #C9C9C9;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        td {
+            padding: 1px;
+        }
+
+        th {
+            padding: 22px 25px;
+            font-size: 14px;
+            font-family: 'Poppins';
+            color: #292b2c;
+        }
+
+        .Indent td input {
+            border: navajowhite;
+            width: 100px;
+            text-align: center;
+        }
+
+        .Indent {
+            margin-left: 11px;
+            margin-top: 7%;
+        }
+
+        div#billingadd {
+            margin-top: -8%;
+        }
+
+        .form-group.col-3.mt-4 {
+            margin-left: 9px;
+        }
+
+        p#Grandtotal {
+            padding: 15%;
+        }
+
+        .alert {
+            position: relative;
+            padding: 7px 19px;
+        }
+
+        .alert-danger {
+            color: #842029;
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+            width: 118%;
+        }
+
+        strong#close {
+            margin-left: 16%;
+            cursor: pointer;
+        }
+
+        #alert {
+            margin-left: 24%;
+        }
+
+        div#form {
+            border-style: solid;
+            border-color: #e9ecef;
+        }
+
+        .sub_merchants .merchant_btn, .manage_customers .manage_customers_btn, .common_Manage_subMerchant .manage_customers_btn {
+            background: #4472C4;
+            border-radius: 5px;
+            padding: 11px 61px;
+            border: 1px solid transparent;
+            font-style: normal;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-page">
+        <section class="inner-section">
+            <div class="edit-customer">
+                <a href="/Po/PoMaster">
+                    <div class="back-button"><img src="~/Content/assets/images/choose-plan.png" alt="back arrow"></div>
+                </a>
+                <h2 class=" font-20">Purchase Order</h2>
+            </div>
+
+            <div class="edit-section">
+                <div class="d-flex justify-content-start">
+                    <h3 class="font-20">PurchaseOrder Information</h3>
+                    <div id="alert" style="padding: 7px 19px;">
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="PoDate">Po Date</label>
+                            @Html.TextBoxFor(m => m.PoDate, "{0:dd-MM-yyyy}", new { @class = "form-control text-field", @id = "PoDate" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="PoNumber">Po No</label>
+                            @Html.TextBoxFor(m => m.PoNumber, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;", id = "PoNumber" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="ProductId">Product Name</label>
+                            @Html.DropDownListFor(m => m.ProductId, MMS.Web.ExtensionMethod.HtmlHelper.ProductName(), new { @class = "select-style text-field ", id = "ProductId" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="IndentNumber">Indent No</label>
+                            @Html.DropDownListFor(m => m.IndentNumber, MMS.Web.ExtensionMethod.HtmlHelper.IndentDetailNo(), new { @class = "select-style text-field", id = "IndentNumber" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="SupplierId">Supplier Name</label>
+                            @Html.DropDownListFor(m => m.SupplierId, MMS.Web.ExtensionMethod.HtmlHelper.SupplierName(), new { @class = "select-style text-field ", id = "SupplierId" })
+                        </div>
+                    </div>
+                    <table style="width:100%" class="Indent" id="indentDetailGrid">
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Store Name</th>
+                                <th>UOM</th>
+                                <th>Unit Price</th>
+                                <th>Indent Qty</th>
+                                <th>Po Qty</th>
+                                <th>Tax %</th>
+                                <th>Tax Value</th>
+                                <th>Discount %</th>
+                                <th>Discount Value</th>
+                                <th>Subtotal</th>
+                                <th>Total Value</th>
+                                <th>Add Products</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @*<tr>
+                                    <td id="ProductId" style="display: none;"></td>
+                                    <td>@Html.TextBoxFor(m => m.ProductId, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "ProductNameId" })</td>
+                                    <td>@Html.TextBoxFor(m => m.StoreCode, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "StoreCode" })</td>
+                                    <td>@Html.TextBoxFor(m => m.UomId, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "UomId" })</td>
+                                    <td>@Html.TextBoxFor(m => m.UnitPrice, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "UnitPrice" })</td>
+
+                                    <td>@Html.TextBoxFor(m => m.IndentQty, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "IndentQty" })</td>
+                                    <td>@Html.TextBoxFor(m => m.PoQty, new { @class = "form-control text-field", style = "width:100%;", id = "PoQty" })</td>
+                                    <td>
+                                        @Html.TextBoxFor(m => m.TaxPercentage, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "TaxPercentage" })
+                                    </td>
+                                    <td>@Html.TextBoxFor(m => m.TaxValue, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "TaxValue" })</td>
+                                    <td>@Html.TextBoxFor(m => m.DiscountPercentage, new { @class = "form-control text-field", style = "width:100%;", id = "DiscountPercentage" })</td>
+                                    <td>@Html.TextBoxFor(m => m.DiscountValue, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "DiscountValue" })</td>
+                                    <td>@Html.TextBoxFor(m => m.Subtotal, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "Subtotal" })</td>
+                                    <td>@Html.TextBoxFor(m => m.TotalValue, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "TotalValue" })</td>
+                                    <td style="background-color: #e9ecef">
+                                        <button class="fill-color font-15" onclick="Save()">Add</button>
+                                    </td>
+                                </tr>*@
+                        </tbody>
+                    </table>
+                    <div>
+                        <div class="table-responsive reports_table_responsive">
+                            <div class="manage_customers_table_in_responsive mt-3" style="height:230px; overflow: auto;" id="form">
+                                <div id="table-wrapper">
+                                    <div id="table-scroll">
+                                        <table class="table table-bordered table-fixed" style="text-align: center; width: 100%;">
+                                            <thead>
+                                                <tr style="position: -webkit-sticky; position: sticky; top: 0; background-color: #4472c4; ">
+                                                    <th scope="col">
+                                                        <span style="color:white">SNO</span>
+                                                        <span>
+                                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <span style="color:white">Product</span>
+                                                        <span>
+                                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <span style="color:white">Unit Price</span>
+                                                        <span>
+                                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <span style="color:white">IndentQty</span>
+                                                        <span>
+                                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <span style="color:white">Discount</span>
+                                                        <span>
+                                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <span style="color:white">Sub Total</span>
+                                                        <span>
+                                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <span style="color:white">Tax Value</span>
+                                                        <span>
+                                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <span style="color:white">Total Value</span>
+                                                        <span>
+                                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                                        </span>
+                                                    </th>
+                                                    @*<th scope="col">
+                                                            <span style="color:white">Status</span>
+                                                        </th>*@
+                                                </tr>
+                                            </thead>
+                                            <tbody id="indentTableBody">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex justify-content-between">
+
+                            @*<div class="form-group col-3 mt-3">
+                                    <label for="exampleFormControlTextarea1">Comments or Special Instructions</label>
+                                    @Html.TextAreaFor(m => m.ShipmentDetails, new { @class = "form-control mt-2", rows = "3", placeholder = "Comments ....." })
+                                </div>*@
+                            <div class="form-group col-3 mt-3">
+                                <label for="additionalcommends">Additional Comments</label>
+                                @Html.TextAreaFor(m => m.ShipmentDetails, new { @class = "form-control mt-2", rows = "3", placeholder = "Additional Comments ....." })
+                            </div>
+                            <div class=" form-group col-3 mt-3">
+                                <div class="form-group row ">
+                                    <label for="inputEmail3" class="col-sm-4 col-form-label" id="price">Price</label>
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(m => m.Total_Price, new { @class = "form-control", disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="form-group row mt-3">
+                                    <label for="inputEmail3" class="col-sm-4 col-form-label">TotalQty</label>
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(m => m.Items, new { @class = "form-control", disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="form-group row mt-3">
+                                    <label for="inputEmail3" class="col-sm-4 col-form-label">Discount</label>
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(m => m.Total_DiscountValue, new { @class = "form-control", disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="form-group row mt-3">
+                                    <label for="subtotal" class="col-sm-4 col-form-label">Sub Total</label>
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(m => m.Total_SubtotalValue, new { @class = "form-control", disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="form-group row mt-3">
+                                    <label for="inputEmail3" class="col-sm-4 col-form-label">Total Tax</label>
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(m => m.Total_TaxValue, new { @class = "form-control", disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="form-group row mt-3">
+                                    <label for="inputEmail3" class="col-sm-4 col-form-label">Grand Total</label>
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(m => m.Total_TotalValue, new { @class = "form-control", disabled = "disabled" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="inner-section-button" style="margin-bottom:-98px;">
+                        <button class="fill-color font-15" onclick="confirmorder()">
+                            Raise Po
+                        </button>
+                        <a href="/Po/PoMaster">
+                            <button class="border-color font-15">
+
+                                CANCEL
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- page-contents end -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Content/js/dropdown.js"></script>
+    <script src="~/Content/js/custom.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script>
+        // for searchable dropdownlist
+        function initializeTomSelect(selectors, options) {
+            selectors.forEach(selector => {
+                new TomSelect(selector, options);
+            });
+        }
+
+        initializeTomSelect([
+            "#ProductId",
+            "#IndentNumber",
+            "#SupplierId"
+
+
+        ], {
+            create: false,
+            sortField: {
+                field: "value",
+                direction: "asc"
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#IndentNumber').on('change', function () {
+                var indentNumber = $(this).val();
+                $.ajax({
+                    url: '/Po/GetIndentNoDetails',
+                    type: 'GET',
+                    data: { indentheaderid: indentNumber },
+                    success: function (response) {
+                        console.log(response);
+                        if (response && response.length > 0) {
+                            populateGrid(response);
+                        } else {
+                            $('#indentDetailGrid tbody').empty(); // Clear the grid if no data
+                            console.error('No data received or error in response.');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error fetching data:', error);
+                    }
+                });
+            });
+
+            // Event delegation for dynamically added elements
+            $('#indentDetailGrid').on('input', 'input[type="text"]', function () {
+                updateCalculations();
+            });
+        });
+
+        function populateGrid(data) {
+            var tbody = $('#indentDetailGrid tbody');
+            tbody.empty(); // Clear existing rows
+            console.log('Data received:', data);
+            $.each(data, function (index, item) {
+                var row = '<tr>' +
+                    '<td>' + item.MaterialNameId + '</td>' +
+                    '<td>' + item.StoreNameId + '</td>' +
+                    '<td>' + item.UomNameId + '</td>' +
+                    '<td>' + item.Price + '</td>' +
+                    '<td>' + item.IndentQty + '</td>' +
+                    '<td><input type="text" class="form-control po-qty" id="PoQty_' + index + '" /></td>' +
+                    '<td>' + item.TaxNameId + '</td>' +
+                    '<td><input type="text" class="form-control tax-value" id="TaxValue_' + index + '" readonly /></td>' +
+                    '<td><input type="text" class="form-control discount-percentage" id="DiscountPercentage_' + index + '" /></td>' +
+                    '<td><input type="text" class="form-control discount-value" id="DiscountValue_' + index + '" readonly /></td>' +
+                    '<td><input type="text" class="form-control subtotal" id="Subtotal_' + index + '" readonly /></td>' +
+                    '<td><input type="text" class="form-control total-value" id="TotalValue_' + index + '" readonly /></td>' +
+                    '<td><button type="button" class="btn btn-primary btn-sm save-btn" data-index="' + index + '">Add</button></td>' +
+                    '</tr>';
+
+                tbody.append(row);
+            });
+
+            // Bind click event to dynamically generated buttons
+            tbody.find('.save-btn').click(function () {
+                var index = $(this).data('index');
+                var item = data[index]; // Get the corresponding item from data array
+                Save(index, item); // Pass the item object to Save function
+            });
+        }
+
+
+
+        function updateCalculations() {
+            var totalUnitPrice = 0;
+            var totalDiscountValue = 0;
+            var totalSubtotal = 0;
+            var totalTax = 0;
+            var grandTotal = 0;
+            var items = 0;
+
+            // Calculate totals based on each row in the grid
+            $('#indentDetailGrid tbody tr').each(function () {
+                var row = $(this);
+                var unitPrice = parseFloat(row.find('td:eq(3)').text()); // Unit Price
+                var indentQty = parseFloat(row.find('td:eq(4)').text()); // Indent Qty
+                var poQty = parseFloat(row.find('.po-qty').val()) || 0; // Po Qty
+                var taxPercentage = parseFloat(row.find('td:eq(6)').text()); // Tax %
+                var discountPercentage = parseFloat(row.find('.discount-percentage').val()) || 0; // Discount %
+                var taxValue = (unitPrice * poQty * taxPercentage) / 100; // Tax Value
+                var discountedUnitPrice = unitPrice * (1 - discountPercentage / 100); // Discounted Unit Price
+                var discountValue = unitPrice * poQty * (discountPercentage / 100); // Discount Value
+                var subtotal = discountedUnitPrice * poQty; // Subtotal
+                var totalValue = subtotal + taxValue; // Total Value
+                /* var totalqty = poQty;*/
+
+                row.find('.tax-value').val(taxValue.toFixed(2));
+                row.find('.discount-value').val(discountValue.toFixed(2));
+                row.find('.subtotal').val(subtotal.toFixed(2));
+                row.find('.total-value').val(totalValue.toFixed(2));
+
+                totalUnitPrice += unitPrice * poQty;
+                totalDiscountValue += discountValue;
+                totalSubtotal += subtotal;
+                totalTax += taxValue;
+                grandTotal += totalValue;
+                items += poQty;
+            });
+
+            // Update the totals in the summary section outside the grid
+            $('#Total_Price').val(totalUnitPrice.toFixed(2));
+            $('#Items').val(items.toFixed(2));
+            $('#Total_DiscountValue').val(totalDiscountValue.toFixed(2));
+            $('#Total_SubtotalValue').val(totalSubtotal.toFixed(2));
+            $('#Total_TaxValue').val(totalTax.toFixed(2));
+            $('#Total_TotalValue').val(grandTotal.toFixed(2));
+        }
+
+        function Save(indentPoMapId, item) {
+            debugger;
+            var PoQty = $('#PoQty_' + indentPoMapId).val();
+            var DiscountPercentage = $('#DiscountPercentage_' + indentPoMapId).val();
+            var TaxValue = $('#TaxValue_' + indentPoMapId).val();
+            var DiscountValue = $('#DiscountValue_' + indentPoMapId).val();
+            var Subtotal = $('#Subtotal_' + indentPoMapId).val();
+            var TotalValue = $('#TotalValue_' + indentPoMapId).val();
+
+            // Assuming you have other fields populated from elsewhere
+            var SupplierId = $('#SupplierId').val();
+            var ProductId = item.MaterialId;
+            var StoreCode = item.StoreNameId;
+            var UnitPrice = item.Price;
+            var IndentQty = item.IndentQty;
+            var PoDate = $('#PoDate').val();
+            var UomId = item.UomId;
+            var TaxPercentage = item.TaxNameId;
+            var PoNumber = $('#PoNumber').val();
+            var IndentNumber = $('#IndentNumber').val();
+            var IndentPoMapId = item.IndentPoMapId
+
+            var formData = new FormData();
+            formData.append("IndentPoMapId", IndentPoMapId);
+            formData.append("SupplierId", SupplierId);
+            formData.append("ProductId", ProductId);
+            formData.append("StoreCode", StoreCode);
+            formData.append("UnitPrice", UnitPrice);
+            formData.append("IndentQty", IndentQty);
+            formData.append("PoQty", PoQty);
+            formData.append("PoDate", PoDate);
+            formData.append("UomId", UomId);
+            formData.append("TaxValue", TaxValue);
+            formData.append("DiscountPercentage", DiscountPercentage);
+            formData.append("DiscountValue", DiscountValue);
+            formData.append("Subtotal", Subtotal);
+            formData.append("TotalValue", TotalValue);
+            formData.append("PoNumber", PoNumber);
+            formData.append("IndentNumber", IndentNumber);
+            formData.append("TaxPercentage", TaxPercentage);
+            if (indentPoMapId !== 0) {
+                // Use item's ProductId when IndentPoMapId is not 0
+                ProductId = item.ProductId;
+                // Append ProductId to FormData
+                formData.append("ProductId", ProductId);
+            }
+
+
+            $.ajax({
+                type: 'POST',
+                url: '/Po/SavePoIndentMapping',
+                contentType: false,
+                processData: false,
+                dataType: 'json',
+                data: formData,
+                success: function (data) {
+                    console.log('Save successful:', data);
+
+                    if (data && data.Success) {
+                        if (data.message === "Inserted") {
+                            alert("PO Added successful");
+                            // Update table with new indents for the current IndentNo
+                            updateIndentTable(data.Indents);
+                        }
+                       else if (data.message === "Updated") {
+                            alert("PO Updated successful");
+                        } else {
+                            alert("Unknown response or operation failed.");
+                        }
+                    } else {
+                        alert("Unknown response or operation failed.");
+                    }
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                    alert("Error occurred while saving indent. Please try again.");
+                }
+            });
+        }
+
+        function updateIndentTable(indents) {
+            var tableBody = $('#indentTableBody');
+            tableBody.empty(); // Clear existing rows
+
+            // Loop through indents and append rows to table
+            indents.forEach(function (indent, index) {
+                var newRow = '<tr>' +
+                    '<td>' + (index + 1) + '</td>' +
+                    '<td>' + indent.ProductName + '</td>' +
+                    '<td>' + indent.UnitPrice + '</td>' +
+                    '<td>' + indent.IndentQty + '</td>' +
+                    '<td>' + indent.DiscountValue + '</td>' +
+                    '<td>' + indent.Subtotal + '</td>' +
+                    '<td>' + indent.TaxValue + '</td>' +
+                    '<td>' + indent.TotalValue + '</td>' +
+                    '</tr>';
+
+                tableBody.append(newRow);
+            });
+        }
+
+    </script>
+    <script>
+        function confirmorder() {
+            debugger;
+            var SupplierId = $('#SupplierId').val();
+            var PoNumber = $('#PoNumber').val();
+            var IndentNumber = $('#IndentNumber').val();
+            var PoDate = $('#PoDate').val();
+            /*var IndentQty = item.IndentQty;*/
+            var Items = $('#Items').val();
+            var Total_Price = $('#Total_Price').val();
+            var Total_DiscountValue = $('#Total_DiscountValue').val();
+            var Total_SubtotalValue = $('#Total_SubtotalValue').val();
+            var Total_TaxValue = $('#Total_TaxValue').val();
+            var Total_TotalValue = $('#Total_TotalValue').val();
+
+            var formData = new FormData();
+            formData.append("IndentNumber", IndentNumber);
+            formData.append("PoDate", PoDate);
+            formData.append("PoNumber", PoNumber);
+            formData.append("SupplierId", SupplierId);
+            /*    formData.append("IndentQty", IndentQty);*/
+            formData.append("Items", Items);
+            formData.append("Total_Price", Total_Price);
+            formData.append("Total_DiscountValue", Total_DiscountValue);
+            formData.append("Total_SubtotalValue", Total_SubtotalValue);
+            formData.append("Total_TaxValue", Total_TaxValue);
+            formData.append("Total_TotalValue", Total_TotalValue);
+
+
+            $.ajax({
+                type: 'POST',
+                url: '/Po/SaveConfirmPo',
+                contentType: false,
+                processData: false,
+                dataType: 'json',
+                data: formData,
+                success: function (data) {
+                    console.log('Save successful:', data);
+
+                    if (data && data.Success) {
+                        if (data.message === "Inserted" || data.message === "Updated") {
+                            alert("PO confirmed successful");
+                            location.href = "/Po/PoGrid";
+                            // Clear form fields or reset as needed
+                            $('#MaterialId').val('');
+                            $('#Price').val('');
+                            $('#IndentRequiredQty').val('');
+                            $('#RequiredQty').val('');
+                            $('#IndentDate').val('');
+
+                        }
+                        else {
+                            alert("Unknown response or operation failed.");
+                        }
+                    }
+                    else {
+                        alert("Unknown response or operation failed.");
+                    }
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                    alert("Error occurred while saving indent. Please try again.");
+                }
+            });
+        }
+
+    </script>
+    <script>
+$(document).ready(function () {
+    var data = @Html.Raw(ViewBag.DataListJson); // Deserialize server-side serialized JSON
+
+    console.log('Data received:', data); // Debug: Log data to console
+
+    var tbody = $('#indentDetailGrid tbody');
+    tbody.empty(); // Clear existing rows
+
+    // Check if data is correctly populated
+    if (data && data.length > 0) {
+        $.each(data, function (index, item) {
+            var row = '<tr>' +
+                '<td>' + item.ProductId + '</td>' +
+                '<td>' + item.StoreCode + '</td>' +
+                '<td>' + item.UomId + '</td>' +
+                '<td>' + item.UnitPrice + '</td>' +
+                '<td>' + item.IndentQty + '</td>' +
+                '<td><input type="text" class="form-control po-qty" id="PoQty_' + item.IndentPoMapId + '" value="' + item.PoQty + '" /></td>' +
+                '<td>' + item.TaxPercentage + '</td>' +
+                '<td><input type="text" class="form-control tax-value" id="TaxValue_' + item.IndentPoMapId + '" readonly value="' + item.TaxValue + '" /></td>' +
+                '<td><input type="text" class="form-control discount-percentage" id="DiscountPercentage_' + item.IndentPoMapId + '" value="' + item.DiscountPercentage + '" /></td>' +
+                '<td><input type="text" class="form-control discount-value" id="DiscountValue_' + item.IndentPoMapId + '" readonly value="' + item.DiscountValue + '" /></td>' +
+                '<td><input type="text" class="form-control subtotal" id="Subtotal_' + item.IndentPoMapId + '" readonly value="' + item.Subtotal + '" /></td>' +
+                '<td><input type="text" class="form-control total-value" id="TotalValue_' + item.IndentPoMapId + '" readonly value="' + item.TotalValue + '" /></td>' +
+                '<td><button type="button" class="btn btn-primary btn-sm save-btn" data-index="' + index + '">Save</button></td>' +
+                '</tr>';
+
+            tbody.append(row);
+        });
+    } else {
+        console.log('Data is empty or undefined.');
+    }
+
+    // Bind input change events to po-qty and discount-percentage fields
+    tbody.on('input', '.po-qty, .discount-percentage', function () {
+        updateCalculations();
+    });
+
+    // Bind click event to dynamically generated "Save" buttons
+    tbody.on('click', '.save-btn', function () {
+        var index = $(this).data('index');
+        var item = data[index]; // Get the corresponding item from data array
+        var indentPoMapId = item.IndentPoMapId; // Assuming IndentPoMapId exists in 'item'
+        var row = $(this).closest('tr');
+
+        // Update the item object with the new values from the UI
+        item.PoQty = parseFloat(row.find('.po-qty').val());
+        item.DiscountPercentage = parseFloat(row.find('.discount-percentage').val());
+
+        // Pass the updated item object to your save function
+        Save(indentPoMapId, item);
+    });
+
+    // Initial calculations
+    updateCalculations();
+});
+
+function updateCalculations() {
+    var totalUnitPrice = 0;
+    var totalDiscountValue = 0;
+    var totalSubtotal = 0;
+    var totalTax = 0;
+    var grandTotal = 0;
+    var items = 0;
+
+    // Calculate totals based on each row in the grid
+    $('#indentDetailGrid tbody tr').each(function () {
+        var row = $(this);
+        var unitPrice = parseFloat(row.find('td:eq(3)').text()); // Unit Price
+        var indentQty = parseFloat(row.find('td:eq(4)').text()); // Indent Qty
+        var poQty = parseFloat(row.find('.po-qty').val()) || 0; // Po Qty
+        var taxPercentage = parseFloat(row.find('td:eq(6)').text()); // Tax %
+        var discountPercentage = parseFloat(row.find('.discount-percentage').val()) || 0; // Discount %
+        var taxValue = (unitPrice * poQty * taxPercentage) / 100; // Tax Value
+        var discountedUnitPrice = unitPrice * (1 - discountPercentage / 100); // Discounted Unit Price
+        var discountValue = unitPrice * poQty * (discountPercentage / 100); // Discount Value
+        var subtotal = discountedUnitPrice * poQty; // Subtotal
+        var totalValue = subtotal + taxValue; // Total Value
+
+        row.find('.tax-value').val(taxValue.toFixed(2));
+        row.find('.discount-value').val(discountValue.toFixed(2));
+        row.find('.subtotal').val(subtotal.toFixed(2));
+        row.find('.total-value').val(totalValue.toFixed(2));
+
+        totalUnitPrice += unitPrice * poQty;
+        totalDiscountValue += discountValue;
+        totalSubtotal += subtotal;
+        totalTax += taxValue;
+        grandTotal += totalValue;
+        items += poQty;
+    });
+
+    // Update the totals in the summary section outside the grid
+    $('#Total_Price').val(totalUnitPrice.toFixed(2));
+    $('#Items').val(items.toFixed(2));
+    $('#Total_DiscountValue').val(totalDiscountValue.toFixed(2));
+    $('#Total_SubtotalValue').val(totalSubtotal.toFixed(2));
+    $('#Total_TaxValue').val(totalTax.toFixed(2));
+    $('#Total_TotalValue').val(grandTotal.toFixed(2));
+}
+    </script>
+
+
+
+
+
+</body>
+</html>
