@@ -272,7 +272,7 @@ namespace MMS.Web.Controllers
 
             // Serialize DataList to JSON
             ViewBag.DataListJson = Newtonsoft.Json.JsonConvert.SerializeObject(model.DataList);
-            return View("~/Views/Po/PoDetails.cshtml", model);
+            return View("~/Views/PurchaseOrder/PoDetails.cshtml", model);
         }
 
         [HttpGet]
