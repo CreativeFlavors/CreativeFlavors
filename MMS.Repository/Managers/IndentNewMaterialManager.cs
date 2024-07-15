@@ -259,6 +259,21 @@ namespace MMS.Repository.Managers
             }
             return indentlistcart;
         }
+        public List<Indentheader> Get()
+        {
+            List<Indentheader> indentlistcart = new List<Indentheader>();
+            try
+            {
+                indentlistcart = indentheaderRepository.Table.ToList<Indentheader>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return indentlistcart;
+        }
+
         public int? GetNextIndentNumberFromDatabase()
         {
             int? latestNumber = 0; // Initialize with a default value
@@ -280,6 +295,26 @@ namespace MMS.Repository.Managers
             return indentCarts;
         }
 
+        public List<Indentdetail> GetIndentdetailsList(int? indentheaderid)
+        {
+            List<Indentdetail> indentdetails = new List<Indentdetail>();
+            indentdetails = indentdetailRepository.Table.Where(x => x.IndentHeaderId == indentheaderid).ToList();
+            return indentdetails;
+        }
+
+        public IndentCart GetIndentCartById(int? indentnumber)
+        {
+            IndentCart indentCarts = new IndentCart();
+            indentCarts = indentcartRepository.Table.Where(x => x.IndentCartId == indentnumber).FirstOrDefault();
+            return indentCarts;
+        }
+
+        public Indentdetail GetIndentDetailById(int? indentnumber)
+        {
+            Indentdetail indentdetail = new Indentdetail();
+            indentdetail = indentdetailRepository.Table.Where(x => x.IndentHeaderId == indentnumber).FirstOrDefault();
+            return indentdetail;
+        }
         public void UpdateTempIndent(int? materialId, decimal? indentQty)
         {
             var tempIndentRecord = GetTempIndentRecord(materialId.Value);
