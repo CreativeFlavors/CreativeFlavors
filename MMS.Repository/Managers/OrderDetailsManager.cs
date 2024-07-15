@@ -49,6 +49,15 @@ namespace MMS.Repository.Managers
             }
             return salesorder;
         }
+        public orderdetails Get(int id)
+        {
+            orderdetails oorderheader = new orderdetails();
+            if (id != 0)
+            {
+                oorderheader = order_detailsRepository.Table.Where(x => x.invoicehd_id == id).FirstOrDefault();
+            }
+            return oorderheader;
+        }
         public List<orderdetails> Get()
         {
             List<orderdetails> obj = new List<orderdetails>();

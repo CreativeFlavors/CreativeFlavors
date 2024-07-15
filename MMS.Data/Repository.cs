@@ -284,6 +284,11 @@ namespace MMS.Data
             var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.Salesorder_Grid>("SELECT * FROM salesorder_Grid()").ToList();
             return ResultList;
         }
+        public List<MMS.Data.StoredProcedureModel.FineshedgoodsReport> Fineshedgoods()
+        {
+            var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.FineshedgoodsReport>("SELECT * FROM Fineshedgoods_report()").ToList();
+            return ResultList;
+        }
         public MMS.Data.StoredProcedureModel.Salesorder_Grid salesorder_gridSearch(int SOid)
         {
             try
@@ -705,6 +710,7 @@ namespace MMS.Data
             var ResultList = context.Database.SqlQuery<PurchaseOrderGrid>("SELECT * FROM purchaseordergrid()").ToList();
             return ResultList;
         }
+
         public List<GRNGrid> GetPurchaseOrderGrid(string Filter)
         {
             var ResultList = context.Database.SqlQuery<GRNGrid>("Execute GrnGrid @Search={0}", Filter).ToList();

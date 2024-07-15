@@ -3,6 +3,7 @@ using MMS.Core.Entities;
 using MMS.Data;
 using MMS.Data.Context;
 using MMS.Data.Mapping;
+using MMS.Data.StoredProcedureModel;
 using MMS.Repository.Service;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,12 @@ namespace MMS.Repository.Managers
             {
                 context.Dispose();
             }
+        }
+        public List<FineshedgoodsReport> Fineshedgoods_Report()
+        {
+            List<FineshedgoodsReport> FineshedgoodsReport = new List<FineshedgoodsReport>();
+            FineshedgoodsReport = finishedgoodrep.Fineshedgoods();
+            return FineshedgoodsReport;
         }
         public List<FinishedGood> Get()
         {

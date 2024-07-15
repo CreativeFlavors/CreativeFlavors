@@ -14,6 +14,8 @@ namespace MMS.Core.Entities
         public int ProductTypeID { get; set; }
         [Column("producttypename")]
         public string ProductTypeName { get; set; }
+        [Column("description")]
+        public string description { get; set; }
         [Column("createdby")]
         public string CreatedBy { get; set; }
         [Column("updatedby")]

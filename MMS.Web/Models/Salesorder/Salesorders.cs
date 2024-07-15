@@ -47,6 +47,7 @@ namespace MMS.Web.Models
         public decimal? Total_discountval { get; set; }
         public decimal? Total_Subtotal { get; set; }
         public decimal? Total_Grandtotal { get; set; }
+        public decimal? Final_Grandtotal { get; set; }
         public decimal? discountperid { get; set; }
         public decimal? subassemblyqty { get; set; }
         public decimal? discountvalue { get; set; }

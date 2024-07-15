@@ -26,9 +26,9 @@ namespace MMS.Data.Mapping
             Property(t => t.InvBalanceAmount);
             Property(t => t.IsCustomerOnHold);
             Property(t => t.PaymentRefNo);
-            Property(t => t.CreditNoteRef);
-            Property(t => t.CreditNoteDate);
-            Property(t => t.CreditNoteValue);
+            Property(t => t.Debitnotedate);
+            Property(t => t.Debitnoteref);
+            Property(t => t.Debitnotevalue);
             Property(t => t.CreatedDate);
             Property(t => t.UpdatedDate);
             Property(t => t.CreatedBy);

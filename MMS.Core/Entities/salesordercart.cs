@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace MMS.Core.Entities
 {
     [Table("Salesorder", Schema = "public")]
-    public class salesorder : BaseEntity
+    public class salesordercart : BaseEntity
     {
         [System.ComponentModel.DataAnnotations.Key]
         [Column("salesorderid")]

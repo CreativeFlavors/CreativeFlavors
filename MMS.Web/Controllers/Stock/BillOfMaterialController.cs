@@ -29,7 +29,7 @@ namespace MMS.Web.Controllers.Stock
     {
 
         #region Helper Method
-        public ActionResult BOMMaterialListGrid(int page = 1, int pageSize = 8)
+        public ActionResult BOMMaterialListGrid(int page = 1, int pageSize = 15)
         {
             List<ParentBillofMaterial> totalList = new List<ParentBillofMaterial>();
 
@@ -46,14 +46,12 @@ namespace MMS.Web.Controllers.Stock
             }
             var totalCount = totalList.Count();
             int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
-
             int startIndex = (page - 1) * pageSize;
             int endIndex = Math.Min(startIndex + pageSize - 1, totalCount - 1);
             totalList = totalList.OrderByDescending(d => d.Bomid)
                          .Skip(startIndex)
                          .Take(pageSize)
                          .ToList();
-
             ViewBag.TotalPages = totalPages;
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
@@ -97,7 +95,6 @@ namespace MMS.Web.Controllers.Stock
         }
         public ActionResult BillOfMaterialDetails()
         {
-
             ParentbomManager parentbomManager = new ParentbomManager();
             ParentBillofMaterial model = new ParentBillofMaterial();
             string LastBOmNO = string.Empty;

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MMS.Data.Mapping
 {
-    public class SalesorderMap : EntityTypeConfiguration<salesorder>
+    public class SalesorderMap : EntityTypeConfiguration<salesordercart>
     {                                  
         public SalesorderMap()
         {

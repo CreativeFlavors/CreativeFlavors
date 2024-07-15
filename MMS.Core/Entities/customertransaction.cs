@@ -35,12 +35,12 @@ namespace MMS.Core.Entities
         public bool IsCustomerOnHold { get; set; }
         [Column("paymentrefno")]
         public string PaymentRefNo { get; set; }
-        [Column("creditnoteref")]
-        public string CreditNoteRef { get; set; }
-        [Column("creditnotedate")]
-        public DateTime? CreditNoteDate { get; set; }
-        [Column("creditnotevalue")]
-        public decimal? CreditNoteValue { get; set; }       
+        [Column("debitnoteref")]
+        public string Debitnoteref { get; set; }
+        [Column("debitnotedate")]
+        public DateTime? Debitnotedate { get; set; }
+        [Column("debitnotevalue")]
+        public decimal? Debitnotevalue { get; set; }       
         [Column("createdby")]
         public string CreatedBy { get; set; }
         [Column("updatedby")]

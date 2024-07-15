@@ -46,7 +46,7 @@ namespace MMS.Web.Controllers.Stock
             models.Total_Price = Math.Round((decimal)headerdata.Total_price, 2);
             models.salesorderdate = headerdata.Salesorderdate;
             models.quantity = headerdata.quantity;
-
+            models.Final_Grandtotal = headerdata.grand_total;
             models.item = headerdata.items;
             List<Salesorders> totaldata = new List<Salesorders>();
             var totallist = SalesorderDT_Manager.salesorder_Grid();

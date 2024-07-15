@@ -1,6 +1,7 @@
 ﻿using MMS.Core.Entities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
@@ -21,6 +22,10 @@ namespace MMS.Web.Models.FinishedGoods
         public string SaleUOM { get; set; }
         public string LastTransNo { get; set; }
         public decimal LastTransQty { get; set; }
+        public string ProductName { get; set; }
+        public string ProductTypeName { get; set; }
+        public string StoreName { get; set; }
+        public string ShortUnitName { get; set; }
         public DateTime? LastTransDate { get; set; }
         public string CreatedBy { get; set; }
         public string UpdatedBy { get; set; }

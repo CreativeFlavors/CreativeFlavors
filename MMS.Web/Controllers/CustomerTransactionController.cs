@@ -20,12 +20,12 @@ namespace MMS.Web.Controllers
             return View(model);
         }
         [HttpGet]
-        public ActionResult CustomerTransactionGrid(int page = 1, int pageSize = 8)
+        public ActionResult CustomerTransactionGrid(int page = 1, int pageSize = 15)
         {
 
             Customertransaction model = new Customertransaction();
 
-            InvoiceManager manager = new InvoiceManager();
+            OrderHeaderManager manager = new OrderHeaderManager();
             var Customertransactionlist = manager.Get();
             BuyerManager BuyerManager = new BuyerManager();
             var data1 = BuyerManager.Get();
@@ -39,16 +39,14 @@ namespace MMS.Web.Controllers
             foreach (var item in Customertransactionlist)
             {
                 Customertransaction customertransaction = new Customertransaction();
-                customertransaction.InvDate = item.DocDate;
-                customertransaction.InvAmount = item.DocNetValue;
-                customertransaction.InvRefNumber = item.Id;
-                customertransaction.RefItems = item.RefItems;
-                customertransaction.RefQuantity = item.DocQuantity;
-                customertransaction.Id = item.Id;
+                customertransaction.InvDate = item.invoicedate;
+                customertransaction.InvAmount = item.TotalPrice;
+                customertransaction.InvHDNumber = item.invoicehd_id;
+                customertransaction.RefItems = item.invoice_items;
+                customertransaction.RefQuantity = item.Quantity;
                 customertransaction.BuyerMaster = data1.Where(W => W.BuyerMasterId == item.CustomerId).ToList().FirstOrDefault();
-                customertransaction.customertransaction = data2.Where(W => W.InvRefNumber == item.Id).ToList().FirstOrDefault();
+                customertransaction.customertransaction = data2.Where(W => W.InvRefNumber == item.invoicehd_id).ToList().FirstOrDefault();
                 totalList.Add(customertransaction);
-
             }
        
 
@@ -58,7 +56,7 @@ namespace MMS.Web.Controllers
 
             int startIndex = (page - 1) * pageSize;
             int endIndex = Math.Min(startIndex + pageSize - 1, totalCount - 1);
-            totalList = totalList.OrderByDescending(ct => ct.Id)
+            totalList = totalList.OrderByDescending(ct => ct.Invoicedt_Id)
                          .Skip(startIndex)
                          .Take(pageSize)
                          .ToList();
@@ -74,34 +72,32 @@ namespace MMS.Web.Controllers
         public ActionResult CustomerTransaction(int id)
         {
             Customertransaction model = new Customertransaction();
-            BuyerOrderEntryManager buyerOrderEntryManager = new BuyerOrderEntryManager();
-            InvoiceManager manager = new InvoiceManager();
+            SalesorderDT_Manager SalesorderDT_Manager = new SalesorderDT_Manager();
+            OrderDetailsManager orderDetailsManager = new OrderDetailsManager();
+            OrderHeaderManager OrderHeaderManager = new OrderHeaderManager();
             BuyerManager BuyerManager = new BuyerManager();
             AccounttypeManager accounttypeManager = new AccounttypeManager();
             CustomertransactionManager Customertransactions = new CustomertransactionManager();
-            var data = manager.Get(id);
-            var buyid = data.CustomerId;
-            var buyersino = data.OrderId;
-            var Cust = data.CustomerId;
-            var data1 = BuyerManager.GetBuyerMasterId(buyid);
-            var acctype = data1.accountypeid;
-            var data2 = buyerOrderEntryManager.GetBuyersino(buyersino);
-            var daylist = accounttypeManager.GettypeId(acctype);
-            var balance = Customertransactions.GettypeId(id);
+            var orderhd = OrderHeaderManager.Get(id);
+            var orderDT = orderDetailsManager.Get(orderhd.invoicehd_id);
+            var buyer = BuyerManager.GetBuyerMasterId(orderhd.CustomerId);
+            var SODT = SalesorderDT_Manager.GetSO(orderDT.SalesOrderId_dt);
+            var daylist = accounttypeManager.GettypeId(buyer.accountypeid);
+            var balance = Customertransactions.GetiNId(id);
 
             var Termdays = daylist.TermDays;
 
-            model.InvRefNumber = data.Id;
-            model.customer = data1.BuyerFullName;
-            model.buyercode = data1.BuyerCode;
-            model.InvDate = data.DocDate;
-            model.RefItems = data.RefItems;
-            model.RefQuantity = data.DocQuantity;
-            model.InvAmount = data.DocNetValue;
-            model.Sonumber = data2.BuyerOrderSlNo;
-            model.InvDueDate = data.DueDate;
-            model.SoDate = data2.CreatedDate;
-            model.buyerid = data.CustomerId;
+            model.InvHDNumber = orderhd.invoicehd_id;
+            model.customer = buyer.BuyerFullName;
+            model.buyercode = buyer.BuyerCode;
+            model.InvDate = orderhd.invoicedate;
+            model.RefItems = orderhd.invoice_items;
+            model.RefQuantity = orderhd.Quantity;
+            model.InvAmount = orderhd.TotalPrice;
+            model.Sonumber = SODT.Salesorderid_hd;
+            model.InvDueDate = orderhd.invoicedate;
+            model.SoDate = SODT.salesorderdate;
+            model.buyerid = orderhd.CustomerId;
             if (balance != null)
             {
                 model.InvBalanceAmount = balance.InvBalanceAmount;
@@ -110,24 +106,20 @@ namespace MMS.Web.Controllers
             }
             else
             {
-                model.InvBalanceAmount = data.DocNetValue;
-
+                model.InvBalanceAmount = orderhd.TotalPrice;
             }
-
-            var PaymentDate = data.DocDate;
+            var PaymentDate = orderhd.invoicedate;
             DateTime startDate = PaymentDate;
             model.PaymentDate = startDate.AddDays(Termdays);
-
-
 
             return PartialView("Partial/CustomerTransaction", model);
         }
         public ActionResult Transactiondata(Customertransaction model)
         {
+            customertransaction customertransaction = new customertransaction();
+            CustomertransactionManager customertransactionManager = new CustomertransactionManager();
             if (model.Id == 0)
             {
-                customertransaction customertransaction = new customertransaction();
-                CustomertransactionManager customertransactionManager = new CustomertransactionManager();
 
                 if (model.Cash != null)
                 {
@@ -148,23 +140,23 @@ namespace MMS.Web.Controllers
                 else if (model.PaymentAmount != null)
                 {
                     var totalamount = model.InvAmount;
-                    var money = model.CreditNoteValue;
+                    var money = model.Debitnotevalue;
                     var balanceamount = totalamount - money;
                     customertransaction.InvBalanceAmount = balanceamount;
-                    customertransaction.InvPaidAmount = model.CreditNoteValue;
+                    customertransaction.InvPaidAmount = model.Debitnotevalue;
                 }
                 customertransaction.CustomerId = model.buyerid;
                 customertransaction.PaymentDate = model.PaymentDate;
                 customertransaction.PaymentAmount = model.PaymentAmount;
-                customertransaction.InvRefNumber = model.InvRefNumber;
+                customertransaction.InvRefNumber = model.InvHDNumber;
                 customertransaction.InvDate = model.InvDate;
                 customertransaction.InvDueDate = model.InvDueDate;
                 customertransaction.InvAmount = model.InvAmount;
                 customertransaction.IsCustomerOnHold = model.IsCustomerOnHold;
                 customertransaction.PaymentRefNo = model.PaymentRefNo;
-                customertransaction.CreditNoteRef = model.CreditNoteRef;
-                customertransaction.CreditNoteValue = model.CreditNoteValue;
-                customertransaction.CreditNoteDate = model.CreditNoteDate;
+                customertransaction.Debitnoteref = model.Debitnoteref;
+                customertransaction.Debitnotevalue = model.Debitnotevalue;
+                customertransaction.Debitnotedate = model.Debitnotedate;
                 customertransaction.PaymentId = model.paymentid;
                 customertransaction.Cash = model.Cash;
                 customertransaction.CreatedDate = DateTime.Now;
@@ -172,9 +164,7 @@ namespace MMS.Web.Controllers
             }
             else
             {
-                customertransaction customertransaction = new customertransaction();
-                CustomertransactionManager customertransactionManager = new CustomertransactionManager();
-
+               
                 if (model.Cash != null)
                 {
                     var totalamount = model.InvBalanceAmount;
@@ -191,27 +181,36 @@ namespace MMS.Web.Controllers
                     customertransaction.InvBalanceAmount = balanceamount;
                     customertransaction.InvPaidAmount = model.PaymentAmount;
                 }
-                else if (model.CreditNoteValue != null)
+                else if (model.Debitnotevalue != null)
                 {
-                    var totalamount = model.InvBalanceAmount;
-                    var money = model.CreditNoteValue;
+                    var totalamount = model.InvBalanceAmount;   
+                    var money = model.Debitnotevalue;
                     var balanceamount = totalamount - money;
                     customertransaction.InvBalanceAmount = balanceamount;
-                    customertransaction.InvPaidAmount = model.CreditNoteValue;
+                    customertransaction.InvPaidAmount = model.Debitnotevalue;
+                }
+                var cash = customertransactionManager.GetCTId(model.Id);
+                var balance = cash.InvPaidAmount + customertransaction.InvPaidAmount;
+                var AlertMessage = "";
+                if (cash.InvAmount < balance)
+                {
+                    AlertMessage = "Payless";
+                    return Json(AlertMessage, JsonRequestBehavior.AllowGet);
+
                 }
                 customertransaction.Id = model.Id;
                 customertransaction.CustomerId = model.buyerid;
                 customertransaction.PaymentDate = model.PaymentDate;
                 customertransaction.PaymentAmount = model.PaymentAmount;
-                customertransaction.InvRefNumber = model.InvRefNumber;
+                customertransaction.InvRefNumber = model.InvHDNumber;
                 customertransaction.InvDate = model.InvDate;
                 customertransaction.InvDueDate = model.InvDueDate;
                 customertransaction.InvAmount = model.InvAmount;
                 customertransaction.IsCustomerOnHold = model.IsCustomerOnHold;
                 customertransaction.PaymentRefNo = model.PaymentRefNo;
-                customertransaction.CreditNoteRef = model.CreditNoteRef;
-                customertransaction.CreditNoteValue = model.CreditNoteValue;
-                customertransaction.CreditNoteDate = model.CreditNoteDate;
+                customertransaction.Debitnoteref = model.Debitnoteref;
+                customertransaction.Debitnotevalue = model.Debitnotevalue;
+                customertransaction.Debitnotedate = model.Debitnotedate;
                 customertransaction.PaymentId = model.paymentid;
                 customertransaction.Cash = model.Cash;
                 customertransaction.CreatedDate = DateTime.Now;
@@ -225,7 +224,7 @@ namespace MMS.Web.Controllers
         {
             Customertransaction model1 = new Customertransaction();
 
-            InvoiceManager manager = new InvoiceManager();
+            OrderHeaderManager manager = new OrderHeaderManager();
             var Customertransactionlist = manager.Get();
             BuyerManager BuyerManager = new BuyerManager();
             var data1 = BuyerManager.Get();
@@ -238,17 +237,16 @@ namespace MMS.Web.Controllers
 
             foreach (var item in Customertransactionlist)
             {
-                if (item.CustomerId == Buyerid && item.Id == INvRefNumber)
+                if (item.CustomerId == Buyerid && item.invoicehd_id == INvRefNumber)
                 {
                     Customertransaction customertransaction = new Customertransaction();
-                    customertransaction.InvDate = item.DocDate;
-                    customertransaction.InvAmount = item.RefGrossValue;
-                    customertransaction.InvRefNumber = item.Id;
-                    customertransaction.RefItems = item.RefItems;
-                    customertransaction.RefQuantity = item.RefQuantity;
-                    customertransaction.Id = item.Id;
+                    customertransaction.InvDate = item.invoicedate;
+                    customertransaction.InvAmount = item.TotalPrice;
+                    customertransaction.InvHDNumber = item.invoicehd_id;
+                    customertransaction.RefItems = item.invoice_items;
+                    customertransaction.RefQuantity = item.Quantity;
                     customertransaction.BuyerMaster = data1.Where(W => W.BuyerMasterId == item.CustomerId).ToList().FirstOrDefault();
-                    customertransaction.customertransaction = data2.Where(W => W.InvRefNumber == item.Id).ToList().FirstOrDefault();
+                    customertransaction.customertransaction = data2.Where(W => W.InvRefNumber == item.invoicehd_id).ToList().FirstOrDefault();
 
                     totalList.Add(customertransaction);
                 }

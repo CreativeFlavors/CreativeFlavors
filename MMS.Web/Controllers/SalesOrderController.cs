@@ -34,7 +34,7 @@ namespace MMS.Web.Controllers
             return View();
         }
         [HttpGet]
-        public ActionResult SalesOrderGrid(int page = 1, int pageSize = 8)
+        public ActionResult SalesOrderGrid(int page = 1, int pageSize = 15)
         {
             SalesorderDT_Manager salesorderManager = new SalesorderDT_Manager();
             List<Salesorders> totaldata = new List<Salesorders>();
@@ -74,7 +74,7 @@ namespace MMS.Web.Controllers
             return PartialView("partial/SalesOrderDetailsGrid", totaldata);
         }
         [HttpGet]
-        public ActionResult salesorderheader(int page = 1, int pageSize = 8)
+        public ActionResult salesorderheader(int page = 1, int pageSize = 15)
         {
             SalesorderHD_Manager salesorderManager = new SalesorderHD_Manager();
             SalesorderDT_Manager SalesorderDT_Manager = new SalesorderDT_Manager();
@@ -88,6 +88,7 @@ namespace MMS.Web.Controllers
                 var salesorderdt = SalesorderDT_Manager.GetSOIdS(i.salesorderid_hd);
                 var counts = 0;
                 decimal? dc_qty = 0;
+                decimal? Invoice_qty = 0;
                 foreach (var k in salesorderdt)
                 {
                     if(k.dc_qty != null)
@@ -95,9 +96,14 @@ namespace MMS.Web.Controllers
                         counts++;
                         dc_qty += k.dc_qty;
                     }
+                    if(k.Invoice_qty != null)
+                    {
+                        Invoice_qty += k.Invoice_qty;
+                    }
                 }
                 model.dc_qty = dc_qty;
                 model.itemdc = counts;
+                model.invoice_qty = Invoice_qty;
                 model.SalesorderId_HD = i.salesorderid_hd;
                 model.salesorderdate = i.Salesorderdate;
                 model.item = i.items;
@@ -410,7 +416,7 @@ namespace MMS.Web.Controllers
         public ActionResult SalesorderDetails(Salesorders model)
         {
             SalesorderManager salesorderManager = new SalesorderManager();
-            salesorder salesorder = new salesorder();
+            salesordercart salesorder = new salesordercart();
             ProductManager productManager = new ProductManager();
             TaxTypeManager taxTypeManager = new TaxTypeManager();
             BuyerManager buyerManager = new BuyerManager();
@@ -487,10 +493,6 @@ namespace MMS.Web.Controllers
             SalesorderHD_Manager salesorderHD_Manager = new SalesorderHD_Manager();
             SalesorderDT_Manager salesorderDT = new SalesorderDT_Manager();
             CurrencyManager currencyManager = new CurrencyManager();
-            salesorder salesorder = new salesorder();
-            ProductManager productManager = new ProductManager();
-            TaxTypeManager taxTypeManager = new TaxTypeManager();
-            BuyerManager buyerManager = new BuyerManager();
             var productlist = salesorderManager.GetsalesorderCartList(model.buyerid);
             var count = productlist.Count;
             if (count <= 0)
@@ -561,7 +563,7 @@ namespace MMS.Web.Controllers
         {
             SalesorderManager SalesorderManager = new SalesorderManager();
             string AlertMessage = "";
-            salesorder parentbom = new salesorder();
+            salesordercart parentbom = new salesordercart();
             parentbom = SalesorderManager.GetSO(SOId);
             if (parentbom != null)
             {
@@ -601,6 +603,7 @@ namespace MMS.Web.Controllers
         public ActionResult search(int customerid, int SOid)
         {
             SalesorderHD_Manager salesorderManager = new SalesorderHD_Manager();
+            SalesorderDT_Manager salesorderDT_manager = new SalesorderDT_Manager(); 
             BuyerManager BuyerManager = new BuyerManager();
             var data1 = BuyerManager.Get();
             List<Salesorders> totalList = new List<Salesorders>();
@@ -608,6 +611,24 @@ namespace MMS.Web.Controllers
             foreach (var i in data)
             {
                 Salesorders model = new Salesorders();
+                var salesorderdt = salesorderDT_manager.GetSOIdS(i.salesorderid_hd);
+                var counts = 0;
+                decimal? dc_qty = 0;
+                decimal? Invoice_qty = 0;
+                foreach (var k in salesorderdt)
+                {
+                    if (k.dc_qty != null)
+                    {
+                        counts++;
+                        dc_qty += k.dc_qty;
+                    }
+                    if (k.Invoice_qty != null)
+                    {
+                        Invoice_qty += k.Invoice_qty;
+                    }
+                }
+                model.invoice_qty = Invoice_qty;
+                model.dc_qty = dc_qty;
                 model.SalesorderId = i.salesorderid_hd;
                 model.salesorderdate = i.Salesorderdate;
                 model.item = i.items;
