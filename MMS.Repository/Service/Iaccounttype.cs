@@ -9,7 +9,6 @@ namespace MMS.Repository.Service
 {
     public interface Iaccounttype
     {
-        accounttype GettypeId(int id);
         List<accounttype> Get();
     }
 }

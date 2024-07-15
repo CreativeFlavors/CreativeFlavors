@@ -17,11 +17,11 @@ namespace MMS.Repository.Managers
     public class SalesorderManager : ISalesorder, IDisposable
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-        private Repository<salesorder> salesorderrep;
+        private Repository<salesordercart> salesorderrep;
 
         public SalesorderManager()
         {
-            salesorderrep = unitOfWork.Repository<salesorder>();
+            salesorderrep = unitOfWork.Repository<salesordercart>();
 
         }
         public void Dispose()
@@ -76,9 +76,9 @@ namespace MMS.Repository.Managers
             }
             return MRP_Details;
         }
-        public salesorder Post(salesorder arg)
+        public salesordercart Post(salesordercart arg)
         {
-            salesorder salesorder  = new salesorder();
+            salesordercart salesorder  = new salesordercart();
             try
             {
                 string username = "admin";
@@ -109,9 +109,9 @@ namespace MMS.Repository.Managers
             }
             return salesorder;
         }
-        public List<salesorder> GetsalesorderCartList(int customerid)
+        public List<salesordercart> GetsalesorderCartList(int customerid)
         {
-            List<salesorder> salesorder = new List<salesorder>();
+            List<salesordercart> salesorder = new List<salesordercart>();
                  salesorder = salesorderrep.Table.Where(x => x.customerid== customerid && x.Status == 1 && x.isdeleted == true).ToList();
             return salesorder;
         }
@@ -119,7 +119,7 @@ namespace MMS.Repository.Managers
         {
             bool result = false;
 
-                List<salesorder> models = salesorderrep.Table.Where(x => x.Status == 1 && x.isdeleted == true).ToList();
+                List<salesordercart> models = salesorderrep.Table.Where(x => x.Status == 1 && x.isdeleted == true).ToList();
 
                 if (models != null && models.Count > 0)
                 {
@@ -141,7 +141,7 @@ namespace MMS.Repository.Managers
         {
             bool result = false;
 
-            List<salesorder> models = salesorderrep.Table.Where(x => x.Status == 1 && x.isdeleted == true).ToList();
+            List<salesordercart> models = salesorderrep.Table.Where(x => x.Status == 1 && x.isdeleted == true).ToList();
 
             if (models != null && models.Count > 0)
             {
@@ -160,15 +160,15 @@ namespace MMS.Repository.Managers
             return result;
         }
 
-        public List<salesorder> Get()
+        public List<salesordercart> Get()
         {
-            List<salesorder> obj = new List<salesorder>();
-            obj = salesorderrep.Table.ToList<salesorder>();
+            List<salesordercart> obj = new List<salesordercart>();
+            obj = salesorderrep.Table.ToList<salesordercart>();
             return obj;
         }
-        public salesorder GetSO(int? id)
+        public salesordercart GetSO(int? id)
         {
-            salesorder salesorder = new salesorder();
+            salesordercart salesorder = new salesordercart();
             if (id != null)
             {
                 salesorder = salesorderrep.Table.Where(x => x.SalesorderId == id && x.isdeleted == true).FirstOrDefault();
@@ -176,16 +176,16 @@ namespace MMS.Repository.Managers
             return salesorder;
         }
 
-        public salesorder Getproductqty(int productid)
+        public salesordercart Getproductqty(int productid)
         {
-            salesorder salesorder = new salesorder();
+            salesordercart salesorder = new salesordercart();
             if (productid != null)
             {
                 salesorder = salesorderrep.Table.Where(x => x.ProductNameid == productid).FirstOrDefault();
             }
             return salesorder;
         }
-        public salesorder GettypeId(int id)
+        public salesordercart GettypeId(int id)
         {
             throw new NotImplementedException();
         }
@@ -194,7 +194,7 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                salesorder model = salesorderrep.GetById(id);
+                salesordercart model = salesorderrep.GetById(id);
                 model.isdeleted = false;
                 model.Deletedby = "admin";
                 model.Deleteddate = DateTime.Now;

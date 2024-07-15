@@ -9,6 +9,6 @@ namespace MMS.Repository.Service
 {
     public interface IDeliveryChallanDTServices
     {
-        salesorder GettypeId(int id);
+        salesordercart GettypeId(int id);
     }
 }

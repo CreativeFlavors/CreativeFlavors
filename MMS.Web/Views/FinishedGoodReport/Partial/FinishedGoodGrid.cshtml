@@ -1,143 +1,293 @@
-﻿@model MMS.Repository.ViewModel.ProductionViewModel
-@using MMS.Repository.Managers
-
+﻿@using MMS.Core.Entities
+@model IEnumerable<MMS.Web.Models.FinishedGoods.FinishedGoodModel>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
-    @*<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">*@
-    <link href="~/Content/css1/font-awesome.min.css" rel="stylesheet" />
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
-    <link href="~/Content/css1/FinishedGood.css" rel="stylesheet" />
-
-
     <style>
-        input[type=text] {
-            padding: 12px;
-            font-size: 17px;
-            border: 1px solid grey;
-            width: 80%;
+        .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
+            padding: 16px;
         }
 
-        .buttonone {
-            float: right;
-            width: 20%;
-            padding: 12px;
-            background: #2196F3;
-            color: white;
-            font-size: 17px;
-            border: 1px solid grey;
-            border-left: none;
-            cursor: pointer;
+        img#paynows {
+            width: 26%;
+        }
+
+        .manage_customers_table_responsive, .reports .reports_table_responsive {
+            padding: 1px 15px 13px;
+            box-sizing: border-box;
+            overflow-x: unset;
+        }
+
+        .sub_merchants .merchant_btn, .manage_customers .manage_customers_btn, .common_Manage_subMerchant .manage_customers_btn {
+            background: #4472C4;
+            border-radius: 5px;
+            padding: 11px 61px;
+            border: 1px solid transparent;
+            font-style: normal;
+            font-weight: 500;
         }
     </style>
-
-
 </head>
 <body>
-    <div class="manage_customers">
-        <div class="d-flex justify-content-between align-items-center manage_customers_head">
-            <div class="manage_customers_main_head">
-                <h6 class="font-20">FinishedGood Inventory</h6>
-            </div>
 
-        </div>
-        <div class="table-responsive manage_customers_table_responsive">
-            <div class="customer_manage_search_containers" style="width:40%;">
-                <input type="text" placeholder="Search by Product Name" id="SeaarchID" name="search2">
-                <button class="buttonone" onclick="Search()" title="Filter" type="submit"><i class="fa fa-search"></i></button>
-
-            </div>
-            <br />
-            
-            <table class="container-fluid">
-                <thead>
-                    <tr>
-                        <th><h1>Sites</h1></th>
-                        <th><h1>Views</h1></th>
-                        <th><h1>Clicks</h1></th>
-                        <th><h1>Average</h1></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Google</td>
-                        <td>9518</td>
-                        <td>6369</td>
-                        <td>01:32:50</td>
-                    </tr>
-                    <tr>
-                        <td>Twitter</td>
-                        <td>7326</td>
-                        <td>10437</td>
-                        <td>00:51:22</td>
-                    </tr>
-                    <tr>
-                        <td>Amazon</td>
-                        <td>4162</td>
-                        <td>5327</td>
-                        <td>00:24:34</td>
-                    </tr>
-                    <tr>
-                        <td>LinkedIn</td>
-                        <td>3654</td>
-                        <td>2961</td>
-                        <td>00:12:10</td>
-                    </tr>
-                    <tr>
-                        <td>CodePen</td>
-                        <td>2002</td>
-                        <td>4135</td>
-                        <td>00:46:19</td>
-                    </tr>
-                    <tr>
-                        <td>GitHub</td>
-                        <td>4623</td>
-                        <td>3486</td>
-                        <td>00:31:52</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="row manage_customer_show">
-                <div class="font-14 manage_customer_show_I col-xl-6">
-                    <span>Showing </span>
-                    <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
-                        <option value="5" @(ViewBag.PageSize == 5 ? "selected" : "")>5</option>
-                        <option value="10" @(ViewBag.PageSize == 10 ? "selected" : "")>10</option>
-                        <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
-                        <option value="20" @(ViewBag.PageSize == 20 ? "selected" : "")>20</option>
-                    </select>
-
+    <div class="main-page">
+        <div id="transaction_report" class="reports common_Manage_subMerchant">
+            <div class="d-flex justify-content-between align-items-center manage_customers_head">
+                <div class="manage_customers_main_head">
+                    <h6 class="font-20">Finished Good Report</h6>
+                </div>
+                <div>
 
                 </div>
+            </div>
 
-                <div class="col-xl-6 manage_customer_show_II">
-                    <nav class="float-xl-end">
-                        <ul class="pagination font-14">
-                            <li class="page-item">
-                                <a href="##" id="previousPage" class="page-link">Previous</a>
-                            </li>
-                            @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                            {
-                                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                    <a href="@Url.Action("ProductionGrid", "Production", new { page = i })" class="page-link">@i</a>
+            <div class="table-responsive reports_table_responsive">
+                <div class="customer_manage_search_container">
+                    <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Product Name">
+                </div>
+                <div class="manage_customers_table_in_responsive" id="form">
+
+                    <table class="table table-striped text-center">
+                        <thead>
+                            <tr class="font-16">
+                                <th scope="col">
+                                    <span>Si.No</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Product Name</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>pProduct Code</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Product type</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Price</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Costing</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Store</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Quantity</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>UOM</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        @if (Model != null && Model.Count() > 0)
+                        {
+                            int count = 1;
+                            <tbody>
+
+                                @foreach (var i in Model)
+                                {
+
+                                    <tr>
+                                        <td class="veh-1">@count</td>
+                                        <td class="veh-2" style="width: 12%;text-align:left;">@i.ProductName</td>
+                                        <td class="veh-3" style="width: 12%; text-align: left;">@i.ProductCode</td>
+                                        <td class="veh-5" style="width: 12%; text-align: left;">@i.ProductTypeName</td>
+                                        <td class="veh-4" style="width: 12%; text-align: right;">@i.Price</td>
+                                        <td class="veh-4" style="width: 12%; text-align: center; ">@i.Cost</td>
+                                        <td class="veh-3" style="width: 12%; text-align: left;">@i.StoreName</td>
+                                        <td class="veh-4" style="width: 12%; text-align: right; ">@i.Quantity</td>
+                                        <td class="veh-4" style="width: 12%; text-align: left;">@i.ShortUnitName</td>
+                                    </tr>
+                                    count++;
+                                }
+                            </tbody>
+
+                        }
+                    </table>
+                </div>
+                <div class="row manage_customer_show">
+                    <div class="font-14 manage_customer_show_I col-xl-6">
+                        <span>Showing </span>
+                        <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
+                            <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
+                            <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
+                            <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
+                            <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
+                        </select>
+
+
+                    </div>
+
+                    <div class="col-xl-6 manage_customer_show_II">
+                        <nav class="float-xl-end">
+                            <ul class="pagination font-14">
+                                <li class="page-item">
+                                    <a href="##" id="previousPage" class="page-link">Previous</a>
                                 </li>
-                            }
-                            <li class="page-item">
-                                <a class="page-link" id="nextPage" href="##">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
+                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                        <a href="@Url.Action("BOMMaterialListGrid", "BillOfMaterial", new { page = i })" class="page-link">@i</a>
+                                    </li>
+                                }
+                                <li class="page-item">
+                                    <a class="page-link" id="nextPage" href="##">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
                 </div>
             </div>
+
         </div>
-        </div>
+
+    </div>
+    <script src="~/Content/js/custom.js"></script>
+    <link href="~/Content/css1/sweetalert.css" rel="stylesheet" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#FinishedGoods").attr('checked', true);
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#customer_manage_search").keyup(function () {
+                var prosearch = $("#customer_manage_search").val();
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/FinishedGoodReport/ReportSearch',
+                    data: { filter: prosearch },
+                    contentType: 'application/json',
+                    success: function (values) {
+                        $("tbody").empty();
+                        var count = 1;
+                        $.each(values, function (i, item) {
+                            $("tbody").append(`
+                         <tr class="font-14">
+         <td class="veh1-5">${count}</td>
+         <td class="veh1-5" style="width: 12%;">${item.ProductName}</td>
+         <td class="veh1-5" style="width: 12%;">${item.ProductCode}</td>
+         <td class="veh1-5" style="width: 12%;">${item.ProductTypeName}</td>
+         <td class="veh1-5" style="width: 12%;">${item.Price}</td>
+         <td class="veh1-5" style="width: 12%;">${item.Cost}</td>
+         <td class="veh1-5" style="width: 12%;">${item.StoreName}</td>
+         <td class="veh1-5" style="width: 12%;">${item.Quantity}</td>
+         <td class="veh1-5" style="width: 12%;">${item.ShortUnitName}</td>
+                        </tr>
+                         `);
+                            count++;
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+  $(document).ready(function() {
+    $('#manage_customer_show_no').change(function() {
+        var PageSize = parseInt($(this).val());
+        $.ajax({
+            url: '/FinishedGoodReport/FinishedGoodMaster',
+            type: "GET",
+            dataType: "JSON",
+            data: { pageSize: PageSize },
+            success: function (values) {
+                $("#summery").html(values).show();
+            }
+        });
+    });
+      $(".page-link").click(function(){
+            var page = $(this).data("page");
+            $.ajax({
+                url: "@Url.Action("salesorderheader", "FinishedGoodMaster")",
+                type: "GET",
+                data: { page: page },
+                success: function(data){
+                    $("#summery").html(data).show();
+                }
+            });
+        });
+    $('#previousPage').click(function() {
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        if (currentPage > 1) {
+            var previousPage = currentPage - 1;
+            $.ajax({
+                url: '/FinishedGoodReport/FinishedGoodMaster',
+                type: "GET",
+                dataType: "JSON",
+                data: { page: previousPage, pageSize:parseInt('@ViewBag.PageSize') },
+                success: function (values) {
+                    $("#summery").html(values).show();
+                }
+            });
+        }
+    });
+
+    $('#nextPage').click(function() {
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        var totalPages = parseInt('@ViewBag.TotalPages');
+        if (currentPage < totalPages) {
+            var nextPage = currentPage + 1;
+             $.ajax({
+                 url: '/FinishedGoodReport/FinishedGoodMaster   ',
+                  type: "GET",
+                  dataType: "JSON",
+                   data: { page: nextPage, pageSize:parseInt('@ViewBag.PageSize') },
+                  success: function (values) {
+                       $("#summery").html(values).show();
+                  }
+             });
+
+        }
+    });
+
+});
+
+    </script>
+
 </body>
 </html>
+
+

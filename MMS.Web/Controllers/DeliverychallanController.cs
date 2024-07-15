@@ -19,11 +19,13 @@ namespace MMS.Web.Controllers
     public class DeliverychallanController : Controller
     {
         #region view
+
         [HttpGet]
         public ActionResult DCMaster()
         {
             return View();
         }
+        [HttpGet]
         public ActionResult DeliverychallanGrid(int page = 1, int pageSize = 5)
         {
             SalesorderHD_Manager salesorderManager = new SalesorderHD_Manager();
@@ -224,7 +226,7 @@ namespace MMS.Web.Controllers
             models.Total_Price = Math.Round((decimal)headerdata.Total_price, 2);
             models.salesorderdate = headerdata.Salesorderdate;
             models.quantity = headerdata.quantity;
-
+            models.Final_Grandtotal = headerdata.grand_total;
             models.item = headerdata.items;
             List<Salesorders> totaldata = new List<Salesorders>();
             var totallist = SalesorderDT_Manager.salesorder_Grid();
@@ -425,6 +427,59 @@ namespace MMS.Web.Controllers
         }
 
         #endregion
+        #region Filter
+        public ActionResult Search(int customerid, int SOid)
+        {
+            SalesorderHD_Manager salesorderManager = new SalesorderHD_Manager();
+            BuyerManager BuyerManager = new BuyerManager();
+            SalesorderDT_Manager SalesorderDT_Manager = new SalesorderDT_Manager();
+            var data1 = BuyerManager.Get();
+            List<Salesorders> totalList = new List<Salesorders>();
+            var data = salesorderManager.Get();
+            foreach (var i in data)
+            {
+                Salesorders model = new Salesorders();
+                var salesorderdt = SalesorderDT_Manager.GetSOIdS(i.salesorderid_hd);
+                var counts = 0;
+                var count = 0;
+                foreach (var k in salesorderdt)
+                {
+                    if (k.quantity == k.dc_qty)
+                    {
+                        counts++;
+                    }
+                }
+                foreach (var j in salesorderdt)
+                {
+                    if (j.quantity == j.Invoice_qty)
+                    {
+                        count++;
+                    }
+                }
+                model.itemInvoiced = count;
+                model.itemdc = counts;
+                model.SalesorderId = i.salesorderid_hd;
+                model.salesorderdate = i.Salesorderdate;
+                model.item = i.items;
+                model.quantity = i.quantity;
+                model.Total_Price = i.Total_price;
+                model.Total_discountval = i.Total_disamount;
+                model.Total_Grandtotal = i.grand_total;
+                model.Total_Subtotal = i.Total_subtotal;
+                model.Total_TaxValue = i.Total_taxamount;
+                model.BuyerMaster = data1.Where(W => W.BuyerMasterId == i.customerid).ToList().FirstOrDefault();
+                totalList.Add(model);
+            }
+            var filteredList = totalList.Where(J => J.buyerid == customerid || J.SalesorderId == SOid);
 
+            return Json(filteredList, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult Getbuyerorderno(int id)
+        {
+            SalesorderHD_Manager SalesorderHD_Manager = new SalesorderHD_Manager();
+            var data = SalesorderHD_Manager.GettypeId(id);
+            return Json(data, JsonRequestBehavior.AllowGet);
+        }
+        #endregion
     }
 }

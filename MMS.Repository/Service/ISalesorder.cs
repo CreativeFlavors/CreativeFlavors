@@ -9,7 +9,7 @@ namespace MMS.Repository.Service
 {
     public interface ISalesorder
     {
-        salesorder GettypeId(int id);
-        List<salesorder> Get();
+        salesordercart GettypeId(int id);
+        List<salesordercart> Get();
     }
 }

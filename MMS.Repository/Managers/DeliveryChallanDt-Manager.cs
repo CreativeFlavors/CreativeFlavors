@@ -55,7 +55,7 @@ namespace MMS.Repository.Managers
             throw new NotImplementedException();
         }
 
-        public salesorder GettypeId(int id)
+        public salesordercart GettypeId(int id)
         {
             throw new NotImplementedException();
         }

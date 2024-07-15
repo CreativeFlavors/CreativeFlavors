@@ -56,10 +56,5 @@ namespace MMS.Repository.Managers
             }
             return paymentList;
         }
-
-        public accounttype GettypeId(int id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

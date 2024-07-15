@@ -25,7 +25,7 @@ namespace MMS.Web.Controllers
     {
         #region views
 
-        public ActionResult MRP_Master(int page = 1, int pageSize = 6)
+        public ActionResult MRP_Master(int page = 1, int pageSize = 15)
         {
             SalesorderManager salesorderManager = new SalesorderManager();
             Salesorders salesorders = new Salesorders();
@@ -66,7 +66,7 @@ namespace MMS.Web.Controllers
         }
 
 
-        public ActionResult MRP_Filter(int page = 1, int pageSize = 6)
+        public ActionResult MRP_Filter(int page = 1, int pageSize = 15)
         {
             SalesorderManager salesorderManager = new SalesorderManager();
             Salesorders salesorders = new Salesorders();

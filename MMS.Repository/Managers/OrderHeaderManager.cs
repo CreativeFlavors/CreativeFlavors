@@ -30,6 +30,15 @@ namespace MMS.Repository.Managers
         {
             throw new NotImplementedException();
         }
+        public orderheader_hd Get(int id)
+        {
+            orderheader_hd oorderheader = new orderheader_hd();
+            if (id != 0)
+            {
+                oorderheader = OrderHeaderrep.Table.Where(x => x.invoicehd_id == id).FirstOrDefault();
+            }
+            return oorderheader;
+        }
         public orderheader_hd POST(orderheader_hd arg)
         {
             orderheader_hd salesorder = new orderheader_hd();

@@ -57,7 +57,7 @@ namespace MMS.Repository.Managers
             }
             return customertransaction;
         }
-        public customertransaction GettypeId(int id)
+        public customertransaction GetiNId(int id)
         {
             customertransaction customertransaction = new customertransaction();
             try
@@ -74,6 +74,15 @@ namespace MMS.Repository.Managers
             }
 
         }
+        public customertransaction GetCTId(int id)
+        {
+            customertransaction customertransaction = new customertransaction();
+            if (id != 0)
+            {
+                customertransaction = customertransactionrep.Table.FirstOrDefault(x => x.Id == id);
+            }
+            return customertransaction;
+        }
         public bool Put(customertransaction arg)
         {
             bool result = false;
@@ -83,17 +92,16 @@ namespace MMS.Repository.Managers
                 customertransaction model = customertransactionrep.Table.Where(p => p.Id == arg.Id).FirstOrDefault();
                 if (model != null)
                 {
-                    model.InvBalanceAmount= arg.InvBalanceAmount;
+                    model.InvBalanceAmount = arg.InvBalanceAmount;
                     var data = model.InvPaidAmount;
                     data += arg.InvPaidAmount;
                     model.InvPaidAmount = data;
-
-                    model.Cash= arg.Cash;
-                    model.CreditNoteRef= arg.CreditNoteRef;
-                    model.CreditNoteDate= arg.CreditNoteDate;
-                    model.CreditNoteValue= arg.CreditNoteValue;
-                    model.PaymentAmount= arg.PaymentAmount;
-                    model.PaymentRefNo= arg.PaymentRefNo;
+                    model.Cash = arg.Cash;
+                    model.Debitnoteref = arg.Debitnoteref;
+                    model.Debitnotedate = arg.Debitnotedate;
+                    model.Debitnotevalue = arg.Debitnotevalue;
+                    model.PaymentAmount = arg.PaymentAmount;
+                    model.PaymentRefNo = arg.PaymentRefNo;
 
                     model.UpdatedDate = DateTime.Now;
                     //string username = HttpContext.Current.Session["UserName"].ToString();

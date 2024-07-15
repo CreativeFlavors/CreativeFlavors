@@ -73,7 +73,7 @@
                 </div>
                 <div class="customers-details-inner">
                     <p class="font-16">Invoice Number</p>
-                    <p class="font-16">@Model.InvRefNumber</p>
+                    <p class="font-16">@Model.InvHDNumber</p>
                 </div>
             </div>
             <div class="customers-details">
@@ -82,20 +82,20 @@
                     <p class="font-16">@Model.InvDate.ToString("dd/MM/yyyy")</p>
                 </div>
                 <div class="customers-details-inner">
-                    <p class="font-16">Invoice Item / Quantity</p>
-                    <p class="font-16">@Model.RefItems <b> / </b> @Model.RefQuantity</p>
+                    <p class="font-16"> Quantity / Invoice Item </p>
+                    <p class="font-16">@string.Format("{0:0.00}", Model.RefQuantity) <b> / </b> @Model.RefItems</p>
                 </div>
                 <div class="customers-details-inner">
                     <p class="font-16">Invoice Value</p>
-                    <p class="font-16">@Model.InvAmount</p>
+                    <p class="font-16">@string.Format("{0:0.00}", Model.InvAmount)</p>
                 </div>
                 <div class="customers-details-inner">
                     <p class="font-16">Amount Paid</p>
-                    <p class="font-16">@Model.InvPaidAmount</p>
+                    <p class="font-16">@string.Format("{0:0.00}", Model.InvPaidAmount)</p>
                 </div>
                 <div class="customers-details-inner">
                     <p class="font-16">Balance Amount</p>
-                    <p class="font-16">@Model.InvBalanceAmount</p>
+                    <p class="font-16">@string.Format("{0:0.00}", Model.InvBalanceAmount)</p>
                 </div>
                 <div class="customers-details-inner">
                     <p class="font-16">Payment Due Date</p>
@@ -126,20 +126,20 @@
             <div class="edit-merchant">
                 <div class="edit-merchant-inner-section">
                     <div class="input-part" id="one">
-                        @Html.LabelFor(m => m.CreditNoteRef, "Debit Note Number :")
-                        @Html.TextBoxFor(m => m.CreditNoteRef, new { @class = "form-control text-field", placeholder = "Enter Debit Number" })
+                        @Html.LabelFor(m => m.Debitnoteref, "Debit Note Number :")
+                        @Html.TextBoxFor(m => m.Debitnoteref, new { @class = "form-control text-field", placeholder = "Enter Debit Number" })
                     </div>
                 </div>
                 <div class="edit-merchant-inner-section">
                     <div class="input-part" id="one1">
-                        @Html.LabelFor(m => m.CreditNoteDate, "Debit Note Date :")
-                        @Html.TextBoxFor(m => m.CreditNoteDate, new { @class = "form-control", type = "date" })
+                        @Html.LabelFor(m => m.Debitnotedate, "Debit Note Date :")
+                        @Html.TextBoxFor(m => m.Debitnotedate, new { @class = "form-control", type = "date" })
                     </div>
                 </div>
                 <div class="edit-merchant-inner-section">
                     <div class="input-part" id="one2">
-                        @Html.LabelFor(m => m.CreditNoteValue, "Debit Note Value :")
-                        @Html.TextBoxFor(m => m.CreditNoteValue, new { @class = "form-control text-field", placeholder = "Enter Debit Value" })
+                        @Html.LabelFor(m => m.Debitnotevalue, "Debit Note Value :")
+                        @Html.TextBoxFor(m => m.Debitnotevalue, new { @class = "form-control text-field", placeholder = "Enter Debit Value" })
                     </div>
                 </div>
                 <div class="edit-merchant-inner-section">
@@ -226,8 +226,8 @@
         function Save() {
             var Cash = $("#Cash").val();
             var PaymentAmount = $("#PaymentAmount").val();
-            var CreditNoteValue = $("#CreditNoteValue").val();
-            if (Cash != "" || PaymentAmount != "" || CreditNoteValue != "") {
+            var Debitnotevalue = $("#Debitnotevalue").val();
+            if (Cash != "" || PaymentAmount != "" || Debitnotevalue != "") {
 
             if (@Model.InvBalanceAmount == "0.00") {
                 alert("Full payment done already");
@@ -236,7 +236,7 @@
                 var buyerid ="@Model.buyerid";
 var PaymentDate ="@Model.PaymentDate";
 var PaymentAmount = $("#PaymentAmount").val();
-var InvRefNumber = "@Model.InvRefNumber";
+                var InvHDNumber = "@Model.InvHDNumber";
 var InvDate ="@Model.InvDate";
 var InvDueDate = "@Model.InvDueDate";
 var InvAmount = "@Model.InvAmount";
@@ -244,9 +244,9 @@ var InvPaidAmount = "@Model.InvPaidAmount";
 var InvBalanceAmount = "@Model.InvBalanceAmount";
 var IsCustomerOnHold = $("#IsCustomerOnHold").val();
 var PaymentRefNo = $("#PaymentRefNo").val();
-                var CreditNoteRef = $("#CreditNoteRef").val();
-var CreditNoteValue = $("#CreditNoteValue").val();
-var CreditNoteDate = $("#CreditNoteDate").val();
+                var Debitnoteref = $("#Debitnoteref").val();
+                var Debitnotevalue = $("#Debitnotevalue").val();
+                var Debitnotedate = $("#Debitnotedate").val();
 var paymentid = $("#paymentid").val();
 var Cash = $("#Cash").val();
 var Id = "@Model.Id";
@@ -255,7 +255,7 @@ var formdata = new FormData();
 formdata.append("buyerid", buyerid);
 formdata.append("PaymentDate", PaymentDate);
 formdata.append("PaymentAmount", PaymentAmount);
-formdata.append("InvRefNumber", InvRefNumber);
+                formdata.append("InvHDNumber", InvHDNumber);
 formdata.append("InvDate", InvDate);
 formdata.append("InvDueDate", InvDueDate);
 formdata.append("InvAmount", InvAmount);
@@ -263,9 +263,9 @@ formdata.append("InvPaidAmount", InvPaidAmount);
 formdata.append("InvBalanceAmount", InvBalanceAmount);
 formdata.append("IsCustomerOnHold", IsCustomerOnHold);
 formdata.append("PaymentRefNo", PaymentRefNo);
-                formdata.append("CreditNoteRef", CreditNoteRef);
-formdata.append("CreditNoteValue", CreditNoteValue);
-formdata.append("CreditNoteDate", CreditNoteDate);
+                formdata.append("Debitnoteref", Debitnoteref);
+                formdata.append("Debitnotevalue", Debitnotevalue);
+                formdata.append("Debitnotedate", Debitnotedate);
 formdata.append("paymentid", paymentid);
 formdata.append("Cash", Cash);
 formdata.append("Id", Id);
@@ -276,20 +276,26 @@ $.ajax({
     processData: false,
     dataType: 'html',
     data: formdata,
-    success: function (data) {
-
-        Swal.fire({
-            title: 'Success!!',
-            text: 'Your Payment has Done Successful!',
-            icon: 'success',
-            timer: 2000,
-            timerProgressBar: true,
-            showConfirmButton: false
-        });
-        setTimeout(function () {
-            location.href = "/CustomerTransaction/Customermaster";
-            return false;
-        }, 1500);
+    success: function (values) {
+        var data = JSON.parse(values);
+        if (data === "Payless") {
+            alert("Provide the accurate ledger amount");
+        }
+        else {
+            Swal.fire({
+                title: 'Success!!',
+                text: 'Your Payment has Done Successful!',
+                icon: 'success',
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+            setTimeout(function () {
+                location.href = "/CustomerTransaction/Customermaster";
+                return false;
+            }, 1500);
+        }
+       
     }
 
 });

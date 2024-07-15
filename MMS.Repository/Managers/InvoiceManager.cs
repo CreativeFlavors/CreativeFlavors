@@ -155,14 +155,7 @@ namespace MMS.Repository.Managers
             order_header oorderheader = new order_header();
             if (id != 0)
             {
-                try
-                {
                     oorderheader = order_headerRepository.Table.Where(x => x.Id == id).FirstOrDefault();
-                }
-                catch (Exception ex)
-                {
-                    throw;
-                }
             }
             return oorderheader;
         }
