@@ -1,4 +1,5 @@
 ﻿using MMS.Core.Entities;
+using MMS.Data.StoredProcedureModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,6 +60,7 @@ namespace MMS.Web.Models.Po
 
         public string ProductName {  get; set; }
         public List<IndentPoMapping> DataList { get; set; }
+        public IndentPoMappingsp DataListsp { get; set; }
     
 
     public class DataItem

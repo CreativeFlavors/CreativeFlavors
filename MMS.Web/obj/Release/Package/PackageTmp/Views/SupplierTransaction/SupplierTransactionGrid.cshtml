@@ -12,7 +12,14 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
-
+    <style>
+        .page-item.active .page-link {
+            z-index: 3;
+            color: #fff;
+            background-color: #4472C4;
+            border-color: #0d6efd;
+        }
+    </style>
 </head>
 <body>
 
@@ -56,13 +63,10 @@
                         <input type="date" class="form-control" id="GrnDueDate" />
                         <label for="GrnDueDate">To Date</label>
                     </div>
-                    @*<div class="form-floating">
-                            @Html.DropDownListFor(m => m.CreditNoteRef, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "form-select" })
-                            <label for="floatingSelectGrid">Grn Number</label>
-                        </div>*@
+
                     <div id="transaction_reports_search4_container" class="reports_search_container_btn">
                         <button type="button" class="manage_customers_btn font-15">
-                            <a href="##" id="supplierid" onclick="filterSupplierTransactions()">FILTER</a>
+                            <a href="##" id="SearchID" onclick="Search()">FILTER</a>
                         </button>
                     </div>
                 </div>
@@ -112,12 +116,6 @@
                                         <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
                                     </span>
                                 </th>
-                                @*<th scope="col">
-                                        <span>Payment Due Date</span>
-                                        <span>
-                                            <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
-                                        </span>
-                                    </th>*@
 
                                 <th scope="col">
                                     <span>Grn Qty</span>
@@ -130,18 +128,18 @@
                         </thead>
                         @if (Model != null && Model.Count() > 0)
                         {
-                            int count = 1;
                             <tbody>
+                                @{
+                                    int currentPage = ViewBag.CurrentPage ?? 1;
+                                    int pageSize = ViewBag.PageSize ?? 8;
+                                    int totalItems = ViewBag.TotalList.Count;
+                                    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+                                }
                                 @foreach (var i in Model)
                                 {
-
                                     <tr class="font-14">
-                                        <td>@count</td>
+                                        <td>@startSerialNumber</td>
                                         <td>@(i.SupplierMaster != null ? i.SupplierMaster.SupplierName : "")</td>
-
-
-
-                                        @*<td class="veh1-5" style="width: 12%;">@item.SupplierMaster.SupplierName</td>*@
                                         <td>@i.GrnRefNumber</td>
                                         <td>@i.GrnDate</td>
                                         <td>@i.GrnAmount</td>
@@ -155,12 +153,11 @@
                                             <td>@(i.suppliertransaction.GrnPaidAmount ?? 0)</td>
                                             <td>@(i.suppliertransaction.GrnBalanceAmount ?? 0)</td>
                                         }
-                                        <!--<-->@*td>abcd</td>*@
                                         <td>@i.Grnqty </td>
                                         <td><button class="btn btn-success" id="paynow" onclick="paynow('@i.Id')" title="PayNow">Pay Now</button></td>
 
                                     </tr>
-                                    count++;
+                                    startSerialNumber++;
                                 }
 
                             </tbody>
@@ -169,93 +166,31 @@
                     </table>
                 </div>
 
-                <tfoot class="footer-pager">
-                    <tr>
-                        <td colspan="4">
-                            <!-- pager -->
-                            @if (ViewBag.TotalCount > ViewBag.PageSize)
-                            {
-                                <ul class="pagination">
-                                    @if (ViewBag.CurrentPage > 1)
-                                    {
-                                        <li>
-                                            <a href="@Url.Action("SupplierTransactionGrid", "SupplierTransaction", new { page = 1 })">First</a>
-                                        </li>
-                                        <li>
-                                            <a href="@Url.Action("SupplierTransactionGrid", "SupplierTransaction", new { page = ViewBag.CurrentPage - 1 })">Previous</a>
-                                        </li>
-                                    }
-
-                                    @for (var page = ViewBag.StartPage; page <= ViewBag.EndPage; page++)
-                                    {
-                                        <li class="@(page == ViewBag.CurrentPage ? "active" : "")">
-                                            <a href="@Url.Action("SupplierTransactionGrid", "SupplierTransaction", new { page = page })">@page</a>
-                                        </li>
-                                    }
-
-                                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-                                    {
-                                        <li>
-                                            <a href="@Url.Action("SupplierTransactionGrid", "SupplierTransaction", new { page = ViewBag.CurrentPage + 1 })">Next</a>
-                                        </li>
-                                        <li>
-                                            <a href="@Url.Action("SupplierTransactionGrid", "SupplierTransaction", new { page = ViewBag.TotalPages })">Last</a>
-                                        </li>
-                                    }
-                                </ul>
-                            }
-                        </td>
-                    </tr>
-                </tfoot>
-
-
                 <div class="row manage_customer_show">
                     <div class="font-14 manage_customer_show_I col-xl-6">
                         <span>Showing </span>
-                        <select class="form-select font-16" name="manage_customer_show_content"
-                                id="list_report_show_no" aria-label="select example">
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="15">15</option>
+                        <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
+                            <option value="5" @(ViewBag.PageSize == 5 ? "selected" : "")>5</option>
+                            <option value="10" @(ViewBag.PageSize == 10 ? "selected" : "")>10</option>
+                            <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
+                            <option value="20" @(ViewBag.PageSize == 20 ? "selected" : "")>20</option>
                         </select>
-                        <span>per page of 120 customers</span>
                     </div>
 
                     <div class="col-xl-6 manage_customer_show_II">
                         <nav class="float-xl-end">
                             <ul class="pagination font-14">
                                 <li class="page-item">
-                                    <a href="##" class="page-link">Previous</a>
+                                    <a href="##" id="previousPage" class="page-link">Previous</a>
                                 </li>
+                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                        <a href="@Url.Action("SupplierTransactionGrid", "SupplierTransaction", new { page = i })" class="page-link">@i</a>
+                                    </li>
+                                }
                                 <li class="page-item">
-                                    <a class="page-link" href="##">1</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="##">2</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="##">3</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="##">4</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="##">5</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="##">6</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="##">7</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="##">8</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="##">...</a>
-                                </li>
-                                <li class=" page-item">
-                                    <a class="page-link" href="##">Next</a>
+                                    <a class="page-link" id="nextPage" href="##">Next</a>
                                 </li>
                             </ul>
                         </nav>
@@ -288,6 +223,37 @@
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
 
     <script>
+  $(document).ready(function() {
+    // Function to handle changing the number of items per page
+    $('#manage_customer_show_no').change(function() {
+        var pageSize = parseInt($(this).val());
+        window.location.href = "@Url.Action("SupplierTransactionGrid", "SupplierTransaction")?pageSize=" + pageSize;
+    });
+
+    $('#previousPage').click(function(e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        if (currentPage > 1) {
+            var previousPage = currentPage - 1;
+            window.location.href = "@Url.Action("SupplierTransactionGrid", "SupplierTransaction")?page=" + previousPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+        }
+    });
+
+    $('#nextPage').click(function(e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        var totalPages = parseInt('@ViewBag.TotalPages');
+        if (currentPage < totalPages) {
+            var nextPage = currentPage + 1;
+            window.location.href = "@Url.Action("SupplierTransactionGrid", "SupplierTransaction")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+        }
+    });
+});
+
+
+    </script>
+
+    <script>
         function paynow(arg) {
             $.ajax({
                 type: 'GET',
@@ -311,22 +277,40 @@
     </script>
 
     <script>
-    function filterSupplierTransactions() {
-        var selectedSupplierId = document.getElementById('supplierid').value;
-        // Perform AJAX call to retrieve filtered records
-        $.ajax({
-            url: '@Url.Action("SupplierTransactionSearch", "SupplierTransaction")',
-            type: 'GET',
-            data: { supplierId: selectedSupplierId },
-            success: function(data) {
-                // Handle success, e.g., update UI with filtered records
-            },
-            error: function(xhr, textStatus, errorThrown) {
-                // Handle error
-            }
-        });
-    }
+        function Search() {
+            var supplierid = $("#supplierid").val();
+            $.ajax({
+                type: "GET",
+                url: '/SupplierTransaction/SupplierTransactionSearch',
+                data: { Supplierid: supplierid },  
+                dataType: 'json',
+                success: function (data) {
+                    $("tbody").empty();
+                    var startSerialNumber = 1;
+                    $.each(data, function (index, i) { 
+                        $("tbody").append(`
+                            <tr class="font-14">
+                                <td>${startSerialNumber}</td>
+                                <td>${i.SupplierMaster != null ? i.SupplierMaster.SupplierName : ""}
+                                <td>${i.GrnRefNumber}</td>
+                                <td>${i.GrnDate}</td>
+                                <td>${i.GrnAmount}</td>
+                                <td>${i.suppliertransaction == null ? '0' : i.suppliertransaction.GrnPaidAmount ?? '0'}</td>  
+                                <td>${i.suppliertransaction == null ? i.GrnAmount : i.suppliertransaction.GrnBalanceAmount ?? '0'}</td>
+                                <td>${i.Grnqty}</td>
+                                <td><button class="btn btn-success" onclick="paynow('${i.Id}')" title="Pay Now">Pay Now</button></td>
+                            </tr>
+                        `);
+                        startSerialNumber++;
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error occurred:", status, error);
+                }
+            });
+        }
     </script>
+
 
 </body>
 </html>

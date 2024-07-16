@@ -15,7 +15,9 @@
         img#paynows {
             width: 26%;
         }
-
+   /*     .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
+            padding: 20px;
+        }*/
         .page-item.active .page-link {
             z-index: 3;
             color: #fff;
@@ -47,7 +49,7 @@
                     </div>
 
                     <div class="form-floating">
-                        <select id="InvRefNumber" class="form-select">
+                        <select id="InvHDNumber" class="form-select">
                             @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.invoisenoListdata())
                             {
                                 <option value="@item.Value">@item.Text</option>
@@ -134,7 +136,7 @@
                                         </span>
                                     </th>*@
                                 <th scope="col">
-                                    <span>Invoice Item / Qty</span>
+                                    <span>Qty / Invoice Item </span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
@@ -153,24 +155,24 @@
 
                                     <tr class="font-14">
                                         <td class="veh1-5">@count</td>
-                                        <td class="veh1-5" style="width: 12%;">@i.BuyerMaster.BuyerFullName</td>
-                                        <td class="veh1-5" style="width: 12%;">@i.InvRefNumber</td>
+                                        <td class="veh1-5" style="width: 12%; text-align:left;">@i.BuyerMaster.BuyerFullName</td>
+                                        <td class="veh1-5" style="width: 12%; text-align: right;">@i.InvHDNumber</td>
                                         <td class="veh1-5" style="width: 12%;">@i.InvDate.ToString("dd/MM/yyyy")</td>
-                                        <td class="veh1-5" style="width: 12%;">@i.InvAmount</td>
+                                        <td class="veh1-5" style="width: 12%; text-align: right; ">@string.Format("{0:0.00}",i.InvAmount)</td>
                                         @if (i.customertransaction == null)
                                         {
-                                            <td class="veh1-5" style="width: 12%;">0</td>
-                                            <td class="veh1-5" style="width: 12%;">@i.InvAmount</td>
+                                            <td class="veh1-5" style="width: 12%; text-align: right; ">0</td>
+                                            <td class="veh1-5" style="width: 12%; text-align: right; ">@string.Format("{0:0.00}", i.InvAmount)</td>
                                         }
                                         else if (i.customertransaction != null)
                                         {
-                                            <td class="veh1-5" style="width: 12%;">@(i.customertransaction.InvPaidAmount ?? 0)</td>
-                                            <td class="veh1-5" style="width: 12%;">@(i.customertransaction.InvBalanceAmount ?? 0)</td>
+                                    <td class="veh1-5" style="width: 12%; text-align: right; ">@string.Format("{0:0.00}", i.customertransaction.InvPaidAmount)</td>
+                                    <td class="veh1-5" style="width: 12%; text-align: right; ">@string.Format("{0:0.00}", i.customertransaction.InvBalanceAmount)</td>
                                         }
                                         @*<td class="veh1-5" style="width: 12%;">@i.RefItems</td>*@
-                                        <td class="veh1-5" style="width: 12%;">@i.RefItems / @i.RefQuantity</td>
+                                    <td class="veh1-5" style="width: 12%; ">@string.Format("{0:0.00}", i.RefQuantity) / @i.RefItems</td>
 
-                                        <td id="paynow" onclick="booking('@i.Id')">
+                                        <td id="paynow" onclick="booking('@i.InvHDNumber')">
                                             <div><img src="~/Content/assets/images/payment-method.png" id="paynows" /></div>
                                         </td>
                                         @*<td><button class="btn btn-success" id="paynow" onclick="booking('@i.Id')" title="PayNow">Get Payment</button></td>*@
@@ -194,10 +196,10 @@
                     <div class="font-14 manage_customer_show_I col-xl-6">
                         <span>Showing </span>
                         <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
-                            <option value="5" @(ViewBag.PageSize == 5 ? "selected" : "")>5</option>
-                            <option value="10" @(ViewBag.PageSize == 10 ? "selected" : "")>10</option>
                             <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
-                            <option value="20" @(ViewBag.PageSize == 20 ? "selected" : "")>20</option>
+                            <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
+                            <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
+                            <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
                         </select>
 
 
