@@ -305,7 +305,7 @@ namespace MMS.Repository.Managers
         public IndentCart GetIndentCartById(int? indentnumber)
         {
             IndentCart indentCarts = new IndentCart();
-            indentCarts = indentcartRepository.Table.Where(x => x.IndentCartId == indentnumber).FirstOrDefault();
+            indentCarts = indentcartRepository.Table.Where(x => x.IndentNumber == indentnumber).FirstOrDefault();
             return indentCarts;
         }
 

@@ -1,0 +1,201 @@
+﻿@model MMS.Web.Models.Salesorders
+@using MMS.Repository.Managers
+@using MMS.Core.Entities
+
+@{
+    ViewBag.Title = "DCMaster";
+
+
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+}
+
+
+<script src="~/Content/js/custom.js"></script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script src="~/Content/js/bootstrap.bundle.min.js"></script>
+
+
+<div>
+    @Html.Action("DeliverychallanGrid", "Deliverychallan")
+</div>
+<script>
+    function confirmInvoiceorder() {
+        var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+        var buyerid = $("#BuyerName").val();
+        var totaltax = $("#Total_TaxValue").val();
+        var totaldis = $("#Total_discountval").val();
+        var totalsub = $("#Total_Subtotal").val();
+        var totaldgrand = $("#Total_Grandtotal").val();
+        var Total_Price = $("#Total_Price").val();
+        var formdata = new FormData();
+        formdata.append("buyerid", buyerid);
+        formdata.append("currencyOption", currencyOption);
+        formdata.append("Total_Price", Total_Price);
+        formdata.append("Total_Subtotal", totalsub);
+        formdata.append("Total_TaxValue", totaltax);
+        formdata.append("Total_discountval", totaldis);
+        formdata.append("Total_Grandtotal", totaldgrand);
+
+        var salesOrderData = [];
+        $('#salesOrderTable tr').each(function () {
+            var row = $(this);
+            var orderItem = {
+                SalesorderId_DT: row.find('#SalesorderId_DT').text(),
+                ProductCode: row.find('#productcode').text(),
+                ProductID: row.find('#productid').text(),
+                Quantity: parseInt(row.find('.quantityInput').val()),
+            };
+            salesOrderData.push(orderItem);
+        });
+
+        formdata.append("salesOrderData", JSON.stringify(salesOrderData));
+
+        $.ajax({
+            url: '/InvoiceDetails/Invoice_Post',
+            type: 'POST',
+            contentType: false,
+            processData: false,
+            dataType: 'html',
+            data: formdata,
+            success: function (response) {
+                alert("Invoice raised successfully!");
+                window.location.href = "/deliverychallan/DCMaster";
+
+            }
+        });
+    }
+</script>
+
+<script>
+
+    $(document).ready(function () {
+        $(document).on("click", ".decrementInbtn", function () {
+            var $quantityInput = $(this).siblings('.quantityInput');
+            var quantityValue = parseInt($quantityInput.val(), 10);
+            if (quantityValue > 0) {
+                $quantityInput.val(quantityValue - 1);
+
+                var quantity = (quantityValue - 1);
+                var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+                var buyerid = $("#BuyerName").val();
+                var row = $(this).closest('tr');
+                var ProductID = row.find('#productid').text();
+                var discountval = row.find('#discount').text();
+                var totaltax = $("#Total_TaxValue").val();
+                var totaldis = $("#Total_discountval").val();
+                var totalsub = $("#Total_Subtotal").val();
+                var totaldgrand = $("#Total_Grandtotal").val();
+                var formdata = new FormData();
+                formdata.append("buyerid", buyerid);
+                formdata.append("ProductID", ProductID);
+                formdata.append("discountval", discountval);
+                formdata.append("quantity", quantity);
+                formdata.append("currencyOption", currencyOption);
+
+                formdata.append("Total_Subtotal", totalsub);
+                formdata.append("Total_TaxValue", totaltax);
+                formdata.append("Total_discountval", totaldis);
+                formdata.append("Total_Grandtotal", totaldgrand);
+                $.ajax({
+                    url: '/InvoiceDetails/Dec_Calculation_Indetails',
+                    type: 'POST',
+                    contentType: false,
+                    processData: false,
+                    dataType: 'html',
+                    data: formdata,
+                    success: function (response) {
+                        row.find("#subtotal").text("");
+                        row.find("#TaxValue").text("");
+                        row.find("#totalprice").text("");
+                        row.find("#discountamount").text("");
+                        $("#Total_Subtotal").val("");
+                        $("#Total_discountval").val("");
+                        $("#Total_TaxValue").val("");
+                        $("#Total_Grandtotal").val("");
+                        var data = JSON.parse(response);
+                        row.find("#subtotal").text(data.Subtotal);
+                        row.find("#TaxValue").text(data.TaxValue);
+                        row.find("#totalprice").text(data.Grandtotal);
+                        row.find("#discountamount").text(data.discountvalue);
+
+                        $("#Total_discountval").val(data.Total_discountval);
+                        $("#Total_Subtotal").val(data.Total_Subtotal);
+                        $("#Total_TaxValue").val(data.Total_TaxValue);
+                        $("#Total_Grandtotal").val(data.Total_Grandtotal);
+                    }
+
+                });
+            }
+
+        });
+
+        $(document).on("click", ".incrementINbtn", function () {
+            var $quantityInput = $(this).siblings('.quantityInput');
+            var quantityValue = parseInt($quantityInput.val(), 10);
+
+            var maxQuantity = $(this).closest('td').data('max-quantity');
+            if (quantityValue < maxQuantity) {
+                $quantityInput.val(quantityValue + 1);
+
+                var quantity = (quantityValue + 1);
+                var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+                var buyerid = $("#BuyerName").val();
+                var row = $(this).closest('tr');
+                var ProductID = row.find('#productid').text();
+                var discountperid = row.find('#discount').text();
+                var totaltax = $("#Total_TaxValue").val();
+                var totaldis = $("#Total_discountval").val();
+                var totalsub = $("#Total_Subtotal").val();
+                var totaldgrand = $("#Total_Grandtotal").val();
+                var formdata = new FormData();
+                formdata.append("buyerid", buyerid);
+                formdata.append("ProductID", ProductID);
+                formdata.append("discountval", discountperid);
+                formdata.append("quantity", quantity);
+                formdata.append("currencyOption", currencyOption);
+                formdata.append("Total_Subtotal", totalsub);
+                formdata.append("Total_TaxValue", totaltax);
+                formdata.append("Total_discountval", totaldis);
+                formdata.append("Total_Grandtotal", totaldgrand);
+                $.ajax({
+                    url: '/InvoiceDetails/Inc_Calculation_Indetails',
+                    type: 'POST',
+                    contentType: false,
+                    processData: false,
+                    dataType: 'html',
+                    data: formdata,
+                    success: function (response) {
+                        row.find("#subtotal").text("");
+                        row.find("#TaxValue").text("");
+                        row.find("#totalprice").text("");
+                        row.find("#discountamount").text("");
+                        $("#Total_Subtotal").val("");
+                        $("#Total_discountval").val("");
+                        $("#Total_TaxValue").val("");
+                        $("#Total_Grandtotal").val("");
+                        var data = JSON.parse(response);
+                        row.find("#subtotal").text(data.Subtotal);
+                        row.find("#TaxValue").text(data.TaxValue);
+                        row.find("#totalprice").text(data.Grandtotal);
+                        row.find("#discountamount").text(data.discountvalue);
+                        $("#Total_discountval").val(data.Total_discountval);
+                        $("#Total_Subtotal").val(data.Total_Subtotal);
+                        $("#Total_TaxValue").val(data.Total_TaxValue);
+                        $("#Total_Grandtotal").val(data.Total_Grandtotal);
+                    }
+
+                });
+
+            }
+        });
+
+
+    });
+</script>
+

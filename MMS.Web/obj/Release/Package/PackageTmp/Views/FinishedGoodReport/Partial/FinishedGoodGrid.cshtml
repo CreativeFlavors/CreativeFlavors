@@ -1,4 +1,5 @@
-﻿@model  IEnumerable<MMS.Web.Models.StockModel.ParentBillofMaterial>
+﻿@using MMS.Core.Entities
+@model IEnumerable<MMS.Web.Models.FinishedGoods.FinishedGoodModel>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +12,7 @@
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
     <style>
         .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
-            padding: 10px;
+            padding: 16px;
         }
 
         img#paynows {
@@ -31,14 +32,6 @@
             border: 1px solid transparent;
             font-style: normal;
             font-weight: 500;
-            color: white;
-        }
-
-        .page-item.active .page-link {
-            z-index: 3;
-            color: #fff;
-            background-color: #4472C4;
-            border-color: #0d6efd;
         }
     </style>
 </head>
@@ -48,82 +41,99 @@
         <div id="transaction_report" class="reports common_Manage_subMerchant">
             <div class="d-flex justify-content-between align-items-center manage_customers_head">
                 <div class="manage_customers_main_head">
-                    <h6 class="font-20">Bill Of Material</h6>
+                    <h6 class="font-20">Finished Good Report</h6>
                 </div>
                 <div>
-                    <a href="/BillOfMaterial/BillOfMaterialDetails">
-                        <button type="button" class="manage_customers_btn font-15" id="add">
-                            ADD
-                        </button>
-                    </a>
+
                 </div>
             </div>
 
             <div class="table-responsive reports_table_responsive">
                 <div class="customer_manage_search_container">
-                    <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by BOM No">
+                    <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Product Name">
                 </div>
                 <div class="manage_customers_table_in_responsive" id="form">
 
                     <table class="table table-striped text-center">
                         <thead>
                             <tr class="font-16">
-                                <th scope="col" style="width: 12%;">
+                                <th scope="col">
                                     <span>Si.No</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
                                 </th>
-                                <th scope="col" style="width: 12%;">
-                                    <span>BOM NO</span>
+                                <th scope="col">
+                                    <span>Product Name</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
                                 </th>
-                                <th scope="col" style="width: 12%;">
-                                    <span>Description</span>
+                                <th scope="col">
+                                    <span>pProduct Code</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
                                 </th>
-                                <th scope="col" style="width: 12%;">
-                                    <span>Date</span>
+                                <th scope="col">
+                                    <span>Product type</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
                                 </th>
-
-                                <th scope="col" style="width: 12%;">
-                                    <span>Status</span>
+                                <th scope="col">
+                                    <span>Price</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Costing</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Store</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Quantity</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>UOM</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
                                 </th>
                             </tr>
                         </thead>
-                        @if (Model != null)
+                        @if (Model != null && Model.Count() > 0)
                         {
                             int count = 1;
                             <tbody>
+
                                 @foreach (var i in Model)
                                 {
 
-                                    <tr class="font-14">
-                                        <td class="veh1-5"style="width: 2%;">@count</td>
-                                        <td class="veh1-5" style="width: 2%;text-align:left;">@i.Bomno</td>
-                                        <td class="veh1-5" style="width: 2%; text-align: left;">@i.Description</td>
-                                        <td class="veh1-5" style="width: 2%;">
-                                            @(i.Date.HasValue ? i.Date.Value.ToString("dd/MM/yyyy") : "No Date")
-                                        </td>
-                                        <td class="veh-4" style="width:2%;">
-                                            <span class="table_icons">
-                                                <img src="~/Content/assets/images/edit-icon.png" onclick="Edit('@i.Bomid')" />
-                                            </span>
-                                            <span class="table_icons">
-                                                <img src="~/Content/assets/images/delete-icon.png" onclick="Delete('@i.Bomid')" />
-                                            </span>
-                                        </td>
+                                    <tr>
+                                        <td class="veh-1">@count</td>
+                                        <td class="veh-2" style="width: 12%;text-align:left;">@i.ProductName</td>
+                                        <td class="veh-3" style="width: 12%; text-align: left;">@i.ProductCode</td>
+                                        <td class="veh-5" style="width: 12%; text-align: left;">@i.ProductTypeName</td>
+                                        <td class="veh-4" style="width: 12%; text-align: right;">@i.Price</td>
+                                        <td class="veh-4" style="width: 12%; text-align: center; ">@i.Cost</td>
+                                        <td class="veh-3" style="width: 12%; text-align: left;">@i.StoreName</td>
+                                        <td class="veh-4" style="width: 12%; text-align: right; ">@i.Quantity</td>
+                                        <td class="veh-4" style="width: 12%; text-align: left;">@i.ShortUnitName</td>
                                     </tr>
                                     count++;
                                 }
-
                             </tbody>
 
                         }
@@ -162,7 +172,6 @@
                     </div>
 
                 </div>
-
             </div>
 
         </div>
@@ -178,104 +187,107 @@
     <script>
         $(window).on("load", function () {
             $(".report-inner-section").addClass("transection");
-            $("#BOM").attr('checked', true);
-
+            $("#FinishedGoods").attr('checked', true);
         });
     </script>
-
     <script>
         $(document).ready(function () {
             $("#customer_manage_search").keyup(function () {
-                var bomsearch = $("#customer_manage_search").val();
+                var prosearch = $("#customer_manage_search").val();
 
                 $.ajax({
                     type: 'GET',
-                    url: '/BillOfMaterial/BOMSearch',
-                    data: { filter: bomsearch },
+                    url: '/FinishedGoodReport/ReportSearch',
+                    data: { filter: prosearch },
                     contentType: 'application/json',
                     success: function (values) {
                         $("tbody").empty();
                         var count = 1;
                         $.each(values, function (i, item) {
-                            const formattedDate = convertToReadableDate(item.Date);
                             $("tbody").append(`
-                <tr class="font-14">
-                <td class="veh1-5">${count}</td>
-                <td class="veh1-5" style="width: 12%;">${item.Bomno}</td>
-                <td class="veh1-5" style="width: 12%;">${item.Description}</td>
-                <td class="veh1-5" style="width: 12%;">${formattedDate}</td>
-                <td class="veh-4" style="width:12%;">
-                <span class="table_icons">
-                    <img src="/Content/assets/images/edit-icon.png" onclick="Edit('${item.Bomid}')" />
-                </span>
-                <span class="table_icons">
-                    <img src="/Content/assets/images/delete-icon.png" onclick="Delete('${item.Bomid}')" />
-                   </span>
-                </td>
-                </tr>
-                 `);
+                         <tr class="font-14">
+         <td class="veh1-5">${count}</td>
+         <td class="veh1-5" style="width: 12%;">${item.ProductName}</td>
+         <td class="veh1-5" style="width: 12%;">${item.ProductCode}</td>
+         <td class="veh1-5" style="width: 12%;">${item.ProductTypeName}</td>
+         <td class="veh1-5" style="width: 12%;">${item.Price}</td>
+         <td class="veh1-5" style="width: 12%;">${item.Cost}</td>
+         <td class="veh1-5" style="width: 12%;">${item.StoreName}</td>
+         <td class="veh1-5" style="width: 12%;">${item.Quantity}</td>
+         <td class="veh1-5" style="width: 12%;">${item.ShortUnitName}</td>
+                        </tr>
+                         `);
                             count++;
                         });
                     }
                 });
             });
-            function convertToReadableDate(dateString) {
-                const match = dateString.match(/\d+/);
-                if (match) {
-                    const timestamp = parseInt(match[0], 10);
-                    const date = new Date(timestamp);
-                    const day = date.getDate().toString().padStart(2, '0');
-                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                    const year = date.getFullYear();
-                    return `${day}/${month}/${year}`;
-                }
-                return "Invalid Date";
-            }
+        });
+    </script>
+    <script>
+  $(document).ready(function() {
     $('#manage_customer_show_no').change(function() {
-        var pageSize = parseInt($(this).val());
-        window.location.href = "@Url.Action("BOMMaterialListGrid", "BillOfMaterial")?pageSize=" + pageSize;
+        var PageSize = parseInt($(this).val());
+        $.ajax({
+            url: '/FinishedGoodReport/FinishedGoodMaster',
+            type: "GET",
+            dataType: "JSON",
+            data: { pageSize: PageSize },
+            success: function (values) {
+                $("#summery").html(values).show();
+            }
+        });
     });
-
-    $('#previousPage').click(function(e) {
-        e.preventDefault();
+      $(".page-link").click(function(){
+            var page = $(this).data("page");
+            $.ajax({
+                url: "@Url.Action("salesorderheader", "FinishedGoodMaster")",
+                type: "GET",
+                data: { page: page },
+                success: function(data){
+                    $("#summery").html(data).show();
+                }
+            });
+        });
+    $('#previousPage').click(function() {
         var currentPage = parseInt('@ViewBag.CurrentPage');
         if (currentPage > 1) {
             var previousPage = currentPage - 1;
-            window.location.href = "@Url.Action("BOMMaterialListGrid", "BillOfMaterial")?page=" + previousPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+            $.ajax({
+                url: '/FinishedGoodReport/FinishedGoodMaster',
+                type: "GET",
+                dataType: "JSON",
+                data: { page: previousPage, pageSize:parseInt('@ViewBag.PageSize') },
+                success: function (values) {
+                    $("#summery").html(values).show();
+                }
+            });
         }
     });
 
-    $('#nextPage').click(function(e) {
-        e.preventDefault();
+    $('#nextPage').click(function() {
         var currentPage = parseInt('@ViewBag.CurrentPage');
         var totalPages = parseInt('@ViewBag.TotalPages');
         if (currentPage < totalPages) {
             var nextPage = currentPage + 1;
-            window.location.href = "@Url.Action("BOMMaterialListGrid", "BillOfMaterial")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+             $.ajax({
+                 url: '/FinishedGoodReport/FinishedGoodMaster   ',
+                  type: "GET",
+                  dataType: "JSON",
+                   data: { page: nextPage, pageSize:parseInt('@ViewBag.PageSize') },
+                  success: function (values) {
+                       $("#summery").html(values).show();
+                  }
+             });
+
         }
     });
+
 });
 
-
-    </script>
-    <script>
-        function Edit(arg) {
-            window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + arg;
-        }
-        function Delete(arg) {
-       $.ajax({
-           type: "DELETE",
-           url: ' @Url.Action("BOMGridDelete", "BillOfMaterial")',
-           data: { BomId: arg },
-           success: function (values) {
-               if (values === "Success") {
-                   alert("Deleted Successfully.");
-                   location.href = "/BillOfMaterial/BOMMaterialListGrid";
-               }
-           }
-       });
-   }
     </script>
 
 </body>
 </html>
+
+
