@@ -112,11 +112,9 @@ namespace MMS.Repository.Managers
                     indentPoMapping.CreatedDate = arg.CreatedDate;
                     indentPoMapping.UpdatedDate = DateTime.Now;
                     //model.CreatedBy = "";
-                    string username = HttpContext.Current.Session["UserName"]?.ToString();
-                    if (username != null)
-                    {
-                        indentPoMapping.UpdatedBy = username;
-                    }
+                    string username = "admin";
+                    arg.UpdatedBy = username;
+                    indentPoMapping.UpdatedBy = arg.UpdatedBy;
                     //model.UpdatedBy = username;
                     indentpomappingRepository.Update(indentPoMapping);
                     result = true;

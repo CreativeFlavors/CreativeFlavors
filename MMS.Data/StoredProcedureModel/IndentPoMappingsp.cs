@@ -50,5 +50,14 @@ namespace MMS.Data.StoredProcedureModel
 
         [Column("ponumber")]
         public int PoNumber { get; set; }
+
+        [Column("taxpercentage")]
+        public decimal? TaxPercentage { get; set; }
+
+        [Column("productid")]
+        public int ProductId { get; set; }
+
+        [Column("discountpercentage")]
+        public decimal? DiscountPercentage { get; set; }
     }
 }

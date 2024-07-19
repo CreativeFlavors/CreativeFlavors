@@ -72,13 +72,13 @@ namespace MMS.Web.Controllers
                 product product = new product();
                 product = productManager.GetId(model.ProductId);
                 IndentNewMaterialManager indentNewMaterialManager = new IndentNewMaterialManager();
-                Indentdetail indentdetail = indentNewMaterialManager.GetIndentDetailById(model.IndentNumber);
+                IndentCart indentcart = indentNewMaterialManager.GetIndentCartById(model.IndentNumber);
                 if (model.IndentPoMapId == 0)
                 {
                     indentPoMapping.IndentPoMapId = model.IndentPoMapId;
                     indentPoMapping.SupplierId = model.SupplierId;
                     indentPoMapping.ProductId = model.ProductId;
-                    indentPoMapping.IndentId = model.IndentNumber;
+                    indentPoMapping.IndentId = indentcart.IndentCartId;
                     indentPoMapping.IndentProductId = model.ProductId;
                     indentPoMapping.StoreCode = product.StoreId;
                     indentPoMapping.UnitPrice = model.UnitPrice;
@@ -106,7 +106,7 @@ namespace MMS.Web.Controllers
                     indentPoMapping.IndentPoMapId = model.IndentPoMapId;
                     indentPoMapping.SupplierId = model.SupplierId;
                     indentPoMapping.ProductId = model.ProductId;
-                    indentPoMapping.IndentId = model.IndentNumber;
+                    indentPoMapping.IndentId = indentcart.IndentCartId;
                     indentPoMapping.IndentProductId = model.ProductId;
                     indentPoMapping.StoreCode = product.StoreId;
                     indentPoMapping.UnitPrice = model.UnitPrice;
@@ -160,7 +160,6 @@ namespace MMS.Web.Controllers
             var status = "";
             PoManager poManager = new PoManager();
             var productlist = poManager.GetIndentpomapList(model.PoNumber);
-            //IndentCart indentCart = indentNewMaterialManager.Getindentcard(model.IndentCartId);
             var count = productlist.Count;
             if (count <= 0)
             {
@@ -179,9 +178,6 @@ namespace MMS.Web.Controllers
                 poHeader.TotalTotalValue = model.Total_TotalValue;
                 poHeader.TotalPrice = model.Total_Price;
                 poHeader.PoNumber = model.PoNumber;
-                //poHeader.Quantity = model.IndentQty;
-                //poHeader.Quantity = model.IndentQty;
-                //poHeader.Quantity = model.IndentQty;
                 poManager.PostPoHeader(poHeader);
 
                 foreach (var i in productlist)
@@ -204,16 +200,7 @@ namespace MMS.Web.Controllers
                     poDetail.TaxInclusive = i.TaxInclusive;
                     poDetail.PoNumber = i.PoNumber;
                     poDetail.IndentNumber = i.IndentNumber;
-                    //poDetail.DiscountPercentage = i.DiscountPercentage;
-                    //poDetail.DiscountPercentage = i.DiscountPercentage;
-                    //poDetail.DiscountPercentage = i.DiscountPercentage;
-                    //poDetail.DiscountPercentage = i.DiscountPercentage;
-                    //poDetail.DiscountPercentage = i.DiscountPercentage;
-
-
                     poManager.PostPoDetail(poDetail);
-                    //indentNewMaterialManager.UpdateTempIndent(i.MaterialNameId, i.IndentRequiredQty);
-
                 }
                 status = "Inserted";
                 return Json(new { Success = true, message = status }, JsonRequestBehavior.AllowGet);
@@ -227,30 +214,6 @@ namespace MMS.Web.Controllers
             PoModel model = new PoModel();
             var data = poManager.GetIndentPoMapid(indentpomapid);
             var data1 = poManager.GetindentPoMappingId(indentpomapid);
-            //if (data1 != null || data!=null)
-            //{
-            //    return Json(new
-            //    {
-            //        success = true,
-            //        SupplierId = data.SupplierId,
-            //        PoDate = data.PoDate,
-            //        PoNumber = data.PoNumber,
-            //        IndentNumber = data.IndentNumber,
-            //        ProductName = data1.ProductName,
-            //        StoreName = data1.StoreName,
-            //        UomName = data1.UomName, 
-            //        UnitPrice = data1.UnitPrice,
-            //        IndentQty = data1.IndentQty,
-            //        DiscountPercentage = data.DiscountPercentage,
-            //        DiscountValue = data1.DiscountValue,
-            //        SubtotalValue = data1.SubtotalValue,
-            //        TaxPercentage = data.TaxPercentage,
-            //        TaxValue = data1.TaxValue,
-            //        TotalValue = data1.TotalValue
-            //    }, JsonRequestBehavior.AllowGet);
-            //}
-
-            //return Json(new { success = false }, JsonRequestBehavior.AllowGet);
             model.IndentPoMapId = data.IndentPoMapId;
             model.PoDate = data.PoDate;
             model.PoNumber = data.PoNumber;
@@ -268,23 +231,20 @@ namespace MMS.Web.Controllers
             model.DiscountValue = data.DiscountValue;
             model.Subtotal = data.Subtotal;
             model.TotalValue = data.TotalValue;
-            model.DataList = poManager.GetindentPoMappingForTableData(indentpomapid);
+            model.DataListsp = poManager.GetindentPoMappingId(indentpomapid);
 
             // Serialize DataList to JSON
-            ViewBag.DataListJson = Newtonsoft.Json.JsonConvert.SerializeObject(model.DataList);
-            return View("~/Views/Po/PoDetails.cshtml", model);
+            ViewBag.DataListJson = Newtonsoft.Json.JsonConvert.SerializeObject(model.DataListsp);
+            return View("~/Views/PurchaseOrder/PoDetails.cshtml", model);
         }
 
         [HttpGet]
         public ActionResult GetIndentNoDetails(int indentheaderid)
         {
             IndentNewMaterialManager indentNewMaterialManager = new IndentNewMaterialManager();
-            //IndentCart indentCart = indentNewMaterialManager.GetIndentCartById(indentnumber);
             List<IndentMaterialModel> indentDetails = new List<IndentMaterialModel>();
             List<Indentdetail> indentdetail = indentNewMaterialManager.GetIndentdetailsList(indentheaderid);
 
-            //if (indentCart != null)
-            //{
             foreach (var detail in indentdetail)
             {
                 ProductManager productManager = new ProductManager();
@@ -307,65 +267,10 @@ namespace MMS.Web.Controllers
                 };
                 indentDetails.Add(Model);
             }
-            //decimal? indentqty = indentCart.IndentRequiredQty;
-
-            //ProductManager productManager = new ProductManager();
-            //product product = productManager.GetId((int)indentCart.MaterialNameId);
-
-            //int productid = 0;
-            //string productname = null;
-            //decimal? unitprice = 0;
-            //string tax = null;
-            //string store = null;
-            //string uom = null;
-
-            //if (product != null)
-            //{
-            //    productid = product.ProductId;
-            //    productname = product.ProductName;
-            //    unitprice = product.Price;
-
-            //    UOMManager uOMManager = new UOMManager();
-            //    UomMaster uomname = uOMManager.GetUomMasterId(product.UomMasterId);
-            //    if (uomname != null)
-            //    {
-            //        uom = uomname.ShortUnitName;
-            //    }
-
-            //    TaxTypeManager taxTypeManager = new TaxTypeManager();
-            //    TaxTypeMaster taxTypeMaster = taxTypeManager.GetTaxMasterId(product.TaxMasterId);
-            //    if (taxTypeMaster != null)
-            //    {
-            //        tax = taxTypeMaster.TaxValue;
-            //    }
-
-            //    StoreMasterManager storeMasterManager = new StoreMasterManager();
-            //    StoreMaster storeMaster = storeMasterManager.GetStoreMasterId(product.StoreId);
-            //    if (storeMaster != null)
-            //    {
-            //        store = storeMaster.StoreName;
-            //    }
-            //    }
-            //}
-
-            //return Json(new
-            //{
-            //    ProductId = productid,
-            //    ProductName = productname,
-            //    StoreCode = store,
-            //    Uom = uom,
-            //    UnitPrice = unitprice,
-            //    IndentQty = indentqty,
-            //    Tax = tax,
-            //}, JsonRequestBehavior.AllowGet);
             return Json(indentDetails, JsonRequestBehavior.AllowGet);
-
-
         }
 
-        //    return Json(null);
-        //}
-
+        [HttpPost]
         public ActionResult PoDelete(int indentpomapid)
         {
             IndentPoMapping indentpomapping = new IndentPoMapping();

@@ -1,4 +1,4 @@
-﻿@model MMS.Repository.ViewModel.ProductionViewModel
+﻿﻿@model MMS.Data.StoredProcedureModel.IndentPoMappingsp
 @using MMS.Repository.Managers
 
 <!DOCTYPE html>
@@ -53,19 +53,19 @@
         <div class="manage_customers">
             <div class="d-flex justify-content-between align-items-center manage_customers_head">
                 <div class="manage_customers_main_head">
-                    <h6 class="font-20">Production List</h6>
+                    <h6 class="font-20">PurchaseOrder List</h6>
                 </div>
                 <div>
-                    <a href="/Production/ProductionDetails">
-                        <button class="btn btn-success" id="Addproduction" title="Add Production">
-                            ADD Production
+                    <a href="/Po/PoDetails">
+                        <button class="btn btn-success" id="AddPo" title="Po">
+                            ADD Po
                         </button>
                     </a>
                 </div>
             </div>
             <div class="table-responsive manage_customers_table_responsive">
                 <div class="customer_manage_search_containers" style="width:40%;">
-                    <input type="text" placeholder="Search by Product Name" id="SeaarchID" name="search2">
+                    <input type="text" placeholder="Search by Supplier Name" id="SearchID" name="search2">
                     <button class="buttonone" onclick="Search()" title="Filter" type="submit"><i class="fa fa-search"></i></button>
 
                 </div>
@@ -86,25 +86,31 @@
                                     </span>
                                 </th>
                                 <th scope="col">
-                                    <span>Batch Code</span>
+                                    <span>Store Name</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
                                 </th>
                                 <th scope="col">
-                                    <span>Production Qty</span>
+                                    <span>Uom</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
                                 </th>
                                 <th scope="col">
-                                    <span>Required Qty</span>
+                                    <span>Supplier Name</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
                                 </th>
                                 <th scope="col">
-                                    <span>Production Type</span>
+                                    <span>Price</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Po Number</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
@@ -112,34 +118,34 @@
                                 <th scope="col"><span>STATUS</span></th>
                             </tr>
                         </thead>
-                        @if (ViewBag.Productions != null)
+                        @if (ViewBag.Productslist != null)
                         {
                             <tbody>
                                 @{
                                     int currentPage = ViewBag.CurrentPage ?? 1;
-                                    int pageSize = ViewBag.PageSize ?? 8;
-                                    int totalItems = ViewBag.Productions.Count;
+                                    int pageSize = ViewBag.PageSize ?? 9;
+                                    int totalItems = ViewBag.Productslist.Count;
                                     int startSerialNumber = (currentPage - 1) * pageSize + 1;
                                 }
-                                @foreach (var item in ViewBag.Productions)
+
+                                @foreach (var item in ViewBag.Productslist)
                                 {
+
                                     <tr class="font-14">
                                         <td>@startSerialNumber</td>
                                         <td>@item.ProductName</td>
-                                        <td>@item.ProductionCode</td>
-                                        <td>@item.ProductionQty</td>
-                                        <td>@item.RequiredQty</td>
-                                        <td>@item.ProductionType</td>
+                                        <td>@item.StoreName</td>
+                                        <td>@item.UomName</td>
+                                        <td>@item.SupplierName</td>
+                                        <td>@item.UnitPrice</td>
+                                        <td>@item.PoNumber</td>
                                         <td class="veh-1 edit-del-wrap">
-                                            @if (@item.ProductionType == "Production")
-                                            {
-                                                <a href="javascript:void(0)" onclick="Edit('@item.ProductionId', true)" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
-                                            }
-                                            else if (@item.ProductionType == "Subassembly")
-                                            {
-                                                <a href="javascript:void(0)" onclick="Edit('@item.ProductionId', false)" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
-                                            }
+                                            <a href="javascript:void(0)" onclick="Edit('@item.IndentPoMapId')" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
+                                            <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.IndentPoMapId')" class="watchlist-delete" title="Delete"><img src="~/Content/assets/images/delete-icon.png" /></a>
+                                            @*<td><button class="btn btn-success" id="paynow" onclick="paynow('@item.Id')" title="PayNow">Pay Now</button></td>*@
                                         </td>
+
+
                                     </tr>
                                     startSerialNumber++;
                                 }
@@ -170,7 +176,7 @@
                                 @for (int i = 1; i <= ViewBag.TotalPages; i++)
                                 {
                                     <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                        <a href="@Url.Action("ProductionGrid", "Production", new { page = i })" class="page-link">@i</a>
+                                        <a href="@Url.Action("PoMaster", "Po", new { page = i })" class="page-link">@i</a>
                                     </li>
                                 }
                                 <li class="page-item">
@@ -203,7 +209,7 @@
   $(document).ready(function() {
     $('#manage_customer_show_no').change(function() {
         var pageSize = parseInt($(this).val());
-        window.location.href = "@Url.Action("ProductionGrid", "Production")?pageSize=" + pageSize;
+        window.location.href = "@Url.Action("PoMaster", "Po")?pageSize=" + pageSize;
     });
 
     $('#previousPage').click(function(e) {
@@ -211,7 +217,7 @@
         var currentPage = parseInt('@ViewBag.CurrentPage');
         if (currentPage > 1) {
             var previousPage = currentPage - 1;
-            window.location.href = "@Url.Action("ProductionGrid", "Production")?page=" + previousPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+            window.location.href = "@Url.Action("PoMaster", "Po")?page=" + previousPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
         }
     });
 
@@ -221,36 +227,41 @@
         var totalPages = parseInt('@ViewBag.TotalPages');
         if (currentPage < totalPages) {
             var nextPage = currentPage + 1;
-            window.location.href = "@Url.Action("ProductionGrid", "Production")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+            window.location.href = "@Url.Action("PoMaster", "Po")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
         }
     });
 });
     </script>
-
     <script>
         function Search() {
             $.ajax({
                 type: "GET",
-                url: '/Production/ProductionSearch',
-                data: { filter: $('#SeaarchID').val() },
+                url: '/Po/PoSearch',
+                data: { filter: $('#SearchID').val() },
                 dataType: 'json',
                 success: function (data) {
                     $("tbody").empty();
                     var count = 1;
                     $.each(data, function (i, item) {
                         $("tbody").append(`
-                         <tr class="font-14">
-                             <td>${count}</td>
-                             <td>${item.product.ProductName}</td>
-                             <td>${item.ProductionCode}</td>
-                             <td>${item.ProductionQty}</td>
-                             <td class="veh-1 edit-del-wrap">
-                                 <a href="javascript:void(0)" onclick="Edit('${item.ProductionId}')" class="watchlist-edit" title="Edit">
-                                 <img src="/Content/assets/images/edit-icon.png" />
-                                 </a>
-                             </td>
-                         </tr>
-                     `);
+                            <tr class="font-14">
+                                <td>${count}</td>
+                                <td>${item.ProductName}</td>
+                                <td>${item.StoreName}</td>
+                                <td>${item.UomName}</td>
+                                <td>${item.SupplierName}</td>
+                                <td>${item.UnitPrice}</td>
+                                <td>${item.PoNumber}</td>
+                                <td class="veh-1 edit-del-wrap">
+                                 <a href="javascript:void(0)" onclick="Edit('${item.IndentPoMapId}')" class="watchlist-edit" title="Edit">
+                                 <img src="/Content/assets/images/edit-icon.png" /></a>
+
+                                    <a href="javascript:void(0)" onclick="Delete('${item.IndentPoMapId}')" class="watchlist-delete" title="Delete">
+                                        <img src="/Content/assets/images/delete-icon.png" />
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
                         count++;
                     });
                 },
@@ -260,14 +271,41 @@
             });
         }
 
-        function Edit(productionId, isProduction) {
-            if (isProduction) {
-                window.location.href = "/Production/ProductionEdit?productionId=" + productionId;
-            } else {
-                window.location.href = "/Production/ProductionSubassemblyEdit?productionId=" + productionId;
+        function Delete(arg) {
+            var answer = confirm("Are you sure want to delete?");
+            if (answer) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/Po/PoDelete',
+                    data: { IndentPoMapId: arg },
+                    success: function (data) {
+                        if (data == "Success") {
+                            alert('PO Deleted Successfully.');
+                            location.reload();
+                            return false;
+                        }
+                        else {
+                            alert('PO deletion failed.');
+                        }
+
+                    },
+                    error: function (ex) {
+                        alert('This PO Already Exist in the database.');
+                    }
+                });
+            }
+            else {
+                return false;
             }
         }
+
+        function Edit(indentpomapid) {
+
+            window.location.href = "/Po/PoIndentEdit?indentpomapid=" + indentpomapid;
+
+        }
     </script>
+
 
 </body>
 </html>
