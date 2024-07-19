@@ -28,11 +28,11 @@ namespace MMS.Repository.Managers
         {
             throw new NotImplementedException();
         }
-        public decimal Getcurrencyconversion(string p_primarycurrency, string p_secondarycurrency, string todaydate)
+        public currencycunversion Getcurrencyconversion(string p_primarycurrency, string p_secondarycurrency, string todaydate)
         {
-            decimal val = 0;
-            val = salesorderrep.Getcurrencyconversion(p_primarycurrency, p_secondarycurrency, todaydate);
-            return val;
+            currencycunversion currencycunversion = new currencycunversion();
+            currencycunversion = salesorderrep.Getcurrencyconversion(p_primarycurrency, p_secondarycurrency, todaydate);
+            return currencycunversion;
         }
         public List<MRP_Details> GetmrpList()
         {

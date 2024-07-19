@@ -289,6 +289,12 @@ namespace MMS.Data
             var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.FineshedgoodsReport>("SELECT * FROM Fineshedgoods_report()").ToList();
             return ResultList;
         }
+         public List<MMS.Data.StoredProcedureModel.GRNCarlist> GRNCartlist(int poheader)
+        {
+            var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.GRNCarlist>("SELECT * FROM get_grn_cart(@p0)", poheader).ToList();
+            return ResultList;
+        }
+
         public MMS.Data.StoredProcedureModel.Salesorder_Grid salesorder_gridSearch(int SOid)
         {
             try
@@ -350,7 +356,20 @@ namespace MMS.Data
             {
                 throw;
             }
+        }     
+        public List<MMS.Data.StoredProcedureModel.PODetails> GetPODetailsList()
+        {
+            try
+            {
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.PODetails>("SELECT * FROM PODetails()").ToList();
+                return ResultList;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
+
         public List<MMS.Data.StoredProcedureModel.mrp_material_list> mrpMaterialList1(int? productid)
         {
             try
@@ -887,10 +906,9 @@ namespace MMS.Data
             var ResultList = context.Database.SqlQuery<MMS.Core.Entities.order_header>("SELECT * FROM get_orderheader_data_by_filter(@p0,@p1,@p2,@p3,@p4,@p5)", buerid, Process, OrderEntryId, orderheaderid, from_date, to_date).ToList();
             return ResultList;
         }
-        public decimal Getcurrencyconversion(string p_primarycurrency, string p_secondarycurrency, string todaydate)
+        public MMS.Data.StoredProcedureModel.currencycunversion Getcurrencyconversion(string p_primarycurrency, string p_secondarycurrency, string todaydate)
         {
-            decimal val = 0;
-            val = context.Database.SqlQuery<decimal>("SELECT * FROM get_currency_conversion(@p0,@p1,@p2)", p_primarycurrency, p_secondarycurrency, todaydate).SingleOrDefault();
+            var val = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.currencycunversion>("SELECT * FROM get_currency_conversion(@p0,@p1,@p2)", p_primarycurrency, p_secondarycurrency, todaydate).FirstOrDefault();
             return val;
         }
         public MMS.Core.Entities.Stock.OrderEntry BuyerOrderstyleList()

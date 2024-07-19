@@ -2,6 +2,7 @@
 using MMS.Core.Entities;
 using MMS.Data;
 using MMS.Data.Context;
+using MMS.Data.Mapping;
 using MMS.Data.StoredProcedureModel;
 using MMS.Repository.Service;
 using System;
@@ -35,7 +36,25 @@ namespace MMS.Repository.Managers
                 context.Dispose();
             }
         }
-
+        public List<PoHeader> GetPOId(int id)
+        {
+            List<PoHeader> PoHeader = new List<PoHeader>();
+            PoHeader = poheaderRepository.Table.Where(x => x.SupplierId == id).ToList();
+            return PoHeader;
+        }
+        public List<PODetails> GetPODetails()
+        {
+            List<PODetails> PoDetail = new List<PODetails>();
+            try
+            {
+                PoDetail = podetailRepository.GetPODetailsList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return PoDetail;
+        }
         public bool PostIndentPoMapping(IndentPoMapping arg)
         {
             bool result = false;
@@ -171,6 +190,19 @@ namespace MMS.Repository.Managers
             }
 
             return result;
+        }
+        public List<PoHeader> Get()
+        {
+            List<PoHeader> obj = new List<PoHeader>();
+            obj = poheaderRepository.Table.ToList<PoHeader>();
+            return obj;
+          
+        }
+        public List<PoDetail> Getdetails()
+        {
+            List<PoDetail> obj = new List<PoDetail>();
+            obj = podetailRepository.Table.ToList<PoDetail>();
+            return obj;
         }
         public IndentPoMapping GetIndentPoMapid(int indentpomapid)
         {

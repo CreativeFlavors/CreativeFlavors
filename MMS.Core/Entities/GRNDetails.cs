@@ -1,42 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MMS.Core.Entities
 {
-    [Table("grnheader", Schema = "public")]
-    public class GRNHeader :BaseEntity
+    [Table("grndetails", Schema = "public")]
+    public class GRNDetails :BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("grndetailid")]
+        public int GrnDetailId { get; set; }
         [Column("grnheaderid")]
         public int GrnHeaderId { get; set; }
         [Column("supplierid")]
         public int SupplierId { get; set; }
-        [Column("grndate")]
-        public DateTime GrnDate { get; set; }
-        [Column("refinvoicenumber")]
-        public string RefInvoiceNumber { get; set; }
-        [Column("refinvoicedate")]
-        public DateTime? RefInvoiceDate { get; set; }
-        [Column("ponumber")]
-        public int PoNumber { get; set; } 
-        [Column("currencyid")]
-        public int currencyid { get; set; }
-        [Column("podate")]
-        public DateTime? PoDate { get; set; }
-        [Column("storecode")]
-        public int StoreCode { get; set; }
-        [Column("items")]
-        public int Items { get; set; }
+        [Column("productid")]
+        public int productid { get; set; }
+        [Column("podetailid")]
+        public int? PoDetailId { get; set; }
+        [Column("poquantity")]
+        public decimal? PoQuantity { get; set; }  
+        [Column("Pounitprice")]
+        public decimal? Pounitprice { get; set; }
+        [Column("unitprice")]
+        public decimal? UnitPrice { get; set; }
         [Column("quantity")]
         public decimal? Quantity { get; set; }
-        [Column("total_unitprice")]
-        public decimal? total_unitprice { get; set; }
         [Column("discountvalue")]
         public decimal? DiscountValue { get; set; }
         [Column("subtotalvalue")]
@@ -45,9 +39,17 @@ namespace MMS.Core.Entities
         public decimal? TaxValue { get; set; }
         [Column("totalvalue")]
         public decimal? TotalValue { get; set; }
-        [Column("Isfulfilled")]
-        public DateTime? IsFulfilled { get; set; }
-        [Column("Status")]
+        [Column("expirydate")]
+        public DateTime? ExpiryDate { get; set; }
+        [Column("batchcode")]
+        public string BatchCode { get; set; }
+        [Column("storecode")]
+        public int StoreCode { get; set; }
+        [Column("weight")]
+        public decimal? Weight { get; set; }
+        [Column("isfulfilled")]
+        public DateTime IsFulfilled { get; set; }
+        [Column("status")]
         public string Status { get; set; }
         [Column("shipmentdetails")]
         public string ShipmentDetails { get; set; }
@@ -69,5 +71,12 @@ namespace MMS.Core.Entities
         public string CreatedBy { get; set; }
         [Column("updatedby")]
         public string UpdatedBy { get; set; }
+        [Column("currencyid")]
+        public int currencyid { get; set; }
+        [Column("currencyconid")]
+        public int currencyconid { get; set; }
+        [Column("for_currencyconid")]
+        public int? for_currencyconid { get; set; }
+
     }
 }

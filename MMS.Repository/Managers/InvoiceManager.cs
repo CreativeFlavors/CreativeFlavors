@@ -13,6 +13,7 @@ using MMS.Data.Mapping;
 using MMS.Repository.Service;
 using System.Runtime.Remoting.Contexts;
 using System.Diagnostics;
+using MMS.Data.StoredProcedureModel;
 
 namespace MMS.Repository.Managers
 {
@@ -168,11 +169,11 @@ namespace MMS.Repository.Managers
             }
             return oorderheader;
         }
-        public decimal Getcurrencyconversion(string p_primarycurrency, string p_secondarycurrency,  string todaydate)
+        public currencycunversion Getcurrencyconversion(string p_primarycurrency, string p_secondarycurrency, string todaydate)
         {
-            decimal val = 0;
-            val = order_headerRepository.Getcurrencyconversion(p_primarycurrency, p_secondarycurrency, todaydate);
-            return val;
+            currencycunversion currencycunversion = new currencycunversion();
+            currencycunversion = order_headerRepository.Getcurrencyconversion(p_primarycurrency, p_secondarycurrency, todaydate);
+            return currencycunversion;
         }
         public List<order_header> GetOrderheaderListEntryId(int buerid, int Process, int OrderEntryId, int orderheaderid, DateTime? from_date, DateTime? to_date)
         {
