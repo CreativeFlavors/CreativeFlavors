@@ -29,7 +29,6 @@ namespace MMS.Web.Controllers.Stock
         {
             return View();
         }
-
         public ActionResult Indent()
         {
             return View("~/Views/Stock/Indent/Indent.cshtml");

@@ -337,20 +337,27 @@ namespace MMS.Web.Controllers
             TaxTypeManager taxTypeManager = new TaxTypeManager();
             Salesorders salesorders = new Salesorders();
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
+            decimal? conversionval = 0;
+            int id = 0;
             if (model.currencyOption.ToUpper() != "ZAR")
             {
-                model.ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "USD", dateOnly);
+                var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
+                conversionval = ConversionValue.conversionvalue;
+                id = ConversionValue.id;
             }
             else
             {
-                model.ConversionValue = 1;
+                var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
+                conversionval = ConversionValue.conversionvalue;
+                id = ConversionValue.id;
             }
+
             var product = productManager.GetId(model.ProductID);
             var tax = taxTypeManager.GetTaxMasterId(product.TaxMasterId);
             var taxper = tax.TaxValue;
             var qty = model.quantity;
             var discount = model.discountperid;
-            var unitprice = product.Price * model.ConversionValue;
+            var unitprice = product.Price * conversionval;
             int intVal = int.Parse(taxper);
 
             if ((model.quantity != null) && (discount != null))
@@ -422,14 +429,21 @@ namespace MMS.Web.Controllers
             BuyerManager buyerManager = new BuyerManager();
 
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
+            decimal? conversionval = 0;
+            int id = 0;
             if (model.currencyOption.ToUpper() != "ZAR")
             {
-                model.ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "USD", dateOnly);
+                var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
+                conversionval = ConversionValue.conversionvalue;
+                id = ConversionValue.id;
             }
             else
             {
-                model.ConversionValue = 1;
+                var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
+                conversionval = ConversionValue.conversionvalue;
+                id = ConversionValue.id;
             }
+
             var product = productManager.GetId(model.ProductID);
             var tax = taxTypeManager.GetTaxMasterId(product.TaxMasterId);
             var addreddcode = buyerManager.GetBuyerMasterId(model.buyerid);
@@ -449,7 +463,7 @@ namespace MMS.Web.Controllers
             salesorder.custaddcode = addreddcode.BuyerCode;
             salesorder.custbillcode = addreddcode.BuyerAddress1;
             salesorder.custshipcode = addreddcode.BuyerAddress2;
-            var unitprice = product.Price * model.ConversionValue;
+            var unitprice = product.Price * conversionval;
             salesorder.taxinclusive = true;
             salesorder.isactive = true;
             var taxper = tax.TaxValue;

@@ -1764,6 +1764,23 @@ namespace MMS.Web.ExtensionMethod
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
         }
+        public static SelectList PONo()
+        {
+            PoManager Manager = new PoManager();
+            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.PoheaderId).Select(
+                                                  item => new System.Web.Mvc.SelectListItem()
+                                                  {
+                                                      Text = item.PoheaderId.ToString(),
+                                                      Value = item.PoheaderId.ToString()
+                                                  }).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Select PONo"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }
         public static SelectList ProductName()
         {
             ProductManager Manager = new ProductManager();
