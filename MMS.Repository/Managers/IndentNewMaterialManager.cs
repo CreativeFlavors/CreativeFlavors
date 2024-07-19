@@ -309,6 +309,18 @@ namespace MMS.Repository.Managers
             return indentCarts;
         }
 
+        public IndentCart GetProductId(int? productId)
+        {
+            IndentCart indentCarts = new IndentCart();
+            indentCarts = indentcartRepository.Table.Where(x => x.MaterialNameId == productId).FirstOrDefault();
+            return indentCarts;
+        }
+        public List<Indentdetail> GetProductsId(int? productId)
+        {
+            List<Indentdetail> indentCarts = new List<Indentdetail>();
+            indentCarts = indentdetailRepository.Table.Where(x => x.MaterialId == productId).ToList();
+            return indentCarts;
+        }
         public Indentdetail GetIndentDetailById(int? indentnumber)
         {
             Indentdetail indentdetail = new Indentdetail();

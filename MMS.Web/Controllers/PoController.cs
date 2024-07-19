@@ -235,7 +235,7 @@ namespace MMS.Web.Controllers
 
             // Serialize DataList to JSON
             ViewBag.DataListJson = Newtonsoft.Json.JsonConvert.SerializeObject(model.DataListsp);
-            return View("~/Views/PurchaseOrder/PoDetails.cshtml", model);
+            return View("~/Views/Po/PoDetails.cshtml", model);
         }
 
         [HttpGet]
@@ -268,6 +268,86 @@ namespace MMS.Web.Controllers
                 indentDetails.Add(Model);
             }
             return Json(indentDetails, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public ActionResult GetProductDetails(int? productId)
+        {
+            IndentNewMaterialManager indentNewMaterialManager = new IndentNewMaterialManager();
+            List<IndentMaterialModel> indentDetails = new List<IndentMaterialModel>();
+            //List<Product> indentDetails = new List<Product>();
+            //List<Indentdetail> indentdetail = indentNewMaterialManager.GetProductsId(productId);
+            ProductManager productManager = new ProductManager();
+            product product1 = productManager.GetId((int)productId);
+
+            //foreach (var detail in product1)
+            //{
+            //    ProductManager productManager1 = new ProductManager();
+                product product = productManager.GetId((int)product1.ProductId);
+                StoreMasterManager storeManager = new StoreMasterManager();
+                StoreMaster store = storeManager.GetStoreMasterId(product1.StoreId);
+                UOMManager uomManager = new UOMManager();
+                UomMaster uom = uomManager.GetUomMasterId(product1.UomMasterId);
+                TaxTypeManager taxManager = new TaxTypeManager();
+                TaxTypeMaster tax = taxManager.GetTaxMasterId(product1.TaxMasterId);
+                IndentMaterialModel Model = new IndentMaterialModel
+                {
+                    MaterialId = product.ProductId,
+                    MaterialNameId = product.ProductName,
+                    StoreNameId = store.StoreName,
+                    UomNameId = uom.ShortUnitName,
+                    Price = product.Price,
+                    //IndentQty = (decimal)detail.IndentQty,
+                    TaxNameId = tax.TaxValue
+                };
+                indentDetails.Add(Model);
+            //}
+            return Json(indentDetails, JsonRequestBehavior.AllowGet);
+        }
+
+
+        [HttpGet]
+        public ActionResult GetSupplierProducts(int indentNumber,int supplierId)
+         {
+            IndentNewMaterialManager indentNewMaterialManager = new IndentNewMaterialManager();
+            List<IndentMaterialModel> indentcart = new List<IndentMaterialModel>();
+            List<Indentdetail> indentdetail = indentNewMaterialManager.GetIndentdetailsList(indentNumber);
+
+            foreach (var detail in indentdetail)
+            {
+                // Check if the material (product) is supplied by the selected supplier
+                if (IsMaterialSuppliedBySupplier(detail.MaterialId, supplierId))
+                {
+                    ProductManager productManager = new ProductManager();
+                    product product = productManager.GetId((int)detail.MaterialId);
+                    StoreMasterManager storeManager = new StoreMasterManager();
+                    StoreMaster store = storeManager.GetStoreMasterId(detail.StoreCode);
+                    UOMManager uomManager = new UOMManager();
+                    UomMaster uom = uomManager.GetUomMasterId(detail.UomId);
+                    TaxTypeManager taxManager = new TaxTypeManager();
+                    TaxTypeMaster tax = taxManager.GetTaxMasterId(detail.TaxId);
+                    IndentMaterialModel Model = new IndentMaterialModel
+                    {
+                        MaterialId = product.ProductId,
+                        MaterialNameId = product.ProductName,
+                        StoreNameId = store.StoreName,
+                        UomNameId = uom.ShortUnitName,
+                        Price = product.Price,
+                        IndentQty = (decimal)detail.IndentQty,
+                        TaxNameId = tax.TaxValue
+                    };
+                    indentcart.Add(Model);
+                }
+            }
+            return Json(indentcart, JsonRequestBehavior.AllowGet);
+        }
+
+        private bool IsMaterialSuppliedBySupplier(int? productId, int supplierId)
+        {
+            var supplierMaterialManager = new SupplierMaterialManager();
+            var isSupplied = supplierMaterialManager.IsMaterialSuppliedBySupplier(productId, supplierId);
+
+            return isSupplied;
         }
 
         [HttpPost]
