@@ -21,12 +21,8 @@ namespace MMS.Data.Mapping
             Property(t => t.UpdatedDate);
             Property(t => t.CreatedBy);
             Property(t => t.UpdatedBy);
-            Property(t => t.MaterialCategory);
             Property(t => t.DeletedBy);
             Property(t => t.DeletedDate);
-            Property(t => t.MaterialGroupId);
-            Property(t => t.MaterialMasterId);
-            Property(t => t.UomId);
             Property(t => t.RequiredQty);
             Property(t => t.IsDelete);
             Property(t => t.IsActive);

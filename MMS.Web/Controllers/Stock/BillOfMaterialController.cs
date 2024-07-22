@@ -77,12 +77,33 @@ namespace MMS.Web.Controllers.Stock
 
             return Json(ParentBillofMaterial, JsonRequestBehavior.AllowGet);
         }
+        public ActionResult FillUOMBasedonproductName(int productid)
+        {
+
+            List<product> materialNameMasterList = new List<product>();
+            ProductManager ProductManager = new ProductManager();
+
+            MaterialManager materialManager = new MaterialManager();
+            UOMManager uomManager = new UOMManager();
+            var items = (from x in ProductManager.Get()
+                         join z in uomManager.Get()
+                         on x.UomMasterId equals z.UomMasterId
+                         where x.ProductId == productid
+                         select new
+                         {
+                             UomName = z.LongUnitName,
+                             uomid = z.UomMasterId,
+                         });
+
+            var distinctList = items.GroupBy(x => x.UomName).Select(g => g.First()).ToList();
+            return Json(distinctList, JsonRequestBehavior.AllowGet);
+        }
         public ActionResult BOMmaterialSearch(string filter, int bomid)
         {
             Parentbom_materialManager parentbom_MaterialManager = new Parentbom_materialManager();
             var datas = parentbom_MaterialManager.GetBomList(bomid);
 
-            var namelist = datas.Where(x => x.MaterialNames != null && x.MaterialNames.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
+            var namelist = datas.Where(x => x.productname != null && x.productname.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
             return Json(namelist, JsonRequestBehavior.AllowGet);
         }
         public ActionResult BOMsubassemblySearch(string filter, int bomid)
@@ -143,7 +164,7 @@ namespace MMS.Web.Controllers.Stock
                     subassembly subassembly = new subassembly();
                     subassemblyManager subassemblyManager = new subassemblyManager();
                     subassembly.BomId = parentboms.BomId;
-                    subassembly.ProductId = model.Productid;
+                    subassembly.ProductId = model.ProductSUBid;
                     subassembly.RequiredQty = model.Requiredqty;
                     var bOMMaterial = subassemblyManager.Post(subassembly);
                     return Json(new { bomid = parentboms.BomId, AlertMessage = AlertMessage, bomids = parentboms.BomId }, JsonRequestBehavior.AllowGet);
@@ -174,7 +195,7 @@ namespace MMS.Web.Controllers.Stock
                     subassembly subassembly = new subassembly();
                     subassemblyManager subassemblyManager = new subassemblyManager();
                     subassembly.BomId = model.Bomid;
-                    subassembly.ProductId = model.Productid;
+                    subassembly.ProductId = model.ProductSUBid;
                     subassembly.RequiredQty = model.Requiredqty;
                     var bOMMaterial = subassemblyManager.Post(subassembly);
                     AlertMessage = "Updated Successfully";
@@ -207,7 +228,7 @@ namespace MMS.Web.Controllers.Stock
                 subassembly subassembly = new subassembly();
                 subassemblyManager subassemblyManager = new subassemblyManager();
                 subassembly.BomId = model.Bomid;
-                subassembly.ProductId = model.Productid;
+                subassembly.ProductId = model.ProductSUBid;
                 subassembly.RequiredQty = model.Requiredqty;
                 subassembly.SubassemblyId = model.subassemblyid;
                 var bOMMaterial = subassemblyManager.Put(subassembly);
@@ -250,9 +271,6 @@ namespace MMS.Web.Controllers.Stock
 
                     parentbom_Material.BomID = parentboms.BomId;
                     parentbom_Material.ProductId = model.Productid;
-                    parentbom_Material.MaterialCategory = model.MaterialCategoryid;
-                    parentbom_Material.MaterialGroupId = model.MaterialGroupid;
-                    parentbom_Material.MaterialMasterId = model.MaterialMasterid;
                     parentbom_Material.UomId = model.Uomid;
                     parentbom_Material.RequiredQty = model.Requiredqty;
                     var bOMMaterial = parentbom_materialManager.Post(parentbom_Material);
@@ -288,9 +306,6 @@ namespace MMS.Web.Controllers.Stock
 
                     parentbom_Material.BomID = model.Bomid;
                     parentbom_Material.ProductId = model.Productid;
-                    parentbom_Material.MaterialCategory = model.MaterialCategoryid;
-                    parentbom_Material.MaterialGroupId = model.MaterialGroupid;
-                    parentbom_Material.MaterialMasterId = model.MaterialMasterid;
                     parentbom_Material.UomId = model.Uomid;
                     parentbom_Material.RequiredQty = model.Requiredqty;
                     var bOMMaterial = parentbom_materialManager.Post(parentbom_Material);
@@ -328,9 +343,6 @@ namespace MMS.Web.Controllers.Stock
                 parentbom_Material.BomMaterialId = model.Bommaterialid;
                 parentbom_Material.BomID = model.Bomid;
                 parentbom_Material.ProductId = model.Productid;
-                parentbom_Material.MaterialCategory = model.MaterialCategoryid;
-                parentbom_Material.MaterialGroupId = model.MaterialGroupid;
-                parentbom_Material.MaterialMasterId = model.MaterialMasterid;
                 parentbom_Material.UomId = model.Uomid;
                 parentbom_Material.RequiredQty = model.Requiredqty;
                 var bOMMaterial = parentbom_materialManager.Put(parentbom_Material);
@@ -396,9 +408,6 @@ namespace MMS.Web.Controllers.Stock
                 model.Description = parentboms.Description;
                 model.Lastbom = parentboms.LastBom;
                 model.Productid = material.ProductId;
-                model.MaterialCategoryid = material.MaterialCategory;
-                model.MaterialGroupid = material.MaterialGroupId;
-                model.MaterialMasterid = namematerial.MaterialMasterID;
                 model.Uomid = material.UomId;
                 model.Requiredqty = material.RequiredQty;
                 model.Bommaterialid = material.BomMaterialId;
@@ -429,7 +438,7 @@ namespace MMS.Web.Controllers.Stock
                 model.Date = parentboms.Date;
                 model.Description = parentboms.Description;
                 model.Lastbom = parentboms.LastBom;
-                model.Productid = material.ProductId;
+                model.ProductSUBid = material.ProductId;
                 model.Requiredqty = material.RequiredQty;
                 model.subassemblyid = material.SubassemblyId;
                 model.bomMaterialGridList = datas;

@@ -22,6 +22,7 @@ using System.Configuration;
 using System.Net.Mail;
 using System.ComponentModel.DataAnnotations;
 using MMS.Web.Models.GateEntryModel;
+using MMS.Web.Models.Product;
 
 namespace MMS.Web.ExtensionMethod
 {
@@ -1798,24 +1799,52 @@ namespace MMS.Web.ExtensionMethod
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
         }
-        //public static SelectList IndentNo()
-        //{
-        //    IndentNewMaterialManager Manager = new IndentNewMaterialManager();
-        //    List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.IndentNumber).Select(
-        //                                          item => new System.Web.Mvc.SelectListItem()
-        //                                          {
-        //                                              Text = item.IndentNumber.ToString(),
-        //                                              Value = item.IndentCartId.ToString()
-        //                                          }).ToList();
-        //    var ShotName = new System.Web.Mvc.SelectListItem()
-        //    {
-        //        Value = "",
-        //        Text = "Please Select IndentNo"
-        //    };
-        //    items.Insert(0, ShotName);
-        //    return new SelectList(items, "Value", "Text");
-        //}
+        public static SelectList ProductmMATName()
+        {
+            ProductManager Manager = new ProductManager();
+            List<product> products = Manager.Get();
+            var filteredProducts = products.Where(p => p.ProductType == 3).OrderBy(p => p.ProductName).ToList();
+            List<System.Web.Mvc.SelectListItem> items = filteredProducts.Select(
+                                                 item => new System.Web.Mvc.SelectListItem()
+                                                 {
+                                                     Text = item.ProductName,
+                                                     Value = item.ProductId.ToString()
+                                                 }).ToList();
 
+            // Insert the "Please Select Product" item
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select Product"
+            };
+
+            items.Insert(0, ShotName);
+
+            return new SelectList(items, "Value", "Text");
+        }       
+        public static SelectList ProductmSUBName()
+        {
+            ProductManager Manager = new ProductManager();
+            List<product> products = Manager.Get();
+            var filteredProducts = products.Where(p => p.ProductType == 2).OrderBy(p => p.ProductName).ToList();
+            List<System.Web.Mvc.SelectListItem> items = filteredProducts.Select(
+                                                 item => new System.Web.Mvc.SelectListItem()
+                                                 {
+                                                     Text = item.ProductName,
+                                                     Value = item.ProductId.ToString()
+                                                 }).ToList();
+
+            // Insert the "Please Select Product" item
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select Product"
+            };
+
+            items.Insert(0, ShotName);
+
+            return new SelectList(items, "Value", "Text");
+        }
         public static SelectList IndentDetailNo()
         {
             IndentNewMaterialManager Manager = new IndentNewMaterialManager();

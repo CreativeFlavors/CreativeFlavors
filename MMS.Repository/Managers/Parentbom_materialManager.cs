@@ -69,11 +69,7 @@ namespace MMS.Repository.Managers
                     model.BomMaterialId = arg.BomMaterialId;
                     model.IsActive = arg.IsActive;
                     model.BomID = arg.BomID;
-                    model.ProductId = arg.ProductId;
-                    model.MaterialCategory=arg.MaterialCategory;
-                    model.MaterialGroupId = arg.MaterialGroupId;
-                    model.MaterialMasterId = arg.MaterialMasterId;
-                    model.UomId = arg.UomId;
+                    model.ProductId = arg.ProductId;;
                     model.RequiredQty = arg.RequiredQty;
                     model.UpdatedDate = DateTime.Now;
                     string username = "admin";

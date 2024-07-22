@@ -40,6 +40,7 @@ namespace MMS.Web.Models.StockModel
         public DateTime? Deleteddate { get; set; }
         public int Bommaterialid { get; set; }
         public int subassemblyid { get; set; }
+        public int ProductSUBid { get; set; }
         public int Productid { get; set; }
 
         public int MaterialCategoryid { get; set; }
