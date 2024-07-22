@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using static System.Data.Entity.Infrastructure.Design.Executor;
 
 namespace MMS.Web.Controllers
 {
@@ -20,7 +21,7 @@ namespace MMS.Web.Controllers
         }
         [HttpGet]
         public ActionResult ProductionGrid(int page = 1, int pageSize = 9)
-        {
+            {
             try
             {
                 ProductionManager productionManager = new ProductionManager();
@@ -184,35 +185,64 @@ namespace MMS.Web.Controllers
                 // Check if the production status has changed to "packing" means update the finishedgood table
                 if (model.ProductionStatus == 7)
                 {
-                    // Update the FinishedGood table with relevant data from Production table
-                    FinishedGoodManager finishedGoodManager = new FinishedGoodManager();
-                    FinishedGood existingFinishedGood = finishedGoodManager.GetByProductCode(model.ProductCode);
-                    if (existingFinishedGood != null)
+                   // Update the batch table with relevant data from Production table
+                    BatchStockManager batchStockManager = new BatchStockManager();
+                    BatchStock existingBatchStock = batchStockManager.GetByProductCode(model.ProductCode);
+                    if(existingBatchStock != null)
                     {
-                        //already quantity is there Update the stock quantity increased to finishedgood table
-                        existingFinishedGood.Quantity += model.ProductionQty;
-                        finishedGoodManager.Put(existingFinishedGood);
+                        //already quantity is there Update the stock quantity increased to batchstock table
+                        existingBatchStock.Quantity += model.ProductionQty;
+                        existingBatchStock.AltBatchCode = model.ProductionCode;
+                        batchStockManager.Put(existingBatchStock);
                         status = "Packing";
                     }
                     else
                     {
-                        //insert new record to finishedgood table
-                        FinishedGood finishedGood = new FinishedGood
+                        //insert new record to batchstock table
+                        BatchStock batchStock = new BatchStock
                         {
-                            Batchcode = production.ProductionCode,
                             StoreCode = production.StoreCode,
+                            productid = products.ProductId,
+                            BatchCode = production.ProductionCode,
                             Quantity = production.ProductionQty,
-                            ProductCode = production.ProductCode,
-                            UpdatedDate = DateTime.Now,
                             Price = products.Price,
-                            ProductType = products.ProductType,
-                            ProductId = products.ProductId,
-
+                            TaxCode = products.TaxMasterId,
+                            UomId = products.UomMasterId,
+                            producttype = products.ProductType,
+                            ProductCode = production.ProductCode,
                         };
-
-                        finishedGoodManager.Post(finishedGood);
+                        batchStockManager.POST(batchStock);
                         status = "Packing";
                     }
+                    // Update the FinishedGood table with relevant data from Production table
+                    //FinishedGoodManager finishedGoodManager = new FinishedGoodManager();
+                    //FinishedGood existingFinishedGood = finishedGoodManager.GetByProductCode(model.ProductCode);
+                    //if (existingFinishedGood != null)
+                    //{
+                    //    //already quantity is there Update the stock quantity increased to finishedgood table
+                      // existingFinishedGood.Quantity += model.ProductionQty;
+                        //finishedGoodManager.Put(existingFinishedGood);
+                    //  /  status = "Packing";
+                   // }
+                    //else
+                    //{
+                    //    //insert new record to finishedgood table
+                    //    FinishedGood finishedGood = new FinishedGood
+                    //    {
+                    //        Batchcode = production.ProductionCode,
+                    //        StoreCode = production.StoreCode,
+                    //        Quantity = production.ProductionQty,
+                    //        ProductCode = production.ProductCode,
+                    //        UpdatedDate = DateTime.Now,
+                    //        Price = products.Price,
+                    //        ProductType = products.ProductType,
+                    //        ProductId = products.ProductId,
+
+                    //    };
+
+                    //    finishedGoodManager.Post(finishedGood);
+                    //    status = "Packing";
+                    //}
 
                 }
                 // Update status history table when status changes from 2 Inprogress
@@ -387,35 +417,64 @@ namespace MMS.Web.Controllers
                 // Check if the production status has changed to "Released for Assembly" means update the subassemblyinventory table
                 if (model.ProductionSubassemblyStatus == 6)
                 {
-                    // Update the subassemblyinventory table with relevant data from Productionsubassembly table
-                    SubassemblyinventoryManager subassemblyinventoryManager = new SubassemblyinventoryManager();
-                    Subassemblyinventory existingsubassembly = subassemblyinventoryManager.GetByProductCode(model.ProductCode);
-                    if (existingsubassembly != null)
+                    // Update the batch table with relevant data from Production table
+                    BatchStockManager batchStockManager = new BatchStockManager();
+                    BatchStock existingBatchStock = batchStockManager.GetByProductCode(model.ProductCode);
+                    if (existingBatchStock != null)
                     {
-                        //already quantity is there Update the stock quantity increased to subassemblyinventory table
-                        existingsubassembly.Quantity += model.ProductionQty;
-                        subassemblyinventoryManager.Put(existingsubassembly);
-                        status = "Released for Assembly";
+                        //already quantity is there Update the stock quantity increased to batchstock table
+                        existingBatchStock.Quantity += model.ProductionQty;
+                        existingBatchStock.AltBatchCode = model.ProductionCode;
+                        batchStockManager.Put(existingBatchStock);
+                        status = "ReleasedForAssembly";
                     }
                     else
                     {
-                        //insert new record to subassemblyinventory table
-                        Subassemblyinventory subassemblyinventory = new Subassemblyinventory
+                        //insert new record to batchstock table
+                        BatchStock batchStock = new BatchStock
                         {
-                            Batchcode = production.ProductionCode,
                             StoreCode = production.StoreCode,
+                            productid = products.ProductId,
+                            BatchCode = production.ProductionCode,
                             Quantity = production.ProductionQty,
-                            ProductCode = production.ProductCode,
-                            UpdatedDate = DateTime.Now,
                             Price = products.Price,
-                            ProductType = products.ProductType,
-                            ProductId = products.ProductId,
-
+                            TaxCode = products.TaxMasterId,
+                            UomId = products.UomMasterId,
+                            producttype = products.ProductType,
+                            ProductCode = production.ProductCode,
                         };
-
-                        subassemblyinventoryManager.Post(subassemblyinventory);
-                        status = "Released for Assembly";
+                        batchStockManager.POST(batchStock);
+                        status = "ReleasedForAssembly";
                     }
+                    //// Update the subassemblyinventory table with relevant data from Productionsubassembly table
+                    //SubassemblyinventoryManager subassemblyinventoryManager = new SubassemblyinventoryManager();
+                    //Subassemblyinventory existingsubassembly = subassemblyinventoryManager.GetByProductCode(model.ProductCode);
+                    //if (existingsubassembly != null)
+                    //{
+                    //    //already quantity is there Update the stock quantity increased to subassemblyinventory table
+                    //    existingsubassembly.Quantity += model.ProductionQty;
+                    //    subassemblyinventoryManager.Put(existingsubassembly);
+                    //    status = "Released for Assembly";
+                    //}
+                    //else
+                    //{
+                    //    //insert new record to subassemblyinventory table
+                    //    Subassemblyinventory subassemblyinventory = new Subassemblyinventory
+                    //    {
+                    //        Batchcode = production.ProductionCode,
+                    //        StoreCode = production.StoreCode,
+                    //        Quantity = production.ProductionQty,
+                    //        ProductCode = production.ProductCode,
+                    //        UpdatedDate = DateTime.Now,
+                    //        Price = products.Price,
+                    //        ProductType = products.ProductType,
+                    //        ProductId = products.ProductId,
+
+                    //    };
+
+                    //    subassemblyinventoryManager.Post(subassemblyinventory);
+                    //    status = "Released for Assembly";
+                    //}
 
                 }
                 // Update status history table when status changes from 2 Inprogress

@@ -88,7 +88,7 @@ namespace MMS.Repository.Managers
                     indentPoMapping.IndentPoMapId = arg.IndentPoMapId;
                     indentPoMapping.SupplierId = arg.SupplierId;
                     indentPoMapping.ProductId = arg.ProductId;
-                    indentPoMapping.IndentId = arg.IndentNumber;
+                    indentPoMapping.IndentId = (int)arg.IndentNumber;
                     indentPoMapping.IndentProductId = arg.ProductId;
                     indentPoMapping.StoreCode = product.StoreId;
                     indentPoMapping.UnitPrice = arg.UnitPrice;

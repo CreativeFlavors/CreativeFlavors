@@ -98,6 +98,6 @@ namespace MMS.Core.Entities
         public int PoNumber { get; set; }
 
         [Column("indentnumber")]
-        public int IndentNumber { get; set; }
+        public int? IndentNumber { get; set; }
     }
 }

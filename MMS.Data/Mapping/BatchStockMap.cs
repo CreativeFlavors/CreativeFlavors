@@ -37,7 +37,8 @@ namespace MMS.Data.Mapping
             Property(t => t.UpdatedBy).HasColumnName("updatedby");
             Property(t => t.status).HasColumnName("status");
             Property(t => t.producttype).HasColumnName("producttype");
-            ToTable("grndetails");
+            Property(t => t.ProductCode).HasColumnName("productcode");
+            ToTable("batchstock");
         }
     }
 }
