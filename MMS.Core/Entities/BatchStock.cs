@@ -61,5 +61,8 @@ namespace MMS.Core.Entities
         public int status { get; set; }
         [Column("producttype")]
         public int producttype { get; set; }
+
+        [Column("productcode")]
+        public string ProductCode { get; set; }
     }
 }

@@ -96,12 +96,12 @@ namespace MMS.Repository.Managers
                     model.CreatedDate = arg.CreatedDate;
                     model.UpdatedDate = DateTime.Now;
                     //model.CreatedBy = "";
-                    string username = HttpContext.Current.Session["UserName"]?.ToString();
-                    if (username != null)
-                    {
-                        model.UpdatedBy = username;
-                    }
-                    //model.UpdatedBy = username;
+                    //string username = HttpContext.Current.Session["UserName"]?.ToString();
+                    //if (username != null)
+                    //{
+                    //    model.UpdatedBy = username;
+                    //}
+                    model.UpdatedBy ="Admin";
                     productionrep.Update(model);
                     result = true;
                 }
