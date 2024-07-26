@@ -19,10 +19,11 @@ namespace MMS.Repository.Managers
         private UnitOfWork unitOfWork = new UnitOfWork();
         private Repository<parentbom_material> parentbom_materialRepository;
         private Repository<parentbom_material> BillOfMaterialRepository;
+        private Repository<parentbom> parentbomrepository;
         public Parentbom_materialManager()
         {
             parentbom_materialRepository = unitOfWork.Repository<parentbom_material>();
-
+            parentbomrepository = unitOfWork.Repository<parentbom>();
         }
         public List<Parentbommatertial> GetBomList(int bom_id)
         {
@@ -99,6 +100,15 @@ namespace MMS.Repository.Managers
                     .Where(x => x.BomID == BOMID)
                     .OrderBy(x => x.BomID)
                     .ToList();
+            }
+            return billOfMaterial;
+        }
+        public parentbom GetParentBomMaterialId(string bomno)
+        {
+            parentbom billOfMaterial = new parentbom();
+            if (bomno != null)
+            {
+                billOfMaterial = parentbomrepository.Table.Where(x => x.BomNo == bomno && x.IsDelete == true).FirstOrDefault();
             }
             return billOfMaterial;
         }

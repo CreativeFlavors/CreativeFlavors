@@ -180,12 +180,16 @@ namespace MMS.Web.Controllers
             ProductManager productManager = new ProductManager();
             product product = productManager.GetId(productid);
             decimal? price = 0;
+            decimal? minqty = 0;
+            decimal? maxqty = 0;
             string materialname = null;
-            if (product != null && product.ProductType == 3) // Check if product type is 3
+            if (product != null && product.ProductType == 3 || product.ProductType ==2) // Check if product type is 3
             {
                 if (product != null)
                 {
                     price = product.Price;
+                    minqty = product.MinStock;
+                    maxqty = product.MaxStock;
                     materialname = product.ProductName;
                 }
                 UOMManager uOMManager = new UOMManager();
@@ -215,6 +219,8 @@ namespace MMS.Web.Controllers
                 return Json(new
                 {
                     Price = price,
+                    MinQty = minqty,
+                    MaxQty = maxqty,
                     Uom = uom,
                     Tax = tax,
                     Store = store,

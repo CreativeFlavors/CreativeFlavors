@@ -59,6 +59,8 @@ namespace MMS.Web.Models.IndentMaterial
         public decimal? RequiredQty { get; set; }
         public int? IndentNumber { get; set; }
         public int? cartStatus { get; set; }
+        public decimal? MinQty { get; set; }
+        public decimal? MaxQty { get; set; }
 
         public product product { get; set; }
 
