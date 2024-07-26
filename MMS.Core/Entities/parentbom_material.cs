@@ -26,7 +26,7 @@ namespace MMS.Core.Entities
         [Column("materialmasterid")]
         public int? MaterialMasterId { get; set; }
         [Column("uomid")]
-        public int? UomId { get; set; }
+        public int UomId { get; set; }
         [Column("requiredqty")]
         public decimal? RequiredQty { get; set; }
         [Column("isactive")]

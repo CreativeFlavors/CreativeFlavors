@@ -18,7 +18,7 @@ namespace MMS.Web.Controllers
         }
         public ActionResult FinishedGoodGrid(int page = 1, int pageSize = 15)
         {
-            FinishedGoodManager finishedgoodrep = new FinishedGoodManager();
+            BatchStockManager finishedgoodrep = new BatchStockManager();
             var totalist = finishedgoodrep.Fineshedgoods_Report();
             List<FinishedGoodModel> totaldata= new List<FinishedGoodModel>();
             foreach(var i in totalist)
@@ -52,7 +52,7 @@ namespace MMS.Web.Controllers
         public ActionResult ReportSearch(string filter)
         {
             List<FinishedGoodModel> totaldata = new List<FinishedGoodModel>();
-            FinishedGoodManager FinishedGoodManager = new FinishedGoodManager();
+            BatchStockManager FinishedGoodManager = new BatchStockManager();
             var data = FinishedGoodManager.Fineshedgoods_Report();
             var list = data.Where(x => x.ProductName.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
             var detailslist = list;

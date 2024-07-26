@@ -2,146 +2,178 @@
 @using MMS.Repository.Managers
 @using MMS.Core.Entities
 @{
- 
+
 }
-<div class="veh-tablewrap">
-    <div class="veh-tablecont">
-        <div id="sortMsg" style="text-align: center; color: Red;"></div>
-
-        <table class="veh-table" id="empTable">
-            <thead>
-                <tr class="color-code-top-btn">
-                    <td colspan="10" style="padding-bottom:0;">
-                        @using (Html.BeginForm("Upload", "SupplierMaster", null, FormMethod.Post, new { enctype = "multipart/form-data" }))
-                        {
-                            @Html.AntiForgeryToken()
-                            @Html.ValidationSummary()
-
-                            <div class="form-group" style="display:inline-block;">
-                                <input type="file" id="dataFile" name="upload" style="display:inline-block;float:left;"/>
-                                <input type="submit" value="Upload" class="btn btn-default" style="display:inline-block;float:left;"/>
-                                @if (Model.UploadError != null)
-                                {
-                                    <span id="spn_error" style="display:inline-block;float:left;color:red;padding:8px 10px;">@Model.UploadError</span>
-                                }
-                              
-                                
-                                <input type="button" value="Search" onclick="Search()" style="display:inline-block;float:right;">
-                                <input type="button" value="Add" onclick="Add()" style="display:inline-block;float:right;">
-                                
-                                <input type="text" id="SeaarchID" placeholder="Search.." style="display:inline-block;float:right;" />
-                            </div>
-                            @Html.ValidationMessageFor(x => x.UploadError);
-                       
-                        }                      
-                   
-                    </td>
-                </tr>
-                <tr>
-                    <th class="veh-1">
-                        Si.No
-                    </th>
-                    <th class="veh-1">
-                        Supplier Code
-                    </th>
-                    <th class="veh-2">
-                        Supplier Name
-                    </th>
-                    <th class="veh-3">
-                        Designation
-                    </th>
-                    <th class="veh-4">
-                        Information
-                    </th>
-                    <th class="veh-5">
-                        Currency
-                    </th>
-                    <th class="veh-6">
-                        Email
-                    </th>
-                    <th class="veh-7">
-                        Mobile No
-                    </th>
-                    <th class="veh-8">
-                        Contact Person
-                    </th>
-
-                    <th class="veh-9">
-                        Edit/Delete
-                    </th>
-                </tr>
-            </thead>
-            @if (Model.SupplierMasterList.Count > 0 && Model.SupplierMasterList != null)
-            {
-                int count = 1;
-                <tbody>
-
-                    @foreach (var SupplierMaster in Model.SupplierMasterList)
-                    {
-                        <tr>
-                            <td class="veh-1">@count</td>
-                            <td class="veh-1">SUP00 @SupplierMaster.SupplierCode</td>
-                            <td class="veh-2">@SupplierMaster.SupplierName</td>
-                            <td class="veh-3">@SupplierMaster.Designation</td>
-                            <td class="veh-4">@SupplierMaster.OtherInformation</td>
-                            <td class="veh-5">@SupplierMaster.Currency</td>
-                            <td class="veh-6">@SupplierMaster.Email</td>
-                            <td class="veh-7">@SupplierMaster.Mobile</td>
-                            <td class="veh-8">@SupplierMaster.ContactPerson</td>
-                            <td class="veh-1 edit-del-wrap">
-                                <a href="javascript:void(0)" onclick="Edit('@SupplierMaster.SupplierMasterId')" class="watchlist-edit" title="Edit"></a>
-                                <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@SupplierMaster.SupplierMasterId')" class="watchlist-delete" title="Delete"></a>
-
-                            </td>
-                        </tr>
-                        count++;
-                    }
-
-
-                </tbody>
-                <tfoot class="footer-pager">
-                    <tr>
-                        <td colspan="4">
-                            <div id="pager">
-                                <form>
-                                    <img src="@Url.Content("~/Content/images/first.png")" class="first" />
-                                    <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
-                                    <input type="text" class="pagedisplay" />
-                                    <img src="@Url.Content("~/Content/images/next.png")" class="next" />
-                                    <img src="@Url.Content("~/Content/images/last.png")" class="last" />
-                                    <select class="pagesize">
-                                        <option selected="selected" value="5">5</option>
-                                        <option value="10">10</option>
-                                        <option value="20">20</option>
-                                        <option value="30">30</option>
-                                        <option value="40">40</option>
-                                    </select>
-                                </form>
-                            </div>
-
-                        </td>
-
-                    </tr>
-
-                </tfoot>
-
-            }
-        </table>
-        @if (Model.SupplierMasterList != null && Model.SupplierMasterList.Count == 0)
-        {
-            <div style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <style>
+        .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
+            padding: 16px;
         }
+
+        img#paynows {
+            width: 26%;
+        }
+
+        .manage_customers_table_responsive, .reports .reports_table_responsive {
+            padding: 1px 15px 13px;
+            box-sizing: border-box;
+            overflow-x: unset;
+        }
+
+        .sub_merchants .merchant_btn, .manage_customers .manage_customers_btn, .common_Manage_subMerchant .manage_customers_btn {
+            background: #4472C4;
+            border-radius: 5px;
+            padding: 11px 61px;
+            border: 1px solid transparent;
+            font-style: normal;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-page">
+        <div id="transaction_report" class="reports common_Manage_subMerchant">
+            <h3>Supplier Master</h3>
+            <div class="table-responsive reports_table_responsive">
+                <div class="d-flex justify-content-between">
+                    <div class="customer_manage_search_container">
+                        <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Contact Name">
+                    </div>
+                    <a href="/SupplierMaterial/SupplierMaterial_Details">
+                        <button type="button" class="manage_customers_btn font-15" id="add" style="color: white; margin-top: 14%;">
+                            ADD
+                        </button>
+                    </a>
+                </div>
+
+                <div class="manage_customers_table_in_responsive" id="form">
+
+                    <table class="table table-striped text-center">
+                        <thead>
+                            <tr class="font-16">
+                                <th scope="col">
+                                    <span>Si.No</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span> Supplier Code</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span> Supplier Name</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span> Designation</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Information</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th><th scope="col">
+                                         <span> Currency</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                         <span> Mobile No</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span><th scope="col">
+                                               <span> Contact Person</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Status</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        @if (Model.SupplierMasterList.Count > 0 && Model.SupplierMasterList != null)
+                        {
+                            int count = 1;
+                            <tbody>
+
+
+                                @foreach (var SupplierMaster in Model.SupplierMasterList)
+                                {
+                                    <tr>
+                                        <td class="veh-1">@count</td>
+                                        <td class="veh-1" style="width: 12%;"> @SupplierMaster.SupplierCode</td>
+                                        <td class="veh-2" style="width: 12%;">@SupplierMaster.SupplierName</td>
+                                        <td class="veh-3" style="width: 12%;">@SupplierMaster.Designation</td>
+                                        <td class="veh-4" style="width: 12%;">@SupplierMaster.OtherInformation</td>
+                                        <td class="veh-5" style="width: 12%;">@SupplierMaster.Currency</td>
+                                        <td class="veh-7" style="width: 12%;">@SupplierMaster.Mobile</td>
+                                        <td class="veh-8" style="width: 12%;">@SupplierMaster.ContactPerson</td>
+                                        <td class="veh-4" style="width:12%;">
+                                            <span class="table_icons">
+                                                <img src="~/Content/assets/images/edit-icon.png" onclick="Edit('@SupplierMaster.SupplierMasterId')" />
+                                            </span>
+                                            <span class="table_icons">
+                                                <img src="~/Content/assets/images/delete-icon.png" onclick="Delete('@SupplierMaster.SupplierMasterId')" />
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    count++;
+                                }
+
+                            </tbody>
+
+                        }
+                    </table>
+                </div>
+                <div class="row manage_customer_show">
+                    <div class="col-xl-6 manage_customer_show_II">
+                        <nav class="float-xl-start">
+                            <ul class="pagination font-14">
+                                @if (ViewBag.startpage != null && ViewBag.endpage != null)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" id="left" value="@(ViewBag.currentpage-1)">Previous</a>
+                                    </li>
+                                    for (int i = ViewBag.startpage; i <= ViewBag.endpage; i++)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" id="number" value="@i">@i</a>
+                                        </li>
+
+                                    }
+                                    <li class=" page-item">
+                                        <a class="page-link" id="right" value="@(ViewBag.currentpage+1)">Next</a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
-
-    <div id="EditColorPartial">
-        @Html.Partial("Partial/SupplierMasterDetails", Model)
-    </div>
-
-
-</div>
-
-
-<script>
+    <script>
     $(document).ajaxStart(function () {
         $(".loader-overlay").css("display", "block");
     });
@@ -155,7 +187,7 @@
 
     $(function () {
         setTimeout(function () { $("#spn_error").fadeOut(1500); }, 5000);
-        
+
     })
     function Search() {
         $.ajax({
@@ -163,7 +195,7 @@
             url: ' @Url.Action("Search", "SupplierMaster")',
             data: { filter: $('#SeaarchID').val() },
             success: function (data) {
-              
+
                 $(".veh-tablewrap").html(data);
                 $(".veh-tablewrap").show();
                 $('#DivShow').hide();
@@ -231,4 +263,4 @@
     }
 
 
-</script>
+    </script>

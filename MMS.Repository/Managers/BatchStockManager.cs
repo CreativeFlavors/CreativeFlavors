@@ -2,6 +2,7 @@
 using MMS.Core.Entities;
 using MMS.Data;
 using MMS.Data.Mapping;
+using MMS.Data.StoredProcedureModel;
 using MMS.Repository.Service;
 using System;
 using System.Collections.Generic;
@@ -42,82 +43,27 @@ namespace MMS.Repository.Managers
             }
             return salesorder;
         }
-        public bool Put(BatchStock arg)
+        public List<FineshedgoodsReport> Fineshedgoods_Report()
         {
-            bool result = false;
-            try
-            {
-                BatchStock model = BatchStockrep.Table.Where(f => f.BatchStockId == arg.BatchStockId).FirstOrDefault();
-                if (model != null)
-                {
-                    model.BatchStockId = arg.BatchStockId;
-                    model.SupplierId = arg.SupplierId;
-                    model.StoreCode = arg.StoreCode;
-                    model.productid = arg.productid;
-                    model.BatchCode = arg.BatchCode;
-                    model.AltBatchCode = arg.AltBatchCode;
-                    model.ExpiryDate = arg.ExpiryDate;
-                    model.Quantity = arg.Quantity;
-                    model.GrnNumber = arg.GrnNumber;
-                    model.GrnDate = arg.GrnDate;
-                    model.GrnDetailId = arg.GrnDetailId;
-                    model.Price = arg.Price;
-                    model.Cost = arg.Cost;
-                    model.TaxCode = arg.TaxCode;
-                    model.UomId = arg.UomId;
-                    model.ReservedQty = arg.ReservedQty;
-                    model.LastTransMode = arg.LastTransMode;
-                    model.LastTransNumber = arg.LastTransNumber;
-                    model.LastTransDate = arg.LastTransDate;
-                    model.LastTransQty = arg.LastTransQty;
-                    model.status = arg.status;
-                    model.producttype = arg.producttype;
-                    model.ProductCode = arg.ProductCode;
-                    model.UpdatedDate = DateTime.Now;
-                    //model.CreatedBy = "";
-                    //string username = HttpContext.Current.Session["UserName"]?.ToString();
-                    //if (username != null)
-                    //{
-                    //    model.UpdatedBy = username;
-                    //}
-                    model.UpdatedBy = "Admin";
-                    BatchStockrep.Update(model);
-                    result = true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
-                result = false;
-            }
-
-            return result;
+            List<FineshedgoodsReport> FineshedgoodsReport = new List<FineshedgoodsReport>();
+            FineshedgoodsReport = BatchStockrep.Fineshedgoods();
+            return FineshedgoodsReport;
         }
+
         public List<BatchStock> Get()
         {
             List<BatchStock> obj = new List<BatchStock>();
             obj = BatchStockrep.Table.ToList<BatchStock>();
             return obj;
         }
-        public BatchStock GetByProductCode(string productcode)
+        public BatchStock GetmaterialOpeningMaterialID(int? productid)
         {
-            BatchStock finishedgoodlist = new BatchStock();
-            if (productcode != null)
+            BatchStock materialOpeningMaster = new BatchStock();
+            if (productid != 0)
             {
-                try
-                {
-                    finishedgoodlist = BatchStockrep.Table.Where(x => x.ProductCode == productcode).FirstOrDefault();
-                }
-                catch (Exception ex)
-                {
-                    throw;
-                }
+                materialOpeningMaster = BatchStockrep.Table.Where(x => x.productid == productid ).FirstOrDefault();
             }
-            return finishedgoodlist;
+            return materialOpeningMaster;
         }
 
         public BatchStock GetBatchProductMaterialStock(int productid)

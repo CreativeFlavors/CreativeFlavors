@@ -83,6 +83,8 @@ namespace MMS.Web.Controllers
         }
         public ActionResult GetPODetails(int POno)
         {
+            GRNCartManager gRNCartManager = new GRNCartManager();
+            gRNCartManager.Putcancelsuccess();
             GRNModel model = new GRNModel();
             PoManager poManager = new PoManager();
             GRNCartManager GRNCartManager = new GRNCartManager();
@@ -224,11 +226,24 @@ namespace MMS.Web.Controllers
             if (list != null )
             {
                 decimal? dt_qty = 0;
+                decimal? dis = 0;
+                decimal? sub = 0;
+                decimal? taxs = 0; 
+                decimal? grand = 0;
 
                     if (list.Quantity != null)
                     {
                     dt_qty = list.Quantity + model.Quantity;
+                     sub = list.Subtotal + GRNCart.Subtotal;
+                    dis = list.DiscountValue + GRNCart.DiscountValue;
+                    taxs=list.TaxValue + GRNCart.TaxValue;
+                    grand=list.Grandtotal + GRNCart.Grandtotal;
+
                     }
+                    GRNCart.DiscountValue = dis;
+                GRNCart.TaxValue = taxs;
+                GRNCart.Subtotal = sub;
+                GRNCart.Grandtotal = grand;
                 GRNCart.Quantity = dt_qty;
                 GRNCart.BatchCode=model.BatchCode;
                 GRNCart.ExpiryDate = model.ExpiryDate;
@@ -238,10 +253,15 @@ namespace MMS.Web.Controllers
             {
                 GRNCart = gRNCartManager.POST(GRNCart);
             }
-            var grnqty =  GRNCart.poquantity- GRNCart.Quantity ;
+            var grnqty =  GRNCart.poquantity- GRNCart.Quantity;
+            var finsubtotal = podetails.Subtotal - GRNCart.Subtotal;
+            var fintaxtotal = podetails.TaxValue - GRNCart.TaxValue;
+            var fingrandtotal = podetails.TotalValue - GRNCart.Grandtotal;
+            var findistotal = podetails.DiscountValue - GRNCart.DiscountValue;
+
             decimal? unitprices = GRNCart.unitprice;
             AlertMessage = "Added Successfully";
-            return Json(new { Grnqty= grnqty, Unitprices= unitprices, AlertMessage = AlertMessage }, JsonRequestBehavior.AllowGet);
+            return Json(new { Grnqty= grnqty, Unitprices= unitprices, Finsubtotal = finsubtotal, Fintaxtotal = fintaxtotal, Gingrandtotal = fingrandtotal, Findistotal = findistotal, AlertMessage = AlertMessage }, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
         public ActionResult ConfirmGRN(GRNModel model)
@@ -266,7 +286,7 @@ namespace MMS.Web.Controllers
                 var podetails = PoManager.Getdetails().Where(x => x.PoheaderId == model.PoHeaderId).FirstOrDefault();
                 var currencyids = currencyManager.GetContainCurrencyid(model.currencyOption);
                 GRNHeader GRNHeader = new GRNHeader();
-                GRNHeader.Items =grnlist.Count();
+                GRNHeader.Items = grnlist.Count();
                 GRNHeader.GrnDate = DateTime.Now;
                 GRNHeader.PoNumber = model.PoHeaderId;
                 GRNHeader.total_unitprice = model.Total_Price;
@@ -282,7 +302,7 @@ namespace MMS.Web.Controllers
                 GRNHeader.Notes = model.Notes;
                 GRNHeader.OverallWeight = model.OverallWeight;
                 GRNHeader.RefInvoiceDate = model.RefInvoiceDate;
-                GRNHeader.RefInvoiceNumber=model.RefInvoiceNumber;
+                GRNHeader.RefInvoiceNumber = model.RefInvoiceNumber;
                 GRNHeader.currencyid = currencyids.id;
                 decimal? quantity = 0;
                 decimal? taxvalue = 0;
@@ -298,7 +318,7 @@ namespace MMS.Web.Controllers
                     unitprice += i.for_totalunitprice;
                     subtotal += i.ForSubtotalValue;
                     discountval += i.ForDiscountValue;
-                    
+
                 }
                 GRNHeader.Quantity = quantity;
                 GRNHeader.for_totalunitprice = unitprice;
@@ -328,7 +348,7 @@ namespace MMS.Web.Controllers
                     GRNDetails.ExpiryDate = i.ExpiryDate;
                     GRNDetails.BatchCode = i.BatchCode;
                     GRNDetails.StoreCode = i.StoreCode;
-                    GRNDetails.Weight =model.Weight;
+                    GRNDetails.Weight = model.Weight;
                     GRNDetails.currencyid = currencyid.id;
                     GRNDetails.currencyconid = i.currencyconid;
                     GRNDetails.for_currencyconid = i.for_currencyconid;
@@ -343,7 +363,7 @@ namespace MMS.Web.Controllers
                     GRNDetails.IsFulfilled = DateTime.Now;
                     var data = GRNDetailsManager.POST(GRNDetails);
                     BatchStock batchStock = new BatchStock();
-                    batchStock.SupplierId= headerid.SupplierId;
+                    batchStock.SupplierId = headerid.SupplierId;
                     batchStock.StoreCode = i.StoreCode;
                     batchStock.productid = i.ProductNameId;
                     batchStock.BatchCode = i.BatchCode;
@@ -550,6 +570,7 @@ namespace MMS.Web.Controllers
             GRNModel.GrandTotal = total;
             GRNModel.DiscountValue = disamount;
 
+            
             var subtotal1 = (qty + 1) * unitprice;
             var disamount1 = subtotal1 * discounts / 100;
             var subtotals1 = subtotal1 - disamount1;

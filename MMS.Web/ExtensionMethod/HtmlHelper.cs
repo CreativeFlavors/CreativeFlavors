@@ -1799,6 +1799,28 @@ namespace MMS.Web.ExtensionMethod
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
         }
+        public static SelectList ProductmFINName()
+        {
+            ProductManager Manager = new ProductManager();
+            List<product> products = Manager.Get();
+            var filteredProducts = products.Where(p => p.ProductType == 1).OrderBy(p => p.ProductName).ToList();
+            List<System.Web.Mvc.SelectListItem> items = filteredProducts.Select(
+                                                 item => new System.Web.Mvc.SelectListItem()
+                                                 {
+                                                     Text = item.ProductName,
+                                                     Value = item.ProductId.ToString()
+                                                 }).ToList();
+
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select Product"
+            };
+
+            items.Insert(0, ShotName);
+
+            return new SelectList(items, "Value", "Text");
+        }      
         public static SelectList ProductmMATName()
         {
             ProductManager Manager = new ProductManager();

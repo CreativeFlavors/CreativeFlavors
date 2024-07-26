@@ -18,7 +18,6 @@ using System.Web.Mvc;
 
 namespace MMS.Web.Controllers
 {
-    [CustomFilter]
     public class SupplierMasterController : Controller
     {
         #region Accounts View

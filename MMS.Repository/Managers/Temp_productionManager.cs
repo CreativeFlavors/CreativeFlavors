@@ -35,6 +35,7 @@ namespace MMS.Repository.Managers
                 string username = "admin";
                 arg.CreatedBy = username;
                 arg.CreatedDate = DateTime.Now;
+                arg.Status = "1";
                 preproductionrepos.Insert(arg);
                 result = true;
             }
@@ -69,6 +70,15 @@ namespace MMS.Repository.Managers
             if (id != null)
             {
                 tempro = tempproductionrep.Table.Where(x => x.SalesOrderId == id).FirstOrDefault();
+            }
+            return tempro;
+        }   
+        public List<temp_production> GetProd(int proid,int SOid)
+        {
+            List<temp_production> tempro = new List<temp_production>();
+            if (proid != null && SOid != null)
+            {
+                tempro = tempproductionrep.Table.Where(x => x.SalesOrderId == SOid && x.ProductId == proid).ToList();
             }
             return tempro;
         }

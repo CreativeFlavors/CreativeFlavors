@@ -25,6 +25,7 @@ namespace MMS.Data.Mapping
             Property(t => t.quantity).HasColumnName("quantity");
             Property(t => t.Subtotal).HasColumnName("subtotal");
             Property(t => t.Grandtotal).HasColumnName("grandtotal");
+            Property(t => t.producttype_id).HasColumnName("producttype_id");
             Property(t => t.Discountperid).HasColumnName("discountperid");
             Property(t => t.Discountvalue).HasColumnName("discountvalue");
             Property(t => t.Specialinstruction).HasColumnName("specialinstruction");
@@ -44,7 +45,7 @@ namespace MMS.Data.Mapping
             Property(t => t.isdeleted).HasColumnName("isdeleted");
             Property(t => t.Deletedby).HasColumnName("deletedby");
             Property(t => t.Deleteddate).HasColumnName("deleteddate");
-            ToTable("salesorder");
+            ToTable("salesordercart");
         }
     }
 }

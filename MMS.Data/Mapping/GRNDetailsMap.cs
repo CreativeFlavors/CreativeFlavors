@@ -45,7 +45,7 @@ namespace MMS.Data.Mapping
             Property(t => t.UpdatedBy).HasColumnName("updatedby"); 
             Property(t => t.for_currencyconid).HasColumnName("for_currencyconid");
             Property(t => t.currencyconid).HasColumnName("currencyconid");
-            Property(t => t.Pounitprice).HasColumnName("Pounitprice");
+            Property(t => t.Pounitprice).HasColumnName("pounitprice");
             Property(t => t.currencyid).HasColumnName("currencyid");
             ToTable("grndetails");
 
