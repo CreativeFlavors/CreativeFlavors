@@ -65,5 +65,25 @@ namespace MMS.Repository.Managers
             }
             return materialOpeningMaster;
         }
+
+        public BatchStock GetBatchProductMaterialStock(int productid)
+        {
+            BatchStock materialOpeningMaster = new BatchStock();
+            if (productid != 0)
+            {
+                materialOpeningMaster = BatchStockrep.Table.Where(x => x.productid == productid).FirstOrDefault();
+            }
+            return materialOpeningMaster;
+        }
+
+        public List<BatchStock> GetBatchProductMaterialStocks(int productid)
+        {
+            List<BatchStock> materialOpeningMaster = new List<BatchStock>();
+            if (productid != 0)
+            {
+                materialOpeningMaster = BatchStockrep.Table.Where(x => x.productid == productid).ToList();
+            }
+            return materialOpeningMaster;
+        }
     }
 }

@@ -1,6 +1,8 @@
-﻿using MMS.Core.Entities;
+﻿using MMS.Common;
+using MMS.Core.Entities;
 using MMS.Data;
 using MMS.Data.Context;
+using MMS.Data.Mapping;
 using MMS.Repository.Service;
 using System;
 using System.Collections.Generic;
@@ -26,6 +28,35 @@ namespace MMS.Repository.Managers
             {
                 context.Dispose();
             }
+        }
+
+        public bool Post(ProductionMaterial arg)
+        {
+            bool result = false;
+            try
+            {
+                string username = "admin";
+                arg.CreatedBy = username;
+                arg.CreatedDate = DateTime.Now;
+                productionmaterialrepository.Insert(arg);
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                result = false;
+            }
+            return result;
+        }
+
+        public List<ProductionMaterial> GetProductionMaterial(int productionid)
+        {
+            List<ProductionMaterial> productionMaterial = new List<ProductionMaterial>();
+            if (productionid != 0)
+            {
+                productionMaterial = productionmaterialrepository.Table.Where(x => x.ProductionId == productionid).ToList();
+            }
+            return productionMaterial;
         }
     }
 }

@@ -14,11 +14,14 @@ namespace MMS.Core.Entities
         [Column("productionmaterialid")]
         public int ProductionMaterialId { get; set; }
 
-        [Column("productid")]
-        public int ProductId { get; set; }
+        [Column("productsid")]
+        public int ProductsId { get; set; }
 
-        [Column("quantity")]
-        public decimal? Quantity { get; set; }
+        [Column("productsmatid")]
+        public int ProductsMatId { get; set; }
+
+        [Column("consumeqty")]
+        public decimal? ConsumeQty { get; set; }
 
         [Column("createdby")]
         public string CreatedBy { get; set; }
@@ -40,5 +43,20 @@ namespace MMS.Core.Entities
 
         [Column("deleteddate")]
         public DateTime? DeletedDate { get; set; }
+
+        [Column("productionid")]
+        public int ProductionId { get; set; }
+
+        [Column("stockonhand")]
+        public decimal? StockOnHand { get; set; }
+
+        [Column("productiondate")]
+        public DateTime? ProductionDate { get; set; }
+
+        [Column("storecode")]
+        public int StoreCode { get; set; }
+
+        [Column("producttype")]
+        public int ProductType { get; set; }
     }
 }
