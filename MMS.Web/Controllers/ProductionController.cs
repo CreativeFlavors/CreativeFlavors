@@ -1,10 +1,13 @@
 ﻿using MMS.Common;
 using MMS.Core.Entities;
 using MMS.Core.Entities.Stock;
+using MMS.Data.StoredProcedureModel;
 using MMS.Repository.Managers;
 using MMS.Repository.Managers.StockManager;
 using MMS.Repository.ViewModel;
 using MMS.Web.Models.Production;
+using Newtonsoft.Json;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,15 +24,18 @@ namespace MMS.Web.Controllers
         }
         [HttpGet]
         public ActionResult ProductionGrid(int page = 1, int pageSize = 9)
-            {
+        {
             try
             {
                 ProductionManager productionManager = new ProductionManager();
                 ProductManager productManager = new ProductManager();
                 ProductionSubassemblyManager productionSubassemblyManager = new ProductionSubassemblyManager();
+                StatusProductionManager statusProductionManager = new StatusProductionManager();
+                StatusProductionSubassemblyManager statusProductionSubassemblyManager = new StatusProductionSubassemblyManager();
                 // Fetch production data
                 var productions = (from P in productionManager.GetProductions()
                                    join pr in productManager.Get() on P.ProductId equals pr.ProductId
+                                   join sp in statusProductionManager.Get() on P.ProductionStatus equals sp.StatusId
                                    select new ProductionViewModel
                                    {
                                        ProductionId = P.ProductionId,
@@ -37,11 +43,13 @@ namespace MMS.Web.Controllers
                                        ProductionQty = P.ProductionQty,
                                        RequiredQty = P.RequiredQty,
                                        ProductName = pr.ProductName,
-                                       ProductionType = "Production"
+                                       ProductionType = "Production",
+                                       ProductionStatus = sp.Status
                                    }).ToList();
                 // Fetch production subassembly data
                 var productionSubassemblies = (from psa in productionSubassemblyManager.GetProductions()
                                                join pr in productManager.Get() on psa.ProductId equals pr.ProductId
+                                               join sps in statusProductionSubassemblyManager.Get() on psa.ProductionSubassemblyStatus equals sps.StatusId
                                                select new ProductionViewModel
                                                {
                                                    ProductionId = psa.ProductionId,
@@ -49,7 +57,8 @@ namespace MMS.Web.Controllers
                                                    ProductionQty = psa.ProductionQty,
                                                    RequiredQty = psa.RequiredQty,
                                                    ProductName = pr.ProductName,
-                                                   ProductionType = "Subassembly"
+                                                   ProductionType = "Subassembly",
+                                                   ProductionStatus = sps.Status
                                                }).ToList();
                 // Combine both lists
                 productions.AddRange(productionSubassemblies);
@@ -99,8 +108,10 @@ namespace MMS.Web.Controllers
             try
             {
                 Production production = new Production();
+                ProductionMaterial productionMaterial = new ProductionMaterial();
                 string status = "";
                 ProductionManager productionManager = new ProductionManager();
+                ProductionMaterialManager productionMaterialManager = new ProductionMaterialManager();
                 production = productionManager.Getproductionid(model.ProductionId);
                 ProductManager productManager = new ProductManager();
                 product products = new product();
@@ -181,23 +192,43 @@ namespace MMS.Web.Controllers
                     productionManager.Put(production);
                     status = "Updated";
                 }
+                // Retrieve JSON data from AJAX request & production material consume values save to productionmaterial table
+                string jsonData = HttpContext.Request.Form["tableData"];
 
-                // Check if the production status has changed to "packing" means update the finishedgood table
+                // Deserialize JSON data into array of objects
+                List<ProductionMaterial> tableData = JsonConvert.DeserializeObject<List<ProductionMaterial>>(jsonData);
+
+                // Save ProductionMaterial records
+                foreach (var productionMaterials in tableData)
+                {
+                    ProductionMaterial productionMaterial1 = new ProductionMaterial();
+                    productionMaterial1.ProductsId = production.ProductId;
+                    productionMaterial1.ProductsMatId = productionMaterials.ProductsMatId;
+                    productionMaterial1.ConsumeQty = productionMaterials.ConsumeQty;
+                    productionMaterial1.StockOnHand = productionMaterials.StockOnHand;
+                    productionMaterial1.ProductionId = production.ProductionId;
+                    productionMaterial1.StoreCode = production.StoreCode;
+                    productionMaterial1.ProductionDate = production.ProductionDate;
+                    productionMaterial1.IsActive = true;
+                    productionMaterial1.ProductType = productionMaterials.ProductType;
+                    productionMaterialManager.Post(productionMaterial1);
+                }
+                // Check if the production status has changed to "packing" means update the batchstock table
                 if (model.ProductionStatus == 7)
                 {
                    // Update the batch table with relevant data from Production table
                     BatchStockManager batchStockManager = new BatchStockManager();
                     BatchStock existingBatchStock = batchStockManager.GetByProductCode(model.ProductCode);
-                    if(existingBatchStock != null)
-                    {
-                        //already quantity is there Update the stock quantity increased to batchstock table
-                        existingBatchStock.Quantity += model.ProductionQty;
-                        existingBatchStock.AltBatchCode = model.ProductionCode;
-                        batchStockManager.Put(existingBatchStock);
-                        status = "Packing";
-                    }
-                    else
-                    {
+                    //if(existingBatchStock != null)
+                    //{
+                    //    //already quantity is there Update the stock quantity increased to batchstock table
+                    //    existingBatchStock.Quantity += model.ProductionQty;
+                    //    existingBatchStock.AltBatchCode = model.ProductionCode;
+                    //    batchStockManager.Put(existingBatchStock);
+                    //    status = "Packing";
+                    //}
+                    //else
+                    //{
                         //insert new record to batchstock table
                         BatchStock batchStock = new BatchStock
                         {
@@ -213,7 +244,7 @@ namespace MMS.Web.Controllers
                         };
                         batchStockManager.POST(batchStock);
                         status = "Packing";
-                    }
+                    //}
                     // Update the FinishedGood table with relevant data from Production table
                     //FinishedGoodManager finishedGoodManager = new FinishedGoodManager();
                     //FinishedGood existingFinishedGood = finishedGoodManager.GetByProductCode(model.ProductCode);
@@ -245,9 +276,20 @@ namespace MMS.Web.Controllers
                     //}
 
                 }
-                // Update status history table when status changes from 2 Inprogress
+                // Update status history table and productmaterial stock decreased when status changes from 2 Inprogress
                 else if (model.ProductionStatus == 2)
                 {
+                    List<ProductionMaterial> productionMaterial1 = productionMaterialManager.GetProductionMaterial(production.ProductionId);
+                    foreach (var productionMaterials in productionMaterial1)
+                    {
+                        BatchStockManager batchStockManager = new BatchStockManager();
+                        List<BatchStock> batchStocks = batchStockManager.GetBatchProductMaterialStocks(productionMaterials.ProductsMatId);
+                        foreach (var batchStock in batchStocks)
+                        {
+                            batchStock.Quantity -= productionMaterials.ConsumeQty;
+                            batchStockManager.Put(batchStock);
+                        }
+                    }
                     StatusHistoryManager statusHistoryManager = new StatusHistoryManager();
                     StatusHistory statusHistory = new StatusHistory
                     {
@@ -332,6 +374,7 @@ namespace MMS.Web.Controllers
             {
                 Productionsubassembly production = new Productionsubassembly();
                 string status = "";
+                ProductionMaterialManager productionMaterialManager = new ProductionMaterialManager();
                 ProductionSubassemblyManager productionSubassemblyManager = new ProductionSubassemblyManager();
                 production = productionSubassemblyManager.Getproductionid(model.ProductionId);
                 ProductManager productManager = new ProductManager();
@@ -414,22 +457,43 @@ namespace MMS.Web.Controllers
                     status = "Updated";
                 }
 
+                // Retrieve JSON data from AJAX request & production material consume values save to productionmaterial table
+                string jsonData = HttpContext.Request.Form["tableData"];
+
+                // Deserialize JSON data into array of objects
+                List<ProductionMaterial> tableData = JsonConvert.DeserializeObject<List<ProductionMaterial>>(jsonData);
+
+                // Save ProductionMaterial records
+                foreach (var productionMaterials in tableData)
+                {
+                    ProductionMaterial productionMaterial1 = new ProductionMaterial();
+                    productionMaterial1.ProductsId = production.ProductId;
+                    productionMaterial1.ProductsMatId = productionMaterials.ProductsMatId;
+                    productionMaterial1.ConsumeQty = productionMaterials.ConsumeQty;
+                    productionMaterial1.StockOnHand = productionMaterials.StockOnHand;
+                    productionMaterial1.ProductionId = production.ProductionId;
+                    productionMaterial1.StoreCode = production.StoreCode;
+                    productionMaterial1.ProductionDate = production.ProductionDate;
+                    productionMaterial1.IsActive = true;
+                    productionMaterial1.ProductType = productionMaterials.ProductType;
+                    productionMaterialManager.Post(productionMaterial1);
+                }
                 // Check if the production status has changed to "Released for Assembly" means update the subassemblyinventory table
                 if (model.ProductionSubassemblyStatus == 6)
                 {
                     // Update the batch table with relevant data from Production table
                     BatchStockManager batchStockManager = new BatchStockManager();
                     BatchStock existingBatchStock = batchStockManager.GetByProductCode(model.ProductCode);
-                    if (existingBatchStock != null)
-                    {
-                        //already quantity is there Update the stock quantity increased to batchstock table
-                        existingBatchStock.Quantity += model.ProductionQty;
-                        existingBatchStock.AltBatchCode = model.ProductionCode;
-                        batchStockManager.Put(existingBatchStock);
-                        status = "ReleasedForAssembly";
-                    }
-                    else
-                    {
+                    //if (existingBatchStock != null)
+                    //{
+                    //    //already quantity is there Update the stock quantity increased to batchstock table
+                    //    existingBatchStock.Quantity += model.ProductionQty;
+                    //    existingBatchStock.AltBatchCode = model.ProductionCode;
+                    //    batchStockManager.Put(existingBatchStock);
+                    //    status = "ReleasedForAssembly";
+                    //}
+                    //else
+                    //{
                         //insert new record to batchstock table
                         BatchStock batchStock = new BatchStock
                         {
@@ -445,7 +509,7 @@ namespace MMS.Web.Controllers
                         };
                         batchStockManager.POST(batchStock);
                         status = "ReleasedForAssembly";
-                    }
+                    //}
                     //// Update the subassemblyinventory table with relevant data from Productionsubassembly table
                     //SubassemblyinventoryManager subassemblyinventoryManager = new SubassemblyinventoryManager();
                     //Subassemblyinventory existingsubassembly = subassemblyinventoryManager.GetByProductCode(model.ProductCode);
@@ -477,9 +541,20 @@ namespace MMS.Web.Controllers
                     //}
 
                 }
-                // Update status history table when status changes from 2 Inprogress
+                // Update status history table and subassembly materials decreased when status changes from 2 Inprogress
                 else if (model.ProductionSubassemblyStatus == 2)
                 {
+                    List<ProductionMaterial> productionMaterial1 = productionMaterialManager.GetProductionMaterial(production.ProductionId);
+                    foreach (var productionMaterials in productionMaterial1)
+                    {
+                        BatchStockManager batchStockManager = new BatchStockManager();
+                        List<BatchStock> batchStocks = batchStockManager.GetBatchProductMaterialStocks(productionMaterials.ProductsMatId);
+                        foreach (var batchStock in batchStocks)
+                        {
+                            batchStock.Quantity -= productionMaterials.ConsumeQty;
+                            batchStockManager.Put(batchStock);
+                        }
+                    }
                     StatusHistorySubassemblyManager statusHistoryManager = new StatusHistorySubassemblyManager();
                     StatusHistorySubassembly statusHistory = new StatusHistorySubassembly
                     {
@@ -727,17 +802,8 @@ namespace MMS.Web.Controllers
             string productcode = null;
             decimal? quantity = 0;
 
-            // Retrieve data from managers
-            Temp_productionManager temp_ProductionManager = new Temp_productionManager();
-            List<temp_production> temp_Productions = temp_ProductionManager.GetbomproductionMaterial(productid);
-
             ProductManager productManager = new ProductManager();
             product product = productManager.GetId(productid);
-
-            Temp_productionManager temp_preproductionManager = new Temp_productionManager();
-            preproduction preproduction = temp_preproductionManager.Getproductionqty(productid);
-
-            // Populate variables based on retrieved data
             if (product != null)
             {
                 minstock = product.MinStock;
@@ -746,43 +812,64 @@ namespace MMS.Web.Controllers
                 productcode = product.ProductCode;
             }
 
+        // for totalquantity ordered list
+            Temp_productionManager temp_preproductionManager = new Temp_productionManager();
+            preproduction preproduction = temp_preproductionManager.Getproductionqty(productid);
             if (preproduction != null)
             {
                 quantity = preproduction.Qty;
             }
 
-            // Fetch material names and consumption quantities  
+            // Listout productmaterial list for production start
+            List<int> materialid = new List<int>();
             List<string> materialNames = new List<string>();
+            List<int> producttype = new List<int>();
             List<decimal> consumes = new List<decimal>();
-
+            List<decimal?> stockformaterial = new List<decimal?>();
+            Temp_productionManager temp_ProductionManager = new Temp_productionManager();
+            List<temp_production> temp_Productions = temp_ProductionManager.GetbomproductionMaterial(productid);
             foreach (var tempProductionItem in temp_Productions)
             {
-                MaterialNameManager materialNameManager = new MaterialNameManager();
-                tbl_materialnamemaster materialInfo = materialNameManager.GetMaterialNameMaterial(tempProductionItem.MaterialId);
+                ProductManager productManager1 = new ProductManager();
+                product materialInfo = productManager1.GetId(tempProductionItem.MaterialId);
 
                 if (materialInfo != null)
                 {
-                    materialNames.Add(materialInfo.MaterialDescription);
-                    consumes.Add((decimal)tempProductionItem.Consume);
+                    materialid.Add(materialInfo.ProductId);
+                    materialNames.Add(materialInfo.ProductName);
+                    producttype.Add(materialInfo.ProductType);
+                    consumes.Add((decimal)tempProductionItem.Consume);                   
+                }
+
+                BatchStockManager batchStockManager = new BatchStockManager();
+                List<BatchStock> batchStock = batchStockManager.GetBatchProductMaterialStocks(tempProductionItem.MaterialId);
+                if (batchStock != null && batchStock.Any())
+                {
+                    decimal? totalStockQuantity = batchStock.Sum(bs => bs.Quantity);
+                    stockformaterial.Add(totalStockQuantity);
                 }
             }
 
+        //Listout the productmaterial list for available to manufacture
             List<string> Bommaterialname = new List<string>();
             List<decimal?> requiredqty = new List<decimal?>();
             List<string> uom = new List<string>();
-            List<decimal> stockqty = new List<decimal>();
+            List<decimal?> stockqty = new List<decimal?>();
             ProductManager productManagers = new ProductManager();
             product products = productManager.GetId(productid);
+            Parentbom_materialManager parentbom_MaterialManager1 = new Parentbom_materialManager();
+            //parentbom parentbom = parentbom_MaterialManager1.GetParentBomMaterialId(products.BomNo.ToString());
             Parentbom_materialManager parentbom_MaterialManager = new Parentbom_materialManager();
             List<parentbom_material> parentbom_Material = parentbom_MaterialManager.GetMaterialList(products.BomNo);
 
             foreach (var parentBomMaterial in parentbom_Material)
             {
-                MaterialNameManager materialNameManager = new MaterialNameManager();
-                tbl_materialnamemaster materialname = materialNameManager.GetMaterialNameMaterial(parentBomMaterial.MaterialMasterId);
+                ProductManager productManager1 = new ProductManager();
+                product materialname = productManager1.GetId(parentBomMaterial.ProductId);
+
                 if (materialname != null)
                 {
-                    Bommaterialname.Add(materialname.MaterialDescription);
+                    Bommaterialname.Add(materialname.ProductName);
                     requiredqty.Add(parentBomMaterial.RequiredQty);
                 }
 
@@ -792,20 +879,20 @@ namespace MMS.Web.Controllers
                 {
                     uom.Add(uomname.ShortUnitName);
                 }
-
-                MaterialOpeningStockManager materialOpeningStockManager = new MaterialOpeningStockManager();
-                MaterialOpeningMaster materialOpeningstock = materialOpeningStockManager.GetmaterialOpeningMaterialID(parentBomMaterial.MaterialMasterId);
-                if (materialOpeningstock != null)
+                BatchStockManager batchStockManager = new BatchStockManager();
+                List<BatchStock> batchStock = batchStockManager.GetBatchProductMaterialStocks(parentBomMaterial.ProductId);
+                if (batchStock != null && batchStock.Any())
                 {
-                    stockqty.Add(materialOpeningstock.Qty);
+                    decimal? totalStockQuantity = batchStock.Sum(bs => bs.Quantity);
+                    stockqty.Add(totalStockQuantity);
                 }
-
             }
 
+        //Listout the subassembly manufacturing list
             List<string> Subassmblyname = new List<string>();
             List<decimal?> Subassmblyrequiredqty = new List<decimal?>();
             //List<string> Subassmblyuom = new List<string>();
-            List<decimal> Subassmblystockqty = new List<decimal>();
+            List<decimal?> Subassmblystockqty = new List<decimal?>();
             subassemblyManager subassemblyManager = new subassemblyManager();
             List<subassembly> subassemblylist = subassemblyManager.GetsubassemblyList(products.BomNo);
 
@@ -824,19 +911,21 @@ namespace MMS.Web.Controllers
                 //{
                 //    uom.Add(uomname.ShortUnitName);
                 //}
-
-                FinishedGoodManager finishedGoodManager = new FinishedGoodManager();
-                FinishedGood finishedGood = finishedGoodManager.GetByfinsihedgoodqty(subassemblyitem.ProductId);
-                if (finishedGood != null)
+                BatchStockManager batchStockManager = new BatchStockManager();
+                List<BatchStock> batchStock = batchStockManager.GetBatchProductMaterialStocks(subassemblyitem.ProductId);
+                if (batchStock != null && batchStock.Any())
                 {
-                    Subassmblystockqty.Add(finishedGood.Quantity);
+                    decimal? totalStockQuantity = batchStock.Sum(bs => bs.Quantity);
+                    Subassmblystockqty.Add(totalStockQuantity);
                 }
-
             }
             return Json(new
             {
+                Productsid = materialid,
+                ProductType = producttype,
                 bomdata = materialNames,
                 Consumeqty = consumes,
+                StockforMaterial = stockformaterial,
                 Minstock = minstock,
                 Maxstock = maxstock,
                 producttotalitems = quantity,

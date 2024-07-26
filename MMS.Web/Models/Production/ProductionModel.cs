@@ -3,6 +3,7 @@ using MMS.Core.Entities.JobWork;
 using MMS.Core.Entities.Stock;
 using MMS.Repository.Service;
 using MMS.Web.Models.ProductionSubassembly;
+using MMS.Web.Models.ProductionMaterial;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,6 +51,7 @@ namespace MMS.Web.Models.Production
         public decimal? QuantityToManufacture { get; set; }
         public decimal? AvailableToManufacture { get; set; }
         public string ProductCode { get; set; }
-        public product product { get; set; }       
+        public product product { get; set; } 
+        public ProductionMaterialModel productionMaterial { get; set; }
     }
 }
