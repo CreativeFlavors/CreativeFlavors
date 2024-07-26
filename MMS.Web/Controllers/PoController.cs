@@ -78,7 +78,10 @@ namespace MMS.Web.Controllers
                     indentPoMapping.IndentPoMapId = model.IndentPoMapId;
                     indentPoMapping.SupplierId = model.SupplierId;
                     indentPoMapping.ProductId = model.ProductId;
-                    indentPoMapping.IndentId = indentcart.IndentCartId;
+                    if (indentcart !=null)
+                    {
+                        indentPoMapping.IndentId = indentcart.IndentCartId;
+                    }
                     indentPoMapping.IndentProductId = model.ProductId;
                     indentPoMapping.StoreCode = product.StoreId;
                     indentPoMapping.UnitPrice = model.UnitPrice;
@@ -106,7 +109,10 @@ namespace MMS.Web.Controllers
                     indentPoMapping.IndentPoMapId = model.IndentPoMapId;
                     indentPoMapping.SupplierId = model.SupplierId;
                     indentPoMapping.ProductId = model.ProductId;
-                    indentPoMapping.IndentId = indentcart.IndentCartId;
+                    if (indentcart != null)
+                    {
+                        indentPoMapping.IndentId = indentcart.IndentCartId;
+                    }
                     indentPoMapping.IndentProductId = model.ProductId;
                     indentPoMapping.StoreCode = product.StoreId;
                     indentPoMapping.UnitPrice = model.UnitPrice;
@@ -199,7 +205,7 @@ namespace MMS.Web.Controllers
                     poDetail.TotalValue = i.TotalValue;
                     poDetail.TaxInclusive = i.TaxInclusive;
                     poDetail.PoNumber = i.PoNumber;
-                    poDetail.IndentNumber = i.IndentNumber;
+                    poDetail.IndentNumber = (int)i.IndentNumber;
                     poManager.PostPoDetail(poDetail);
                 }
                 status = "Inserted";
@@ -217,7 +223,7 @@ namespace MMS.Web.Controllers
             model.IndentPoMapId = data.IndentPoMapId;
             model.PoDate = data.PoDate;
             model.PoNumber = data.PoNumber;
-            model.IndentNumber = data.IndentNumber;
+            model.IndentNumber = (int)data.IndentNumber;
             model.SupplierId = data.SupplierId;
             model.ProductId = data.ProductId;
             model.StoreCode = data.StoreCode;
