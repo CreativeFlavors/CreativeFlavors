@@ -107,16 +107,12 @@ namespace MMS.Repository.Managers
             }
             return result;
         }
-        public ProductType Get(int id)
-        {
-            return null;
-        }
         public List<Product_Type> Get()
         {
             List<Product_Type> productType = new List<Product_Type>();
             try
             {
-                productType = product_TypeRepository.Table.Where(X => X.IsDeleted == false || X.IsDeleted == null).ToList<Product_Type>();
+                productType = product_TypeRepository.Table.Where(X => X.IsDeleted == true || X.IsDeleted == null).ToList<Product_Type>();
             }
             catch (Exception ex)
             {

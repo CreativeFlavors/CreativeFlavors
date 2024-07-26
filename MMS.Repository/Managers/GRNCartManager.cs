@@ -78,8 +78,8 @@ namespace MMS.Repository.Managers
             {
                 throw;
             }
-            
-        }     
+
+        }
         public GRNCart Getgrncartdt(int id)
         {
             try
@@ -87,7 +87,7 @@ namespace MMS.Repository.Managers
                 GRNCart GRNCart = new GRNCart();
                 if (id != null)
                 {
-                    GRNCart = GRNCartrep.Table.Where(x => x.podetailid == id && x.IsDeleted == true && x.Status ==1).FirstOrDefault();
+                    GRNCart = GRNCartrep.Table.Where(x => x.podetailid == id && x.IsDeleted == true && x.Status == 1).FirstOrDefault();
                 }
                 return GRNCart;
             }
@@ -95,8 +95,8 @@ namespace MMS.Repository.Managers
             {
                 throw;
             }
-            
-        }     
+
+        }
         public List<GRNCart> GetgrncartHD(int id)
         {
             try
@@ -112,7 +112,7 @@ namespace MMS.Repository.Managers
             {
                 throw;
             }
-            
+
         }
         public bool Putstatussuccess()
         {
@@ -135,7 +135,7 @@ namespace MMS.Repository.Managers
             }
 
             return result;
-        } 
+        }
         public bool Putcancelsuccess()
         {
             bool result = false;
@@ -160,20 +160,24 @@ namespace MMS.Repository.Managers
         }
         public GRNCart Put(GRNCart arg)
         {
-                GRNCart GRNCart = new GRNCart();
-                GRNCart model = GRNCartrep.Table.Where(p => p.podetailid == arg.podetailid).FirstOrDefault();
-                if (model != null)
-                {
-                    model.Quantity = arg.Quantity;
-                    model.BatchCode = arg.BatchCode;
-                    model.ExpiryDate = arg.ExpiryDate;
-                    model.UpdatedDate = DateTime.Now;
-                    string username = "admin";
+            GRNCart GRNCart = new GRNCart();
+            GRNCart model = GRNCartrep.Table.Where(p => p.podetailid == arg.podetailid).FirstOrDefault();
+            if (model != null)
+            {
+                model.Quantity = arg.Quantity;
+                model.BatchCode = arg.BatchCode;
+                model.Subtotal = arg.Subtotal;
+                model.Grandtotal = arg.Grandtotal;
+                model.TaxValue = arg.TaxValue;
+                model.DiscountValue = arg.DiscountValue;
+                model.ExpiryDate = arg.ExpiryDate;
+                model.UpdatedDate = DateTime.Now;
+                string username = "admin";
 
-                    model.UpdatedBy = username;
-                    GRNCartrep.Update(model);
-                    GRNCart = model;
-                }
+                model.UpdatedBy = username;
+                GRNCartrep.Update(model);
+                GRNCart = model;
+            }
             return GRNCart;
         }
         public GRNCart Delete(int id)

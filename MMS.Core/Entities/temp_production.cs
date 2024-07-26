@@ -12,7 +12,9 @@ namespace MMS.Core.Entities
     {
         [System.ComponentModel.DataAnnotations.Key]
         [Column("id")]
-        public int Id { get; set; }
+        public int Id { get; set; } 
+        [Column("producttype")]
+        public int producttype { get; set; }
         [Column("salesorderid")]
         public int SalesOrderId { get; set; }
         [Column("buyerid")]

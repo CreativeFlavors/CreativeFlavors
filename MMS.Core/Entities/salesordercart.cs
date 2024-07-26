@@ -18,7 +18,9 @@ namespace MMS.Core.Entities
         [Column("productcode")]
         public string ProductCode { get; set; }
         [Column("productnameid")]
-        public int ProductNameid { get; set; }
+        public int ProductNameid { get; set; } 
+        [Column("producttype_id")]
+        public int producttype_id { get; set; }
         [Column("uommasterid")]
         public int UomMasterId { get; set; }
         [Column("taxperid")]

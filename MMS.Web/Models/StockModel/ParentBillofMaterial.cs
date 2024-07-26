@@ -16,6 +16,7 @@ namespace MMS.Web.Models.StockModel
         public string MaterialNames { get; set; }
         public string UOMName { get; set; }
         public string productname { get; set; }
+        public string productype{ get; set; }
         public string materialcategory { get; set; }
         public string materialgroup { get; set; }
         public DateTime? Date { get; set; }
@@ -49,7 +50,7 @@ namespace MMS.Web.Models.StockModel
 
         public int? MaterialMasterid { get; set; }
 
-        public int? Uomid { get; set; }
+        public int Uomid { get; set; }
         public decimal? availablestock { get; set; }
 
         public decimal? Requiredqty { get; set; }

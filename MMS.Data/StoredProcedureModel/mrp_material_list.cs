@@ -13,7 +13,9 @@ namespace MMS.Data.StoredProcedureModel
         [Column("materialmasterid")]
         public int MaterialMasterId { get; set; }
         [Column("materialnames")]
-        public string MaterialNames { get; set; }
+        public string MaterialNames { get; set; } 
+        [Column("producttype")]
+        public string producttype { get; set; }
         [Column("availablestock")]
         public decimal? AvailableStock { get; set; }
         [Column("requiredqty")]

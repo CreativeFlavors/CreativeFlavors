@@ -137,7 +137,8 @@ namespace MMS.Web.Controllers
         {
             Salesorders model = new Salesorders();
             SalesorderManager salesorderManager = new SalesorderManager();
-
+            CustAddressMangers custAddressMangers = new CustAddressMangers();
+            var data = custAddressMangers.GetCustAddressbuyerid(id);
             if (id == 0)
             {
                 var bOMMaterial = salesorderManager.Putstatus();
@@ -159,6 +160,8 @@ namespace MMS.Web.Controllers
                     tax += i.taxvalue;
                     grandtotal += i.totalprice;
                 }
+                model.Billingadd = data.Add1;
+                model.shippingadd = data.Add2;
                 model.Total_Price = price;
                 model.Total_Subtotal = subtotal;
                 model.Total_discountval = discount;
@@ -186,6 +189,7 @@ namespace MMS.Web.Controllers
                 availablestock.availablestock = item.AvailableStock;
                 availablestock.UOMName = item.UOMName;
                 availablestock.MaterialMasterid = item.MaterialMasterId;
+                availablestock.productype = item.producttype;
                 totalList.Add(availablestock);
             }
 
@@ -220,35 +224,47 @@ namespace MMS.Web.Controllers
             SalesorderDT_Manager salesorderManager = new SalesorderDT_Manager();
             ProductManager productManager = new ProductManager();
             Parentbom_materialManager bOMMaterialListManager = new Parentbom_materialManager();
+            subassemblyManager subassemblyManager = new subassemblyManager();
             var st = salesorderManager.GetSO(id);
             var product = productManager.GetId(st.productid);
             var bommaterial = bOMMaterialListManager.GetMaterialList(product.BomNo);
+            //var submaterial = subassemblyManager.GetMaterialList(product.BomNo);
             Temp_Indent temp_Salesorder = new Temp_Indent();
             foreach (var item in bommaterial)
             {
-                MaterialOpeningStockManager materialOpeningStockManager = new MaterialOpeningStockManager();
+                BatchStockManager batchStockManager = new BatchStockManager();
                 Temp_salesorderManager temp_SalesorderManager = new Temp_salesorderManager();
-                var MaterialOpeningMaster = materialOpeningStockManager.GetmaterialOpeningMaterialID(item.MaterialMasterId);
-                temp_Salesorder.SalesOrderId = id;
+                var MaterialOpeningMaster = batchStockManager.GetmaterialOpeningMaterialID(item.ProductId);
+                temp_Salesorder.SalesOrderId = st.Salesorderid_hd;  
                 temp_Salesorder.BuyerId = st.Customerid;
                 temp_Salesorder.ProductId = product.ProductId;
                 temp_Salesorder.ProductItem = st.quantity;
                 if (MaterialOpeningMaster != null)
                 {
-                    temp_Salesorder.MaterialId = MaterialOpeningMaster.MaterialMasterId;
-                    temp_Salesorder.AvailableStock = MaterialOpeningMaster.Qty;
-                    temp_Salesorder.AvailableUnitId = MaterialOpeningMaster.PrimaryUomMasterId;
+                    temp_Salesorder.MaterialId = MaterialOpeningMaster.productid;
+                    temp_Salesorder.AvailableStock = MaterialOpeningMaster.Quantity;
+                    temp_Salesorder.AvailableUnitId = MaterialOpeningMaster.UomId;
                     var consume = st.quantity * item.RequiredQty;
                     temp_Salesorder.Consume = consume;
-                    temp_Salesorder.ConsumeUnitId = MaterialOpeningMaster.PrimaryUomMasterId;
-                    var stockRequired = consume - MaterialOpeningMaster.Qty;
+                    temp_Salesorder.ConsumeUnitId = MaterialOpeningMaster.UomId;
+                    var stockRequired = consume - MaterialOpeningMaster.Quantity;
                     temp_Salesorder.stockRequired = stockRequired;
-                    if (MaterialOpeningMaster.Qty <= consume)
+                    if (MaterialOpeningMaster.Quantity <= consume)
                     {
                         temp_SalesorderManager.Post(temp_Salesorder);
                     }
                 }
-            }
+                else
+                {
+                    temp_Salesorder.MaterialId = item.ProductId;
+                    var consume = st.quantity * item.RequiredQty;
+                    temp_Salesorder.Consume = consume;
+                    temp_Salesorder.ConsumeUnitId = item.UomId;
+                    var stockRequired = consume;
+                    temp_Salesorder.stockRequired = stockRequired;
+                        temp_SalesorderManager.Post(temp_Salesorder);
+                }
+            }     
             var data = "Success";
 
             return Json(data, JsonRequestBehavior.AllowGet);
@@ -262,42 +278,120 @@ namespace MMS.Web.Controllers
                 return Json(new { data = "Failer" }, JsonRequestBehavior.AllowGet);
             }
             SalesorderDT_Manager salesorderManager = new SalesorderDT_Manager();
+            subassemblyManager subassemblyManager = new subassemblyManager();
             ProductManager productManager = new ProductManager();
             Parentbom_materialManager bOMMaterialListManager = new Parentbom_materialManager();
             var st = salesorderManager.GetSO(id);
             var product = productManager.GetId(st.productid);
             var bommaterial = bOMMaterialListManager.GetMaterialList(product.BomNo);
+            var submaterial = subassemblyManager.GetMaterialList(product.BomNo);
             temp_production temp_production = new temp_production();
             preproduction preproduction = new preproduction();
             foreach (var item in bommaterial)
-
             {
-                MaterialOpeningStockManager materialOpeningStockManager = new MaterialOpeningStockManager();
+                BatchStockManager batchStockManager = new BatchStockManager();
                 Temp_productionManager Temp_productionManagers = new Temp_productionManager();
-                var MaterialOpeningMaster = materialOpeningStockManager.GetmaterialOpeningMaterialID(item.MaterialMasterId);
-                temp_production.SalesOrderId = id;
-                preproduction.SalesOrderNo = id;
+                var batchStockMaster = batchStockManager.GetmaterialOpeningMaterialID(item.ProductId);
+                temp_production.SalesOrderId = st.Salesorderid_hd;
+                preproduction.SalesOrderNo = st.Salesorderid_hd;
                 temp_production.BuyerId = st.Customerid;
                 temp_production.ProductId = product.ProductId;
                 temp_production.ProductItem = st.quantity;
                 temp_production.Bomid = product.BomNo;
-                if (MaterialOpeningMaster != null)
+                if (batchStockMaster != null)
                 {
-                    temp_production.MaterialId = MaterialOpeningMaster.MaterialMasterId;
-                    temp_production.AvailableStock = MaterialOpeningMaster.Qty;
-                    temp_production.AvailableUnitId = MaterialOpeningMaster.PrimaryUomMasterId;
+                    temp_production.MaterialId = batchStockMaster.productid;
+                    temp_production.AvailableStock = batchStockMaster.Quantity;
+                    temp_production.AvailableUnitId = batchStockMaster.UomId;
                     var consume = st.quantity * item.RequiredQty;
                     temp_production.Consume = consume;
-                    temp_production.ConsumeUnitId = MaterialOpeningMaster.PrimaryUomMasterId;
+                    temp_production.ConsumeUnitId = batchStockMaster.UomId;
                     preproduction.ProductId = product.ProductId;
                     preproduction.SalesOrderDate = st.salesorderdate;
                     preproduction.BuyerId = st.Customerid;
                     preproduction.Qty = st.quantity;
-                    preproduction.Materialid = MaterialOpeningMaster.MaterialMasterId;
+                    preproduction.Materialid = batchStockMaster.productid;
                     Temp_productionManagers.Postpreproduction(preproduction);
                     Temp_productionManagers.Post(temp_production);
 
                 }
+            }
+
+            foreach (var item in submaterial)
+            {
+                BatchStockManager batchStockManager = new BatchStockManager();
+                Temp_productionManager Temp_productionManagers = new Temp_productionManager();
+                var batchStockMaster = batchStockManager.GetmaterialOpeningMaterialID(item.ProductId);
+                temp_production.SalesOrderId = st.Salesorderid_hd;
+                preproduction.SalesOrderNo = st.Salesorderid_hd;
+                temp_production.BuyerId = st.Customerid;
+                temp_production.ProductId = product.ProductId;
+                temp_production.ProductItem = st.quantity;
+                temp_production.Bomid = product.BomNo;
+                if (batchStockMaster != null)
+                {
+                    temp_production.MaterialId = batchStockMaster.productid;
+                    temp_production.AvailableStock = batchStockMaster.Quantity;
+                    temp_production.AvailableUnitId = batchStockMaster.UomId;
+                    var consume = st.quantity * item.RequiredQty;
+                    temp_production.Consume = consume;
+                    temp_production.ConsumeUnitId = batchStockMaster.UomId;
+                    preproduction.ProductId = product.ProductId;
+                    preproduction.SalesOrderDate = st.salesorderdate;
+                    preproduction.BuyerId = st.Customerid;
+                    preproduction.Qty = st.quantity;
+                    preproduction.Materialid = batchStockMaster.productid;
+                    Temp_productionManagers.Postpreproduction(preproduction);
+                    Temp_productionManagers.Post(temp_production);
+
+                }
+            }
+            var data = "Success";
+
+            return Json(data, JsonRequestBehavior.AllowGet);
+        } 
+        public ActionResult TempProductionSubassembly(int proid ,int SOid)
+        {
+            Temp_productionManager Temp_productionManager = new Temp_productionManager();
+            SalesorderDT_Manager salesorderManager = new SalesorderDT_Manager();
+            var st = salesorderManager.GetSO(SOid);
+            var st1 = Temp_productionManager.GetProd(proid, st.Salesorderid_hd);
+            if (st1.Count() != 0)
+            {
+                return Json(new { data = "Failer" }, JsonRequestBehavior.AllowGet);
+            }
+          
+            ProductManager productManager = new ProductManager();
+            Parentbom_materialManager bOMMaterialListManager = new Parentbom_materialManager();
+            var product = productManager.GetId(proid);
+
+            var bommaterial = bOMMaterialListManager.GetMaterialList(product.BomNo);
+            temp_production temp_production = new temp_production();
+            preproduction preproduction = new preproduction();
+
+            foreach (var item in bommaterial)
+            {
+                Temp_productionManager Temp_productionManagers = new Temp_productionManager();
+                temp_production.SalesOrderId = st.Salesorderid_hd;
+                preproduction.SalesOrderNo = st.Salesorderid_hd;
+                temp_production.BuyerId = st.Customerid;
+                temp_production.ProductId = product.ProductId;
+                temp_production.producttype = product.ProductType;
+                temp_production.ProductItem = st.quantity;
+                temp_production.Bomid = product.BomNo;
+                    temp_production.MaterialId = item.ProductId;
+                    temp_production.AvailableStock = 0;
+                    var consume = st.quantity * item.RequiredQty;
+                    temp_production.Consume = consume;
+                    temp_production.ConsumeUnitId = item.UomId;
+                    preproduction.ProductId = product.ProductId;
+                    preproduction.SalesOrderDate = st.salesorderdate;
+                    preproduction.BuyerId = st.Customerid;
+                    preproduction.Qty = st.quantity;
+                    preproduction.Materialid = item.ProductId;
+                Temp_productionManagers.Postpreproduction(preproduction);
+                Temp_productionManagers.Post(temp_production);
+
             }
             var data = "Success";
 
@@ -461,6 +555,7 @@ namespace MMS.Web.Controllers
             salesorder.salesorderdate = DateTime.Now;
             salesorder.originalquotedate = DateTime.Now;
             salesorder.custaddcode = addreddcode.BuyerCode;
+            salesorder.producttype_id=product.ProductType;
             salesorder.custbillcode = addreddcode.BuyerAddress1;
             salesorder.custshipcode = addreddcode.BuyerAddress2;
             var unitprice = product.Price * conversionval;
@@ -552,6 +647,7 @@ namespace MMS.Web.Controllers
                     salesorder_Dt.quantity = i.quantity;
                     salesorder_Dt.Subtotal = i.Subtotal;
                     salesorder_Dt.totalprice = i.Grandtotal;
+                    salesorder_Dt.producttype_id = i.producttype_id;
                     salesorder_Dt.Discountperid = i.Discountperid;
                     salesorder_Dt.Discountvalue = i.Discountvalue;
                     salesorder_Dt.Specialinstruction = i.Specialinstruction;

@@ -10,7 +10,8 @@ namespace MMS.Web.Models.SupplierMaterialModel
         public int SupplierMaterialId { get; set; }
         public int SupplierId { get; set; }
         public int ProductId { get; set; }
-        public int UomId { get; set; }
+        public int UomId { get; set; } 
+        public int category { get; set; }
         public int TaxId { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }

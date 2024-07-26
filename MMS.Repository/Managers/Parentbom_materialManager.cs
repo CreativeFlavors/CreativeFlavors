@@ -96,7 +96,7 @@ namespace MMS.Repository.Managers
             if (BOMID != null)
             {
                 billOfMaterial = parentbom_materialRepository.Table
-                    .Where(x => x.BomID == BOMID)
+                    .Where(x => x.BomID == BOMID && x.IsDelete == true)
                     .OrderBy(x => x.BomID)
                     .ToList();
             }

@@ -25,7 +25,7 @@ namespace MMS.Core.Entities
         public int? PoDetailId { get; set; }
         [Column("poquantity")]
         public decimal? PoQuantity { get; set; }  
-        [Column("Pounitprice")]
+        [Column("pounitprice")]
         public decimal? Pounitprice { get; set; }
         [Column("unitprice")]
         public decimal? UnitPrice { get; set; }

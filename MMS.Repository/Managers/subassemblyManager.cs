@@ -31,6 +31,18 @@ namespace MMS.Repository.Managers
             }
             return subassembly;
         }
+        public List<subassembly> GetMaterialList(int BOMID)
+        {
+            List<subassembly> billOfMaterial = new List<subassembly>();
+            if (BOMID != null)
+            {
+                billOfMaterial = subassemblyRepository.Table
+                    .Where(x => x.BomId == BOMID && x.IsDeleted == true)
+                    .OrderBy(x => x.BomId)
+                    .ToList();
+            }
+            return billOfMaterial;
+        }
         public bool Put(subassembly arg)
         {
             bool result = false;

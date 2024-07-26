@@ -85,6 +85,15 @@ namespace MMS.Repository.Managers
                 salesorder = salesorderhdrep.Table.Where(x => x.Salesorderid_dt == id).FirstOrDefault();
             }
             return salesorder;
+        } 
+        public Salesorder_dt Getproductid(int? id)
+        {
+            Salesorder_dt salesorder = new Salesorder_dt();
+            if (id != null)
+            {
+                salesorder = salesorderhdrep.Table.Where(x => x.productid == id).FirstOrDefault();
+            }
+            return salesorder;
         }
         public bool Put(Salesorder_dt arg)
         {

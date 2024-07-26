@@ -1,6 +1,8 @@
 ﻿using MMS.Common;
 using MMS.Core.Entities;
 using MMS.Data;
+using MMS.Data.Mapping;
+using MMS.Data.StoredProcedureModel;
 using MMS.Repository.Service;
 using System;
 using System.Collections.Generic;
@@ -40,11 +42,27 @@ namespace MMS.Repository.Managers
             }
             return salesorder;
         }
+        public List<FineshedgoodsReport> Fineshedgoods_Report()
+        {
+            List<FineshedgoodsReport> FineshedgoodsReport = new List<FineshedgoodsReport>();
+            FineshedgoodsReport = BatchStockrep.Fineshedgoods();
+            return FineshedgoodsReport;
+        }
+
         public List<BatchStock> Get()
         {
             List<BatchStock> obj = new List<BatchStock>();
             obj = BatchStockrep.Table.ToList<BatchStock>();
             return obj;
+        }
+        public BatchStock GetmaterialOpeningMaterialID(int? productid)
+        {
+            BatchStock materialOpeningMaster = new BatchStock();
+            if (productid != 0)
+            {
+                materialOpeningMaster = BatchStockrep.Table.Where(x => x.productid == productid ).FirstOrDefault();
+            }
+            return materialOpeningMaster;
         }
     }
 }

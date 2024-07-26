@@ -28,6 +28,8 @@ namespace MMS.Web.Models.Product
         public DateTime? UpdatedDate { get; set; }
         public string CreatedBy { get; set; }
         public string UpdatedBy { get; set; }
+        public decimal weight { get; set; } 
+        public decimal cost { get; set; }
         public Bom Bom { get; set; }
         public MaterialCategoryMaster materailCategory { get; set; }
         public UomMaster UomMaster { get; set; } = null;

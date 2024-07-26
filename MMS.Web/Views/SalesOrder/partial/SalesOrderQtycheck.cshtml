@@ -5,6 +5,7 @@
 @{
     var bomlist = JsonConvert.SerializeObject(Model.bOMMaterialListModels);
     int a = 0;
+    int b = 0;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -69,7 +70,7 @@
                 <tr>
                     <th>Order No</th>
                     <th>Buyer Name</th>
-                    <th>Product Item</th>
+                    <th>SO Item</th>
                     <th>Product Name</th>
                     <th>Product Code</th>
                     <th>Product Price</th>
@@ -111,13 +112,14 @@
                             <th><span class="text">S.No</span></th>
                             <th><span class="text">Material Item</span></th>
                             <th><span class="text">Type</span></th>
-                            <th><span class="text">Available ST</span></th>
-                            <th><span class="text">Available Unit</span></th>
+                            <th><span class="text">Avail ST</span></th>
+                            <th><span class="text">Avail Unit</span></th>
                             <th><span class="text">Consume</span></th>
                             <th><span class="text">Shortage</span></th>
                             <th><span class="text">Consume Unit</span></th>
                             <th><span class="text">Stage</span></th>
                             <th><span class="text">ETA</span></th>
+                            <th><span class="text">Status</span></th>
                         </tr>
                     </thead>
                     <tbody id="sales">
@@ -131,10 +133,10 @@
                                 <tr>
                                     <td>@count</td>
                                     <td style="text-align:left;">@i.MaterialNames</td>
-                                    <td>MAT</td>
-                                    @if (i.availablestock != null)
+                                    <td>@i.productype</td>`
+                                    @if (i.availablestock != null && i.availablestock != 0)
                                     {
-                                        <td style="text-align:right;">@i.availablestock </td>
+                                        <td style="text-align:right;">@string.Format("{0:0.00}", i.availablestock) </td>
                                     }
                                     else
                                     {
@@ -147,11 +149,20 @@
                                     }
                                     else
                                     {
-                                        <td style="color: red; text-align: right;"><u>@string.Format("{0:0.00}", (i.Requiredqty * Model.quantity))</u></td>
-                                        a++;
+                                        if (i.productype == "MAT")
+                                        {
+                                            <td style="color: red; text-align: right;"><u>@string.Format("{0:0.00}", (i.Requiredqty * Model.quantity))</u></td>
+                                            a++;
+
+                                        }
+                                        else if (i.productype == "SUB")
+                                        {
+                                            <td style="color: red; text-align: right;"><u>@string.Format("{0:0.00}", (i.Requiredqty * Model.quantity))</u></td>
+                                            b++;
+                                        }
 
                                     }
-                                    @if (i.availablestock <= (i.Requiredqty * Model.quantity))
+                                    @if (i.availablestock < (i.Requiredqty * Model.quantity))
                                     {
 
                                         <td style="color: red; text-align: right;"><u>@string.Format("{0:0.00}", (i.Requiredqty * Model.quantity) - (i.availablestock))</u></td>
@@ -173,6 +184,25 @@
                                     <td style="text-align:left;">@i.UOMName </td>
                                     <td style="color: #b9b1b1">Null</td>
                                     <td style="color: #b9b1b1">Null</td>
+                                    <td class="productid" style="display: none;">@i.MaterialMasterid</td>
+                                    @if ((i.availablestock >= (i.Requiredqty * Model.quantity)) && (i.productype == "SUB"))
+                                    {
+                                        <td style="color: #b9b1b1">Null</td>
+                                    }
+                                    else if ((i.availablestock >= (i.Requiredqty * Model.quantity)) && (i.productype == "MAT"))
+                                    {
+                                        <td style="color: #b9b1b1">Null</td>
+                                    }
+                                    else if ((i.availablestock <= (i.Requiredqty * Model.quantity)) && (i.productype == "SUB"))
+                                    {
+                                        <td>
+                                            <button class="button-70 " id="moveprod" role="button">Move Prod</button>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td style="color: #b9b1b1">Null</td>
+                                    }
                                 </tr>
                                 count++;
 
@@ -186,18 +216,32 @@
         </div>
         @if (a != 0)
         {
-            <div class="d-flex justify-content-end mt-3">
-                <button class="btn btn-danger" id="makepayment" onclick="Raise()">Raise Indent</button>
+            <div class="d-flex justify-content-center mt-1">
+                <button class="btn btn-danger" id="makepayment" onclick="RaiseIndent()">Raise Indent</button>
 
+            </div>
+        }
+        else if (b != 0)
+        {
+
+            <div class="d-flex justify-content-center mt-1">
+                <td style="color: red; text-align: right;"><u style="color: red;">Move the Sub Assembly material list to Sub Assembly Production Side</u></td>
             </div>
         }
         else
         {
-            <div class="d-flex justify-content-end mt-3">
-                <button class="btn btn-success" id="makepayment" onclick="RaiseProduction()">Move to Production</button>
+            <div class="d-flex justify-content-center mt-1">
 
+                <button class="button-82-pushable" role="button" onclick="RaiseProduction()">
+                    <span class="button-82-shadow"></span>
+                    <span class="button-82-edge"></span>
+                    <span class="button-82-front text">
+                        Move to Production
+                    </span>
+                </button>
             </div>
         }
+
     </div>
 
 
@@ -209,28 +253,75 @@
 
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
     <script>
+        $(document).ready(function () {
+            $(document).on("click", "#moveprod", function () {
+                var row = $(this).closest('tr');
+                var ProductNameId = row.find('.productid').text();
+                 var salesorderid = @Model.SalesorderId_DT;
+                $.ajax({
+                    type: 'POST',
+                    url: '/SalesOrder/TempProductionSubassembly',
+                    data: JSON.stringify({ proid: ProductNameId, SOid: salesorderid }),
+                    contentType: 'application/json',
+                    success: function (data) {
+                        if (data == 'Success') {
+                            Swal.fire({
+                                title: 'Success!!',
+                                text: 'Move to Prod Queue !',
+                                icon: 'success',
+                                timer: 3000,
+                                timerProgressBar: true,
+                                showConfirmButton: false
+                            });
+                            setTimeout(function () {
+                                location.href = "/SalesOrder/SalesOrderMaster";
+                                return false;
+                            }, 3000);
+
+
+                        }
+                        else {
+                            Swal.fire("Alert", "Already This Material Moved to Prod Queue!", "error");
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
        var bomMaterialList = JSON.parse('@Html.Raw(bomlist)');
 
         function onFilterClick() {
+
     $("#sales").empty();
     var count = 1;
     bomMaterialList.forEach(function (item) {
         if (item != null) {
             var consume = (item.Requiredqty * @Model.quantity).toFixed(2);
             var shortage = ((item.Requiredqty * @Model.quantity) - item.availablestock).toFixed(2);
-            if (item.availablestock <= (item.Requiredqty * @Model.quantity)) {
+            if (item.availablestock < (item.Requiredqty * @Model.quantity)) {
+                var moveProdButton = '';
+                if (item.availablestock <= (item.Requiredqty * @Model.quantity) && item.productype == "SUB") {
+                    moveProdButton = `<button class="button-70" role="button"  id="moveprod">Move Prod</button>`;
+                } else {
+                    moveProdButton = 'Null';
+                }
+
                 $("#sales").append(`
                     <tr>
                         <td class="veh1-5">${count}</td>
                         <td class="veh1-5" style="text-align:left;">${item.MaterialNames}</td>
                         <td class="veh1-5">MAT</td>
-                        <td class="veh1-5"style="text-align:right;">${item.availablestock != null ? item.availablestock : 'Not Added'}</td>
+                        <td class="veh1-5"style="text-align:right;">${item.availablestock != null && item.availablestock != 0 ? item.availablestock : 'Not Added'}</td>
                         <td class="veh1-5"style="text-align:left;">${item.UOMName}</td>
                         <td class="veh1-5" style="color:red;text-align:right;"><u>${consume}</u></td>
                         <td class="veh1-5" style="color:red;text-align:right;"><u>${shortage}</u></td>
                         <td class="veh1-5" style="text-align:left;">${item.UOMName}</td>
                         <td class="veh1-5" style="color: #b9b1b1">Null</td>
                         <td class="veh1-5" style="color: #b9b1b1">Null</td>
+                        <td class="productid" style="display: none;">${item.MaterialMasterid}</td>
+                        <td style="color: #b9b1b1">${moveProdButton}</td>
                     </tr>
                 `);
                 count++;
@@ -239,10 +330,10 @@
     });
 }
 
+
         function data() {
             $("#sales").empty();
             var count = 1;
-
             bomMaterialList.forEach(function (item) {
                 if (item != null) {
                     var consume = (item.Requiredqty * @Model.quantity).toFixed(2);
@@ -253,16 +344,25 @@
                     } else {
                         shortage = 0;
                     }
-
+                    if (item.availablestock >= (item.Requiredqty * @Model.quantity) && item.productype == "SUB") {
+                             moveProdButton = 'Null';
+                         } else if (item.availablestock >= (item.Requiredqty * @Model.quantity) && item.productype == "MAT") {
+                             moveProdButton = 'Null';
+                         }else if (item.availablestock <= (item.Requiredqty * @Model.quantity) && item.productype == "MAT") {
+                             moveProdButton = 'Null';
+                         }
+                         else {
+                        moveProdButton = `<button class="button-70" role="button"  id="moveprod">Move Prod</button>`;
+                         }
                     var rowHtml = `
                 <tr>
                     <td class="veh1-5">${count}</td>
                     <td class="veh1-5"style="text-align:left;">${item.MaterialNames}</td>
                     <td class="veh1-5">MAT</td>
-                        <td class="veh1-5">${item.availablestock != null ? item.availablestock : 'Not Added'}</td>
+                        <td class="veh1-5" style="text-align:right;">${item.availablestock != null && item.availablestock != 0 ? item.availablestock : 'Not Added'}</td>
                     <td class="veh1-5"style="text-align:left;">${item.UOMName}</td>`;
 
-                    if (item.availablestock <= consume) {
+                    if (item.availablestock < consume) {
                         rowHtml += `
                     <td class="veh1-5" style="color:red;text-align:right;"><u>${consume}</u></td>
                     <td class="veh1-5" style="color:red;text-align:right;"><u>${shortage}</u></td>`;
@@ -276,6 +376,8 @@
                     <td class="veh1-5"style="text-align:left;">${item.UOMName}</td>
                     <td class="veh1-5" style="color: #b9b1b1">Null</td>
                     <td class="veh1-5" style="color: #b9b1b1">Null</td>
+                    <td class="productid" style="display: none;">${item.MaterialMasterid}</td>
+                    <td  style="color: #b9b1b1">${moveProdButton}</td>
                 </tr>`;
 
                     $("#sales").append(rowHtml);
@@ -302,7 +404,7 @@
 
 
 
-        function Raise() {
+        function RaiseIndent() {
             var salesorderid = @Model.SalesorderId_DT;
 
             $.ajax({

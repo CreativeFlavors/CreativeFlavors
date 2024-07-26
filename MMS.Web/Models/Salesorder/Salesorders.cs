@@ -30,6 +30,7 @@ namespace MMS.Web.Models
         public string shippingadd { get; set; }
         public string Billingadd { get; set; }
         public int ProductID { get; set; }
+        public string productype { get; set; }
         public string Bomno { get; set; }
         public int buyerid { get; set; }
         public int UomMasterId { get; set; }

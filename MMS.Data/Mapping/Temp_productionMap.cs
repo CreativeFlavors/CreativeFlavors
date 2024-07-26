@@ -22,7 +22,8 @@ namespace MMS.Data.Mapping
             Property(t => t.CreatedBy);
             Property(t => t.UpdatedBy);
             Property(t => t.ProductId);
-            Property(t => t.ProductItem);
+            Property(t => t.ProductItem); 
+            Property(t => t.producttype);
             Property(t => t.MaterialId);
             Property(t => t.Bomid);
             Property(t => t.Probomid);
