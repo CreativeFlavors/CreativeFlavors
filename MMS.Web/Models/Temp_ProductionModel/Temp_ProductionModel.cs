@@ -14,8 +14,11 @@ namespace MMS.Web.Models.Temp_Production
         public int SalesOrderId { get; set; }
         [Column("buyerid")]
         public int BuyerId { get; set; }
+        public string BuyerName { get; set; }
+
         [Column("productid")]
         public int ProductId { get; set; }
+        public string ProductName { get; set; }
         [Column("productitem")]
         public decimal? ProductItem { get; set; }
         [Column("bomid")]
@@ -38,5 +41,8 @@ namespace MMS.Web.Models.Temp_Production
         public string UpdatedBy { get; set; }
         [Column("isactive")]
         public bool IsActive { get; set; }
+        public int Producttype { get; set; }
+        public string ProductTypeName { get; set; }
+        public string ProductionType { get; set; }
     }
 }

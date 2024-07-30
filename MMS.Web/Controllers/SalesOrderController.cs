@@ -24,7 +24,7 @@ namespace MMS.Web.Controllers
 {
     public class SalesOrderController : Controller
     {
-        #region SalesOrder View
+         #region SalesOrder View
         [HttpGet]
 
         public ActionResult SalesOrderMaster()
