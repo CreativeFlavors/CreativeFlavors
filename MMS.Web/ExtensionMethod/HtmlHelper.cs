@@ -824,6 +824,24 @@ namespace MMS.Web.ExtensionMethod
             };
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
+        }    
+        public static SelectList CategoryNames()
+        {
+            CategorymasterManager Manager = new CategorymasterManager();
+            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.CategoryName).Select(
+                                    item => new System.Web.Mvc.SelectListItem()
+                                    {
+                                        Text = item.CategoryName,
+                                        Value = item.CategoryId.ToString()
+                                    }
+                                    ).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Select Category"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
         }
         public static SelectList MaterialSubGroupName()
         {

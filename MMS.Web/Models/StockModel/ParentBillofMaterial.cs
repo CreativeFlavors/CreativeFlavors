@@ -23,7 +23,7 @@ namespace MMS.Web.Models.StockModel
         public List<Parentbommatertial> bomMaterialGridList { get; set; }
         public List<subassemblydata> bomsubassemblyGridList { get; set; }
         public MaterialOpeningModel MaterialOpeningMaster { get; set; }
-
+        public List<mrp_material_list> mrp_Material_Lists { get; set; }
         public string Lastbom { get; set; }
 
         public bool IsActive { get; set; } = true;

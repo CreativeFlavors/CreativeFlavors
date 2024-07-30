@@ -22,7 +22,9 @@ namespace MMS.Core.Entities
         public int ProductId { get; set; }
 
         [Column("uomid")]
-        public int UomId { get; set; }
+        public int UomId { get; set; } 
+        [Column("categoryid")]
+        public int Categoryid { get; set; }
 
         [Column("taxid")]
         public int TaxId { get; set; }

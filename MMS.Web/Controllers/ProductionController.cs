@@ -218,7 +218,7 @@ namespace MMS.Web.Controllers
                 {
                    // Update the batch table with relevant data from Production table
                     BatchStockManager batchStockManager = new BatchStockManager();
-                    BatchStock existingBatchStock = batchStockManager.GetByProductCode(model.ProductCode);
+                    //BatchStock existingBatchStock = batchStockManager.GetByProductCode(model.ProductCode);
                     //if(existingBatchStock != null)
                     //{
                     //    //already quantity is there Update the stock quantity increased to batchstock table
@@ -287,7 +287,7 @@ namespace MMS.Web.Controllers
                         foreach (var batchStock in batchStocks)
                         {
                             batchStock.Quantity -= productionMaterials.ConsumeQty;
-                            batchStockManager.Put(batchStock);
+                            //batchStockManager.Put(batchStock);
                         }
                     }
                     StatusHistoryManager statusHistoryManager = new StatusHistoryManager();
@@ -483,7 +483,7 @@ namespace MMS.Web.Controllers
                 {
                     // Update the batch table with relevant data from Production table
                     BatchStockManager batchStockManager = new BatchStockManager();
-                    BatchStock existingBatchStock = batchStockManager.GetByProductCode(model.ProductCode);
+                    //BatchStock existingBatchStock = batchStockManager.GetByProductCode(model.ProductCode);
                     //if (existingBatchStock != null)
                     //{
                     //    //already quantity is there Update the stock quantity increased to batchstock table
@@ -552,7 +552,7 @@ namespace MMS.Web.Controllers
                         foreach (var batchStock in batchStocks)
                         {
                             batchStock.Quantity -= productionMaterials.ConsumeQty;
-                            batchStockManager.Put(batchStock);
+                            //batchStockManager.Put(batchStock);
                         }
                     }
                     StatusHistorySubassemblyManager statusHistoryManager = new StatusHistorySubassemblyManager();

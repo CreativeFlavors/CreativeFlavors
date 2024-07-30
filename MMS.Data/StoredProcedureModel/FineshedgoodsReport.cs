@@ -18,9 +18,9 @@ namespace MMS.Data.StoredProcedureModel
         [Column("producttypename")]
         public string ProductTypeName { get; set; }
         [Column("price")]
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
         [Column("costs")]
-        public decimal Costs { get; set; }
+        public decimal? Costs { get; set; }
         [Column("storename")]
         public string StoreName { get; set; }
         [Column("quantity")]

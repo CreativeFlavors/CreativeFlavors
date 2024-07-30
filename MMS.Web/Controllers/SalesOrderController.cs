@@ -181,18 +181,6 @@ namespace MMS.Web.Controllers
 
             List<ParentBillofMaterial> totalList = new List<ParentBillofMaterial>();
 
-            foreach (var item in mrp_Material_Lists)
-            {
-                ParentBillofMaterial availablestock = new ParentBillofMaterial();
-                availablestock.MaterialNames = item.MaterialNames;
-                availablestock.Requiredqty = item.RequiredQty;
-                availablestock.availablestock = item.AvailableStock;
-                availablestock.UOMName = item.UOMName;
-                availablestock.MaterialMasterid = item.MaterialMasterId;
-                availablestock.productype = item.producttype;
-                totalList.Add(availablestock);
-            }
-
             var i = salesorderHD_manager.salesorder_get(id);
 
             Salesorders salesorders = new Salesorders();
@@ -204,16 +192,28 @@ namespace MMS.Web.Controllers
             salesorders.Uomname = i.long_unit_name;
             salesorders.ProductName = i.productname;
             salesorders.ProductCode = i.productcode;
+            salesorders.ProductID = i.productid;
             salesorders.BuyerNames = i.buyer_full_name;
             salesorders.Bomno = i.bomno;
+            foreach (var item in mrp_Material_Lists)
+            {
+                ParentBillofMaterial availablestock = new ParentBillofMaterial();
+                availablestock.MaterialNames = item.MaterialNames;
+                availablestock.Requiredqty = item.RequiredQty;
+                availablestock.availablestock = item.AvailableStock;
+                availablestock.UOMName = item.UOMName;
+                availablestock.MaterialMasterid = item.MaterialMasterId;
+                availablestock.mrp_Material_Lists= salesorderManager.GetmrpmaterialList(item.MaterialMasterId);
+                availablestock.productype = item.producttype;
+                totalList.Add(availablestock);
+            }
 
             salesorders.bOMMaterialListModels = totalList;
-
 
             return PartialView("partial/SalesOrderQtycheck", salesorders);
         }
         [HttpPost]
-        public ActionResult Tempsalesorder(int id)
+        public ActionResult Tempsalesorder(int id,int sodt)
         {
             Temp_salesorderManager temp_SalesorderManager1 = new Temp_salesorderManager();
             var st1 = temp_SalesorderManager1.GetSO(id);
@@ -225,7 +225,7 @@ namespace MMS.Web.Controllers
             ProductManager productManager = new ProductManager();
             Parentbom_materialManager bOMMaterialListManager = new Parentbom_materialManager();
             subassemblyManager subassemblyManager = new subassemblyManager();
-            var st = salesorderManager.GetSO(id);
+            var st = salesorderManager.GetSO(sodt);
             var product = productManager.GetId(st.productid);
             var bommaterial = bOMMaterialListManager.GetMaterialList(product.BomNo);
             //var submaterial = subassemblyManager.GetMaterialList(product.BomNo);
@@ -269,11 +269,13 @@ namespace MMS.Web.Controllers
 
             return Json(data, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult TempProductionstock(int id)
+        public ActionResult TempProductionstock(int id, int sodt,int proid)
         {
             Temp_productionManager Temp_productionManager = new Temp_productionManager();
             var st1 = Temp_productionManager.GetPro(id);
-            if (st1 != null)
+            var sts = Temp_productionManager.GetProd(proid, st1.SalesOrderId);
+
+            if (sts.Count() != 0)
             {
                 return Json(new { data = "Failer" }, JsonRequestBehavior.AllowGet);
             }
@@ -281,7 +283,7 @@ namespace MMS.Web.Controllers
             subassemblyManager subassemblyManager = new subassemblyManager();
             ProductManager productManager = new ProductManager();
             Parentbom_materialManager bOMMaterialListManager = new Parentbom_materialManager();
-            var st = salesorderManager.GetSO(id);
+            var st = salesorderManager.GetSO(sodt);
             var product = productManager.GetId(st.productid);
             var bommaterial = bOMMaterialListManager.GetMaterialList(product.BomNo);
             var submaterial = subassemblyManager.GetMaterialList(product.BomNo);
@@ -392,6 +394,63 @@ namespace MMS.Web.Controllers
                 Temp_productionManagers.Postpreproduction(preproduction);
                 Temp_productionManagers.Post(temp_production);
 
+            }
+            var data = "Success";
+
+            return Json(data, JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public ActionResult Tempsalesorder_Subassemblymaterial(int proid, int SOid)
+        {
+            Temp_salesorderManager Temp_productionManager = new Temp_salesorderManager();
+            SalesorderDT_Manager salesorderManager = new SalesorderDT_Manager();
+            var sts = salesorderManager.GetSO(SOid);
+            var st1 = Temp_productionManager.GetProd(proid, sts.Salesorderid_hd);
+            if (st1.Count() != 0)
+            {
+                return Json(new { data = "Failer" }, JsonRequestBehavior.AllowGet);
+            }
+            ProductManager productManager = new ProductManager();
+            Parentbom_materialManager bOMMaterialListManager = new Parentbom_materialManager();
+            subassemblyManager subassemblyManager = new subassemblyManager();
+            var st = salesorderManager.GetSO(SOid);
+            var product = productManager.GetId(proid);
+            var bommaterial = bOMMaterialListManager.GetMaterialList(product.BomNo);
+            Temp_Indent temp_Salesorder = new Temp_Indent();
+            foreach (var item in bommaterial)
+            {
+                BatchStockManager batchStockManager = new BatchStockManager();
+                Temp_salesorderManager temp_SalesorderManager = new Temp_salesorderManager();
+                var MaterialOpeningMaster = batchStockManager.GetmaterialOpeningMaterialID(item.BomMaterialId);
+                temp_Salesorder.SalesOrderId = st.Salesorderid_hd;
+                temp_Salesorder.BuyerId = st.Customerid;
+                temp_Salesorder.ProductId = product.ProductId;
+                temp_Salesorder.ProductItem = st.quantity;
+                if (MaterialOpeningMaster != null)
+                {
+                    temp_Salesorder.MaterialId = MaterialOpeningMaster.productid;
+                    temp_Salesorder.AvailableStock = MaterialOpeningMaster.Quantity;
+                    temp_Salesorder.AvailableUnitId = MaterialOpeningMaster.UomId;
+                    var consume = st.quantity * item.RequiredQty;
+                    temp_Salesorder.Consume = consume;
+                    temp_Salesorder.ConsumeUnitId = MaterialOpeningMaster.UomId;
+                    var stockRequired = consume - MaterialOpeningMaster.Quantity;
+                    temp_Salesorder.stockRequired = stockRequired;
+                    if (MaterialOpeningMaster.Quantity <= consume)
+                    {
+                        temp_SalesorderManager.Post(temp_Salesorder);
+                    }
+                }
+                else
+                {
+                    temp_Salesorder.MaterialId = item.ProductId;
+                    var consume = st.quantity * item.RequiredQty;
+                    temp_Salesorder.Consume = consume;
+                    temp_Salesorder.ConsumeUnitId = item.UomId;
+                    var stockRequired = consume;
+                    temp_Salesorder.stockRequired = stockRequired;
+                    temp_SalesorderManager.Post(temp_Salesorder);
+                }
             }
             var data = "Success";
 

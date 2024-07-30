@@ -33,6 +33,13 @@
             font-style: normal;
             font-weight: 500;
         }
+
+        .page-item.active .page-link {
+            z-index: 3;
+            color: #fff;
+            background-color: #4472C4;
+            border-color: #0d6efd;
+        }
     </style>
 </head>
 <body>
@@ -43,15 +50,15 @@
                     <h6 class="font-20">Supplier Details</h6>
                 </div>
                 <div>
-                        <button type="button" class="manage_customers_btn font-15" id="add" style="color:white;">
-                            ADD
-                        </button>
+                    <button type="button" class="manage_customers_btn font-15" id="add" style="color:white;">
+                        ADD
+                    </button>
                 </div>
             </div>
 
             <div class="table-responsive reports_table_responsive">
                 <div class="customer_manage_search_container">
-                    <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Contact Name">
+                    <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="Search by Supplier Name">
                 </div>
                 <div class="manage_customers_table_in_responsive" id="form">
 
@@ -71,7 +78,20 @@
                                     </span>
                                 </th>
                                 <th scope="col">
+                                    <span>Category Name</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+
+                                <th scope="col">
                                     <span>Product Name</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Product Code</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
@@ -88,35 +108,34 @@
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
                                 </th>
+
                                 <th scope="col">
                                     <span>Status</span>
                                 </th>
                             </tr>
                         </thead>
-                        @*@if (Model != null && Model.Count() > 0)
+                        @if (Model != null && Model.Count() > 0)
                         {
                             int count = 1;
                             <tbody>
 
-                                @foreach (var address in Model)
+                                @foreach (var sup in Model)
                                 {
 
                                     <tr>
-                                        <td class="veh-1">@count</td>
-                                        <td class="veh-2" style="width: 12%;">@address.BuyerMaster.BuyerFullName</td>
-                                        <td class="veh-3" style="width: 12%;">@address.ContactName</td>
-                                        <td class="veh-5" style="width: 12%;">@address.countries.Name</td>
-                                        <td class="veh-4" style="width: 12%;">@address.states.Statename</td>
-                                        <td class="veh-4" style="width: 12%;">@address.cities.Cityname</td>
-                                        <td class="veh-3" style="width: 12%;">@address.ZipCode</td>
-                                        <td class="veh-4" style="width: 12%;">@address.Email</td>
-                                        <td class="veh-4" style="width: 12%;">@address.Phone</td>
+                                        <td class="veh-1" style="width: 12%;">@count</td>
+                                        <td class="veh-2" style="width: 12%; text-align: left;">@sup.suppliername</td>
+                                        <td class="veh-2" style="width: 12%;text-align:left;">@sup.categoryname</td>
+                                        <td class="veh-3" style="width: 12%; text-align: left;">@sup.ProductName</td>
+                                        <td class="veh-3" style="width: 12%; text-align: left;">@sup.Productcode</td>
+                                        <td class="veh-5" style="width: 12%; text-align: left;">@sup.uom</td>
+                                        <td class="veh-4" style="width: 12%; text-align: left;">@sup.tax</td>
                                         <td class="veh-4" style="width:12%;">
                                             <span class="table_icons">
-                                                <img src="~/Content/assets/images/edit-icon.png" onclick="Edit('@address.AddressId')" />
+                                                <img src="~/Content/assets/images/edit-icon.png" onclick="Edit('@sup.SupplierMaterialId')" />
                                             </span>
                                             <span class="table_icons">
-                                                <img src="~/Content/assets/images/delete-icon.png" onclick="Delete('@address.AddressId')" />
+                                                <img src="~/Content/assets/images/delete-icon.png" onclick="Delete('@sup.SupplierMaterialId')" />
                                             </span>
                                         </td>
                                     </tr>
@@ -124,32 +143,41 @@
                                 }
                             </tbody>
 
-                        }*@
+                        }
                     </table>
                 </div>
                 <div class="row manage_customer_show">
-                    <div class="col-xl-6 manage_customer_show_II">
-                        <nav class="float-xl-start">
-                            <ul class="pagination font-14">
-                                @if (ViewBag.startpage != null && ViewBag.endpage != null)
-                                {
-                                    <li class="page-item">
-                                        <a class="page-link" id="left" value="@(ViewBag.currentpage-1)">Previous</a>
-                                    </li>
-                                    for (int i = ViewBag.startpage; i <= ViewBag.endpage; i++)
-                                    {
-                                        <li class="page-item">
-                                            <a class="page-link" id="number" value="@i">@i</a>
-                                        </li>
+                    <div class="font-14 manage_customer_show_I col-xl-6">
+                        <span>Showing </span>
+                        <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
+                            <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
+                            <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
+                            <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
+                            <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
+                        </select>
 
-                                    }
-                                    <li class=" page-item">
-                                        <a class="page-link" id="right" value="@(ViewBag.currentpage+1)">Next</a>
+
+                    </div>
+
+                    <div class="col-xl-6 manage_customer_show_II">
+                        <nav class="float-xl-end">
+                            <ul class="pagination font-14">
+                                <li class="page-item">
+                                    <a href="##" id="previousPage" class="page-link">Previous</a>
+                                </li>
+                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                        <a href="#" class="page-link" data-page="@i">@i</a>
                                     </li>
                                 }
+                                <li class="page-item">
+                                    <a class="page-link" id="nextPage" href="##">Next</a>
+                                </li>
                             </ul>
                         </nav>
                     </div>
+
                 </div>
             </div>
 
@@ -201,7 +229,7 @@
 
                     $.ajax({
                         type: 'GET',
-                        url: '/AddressDetails/Search',
+                        url: '/SupplierMaterial/Search',
                         data: { filter: customerearch },
                         contentType: 'application/json',
                         success: function (values) {
@@ -209,115 +237,139 @@
                             var count = 1;
                             $.each(values, function (i, item) {
                                 $("tbody").append(`
-                                                                                 <tr class="font-14">
-                                                                                 <td class="veh1-5">${count}</td>
-                                                                                 <td class="veh1-5" style="width: 12%;">${item.BuyerMaster.BuyerFullName}</td>
-                                                                                 <td class="veh1-5" style="width: 12%;">${item.ContactName}</td>
-                                                                                 <td class="veh1-5" style="width: 12%;">${item.countries.Name}</td>
-                                                                                 <td class="veh1-5" style="width: 12%;">${item.states.Statename}</td>
-                                                                                 <td class="veh1-5" style="width: 12%;">${item.cities.Cityname}</td>
-                                                                                 <td class="veh1-5" style="width: 12%;">${item.ZipCode}</td>
-                                                                                 <td class="veh1-5" style="width: 12%;">${item.Email}</td>
-                                                                                 <td class="veh1-5" style="width: 12%;">${item.Phone}</td>
-                                                                                 <td class="veh-4" style="width:12%;">
-                                                                                 <span class="table_icons">
-                                                                                     <img src="/Content/assets/images/edit-icon.png" onclick="Edit('${item.AddressId}')" />
-                                                                                 </span>
-                                                                                 <span class="table_icons">
-                                                                                     <img src="/Content/assets/images/delete-icon.png" onclick="Delete('${item.AddressId}')" />
-                                                                                    </span>
-                                                                                 </td>
-                                                                                 </tr>
-                                                                                  `);
+                                                                                         <tr class="font-14">
+                                                                                         <td class="veh1-5">${count}</td>
+                                                                                         <td class="veh1-5" style="width: 12%;">${item.suppliername}</td>
+                                                                                         <td class="veh1-5" style="width: 12%;">${item.categoryname}</td>
+                                                                                         <td class="veh1-5" style="width: 12%;">${item.ProductName}</td>
+                                                                                         <td class="veh1-5" style="width: 12%;">${item.Productcode}</td>
+                                                                                         <td class="veh1-5" style="width: 12%;">${item.uom}</td>
+                                                                                         <td class="veh1-5" style="width: 12%;">${item.tax}</td>
+                                                                                         <td class="veh-4" style="width:12%;">
+                                                                                         <span class="table_icons">
+                                                                                             <img src="/Content/assets/images/edit-icon.png" onclick="Edit('${item.SupplierMaterialId}')" />
+                                                                                         </span>
+                                                                                         <span class="table_icons">
+                                                                                             <img src="/Content/assets/images/delete-icon.png" onclick="Delete('${item.SupplierMaterialId}')" />
+                                                                                            </span>
+                                                                                         </td>
+                                                                                         </tr>
+                                                                                          `);
                                 count++;
                             });
                         }
                     });
                 });
-                $(document).on("click", "#number", function () {
-                    var files = $(this).attr('value');
+ $('#manage_customer_show_no').change(function() {
+     var PageSize = parseInt($(this).val());
+     $.ajax({
+         url: '/SupplierMaterial/SupplierMaster',
+         type: "GET",
+         dataType: "JSON",
+         data: { pageSize: PageSize },
+         success: function (values) {
+             $("#summery").html(values).show();
+         }
+     });
+ });
+   $(".page-link").click(function(e){
+         e.preventDefault();
+         var page = $(this).data("page");
 
-                    $.ajax({
-                        type: 'GET',
-                        url: '/AddressDetails/AddressDetailsGrid',
-                        data: { pageno: files },
-                        contentType: 'application/json',
-                        success: function (values) {
-                            $(".main-page").html(values);
-                        }
-                    });
-                });
-                $(document).on("click", "#left", function () {
-                    var files = $(this).attr('value');
-
-                    $.ajax({
-                        type: 'GET',
-                        url: '/AddressDetails/AddressDetailsGrid',
-                        data: { pageno: files },
-                        contentType: 'application/json',
-                        success: function (values) {
-                            $(".main-page").html(values);
-                        }
-                    });
-                });
-
-                $(document).on("click", "#right", function () {
-                    var files = $(this).attr('value');
-
-                    $.ajax({
-                        type: 'GET',
-                        url: '/AddressDetails/AddressDetailsGrid',
-                        data: { pageno: files },
-                        contentType: 'application/json',
-                        success: function (values) {
-                            $(".main-page").html(values);
-                        }
-                    });
-                });
-            });
-        </script>
-        <script>
-function Delete(arg) {
-     var answer = confirm("Are you sure want to delete?");
-     if (answer) {
          $.ajax({
-             type: 'POST',
-             url: ' @Url.Action("Delete", "AddressDetails")',
-             data: { AddressId: arg },
-             success: function (data) {
-                 if (data == "Success") {
-                     alert('Deleted Successfully.');
-                     location.href = "/AddressDetails/AddressMaster";
-                     return false;
-                 }
-                 else {
-                     alert('address Details deletion failed.');
-                 }
-
-             },
-             error: function (ex) {
-                 alert('This address Already Exist in the database.');
+             url: "@Url.Action("SupplierMaster", "SupplierMaterial")",
+             type: "GET",
+             data: { page: page },
+             success: function(data){
+                 $("#summery").html(data).show();
+             }
+         });
+     });
+ $('#previousPage').click(function(e) {
+     e.preventDefault();
+     var currentPage = parseInt('@ViewBag.CurrentPage');
+     if (currentPage > 1) {
+         var previousPage = currentPage - 1;
+         $.ajax({
+             url: '/SupplierMaterial/SupplierMaster',
+             type: "GET",
+             dataType: "JSON",
+             data: { page: previousPage, pageSize:parseInt('@ViewBag.PageSize') },
+             success: function (values) {
+                 $("#summery").html(values).show();
              }
          });
      }
-     else {
-         return false;
+ });
+
+ $('#nextPage').click(function(e) {
+     e.preventDefault();
+     var currentPage = parseInt('@ViewBag.CurrentPage');
+     var totalPages = parseInt('@ViewBag.TotalPages');
+     if (currentPage < totalPages) {
+         var nextPage = currentPage + 1;
+          $.ajax({
+              url: '/SupplierMaterial/SupplierMaster',
+               type: "GET",
+               dataType: "JSON",
+                data: { page: nextPage, pageSize:parseInt('@ViewBag.PageSize') },
+               success: function (values) {
+                    $("#summery").html(values).show();
+               }
+          });
+
      }
- }
+ });
+            });
+        </script>
+        <script>
+  function Delete(arg) {
+    var answer = confirm("Are you sure you want to delete?");
+    if (answer) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("Delete", "SupplierMaterial")',
+            data: { SupplierMaterialId: arg },
+            success: function (data) {
+                if (data == "Success") {
+                    alert('Deleted Successfully.');
+                    location.href = "/SupplierMaterial/SupplierMaster";
+                } else {
+                    alert('Address details deletion failed.');
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('An error occurred: ' + error);
+            }
+        });
+    } else {
+        return false;
+    }
+}
+function Edit(arg) {
+    $.ajax({
+        type: "POST",
+        url: '@Url.Action("EditsupplierDetails", "SupplierMaterial")',
+        data: JSON.stringify({ SupplierMaterialId: arg }),
+        contentType: 'application/json',
+        success: function (values) {
+            $('#details').html(values);
+
+            var options = {
+                backdrop: 'static',
+                keyboard: false
+            };
+
+            $('#myModal').modal(options);
+            $('#myModal').modal('show');
+        },
+        error: function (xhr, status, error) {
+            alert('An error occurred: ' + error);
+        }
+    });
+}
 
 
-  function Edit(arg) {
-            $('.main-page').hide();
-       $.ajax({
-           type: "POST",
-           url: ' @Url.Action("EditAddressDetails", "AddressDetails")',
-           data: { AddressId: arg },
-           success: function (data) {
-               $(".main-page").html(data);
-               $(".main-page").show();
-           }
-       });
-   }
         </script>
 
 

@@ -288,6 +288,11 @@ namespace MMS.Data
         {
             var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.FineshedgoodsReport>("SELECT * FROM Fineshedgoods_report()").ToList();
             return ResultList;
+        } 
+        public List<MMS.Data.StoredProcedureModel.SupplierMaterialgrid> suppliermaterial()
+        {
+            var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.SupplierMaterialgrid>("SELECT * FROM suppliermaterial()").ToList();
+            return ResultList;
         }
          public List<MMS.Data.StoredProcedureModel.GRNCarlist> GRNCartlist(int poheader)
         {
