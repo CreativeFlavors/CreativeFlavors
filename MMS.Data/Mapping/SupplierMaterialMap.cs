@@ -17,6 +17,7 @@ namespace MMS.Data.Mapping
             Property(e => e.SupplierId).HasColumnName("supplierid");
             Property(e => e.ProductId).HasColumnName("productid");
             Property(e => e.UomId).HasColumnName("uomid");
+            Property(e => e.Categoryid).HasColumnName("categoryid");
             Property(e => e.TaxId).HasColumnName("taxid");          
             Property(e => e.CreatedDate).HasColumnName("createddate");
             Property(e => e.UpdatedDate).HasColumnName("updateddate");

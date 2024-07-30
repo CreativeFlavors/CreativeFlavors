@@ -334,7 +334,7 @@ namespace MMS.Web.Controllers
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
             decimal? conversionval = 0;
             int id = 0;
-            if (model.currencyOption.ToUpper() != "ZAR")
+            if (currencyOption.ToUpper() != "ZAR")
             {
                 var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
                 conversionval = ConversionValue.conversionvalue;

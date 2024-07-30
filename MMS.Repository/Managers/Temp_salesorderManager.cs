@@ -75,6 +75,15 @@ namespace MMS.Repository.Managers
 
             return temp_Salesorder;
         }
+        public List<Temp_Indent> GetProd(int proid, int SOid)
+        {
+            List<Temp_Indent> tempro = new List<Temp_Indent>();
+            if (proid != null && SOid != null)
+            {
+                tempro = tempsalesorderrep.Table.Where(x => x.SalesOrderId == SOid && x.ProductId == proid).ToList();
+            }
+            return tempro;
+        }
         public List<Temp_Indent> GetStockRequiredForMaterials(int MaterialNameID)
         {
             List<Temp_Indent> temp_Salesorder = new List<Temp_Indent>();

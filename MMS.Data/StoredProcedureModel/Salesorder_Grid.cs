@@ -11,7 +11,7 @@ namespace MMS.Data.StoredProcedureModel
     public class Salesorder_Grid
     {
         [Column("salesorderid")]
-        public int salesorderid { get; set; }
+        public int salesorderid { get; set; }  
         [Column("salesorderid_dt")]
         public int salesorderid_dt { get; set; }
         [Column("salesorderid_hd")]

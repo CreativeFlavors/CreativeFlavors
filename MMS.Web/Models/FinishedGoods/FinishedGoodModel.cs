@@ -12,16 +12,16 @@ namespace MMS.Web.Models.FinishedGoods
         public int Id { get; set; }
         public string ProductCode { get; set; }
         public decimal? Price { get; set; }
-        public decimal Cost { get; set; }
+        public decimal? Cost { get; set; }
         public int StoreCode { get; set; }
-        public decimal Quantity { get; set; }
+        public decimal? Quantity { get; set; }
         public string QuantityLock { get; set; }
         public DateTime? QuantityLockRefTime { get; set; }
         public string QuantityLockReleaseAt { get; set; }
         public string PurchaseUOM { get; set; }
         public string SaleUOM { get; set; }
         public string LastTransNo { get; set; }
-        public decimal LastTransQty { get; set; }
+        public decimal? LastTransQty { get; set; }
         public string ProductName { get; set; }
         public string ProductTypeName { get; set; }
         public string StoreName { get; set; }

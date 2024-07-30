@@ -42,7 +42,7 @@
         }
 
         #table-scroll {
-            height: 257px;
+            height: 400px;
             overflow: auto;
         }
 
@@ -128,6 +128,7 @@
                         @if (Model.bOMMaterialListModels != null)
                         {
                             int count = 1;
+                            int counts = 1;
                             foreach (var i in Model.bOMMaterialListModels)
                             {
                                 <tr>
@@ -193,66 +194,142 @@
                                     {
                                         <td style="color: #b9b1b1">Null</td>
                                     }
-                                    else if ((i.availablestock <= (i.Requiredqty * Model.quantity)) && (i.productype == "SUB"))
+                                    else if (i.mrp_Material_Lists.Count() != 0)
                                     {
+
                                         <td>
-                                            <button class="button-70 " id="moveprod" role="button">Move Prod</button>
+                                            <button class="button-77 " id="Raiseindent" role="button">Raise Indent</button>
                                         </td>
-                                    }
-                                    else
-                                    {
-                                        <td style="color: #b9b1b1">Null</td>
-                                    }
-                                </tr>
-                                count++;
+                                    @*<tr id="subtable">
+                                        <th><span class="text">S.No</span></th>
+                                        <th><span class="text">Material Item</span></th>
+                                        <th><span class="text">Type</span></th>
+                                        <th><span class="text">Avail ST</span></th>
+                                        <th><span class="text">Avail Unit</span></th>
+                                        <th><span class="text">Consume</span></th>
+                                        <th><span class="text">Shortage</span></th>
+                                        <th><span class="text">Consume Unit</span></th>
+                                    </tr>
+                                    <tr>
+                                        @foreach (var h in i.mrp_Material_Lists)
+                                        {
+                                            <td>@counts</td>
+                                            <td>@h.MaterialNames</td>
+                                            <td>@h.producttype</td>
+                                            if (h.AvailableStock != null && h.AvailableStock != 0)
+                                            {
+                                                <td style="text-align:right;">@string.Format("{0:0.00}", h.AvailableStock) </td>
+                                            }
+                                            else
+                                            {
+                                                <td style="text-align:right;">Not Added</td>
+                                            }
+                                            <td style="text-align:left;">@i.UOMName</td>
+                                            if (h.AvailableStock >= (h.RequiredQty * i.Requiredqty))
+                                            {
+                                                <td style="text-align:right;">@string.Format("{0:0.00}", (h.RequiredQty * i.Requiredqty))</td>
+                                            }
+                                            else
+                                            {
+                                                if (h.producttype == "MAT")
+                                                {
+                                                    <td style="color: red; text-align: right;"><u>@string.Format("{0:0.00}", (h.RequiredQty * i.Requiredqty))</u></td>
+                                                    a++;
 
+                                                }
+                                                else if (h.producttype == "SUB")
+                                                {
+                                                    <td style="color: red; text-align: right;"><u>@string.Format("{0:0.00}", (h.RequiredQty * i.Requiredqty))</u></td>
+                                                    b++;
+                                                }
+
+                                            }
+                                            if (i.availablestock < (h.RequiredQty * i.Requiredqty))
+                                            {
+
+                                                <td style="color: red; text-align: right;"><u>@string.Format("{0:0.00}", (h.RequiredQty * i.Requiredqty) - (h.AvailableStock))</u></td>
+
+                                            }
+                                            else
+                                            {
+                                                if (h.AvailableStock != null)
+                                                {
+                                                    <td style="color: #b9b1b1; text-align: right;">0</td>
+                                                }
+                                                else
+                                                {
+                                                    <td style="color: red; text-align: right;"><u>@string.Format("{0:0.00}", (h.RequiredQty * i.Requiredqty))</u></td>
+                                                }
+
+                                            }
+
+                                            <td style="text-align:left;">@i.UOMName </td>
+                                            counts++;
+
+                                        }
+                                    </tr>*@
+                                }
+                                else if ((i.availablestock <= (i.Requiredqty * Model.quantity)) && (i.productype == "SUB"))
+                                {
+                                <td>
+                                    <button class="button-70 " id="moveprod" role="button">Move Prod</button>
+                                </td>
                             }
-                        }
+
+                            else
+                            {
+                                <td style="color: #b9b1b1">Null</td>
+                            }
+                                    </tr>
+                                    count++;
+
+                                }
+                            }
 
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+            @if (a != 0)
+            {
+                <div class="d-flex justify-content-center mt-1">
+                    <button class="btn btn-danger" id="makepayment" onclick="RaiseIndent()">Raise Indent</button>
+
+                </div>
+            }
+            else if (b != 0)
+            {
+
+                <div class="d-flex justify-content-center mt-1">
+                    <td style="color: red; text-align: right;"><u style="color: red;">Move the Sub Assembly material list to Sub Assembly Production Side If material Available</u></td>
+                </div>
+            }
+            else
+            {
+                <div class="d-flex justify-content-center mt-1">
+
+                    <button class="button-82-pushable" role="button" onclick="RaiseProduction()">
+                        <span class="button-82-shadow"></span>
+                        <span class="button-82-edge"></span>
+                        <span class="button-82-front text">
+                            Move to Production
+                        </span>
+                    </button>
+                </div>
+            }
+
         </div>
-        @if (a != 0)
-        {
-            <div class="d-flex justify-content-center mt-1">
-                <button class="btn btn-danger" id="makepayment" onclick="RaiseIndent()">Raise Indent</button>
-
-            </div>
-        }
-        else if (b != 0)
-        {
-
-            <div class="d-flex justify-content-center mt-1">
-                <td style="color: red; text-align: right;"><u style="color: red;">Move the Sub Assembly material list to Sub Assembly Production Side</u></td>
-            </div>
-        }
-        else
-        {
-            <div class="d-flex justify-content-center mt-1">
-
-                <button class="button-82-pushable" role="button" onclick="RaiseProduction()">
-                    <span class="button-82-shadow"></span>
-                    <span class="button-82-edge"></span>
-                    <span class="button-82-front text">
-                        Move to Production
-                    </span>
-                </button>
-            </div>
-        }
-
-    </div>
 
 
-    <script src="~/Content/js/custom.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+        <script src="~/Content/js/custom.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
-    <script>
+        <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+        <script>
         $(document).ready(function () {
             $(document).on("click", "#moveprod", function () {
                 var row = $(this).closest('tr');
@@ -286,10 +363,42 @@
                     }
                 });
             });
-        });
-    </script>
+            $(document).on("click", "#Raiseindent", function () {
+       var row = $(this).closest('tr');
+       var ProductNameId = row.find('.productid').text();
+        var salesorderid = @Model.SalesorderId_DT;
+       $.ajax({
+           type: 'POST',
+           url: '/SalesOrder/Tempsalesorder_Subassemblymaterial',
+           data: JSON.stringify({ proid: ProductNameId, SOid: salesorderid }),
+           contentType: 'application/json',
+           success: function (data) {
+               if (data == 'Success') {
+                   Swal.fire({
+                       title: 'Success!!',
+                       text: 'Successfully Raised the Indent!',
+                       icon: 'success',
+                       timer: 3000,
+                       timerProgressBar: true,
+                       showConfirmButton: false
+                   });
+                   setTimeout(function () {
+                       location.href = "/SalesOrder/SalesOrderMaster";
+                       return false;
+                   }, 3000);
 
-    <script>
+
+               }
+               else {
+                   Swal.fire("Alert", "Already This Material Moved to Indent!", "error");
+               }
+           }
+       });
+   });
+        });
+        </script>
+
+        <script>
        var bomMaterialList = JSON.parse('@Html.Raw(bomlist)');
 
         function onFilterClick() {
@@ -312,7 +421,7 @@
                     <tr>
                         <td class="veh1-5">${count}</td>
                         <td class="veh1-5" style="text-align:left;">${item.MaterialNames}</td>
-                        <td class="veh1-5">MAT</td>
+                        <td class="veh1-5">${item.productype}</td>
                         <td class="veh1-5"style="text-align:right;">${item.availablestock != null && item.availablestock != 0 ? item.availablestock : 'Not Added'}</td>
                         <td class="veh1-5"style="text-align:left;">${item.UOMName}</td>
                         <td class="veh1-5" style="color:red;text-align:right;"><u>${consume}</u></td>
@@ -358,7 +467,7 @@
                 <tr>
                     <td class="veh1-5">${count}</td>
                     <td class="veh1-5"style="text-align:left;">${item.MaterialNames}</td>
-                    <td class="veh1-5">MAT</td>
+                    <td class="veh1-5">${item.productype}</td>
                         <td class="veh1-5" style="text-align:right;">${item.availablestock != null && item.availablestock != 0 ? item.availablestock : 'Not Added'}</td>
                     <td class="veh1-5"style="text-align:left;">${item.UOMName}</td>`;
 
@@ -405,12 +514,13 @@
 
 
         function RaiseIndent() {
-            var salesorderid = @Model.SalesorderId_DT;
+            var salesorderid = @Model.SalesorderId;
+             var salesorderiddt = @Model.SalesorderId_DT;
 
             $.ajax({
                 type: 'POST',
                 url: '/SalesOrder/Tempsalesorder',
-                data: { id: salesorderid },
+                data: { id: salesorderid , sodt: salesorderiddt },
                 success: function (data) {
                     if (data == 'Success') {
                         Swal.fire({
@@ -437,11 +547,13 @@
 
         }
 function RaiseProduction() {
-    var salesorderid = @Model.SalesorderId_DT;
+    var salesorderid = @Model.SalesorderId;
+    var salesorderiddt = @Model.SalesorderId_DT;
+    var ProductNameId = @Model.ProductID;
     $.ajax({
         type: 'POST',
         url: '/SalesOrder/TempProductionstock',
-        data: { id: salesorderid },
+        data: { id: salesorderid, sodt: salesorderiddt, proid: ProductNameId },
         success: function (data) {
             if (data == 'Success') {
                 Swal.fire({
@@ -467,8 +579,8 @@ function RaiseProduction() {
     });
 
 }
-    </script>
+        </script>
 
-</body>
+    </body>
 
 </html>

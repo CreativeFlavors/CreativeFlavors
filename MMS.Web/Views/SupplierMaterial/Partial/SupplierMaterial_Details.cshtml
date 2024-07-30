@@ -35,12 +35,12 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="input-part">
                         <label class="font-14" for="#AddressType">Category Name</label>
-                        @Html.DropDownListFor(m => m.category, MMS.Web.ExtensionMethod.HtmlHelper.MaterialCategoryName(), new { @class = "select-style text-field" })
+                        @Html.DropDownListFor(m => m.category, MMS.Web.ExtensionMethod.HtmlHelper.CategoryNames(), new { @class = "select-style text-field" })
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="input-part">
-                        <label class="font-14" for="#AddressType">Product Name</label>
+                        <label class="font-14" for="ProductId">Product Name</label>
                         @Html.DropDownListFor(m => m.ProductId, MMS.Web.ExtensionMethod.HtmlHelper.ProductmMATName(), new { @class = "select-style text-field" })
                     </div>
                 </div>
@@ -113,59 +113,34 @@ style = "background-color: #eee !important;"
                 direction: "asc"
             }
         });
-    </script>
-    <script>
         $(window).on("load", function () {
             $(".report-inner-section").addClass("transection");
             $("#supplier").attr('checked', true);
         });
-        new TomSelect("#ProductId", {
-            create: false,
-            sortField: {
-                field: "text",
-                direction: "asc"
-            }
-        });
-
     </script>
+
 
     <script>
         function Save() {
-            var AddressId = $("#AddressId").val();
-            var BuyerId = $("#BuyerId").val();
-            var AddressType = $("#AddressType").val();
-            var Add1 = $("#Add1").val();
-            var Add2 = $("#Add2").val();
-            var Add3 = $("#Add3").val();
-            var City = $("#City").val();
-            var Country = $("#Country").val();
-            var State = $("#State").val();
-            var ZipCode = $("#ZipCode").val();
-            var ContactName = $("#ContactName").val();
-            var Email = $("#Email").val();
-            var Phone = $("#Phone").val();
-            var Notes = $("#Notes").val();
+            var SupplierId = $("#SupplierId").val();
+            var SupplierMaterialId = $("#SupplierMaterialId").val();
+            var category = $("#category").val();
+            var ProductId = $("#ProductId").val();
+            var UomId = $("#UomId").val();
+            var TaxId = $("#TaxId").val();
             var formdata = new FormData();
-            formdata.append("AddressId", AddressId);
-            formdata.append("BuyerId", BuyerId);
-            formdata.append("AddressType", AddressType);
-            formdata.append("Add1", Add1);
-            formdata.append("Add2", Add2);
-            formdata.append("Add3", Add3);
-            formdata.append("City", City);
-            formdata.append("State", State);
-            formdata.append("Country", Country);
-            formdata.append("ZipCode", ZipCode);
-            formdata.append("ContactName", ContactName);
-            formdata.append("Email", Email);
-            formdata.append("Phone", Phone);
-            formdata.append("Notes", Notes);
-            if (AddressId != "" && BuyerId != "" && AddressType != "" && Add1 != "" && Add2 != "" && City != "" && ContactName != "" && Notes != "") {
+            formdata.append("SupplierId", SupplierId);
+            formdata.append("SupplierMaterialId", SupplierMaterialId);
+            formdata.append("category", category);
+            formdata.append("ProductId", ProductId);
+            formdata.append("UomId", UomId);
+            formdata.append("TaxId", TaxId);
+            if (SupplierId != "" && ProductId != "" && category != "" && UomId != "" && TaxId != "" ) {
 
-                if (AddressId == "0") {
+                if (SupplierMaterialId == "") {
                     $.ajax({
                         type: 'POST',
-                        url: '/AddressDetails/CustAddressInsert',
+                        url: '/SupplierMaterial/SupplierMaterialInsert',
                         contentType: false,
                         processData: false,
                         dataType: 'html',
@@ -174,7 +149,7 @@ style = "background-color: #eee !important;"
 
                             if (data.addresid != "" || data.addresid != 0) {
                                 alert('Saved Successfully.');
-                                location.href = "/AddressDetails/AddressMaster";
+                                location.href = "/SupplierMaterial/SupplierMaster";
                                 return false;
                             }
                             else if (data.addresid == 0 && data.addresid != "") {
@@ -183,7 +158,7 @@ style = "background-color: #eee !important;"
                             }
                             else {
                                 alert('Save process Failed.');
-                                location.href = "/AddressDetails/AddressDetails";
+                                location.href = "/SupplierMaterial/SupplierMaterial_Details";
                                 return false;
                             }
 
@@ -196,21 +171,21 @@ style = "background-color: #eee !important;"
                 else {
                     $.ajax({
                         type: 'POST',
-                        url: '/AddressDetails/Update',
+                        url: '/SupplierMaterial/Update',
                         contentType: false,
                         processData: false,
                         dataType: 'html',
                         data: formdata,
                         success: function (data) {
 
-                            if (data.addresid != "" || data.addresid != 0) {
+                            if (data.SupplierMaterialId != "" || data.SupplierMaterialId != 0) {
                                 alert('Update Successfully.');
-                                location.href = "/AddressDetails/AddressMaster";
+                                location.href = "/SupplierMaterial/SupplierMaster";
                                 return false;
                             }
                             else {
                                 alert('Update process Failed.');
-                                location.href = "/AddressDetails/AddressDetails";
+                                location.href = "/SupplierMaterial/SupplierMaterial_Details";
                                 return false;
                             }
 
@@ -223,6 +198,31 @@ style = "background-color: #eee !important;"
 
             }
         }
+    </script>
+    <script>
+$(document).ready(function() {
+    $("#ProductId").change(function () {
+        var productId = $('#ProductId').val();
+        $.ajax({
+            url: '@Url.Action("FillUOMBasedonproductName", "SupplierMaterial")',
+            type: "GET",
+            dataType: "json", 
+            data: { productid: productId },
+            success: function(response) {
+                var $uomId = $("#UomId");
+                $uomId.empty(); 
+                $.each(response, function(index, item) {
+                    $uomId.append(
+                        $('<option></option>').val(item.uomid).html(item.UomName)
+                    );
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("Error occurred: " + status + " - " + error);
+            }
+        });
+    });
+});
     </script>
 
 </body>
