@@ -85,7 +85,7 @@ namespace MMS.Repository.Managers
         public List<temp_production> Getmaterial()
         {
             List<temp_production> list = new List<temp_production>();
-            list = tempproductionrep.Table.Where(x => x.IsActive == true).ToList<temp_production>();
+            list = tempproductionrep.Table.ToList<temp_production>();
             return list;
         }
         public void UpdateProductionBOMID(int pbomid, int materialid)

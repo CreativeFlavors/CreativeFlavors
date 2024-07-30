@@ -794,7 +794,7 @@ namespace MMS.Web.Controllers
 
         #endregion
         public ActionResult GetBomMaterialForProduction(int productid)
-        {
+            {
             // Initialize variables
             decimal? minstock = 0;
             decimal? maxstock = 0;
