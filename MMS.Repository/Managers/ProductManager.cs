@@ -4,6 +4,7 @@ using MMS.Core.Entities.Stock;
 using MMS.Data;
 using MMS.Data.Context;
 using MMS.Data.Mapping;
+using MMS.Data.StoredProcedureModel;
 using MMS.Repository.Service;
 using System;
 using System.Collections.Generic;
@@ -60,7 +61,6 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-
                 product model = productrep.Table.Where(p => p.ProductId == arg.ProductId).FirstOrDefault();
                 if (model != null)
                 {
@@ -72,6 +72,15 @@ namespace MMS.Repository.Managers
                     model.Price = arg.Price;
                     model.BomNo = arg.BomNo;
                     model.IsActive = arg.IsActive;
+                    model.ProductType = arg.ProductType;
+                    model.weight = arg.weight;
+                    model.cost = arg.cost;
+                    model.MaxStock = arg.MaxStock;
+                    model.MinStock = arg.MinStock;
+                    model.ProductionPerDay = arg.ProductionPerDay;
+                    model.ProductionTime = arg.ProductionTime;
+                    model.StoreId = arg.StoreId;
+                    model.MaterialCategoryMasterId = arg.MaterialCategoryMasterId;
                     model.UpdatedDate = DateTime.Now;
                     model.UpdatedBy = "admin";
                     productrep.Update(model);
@@ -127,7 +136,12 @@ namespace MMS.Repository.Managers
             }
             return products;
         }
-
+        public List<ProductGrid> Product_Grid()
+        {
+            List<ProductGrid> ProductGrid = new List<ProductGrid>();
+            ProductGrid = productrep.Get_ProductGrid();
+            return ProductGrid;
+        }
         public List<product> Get(int productid)
         {
             List<product> products = new List<product>();

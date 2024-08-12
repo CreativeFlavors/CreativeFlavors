@@ -1,0 +1,321 @@
+﻿@model MMS.Web.Models.Product.Product
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <style>
+
+        .container1 {
+            background-color: #fff;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+            border-radius: 5px;
+            padding: 25px 30px;
+            width: 70rem;
+        }
+
+            .container1 .title {
+                font-size: 25px;
+                font-weight: 500;
+                margin-bottom: 15px;
+                position: relative;
+            }
+
+                .container1 .title::after {
+                    content: "";
+                    position: absolute;
+                    left: 0;
+                    bottom: 0;
+                    width: 30px;
+                    height: 20px;
+                    border-bottom: 3px solid #8a73c1;
+                }
+
+            .container1 form .user-details {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+        .input-box,
+        .gender-details,
+        .status {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+            width: calc(100% / 3 - 20px);
+        }
+
+        .details {
+            display: block;
+            font-weight: 500;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        #arrow {
+            background: linear-gradient(to top, #e0dbed 0%, #9db4d7 100%);
+            min-height: 78vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        #submitproduct {
+            border-radius: 5px;
+            background: linear-gradient(to top, #625386 0%, #bc74a8 100%);
+            border: none;
+            height: 40px;
+            margin-block: 18px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #submitproduct {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+
+            #submitproduct:hover {
+                background: linear-gradient(to top, #7a5bbc 0%, #92447c 100%);
+            }
+
+
+        #alert {
+            margin-left: 24%;
+        }
+
+        .alert {
+            position: relative;
+            padding: 5px 1rem;
+        }
+
+        strong#close {
+            margin-left: 18%;
+            cursor: pointer;
+        }
+
+        .alert-danger {
+            color: #842029;
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+            width: 43%;
+        }
+
+        .modal-content {
+            position: relative;
+            display: flex;
+            margin-left: -71%;
+            flex-direction: column;
+            width: 236%;
+            pointer-events: auto;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid rgba(0, 0, 0, .2);
+            border-radius: .3rem;
+            outline: 0;
+        }
+    </style>
+
+</head>
+<body>
+    <div id="arrow">
+        <section action="" class="container1">
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="d-flex justify-content-center">
+                <h1 class="title">Product</h1>
+            </div>
+            <div class="content">
+                <form action="#">
+                    <div class="user-details">
+                        @Html.HiddenFor(m => m.ProductId)
+                        <div class="input-box">
+                            <span class="details">Product Type</span>
+                            @Html.DropDownListFor(m => m.ProductType, MMS.Web.ExtensionMethod.HtmlHelper.ProductType(), new { @class = "sel-dropdown form-control", onchange = "ProductTypes()" })
+                            <p id="error1" style="color: red;"></p>
+                        </div>
+                        <div class="input-box">
+                            <span class="details">Category</span>
+                            @Html.DropDownListFor(m => m.MaterialCategoryMasterId, MMS.Web.ExtensionMethod.HtmlHelper.CategoryNames(), new { @class = "sel-dropdown form-control", onchange = "Category()" })
+                            <p id="error2" style="color: red; margin: 0px 00%;"></p>
+                        </div>
+                        <div class="input-box">
+                            <span class="details">Product Code</span>
+                            @Html.TextBoxFor(m => m.ProductCode, new
+                       {
+                           @class = "form-control text-field",
+                           placeholder = "Enter Product Code",
+                           style = "width:100%;",
+                           onkeyup = "ProdCod()"
+                       })
+                            <p id="error3" style="color: red; margin: 0px 00%;"></p>
+                        </div>
+                        <div class="input-box">
+                            <span class="details">Product Name</span>
+                            @Html.TextBoxFor(m => m.ProductName, new { @class = "form-control text-field", placeholder = "Enter Product Desc", style = "width:100%;", onkeyup = "ProdName()" })
+                            <p id="error4" style="color: red; margin: 0px 00%;"></p>
+                        </div>
+                        <div class="input-box">
+                            <span class="details">Price</span>
+                            @Html.TextBoxFor(m => m.Price, new { @class = "form-control text-field", placeholder = "Enter Price", style = "width:100%;", onkeyup = "Prices()" })
+                            <p id="error7" style="color: red; "></p>
+                        </div>
+                        <div class="input-box">
+                            <span class="details">Product Description</span>
+                            @Html.TextAreaFor(m => m.ProductDesc, new { @class = "form-control text-field", placeholder = "Enter Product Desc", onkeyup = "ProdDes()" })
+                            <p id="error5" style="color: red; "></p>
+                        </div>
+
+                        <div class="gender-details">
+                            <span class="details">Cost :</span>
+                            @Html.TextBoxFor(m => m.cost, new { @class = "form-control text-field", placeholder = "Enter Cost", style = "width:100%;", onkeyup = "Costs()" })
+                            <p id="error6" style="color: red; "></p>
+                        </div>
+
+                        <div class="status">
+                            <span class="details">Weight :</span>
+                            @Html.TextBoxFor(m => m.weight, new { @class = "form-control text-field", placeholder = "Enter Production Per Day", style = "width:100%;", onkeyup = "proweights()" })
+                            <p id="error8" style="color: red; "></p>
+
+                        </div>
+                        <div class="gender-details">
+                            <span class="details">UOM :</span>
+                            @Html.DropDownListFor(m => m.UomMasterId, MMS.Web.ExtensionMethod.HtmlHelper.Uom(), new { @class = "sel-dropdown form-control", onchange = "Uom()" })
+                            <p id="error9" style="color: red; "></p>
+
+                        </div>
+                        <div class="status">
+                            <span class="details">Tax Type :</span>
+                            @Html.DropDownListFor(m => m.TaxMasterId, MMS.Web.ExtensionMethod.HtmlHelper.GetTaxRef(), new { @class = "sel-dropdown form-control", onchange = "Tax()" })
+                            <p id="error10" style="color: red; "></p>
+                        </div>
+                        <div class="gender-details">
+                            <span class="details">BOM No :</span>
+                            @Html.DropDownListFor(m => m.BomNo, MMS.Web.ExtensionMethod.HtmlHelper.GetBomno(), new { @class = "sel-dropdown form-control" })
+                            <p style="color: red; "></p>
+                        </div>
+                        <div class="status">
+                            <span class="details">Store Name :</span>
+                            @Html.DropDownListFor(m => m.StoreId, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "sel-dropdown form-control", onchange = "Store()" })
+                            <p id="error12" style="color: red; "></p>
+
+                        </div>
+                        <div class="gender-details">
+                            <span class="details">Production Per-day :</span>
+                            @Html.TextBoxFor(m => m.productionperday, new { @class = "form-control text-field", placeholder = "Enter Production Per Day", style = "width:100%;", onkeyup = "productions()" })
+                            <p id="error13" style="color: red; "></p>
+
+                        </div>
+                        <div class="status">
+                            <span class="details">Min Stock :</span>
+                            @Html.TextBoxFor(m => m.MinStock, new { @class = "form-control text-field", placeholder = "Enter Minium Stock", style = "width:100%;", onkeyup = "MinSt()" })
+                            <p id="error14" style="color: red; "></p>
+
+                        </div>
+                        <div class="gender-details">
+                            <span class="details">Max Stock :</span>
+                            @Html.TextBoxFor(m => m.MaxStock, new { @class = "form-control text-field", placeholder = "Enter Maxium Stock", style = "width:100%;", onkeyup = "MaxSt()" })
+                            <p id="error15" style="color: red; "></p>
+
+                        </div>
+                        <button onclick="productfun()" type="button" id="submitproduct">Submit</button>
+                    </div>
+
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <script src="~/Content/js/custom.js"></script>
+    <script src="~/Content/js/dropdown.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="~/Content/js/Validation.js"></script>
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $(document).on("click", "#submitproduct", function () {
+                var ProductCode = $("#ProductCode").val();
+                var ProductName = $("#ProductName").val();
+                var ProductDesc = $("#ProductDesc").val();
+                var ProductId = $("#ProductId").val();
+                var TaxMasterId = $("#TaxMasterId").val();
+                var UomMasterId = $("#UomMasterId").val();
+                var Price = $("#Price").val();
+                var BomNo = $("#BomNo").val();
+                var MaterialCategoryMasterId = $("#MaterialCategoryMasterId").val();
+                var ProductType = $("#ProductType").val();
+                var cost = $("#cost").val();
+                var StoreId = $("#StoreId").val();
+                var weight = $("#weight").val();
+                var productionperday = $("#productionperday").val();
+                var MinStock = $("#MinStock").val();
+                var MaxStock = $("#MaxStock").val();
+                var filter = /^[0-9]+(\.[0-9]+)?$/;
+                if (ProductCode != "" && ProductName != "" && ProductDesc != "" &&
+                    TaxMasterId != "" && UomMasterId != "" && MaterialCategoryMasterId != "" && cost != "" && MaxStock != "" && MinStock != "" &&
+                    productionperday != "" && weight != "" && StoreId != "" && ProductType != "" && Price != "" && filter.test(MinStock) &&
+                    filter.test(MaxStock) && filter.test(productionperday) && filter.test(weight) && filter.test(cost) && filter.test(Price)) {
+                    var formdata = new FormData();
+                    formdata.append("ProductId", ProductId);
+                    formdata.append("cost", cost);
+                    formdata.append("weight", weight);
+                    formdata.append("MinStock", MinStock);
+                    formdata.append("MaxStock", MaxStock);
+                    formdata.append("ProductCode", ProductCode);
+                    formdata.append("ProductName", ProductName);
+                    formdata.append("ProductDesc", ProductDesc);
+                    formdata.append("TaxMasterId", TaxMasterId);
+                    formdata.append("UomMasterId", UomMasterId);
+                    formdata.append("Price", Price);
+                    formdata.append("BomNo", BomNo);
+                    formdata.append("MaterialCategoryMasterId", MaterialCategoryMasterId);
+                    formdata.append("ProductType", ProductType);
+                    formdata.append("StoreId", StoreId);
+                    formdata.append("productionperday", productionperday);
+                        $.ajax({
+                            type: 'POST',
+                            url: '/Product/ProductDataInsert',
+                            contentType: false,
+                            processData: false,
+                            dataType: 'html',
+                            data: formdata,
+                            success: function (data) {
+                                if (data.includes("Inserted")) {
+                                    alert("Product Saved successfully");
+                                } else if (data.includes("Updated")) {
+                                    alert("Product Updated successfully");
+                                } else {
+                                    alert('Operation failed. Please try again.');
+                                }
+                            }
+                        });
+                }
+
+            });
+        });
+    </script>
+
+
+</body>
+
+</html>

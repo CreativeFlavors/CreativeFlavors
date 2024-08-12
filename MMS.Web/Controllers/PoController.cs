@@ -25,10 +25,10 @@ namespace MMS.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult PoGrid(int page = 1, int pageSize = 9)
+        public ActionResult PoGrid(int page = 1, int pageSize = 15)
         {
             PoManager poManager = new PoManager();
-            var totalList = poManager.GetindentPoMappingList();
+            var totalList = poManager.GetPODetails();
             var totalCount = totalList.Count();
             int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
             int startIndex = (page - 1) * pageSize;
@@ -218,9 +218,9 @@ namespace MMS.Web.Controllers
          {
             PoManager poManager = new PoManager();
             PoModel model = new PoModel();
-            var data = poManager.GetIndentPoMapid(indentpomapid);
+            var data = poManager.Getpoid(indentpomapid);
             var data1 = poManager.GetindentPoMappingId(indentpomapid);
-            model.IndentPoMapId = data.IndentPoMapId;
+            model.PodetailId = data.PodetailId;
             model.PoDate = data.PoDate;
             model.PoNumber = data.PoNumber;
             model.IndentNumber = (int)data.IndentNumber;
@@ -229,8 +229,8 @@ namespace MMS.Web.Controllers
             model.StoreCode = data.StoreCode;
             model.UomId = data.UomId;
             model.UnitPrice = data.UnitPrice;
-            model.IndentQty = data.IndentQty;
-            model.PoQty = data.PoQty;
+            model.IndentQty = data.IndentNumber;
+            model.PoQty = data.Quantity;
             model.TaxPercentage = data.TaxPercentage;
             model.TaxValue = data.TaxValue;
             model.DiscountPercentage = data.DiscountPercentage;
@@ -357,16 +357,15 @@ namespace MMS.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult PoDelete(int indentpomapid)
+        public ActionResult PoDelete(int poId)
         {
-            IndentPoMapping indentpomapping = new IndentPoMapping();
             string status = "";
             PoManager poManager = new PoManager();
-            indentpomapping = poManager.GetIndentPoMapid(indentpomapid);
-            if (indentpomapping.IndentPoMapId == indentpomapid)
+            var vindentpomapping = poManager.Getpoid(poId);
+            if (vindentpomapping != null)
             {
                 status = "Success";
-                poManager.Delete(indentpomapid);
+                poManager.Deletepodt(poId);
             }
             return Json(status, JsonRequestBehavior.AllowGet);
         }

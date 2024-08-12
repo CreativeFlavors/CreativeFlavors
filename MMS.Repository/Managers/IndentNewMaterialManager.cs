@@ -84,6 +84,8 @@ namespace MMS.Repository.Managers
                 string username = "admin";
                 arg.CreatedBy = username;
                 arg.CreatedDate = DateTime.Now;
+                arg.Status = 1;
+                arg.IsActive = true;
                 indentcartRepository.Insert(arg);
                 result = true;
             }
@@ -229,6 +231,7 @@ namespace MMS.Repository.Managers
             }
             return Indentcartlist;
         }
+
         public IndentCart Getindentcard(int materialnameid)
         {
             IndentCart Indentcartlist = new IndentCart();
@@ -245,12 +248,26 @@ namespace MMS.Repository.Managers
             return Indentcartlist;
         }
 
-        public List<IndentCartsp> GetindentcartList()
+        public List<get_indent> GetindentcartList()
         {
-            List<IndentCartsp> indentlistcart = new List<IndentCartsp>();
+            List<get_indent> indentlistcart = new List<get_indent>();
             try
             {
                 indentlistcart = indentcartRepository.Getindentcart();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return indentlistcart;
+        }  
+        public List<get_indentcart> GetindentcartLists()
+        {
+            List<get_indentcart> indentlistcart = new List<get_indentcart>();
+            try
+            {
+                indentlistcart = indentcartRepository.Getindentcarts().Where(m=>m.isactive == true && m.status == 1).ToList();
 
             }
             catch (Exception ex)
@@ -298,7 +315,7 @@ namespace MMS.Repository.Managers
         public List<Indentdetail> GetIndentdetailsList(int? indentheaderid)
         {
             List<Indentdetail> indentdetails = new List<Indentdetail>();
-            indentdetails = indentdetailRepository.Table.Where(x => x.IndentHeaderId == indentheaderid).ToList();
+            indentdetails = indentdetailRepository.Table.Where(x => x.IndentNo == indentheaderid).ToList();
             return indentdetails;
         }
 

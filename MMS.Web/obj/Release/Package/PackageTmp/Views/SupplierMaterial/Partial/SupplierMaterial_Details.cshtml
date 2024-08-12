@@ -1,0 +1,229 @@
+﻿@model MMS.Web.Models.SupplierMaterialModel.SupplierMaterialModel
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
+
+</head>
+
+<body>
+
+    <section class="inner-section">
+        <div class="d-flex justify-content-between">
+            <h2 class=" font-20">SUpplier Materials</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="edit-section">
+            <h3 class="font-20">Basic Information</h3>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="input-part">
+                        <label class="font-14" for="#BuyerId">Supplier Name</label>
+                        @Html.DropDownListFor(m => m.SupplierId, MMS.Web.ExtensionMethod.HtmlHelper.SupplierName(), new { @class = "select-style text-field" })
+                        @Html.HiddenFor(x => x.SupplierMaterialId)
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="input-part">
+                        <label class="font-14" for="#AddressType">Category Name</label>
+                        @Html.DropDownListFor(m => m.category, MMS.Web.ExtensionMethod.HtmlHelper.CategoryNames(), new { @class = "select-style text-field" })
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="input-part">
+                        <label class="font-14" for="ProductId">Product Name</label>
+                        @Html.DropDownListFor(m => m.ProductId, MMS.Web.ExtensionMethod.HtmlHelper.ProductmMATName(), new { @class = "select-style text-field" })
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="input-part">
+                        <label class="font-14" for="Uomid">UOM Name</label>
+                        @Html.DropDownListFor(
+m => m.UomId,
+MMS.Web.ExtensionMethod.HtmlHelper.Uom(),
+new
+{
+    @class = "select-style text-field read-only-dropdown",
+style = "background-color: #eee !important;"
+}
+)
+
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="input-part">
+                        <label class="font-14" for="#State">Tax</label>
+                        @Html.DropDownListFor(m => m.TaxId, MMS.Web.ExtensionMethod.HtmlHelper.GetTaxON(), new { @class = "select-style text-field" })
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+
+            </div>
+            <div class="inner-section-button mt-4">
+
+                <button class="fill-color font-15" onclick="Save()">
+                    SAVE
+                </button>
+
+                <a href="/SupplierMaterial/SupplierMaster">
+                    <button class="border-color font-15">
+                        CANCEL
+                    </button>
+                </a>
+            </div>
+        </div>
+    </section>
+    <script src="~/Content/js/custom.js"></script>
+    <script src="~/Content/js/dropdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script>
+        new TomSelect("#SupplierId", {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            }
+        });
+        new TomSelect("#category", {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            }
+        });
+        new TomSelect("#ProductId", {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            }
+        });
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#supplier").attr('checked', true);
+        });
+    </script>
+
+
+    <script>
+        function Save() {
+            var SupplierId = $("#SupplierId").val();
+            var SupplierMaterialId = $("#SupplierMaterialId").val();
+            var category = $("#category").val();
+            var ProductId = $("#ProductId").val();
+            var UomId = $("#UomId").val();
+            var TaxId = $("#TaxId").val();
+            var formdata = new FormData();
+            formdata.append("SupplierId", SupplierId);
+            formdata.append("SupplierMaterialId", SupplierMaterialId);
+            formdata.append("category", category);
+            formdata.append("ProductId", ProductId);
+            formdata.append("UomId", UomId);
+            formdata.append("TaxId", TaxId);
+            if (SupplierId != "" && ProductId != "" && category != "" && UomId != "" && TaxId != "" ) {
+
+                if (SupplierMaterialId == "") {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/SupplierMaterial/SupplierMaterialInsert',
+                        contentType: false,
+                        processData: false,
+                        dataType: 'html',
+                        data: formdata,
+                        success: function (data) {
+
+                            if (data.addresid != "" || data.addresid != 0) {
+                                alert('Saved Successfully.');
+                                location.href = "/SupplierMaterial/SupplierMaster";
+                                return false;
+                            }
+                            else if (data.addresid == 0 && data.addresid != "") {
+                                alert('Already Exist in the database.');
+                                return false;
+                            }
+                            else {
+                                alert('Save process Failed.');
+                                location.href = "/SupplierMaterial/SupplierMaterial_Details";
+                                return false;
+                            }
+
+                        },
+                        error: function (ex) {
+                            alert('Already Exist in the database.');
+                        }
+                    });
+                }
+                else {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/SupplierMaterial/Update',
+                        contentType: false,
+                        processData: false,
+                        dataType: 'html',
+                        data: formdata,
+                        success: function (data) {
+
+                            if (data.SupplierMaterialId != "" || data.SupplierMaterialId != 0) {
+                                alert('Update Successfully.');
+                                location.href = "/SupplierMaterial/SupplierMaster";
+                                return false;
+                            }
+                            else {
+                                alert('Update process Failed.');
+                                location.href = "/SupplierMaterial/SupplierMaterial_Details";
+                                return false;
+                            }
+
+                        },
+                        error: function (ex) {
+                            alert('Update process Failed in the database.');
+                        }
+                    });
+                }
+
+            }
+        }
+    </script>
+    <script>
+$(document).ready(function() {
+    $("#ProductId").change(function () {
+        var productId = $('#ProductId').val();
+        $.ajax({
+            url: '@Url.Action("FillUOMBasedonproductName", "SupplierMaterial")',
+            type: "GET",
+            dataType: "json", 
+            data: { productid: productId },
+            success: function(response) {
+                var $uomId = $("#UomId");
+                $uomId.empty(); 
+                $.each(response, function(index, item) {
+                    $uomId.append(
+                        $('<option></option>').val(item.uomid).html(item.UomName)
+                    );
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("Error occurred: " + status + " - " + error);
+            }
+        });
+    });
+});
+    </script>
+
+</body>
+</html>

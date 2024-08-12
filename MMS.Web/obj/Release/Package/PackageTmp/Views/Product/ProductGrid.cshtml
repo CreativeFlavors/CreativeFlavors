@@ -1,5 +1,5 @@
-﻿@model MMS.Web.Models.Product.Product
-@using MMS.Repository.Managers
+﻿@model IEnumerable<MMS.Web.Models.Product.Product>
+@using MMS.Core.Entities
 
 <!DOCTYPE html>
 <html lang="en">
@@ -63,16 +63,14 @@
                 </div>
             </div>
             <div class="table-responsive manage_customers_table_responsive">
-                <div class="customer_manage_search_containers" style="width:40%;">
-                    <input type="text" placeholder="Search by Product Name" id="SeaarchID" name="search2">
-                    <button class="buttonone" onclick="Search()" title="Filter" type="submit"><i class="fa fa-search"></i></button>
-
+                <div class="customer_manage_search_container">
+                    <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Product Name">
                 </div>
                 @*<div id="transaction_reports_search4_container" class="reports_search_container_btn">
-                        <button type="button" class="btn btn-primary">
-                            <a href="##" id="filter" onclick="Search()">FILTER</a>
-                        </button>
-                    </div>*@
+            <button type="button" class="btn btn-primary">
+                <a href="##" id="filter" onclick="Search()">FILTER</a>
+            </button>
+        </div>*@
 
                 <div class="manage_customers_table_in_responsive">
                     <table class="table table-striped text-center">
@@ -103,12 +101,7 @@
                                     </span>
                                 </th>
 
-                                <th scope="col">
-                                    <span>Prodct Desc</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
+             
                                 <th scope="col">
                                     <span>Tax Code</span>
                                     <span>
@@ -136,29 +129,28 @@
                                 <th scope="col"><span>STATUS</span></th>
                             </tr>
                         </thead>
-                        @if (ViewBag.Productslist != null && ViewBag.Productslist.Count > 0)
+                        @if (Model != null)
                         {
                             int count = 1;
                             <tbody>
-                                @foreach (var item in ViewBag.Productslist)
+                                @foreach (var item in Model)
                                 {
 
                                     <tr class="font-14">
                                         <td>@count</td>
-                                        <td>@item.materailCategory.CategoryName</td>
-                                        <td>@item.ProductCode</td>
-                                        <td>@item.ProductName</td>
-                                        <td>@item.ProductDesc</td>
-                                        <td>@item.TaxTypeMaster.TaxCode</td>
-                                        <td>@item.UomMaster.LongUnitName</td>
-                                        <td>@item.Price</td>
-                                        @if (item.Bom != null)
+                                        <td style="text-align:left">@item.CategoryName</td>
+                                        <td style="text-align:left">@item.ProductCode</td>
+                                        <td style="text-align:left">@item.ProductName</td>
+                                        <td style="text-align:left">@item.taxname</td>
+                                        <td style="text-align:left">@item.uom</td>
+                                        <td style="text-align:right">@item.Price</td>
+                                        @if (item.BomNo1 != null)
                                         {
-                                            <td>@item.Bom.BomNo</td>
+                                            <td style="text-align:left">@item.BomNo1</td>
                                         }
                                         else
                                         {
-                                         <td>@item.BomNo</td>
+                                            <td>-</td>
                                         }
                                         <td class="veh-1 edit-del-wrap">
                                             <a href="javascript:void(0)" onclick="Edit('@item.ProductId')" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
@@ -180,10 +172,10 @@
                     <div class="font-14 manage_customer_show_I col-xl-6">
                         <span>Showing </span>
                         <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
-                            <option value="5" @(ViewBag.PageSize == 5 ? "selected" : "")>5</option>
-                            <option value="10" @(ViewBag.PageSize == 10 ? "selected" : "")>10</option>
                             <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
-                            <option value="20" @(ViewBag.PageSize == 20 ? "selected" : "")>20</option>
+                            <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
+                            <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
+                            <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
                         </select>
 
 
@@ -341,37 +333,43 @@
             }
         }
 
-        function Search() {
+        $("#customer_manage_search").keyup(function () {
+            var productsearch = $("#customer_manage_search").val();
             $.ajax({
                 type: "GET",
                 url: '/Product/ProductSearch',
-                data: { filter: $('#SeaarchID').val() },
+                data: { filter: productsearch },
                 dataType: 'json',
                 success: function (data) {
                     $("tbody").empty();
                     var count = 1;
                     $.each(data, function (i, item) {
+                        if (item.BomNo1) {
+                            var data = item.BomNo1;
+                        }
+                        else {
+                            var data="-"
+                        }
                         $("tbody").append(`
-                                <tr class="font-14">
-                                    <td>${count}</td>
-                                    <td>${item.MaterialCategoryMasterId}</td>
-                                    <td>${item.ProductCode}</td>
-                                    <td>${item.ProductName}</td>
-                                    <td>${item.ProductDesc}</td>
-                                    <td>${item.TaxMasterId}</td>
-                                    <td>${item.UomMasterId}</td>
-                                    <td>${item.Price}</td>
-                                    <td>${item.BomNo}</td>
-                                    <td class="veh-1 edit-del-wrap">
-                                        <a href="javascript:void(0)" onclick="Edit('${item.ProductId}')" class="watchlist-edit" title="Edit">
-                                            <img src="/Content/assets/images/edit-icon.png" />
-                                        </a>
-                                        <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('${item.ProductId}')" class="watchlist-delete" title="Delete">
-                                            <img src="/Content/assets/images/delete-icon.png" />
-                                        </a>
-                                    </td>
-                                </tr>
-                            `);
+                                    <tr class="font-14">
+                                        <td>${count}</td>
+                                        <td style="text-align:left">${item.CategoryName}</td>
+                                        <td style="text-align:left">${item.ProductCode}</td>
+                                        <td style="text-align:left">${item.ProductName}</td>
+                                        <td style="text-align:right">${item.taxname}</td>
+                                        <td style="text-align:left">${item.uom}</td>
+                                        <td style="text-align:right">${item.Price}</td>
+                                        <td style="text-align:left">${data}</td>
+                                        <td class="veh-1 edit-del-wrap">
+                                            <a href="javascript:void(0)" onclick="Edit('${item.ProductId}')" class="watchlist-edit" title="Edit">
+                                                <img src="/Content/assets/images/edit-icon.png" />
+                                            </a>
+                                            <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('${item.ProductId}')" class="watchlist-delete" title="Delete">
+                                                <img src="/Content/assets/images/delete-icon.png" />
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `);
                         count++;
                     });
                 },
@@ -379,7 +377,7 @@
                     console.error("Error occurred:", status, error);
                 }
             });
-        }
+        });
 
 
 

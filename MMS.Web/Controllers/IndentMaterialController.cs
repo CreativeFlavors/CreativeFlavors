@@ -26,7 +26,7 @@ namespace MMS.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult IndentMaterialGrid(int page = 1, int pageSize = 9)
+        public ActionResult IndentMaterialGrid(int page = 1, int pageSize = 15)
         {
             IndentNewMaterialManager indentnewMaterialManager = new IndentNewMaterialManager();
             var totalList = indentnewMaterialManager.GetindentcartList();
@@ -108,16 +108,16 @@ namespace MMS.Web.Controllers
                     status = "Updated";
                 }
                 List<IndentMaterialModel> updatedIndents = new List<IndentMaterialModel>();
-                updatedIndents = indentNewMaterialManager.GetindentcartList()
+                updatedIndents = indentNewMaterialManager.GetindentcartLists()
                                 .Where(i => i.IndentNumber == model.IndentNumber)
                                 .Select(i => new IndentMaterialModel
-                                {                                 
+                                {
                                     MaterialNameId = i.ProductName,
                                     StoreNameId = i.StoreName,
                                     TaxNameId = i.TaxName,
                                     UomNameId = i.UomName,
+                                    IndentRequiredQty = i.indentrequiredqty,
                                     Price = i.Price,
-                                    IndentRequiredQty = i.IndentRequiredQty,
                                     RequiredQty = i.RequiredQty
                                 })
                                 .ToList();
@@ -252,7 +252,7 @@ namespace MMS.Web.Controllers
             {
                 IndentNewMaterialManager indentnewMaterialManager = new IndentNewMaterialManager();
                 var totalList = indentnewMaterialManager.GetindentcartList();
-                List<IndentCartsp> indentCartsps = new List<IndentCartsp>();
+                List<get_indent> indentCartsps = new List<get_indent>();
                 indentCartsps = totalList.Where(x => x.ProductName.ToLower().Contains(filter.ToLower())).ToList();
                 return Json(indentCartsps, JsonRequestBehavior.AllowGet);
             }

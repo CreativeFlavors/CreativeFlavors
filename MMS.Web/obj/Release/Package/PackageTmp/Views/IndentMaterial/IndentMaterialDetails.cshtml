@@ -15,6 +15,7 @@
     <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
 
     <style>
+
         table, th, td {
             border: 1px solid #C9C9C9;
             border-collapse: collapse;
@@ -40,7 +41,7 @@
 
         .Indent {
             margin-left: 11px;
-            margin-top: 7%;
+            margin-top: 4%;
         }
 
         div#billingadd {
@@ -75,6 +76,7 @@
         #alert {
             margin-left: 24%;
         }
+
         div#form {
             border-style: solid;
             border-color: #e9ecef;
@@ -97,7 +99,7 @@
             <div class="edit-customer">
                 <a href="/IndentMaterial/IndentMaterialMaster">
                     <div class="back-button"><img src="~/Content/assets/images/choose-plan.png" alt="back arrow"></div>
-                </a>                
+                </a>
                 <h2 class=" font-20">Indent</h2>
             </div>
 
@@ -112,7 +114,7 @@
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="#IndentDate">Indent Date</label>
-                            @Html.TextBoxFor(m => m.IndentDate, "{0:dd-MM-yyyy}", new { @class = "form-control text-field", @id = "IndentDate" })
+                            @Html.TextBoxFor(m => m.IndentDate, "{0:dd-MM-yyyy}", new { @class = "form-control text-field", @id = "IndentDate", @readonly = "true", style = "background-color: #eee !important;" })
                         </div>
                     </div>
 
@@ -124,9 +126,10 @@
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="input-part">
-                            <label class="font-14" for="#MaterialId">Material Name</label>
-                            @Html.DropDownListFor(m => m.MaterialId, MMS.Web.ExtensionMethod.HtmlHelper.ProductName(), new { @class = "select-style text-field " })
+                            <label class="font-14" for="#MaterialId">Product Name</label>
+                            @Html.DropDownListFor(m => m.MaterialId, MMS.Web.ExtensionMethod.HtmlHelper.ProductmMATName(), new { @class = "select-style text-field ", onchange = "matfun()" })
                         </div>
+                        <p id="materror" style="color: red; "></p>
                     </div>
                     <br />
                     <table style="width:100%" class="Indent">
@@ -137,6 +140,8 @@
                                 <th>Tax</th>
                                 <th>UOM</th>
                                 <th>Price</th>
+                                <th>MinQty</th>
+                                <th>MaxQty</th>
                                 <th>Indent Qty</th>
                                 <th>Required Qty</th>
                                 <th>Add Products</th>
@@ -149,16 +154,19 @@
                                 <td>@Html.TextBoxFor(m => m.TaxNameId, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "TaxNameId" })</td>
                                 <td>@Html.TextBoxFor(m => m.UomNameId, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "UomNameId" })</td>
                                 <td>@Html.TextBoxFor(m => m.Price, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "Price" })</td>
+                                <td>@Html.TextBoxFor(m => m.MinQty, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "MinQty" })</td>
+                                <td>@Html.TextBoxFor(m => m.MaxQty, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "MaxQty" })</td>
                                 <td>
                                     @Html.TextBoxFor(m => m.IndentRequiredQty, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;width:100%;", id = "IndentRequiredQty" })
                                 </td>
-                                <td>@Html.TextBoxFor(m => m.RequiredQty, new { @class = "form-control text-field", style = "width:100%;", id = "RequiredQty" })</td>
+                                <td>@Html.TextBoxFor(m => m.RequiredQty, new { @class = "form-control text-field", style = "width:100%;", id = "RequiredQty", onKeyUp = "quantityINvalidate()" })</td>
                                 <td style="background-color: #e9ecef">
-                                    <button class="fill-color font-15" onclick="Save()">Add</button>
+                                    <button class="fill-color font-15" onclick="Save(); addindent()">Add</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                    <p id="inerror" style="color: red; margin: 0px 80%;"></p>
                     <div>
                         <div class="table-responsive reports_table_responsive">
                             <div class="manage_customers_table_in_responsive mt-3" style="height:230px; overflow: auto;" id="form">
@@ -237,6 +245,7 @@
                         </a>
                     </div>
                 </div>
+
             </div>
         </section>
     </div>
@@ -247,8 +256,12 @@
     <script src="~/Content/js/dropdown.js"></script>
     <script src="~/Content/js/custom.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="~/Content/js/Validation.js"></script>
     <script>
-        // for searchable dropdownlist
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#indent").attr('checked', true);
+        });
         function initializeTomSelect(selectors, options) {
             selectors.forEach(selector => {
                 new TomSelect(selector, options);
@@ -281,6 +294,8 @@
                         $('#TaxNameId').val(response.Tax);
                         $('#UomNameId').val(response.Uom);
                         $('#Price').val(response.Price);
+                        $('#MinQty').val(response.MinQty);
+                        $('#MaxQty').val(response.MaxQty);
                         $('#IndentRequiredQty').val(response.Indentstock);
                     },
                     error: function (xhr, status, error) {
@@ -307,42 +322,45 @@
             formData.append("RequiredQty", RequiredQty);
             formData.append("IndentNumber", IndentNumber);
             formData.append("IndentDate", IndentDate);
+            var filter = /^[0-9]+$/;
+            if (RequiredQty != "" && MaterialId != "" && filter.test(RequiredQty)) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/IndentMaterial/SaveIndentCart',
+                    contentType: false,
+                    processData: false,
+                    dataType: 'json',
+                    data: formData,
+                    success: function (data) {
+                        console.log('Save successful:', data);
 
-            $.ajax({
-                type: 'POST',
-                url: '/IndentMaterial/SaveIndentCart',
-                contentType: false,
-                processData: false,
-                dataType: 'json',
-                data: formData,
-                success: function (data) {
-                    console.log('Save successful:', data);
-
-                    if (data && data.Success) {
-                        if (data.message === "Inserted" || data.message === "Updated") {
-                            alert("Indent Added successful");
-                            // Update table with new indents for the current IndentNo
-                            updateIndentTable(data.Indents);
+                        if (data && data.Success) {
+                            if (data.message === "Inserted" || data.message === "Updated") {
+                                alert("Indent Added successful");
+                                // Update table with new indents for the current IndentNo
+                                updateIndentTable(data.Indents);
+                            }
+                            else {
+                                alert("Unknown response or operation failed.");
+                            }
                         }
                         else {
                             alert("Unknown response or operation failed.");
                         }
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                        alert("Error occurred while saving indent. Please try again.");
                     }
-                    else {
-                        alert("Unknown response or operation failed.");
-                    }
-                },
-                error: function (error) {
-                    console.error('Error:', error);
-                    alert("Error occurred while saving indent. Please try again.");
-                }
-            });
+                });
+            }
+
         }
 
         function updateIndentTable(indents) {
             var tableBody = $('#indentTableBody');
             tableBody.empty(); // Clear existing rows
-
+            $("#RequiredQty").val("");
             // Loop through indents and append rows to table
             indents.forEach(function (indent, index) {
                 var newRow = '<tr>' +

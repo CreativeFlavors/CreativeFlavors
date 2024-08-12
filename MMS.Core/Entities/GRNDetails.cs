@@ -76,7 +76,8 @@ namespace MMS.Core.Entities
         [Column("currencyconid")]
         public int currencyconid { get; set; }
         [Column("for_currencyconid")]
-        public int? for_currencyconid { get; set; }
+        public int? for_currencyconid { get; set; }  
+
 
     }
 }

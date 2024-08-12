@@ -82,7 +82,7 @@
                             @if (Model != null && Model.Bomid != 0)
                             {
                                 var from = Model.Date;
-                                @Html.TextBoxFor(m => m.Date, new { @Value = from, @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
+                                @Html.TextBoxFor(m => m.Date, new { @Value = System.DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
                             }
                             else
                             {
@@ -117,20 +117,24 @@
                         </div>
                         <div class="edit-merchant">
                             <div class="row">
-                                <div class="col-lg-5 col-md-5 col-sm-12" id="product">
+                                <div class="col-lg-5 col-md-4 col-sm-12" id="product">
                                     <div class="input-part">
                                         @Html.HiddenFor(m => m.Bommaterialid)
                                         @Html.HiddenFor(m => m.subassemblyid)
-                                        <label class="font-14" for="produzct">Product Name</label>
-                                        @Html.DropDownListFor(m => m.Productid, MMS.Web.ExtensionMethod.HtmlHelper.ProductmMATName(), new { @class = "select-style text-field " })
+                                        <label class="font-14" for="produzct">Raw Material</label>
+                                        @Html.DropDownListFor(m => m.Productid, MMS.Web.ExtensionMethod.HtmlHelper.ProductmMATName(), new { @class = "select-style text-field ", onchange = "materialfun()" })
                                     </div>
-                                </div> <div class="col-lg-5 col-md-5 col-sm-12" id="productSUB">
-                                    <div class="input-part">
-                                        <label class="font-14" for="produzct">Product NameS</label>
-                                        @Html.DropDownListFor(m => m.ProductSUBid, MMS.Web.ExtensionMethod.HtmlHelper.ProductmSUBName(), new { @class = "select-style text-field " })
-                                    </div>
+                                    <p id="materror" style="color: red; margin-top:1px;"></p>
                                 </div>
-                                <div class="col-lg-5 col-md-5 col-sm-12"id="uom" >
+
+                                <div class="col-lg-5 col-md-4 col-sm-12" id="productSUB">
+                                    <div class="input-part">
+                                        <label class="font-14" for="produzct"> Sub-assembly Product</label>
+                                        @Html.DropDownListFor(m => m.ProductSUBid, MMS.Web.ExtensionMethod.HtmlHelper.ProductmSUBName(), new { @class = "select-style text-field ",onchange = "submaterialfun()" })
+                                    </div>
+                                    <p id="suberror" style="color: red; margin-top:1px;"></p>
+                                </div>
+                                <div class="col-lg-5 col-md-4 col-sm-12" id="uom">
                                     <div class="input-part">
                                         <label class="font-14" for="Uomid">UOM Name</label>
                                         @Html.DropDownListFor(
@@ -144,23 +148,31 @@ style = "background-color: #eee !important;"
 )
 
                                     </div>
-                                </div> 
-                                <div class="col-lg-5 col-md-5 col-sm-12">
+                                </div>
+                                <div class="col-lg-5 col-md-5 col-sm-12" id="matreq">
                                     <div class="input-part">
-                                        <label class="font-14" for="requiredqty">Required Qty</label>
-                                        @Html.TextBoxFor(m => m.Requiredqty, new { @class = "form-control text-field", placeholder = "Enter Qty" })
+                                        <label class="font-14" for="requiredqty">Raw Material Req Qty</label>
+                                        @Html.TextBoxFor(m => m.Requiredqty, new { @class = "form-control text-field", placeholder = "Enter Qty", onKeyUp = "quantitybom()" })
                                     </div>
+                                    <p id="bomerror" style="color: red; margin-top:1px;"></p>
+                                </div> 
+                                <div class="col-lg-5 col-md-5 col-sm-12" id="subreq">
+                                    <div class="input-part">
+                                        <label class="font-14" for="subRequiredqty">sub-assembly Req Qty</label>
+                                        @Html.TextBoxFor(m => m.subRequiredqty, new { @class = "form-control text-field", placeholder = "Enter Qty", onKeyUp = "subquantitybom()" })
+                                    </div>
+                                    <p id="subbomerror" style="color: red; margin-top:1px;"></p>
                                 </div>
                             </div>
                         </div>
                         <div class="d-flex justify-content-end">
                             <div class="botton-section" id="mat">
-                                <button type="button" class="button" value="AddMaterial" id="add-Material" onclick="Save()">Add Material</button>
+                                <button type="button" class="button" value="AddMaterial" id="add-Material" onclick="Save();addbom()">Add Material</button>
                             </div>
                         </div>
                         <div class="d-flex justify-content-end">
                             <div class="botton-section" id="sub">
-                                <button type="button" class="button" value="AddMaterial" id="Sub_Assembly" onclick="addsubass()">Add Sub_Assembly</button>
+                                <button type="button" class="button" value="AddMaterial" id="Sub_Assembly" onclick="addsubass(); addsubbom()">Add Sub_Assembly</button>
                             </div>
                         </div>
                     </div>
@@ -181,6 +193,7 @@ style = "background-color: #eee !important;"
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Content/js/Validation.js"></script>
     <script>
         $(window).on("load", function () {
             $(".report-inner-section").addClass("transection");
@@ -224,8 +237,9 @@ style = "background-color: #eee !important;"
             formdata.append("Lastbom", Lastbom);
             formdata.append("Productid", Productid);
             formdata.append("Requiredqty", Requiredqty);
+            var filter = /^[0-9]+$/;
             if (Bommaterialid != "") {
-                if (Bomno != ""  && Requiredqty != "") {
+                if (Bomno != "" && Requiredqty != "" && filter.test(Requiredqty)) {
                     if (Bomid == "0") {
                         $.ajax({
                             type: 'POST',
@@ -348,7 +362,7 @@ style = "background-color: #eee !important;"
             var subassemblyid = $("#subassemblyid").val();
             var Lastbom = $("#Lastbom").val();
             var ProductSUBid = $("#ProductSUBid").val();
-            var Requiredqty = $("#Requiredqty").val();
+            var Requiredqty = $("#subRequiredqty").val();
             var formdata = new FormData();
             formdata.append("Bomno", Bomno);
             formdata.append("Bomid", Bomid);
@@ -358,8 +372,9 @@ style = "background-color: #eee !important;"
             formdata.append("Lastbom", Lastbom);
             formdata.append("ProductSUBid", ProductSUBid);
             formdata.append("Requiredqty", Requiredqty);
+            var filter = /^[0-9]+$/;
             if (subassemblyid == "") {
-                if (Bomno != "" && Requiredqty != "") {
+                if (Bomno != "" && Requiredqty != "" && filter.test(Requiredqty)) {
                     if (Bomid == "0") {
                         $.ajax({
                             type: 'POST',
@@ -476,11 +491,14 @@ style = "background-color: #eee !important;"
         $(document).ready(function () {
             $(".read-only-dropdown").attr("disabled", "disabled");
             $("#sub").hide();
+            $("#subreq").hide();
             $("#productSUB").hide();
             $("#add1").on("click", function () {
                 $("#mat").hide();
                 $("#uom").hide();
+                $("#matreq").hide();
                 $("#sub").show();
+                $("#subreq").show();
                 $("#productSUB").show();
                 $("#product").hide();
             });
@@ -488,8 +506,10 @@ style = "background-color: #eee !important;"
                 $("#product").show();
                 $("#productSUB").hide();
                 $("#mat").show();
+                $("#matreq").show();
                 $("#uom").show();
                 $("#sub").hide();
+                $("#subreq").hide();
             });
         });
     </script>

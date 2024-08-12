@@ -5,8 +5,10 @@ using MMS.Repository.Managers;
 using MMS.Repository.Managers.StockManager;
 using MMS.Web.Models;
 using MMS.Web.Models.Addressdetails;
+using MMS.Web.Models.FinishedGoods;
 using MMS.Web.Models.GRNModel;
 using MMS.Web.Models.IndentMaterial;
+using MMS.Web.Models.Po;
 using MMS.Web.Models.SupplierMasterModel;
 using System;
 using System.Collections.Generic;
@@ -23,41 +25,36 @@ namespace MMS.Web.Controllers
         [HttpGet]
         public ActionResult GRNMaster()
         {
-                GRNCartManager gRNCartManager = new GRNCartManager();
-                gRNCartManager.Putcancelsuccess();
             return View();
         }
         public ActionResult GRNGrid(int page = 1, int pageSize = 15)
         {
-            GRNModel model = new GRNModel();
             GRNHeaderManager headerManager = new GRNHeaderManager();
-            SupplierMasterManager supplierMaster = new SupplierMasterManager();
-            var totaldata = (from d in headerManager.Get()
-                             join d1 in supplierMaster.Get() on d.SupplierId equals d1.SupplierMasterId
-                             select new GRNModel
-                             {
-                                 GrnDate = d.GrnDate,
-                                 RefInvoiceNumber = d.RefInvoiceNumber,
-                                 item=d.Items,
-                                 Quantity = d.Quantity,
-                                 UnitPrice=d.total_unitprice,
-                                 SubTotal=d.SubtotalValue,
-                                 TaxValue=d.TaxValue,
-                                 DiscountValue=d.DiscountValue,
-                                 TotalValue=d.TotalValue,
-                                 SupplierMaster = new SupplierMaster
-                                 {
-                                     SupplierName = d1.SupplierName,
-                                 },
-
-                             }).ToList();
-            var totalCount = totaldata.Count();
+            var grndetails = headerManager.GetgrnList();
+            List<GRNModel> totalList = new List<GRNModel>();
+            foreach (var item in grndetails)
+            {
+                GRNModel model = new GRNModel();
+                model.GrnDate = item.GrnDate;
+                model.RefInvoiceNumber = item.RefInvoiceNumber;
+                model.item = item.Items;
+                model.Quantity = item.Quantity;
+                model.UnitPrice = item.UnitPrice;
+                model.PoHeaderId = item.PoHeaderId;
+                model.SubTotal = item.SubTotal;
+                model.TaxValue = item.TaxValue;
+                model.DiscountValue = item.DiscountValue;
+                model.TotalValue = item.TotalValue;
+                model.suppliername = item.SupplierName;
+                totalList.Add(model);
+            }
+            var totalCount = totalList.Count();
 
             int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
             int startIndex = (page - 1) * pageSize;
             int endIndex = Math.Min(startIndex + pageSize - 1, totalCount - 1);
-            totaldata = totaldata.OrderByDescending(s => s.GrnHeaderId)
+            totalList = totalList.OrderByDescending(s => s.GrnHeaderId)
                          .Skip(startIndex)
                          .Take(pageSize)
                          .ToList();
@@ -65,21 +62,30 @@ namespace MMS.Web.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
 
-
-            return PartialView("~/Views/GRN/Partial/GRNGrid.cshtml", totaldata);
+            return PartialView("~/Views/GRN/Partial/GRNGrid.cshtml", totalList);
         }
+
         public ActionResult GRNDetails(int? POno)
         {
             GRNModel model = new GRNModel();
             GRNHeaderManager GRNHeaderManager = new GRNHeaderManager();
+            GRNCartManager gRNCartManager = new GRNCartManager();
+            gRNCartManager.Putcancelsuccess();
 
             if (POno == null)
             {
                 model.GrnDate = DateTime.Today;
-                int intentno = GRNHeaderManager.GetNextGRNNumberFromDatabase();
-                model.GrnHeaderId = intentno;
+                int grnno = GRNHeaderManager.GetNextGRNNumberFromDatabase();
+                if(grnno == 0)
+                {
+                    model.grnnumber = 1;
+                }
+                else
+                {
+                    model.grnnumber = grnno;
+                }
             }
-            return View("~/Views/GRN/Partial/GRN_Details.cshtml",model);
+            return View("~/Views/GRN/Partial/GRN_Details.cshtml", model);
         }
         public ActionResult GetPODetails(int POno)
         {
@@ -88,16 +94,107 @@ namespace MMS.Web.Controllers
             GRNModel model = new GRNModel();
             PoManager poManager = new PoManager();
             GRNCartManager GRNCartManager = new GRNCartManager();
-            var POList = poManager.GetPODetails();
-            var POHeaderlist= poManager.Get().Where(m=>m.PoheaderId == POno).FirstOrDefault();
-            var totalist = POList.Where(m=>m.poheader==POno).ToList();
-            model.Total_Price = POHeaderlist.TotalPrice;
-            model.Total_discountval = POHeaderlist.TotalDiscountValue;
-            model.Total_Subtotal = POHeaderlist.TotalSubtotalValue;
-            model.Total_TaxValue = POHeaderlist.TotalTaxValue;
-            model.Total_Grandtotal = POHeaderlist.TotalTotalValue;
+            GRNDetailsManager gRNDetailsManager = new GRNDetailsManager();
+            GRNHeaderManager gRNHeaderManager = new GRNHeaderManager();
+            PoManager PoManager = new PoManager();
 
-            model.polist = totalist;
+            var GRNheader = gRNHeaderManager.GetGRNId(POno);
+            if (GRNheader.Count() == 0)
+            {
+                var POList = poManager.GetPODetails();
+                var POHeaderlist = poManager.Get().Where(m => m.PoNumber == POno).FirstOrDefault();
+                var totalist = POList.Where(m => m.PoNumber == POno).ToList();
+                model.Total_Price = POHeaderlist.TotalPrice;
+                model.Total_discountval = POHeaderlist.TotalDiscountValue;
+                model.Total_Subtotal = POHeaderlist.TotalSubtotalValue;
+                model.Total_TaxValue = POHeaderlist.TotalTaxValue;
+                model.Total_Grandtotal = POHeaderlist.TotalTotalValue;
+
+                model.polist = totalist;
+            }
+            else
+            {
+                List<PODetails> totaldata = new List<PODetails>();
+                var POList = poManager.GetPODetails();
+                var POHeaderlist = poManager.Get().Where(m => m.PoNumber == POno).FirstOrDefault();
+                var totalist = POList.Where(m => m.PoNumber == POno).ToList();
+
+                foreach (var i in totalist)
+                {
+                    PODetails PoModel = new PODetails();
+                    if (i.grnqty != null)
+                    {
+                        var qtys = (i.PoQty) - (i.grnqty);
+                        PoModel.PoQty = qtys;
+                        PoModel.DiscountValue = i.DiscountValue;
+                        PoModel.UnitPrice = i.UnitPrice;
+                        PoModel.UomName = i.UomName;
+                        PoModel.ProductName = i.ProductName;
+                        PoModel.Productcode = i.Productcode;
+                        PoModel.podetail = i.podetail;
+                        PoModel.poheader = i.poheader;
+                        PoModel.discountpercentage = i.discountpercentage;
+                        PoModel.taxpercentage = i.taxpercentage;
+                        PoModel.productid = i.productid;
+                        var subtotal = qtys * i.UnitPrice;
+                        var disamount = subtotal * i.discountpercentage / 100;
+                        var subtotals = subtotal - disamount;
+                        var taxamount1 = subtotals * (i.taxpercentage) / 100;
+                        var total = taxamount1 + subtotals;
+                        PoModel.SubtotalValue = subtotals;
+                        PoModel.TaxValue = taxamount1;
+                        PoModel.TotalValue = total;
+                        PoModel.DiscountValue = disamount;
+                    }
+                    else
+                    {
+                        var qtys = i.PoQty;
+                        PoModel.PoQty = qtys;
+                        PoModel.DiscountValue = i.DiscountValue;
+                        PoModel.UnitPrice = i.UnitPrice;
+                        PoModel.UomName = i.UomName;
+                        PoModel.ProductName = i.ProductName;
+                        PoModel.Productcode = i.Productcode;
+                        PoModel.podetail = i.podetail;
+                        PoModel.poheader = i.poheader;
+                        PoModel.discountpercentage = i.discountpercentage;
+                        PoModel.taxpercentage = i.taxpercentage;
+                        PoModel.productid = i.productid;
+                        var subtotal = qtys * i.UnitPrice;
+                        var disamount = subtotal * i.discountpercentage / 100;
+                        var subtotals = subtotal - disamount;
+                        var taxamount1 = subtotals * (i.taxpercentage) / 100;
+                        var total = taxamount1 + subtotals;
+                        PoModel.SubtotalValue = subtotals;
+                        PoModel.TaxValue = taxamount1;
+                        PoModel.TotalValue = total;
+                        PoModel.DiscountValue = disamount;
+                    }
+                    totaldata.Add(PoModel);
+                }
+                decimal? subtotals1 = 0;
+                decimal? discount = 0;
+                decimal? tax = 0;
+                decimal? grandtotal = 0;
+                decimal? unitprice = 0;
+
+                foreach (var i in totaldata)
+                {
+                    subtotals1 += i.SubtotalValue;
+                    discount += i.DiscountValue;
+                    tax += i.TaxValue;
+                    grandtotal += i.TotalValue;
+                    unitprice += i.UnitPrice;
+                }
+                model.Total_Price = unitprice;
+                model.Total_Subtotal = Math.Round((decimal)subtotals1, 2);
+                model.Total_discountval = Math.Round((decimal)discount, 2);
+                model.Total_TaxValue = Math.Round((decimal)tax, 2);
+                model.Total_Grandtotal = Math.Round((decimal)grandtotal, 2);
+
+                model.polist = totaldata;
+            }
+
 
             return Json(model, JsonRequestBehavior.AllowGet);
         }
@@ -126,13 +223,13 @@ namespace MMS.Web.Controllers
             ProductManager productManager = new ProductManager();
             TaxTypeManager taxTypeManager = new TaxTypeManager();
             BuyerManager buyerManager = new BuyerManager();
-
+            PoManager poManager = new PoManager();
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
             decimal? conversionval = 0;
-            int id = 0;int forid = 0;
+            int id = 0; int forid = 0;
             if (model.currencyOption.ToUpper() != "ZAR")
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("USD","ZAR", dateOnly);
+                var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
                 conversionval = ConversionValue.conversionvalue;
                 forid = ConversionValue.id;
             }
@@ -145,7 +242,7 @@ namespace MMS.Web.Controllers
 
             var product = productManager.GetId(model.ProductNameId);
             var tax = taxTypeManager.GetTaxMasterId(product.TaxMasterId);
-            var podetails= PoManager.Getdetails().Where(x => x.PodetailId == model.PoDetailId).FirstOrDefault();
+            var podetails = PoManager.Getdetails().Where(x => x.PodetailId == model.PoDetailId).FirstOrDefault();
             GRNCart.ProductNameId = model.ProductNameId;
             GRNCart.ProductCode = product.ProductCode;
             GRNCart.UomMasterId = product.UomMasterId;
@@ -156,13 +253,14 @@ namespace MMS.Web.Controllers
             GRNCart.unitprice = model.UnitPrice;
             GRNCart.podetailid = model.PoDetailId;
             GRNCart.poheaderid = model.PoHeaderId;
+            GRNCart.GRNNumber = model.grnnumber;
             GRNCart.poquantity = model.PoQuantity;
             GRNCart.Grndate = DateTime.Now;
             GRNCart.ExpiryDate = model.ExpiryDate;
             GRNCart.BatchCode = model.BatchCode;
             GRNCart.StoreCode = podetails.StoreCode;
-            GRNCart.unitprice =model.UnitPrice;
-            GRNCart.poquantity=podetails.Quantity;
+            GRNCart.unitprice = model.UnitPrice;
+            GRNCart.poquantity = podetails.Quantity;
             GRNCart.currencyconid = id;
             var unitprice = model.UnitPrice * conversionval;
             GRNCart.IsActive = true;
@@ -200,7 +298,7 @@ namespace MMS.Web.Controllers
                 GRNCart.ForDiscountValue = disamount;
                 GRNCart.for_currencyconid = forid;
                 GRNCart.for_totalunitprice = unitpriceS;
-            } 
+            }
             else if (model.currencyOption.ToUpper() == "USD")
             {
                 var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
@@ -223,29 +321,29 @@ namespace MMS.Web.Controllers
             GRNCartManager GRNCartManager = new GRNCartManager();
 
             var list = GRNCartManager.Getgrncartdt(model.PoDetailId);
-            if (list != null )
+            if (list != null)
             {
                 decimal? dt_qty = 0;
                 decimal? dis = 0;
                 decimal? sub = 0;
-                decimal? taxs = 0; 
+                decimal? taxs = 0;
                 decimal? grand = 0;
 
-                    if (list.Quantity != null)
-                    {
+                if (list.Quantity != null)
+                {
                     dt_qty = list.Quantity + model.Quantity;
-                     sub = list.Subtotal + GRNCart.Subtotal;
+                    sub = list.Subtotal + GRNCart.Subtotal;
                     dis = list.DiscountValue + GRNCart.DiscountValue;
-                    taxs=list.TaxValue + GRNCart.TaxValue;
-                    grand=list.Grandtotal + GRNCart.Grandtotal;
+                    taxs = list.TaxValue + GRNCart.TaxValue;
+                    grand = list.Grandtotal + GRNCart.Grandtotal;
 
-                    }
-                    GRNCart.DiscountValue = dis;
+                }
+                GRNCart.DiscountValue = dis;
                 GRNCart.TaxValue = taxs;
                 GRNCart.Subtotal = sub;
                 GRNCart.Grandtotal = grand;
                 GRNCart.Quantity = dt_qty;
-                GRNCart.BatchCode=model.BatchCode;
+                GRNCart.BatchCode = model.BatchCode;
                 GRNCart.ExpiryDate = model.ExpiryDate;
                 GRNCart = gRNCartManager.Put(GRNCart);
             }
@@ -253,15 +351,24 @@ namespace MMS.Web.Controllers
             {
                 GRNCart = gRNCartManager.POST(GRNCart);
             }
-            var grnqty =  GRNCart.poquantity- GRNCart.Quantity;
-            var finsubtotal = podetails.Subtotal - GRNCart.Subtotal;
-            var fintaxtotal = podetails.TaxValue - GRNCart.TaxValue;
-            var fingrandtotal = podetails.TotalValue - GRNCart.Grandtotal;
-            var findistotal = podetails.DiscountValue - GRNCart.DiscountValue;
+            var podt = poManager.GetDTId(model.PoDetailId);
+            decimal? grnqty = 0;
+            if (podt.grn_qty != null)
+            {
+                 grnqty = (GRNCart.poquantity - podt.grn_qty) - GRNCart.Quantity;
+            }
+            else
+            {
+                 grnqty = GRNCart.poquantity  - GRNCart.Quantity;
+            }
+            var finsubtotal = podetails.Subtotal > GRNCart.Subtotal ? podetails.Subtotal - GRNCart.Subtotal : GRNCart.Subtotal - podetails.Subtotal;
+            var fintaxtotal = podetails.TaxValue > GRNCart.TaxValue ? podetails.TaxValue - GRNCart.TaxValue : GRNCart.TaxValue - podetails.TaxValue;
+            var fingrandtotal = podetails.TotalValue > GRNCart.Grandtotal ? podetails.TotalValue - GRNCart.Grandtotal : GRNCart.Grandtotal - podetails.TotalValue;
+            var findistotal = podetails.DiscountValue > GRNCart.DiscountValue ? podetails.DiscountValue - GRNCart.DiscountValue : GRNCart.DiscountValue - podetails.DiscountValue;
 
             decimal? unitprices = GRNCart.unitprice;
             AlertMessage = "Added Successfully";
-            return Json(new { Grnqty= grnqty, Unitprices= unitprices, Finsubtotal = finsubtotal, Fintaxtotal = fintaxtotal, Gingrandtotal = fingrandtotal, Findistotal = findistotal, AlertMessage = AlertMessage }, JsonRequestBehavior.AllowGet);
+            return Json(new { Grnqty = grnqty, Unitprices = unitprices, Finsubtotal = finsubtotal, Fintaxtotal = fintaxtotal, Gingrandtotal = fingrandtotal, Findistotal = findistotal, AlertMessage = AlertMessage }, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
         public ActionResult ConfirmGRN(GRNModel model)
@@ -272,8 +379,10 @@ namespace MMS.Web.Controllers
             GRNCartManager GrnManager = new GRNCartManager();
             GRNHeaderManager GRNHeaderManager = new GRNHeaderManager();
             GRNDetailsManager GRNDetailsManager = new GRNDetailsManager();
+            PoDetail poDetail = new PoDetail();
+            BatchStock batchStock1 = new BatchStock();
             CurrencyManager currencyManager = new CurrencyManager();
-            var grnlist = GrnManager.GetgrncartHD(model.PoHeaderId);
+            var grnlist = GrnManager.GetgrncartHD(model.PoHeaderId,model.grnnumber);
             var count = grnlist.Count;
             if (count <= 0)
             {
@@ -283,7 +392,7 @@ namespace MMS.Web.Controllers
             }
             else
             {
-                var podetails = PoManager.Getdetails().Where(x => x.PoheaderId == model.PoHeaderId).FirstOrDefault();
+                var podetails = PoManager.Getdetails().Where(x => x.PoNumber == model.PoHeaderId).FirstOrDefault();
                 var currencyids = currencyManager.GetContainCurrencyid(model.currencyOption);
                 GRNHeader GRNHeader = new GRNHeader();
                 GRNHeader.Items = grnlist.Count();
@@ -297,6 +406,7 @@ namespace MMS.Web.Controllers
                 GRNHeader.DiscountValue = model.Total_discountval;
                 GRNHeader.SubtotalValue = model.Total_Subtotal;
                 GRNHeader.TotalValue = model.Total_Grandtotal;
+                GRNHeader.GRNNumber = model.grnnumber;
                 GRNHeader.IsFulfilled = DateTime.Now;
                 GRNHeader.ShipmentDetails = model.ShipmentDetails;
                 GRNHeader.Notes = model.Notes;
@@ -330,6 +440,15 @@ namespace MMS.Web.Controllers
 
                 foreach (var i in grnlist)
                 {
+                    var grn_dt = GRNDetailsManager.GetGRNdtId(Convert.ToInt32(i.podetailid));
+                    decimal? quantitys = 0;
+                    foreach (var k in grn_dt)
+                    {
+                        if (k.Quantity != 0)
+                        {
+                            quantitys += (k.Quantity);
+                        }
+                    }
                     var currencyid = currencyManager.GetContainCurrencyid(model.currencyOption);
                     GRNDetails GRNDetails = new GRNDetails();
                     GRNDetails.GrnHeaderId = headerid.GrnHeaderId;
@@ -361,26 +480,58 @@ namespace MMS.Web.Controllers
                     GRNDetails.ForTotalValue = i.ForTotalValue;
                     GRNDetails.Status = "1";
                     GRNDetails.IsFulfilled = DateTime.Now;
-                    var data = GRNDetailsManager.POST(GRNDetails);
-                    BatchStock batchStock = new BatchStock();
-                    batchStock.SupplierId = headerid.SupplierId;
-                    batchStock.StoreCode = i.StoreCode;
-                    batchStock.productid = i.ProductNameId;
-                    batchStock.BatchCode = i.BatchCode;
-                    batchStock.AltBatchCode = i.BatchCode;
-                    batchStock.ExpiryDate = i.ExpiryDate;
-                    batchStock.Quantity = i.Quantity;
-                    batchStock.GrnNumber = headerid.GrnHeaderId;
-                    batchStock.GrnDate = headerid.GrnDate;
-                    batchStock.GrnDetailId = data.GrnDetailId;
-                    batchStock.Price = i.Grandtotal;
-                    batchStock.Cost = 0;
-                    batchStock.TaxCode = i.TaxPerId;
-                    batchStock.UomId = i.UomMasterId;
-                    batchStock.producttype = 3;
-                    batchStockManager.POST(batchStock);
+                    if ((Convert.ToInt32(i.Quantity)) != 0 && grn_dt.Count() != 0)
+                    {
+                        poDetail.grn_qty = i.Quantity + quantitys;
+                        poDetail.PodetailId = i.podetailid;
+                        var data = GRNDetailsManager.POST(GRNDetails);
+                        PoManager.Put(poDetail);
+                        BatchStock batchStock = new BatchStock();
+                        batchStock.SupplierId = headerid.SupplierId;
+                        batchStock.StoreCode = i.StoreCode;
+                        batchStock.productid = i.ProductNameId;
+                        batchStock.BatchCode = i.BatchCode;
+                        batchStock.AltBatchCode = i.BatchCode;
+                        batchStock.ExpiryDate = i.ExpiryDate;
+                        batchStock.Quantity = i.Quantity;
+                        batchStock.GrnNumber = headerid.GrnHeaderId;
+                        batchStock.GrnDate = headerid.GrnDate;
+                        batchStock.GrnDetailId = data.GrnDetailId;
+                        batchStock.Price = i.Grandtotal;
+                        batchStock.Cost = 0;
+                        batchStock.TaxCode = i.TaxPerId;
+                        batchStock.UomId = i.UomMasterId;
+                        batchStock.producttype = 3;
+                        batchStockManager.POST(batchStock);
+                    }
+                    else if ((Convert.ToInt32(i.Quantity)) != 0)
+                    {
+                        poDetail.grn_qty = i.Quantity;
+                        poDetail.PodetailId = i.podetailid;
+                        var data = GRNDetailsManager.POST(GRNDetails);
+                        PoManager.Put(poDetail);
+                        BatchStock batchStock = new BatchStock();
+                        batchStock.SupplierId = headerid.SupplierId;
+                        batchStock.StoreCode = i.StoreCode;
+                        batchStock.productid = i.ProductNameId;
+                        batchStock.BatchCode = i.BatchCode;
+                        batchStock.AltBatchCode = i.BatchCode;
+                        batchStock.ExpiryDate = i.ExpiryDate;
+                        batchStock.Quantity = i.Quantity;
+                        batchStock.GrnNumber = headerid.GrnHeaderId;
+                        batchStock.GrnDate = headerid.GrnDate;
+                        batchStock.GrnDetailId = data.GrnDetailId;
+                        batchStock.Price = i.Grandtotal;
+                        batchStock.Cost = 0;
+                        batchStock.TaxCode = i.TaxPerId;
+                        batchStock.UomId = i.UomMasterId;
+                        batchStock.producttype = 3;
+                        batchStockManager.POST(batchStock);
+                        AlertMessage = "Confirm Order";
+                    }
+
                 }
-                var bOMMaterial = GrnManager.Putstatussuccess();
+                var bOMMaterial = GrnManager.Putstatussuccess(model.grnnumber);
 
 
                 AlertMessage = "Confirm Order";
@@ -399,15 +550,15 @@ namespace MMS.Web.Controllers
             if (GRNCart != null)
             {
                 AlertMessage = "Success";
-                var delete=GRNCartManager.Delete(GRNCart.grncartid);
-                 list = GRNCartManager.GetGRNCsrtList(delete.poheaderid);
+                var delete = GRNCartManager.Delete(GRNCart.grncartid);
+                list = GRNCartManager.GetGRNCsrtList(delete.poheaderid);
             }
 
             if (list != null)
             {
                 model.grnCarlist = list;
             }
-            return Json(new { AlertMessage = AlertMessage, model}, JsonRequestBehavior.AllowGet);
+            return Json(new { AlertMessage = AlertMessage, model }, JsonRequestBehavior.AllowGet);
         }
         #endregion
         #region Calculation
@@ -430,8 +581,8 @@ namespace MMS.Web.Controllers
             else
             {
                 var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
-                     conversionval= ConversionValue.conversionvalue;
-                    id= ConversionValue.id;
+                conversionval = ConversionValue.conversionvalue;
+                id = ConversionValue.id;
             }
 
 
@@ -492,8 +643,8 @@ namespace MMS.Web.Controllers
             else
             {
                 var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
-                     conversionval= ConversionValue.conversionvalue;
-                    id= ConversionValue.id;
+                conversionval = ConversionValue.conversionvalue;
+                id = ConversionValue.id;
             }
 
 
@@ -523,8 +674,8 @@ namespace MMS.Web.Controllers
             var total1 = taxamounts + subtotals1;
 
             GRNModel.Total_discountval = model.Total_discountval;
-            GRNModel.Total_Subtotal = model.Total_Subtotal ;
-            GRNModel.Total_TaxValue = model.Total_TaxValue ;
+            GRNModel.Total_Subtotal = model.Total_Subtotal;
+            GRNModel.Total_TaxValue = model.Total_TaxValue;
             GRNModel.Total_Grandtotal = model.Total_Grandtotal;
 
             return Json(GRNModel, JsonRequestBehavior.AllowGet);
@@ -570,7 +721,7 @@ namespace MMS.Web.Controllers
             GRNModel.GrandTotal = total;
             GRNModel.DiscountValue = disamount;
 
-            
+
             var subtotal1 = (qty + 1) * unitprice;
             var disamount1 = subtotal1 * discounts / 100;
             var subtotals1 = subtotal1 - disamount1;
@@ -597,6 +748,33 @@ namespace MMS.Web.Controllers
             PoManager PoManager = new PoManager();
             var data = PoManager.GetPOId(id);
             return Json(data, JsonRequestBehavior.AllowGet);
+        }
+        [HttpGet]
+        public ActionResult GRNSearch(int filter)
+        {
+            GRNHeaderManager headerManager = new GRNHeaderManager();
+            var grndetails = headerManager.GetgrnList();
+            var list = grndetails.Where(x => x.PoHeaderId == filter).ToList();
+            List<GRNModel> totalList = new List<GRNModel>();
+
+            foreach (var item in list)
+            {
+                GRNModel model = new GRNModel();
+                model.GrnDate = item.GrnDate;
+                model.RefInvoiceNumber = item.RefInvoiceNumber;
+                model.item = item.Items;
+                model.Quantity = item.Quantity;
+                model.UnitPrice = item.UnitPrice;
+                model.PoHeaderId = item.PoHeaderId;
+                model.SubTotal = item.SubTotal;
+                model.TaxValue = item.TaxValue;
+                model.DiscountValue = item.DiscountValue;
+                model.TotalValue = item.TotalValue;
+                model.suppliername = item.SupplierName;
+                totalList.Add(model);
+            }
+
+            return Json(totalList, JsonRequestBehavior.AllowGet);
         }
         #endregion
     }

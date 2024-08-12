@@ -439,7 +439,7 @@ namespace MMS.Web.Controllers.Stock
                 model.Description = parentboms.Description;
                 model.Lastbom = parentboms.LastBom;
                 model.ProductSUBid = material.ProductId;
-                model.Requiredqty = material.RequiredQty;
+                model.subRequiredqty = material.RequiredQty;
                 model.subassemblyid = material.SubassemblyId;
                 model.bomMaterialGridList = datas;
                 model.bomsubassemblyGridList = subassembly;

@@ -130,13 +130,13 @@
 
                                     <tr>
                                         <td class="veh-1">@count</td>
-                                        <td class="veh-2" style="width: 12%;">@address.BuyerMaster.BuyerFullName</td>
-                                        <td class="veh-3" style="width: 12%;">@address.ContactName</td>
-                                        <td class="veh-5" style="width: 12%;">@address.countries.Name</td>
-                                        <td class="veh-4" style="width: 12%;">@address.states.Statename</td>
-                                        <td class="veh-4" style="width: 12%;">@address.cities.Cityname</td>
-                                        <td class="veh-3" style="width: 12%;">@address.ZipCode</td>
-                                        <td class="veh-4" style="width: 12%;">@address.Email</td>
+                                        <td class="veh-2" style="width: 12%; text-align:left">@address.BuyerMaster.BuyerFullName</td>
+                                        <td class="veh-3" style="width: 12%; text-align:left" ">@address.ContactName</td>
+                                        <td class="veh-5" style="width: 12%; text-align:left" ">@address.countries.Name</td>
+                                        <td class="veh-4" style="width: 12%; text-align:left" ">@address.states.Statename</td>
+                                        <td class="veh-4" style="width: 12%; text-align:left" ">@address.cities.Cityname</td>
+                                        <td class="veh-3" style="width: 12%; text-align:center" ">@address.ZipCode</td>
+                                        <td class="veh-4" style="width: 12%; text-align:left" ">@address.Email</td>
                                         <td class="veh-4" style="width: 12%;">@address.Phone</td>
                                         <td class="veh-4" style="width:12%;">
                                             <span class="table_icons">
@@ -155,28 +155,35 @@
                     </table>
                 </div>
                 <div class="row manage_customer_show">
-                    <div class="col-xl-6 manage_customer_show_II">
-                        <nav class="float-xl-start">
-                            <ul class="pagination font-14">
-                                @if (ViewBag.startpage != null && ViewBag.endpage != null)
-                                {
-                                    <li class="page-item">
-                                        <a class="page-link" id="left" value="@(ViewBag.currentpage-1)">Previous</a>
-                                    </li>
-                                    for (int i = ViewBag.startpage; i <= ViewBag.endpage; i++)
-                                    {
-                                        <li class="page-item">
-                                            <a class="page-link" id="number" value="@i">@i</a>
-                                        </li>
+                    <div class="font-14 manage_customer_show_I col-xl-6">
+                        <span>Showing </span>
+                        <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
+                            <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
+                            <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
+                            <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
+                            <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
+                        </select>
+                    </div>
 
-                                    }
-                                    <li class=" page-item">
-                                        <a class="page-link" id="right" value="@(ViewBag.currentpage+1)">Next</a>
+                    <div class="col-xl-6 manage_customer_show_II">
+                        <nav class="float-xl-end">
+                            <ul class="pagination font-14">
+                                <li class="page-item">
+                                    <a href="" id="previousPage" class="page-link">Previous</a>
+                                </li>
+                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                        <a href="@Url.Action("AddressMaster", "AddressDetails", new { page = i })" class="page-link">@i</a>
                                     </li>
                                 }
+                                <li class="page-item">
+                                    <a class="page-link" id="nextPage" href="">Next</a>
+                                </li>
                             </ul>
                         </nav>
                     </div>
+
                 </div>
             </div>
 
@@ -199,6 +206,29 @@
     </script>
     <script>
         $(document).ready(function () {
+            $('#manage_customer_show_no').change(function() {
+        var pageSize = parseInt($(this).val());
+        window.location.href = "@Url.Action("AddressMaster", "AddressDetails")?pageSize=" + pageSize;
+    });
+
+    $('#previousPage').click(function(e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        if (currentPage > 1) {
+            var previousPage = currentPage - 1;
+            window.location.href = "@Url.Action("AddressMaster", "AddressDetails")?page=" + previousPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+        }
+    });
+
+    $('#nextPage').click(function(e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        var totalPages = parseInt('@ViewBag.TotalPages');
+        if (currentPage < totalPages) {
+            var nextPage = currentPage + 1;
+            window.location.href = "@Url.Action("AddressMaster", "AddressDetails")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+        }
+    });
             $("#customer_manage_search").keyup(function () {
                 var customerearch = $("#customer_manage_search").val();
 
@@ -214,14 +244,14 @@
                             $("tbody").append(`
                          <tr class="font-14">
                          <td class="veh1-5">${count}</td>
-                         <td class="veh1-5" style="width: 12%;">${item.BuyerMaster.BuyerFullName}</td>
-                         <td class="veh1-5" style="width: 12%;">${item.ContactName}</td>
-                         <td class="veh1-5" style="width: 12%;">${item.countries.Name}</td>
-                         <td class="veh1-5" style="width: 12%;">${item.states.Statename}</td>
-                         <td class="veh1-5" style="width: 12%;">${item.cities.Cityname}</td>
-                         <td class="veh1-5" style="width: 12%;">${item.ZipCode}</td>
-                         <td class="veh1-5" style="width: 12%;">${item.Email}</td>
-                         <td class="veh1-5" style="width: 12%;">${item.Phone}</td>
+                         <td class="veh1-5" style="width: 12%; text-align:left">${item.BuyerMaster.BuyerFullName}</td>
+                         <td class="veh1-5" style="width: 12%; text-align:left">${item.ContactName}</td>
+                         <td class="veh1-5" style="width: 12%; text-align:left">${item.countries.Name}</td>
+                         <td class="veh1-5" style="width: 12%; text-align:left">${item.states.Statename}</td>
+                         <td class="veh1-5" style="width: 12%; text-align:left">${item.cities.Cityname}</td>
+                         <td class="veh1-5" style="width: 12%; text-align:center">${item.ZipCode}</td>
+                         <td class="veh1-5" style="width: 12%; text-align:left">${item.Email}</td>
+                         <td class="veh1-5" style="width: 12%; ">${item.Phone}</td>
                          <td class="veh-4" style="width:12%;">
                          <span class="table_icons">
                              <img src="/Content/assets/images/edit-icon.png" onclick="Edit('${item.AddressId}')" />
@@ -234,46 +264,6 @@
                           `);
                             count++;
                         });
-                    }
-                });
-            });
-            $(document).on("click", "#number", function () {
-                var files = $(this).attr('value');
-
-                $.ajax({
-                    type: 'GET',
-                    url: '/AddressDetails/AddressDetailsGrid',
-                    data: { pageno: files },
-                    contentType: 'application/json',
-                    success: function (values) {
-                        $(".main-page").html(values);
-                    }
-                });
-            });
-            $(document).on("click", "#left", function () {
-                var files = $(this).attr('value');
-
-                $.ajax({
-                    type: 'GET',
-                    url: '/AddressDetails/AddressDetailsGrid',
-                    data: { pageno: files },
-                    contentType: 'application/json',
-                    success: function (values) {
-                        $(".main-page").html(values);
-                    }
-                });
-            });
-
-            $(document).on("click", "#right", function () {
-                var files = $(this).attr('value');
-
-                $.ajax({
-                    type: 'GET',
-                    url: '/AddressDetails/AddressDetailsGrid',
-                    data: { pageno: files },
-                    contentType: 'application/json',
-                    success: function (values) {
-                        $(".main-page").html(values);
                     }
                 });
             });

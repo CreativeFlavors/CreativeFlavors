@@ -54,5 +54,6 @@ namespace MMS.Web.Models.StockModel
         public decimal? availablestock { get; set; }
 
         public decimal? Requiredqty { get; set; }
+        public decimal? subRequiredqty { get; set; }
     }
 }

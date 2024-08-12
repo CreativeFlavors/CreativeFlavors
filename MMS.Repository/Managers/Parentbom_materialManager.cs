@@ -120,7 +120,7 @@ namespace MMS.Repository.Managers
                 billOfMaterial = parentbom_materialRepository.Table.Where(x => x.BomMaterialId == BOMID && x.IsDelete == true).FirstOrDefault();
             }
             return billOfMaterial;
-        }
+        }     
         public List<parentbom_material> Get()
         {
 

@@ -421,6 +421,10 @@
 
 
     <script>
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#Production").attr('checked', true);
+        });
         $(document).ready(function () {
             // Initially hide subassembly related elements
             $("#productionsubassembly").hide();
@@ -525,6 +529,7 @@
                 $('#table_grid_ROW tr').each(function (index) {
                     var $row = $(this);
                     var consumeqty = parseFloat($row.find('.veh-1:eq(2)').text());
+                    var maxQuantity = parseFloat($row.find('td[data-max-quantity]').attr('data-max-quantity'));
 
                     if (!isNaN(consumeqty)) {
                         // Store the previous consumeqty for each row
@@ -533,7 +538,7 @@
                         }
 
                         // Calculate new consumption quantity based on productionQty
-                        var newConsumeqty = parseFloat(productionQty) * consumeqty;
+                        var newConsumeqty = parseFloat(productionQty) * maxQuantity;
                         $row.find('.veh-1:eq(2)').text(newConsumeqty.toFixed(2));
                     }
                 });
@@ -679,7 +684,14 @@
                                 var producttype = response['ProductType'] && response['ProductType'][i] ? response['ProductType'][i] : '';
                                 var consumeqty = response['Consumeqty'] && response['Consumeqty'][i] ? response['Consumeqty'][i] : '';
                                 var stockonhand = response['StockforMaterial'] && response['StockforMaterial'][i] ? response['StockforMaterial'][i] : '';
-                                $('#table_grid_ROW').append('<tr><td class="veh-1">' + id + '</td><td class="veh-1">' + val + '</td><td class="veh-1">' + consumeqty + '</td><td class="veh-1">' + stockonhand + '</td></tr>');
+                                $('#table_grid_ROW').append(`
+    <tr>
+        <td class="veh-1">${id}</td>
+        <td class="veh-1">${val}</td>
+        <td class="veh-1" data-max-quantity="${consumeqty}">${consumeqty}</td>
+        <td class="veh-1">${stockonhand}</td>
+    </tr>
+`);
                             });
                         } else {
                             $('#table_grid_ROW').append('<tr><td class="veh-1" colspan="3">No data found</td></tr>');

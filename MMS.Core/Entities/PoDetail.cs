@@ -54,7 +54,9 @@ namespace MMS.Core.Entities
         public decimal? TaxValue { get; set; }
 
         [Column("totalvalue")]
-        public decimal? TotalValue { get; set; }
+        public decimal? TotalValue { get; set; } 
+        [Column("grn_qty")]
+        public decimal? grn_qty { get; set; }
 
         [Column("weight")]
         public decimal? Weight { get; set; }
@@ -69,7 +71,7 @@ namespace MMS.Core.Entities
         public DateTime? UpdatedDate { get; set; }
 
         [Column("isactive")]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
         [Column("createdby")]
         public string CreatedBy { get; set; }

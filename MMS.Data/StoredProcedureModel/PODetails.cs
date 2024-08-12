@@ -11,7 +11,9 @@ namespace MMS.Data.StoredProcedureModel
     public class PODetails
     {
         [Column("poheader")]
-        public int poheader { get; set; }
+        public int poheader { get; set; } 
+        [Column("grnqty")]
+        public decimal? grnqty { get; set; }
         [Column("podetail")]
         public int podetail { get; set; }
 
@@ -53,7 +55,7 @@ namespace MMS.Data.StoredProcedureModel
         public decimal? taxpercentage { get; set; }
 
         [Column("productid")]
-        public decimal? productid { get; set; }
+        public int productid { get; set; }
         [Column("discountpercentage")]
         public decimal? discountpercentage { get; set; }
     }
