@@ -1,5 +1,6 @@
 ﻿using MMS.Common;
 using MMS.Core.Entities;
+using MMS.Core.Entities.Stock;
 using MMS.Data;
 using MMS.Data.Mapping;
 using MMS.Data.StoredProcedureModel;
@@ -22,6 +23,23 @@ namespace MMS.Repository.Managers
         public void Dispose()
         {
             throw new NotImplementedException();
+        }
+
+        public GRNHeader Get(int id)
+        {
+            GRNHeader GRNEntityModelNew = new GRNHeader();
+            if (id != 0)
+            {
+                try
+                {
+                    GRNEntityModelNew = GRNHeaderrep.Table.Where(x => x.GRNNumber == id).FirstOrDefault();
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+            }
+            return GRNEntityModelNew;
         }
         public GRNHeader POST(GRNHeader arg)
         {
@@ -65,6 +83,12 @@ namespace MMS.Repository.Managers
         {
             List<GRNHeader> PoHeader = new List<GRNHeader>();
             PoHeader = GRNHeaderrep.Table.Where(x => x.PoNumber == id).ToList();
+            return PoHeader;
+        }     
+        public List<GRNHeader> GetsupplierId(int id)
+        {
+            List<GRNHeader> PoHeader = new List<GRNHeader>();
+            PoHeader = GRNHeaderrep.Table.Where(x => x.SupplierId == id).ToList();
             return PoHeader;
         }
         public int GetNextGRNNumberFromDatabase()

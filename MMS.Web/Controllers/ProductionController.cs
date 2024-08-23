@@ -1,4 +1,5 @@
-﻿using MMS.Common;
+﻿using iTextSharp.text;
+using MMS.Common;
 using MMS.Core.Entities;
 using MMS.Core.Entities.Stock;
 using MMS.Data.StoredProcedureModel;
@@ -12,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using System.Web.UI;
 using static System.Data.Entity.Infrastructure.Design.Executor;
 
 namespace MMS.Web.Controllers
@@ -23,7 +25,7 @@ namespace MMS.Web.Controllers
             return View();
         }
         [HttpGet]
-        public ActionResult ProductionGrid(int page = 1, int pageSize = 9)
+        public ActionResult ProductionGrid(int page = 1, int pageSize = 15)
         {
             try
             {
@@ -42,6 +44,7 @@ namespace MMS.Web.Controllers
                                        ProductionCode = P.ProductionCode,
                                        ProductionQty = P.ProductionQty,
                                        RequiredQty = P.RequiredQty,
+                                       ProductCode = pr.ProductCode,
                                        ProductName = pr.ProductName,
                                        ProductionType = "Production",
                                        ProductionStatus = sp.Status
@@ -56,6 +59,7 @@ namespace MMS.Web.Controllers
                                                    ProductionCode = psa.ProductionCode,
                                                    ProductionQty = psa.ProductionQty,
                                                    RequiredQty = psa.RequiredQty,
+                                                   ProductCode = pr.ProductCode,
                                                    ProductName = pr.ProductName,
                                                    ProductionType = "Subassembly",
                                                    ProductionStatus = sps.Status
@@ -95,7 +99,7 @@ namespace MMS.Web.Controllers
             {               // Generate production code for new entry
                 string productionCode = GenerateBatchCode();
                 model.ProductionCode = productionCode;
-                model.ProductionDate = DateTime.Today;
+                //model.ProductionDate = DateTime.Today;
             }
 
             return View(model);
@@ -120,7 +124,7 @@ namespace MMS.Web.Controllers
                 if (model.ProductionId == 0)
                 {
                     production.ProductionId = model.ProductionId;
-                    production.ProductionDate = model.ProductionDate;
+                    production.ProductionDate = DateTime.Now;
                     production.ProductCode = model.ProductCode;
                     production.ProductionCode = model.ProductionCode;
                     production.ProductionQty = model.ProductionQty;
@@ -155,7 +159,6 @@ namespace MMS.Web.Controllers
                 {
 
                     production.ProductionId = model.ProductionId;
-                    production.ProductionDate = model.ProductionDate;
                     production.ProductionCode = model.ProductionCode;
                     production.ProductionQty = model.ProductionQty;
                     production.ProductionStatus = model.ProductionStatus;
@@ -284,12 +287,35 @@ namespace MMS.Web.Controllers
                     {
                         BatchStockManager batchStockManager = new BatchStockManager();
                         List<BatchStock> batchStocks = batchStockManager.GetBatchProductMaterialStocks(productionMaterials.ProductsMatId);
+                        decimal? remainingQtyToConsume = productionMaterials.ConsumeQty;
+
                         foreach (var batchStock in batchStocks)
                         {
-                            batchStock.Quantity -= productionMaterials.ConsumeQty;
-                            //batchStockManager.Put(batchStock);
+                            if (remainingQtyToConsume <= 0)
+                                break;
+
+                            if (batchStock.Quantity >= remainingQtyToConsume)
+                            {
+                                batchStock.Quantity -= remainingQtyToConsume;
+                                remainingQtyToConsume = 0;
+                            }
+                            else
+                            {
+                                remainingQtyToConsume -= batchStock.Quantity;
+                                batchStock.Quantity = 0;
+                            }
+                            batchStockManager.Put(batchStock);
                         }
                     }
+                    Temp_productionManager temp_ProductionManager = new Temp_productionManager();
+                    preproduction preproduction = new preproduction();
+                    var preproductionlist=temp_ProductionManager.GetPreproductpro(model.ProductId);
+                    foreach( var i in preproductionlist)
+                    {
+                        i.Qty =(i.Qty > model.ProductionQty) ? (i.Qty - model.ProductionQty) : (model.ProductionQty - i.Qty);
+                        temp_ProductionManager.Put(i);
+                    }
+
                     StatusHistoryManager statusHistoryManager = new StatusHistoryManager();
                     StatusHistory statusHistory = new StatusHistory
                     {
@@ -384,7 +410,7 @@ namespace MMS.Web.Controllers
                 if (model.ProductionId == 0)
                 {
                     production.ProductionId = model.ProductionId;
-                    production.ProductionDate = model.ProductionDate;
+                    production.ProductionDate = DateTime.Now;
                     production.ProductCode = model.ProductCode;
                     production.ProductionCode = model.ProductionCode;
                     production.ProductionQty = model.ProductionQty;
@@ -419,7 +445,6 @@ namespace MMS.Web.Controllers
                 {
 
                     production.ProductionId = model.ProductionId;
-                    production.ProductionDate = model.ProductionDate;
                     production.ProductionCode = model.ProductionCode;
                     production.ProductionQty = model.ProductionQty;
                     production.ProductionSubassemblyStatus = model.ProductionSubassemblyStatus;
@@ -549,12 +574,35 @@ namespace MMS.Web.Controllers
                     {
                         BatchStockManager batchStockManager = new BatchStockManager();
                         List<BatchStock> batchStocks = batchStockManager.GetBatchProductMaterialStocks(productionMaterials.ProductsMatId);
+                        decimal? remainingQtyToConsume = productionMaterials.ConsumeQty;
+
                         foreach (var batchStock in batchStocks)
                         {
-                            batchStock.Quantity -= productionMaterials.ConsumeQty;
-                            //batchStockManager.Put(batchStock);
+                            if (remainingQtyToConsume <= 0)
+                                break;
+
+                            if (batchStock.Quantity >= remainingQtyToConsume)
+                            {
+                                batchStock.Quantity -= remainingQtyToConsume;
+                                remainingQtyToConsume = 0;
+                            }
+                            else
+                            {
+                                remainingQtyToConsume -= batchStock.Quantity;
+                                batchStock.Quantity = 0;
+                            }
+                            batchStockManager.Put(batchStock);
                         }
                     }
+                    Temp_productionManager temp_ProductionManager = new Temp_productionManager();
+                    preproduction preproduction = new preproduction();
+                    var preproductionlist = temp_ProductionManager.GetPreproductpro(model.ProductId);
+                    foreach (var i in preproductionlist)
+                    {
+                        i.Qty = (i.Qty > model.ProductionQty) ? (i.Qty - model.ProductionQty) : (model.ProductionQty - i.Qty);
+                        temp_ProductionManager.Put(i);
+                    }
+
                     StatusHistorySubassemblyManager statusHistoryManager = new StatusHistorySubassemblyManager();
                     StatusHistorySubassembly statusHistory = new StatusHistorySubassembly
                     {
@@ -761,26 +809,48 @@ namespace MMS.Web.Controllers
         {
             try
             {
+
+                List<ProductionViewModel> productionModels = new List<ProductionViewModel>();
                 ProductionManager productionManager = new ProductionManager();
                 ProductManager productManager = new ProductManager();
-                // Get all productions and products
-                List<Production> productions = productionManager.GetProductions();
-                List<product> products = productManager.Get();
-                List<ProductionModel> productionModels = new List<ProductionModel>();
-                // Join productions with products to get additional information
-                var totaldata = from P in productions
-                                join pr in products on P.ProductId equals pr.ProductId
-                                select new ProductionModel
-                                {
-                                    ProductionCode = P.ProductionCode,
-                                    ProductionQty = P.ProductionQty,
-                                    product = new product
-                                    {
-                                        ProductName = pr.ProductName,
-                                    }
-                                };
-                // Filter productions based on the provided filter parameter
-                productionModels = totaldata.Where(x => x.product.ProductName.ToLower().Contains(filter.ToLower()) || x.ProductionCode.ToLower().Contains(filter.ToLower())).ToList();
+                ProductionSubassemblyManager productionSubassemblyManager = new ProductionSubassemblyManager();
+                StatusProductionManager statusProductionManager = new StatusProductionManager();
+                StatusProductionSubassemblyManager statusProductionSubassemblyManager = new StatusProductionSubassemblyManager();
+                // Fetch production data
+                var productions = (from P in productionManager.GetProductions()
+                                   join pr in productManager.Get() on P.ProductId equals pr.ProductId
+                                   join sp in statusProductionManager.Get() on P.ProductionStatus equals sp.StatusId
+                                   select new ProductionViewModel
+                                   {
+                                       ProductionId = P.ProductionId,
+                                       ProductionCode = P.ProductionCode,
+                                       ProductionQty = P.ProductionQty,
+                                       RequiredQty = P.RequiredQty,
+                                       ProductName = pr.ProductName,
+                                       ProductCode = pr.ProductCode,
+                                       ProductionType = "Production",
+                                       ProductionStatus = sp.Status
+                                   }).ToList();
+                // Fetch production subassembly data
+                var productionSubassemblies = (from psa in productionSubassemblyManager.GetProductions()
+                                               join pr in productManager.Get() on psa.ProductId equals pr.ProductId
+                                               join sps in statusProductionSubassemblyManager.Get() on psa.ProductionSubassemblyStatus equals sps.StatusId
+                                               select new ProductionViewModel
+                                               {
+                                                   ProductionId = psa.ProductionId,
+                                                   ProductionCode = psa.ProductionCode,
+                                                   ProductionQty = psa.ProductionQty,
+                                                   RequiredQty = psa.RequiredQty,
+                                                   ProductName = pr.ProductName,
+                                                   ProductCode = pr.ProductCode,
+                                                   ProductionType = "Subassembly",
+                                                   ProductionStatus = sps.Status
+                                               }).ToList();
+                // Combine both lists
+                productions.AddRange(productionSubassemblies);
+                productionModels = productions.Where(x => x.ProductName.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
+
+                //productionModels = productions.Where(x => x.ProductName.ToLower().Contains(filter.ToLower()) || x.ProductionCode.ToLower().Contains(filter.ToLower())).ToList();
 
                 return Json(productionModels, JsonRequestBehavior.AllowGet);
             }

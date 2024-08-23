@@ -31,7 +31,7 @@
 <body>
     <div id="summery">
         <ol class="breadcrumb font-20 d-flex justify-content-center">
-            <li class="breadcrumb-item " aria-current="page" style=" font-size: 112%;">SalesOrder Summery</li>
+            <li class="breadcrumb-item " aria-current="page" style=" font-size: 112%;">Sales Order Summery</li>
         </ol>
         <div class="d-flex justify-content-evenly mt-4">
             <div class="form-floating">
@@ -46,10 +46,7 @@
 
             <div class="form-floating">
                 <select id="salesorderno" class="form-select">
-                    @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.salesorderno())
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
+                        <option value="">Please Select SO</option>
                 </select>
                 <label for="floatingSelectGrid">SO Number</label>
             </div>
@@ -162,13 +159,18 @@
                 </thead>
                 @if (Model != null && Model.Count() > 0)
                 {
-                    int count = 1;
                     <tbody>
+                        @{
+                            int currentPage = ViewBag.CurrentPage ?? 1;
+                            int pageSize = ViewBag.PageSize ?? 8;
+                            int totalItems = Model.Count();
+                            int startSerialNumber = (currentPage - 1) * pageSize + 1;
+                        }
                         @foreach (var i in Model)
                         {
 
                             <tr class="font-14">
-                                <td class="veh1-5">@count</td>
+                                <td class="veh1-5">@startSerialNumber</td>
                                 <td class="veh1-5" style="width: 3%; text-align:center;">@i.SalesorderId_HD</td>
                                 <td class="veh1-5" style="width: 2%; text-align:center;">@i.salesorderdate.ToString("dd/MM/yyyy")</td>
                                 <td class="veh1-5" style="width: 12%; text-align:left;">@i.BuyerMaster.BuyerFullName</td>
@@ -204,7 +206,7 @@
                                 <td class="veh1-5" style="width: 12%; text-align: right;">@string.Format("{0:0.00}", i.Total_Grandtotal)</td>
 
                             </tr>
-                            count++;
+                            startSerialNumber++;
                         }
 
                     </tbody>
@@ -335,7 +337,7 @@
                 success: function (values) {
                     $("#salesorderno").html("");
                     $("#salesorderno").append(
-                        $('<option></option>').val(0).html("Please Select")
+                        $('<option></option>').val(0).html("Please Select SO")
                     );
                     $.each(values, function (i, order) {
                         $("#salesorderno").append(
@@ -361,7 +363,7 @@
                         const formattedDate = convertToReadableDate(item.salesorderdate);
                         var formattedQuantity = (item.quantity).toFixed(2);
                         var Total_Price = (item.Total_Price).toFixed(2);
-                        var formattedDiscountValue = (item.Total_discountval).toFixed(2);
+                        var formattedDiscountValue = (item.Total_discountval);
                         var formattedSubtotal = (item.Total_Subtotal).toFixed(2);
                         var formattedTaxValue = (item.Total_TaxValue).toFixed(2);
                         var formattedGrandtotal = (item.Total_Grandtotal).toFixed(2);

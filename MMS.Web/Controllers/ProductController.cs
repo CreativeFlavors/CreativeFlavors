@@ -76,8 +76,23 @@ namespace MMS.Web.Controllers
         {
             product productEntity = new product();
             string status = "";
+            ProductManager ProductManager = new ProductManager();
+
             if (model.ProductId == 0)
             {
+                var totallist = ProductManager.Product_Grid();
+                var productList = totallist.Where(x => x.product_name.ToLower().Contains(model.ProductName.ToLower()) && x.Productype.ToString().ToLower().Contains(model.ProductType.ToString().ToLower())).ToList();
+                if (productList.Count() != 0)
+                {
+                    status = "ProductThere";
+                    return Json(status, JsonRequestBehavior.AllowGet);
+                }
+                var productListcode = totallist.Where(x => x.product_code.ToLower().Contains(model.ProductCode.ToLower()) && x.Productype.ToString().ToLower().Contains(model.ProductType.ToString().ToLower())).ToList();
+                if (productList.Count() != 0)
+                {
+                    status = "ProductcodetThere";
+                    return Json(status, JsonRequestBehavior.AllowGet);
+                }
                 ProductManager productManager = new ProductManager();
                 productEntity.ProductCode = model.ProductCode;
                 productEntity.ProductName = model.ProductName;

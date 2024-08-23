@@ -27,7 +27,9 @@ namespace MMS.Data.StoredProcedureModel
         public string uom { get; set; }
         [Column("price")]
         public decimal? Price { get; set; }
-        [Column("bom_no")]
-        public string bom_no { get; set; }
+        [Column("bom_no")]  
+        public string bom_no { get; set; }   
+        [Column("productype")]
+        public int Productype { get; set; }
     }
 }

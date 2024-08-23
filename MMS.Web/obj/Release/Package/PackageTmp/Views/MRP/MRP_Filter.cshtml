@@ -1,6 +1,11 @@
 ﻿@model IEnumerable<MMS.Web.Models.Salesorders>
 @using MMS.Web.Models
-
+@{
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int pageSize = ViewBag.PageSize ?? 8;
+    int totalItems = Model.Count();
+    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,11 +71,12 @@
                 </li>
                 @if (Model != null)
                 {
-                    int count = 1;
+
+
                     foreach (var i in Model)
                     {
                         <li class="table-row header">
-                            <div class="col col-1 ">@count</div>
+                            <div class="col col-1 ">@startSerialNumber</div>
                             <div class="col col-1" id="Name">@i.ProductName</div>
                             <div class="col col-1">@i.SalesQuantity</div>
                             <div class="col col-1">@i.AvailableStock</div>
@@ -100,7 +106,7 @@
                                 <img src="~/Content/assets/images/plus1.png" id="plus" class="toggle-image" />
                             </div>
                         </li>
-                        count++;
+                        startSerialNumber++;
                         <li class="hidden-content">
                             <div class="manage_customers_table_in_responsive mt-3" style="height:230px; overflow: auto;" id="form">
                                 <div id="table-wrapper">

@@ -9,6 +9,5 @@ namespace MMS.Repository.Service
 {
     public interface IOrderHeaderService
     {
-        orderheader_hd GettypeId(int id);
     }
 }

@@ -2,6 +2,7 @@
 using MMS.Data.StoredProcedureModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
@@ -19,6 +20,7 @@ namespace MMS.Web.Models.StockModel
         public string productype{ get; set; }
         public string materialcategory { get; set; }
         public string materialgroup { get; set; }
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
         public DateTime? Date { get; set; }
         public List<Parentbommatertial> bomMaterialGridList { get; set; }
         public List<subassemblydata> bomsubassemblyGridList { get; set; }

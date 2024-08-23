@@ -55,7 +55,14 @@ namespace MMS.Web.Controllers
             {  
                 model.IndentDate = DateTime.Today;
                 int? intentno = indentnewMaterialManager.GetNextIndentNumberFromDatabase();
-                model.IndentNumber = intentno;
+                if (intentno == 0 || intentno ==null)
+                {
+                    model.IndentNumber = 1;
+                }
+                else
+                {
+                    model.IndentNumber = intentno;
+                }
             }
 
             return View(model);
@@ -233,11 +240,11 @@ namespace MMS.Web.Controllers
 
         public ActionResult IndentDelete(int indentcartid)
         {
-            IndentCart indentCart = new IndentCart();
+            Indentdetail indentCart = new Indentdetail();
             string status = "";
             IndentNewMaterialManager indentnewMaterialManager = new IndentNewMaterialManager();
             indentCart = indentnewMaterialManager.Getindentcartid(indentcartid);
-            if (indentCart.IndentCartId == indentcartid)
+            if (indentCart.IndentDetailId == indentcartid)
             {
                 status = "Success";
                 indentnewMaterialManager.Delete(indentcartid);

@@ -168,6 +168,8 @@
                 <div id="alert">
 
                 </div>
+                <div id="message" style=" color: green; background-color: yellow; padding: 3px; border-radius: 61px;"></div>
+
             </div>
           
                 <div class="edit-section">
@@ -193,8 +195,9 @@
                                     <div class="col-lg-3 col-md-6 col-sm-12" style="margin-top:-15px">
                                         <div class="input-part">
                                             <label class="font-14" for="#StoreCode">Store Code</label>
-                                            @Html.DropDownListFor(m => m.StoreCode, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field", id = "StoreCode" })
+                                            @Html.DropDownListFor(m => m.StoreCode, MMS.Web.ExtensionMethod.HtmlHelper.Store(), new { @class = "select-style text-field", id = "StoreCode" , onchange = "storefun()" })
                                         </div>
+                                        <p id="storeerror" style="color: red;"></p>
                                     </div>
                                 </div>
                             </form>
@@ -203,21 +206,23 @@
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="input-part">
                                 <label class="font-14" for="#ProductionDate">Production Date</label>
-                                @Html.TextBoxFor(m => m.ProductionDate, "{0:dd-MM-yyyy}", new { @class = "form-control text-field", @id = "ProductionDate" })
+                                @Html.TextBoxFor(m => m.ProductionDate, "{0:dd-MM-yyyy}", new { @class = "form-control text-field", value = "Today", @id = "ProductionDate" , @readonly = "true", style = "background-color: #eee !important;" })
                             </div>
                         </div>
 
                         <div class="col-lg-3 col-md-6 col-sm-12" id="productname">
                             <div class="input-part">
-                                <label class="font-14" for="#ProductId">Product Name</label>
-                                @Html.DropDownListFor(m => m.ProductId, MMS.Web.ExtensionMethod.HtmlHelper.ProductmFINName(), new { @class = "select-style text-field", id = "ProductId" })
+                                <label class="font-14" for="ProductId">Product Name</label>
+                                @Html.DropDownListFor(m => m.ProductId, MMS.Web.ExtensionMethod.HtmlHelper.ProductmFINName(), new { @class = "select-style text-field", id = "ProductId", onchange = "prodproductfun()" })
                             </div>
+                            <p id="prodproerror" style="color: red;"></p>
                         </div>
                         <div class="col-lg-3 col-md-6 col-sm-12" id="productsubname">
                             <div class="input-part">
-                                <label class="font-14" for="#ProductSubId">Product Name</label>
-                                @Html.DropDownListFor(m => m.ProductId, MMS.Web.ExtensionMethod.HtmlHelper.ProductmSUBName(), new { @class = "select-style text-field",id = "ProductSubId" })
+                                <label class="font-14" for="ProductSubId">Product Name</label>
+                                @Html.DropDownListFor(m => m.ProductId, MMS.Web.ExtensionMethod.HtmlHelper.ProductmSUBName(), new { @class = "select-style text-field", id = "ProductSubId",onchange= "prodproductsubfun()" })
                             </div>
+                            <p id="prodsuberror" style="color: red;"></p>
                         </div>
 
                         <div class="col-lg-3 col-md-6 col-sm-12">
@@ -257,9 +262,10 @@
 
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="input-part">
-                                <label class="font-14" for="#ProductionQty">Production Qty</label>
-                                @Html.TextBoxFor(m => m.ProductionQty, new { @class = "form-control text-field" })
+                                <label class="font-14" for="ProductionQty">Production Qty</label>
+                                @Html.TextBoxFor(m => m.ProductionQty, new { @class = "form-control text-field", onkeyup = " ProductionQtyfun()" })
                             </div>
+                            <p id="proderror" style="color: red;"></p>
                         </div>
 
                         <div class="col-lg-3 col-md-6 col-sm-12">
@@ -306,7 +312,7 @@
 
                         <div class="inner-section-button mt-4" id="productions1">
 
-                            <button class="fill-color font-15" type="submit" onclick="Save('@(Model != null ? Model.ProductionId.ToString() : "")')">
+                            <button class="fill-color font-15" type="submit" onclick="Save('@(Model != null ? Model.ProductionId.ToString() : "")'); savevalidate();">
                                 SAVE
                             </button>
 
@@ -320,7 +326,7 @@
 
                         <div class="inner-section-button mt-4" id="subassembly1">
 
-                            <button class="fill-color font-15" type="submit" onclick="Addsubassembly('@(Model != null ? Model.ProductionId.ToString() : "")')">
+                            <button class="fill-color font-15" id="subass"type="submit" onclick="Addsubassembly('@(Model != null ? Model.ProductionId.ToString() : "")'); subvalidate();">
                                 ADD Subassembly
                             </button>
 
@@ -331,7 +337,6 @@
                                 </button>
                             </a>
                         </div>
-
                     </div>
                 </div>
             
@@ -418,9 +423,10 @@
     <script src="~/Content/js/dropdown.js"></script>
     <script src="~/Content/js/custom.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
-
+    <script src="~/Content/js/Validation.js"></script>
 
     <script>
+
         $(window).on("load", function () {
             $(".report-inner-section").addClass("transection");
             $("#Production").attr('checked', true);
@@ -664,27 +670,29 @@
                     type: 'GET',
                     data: { productid: productId },
                     success: function (response) {
-                        responseData = response; // Store response globally
-                        $('#table_grid_ROW').empty();
-                        $('#table_grid_ROW1').empty();
-                        $('#table_grid_ROW2').empty(); // Clear existing data
+                        if (response.producttotalitems != 0) {
+                            $("#message").hide();
+                            responseData = response; // Store response globally
+                            $('#table_grid_ROW').empty();
+                            $('#table_grid_ROW1').empty();
+                            $('#table_grid_ROW2').empty(); // Clear existing data
 
-                        // Display general product information
-                        $('#RequiredQty').val(response.producttotalitems).prop('readonly', true);
-                        $('#MinQty').val(response.Minstock).prop('readonly', true);
-                        $('#MaxQty').val(response.Maxstock).prop('readonly', true);
-                        $('#ProductionPerDay').val(response.ProductionperDay).prop('readonly', true);
-                        $('#ProductCode').val(response.ProductCode).prop('readonly', true);
+                            // Display general product information
+                            $('#RequiredQty').val(response.producttotalitems).prop('readonly', true);
+                            $('#MinQty').val(response.Minstock).prop('readonly', true);
+                            $('#MaxQty').val(response.Maxstock).prop('readonly', true);
+                            $('#ProductionPerDay').val(response.ProductionperDay).prop('readonly', true);
+                            $('#ProductCode').val(response.ProductCode).prop('readonly', true);
 
-                        // Populate #table_grid_ROW with consumeqty data
-                        if (response['bomdata'] && response['bomdata'].length > 0) {
-                            $.each(response['bomdata'], function (i, val) {
-                                var id = i + 1;
-                                var productsmatid = response['Productsid'] && response['Productsid'][i] ? response['Productsid'][i] : '';
-                                var producttype = response['ProductType'] && response['ProductType'][i] ? response['ProductType'][i] : '';
-                                var consumeqty = response['Consumeqty'] && response['Consumeqty'][i] ? response['Consumeqty'][i] : '';
-                                var stockonhand = response['StockforMaterial'] && response['StockforMaterial'][i] ? response['StockforMaterial'][i] : '';
-                                $('#table_grid_ROW').append(`
+                            // Populate #table_grid_ROW with consumeqty data
+                            if (response['bomdata'] && response['bomdata'].length > 0) {
+                                $.each(response['bomdata'], function (i, val) {
+                                    var id = i + 1;
+                                    var productsmatid = response['Productsid'] && response['Productsid'][i] ? response['Productsid'][i] : '';
+                                    var producttype = response['ProductType'] && response['ProductType'][i] ? response['ProductType'][i] : '';
+                                    var consumeqty = response['Consumeqty'] && response['Consumeqty'][i] ? response['Consumeqty'][i] : '';
+                                    var stockonhand = response['StockforMaterial'] && response['StockforMaterial'][i] ? response['StockforMaterial'][i] : '';
+                                    $('#table_grid_ROW').append(`
     <tr>
         <td class="veh-1">${id}</td>
         <td class="veh-1">${val}</td>
@@ -692,69 +700,74 @@
         <td class="veh-1">${stockonhand}</td>
     </tr>
 `);
-                            });
-                        } else {
-                            $('#table_grid_ROW').append('<tr><td class="veh-1" colspan="3">No data found</td></tr>');
+                                });
+                            } else {
+                                $('#table_grid_ROW').append('<tr><td class="veh-1" colspan="3">No data found</td></tr>');
+                            }
+
+                            // Populate #table_grid_ROW1 with bomconsumeqty data
+                            if (response['BomMaterialNames'] && response['BomMaterialNames'].length > 0) {
+                                $.each(response['BomMaterialNames'], function (i, val) {
+                                    var id = i + 1;
+                                    var producttype = 'Material';
+                                    var bomrequiredqty = response['BomRequiredQtys'] && response['BomRequiredQtys'][i] ? response['BomRequiredQtys'][i] : '';
+                                    var uom = response['UOMs'] && response['UOMs'][i] ? response['UOMs'][i] : '';
+                                    var bomconsumeqty = ''; // Initialize bomconsumeqty as empty initially
+                                    var stockonhand = response['StockOnHand'] && response['StockOnHand'][i] ? response['StockOnHand'][i] : '';
+                                    var newstockhand = '';
+                                    var canmanufacutrestock = '';
+                                    var canmanufacture = '';
+
+                                    $('#table_grid_ROW1').append('<tr><td class="veh-1">' + id + '</td><td class="veh-1">' + val + '</td><td class="veh-1">' + producttype + '</td><td class="veh-1">' + bomrequiredqty + '</td><td class="veh-1">' + uom + '</td><td class="veh-1 bomconsumeqty">' + bomconsumeqty + '</td><td class="veh-1">' + stockonhand + '</td><td class="veh-1">' + newstockhand + '</td><td class="veh-1">' + canmanufacutrestock + '</td><td class="veh-1">' + canmanufacture + '</td></tr>');
+                                });
+                            } else {
+                                $('#table_grid_ROW1').append('<tr><td class="veh-1" colspan="10">No data found</td></tr>');
+                            }
+
+                            // Populate #table_grid_ROW2 with subassembly data
+                            if (response['subassemblyname'] && response['subassemblyname'].length > 0) {
+                                $.each(response['subassemblyname'], function (i, val) {
+                                    var id = i + 1;
+                                    var producttype = 'Subassembly';
+                                    var subassemblyrequiredqty = response['subassemblyrequiredqty'] && response['subassemblyrequiredqty'][i] ? response['subassemblyrequiredqty'][i] : '';
+                                    /*var uom = response['UOMs'] && response['UOMs'][i] ? response['UOMs'][i] : '';*/
+                                    var subassemblyconsumeqty = ''; // Initialize bomconsumeqty as empty initially
+                                    var subassemblystockqty = response['subassemblystockqty'] && response['subassemblystockqty'][i] ? response['subassemblystockqty'][i] : '';
+                                    var subassemblynewstockhand = '';
+                                    var subassemblycanmanufacutrestock = '';
+                                    var subassemblycanmanufacture = '';
+                                    var imgSrc = '../Content/assets/images/newtab.png';
+                                    var imgAlt = 'new tab';
+                                    var checksubmaterial = '<button class="material-check-button" data-toggle="modal" data-target="#myModal' + id + '">' + '<img src="' + imgSrc + '" alt="' + imgAlt + '">' + '</button>';
+
+                                    $('#table_grid_ROW2').append('<tr><td class="veh-1">' + id + '</td><td class="veh-1">' + val + '</td><td class="veh-1">' + producttype + '</td><td class="veh-1">' + subassemblyrequiredqty + '</td><td class="veh-1 bomconsumeqty">' + subassemblyconsumeqty + '</td><td class="veh-1">' + subassemblystockqty + '</td><td class="veh-1">' + subassemblynewstockhand + '</td><td class="veh-1">' + subassemblycanmanufacutrestock + '</td><td class="veh-1">' + subassemblycanmanufacture + '</td></tr>');
+                                    // Append modal markup for each subassembly
+                                    var modalMarkup = '<div class="modal fade" id="myModal' + id + '" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">' +
+                                        '<div class="modal-dialog" role="document">' +
+                                        '<div class="modal-content">' +
+                                        '<div class="modal-header">' +
+                                        '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                                        '<h4 class="modal-title" id="myModalLabel">' + val + ' Details</h4>' +
+                                        '</div>' +
+                                        '<div class="modal-body">' +
+                                        '<p>Modal body content goes here.</p>' +
+                                        '</div>' +
+                                        '<div class="modal-footer">' +
+                                        '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+                                        '</div>' +
+                                        '</div>' +
+                                        '</div>' +
+                                        '</div>';
+
+                                    $('body').append(modalMarkup);
+                                });
+                            } else {
+                                $('#table_grid_ROW2').append('<tr><td class="veh-1" colspan="10">No data found</td></tr>');
+                            }
                         }
-
-                        // Populate #table_grid_ROW1 with bomconsumeqty data
-                        if (response['BomMaterialNames'] && response['BomMaterialNames'].length > 0) {
-                            $.each(response['BomMaterialNames'], function (i, val) {
-                                var id = i + 1;
-                                var producttype = 'Material';
-                                var bomrequiredqty = response['BomRequiredQtys'] && response['BomRequiredQtys'][i] ? response['BomRequiredQtys'][i] : '';
-                                var uom = response['UOMs'] && response['UOMs'][i] ? response['UOMs'][i] : '';
-                                var bomconsumeqty = ''; // Initialize bomconsumeqty as empty initially
-                                var stockonhand = response['StockOnHand'] && response['StockOnHand'][i] ? response['StockOnHand'][i] : '';
-                                var newstockhand = '';
-                                var canmanufacutrestock = '';
-                                var canmanufacture = '';
-
-                                $('#table_grid_ROW1').append('<tr><td class="veh-1">' + id + '</td><td class="veh-1">' + val + '</td><td class="veh-1">' + producttype + '</td><td class="veh-1">' + bomrequiredqty + '</td><td class="veh-1">' + uom + '</td><td class="veh-1 bomconsumeqty">' + bomconsumeqty + '</td><td class="veh-1">' + stockonhand + '</td><td class="veh-1">' + newstockhand + '</td><td class="veh-1">' + canmanufacutrestock + '</td><td class="veh-1">' + canmanufacture + '</td></tr>');
-                            });
-                        } else {
-                            $('#table_grid_ROW1').append('<tr><td class="veh-1" colspan="10">No data found</td></tr>');
-                        }
-
-                        // Populate #table_grid_ROW2 with subassembly data
-                        if (response['subassemblyname'] && response['subassemblyname'].length > 0) {
-                            $.each(response['subassemblyname'], function (i, val) {
-                                var id = i + 1;
-                                var producttype = 'Subassembly';
-                                var subassemblyrequiredqty = response['subassemblyrequiredqty'] && response['subassemblyrequiredqty'][i] ? response['subassemblyrequiredqty'][i] : '';
-                                /*var uom = response['UOMs'] && response['UOMs'][i] ? response['UOMs'][i] : '';*/
-                                var subassemblyconsumeqty = ''; // Initialize bomconsumeqty as empty initially
-                                var subassemblystockqty = response['subassemblystockqty'] && response['subassemblystockqty'][i] ? response['subassemblystockqty'][i] : '';
-                                var subassemblynewstockhand = '';
-                                var subassemblycanmanufacutrestock = '';
-                                var subassemblycanmanufacture = '';
-                                var imgSrc = '../Content/assets/images/newtab.png';
-                                var imgAlt = 'new tab';
-                                var checksubmaterial = '<button class="material-check-button" data-toggle="modal" data-target="#myModal' + id + '">' + '<img src="' + imgSrc + '" alt="' + imgAlt + '">' + '</button>';
-
-                                $('#table_grid_ROW2').append('<tr><td class="veh-1">' + id + '</td><td class="veh-1">' + val + '</td><td class="veh-1">' + producttype + '</td><td class="veh-1">' + subassemblyrequiredqty + '</td><td class="veh-1 bomconsumeqty">' + subassemblyconsumeqty + '</td><td class="veh-1">' + subassemblystockqty + '</td><td class="veh-1">' + subassemblynewstockhand + '</td><td class="veh-1">' + subassemblycanmanufacutrestock + '</td><td class="veh-1">' + subassemblycanmanufacture + '</td></tr>');
-                                // Append modal markup for each subassembly
-                                var modalMarkup = '<div class="modal fade" id="myModal' + id + '" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">' +
-                                    '<div class="modal-dialog" role="document">' +
-                                    '<div class="modal-content">' +
-                                    '<div class="modal-header">' +
-                                    '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-                                    '<h4 class="modal-title" id="myModalLabel">' + val + ' Details</h4>' +
-                                    '</div>' +
-                                    '<div class="modal-body">' +
-                                    '<p>Modal body content goes here.</p>' +
-                                    '</div>' +
-                                    '<div class="modal-footer">' +
-                                    '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-                                    '</div>' +
-                                    '</div>' +
-                                    '</div>' +
-                                    '</div>';
-
-                                $('body').append(modalMarkup);
-                            });
-                        } else {
-                            $('#table_grid_ROW2').append('<tr><td class="veh-1" colspan="10">No data found</td></tr>');
+                        else {
+                            $('#message').html("<b style='color: green'>Production Completed</b>").show();
+                            alert("Production Completed");
                         }
                     },
                     error: function () {
@@ -804,7 +817,6 @@
             if (!validateForm()) {
                 event.preventDefault(); // Prevent form submission if validation fails
             }
-            debugger;
             @{
     var ProductionId = Model != null ? Model.ProductionId.ToString() : ""; // Check if Model is not null before accessing its properties
 }
@@ -921,7 +933,6 @@
 
         //save production
         function Addsubassembly(ProductionId, event) {
-            debugger
             if (!validateForm()) {
                 event.preventDefault(); // Prevent form submission if validation fails
             }
@@ -945,6 +956,7 @@
             var ProductionDueDate = $('#ProductionDueDate').val();
 
             $(".alert-danger").hide();
+            
             if (ProductionDate != "" && ProductId != "" && ProductionCode != "" && ProductionQty != "" && ProductionStatus != "" && StoreCode != "" && MinQty != "" && MaxQty != "") {
                 var formdata = new FormData();
                 if (ProductionId !== "") {

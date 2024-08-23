@@ -299,6 +299,8 @@ namespace MMS.Web.Controllers.Stock
 
             orderdetails orderdetails = new orderdetails();
             var currencyid = currencyManager.GetContainCurrencyid(currencyOption);
+            var invoisedcount = salesOrderList.Count();
+            var nowinvoised = 0;
             foreach (var i in salesOrderList)
             {
                 var dc_dt = OrderDetailsManager.GetSOId(Convert.ToInt32(i.SalesorderId_DT));
@@ -337,39 +339,49 @@ namespace MMS.Web.Controllers.Stock
                 var qty = (Convert.ToInt32(i.Quantity));
                 var discount = DT.Discountperid;
                 int intVal = int.Parse(taxper);
-
-                if ((qty != null) && (discount != null))
+                if (qty != 0)
                 {
-                    var subtotal = qty * unitprice;
-                    var disamount = subtotal * discount / 100;
-                    var subtotals = subtotal - disamount;
-                    var taxamount1 = subtotals * intVal / 100;
-                    var total = taxamount1 + subtotals;
-                    orderdetails.SubTotal = subtotals;
-                    orderdetails.TaxValue = taxamount1;
-                    orderdetails.TotalPrice = total;
-                    orderdetails.DiscountValue = disamount;
+                    if ((qty != null) && (discount != null))
+                    {
+                        var subtotal = qty * unitprice;
+                        var disamount = subtotal * discount / 100;
+                        var subtotals = subtotal - disamount;
+                        var taxamount1 = subtotals * intVal / 100;
+                        var total = taxamount1 + subtotals;
+                        orderdetails.SubTotal = subtotals;
+                        orderdetails.TaxValue = taxamount1;
+                        orderdetails.TotalPrice = total;
+                        orderdetails.DiscountValue = disamount;
+                    }
+                    if ((Convert.ToInt32(i.Quantity)) != 0 && dc_dt != null)
+                    {
+                        salesorder_Dt.Invoice_qty = (Convert.ToInt32(i.Quantity)) + quantitys;
+                        salesorder_Dt.Salesorderid_dt = (Convert.ToInt32(i.SalesorderId_DT));
+                        AlertMessage = "Confirm Order";
+                        OrderDetailsManager.POST(orderdetails);
+                        salesorderDT_manager.update(salesorder_Dt);
+                    }
+                    else if ((Convert.ToInt32(i.Quantity)) != 0)
+                    {
+                        salesorder_Dt.Invoice_qty = (Convert.ToInt32(i.Quantity));
+                        salesorder_Dt.Salesorderid_dt = (Convert.ToInt32(i.SalesorderId_DT));
+                        AlertMessage = "Confirm Order";
+                        OrderDetailsManager.POST(orderdetails);
+                        salesorderDT_manager.update(salesorder_Dt);
+                    }
                 }
-                if ((Convert.ToInt32(i.Quantity)) != 0 && dc_dt != null)
+                else
                 {
-                    salesorder_Dt.Invoice_qty = (Convert.ToInt32(i.Quantity)) + quantitys;
-                    salesorder_Dt.Salesorderid_dt = (Convert.ToInt32(i.SalesorderId_DT));
-
-                    OrderDetailsManager.POST(orderdetails);
-                    salesorderDT_manager.update(salesorder_Dt);
+                    nowinvoised++;
                 }
-                else if ((Convert.ToInt32(i.Quantity)) != 0)
-                {
-                    salesorder_Dt.Invoice_qty = (Convert.ToInt32(i.Quantity));
-                    salesorder_Dt.Salesorderid_dt = (Convert.ToInt32(i.SalesorderId_DT));
 
-                    OrderDetailsManager.POST(orderdetails);
-                    salesorderDT_manager.update(salesorder_Dt);
-                }
             }
-
-            AlertMessage = "Confirm Order";
-            return Json(new { AlertMessage = AlertMessage }, JsonRequestBehavior.AllowGet);
+            if (nowinvoised == invoisedcount)
+            {
+                AlertMessage = "Full Invoised";
+                return Json(AlertMessage, JsonRequestBehavior.AllowGet);
+            }
+            return Json(AlertMessage, JsonRequestBehavior.AllowGet);
         }
         #endregion
     }

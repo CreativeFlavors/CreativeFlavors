@@ -65,7 +65,6 @@ namespace MMS.Repository.Managers
                 if (model != null)
                 {
                     model.ProductionId = arg.ProductionId;
-                    model.ProductionDate = arg.ProductionDate;
                     model.ProductCode = arg.ProductCode;
                     model.ProductionCode = arg.ProductionCode;
                     model.ProductionQty = arg.ProductionQty;

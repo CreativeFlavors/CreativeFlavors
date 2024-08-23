@@ -46,10 +46,7 @@
 
                         <div class="form-floating">
                             <select id="salesorderno" class="form-select">
-                                @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.salesorderno())
-                                {
-                                    <option value="@item.Value">@item.Text</option>
-                                }
+                                <option value="">Please Select SO</option>
                             </select>
                             <label for="floatingSelectGrid">SO Number</label>
                         </div>
@@ -71,7 +68,7 @@
                         <div id="transaction_reports_search4_container" class="reports_search_container_btn">
                             <a href="/Deliverychallan/DeliverychallanDetails">
                                 <button type="button" class="manage_customers_btn font-15" id="add">
-                                    ADD
+                                    ADD DC
                                 </button>
                             </a>
 
@@ -326,6 +323,7 @@
             var totalsub = $("#Total_Subtotal").val();
             var totaldgrand = $("#Total_Grandtotal").val();
             var Total_Price = $("#Total_Price").val();
+
             var formdata = new FormData();
             formdata.append("buyerid", buyerid);
             formdata.append("currencyOption", currencyOption);
@@ -356,9 +354,16 @@
                 processData: false,
                 dataType: 'html',
                 data: formdata,
-                success: function (response) {
-                    alert("DC Applied successfully!");
-                    window.location.href = "/deliverychallan/DCMaster";
+                success: function (values) {
+                    var data = JSON.parse(values);
+                    if (data === "Confirm Order") {
+                        alert("DC Applied successfully!");
+                        window.location.href = "/deliverychallan/DCMaster";
+                    }
+                    else if (data == "Full Invoised") {
+                        alert("There is no stock for DC");
+                        return false;
+                    }
 
                 }
             });

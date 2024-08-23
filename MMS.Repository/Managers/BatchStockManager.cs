@@ -180,7 +180,7 @@ namespace MMS.Repository.Managers
             List<BatchStock> materialOpeningMaster = new List<BatchStock>();
             if (productid != 0)
             {
-                materialOpeningMaster = BatchStockrep.Table.Where(x => x.productid == productid).ToList();
+                materialOpeningMaster = BatchStockrep.Table.Where(x => x.productid == productid).ToList().OrderByDescending(x => x.CreatedDate).ToList();
             }
             return materialOpeningMaster;
         }

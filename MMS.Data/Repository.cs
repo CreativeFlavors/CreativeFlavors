@@ -286,8 +286,16 @@ namespace MMS.Data
         }  
         public List<MMS.Data.StoredProcedureModel.ProductGrid> Get_ProductGrid()
         {
-            var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.ProductGrid>("SELECT * FROM get_product_details()").ToList();
-            return ResultList;
+            try
+            {
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.ProductGrid>("SELECT * FROM get_product_details()").ToList();
+                return ResultList;
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
+
         }
         public List<MMS.Data.StoredProcedureModel.FineshedgoodsReport> Fineshedgoods()
         {
@@ -329,11 +337,11 @@ namespace MMS.Data
                 throw;
             }
         }
-        public List<MMS.Data.StoredProcedureModel.SalesorderCart> SearchSalesordercart(int customerid)
+        public List<MMS.Data.StoredProcedureModel.SalesorderCart> SearchSalesordercart(int customerid,int salesid)
         {
             try
             {
-                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.SalesorderCart>("SELECT * FROM get_salesorders_cart(@p0)", customerid).ToList();
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.SalesorderCart>("SELECT * FROM get_salesorders_cart(@p0,@p1)", customerid, salesid).ToList();
                 return ResultList;
             }
             catch (Exception ex)

@@ -52,14 +52,14 @@ namespace MMS.Repository.Managers
         
         }
 
-        public supplierTransaction GettypeId(int id)
+        public List<supplierTransaction> GettypeId(int id)
         {
-            supplierTransaction suppliertransaction = new supplierTransaction();
+            List<supplierTransaction> suppliertransaction = new List<supplierTransaction>();
             try
             {
                 if (id != 0)
                 {
-                    suppliertransaction = suppliertransactionrep.Table.FirstOrDefault(x => x.GrnRefNumber == id);
+                    suppliertransaction = suppliertransactionrep.Table.Where(x => x.GrnRefNumber == id).ToList();
                 }
                 return suppliertransaction;
             }

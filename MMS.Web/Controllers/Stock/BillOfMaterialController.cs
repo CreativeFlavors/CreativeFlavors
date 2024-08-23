@@ -52,7 +52,7 @@ namespace MMS.Web.Controllers.Stock
                          .Skip(startIndex)
                          .Take(pageSize)
                          .ToList();
-            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalPage = totalPages;
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
             return View("~/Views/Stock/BillOfMaterial/BOMMaterialListGrid.cshtml", totalList);
@@ -126,6 +126,7 @@ namespace MMS.Web.Controllers.Stock
             {
                 model.Lastbom = "NotApplicable";
             }
+            model.Date = DateTime.Now;
             model.Lastbom = LastBOmNO;
             return View("~/Views/Stock/BillOfMaterial/BillOfMaterialDetails.cshtml", model);
         }
@@ -134,28 +135,27 @@ namespace MMS.Web.Controllers.Stock
 
         #region Curd Operation
         [HttpPost]
-        public ActionResult SubAssemblyDetails(ParentBillofMaterial model) 
+        public ActionResult SubAssemblyDetails(ParentBillofMaterial model)
         {
             if (model.subassemblyid == 0)
             {
                 if (model.Bomid == 0)
                 {
                     parentbom parentboms = new parentbom();
-                    parentbom parentbomsexists = new parentbom();
-
                     ParentbomManager manager = new ParentbomManager();
                     parentboms.BomNo = model.Bomno;
                     parentboms.Description = model.Description;
-                    parentboms.Date = model.Date;
+                    parentboms.Date = DateTime.Now;
                     parentboms.LastBom = model.Lastbom;
                     string AlertMessage = "";
-                    parentbomsexists = manager.GetBomNO(model.Bomno);
-                    if (parentbomsexists == null && model.Bomid == 0)
+                    var totallist = manager.Get();
+                    var bomList = totallist.Where(x => x.BomNo.ToLower().Contains(model.Bomno.ToLower())).ToList();
+                    if (bomList.Count() == 0 && model.Bomid == 0)
                     {
                         parentboms = manager.Post(parentboms);
                         AlertMessage = "Saved Successfully";
                     }
-                    else if (parentbomsexists != null && parentboms.BomId == 0)
+                    else if (bomList.Count() != 0)
                     {
                         AlertMessage = "Already Existed";
                         return Json(AlertMessage, JsonRequestBehavior.AllowGet);
@@ -174,26 +174,21 @@ namespace MMS.Web.Controllers.Stock
                 {
                     parentbom parentboms = new parentbom();
                     parentbom parentbomsexists = new parentbom();
-
+                    subassemblyManager subassemblyManager = new subassemblyManager();
                     ParentbomManager manager = new ParentbomManager();
                     parentboms.BomNo = model.Bomno;
                     parentboms.Description = model.Description;
-                    parentboms.Date = model.Date;
+                    parentboms.Date = DateTime.Now;
                     parentboms.LastBom = model.Lastbom;
                     string AlertMessage = "";
-                    parentbomsexists = manager.GetBomNO(model.Bomno);
-                    if (parentbomsexists == null && model.Bomid == 0)
+                    var totallist1 = subassemblyManager.Get();
+                    var productListcode = totallist1.Where(x => x.ProductId.ToString().ToLower().Contains(model.ProductSUBid.ToString().ToLower()) && x.BomId.ToString().ToLower().Contains(model.Bomid.ToString().ToLower())).ToList();
+                    if (productListcode.Count() != 0 && model.Bomid != 0)
                     {
-                        parentboms = manager.Post(parentboms);
-                        AlertMessage = "Saved Successfully";
-                    }
-                    else if (parentbomsexists != null && parentboms.BomId != 0)
-                    {
-                        AlertMessage = "Already Existed";
+                        AlertMessage = "Already Existed SUB";
                         return Json(AlertMessage, JsonRequestBehavior.AllowGet);
                     }
                     subassembly subassembly = new subassembly();
-                    subassemblyManager subassemblyManager = new subassemblyManager();
                     subassembly.BomId = model.Bomid;
                     subassembly.ProductId = model.ProductSUBid;
                     subassembly.RequiredQty = model.Requiredqty;
@@ -207,6 +202,7 @@ namespace MMS.Web.Controllers.Stock
             {
                 parentbom parentboms = new parentbom();
                 parentbom parentbomsexists = new parentbom();
+                subassemblyManager subassemblyManager = new subassemblyManager();
 
                 ParentbomManager manager = new ParentbomManager();
                 parentboms.BomNo = model.Bomno;
@@ -214,19 +210,14 @@ namespace MMS.Web.Controllers.Stock
                 parentboms.Date = model.Date;
                 parentboms.LastBom = model.Lastbom;
                 string AlertMessage = "";
-                parentbomsexists = manager.GetBomNO(model.Bomno);
-                if (parentbomsexists == null && model.Bomid == 0)
+                var totallist1 = subassemblyManager.Get();
+                var productListcode = totallist1.Where(x => x.ProductId.ToString().ToLower().Contains(model.ProductSUBid.ToString().ToLower()) && x.BomId.ToString().ToLower().Contains(model.Bomid.ToString().ToLower())).ToList();
+                if (productListcode.Count() != 0 && model.Bomid != 0)
                 {
-                    parentboms = manager.Post(parentboms);
-                    AlertMessage = "Saved Successfully";
-                }
-                else if (parentbomsexists != null && parentboms.BomId != 0)
-                {
-                    AlertMessage = "Already Existed";
+                    AlertMessage = "Already Existed SUB";
                     return Json(AlertMessage, JsonRequestBehavior.AllowGet);
                 }
                 subassembly subassembly = new subassembly();
-                subassemblyManager subassemblyManager = new subassemblyManager();
                 subassembly.BomId = model.Bomid;
                 subassembly.ProductId = model.ProductSUBid;
                 subassembly.RequiredQty = model.Requiredqty;
@@ -246,20 +237,21 @@ namespace MMS.Web.Controllers.Stock
                 {
                     parentbom parentboms = new parentbom();
                     parentbom parentbomsexists = new parentbom();
-
+                    Parentbom_materialManager parentbom_MaterialManager = new Parentbom_materialManager();
                     ParentbomManager manager = new ParentbomManager();
                     parentboms.BomNo = model.Bomno;
                     parentboms.Description = model.Description;
-                    parentboms.Date = model.Date;
+                    parentboms.Date =DateTime.Now;
                     parentboms.LastBom = model.Lastbom;
                     string AlertMessage = "";
-                    parentbomsexists = manager.GetBomNO(model.Bomno);
-                    if (parentbomsexists == null && model.Bomid == 0)
+                    var totallist = manager.Get();
+                    var bomList = totallist.Where(x => x.BomNo.ToLower().Contains(model.Bomno.ToLower())).ToList();
+                    if (bomList.Count() == 0 && model.Bomid == 0)
                     {
                         parentboms = manager.Post(parentboms);
                         AlertMessage = "Saved Successfully";
                     }
-                    else if (parentbomsexists != null && parentboms.BomId == 0)
+                    else if (bomList.Count() != 0 && model.Bomid == 0)
                     {
                         AlertMessage = "Already Existed";
                         return Json(AlertMessage, JsonRequestBehavior.AllowGet);
@@ -281,29 +273,18 @@ namespace MMS.Web.Controllers.Stock
                 {
                     parentbom parentboms = new parentbom();
                     parentbom parentbomsexists = new parentbom();
-
+                    Parentbom_materialManager parentbom_materialManager = new Parentbom_materialManager();
                     ParentbomManager manager = new ParentbomManager();
                     parentboms.BomNo = model.Bomno;
-                    parentboms.Description = model.Description;
-                    parentboms.Date = model.Date;
-                    parentboms.LastBom = model.Lastbom;
                     string AlertMessage = "";
-                    parentbomsexists = manager.GetBomNO(model.Bomno);
-                    if (parentbomsexists == null && model.Bomid == 0)
+                    var totallist1 = parentbom_materialManager.Get();
+                    var productListcode = totallist1.Where(x => x.ProductId.ToString().ToLower().Contains(model.Productid.ToString().ToLower()) && x.BomID.ToString().ToLower().Contains(model.Bomid.ToString().ToLower())).ToList();
+                    if (productListcode.Count() != 0 && model.Bomid != 0)
                     {
-                        parentboms = manager.Post(parentboms);
-                        AlertMessage = "Saved Successfully";
-                    }
-                    else if (parentbomsexists != null && parentboms.BomId != 0)
-                    {
-                        AlertMessage = "Already Existed";
+                        AlertMessage = "Already Existed Product";
                         return Json(AlertMessage, JsonRequestBehavior.AllowGet);
                     }
-
-
                     parentbom_material parentbom_Material = new parentbom_material();
-                    Parentbom_materialManager parentbom_materialManager = new Parentbom_materialManager();
-
                     parentbom_Material.BomID = model.Bomid;
                     parentbom_Material.ProductId = model.Productid;
                     parentbom_Material.UomId = model.Uomid;
@@ -318,26 +299,18 @@ namespace MMS.Web.Controllers.Stock
             {
                 parentbom parentboms = new parentbom();
                 parentbom parentbomsexists = new parentbom();
-
+                Parentbom_materialManager parentbom_materialManager1 = new Parentbom_materialManager();
                 ParentbomManager manager = new ParentbomManager();
                 parentboms.BomNo = model.Bomno;
                 parentboms.Description = model.Description;
-                parentboms.Date = model.Date;
-                parentboms.LastBom = model.Lastbom;
                 string AlertMessage = "";
-                parentbomsexists = manager.GetBomNO(model.Bomno);
-                if (parentbomsexists != null && parentboms.BomId != 0)
+                var totallist1 = parentbom_materialManager1.Get();
+                var productListcode = totallist1.Where(x => x.ProductId.ToString().ToLower().Contains(model.Productid.ToString().ToLower()) && x.BomID.ToString().ToLower().Contains(model.Bomid.ToString().ToLower())).ToList();
+                if (productListcode.Count() != 0 && model.Bomid != 0)
                 {
-                    parentboms = manager.Post(parentboms);
-                    AlertMessage = "Saved Successfully";
-                }
-                else if (parentbomsexists != null && parentboms.BomId != 0)
-                {
-                    AlertMessage = "Already Existed";
+                    AlertMessage = "Already Existed Product";
                     return Json(AlertMessage, JsonRequestBehavior.AllowGet);
                 }
-
-
                 parentbom_material parentbom_Material = new parentbom_material();
                 Parentbom_materialManager parentbom_materialManager = new Parentbom_materialManager();
                 parentbom_Material.BomMaterialId = model.Bommaterialid;
@@ -358,13 +331,7 @@ namespace MMS.Web.Controllers.Stock
             parentbom parentboms = new parentbom();
             Parentbom_materialManager parentbom_MaterialManager = new Parentbom_materialManager();
             ParentBillofMaterial model = new ParentBillofMaterial();
-            ProductManager productManager = new ProductManager();
-            MaterialCategoryManager materialCategoryManager = new MaterialCategoryManager();
-            MaterialNameManager materialNameManager = new MaterialNameManager();
-            MaterialGroupManager materialGroupManager = new MaterialGroupManager();
             subassemblyManager subassemblyManager = new subassemblyManager();
-            UOMManager uomManager = new UOMManager();
-
             parentboms = manager.Getbomid(BOMID);
             var datas = parentbom_MaterialManager.GetBomList(BOMID);
             var sunassembly = subassemblyManager.GetBomList(BOMID);
@@ -381,6 +348,7 @@ namespace MMS.Web.Controllers.Stock
             }
             return View("~/Views/Stock/BillOfMaterial/BillOfMaterialDetails.cshtml", model);
         }
+        [HttpGet]
         public ActionResult EditBOMmaterialDetails(int BOMID, int BOMMaterialID)
         {
             ParentbomManager manager = new ParentbomManager();
@@ -417,6 +385,7 @@ namespace MMS.Web.Controllers.Stock
             }
             return PartialView("~/Views/Stock/BillOfMaterial/BillOfMaterialDetails.cshtml", model);
         }
+        [HttpGet]
         public ActionResult EditSubassemblyDetails(int BOMID, int BOMsubassemblyID)
         {
             ParentbomManager manager = new ParentbomManager();
@@ -447,7 +416,7 @@ namespace MMS.Web.Controllers.Stock
             }
             return PartialView("~/Views/Stock/BillOfMaterial/BillOfMaterialDetails.cshtml", model);
         }
-        [HttpDelete]
+        [HttpPost]
         public ActionResult BOMGridDelete(int BomId)
         {
             ParentbomManager ParentbomManager = new ParentbomManager();
@@ -461,7 +430,7 @@ namespace MMS.Web.Controllers.Stock
             }
             return Json(status, JsonRequestBehavior.AllowGet);
         }
-        [HttpDelete]
+        [HttpPost]
         public ActionResult BOMMaterialDelete(int BOMMaterialID)
         {
             Parentbom_materialManager ParentbomManager = new Parentbom_materialManager();
@@ -475,7 +444,7 @@ namespace MMS.Web.Controllers.Stock
             }
             return Json(status, JsonRequestBehavior.AllowGet);
         }
-        [HttpDelete]
+        [HttpPost]
         public ActionResult BOMsubassemblyDelete(int BOMsubassemblyid)
         {
             subassemblyManager subassemblyManager = new subassemblyManager();

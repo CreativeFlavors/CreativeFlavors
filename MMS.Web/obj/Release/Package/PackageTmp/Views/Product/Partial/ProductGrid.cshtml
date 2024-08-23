@@ -20,7 +20,16 @@
             border: 1px solid grey;
             width: 80%;
         }
-
+        .sub_merchant_head, .manage_customers_head {
+            margin-bottom: 0px;
+        }
+        .customer_manage_search_container {
+            margin-top: -6px;
+            margin-left: 10px;
+            cursor: pointer;
+            position: relative;
+            width: 360px;
+        }
         .buttonone {
             float: right;
             width: 20%;
@@ -39,26 +48,42 @@
             background-color: #4472C4;
             border-color: #0d6efd;
         }
+
+        #Addproducts {
+            border-radius: 5px;
+            background: linear-gradient(to top, #625386 0%, #bc74a8 100%);
+            border: none;
+            height: 40px;
+            margin-block: 18px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #Addproducts {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+
+            #Addproducts:hover {
+                background: linear-gradient(to top, #7a5bbc 0%, #92447c 100%);
+            }
     </style>
 
 </head>
 <body>
     <div class="main-page">
-
-
-        <!-- page-contents here -->
-
         <div class="manage_customers">
             <div class="d-flex justify-content-between align-items-center manage_customers_head">
                 <div class="manage_customers_main_head">
-                    <h6 class="font-20">Manage Products</h6>
+                    <h6 class="font-20">Products</h6>
                 </div>
                 <div>
-                    @*<button type="button" class="manage_customers_btn font-15">
-                            <a href="AddEditSubCustomersPage-1.html">ADD Products</a>
-                        </button>*@
-
-                    <button class="btn btn-success" id="Addproducts" onclick="Addproducts()" title="Add Products">ADD Products</button>
+                    <button class="btn" id="Addproducts" onclick="Addproducts()" title="Add Products">ADD Products</button>
 
                 </div>
             </div>
@@ -66,12 +91,6 @@
                 <div class="customer_manage_search_container">
                     <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Product Name">
                 </div>
-                @*<div id="transaction_reports_search4_container" class="reports_search_container_btn">
-            <button type="button" class="btn btn-primary">
-                <a href="##" id="filter" onclick="Search()">FILTER</a>
-            </button>
-        </div>*@
-
                 <div class="manage_customers_table_in_responsive">
                     <table class="table table-striped text-center">
                         <thead>
@@ -100,8 +119,6 @@
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
                                 </th>
-
-             
                                 <th scope="col">
                                     <span>Tax Code</span>
                                     <span>
@@ -133,11 +150,17 @@
                         {
                             int count = 1;
                             <tbody>
+                                @{
+                                    int currentPage = ViewBag.CurrentPage ?? 1;
+                                    int pageSize = ViewBag.PageSize ?? 8;
+                                    int totalItems = Model.Count();
+                                    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+                                }
                                 @foreach (var item in Model)
                                 {
 
                                     <tr class="font-14">
-                                        <td>@count</td>
+                                        <td>@startSerialNumber</td>
                                         <td style="text-align:left">@item.CategoryName</td>
                                         <td style="text-align:left">@item.ProductCode</td>
                                         <td style="text-align:left">@item.ProductName</td>
@@ -155,12 +178,11 @@
                                         <td class="veh-1 edit-del-wrap">
                                             <a href="javascript:void(0)" onclick="Edit('@item.ProductId')" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
                                             <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.ProductId')" class="watchlist-delete" title="Delete"><img src="~/Content/assets/images/delete-icon.png" /></a>
-                                            @*<td><button class="btn btn-success" id="paynow" onclick="paynow('@item.Id')" title="PayNow">Pay Now</button></td>*@
                                         </td>
 
 
                                     </tr>
-                                    count++;
+                                    startSerialNumber++;
                                 }
 
                             </tbody>
@@ -190,7 +212,7 @@
                                 @for (int i = 1; i <= ViewBag.TotalPages; i++)
                                 {
                                     <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                        <a href="@Url.Action("ProductGrid", "Product", new { page = i })" class="page-link">@i</a>
+                                        <a href="@Url.Action("Productmaster", "Product", new { page = i })" class="page-link">@i</a>
                                     </li>
                                 }
                                 <li class="page-item">
@@ -237,7 +259,7 @@
   $(document).ready(function() {
     $('#manage_customer_show_no').change(function() {
         var pageSize = parseInt($(this).val());
-        window.location.href = "@Url.Action("ProductGrid", "Product")?pageSize=" + pageSize;
+        window.location.href = "@Url.Action("Productmaster", "Product")?pageSize=" + pageSize;
     });
 
     $('#previousPage').click(function(e) {
@@ -245,7 +267,7 @@
         var currentPage = parseInt('@ViewBag.CurrentPage');
         if (currentPage > 1) {
             var previousPage = currentPage - 1;
-            window.location.href = "@Url.Action("ProductGrid", "Product")?page=" + previousPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+            window.location.href = "@Url.Action("Productmaster", "Product")?page=" + previousPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
         }
     });
 
@@ -255,7 +277,7 @@
         var totalPages = parseInt('@ViewBag.TotalPages');
         if (currentPage < totalPages) {
             var nextPage = currentPage + 1;
-            window.location.href = "@Url.Action("ProductGrid", "Product")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+            window.location.href = "@Url.Action("Productmaster", "Product")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
         }
     });
 });
@@ -265,19 +287,16 @@
 
 
     <script>
-        function Addproducts(arg) {
+        function Addproducts() {
             $.ajax({
                 type: 'GET',
                 url: '/Product/Product',
-                data: { Id: arg },
                 success: function (values) {
                     $('#details').html(values);
-
                     var options = {
                         backdrop: 'static',
                         keyboard: false
                     };
-
                     $('#myModal').modal(options);
                     $('#myModal').modal('show');
 
@@ -348,28 +367,28 @@
                             var data = item.BomNo1;
                         }
                         else {
-                            var data="-"
+                            var data = "-"
                         }
                         $("tbody").append(`
-                                    <tr class="font-14">
-                                        <td>${count}</td>
-                                        <td style="text-align:left">${item.CategoryName}</td>
-                                        <td style="text-align:left">${item.ProductCode}</td>
-                                        <td style="text-align:left">${item.ProductName}</td>
-                                        <td style="text-align:right">${item.taxname}</td>
-                                        <td style="text-align:left">${item.uom}</td>
-                                        <td style="text-align:right">${item.Price}</td>
-                                        <td style="text-align:left">${data}</td>
-                                        <td class="veh-1 edit-del-wrap">
-                                            <a href="javascript:void(0)" onclick="Edit('${item.ProductId}')" class="watchlist-edit" title="Edit">
-                                                <img src="/Content/assets/images/edit-icon.png" />
-                                            </a>
-                                            <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('${item.ProductId}')" class="watchlist-delete" title="Delete">
-                                                <img src="/Content/assets/images/delete-icon.png" />
-                                            </a>
-                                        </td>
-                                    </tr>
-                                `);
+                                        <tr class="font-14">
+                                            <td>${count}</td>
+                                            <td style="text-align:left">${item.CategoryName}</td>
+                                            <td style="text-align:left">${item.ProductCode}</td>
+                                            <td style="text-align:left">${item.ProductName}</td>
+                                            <td style="text-align:right">${item.taxname}</td>
+                                            <td style="text-align:left">${item.uom}</td>
+                                            <td style="text-align:right">${item.Price}</td>
+                                            <td style="text-align:left">${data}</td>
+                                            <td class="veh-1 edit-del-wrap">
+                                                <a href="javascript:void(0)" onclick="Edit('${item.ProductId}')" class="watchlist-edit" title="Edit">
+                                                    <img src="/Content/assets/images/edit-icon.png" />
+                                                </a>
+                                                <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('${item.ProductId}')" class="watchlist-delete" title="Delete">
+                                                    <img src="/Content/assets/images/delete-icon.png" />
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    `);
                         count++;
                     });
                 },

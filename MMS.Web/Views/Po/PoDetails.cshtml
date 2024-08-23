@@ -250,7 +250,7 @@
 
             <div class="edit-section">
                 <div class="d-flex justify-content-start">
-                    <h3 class="font-20">PurchaseOrder Information</h3>
+                    <h3 class="font-20">Purchase Order Information</h3>
                     <div id="alert" style="padding: 7px 19px;">
 
                     </div>
@@ -492,6 +492,33 @@
     </script>
     <script>
         $(document).ready(function () {
+            $(document).on('keyup', '.po-qty', function () {
+                var inputField = $(this);
+                var poqty = inputField.val();
+                var filter = /^[0-9]+(\.[0-9]+)?$/;
+                if (poqty === "") {
+                    inputField.css('border', '3px solid red');
+                } else if (filter.test(poqty)) {
+                    inputField.css('border', '#fff');
+                } else {
+                    inputField.css('border', '3px solid red');
+                    alert("Please enter a valid number");
+                }
+            });
+            $(document).on('keyup', '.discount-percentage', function () {
+                var inputField = $(this);
+                var poqty = inputField.val();
+                var filter = /^[0-9]+(\.[0-9]+)?$/;
+                if (poqty === "") {
+                    inputField.css('border', '#fff');
+                } 
+                else if (filter.test(poqty)) {
+                    inputField.css('border', '#fff');
+                } else {
+                    inputField.css('border', '3px solid red');
+                    alert("Please enter a valid number");
+                }
+            });
             $('#IndentNumber').on('change', function () {
                 var indentNumber = $(this).val();
                 $.ajax({
@@ -888,23 +915,29 @@ function updateCalculations() {
         var poQty = parseFloat(row.find('.po-qty').val()) || 0;
         var taxPercentage = parseFloat(row.find('td:eq(6)').text());
         var discountPercentage = parseFloat(row.find('.discount-percentage').val()) || 0;
-        var discountedUnitPrice = unitPrice * (1 - discountPercentage / 100);
-        var discountValue = unitPrice * poQty * (discountPercentage / 100);
-        var subtotal = discountedUnitPrice * poQty;
-        var taxValue = (subtotal * taxPercentage) / 100;
-        var totalValue = subtotal + taxValue;
+        if (discountPercentage >= 100) {
+            $('.discount-percentage').css('border', '3px solid red');
+        }
+        else {
+            $('.discount-percentage').css('border', '#fff');
+            var discountedUnitPrice = unitPrice * (1 - discountPercentage / 100);
+            var discountValue = unitPrice * poQty * (discountPercentage / 100);
+            var subtotal = discountedUnitPrice * poQty;
+            var taxValue = (subtotal * taxPercentage) / 100;
+            var totalValue = subtotal + taxValue;
 
-        row.find('.tax-value').val(taxValue.toFixed(2));
-        row.find('.discount-value').val(discountValue.toFixed(2));
-        row.find('.subtotal').val(subtotal.toFixed(2));
-        row.find('.total-value').val(totalValue.toFixed(2));
+            row.find('.tax-value').val(taxValue.toFixed(2));
+            row.find('.discount-value').val(discountValue.toFixed(2));
+            row.find('.subtotal').val(subtotal.toFixed(2));
+            row.find('.total-value').val(totalValue.toFixed(2));
 
-        totalUnitPrice += unitPrice * poQty;
-        totalDiscountValue += discountValue;
-        totalSubtotal += subtotal;
-        totalTax += taxValue;
-        grandTotal += totalValue;
-        items += poQty;
+            totalUnitPrice += unitPrice * poQty;
+            totalDiscountValue += discountValue;
+            totalSubtotal += subtotal;
+            totalTax += taxValue;
+            grandTotal += totalValue;
+            items += poQty;
+        }
     });
 
     // Update the totals in the summary section outside the grid

@@ -4,6 +4,7 @@ using Microsoft.Ajax.Utilities;
 using MMS.Core.Entities;
 using MMS.Repository.Managers;
 using MMS.Repository.Managers.StockManager;
+using MMS.Repository.Service;
 using MMS.Web.Models;
 using MMS.Web.Models.Addressdetails;
 using MMS.Web.Models.CustomerTransaction;
@@ -31,7 +32,7 @@ namespace MMS.Web.Controllers
         public ActionResult SalesOrderMaster()
         {
             SalesorderManager salesorderManager = new SalesorderManager();
-            var bOMMaterial = salesorderManager.Putstatus();
+            //var bOMMaterial = salesorderManager.Putstatus();
             return View();
         }
         [HttpGet]
@@ -134,19 +135,25 @@ namespace MMS.Web.Controllers
             return PartialView("partial/SalesOrderHeaderGrid", totalList);
         }
         [HttpGet]
-        public ActionResult SalesOrderDetails(int id = 0)
+        public ActionResult SalesOrderDetails()
+        {
+            Salesorders model = new Salesorders();
+            return View("SalesOrderDetails",model);
+        }
+        [HttpGet]
+        public ActionResult updateSalesOrderDetails(int id = 0, int salesid = 0)
         {
             Salesorders model = new Salesorders();
             SalesorderManager salesorderManager = new SalesorderManager();
             CustAddressMangers custAddressMangers = new CustAddressMangers();
             var data = custAddressMangers.GetCustAddressbuyerid(id);
-            if (id == 0)
+            if (id == 0 && salesid == 0)
             {
-                var bOMMaterial = salesorderManager.Putstatus();
+                //var bOMMaterial = salesorderManager.Putstatus();
             }
             else
             {
-                var datas = salesorderManager.GetsalesorderList(id);
+                var datas = salesorderManager.GetsalesorderList(id, salesid);
                 decimal? price = 0;
                 decimal? subtotal = 0;
                 decimal? discount = 0;
@@ -169,9 +176,10 @@ namespace MMS.Web.Controllers
                 model.Total_TaxValue = tax;
                 model.Total_Grandtotal = grandtotal;
                 model.BuyerName = id;
+                model.salesordernumber = salesid;
                 model.salesorderList = datas;
             }
-            return View("SalesOrderDetails", model);
+            return Json(model, JsonRequestBehavior.AllowGet);
         }
         public ActionResult SalesOrderQtycheck(int id)
         {
@@ -214,6 +222,8 @@ namespace MMS.Web.Controllers
 
             return PartialView("partial/SalesOrderQtycheck", salesorders);
         }
+        #endregion
+        #region calculatiom 
         [HttpPost]
         public ActionResult Tempsalesorder(int id, int sodt)
         {
@@ -588,7 +598,7 @@ namespace MMS.Web.Controllers
                 salesorders.discountvalue = disamount;
             }
 
-            var datas = salesorderManager.GetsalesorderList(model.buyerid);
+            var datas = salesorderManager.GetsalesorderList(model.buyerid,model.salesordernumber);
             decimal? price = 0;
             decimal? subtotal1 = 0;
             decimal? discounts = 0;
@@ -623,6 +633,8 @@ namespace MMS.Web.Controllers
             return Json(salesorders, JsonRequestBehavior.AllowGet);
 
         }
+        #endregion
+        #region Crud Operation
         [HttpPost]
         public ActionResult SalesorderDetails(Salesorders model)
         {
@@ -647,7 +659,22 @@ namespace MMS.Web.Controllers
                 conversionval = ConversionValue.conversionvalue;
                 id = ConversionValue.id;
             }
-
+            if (model.salesordernumber == 0)
+            {
+                int? salesno = salesorderManager.GetNextsoNumberFromDatabase();
+                if (salesno == 0 || salesno == null)
+                {
+                    salesorder.salesordernumber = 1;
+                }
+                else
+                {
+                    salesorder.salesordernumber = salesno;
+                }
+            }
+            else
+            {
+                salesorder.salesordernumber = model.salesordernumber;
+            }
             var product = productManager.GetId(model.ProductID);
             var tax = taxTypeManager.GetTaxMasterId(product.TaxMasterId);
             var addreddcode = buyerManager.GetBuyerMasterId(model.buyerid);
@@ -699,9 +726,11 @@ namespace MMS.Web.Controllers
                 salesorder.Grandtotal = totalprice;
                 salesorder.Discountvalue = disamount;
             }
+
             salesorder = salesorderManager.Post(salesorder);
+
             AlertMessage = "Added Successfully";
-            return Json(new { customerid = salesorder.customerid, AlertMessage = AlertMessage }, JsonRequestBehavior.AllowGet);
+            return Json(new { customerid = salesorder.customerid, AlertMessage = AlertMessage,salesorderno= salesorder.salesordernumber }, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
         public ActionResult ConfirmSalesorder(Salesorders model)
@@ -712,7 +741,7 @@ namespace MMS.Web.Controllers
             SalesorderHD_Manager salesorderHD_Manager = new SalesorderHD_Manager();
             SalesorderDT_Manager salesorderDT = new SalesorderDT_Manager();
             CurrencyManager currencyManager = new CurrencyManager();
-            var productlist = salesorderManager.GetsalesorderCartList(model.buyerid);
+            var productlist = salesorderManager.GetsalesorderCartList(model.buyerid,model.salesordernumber);
             var count = productlist.Count;
             if (count <= 0)
             {
@@ -778,8 +807,8 @@ namespace MMS.Web.Controllers
                 return Json(new { AlertMessage = AlertMessage }, JsonRequestBehavior.AllowGet);
             }
         }
-        [HttpDelete]
-        public ActionResult SODelete(int SOId)
+        [HttpPost]
+        public ActionResult SODelete(int SOId,int Buyerid,int Salesordernumber)
         {
             SalesorderManager SalesorderManager = new SalesorderManager();
             string AlertMessage = "";
@@ -790,15 +819,20 @@ namespace MMS.Web.Controllers
                 AlertMessage = "Success";
                 SalesorderManager.Delete(parentbom.SalesorderId);
             }
-            return Json(new { AlertMessage = AlertMessage }, JsonRequestBehavior.AllowGet);
+            var datas = SalesorderManager.GetsalesorderList(Buyerid, Salesordernumber);
+            return Json(new { AlertMessage = AlertMessage, SalesOrderList = datas }, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult searchs(int customerid, int SOid)
+        #endregion
+        #region filter
+
+        public ActionResult searchs(int? customerid, int? SOid)
         {
             SalesorderDT_Manager salesorderManager = new SalesorderDT_Manager();
             List<Salesorders> totaldata = new List<Salesorders>();
             var totallist = salesorderManager.salesorder_Grid();
-
-            var filteredList = totallist.Where(i => i.Buyerid == customerid || i.salesorderid == SOid);
+            var filteredList = (customerid == null || SOid == null)
+                ? salesorderManager.salesorder_Grid()
+                : totallist.Where(i => i.Buyerid == customerid && i.salesorderid == SOid);
 
             foreach (var i in filteredList)
             {
@@ -820,7 +854,7 @@ namespace MMS.Web.Controllers
 
             return Json(totaldata, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult search(int customerid, int SOid)
+        public ActionResult search(int? customerid, int? SOid)
         {
             SalesorderHD_Manager salesorderManager = new SalesorderHD_Manager();
             SalesorderDT_Manager salesorderDT_manager = new SalesorderDT_Manager();
@@ -862,15 +896,18 @@ namespace MMS.Web.Controllers
                 model.BuyerMaster = data1.Where(W => W.BuyerMasterId == i.customerid).ToList().FirstOrDefault();
                 totalList.Add(model);
             }
-            var filteredList = totalList.Where(J => J.buyerid == customerid || J.SalesorderId == SOid);
+            var filteredList = (customerid == null || SOid == null)
+              ? totalList
+              : totalList.Where(J => J.buyerid == customerid && J.SalesorderId == SOid);
             return Json(filteredList, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult Alreadychoosenproduct(int Buyerid, int productName)
+        [HttpGet]
+        public ActionResult Alreadychoosenproduct(int Buyerid, int productName,int Salesorder)
         {
             SalesorderManager salesorderManager = new SalesorderManager();
             var data = salesorderManager.Get();
 
-            var filter = data.Where(m => m.customerid == Buyerid && m.ProductNameid == productName && m.Status == 1 && m.isdeleted == true).ToList();
+            var filter = data.Where(m => m.customerid == Buyerid && m.ProductNameid == productName && m.Status == 1 && m.isdeleted == true && m.salesordernumber == Salesorder).ToList();
             if (filter.Count == 0)
             {
                 return View();
@@ -883,8 +920,6 @@ namespace MMS.Web.Controllers
 
         }
 
-        #endregion
-        #region filter
         public ActionResult Getcustomeraddress(int id)
         {
             CustAddressMangers custAddressMangers = new CustAddressMangers();

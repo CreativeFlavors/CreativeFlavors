@@ -54,7 +54,14 @@ namespace MMS.Web.Controllers
             {
                 model.PoDate = DateTime.Today;
                 int pono = poManager.GetNextPONumberFromDatabase();
-                model.PoNumber = pono;
+                if (pono == 0 )
+                {
+                    model.PoNumber = 1;
+                }
+                else
+                {
+                    model.PoNumber = pono;
+                }
             }
 
             return View(model);

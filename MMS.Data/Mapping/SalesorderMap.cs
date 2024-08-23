@@ -44,6 +44,7 @@ namespace MMS.Data.Mapping
             Property(t => t.Updatedby).HasColumnName("updatedby");
             Property(t => t.isdeleted).HasColumnName("isdeleted");
             Property(t => t.Deletedby).HasColumnName("deletedby");
+            Property(t => t.salesordernumber).HasColumnName("salesordernumber");
             Property(t => t.Deleteddate).HasColumnName("deleteddate");
             ToTable("salesordercart");
         }

@@ -28,7 +28,7 @@ namespace MMS.Core.Entities
         public int GrnRefNumber { get; set; }
 
         [Column("grndate")]
-        public string GrnDate { get; set; }
+        public DateTime GrnDate { get; set; }
 
         [Column("grnduedate")]
         public DateTime? GrnDueDate { get; set; }

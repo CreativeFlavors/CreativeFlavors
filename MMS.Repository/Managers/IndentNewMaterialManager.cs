@@ -201,10 +201,9 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                IndentCart model = indentcartRepository.GetById(indentcartid);
-                //model.IsActive = false;
-
-                indentcartRepository.Delete(model);
+                Indentdetail model = indentdetailRepository.GetById(indentcartid);
+                model.IsActive = false;
+                indentdetailRepository.Update(model);
                 result = true;
             }
             catch (Exception ex)
@@ -215,14 +214,14 @@ namespace MMS.Repository.Managers
 
             return result;
         }
-        public IndentCart Getindentcartid(int? indentcartid)
+        public Indentdetail Getindentcartid(int? indentcartid)
         {
-            IndentCart Indentcartlist = new IndentCart();
+            Indentdetail Indentcartlist = new Indentdetail();
             if (indentcartid != 0)
             {
                 try
                 {
-                    Indentcartlist = indentcartRepository.Table.Where(x => x.IndentCartId == indentcartid).FirstOrDefault();
+                    Indentcartlist = indentdetailRepository.Table.Where(x => x.IndentDetailId == indentcartid).FirstOrDefault();
                 }
                 catch (Exception ex)
                 {
