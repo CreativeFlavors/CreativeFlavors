@@ -1,6 +1,7 @@
 ﻿using MMS.Core.Entities;
 using MMS.Repository.Managers;
 using MMS.Repository.Managers.StockManager;
+using MMS.Repository.Service;
 using MMS.Web.Models.Addressdetails;
 using MMS.Web.Models.CustomerTransaction;
 using System;
@@ -38,6 +39,8 @@ namespace MMS.Web.Controllers
 
             foreach (var item in Customertransactionlist)
             {
+                decimal? paid = 0;
+
                 Customertransaction customertransaction = new Customertransaction();
                 customertransaction.InvDate = item.invoicedate;
                 customertransaction.InvAmount = item.TotalPrice;
@@ -45,10 +48,16 @@ namespace MMS.Web.Controllers
                 customertransaction.RefItems = item.invoice_items;
                 customertransaction.RefQuantity = item.Quantity;
                 customertransaction.BuyerMaster = data1.Where(W => W.BuyerMasterId == item.CustomerId).ToList().FirstOrDefault();
-                customertransaction.customertransaction = data2.Where(W => W.InvRefNumber == item.invoicehd_id).ToList().FirstOrDefault();
+                List<customertransaction> customertransactions = data2.Where(W => W.InvRefNumber == item.invoicehd_id).ToList();
+                foreach (var i in customertransactions)
+                {
+                    paid += i.InvPaidAmount;
+                }
+                customertransaction.InvPaidAmount = paid;
+                customertransaction.InvBalanceAmount = item.TotalPrice - paid;
                 totalList.Add(customertransaction);
             }
-       
+
 
             var totalCount = totalList.Count();
 
@@ -56,7 +65,7 @@ namespace MMS.Web.Controllers
 
             int startIndex = (page - 1) * pageSize;
             int endIndex = Math.Min(startIndex + pageSize - 1, totalCount - 1);
-            totalList = totalList.OrderByDescending(ct => ct.Invoicedt_Id)
+            totalList = totalList.OrderByDescending(ct => ct.InvHDNumber)
                          .Skip(startIndex)
                          .Take(pageSize)
                          .ToList();
@@ -66,7 +75,7 @@ namespace MMS.Web.Controllers
             ViewBag.PageSize = pageSize;
 
 
-            return PartialView("Partial/CustomerTransactionGrid",totalList);
+            return PartialView("Partial/CustomerTransactionGrid", totalList);
         }
         [HttpGet]
         public ActionResult CustomerTransaction(int id)
@@ -98,11 +107,16 @@ namespace MMS.Web.Controllers
             model.InvDueDate = orderhd.invoicedate;
             model.SoDate = SODT.salesorderdate;
             model.buyerid = orderhd.CustomerId;
-            if (balance != null)
+            decimal? bal = 0;
+            if (balance.Count() != 0)
             {
-                model.InvBalanceAmount = balance.InvBalanceAmount;
-                model.InvPaidAmount = balance.InvPaidAmount;
-                model.Id = balance.Id;
+                foreach (var item in balance)
+                {
+                    bal += item.InvPaidAmount;
+                }
+                model.InvBalanceAmount = orderhd.TotalPrice - bal;
+                model.InvPaidAmount = bal;
+
             }
             else
             {
@@ -116,108 +130,82 @@ namespace MMS.Web.Controllers
         }
         public ActionResult Transactiondata(Customertransaction model)
         {
+            string AlertMessage = "";
             customertransaction customertransaction = new customertransaction();
             CustomertransactionManager customertransactionManager = new CustomertransactionManager();
-            if (model.Id == 0)
+            var balance = customertransactionManager.GetiNId(model.InvHDNumber);
+            decimal? bal = 0;
+            if (balance.Count() != 0)
             {
-
-                if (model.Cash != null)
+                foreach (var item in balance)
                 {
-                    var totalamount = model.InvAmount;
-                    var money = model.Cash;
-                    var balanceamount = totalamount - money;
-                    customertransaction.InvBalanceAmount = balanceamount;
-                    customertransaction.InvPaidAmount = model.Cash;
+                    bal += item.InvPaidAmount;
                 }
-                else if (model.PaymentAmount != null)
-                {
-                    var totalamount = model.InvAmount;
-                    var money = model.PaymentAmount;
-                    var balanceamount = totalamount - money;
-                    customertransaction.InvBalanceAmount = balanceamount;
-                    customertransaction.InvPaidAmount = model.PaymentAmount;
-                }
-                else if (model.PaymentAmount != null)
-                {
-                    var totalamount = model.InvAmount;
-                    var money = model.Debitnotevalue;
-                    var balanceamount = totalamount - money;
-                    customertransaction.InvBalanceAmount = balanceamount;
-                    customertransaction.InvPaidAmount = model.Debitnotevalue;
-                }
-                customertransaction.CustomerId = model.buyerid;
-                customertransaction.PaymentDate = model.PaymentDate;
-                customertransaction.PaymentAmount = model.PaymentAmount;
-                customertransaction.InvRefNumber = model.InvHDNumber;
-                customertransaction.InvDate = model.InvDate;
-                customertransaction.InvDueDate = model.InvDueDate;
-                customertransaction.InvAmount = model.InvAmount;
-                customertransaction.IsCustomerOnHold = model.IsCustomerOnHold;
-                customertransaction.PaymentRefNo = model.PaymentRefNo;
-                customertransaction.Debitnoteref = model.Debitnoteref;
-                customertransaction.Debitnotevalue = model.Debitnotevalue;
-                customertransaction.Debitnotedate = model.Debitnotedate;
-                customertransaction.PaymentId = model.paymentid;
-                customertransaction.Cash = model.Cash;
-                customertransaction.CreatedDate = DateTime.Now;
-                customertransactionManager.Post(customertransaction);
             }
-            else
+            if (bal == model.InvAmount)
             {
-               
-                if (model.Cash != null)
+                AlertMessage = "Done";
+                return Json(AlertMessage, JsonRequestBehavior.AllowGet);
+            }
+
+
+            if (model.Cash != null)
+            {
+                var totalamount = model.InvAmount;
+                var money = model.Cash + bal;
+                var balanceamount = totalamount - money;
+                customertransaction.InvBalanceAmount = balanceamount;
+                customertransaction.InvPaidAmount = model.Cash;
+                if (money > totalamount)
                 {
-                    var totalamount = model.InvBalanceAmount;
-                    var money = model.Cash;
-                    var balanceamount = totalamount - money;
-                    customertransaction.InvBalanceAmount = balanceamount;
-                    customertransaction.InvPaidAmount = model.Cash;
-                }
-                else if (model.PaymentAmount != null && model.PaymentAmount != 0)
-                {
-                    var totalamount = model.InvBalanceAmount;
-                    var money = model.PaymentAmount;
-                    var balanceamount = totalamount - money;
-                    customertransaction.InvBalanceAmount = balanceamount;
-                    customertransaction.InvPaidAmount = model.PaymentAmount;
-                }
-                else if (model.Debitnotevalue != null)
-                {
-                    var totalamount = model.InvBalanceAmount;   
-                    var money = model.Debitnotevalue;
-                    var balanceamount = totalamount - money;
-                    customertransaction.InvBalanceAmount = balanceamount;
-                    customertransaction.InvPaidAmount = model.Debitnotevalue;
-                }
-                var cash = customertransactionManager.GetCTId(model.Id);
-                var balance = cash.InvPaidAmount + customertransaction.InvPaidAmount;
-                var AlertMessage = "";
-                if (cash.InvAmount < balance)
-                {
-                    AlertMessage = "Payless";
+                    AlertMessage = "Incorrect";
                     return Json(AlertMessage, JsonRequestBehavior.AllowGet);
-
                 }
-                customertransaction.Id = model.Id;
-                customertransaction.CustomerId = model.buyerid;
-                customertransaction.PaymentDate = model.PaymentDate;
-                customertransaction.PaymentAmount = model.PaymentAmount;
-                customertransaction.InvRefNumber = model.InvHDNumber;
-                customertransaction.InvDate = model.InvDate;
-                customertransaction.InvDueDate = model.InvDueDate;
-                customertransaction.InvAmount = model.InvAmount;
-                customertransaction.IsCustomerOnHold = model.IsCustomerOnHold;
-                customertransaction.PaymentRefNo = model.PaymentRefNo;
-                customertransaction.Debitnoteref = model.Debitnoteref;
-                customertransaction.Debitnotevalue = model.Debitnotevalue;
-                customertransaction.Debitnotedate = model.Debitnotedate;
-                customertransaction.PaymentId = model.paymentid;
-                customertransaction.Cash = model.Cash;
-                customertransaction.CreatedDate = DateTime.Now;
-                customertransactionManager.Put(customertransaction);
             }
-
-            return Json(1, JsonRequestBehavior.AllowGet);
+            else if (model.PaymentAmount != null)
+            {
+                var totalamount = model.InvAmount;
+                var money = model.PaymentAmount + bal;
+                var balanceamount = totalamount - money;
+                customertransaction.InvBalanceAmount = balanceamount;
+                customertransaction.InvPaidAmount = model.PaymentAmount;
+                if (money > totalamount)
+                {
+                    AlertMessage = "Incorrect";
+                    return Json(AlertMessage, JsonRequestBehavior.AllowGet);
+                }
+            }
+            else if (model.Debitnotevalue != null)
+            {
+                var totalamount = model.InvAmount;
+                var money = model.Debitnotevalue + bal;
+                var balanceamount = totalamount - money;
+                customertransaction.InvBalanceAmount = balanceamount;
+                customertransaction.InvPaidAmount = model.Debitnotevalue;
+                if (money > totalamount)
+                {
+                    AlertMessage = "Incorrect";
+                    return Json(AlertMessage, JsonRequestBehavior.AllowGet);
+                }
+            }
+            customertransaction.CustomerId = model.buyerid;
+            customertransaction.PaymentDate = model.PaymentDate;
+            customertransaction.PaymentAmount = model.PaymentAmount;
+            customertransaction.InvRefNumber = model.InvHDNumber;
+            customertransaction.InvDate = model.InvDate;
+            customertransaction.InvDueDate = model.InvDueDate;
+            customertransaction.InvAmount = model.InvAmount;
+            customertransaction.IsCustomerOnHold = model.IsCustomerOnHold;
+            customertransaction.PaymentRefNo = model.PaymentRefNo;
+            customertransaction.Debitnoteref = model.Debitnoteref;
+            customertransaction.Debitnotevalue = model.Debitnotevalue;
+            customertransaction.Debitnotedate = model.Debitnotedate;
+            customertransaction.PaymentId = model.paymentid;
+            customertransaction.Cash = model.Cash;
+            customertransaction.CreatedDate = DateTime.Now;
+            customertransactionManager.Post(customertransaction);
+            AlertMessage = "success";
+            return Json(AlertMessage, JsonRequestBehavior.AllowGet);
         }
         [HttpGet]
         public ActionResult CustomerTransactionsearch(int Buyerid, int INvRefNumber)
@@ -239,6 +227,7 @@ namespace MMS.Web.Controllers
             {
                 if (item.CustomerId == Buyerid && item.invoicehd_id == INvRefNumber)
                 {
+                    decimal? paid = 0;
                     Customertransaction customertransaction = new Customertransaction();
                     customertransaction.InvDate = item.invoicedate;
                     customertransaction.InvAmount = item.TotalPrice;
@@ -246,14 +235,25 @@ namespace MMS.Web.Controllers
                     customertransaction.RefItems = item.invoice_items;
                     customertransaction.RefQuantity = item.Quantity;
                     customertransaction.BuyerMaster = data1.Where(W => W.BuyerMasterId == item.CustomerId).ToList().FirstOrDefault();
-                    customertransaction.customertransaction = data2.Where(W => W.InvRefNumber == item.invoicehd_id).ToList().FirstOrDefault();
-
+                    List<customertransaction> customertransactions = data2.Where(W => W.InvRefNumber == item.invoicehd_id).ToList();
+                    foreach (var i in customertransactions)
+                    {
+                        paid += i.InvPaidAmount;
+                    }
+                    customertransaction.InvPaidAmount = paid;
+                    customertransaction.InvBalanceAmount = item.TotalPrice - paid;
                     totalList.Add(customertransaction);
                 }
             }
 
 
             return Json(totalList, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult Getbuyerno(int id)
+        {
+            OrderHeaderManager OrderHeaderManager = new OrderHeaderManager();
+            var data = OrderHeaderManager.GettypeId(id);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
     }
 }

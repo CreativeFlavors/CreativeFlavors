@@ -1,0 +1,406 @@
+﻿@model IEnumerable<MMS.Web.Models.Product.Product>
+@using MMS.Core.Entities
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alain Dashboard</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/custom.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./css/variables.css">
+    <style>
+        input[type=text] {
+            padding: 12px;
+            font-size: 17px;
+            border: 1px solid grey;
+            width: 80%;
+        }
+        .sub_merchant_head, .manage_customers_head {
+            margin-bottom: 0px;
+        }
+        .customer_manage_search_container {
+            margin-top: -6px;
+            margin-left: 10px;
+            cursor: pointer;
+            position: relative;
+            width: 360px;
+        }
+        .buttonone {
+            float: right;
+            width: 20%;
+            padding: 12px;
+            background: #2196F3;
+            color: white;
+            font-size: 17px;
+            border: 1px solid grey;
+            border-left: none;
+            cursor: pointer;
+        }
+
+        .page-item.active .page-link {
+            z-index: 3;
+            color: #fff;
+            background-color: #4472C4;
+            border-color: #0d6efd;
+        }
+
+        #Addproducts {
+            border-radius: 5px;
+            background: linear-gradient(to top, #625386 0%, #bc74a8 100%);
+            border: none;
+            height: 40px;
+            margin-block: 18px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #Addproducts {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+
+            #Addproducts:hover {
+                background: linear-gradient(to top, #7a5bbc 0%, #92447c 100%);
+            }
+    </style>
+
+</head>
+<body>
+    <div class="main-page">
+        <div class="manage_customers">
+            <div class="d-flex justify-content-between align-items-center manage_customers_head">
+                <div class="manage_customers_main_head">
+                    <h6 class="font-20">Products</h6>
+                </div>
+                <div>
+                    <button class="btn" id="Addproducts" onclick="Addproducts()" title="Add Products">ADD Products</button>
+
+                </div>
+            </div>
+            <div class="table-responsive manage_customers_table_responsive">
+                <div class="customer_manage_search_container">
+                    <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Product Name">
+                </div>
+                <div class="manage_customers_table_in_responsive">
+                    <table class="table table-striped text-center">
+                        <thead>
+                            <tr class="font-16">
+                                <th scope="col">
+                                    <span>S.No</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Category Name</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Product Code</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Product Name</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Tax Code</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>UOM</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Price</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>BOM</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col"><span>STATUS</span></th>
+                            </tr>
+                        </thead>
+                        @if (Model != null)
+                        {
+                            int count = 1;
+                            <tbody>
+                                @{
+                                    int currentPage = ViewBag.CurrentPage ?? 1;
+                                    int pageSize = ViewBag.PageSize ?? 8;
+                                    int totalItems = Model.Count();
+                                    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+                                }
+                                @foreach (var item in Model)
+                                {
+
+                                    <tr class="font-14">
+                                        <td>@startSerialNumber</td>
+                                        <td style="text-align:left">@item.CategoryName</td>
+                                        <td style="text-align:left">@item.ProductCode</td>
+                                        <td style="text-align:left">@item.ProductName</td>
+                                        <td style="text-align:left">@item.taxname</td>
+                                        <td style="text-align:left">@item.uom</td>
+                                        <td style="text-align:right">@item.Price</td>
+                                        @if (item.BomNo1 != null)
+                                        {
+                                            <td style="text-align:left">@item.BomNo1</td>
+                                        }
+                                        else
+                                        {
+                                            <td>-</td>
+                                        }
+                                        <td class="veh-1 edit-del-wrap">
+                                            <a href="javascript:void(0)" onclick="Edit('@item.ProductId')" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
+                                            <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.ProductId')" class="watchlist-delete" title="Delete"><img src="~/Content/assets/images/delete-icon.png" /></a>
+                                        </td>
+
+
+                                    </tr>
+                                    startSerialNumber++;
+                                }
+
+                            </tbody>
+
+                        }
+                    </table>
+                </div>
+                <div class="row manage_customer_show">
+                    <div class="font-14 manage_customer_show_I col-xl-6">
+                        <span>Showing </span>
+                        <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
+                            <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
+                            <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
+                            <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
+                            <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
+                        </select>
+
+
+                    </div>
+
+                    <div class="col-xl-6 manage_customer_show_II">
+                        <nav class="float-xl-end">
+                            <ul class="pagination font-14">
+                                <li class="page-item">
+                                    <a href="##" id="previousPage" class="page-link">Previous</a>
+                                </li>
+                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                        <a href="@Url.Action("Productmaster", "Product", new { page = i })" class="page-link">@i</a>
+                                    </li>
+                                }
+                                <li class="page-item">
+                                    <a class="page-link" id="nextPage" href="##">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div id='myModal' class='modal'>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div id='details' class="myModalContent"></div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="~/Content/js/custom.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#Products").attr('checked', true);
+
+        });
+    </script>
+
+    <script>
+  $(document).ready(function() {
+    $('#manage_customer_show_no').change(function() {
+        var pageSize = parseInt($(this).val());
+        window.location.href = "@Url.Action("Productmaster", "Product")?pageSize=" + pageSize;
+    });
+
+    $('#previousPage').click(function(e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        if (currentPage > 1) {
+            var previousPage = currentPage - 1;
+            window.location.href = "@Url.Action("Productmaster", "Product")?page=" + previousPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+        }
+    });
+
+    $('#nextPage').click(function(e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        var totalPages = parseInt('@ViewBag.TotalPages');
+        if (currentPage < totalPages) {
+            var nextPage = currentPage + 1;
+            window.location.href = "@Url.Action("Productmaster", "Product")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+        }
+    });
+});
+
+
+    </script>
+
+
+    <script>
+        function Addproducts() {
+            $.ajax({
+                type: 'GET',
+                url: '/Product/Product',
+                success: function (values) {
+                    $('#details').html(values);
+                    var options = {
+                        backdrop: 'static',
+                        keyboard: false
+                    };
+                    $('#myModal').modal(options);
+                    $('#myModal').modal('show');
+
+                }
+            });
+        }
+
+        function Edit(arg) {
+            $.ajax({
+                type: 'GET',
+                url: '/Product/Productupdate',
+                data: { productid: arg },
+                success: function (data) {
+                    $('#details').html(data);
+
+                    var options = {
+                        backdrop: 'static',
+                        keyboard: false
+                    };
+
+                    $('#myModal').modal(options);
+                    $('#myModal').modal('show');
+
+                }
+            });
+        }
+
+        function Delete(arg) {
+            var answer = confirm("Are you sure want to delete?");
+            if (answer) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/Product/ProductDelete',
+                    data: { productid: arg },
+                    success: function (data) {
+                        if (data == "Success") {
+                            alert('Product Deleted Successfully.');
+                            location.reload();
+                            return false;
+                        }
+                        else {
+                            alert('Product deletion failed.');
+                        }
+
+                    },
+                    error: function (ex) {
+                        alert('This product Already Exist in the database.');
+                    }
+                });
+            }
+            else {
+                return false;
+            }
+        }
+
+        $("#customer_manage_search").keyup(function () {
+            var productsearch = $("#customer_manage_search").val();
+            $.ajax({
+                type: "GET",
+                url: '/Product/ProductSearch',
+                data: { filter: productsearch },
+                dataType: 'json',
+                success: function (data) {
+                    $("tbody").empty();
+                    var count = 1;
+                    $.each(data, function (i, item) {
+                        if (item.BomNo1) {
+                            var data = item.BomNo1;
+                        }
+                        else {
+                            var data = "-"
+                        }
+                        $("tbody").append(`
+                                        <tr class="font-14">
+                                            <td>${count}</td>
+                                            <td style="text-align:left">${item.CategoryName}</td>
+                                            <td style="text-align:left">${item.ProductCode}</td>
+                                            <td style="text-align:left">${item.ProductName}</td>
+                                            <td style="text-align:right">${item.taxname}</td>
+                                            <td style="text-align:left">${item.uom}</td>
+                                            <td style="text-align:right">${item.Price}</td>
+                                            <td style="text-align:left">${data}</td>
+                                            <td class="veh-1 edit-del-wrap">
+                                                <a href="javascript:void(0)" onclick="Edit('${item.ProductId}')" class="watchlist-edit" title="Edit">
+                                                    <img src="/Content/assets/images/edit-icon.png" />
+                                                </a>
+                                                <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('${item.ProductId}')" class="watchlist-delete" title="Delete">
+                                                    <img src="/Content/assets/images/delete-icon.png" />
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    `);
+                        count++;
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error occurred:", status, error);
+                }
+            });
+        });
+
+
+
+    </script>
+
+</body>
+</html>

@@ -27,7 +27,7 @@ namespace MMS.Web.Models.Po
         public string CreatedBy { get; set; }
         public string DeletedBy { get; set; }
         public string UpdatedBy { get; set; }
-        public bool WithIndentReference { get; set; }
+        public bool WithIndentReference { get; set; }   
         public int UomId { get; set; }
         public decimal? TaxValue { get; set; }
         public decimal? DiscountPercentage { get; set; }
@@ -53,12 +53,14 @@ namespace MMS.Web.Models.Po
         public DateTime? PayByDate { get; set; }
         public DateTime? FulfillDate { get; set; }
         public string ShipmentDetails { get; set; }
+        public string uomname { get; set; }
         public decimal? Total_Price { get; set; }
 
         public int PodetailId { get; set; }
         public decimal? Weight { get; set; }
 
         public string ProductName {  get; set; }
+        public string Productcode {  get; set; }
         public List<IndentPoMapping> DataList { get; set; }
         public IndentPoMappingsp DataListsp { get; set; }
     

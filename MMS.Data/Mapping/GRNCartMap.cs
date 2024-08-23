@@ -36,6 +36,7 @@ namespace MMS.Data.Mapping
             Property(t => t.IsActive).HasColumnName("isactive");
             Property(t => t.CreatedBy).HasColumnName("createdby");
             Property(t => t.UpdatedBy).HasColumnName("updatedby");
+            Property(t => t.GRNNumber).HasColumnName("grnnumber");
             Property(t => t.CreatedDate).HasColumnName("createddate");
             Property(t => t.UpdatedDate).HasColumnName("updateddate");
             Property(t => t.currencyconid).HasColumnName("currencyconid");

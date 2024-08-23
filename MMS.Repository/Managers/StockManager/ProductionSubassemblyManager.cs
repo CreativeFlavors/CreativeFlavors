@@ -57,7 +57,6 @@ namespace MMS.Repository.Managers.StockManager
                 if (model != null)
                 {
                     model.ProductionId = arg.ProductionId;
-                    model.ProductionDate = arg.ProductionDate;
                     model.ProductCode = arg.ProductCode;
                     model.ProductionCode = arg.ProductionCode;
                     model.ProductionQty = arg.ProductionQty;

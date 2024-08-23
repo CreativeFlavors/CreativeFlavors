@@ -73,7 +73,7 @@ namespace MMS.Web.Controllers
 
             int startIndex = (page - 1) * pageSize;
             int endIndex = Math.Min(startIndex + pageSize - 1, totalCount - 1);
-            totalList = totalList.OrderByDescending(s => s.SalesorderId_DT)
+            totalList = totalList.OrderByDescending(s => s.SalesorderId)
                          .Skip(startIndex)
                          .Take(pageSize)
                          .ToList();
@@ -223,9 +223,9 @@ namespace MMS.Web.Controllers
             var salesorderdt = SalesorderDT_Manager.GetSOIdS(SOId);
             var counts = 0;
 
-            foreach( var i in salesorderdt)
+            foreach (var i in salesorderdt)
             {
-                if(i.quantity == i.dc_qty)
+                if (i.quantity == i.dc_qty)
                 {
                     counts++;
                 }
@@ -301,7 +301,7 @@ namespace MMS.Web.Controllers
             decimal? grandtotal = 0;
 
             foreach (var i in totaldata)
-            {   
+            {
                 subtotals1 += i.Subtotal;
                 discount += i.discountvalue;
                 tax += i.TaxValue;
@@ -354,11 +354,12 @@ namespace MMS.Web.Controllers
             DeliveryChallanHd.TotalSubtotal = Total_Subtotal;
             DeliveryChallanHd.TotalTaxAmount = Total_TaxValue;
             DeliveryChallanHd.TotalDisAmount = Total_discountval;
-            DeliveryChallanHd.GrandTotal =Total_Grandtotal;
+            DeliveryChallanHd.GrandTotal = Total_Grandtotal;
             DeliveryChallanHd.IsActive = true;
             decimal? quantity = 0;
             var count = 0;
-
+            var invoisedcount = salesOrderList.Count();
+            var nowinvoised = 0;
             foreach (var i in salesOrderList)
             {
                 if ((Convert.ToInt32(i.Quantity)) != 0)
@@ -371,7 +372,6 @@ namespace MMS.Web.Controllers
             DeliveryChallanHd.Quantity = quantity;
 
             var headerid = deliveryChallanHD_Manager.POST(DeliveryChallanHd);
-
             DeliveryChallan_dt deliveryChallanDt = new DeliveryChallan_dt();
             var currencyid = currencyManager.GetContainCurrencyid(currencyOption);
             foreach (var i in salesOrderList)
@@ -392,7 +392,7 @@ namespace MMS.Web.Controllers
                 var addreddcode = buyerManager.GetBuyerMasterId(Convert.ToInt32(buyerid));
 
                 deliveryChallanDt.DCid_hd = headerid.DCid_hd;
-                deliveryChallanDt.SalesOrderId_dt =(Convert.ToInt32(i.SalesorderId_DT));
+                deliveryChallanDt.SalesOrderId_dt = (Convert.ToInt32(i.SalesorderId_DT));
                 deliveryChallanDt.ProductId = (Convert.ToInt32(i.ProductID));
                 deliveryChallanDt.ProductCode = product.ProductCode;
                 deliveryChallanDt.CustomerId = (Convert.ToInt32(buyerid));
@@ -412,39 +412,50 @@ namespace MMS.Web.Controllers
                 var qty = (Convert.ToInt32(i.Quantity));
                 var discount = DT.Discountperid;
                 int intVal = int.Parse(taxper);
-
-                if ((qty != null) && (discount != null))
+                if (qty != 0)
                 {
-                    var subtotal = qty * unitprice;
-                    var disamount = subtotal * discount / 100;
-                    var subtotals = subtotal - disamount;
-                    var taxamount1 = subtotals * intVal / 100;
-                    var total = taxamount1 + subtotals;
-                    deliveryChallanDt.SubTotal = subtotals;
-                    deliveryChallanDt.TaxValue = taxamount1;
-                    deliveryChallanDt.TotalPrice = total;
-                    deliveryChallanDt.DiscountValue = disamount;
-                }
-                if ((Convert.ToInt32(i.Quantity)) != 0 && dc_dt != null)
-                {
-                    salesorder_Dt.dc_qty = (Convert.ToInt32(i.Quantity)) + quantitys;
-                    salesorder_Dt.Salesorderid_dt = (Convert.ToInt32(i.SalesorderId_DT));
+                    if ((qty != 0) && (discount != null))
+                    {
+                        var subtotal = qty * unitprice;
+                        var disamount = subtotal * discount / 100;
+                        var subtotals = subtotal - disamount;
+                        var taxamount1 = subtotals * intVal / 100;
+                        var total = taxamount1 + subtotals;
+                        deliveryChallanDt.SubTotal = subtotals;
+                        deliveryChallanDt.TaxValue = taxamount1;
+                        deliveryChallanDt.TotalPrice = total;
+                        deliveryChallanDt.DiscountValue = disamount;
+                    }
+                    if ((Convert.ToInt32(i.Quantity)) != 0 && dc_dt != null)
+                    {
+                        salesorder_Dt.dc_qty = (Convert.ToInt32(i.Quantity)) + quantitys;
+                        salesorder_Dt.Salesorderid_dt = (Convert.ToInt32(i.SalesorderId_DT));
+                        AlertMessage = "Confirm Order";
+                        deliveryChallanDt_Manager.POST(deliveryChallanDt);
+                        salesorderDT_manager.Put(salesorder_Dt);
+                    }
+                    else if ((Convert.ToInt32(i.Quantity)) != 0)
+                    {
+                        salesorder_Dt.dc_qty = (Convert.ToInt32(i.Quantity));
+                        salesorder_Dt.Salesorderid_dt = (Convert.ToInt32(i.SalesorderId_DT));
 
-                    deliveryChallanDt_Manager.POST(deliveryChallanDt);
-                    salesorderDT_manager.Put(salesorder_Dt);
+                        deliveryChallanDt_Manager.POST(deliveryChallanDt);
+                        salesorderDT_manager.Put(salesorder_Dt);
+                        AlertMessage = "Confirm Order";
+                    }
                 }
-                else if ((Convert.ToInt32(i.Quantity)) != 0)
+                else
                 {
-                    salesorder_Dt.dc_qty = (Convert.ToInt32(i.Quantity)) ;
-                    salesorder_Dt.Salesorderid_dt = (Convert.ToInt32(i.SalesorderId_DT));
-
-                    deliveryChallanDt_Manager.POST(deliveryChallanDt);
-                    salesorderDT_manager.Put(salesorder_Dt);
-                    AlertMessage = "Confirm Order";
+                    nowinvoised++;
                 }
+            
             }
-
-            return Json(new { AlertMessage = AlertMessage }, JsonRequestBehavior.AllowGet);
+            if (nowinvoised == invoisedcount)
+            {
+                AlertMessage = "Full Invoised";
+                return Json(AlertMessage, JsonRequestBehavior.AllowGet);
+            }
+            return Json(AlertMessage, JsonRequestBehavior.AllowGet);
         }
 
         #endregion
@@ -491,7 +502,9 @@ namespace MMS.Web.Controllers
                 model.BuyerMaster = data1.Where(W => W.BuyerMasterId == i.customerid).ToList().FirstOrDefault();
                 totalList.Add(model);
             }
-            var filteredList = totalList.Where(J => J.buyerid == customerid || J.SalesorderId == SOid);
+            var filteredList = (customerid == null || SOid == null)
+       ? totalList
+       : totalList.Where(J => J.buyerid == customerid || J.SalesorderId == SOid);
 
             return Json(filteredList, JsonRequestBehavior.AllowGet);
         }

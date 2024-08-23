@@ -12,7 +12,28 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <style>
+        .alert {
+            position: relative;
+            padding: 5px 1rem;
+        }
 
+        .alert-danger {
+            color: #842029;
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+            width: 63%;
+        }
+
+        strong#close {
+            margin-left: 16%;
+            cursor: pointer;
+        }
+
+        #alert {
+            margin-left: 24%;
+        }
+    </style>
 
 </head>
 
@@ -34,38 +55,31 @@
                     <p class="font-16">@Model.SupplierCode</p>
                 </div>
                 <div class="customers-details-inner">
-                    <p class="font-16">Quote Number</p>
-                    <p class="font-16"></p>
-                </div>
-                <div class="customers-details-inner">
-                    <p class="font-16">Quote Date</p>
-                    <p class="font-16"></p>
-                </div>
-                <div class="customers-details-inner">
                     <p class="font-16">po Number</p>
                     <p class="font-16">@Model.PoNo</p>
                 </div>
                 <div class="customers-details-inner">
                     <p class="font-16">po Date</p>
-                    <p class="font-16">@Model.PoDate</p>
+                    <p class="font-16">@Model.PoDate.ToString("dd/MM/yyyy")</p>
                 </div>
                 <div class="customers-details-inner">
                     <p class="font-16">Grn Number</p>
                     <p class="font-16">@Model.GrnRefNumber</p>
                 </div>
-            </div>
-            <div class="customers-details">
                 <div class="customers-details-inner">
                     <p class="font-16">Grn Date</p>
-                    <p class="font-16">@Model.GrnDate</p>
+                    <p class="font-16">@Model.GrnDate.ToString("dd/MM/yyyy")</p>
                 </div>
+            </div>
+            <div class="customers-details">
+
                 <div class="customers-details-inner">
                     <p class="font-16">Grn Quantity</p>
-                    <p class="font-16">@Model.Grnqty</p>
+                    <p class="font-16">@string.Format("{0:0.00}", Model.Grnqty)</p>
                 </div>
                 <div class="customers-details-inner">
                     <p class="font-16">Grn Value</p>
-                    <p class="font-16">@Model.GrnAmount</p>
+                    <p class="font-16">@string.Format("{0:0.00}", Model.GrnAmount)</p>
                 </div>
                 <div class="customers-details-inner">
                     <p class="font-16">GrnPaidAmount</p>
@@ -73,80 +87,106 @@
                 </div>
                 <div class="customers-details-inner">
                     <p class="font-16">BalanceAmount</p>
-                    <p class="font-16">@Model.GrnBalanceAmount</p>
+                    <p class="font-16">@string.Format("{0:0.00}", Model.GrnBalanceAmount)</p>
                 </div>
                 <div class="customers-details-inner">
                     <p class="font-16">Payment Due Date</p>
-                    <p class="font-16">@Model.PaymentDate</p>
+                    <p class="font-16">@Model.PaymentDate.ToString("dd/MM/yyyy")</p>
                 </div>
             </div>
         </div>
 
 
         <div class="edit-section">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">Payment Method</h1>
-            @*<div class="radioSection">
-                    <label for="add"> <input type="radio" name="yes" id="add" checked> Credit Note</label>
-                    <label for="add1"><input type="radio" name="yes" id="add1">Online </label>
-                </div>*@
+            <div class="d-flex">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Payment Method</h1>
+            </div>
+            <div id="alert">
 
+            </div>
             <div class="edit-merchant-inner-section">
                 <div class="input-part">
                     @Html.DropDownListFor(m => m.paymentid, MMS.Web.ExtensionMethod.HtmlHelper.Paymentmethodlist(), new { @class = " sel-dropdown" })
                 </div>
             </div>
             <div class="edit-merchant">
-                <div class="edit-merchant-inner-section">
-                    <div class="input-part" id="one">
-                        @Html.LabelFor(m => m.CreditNoteRef, "Credit Note Number :")
-                        @Html.TextBoxFor(m => m.CreditNoteRef, new { @class = "form-control text-field", placeholder = "Enter Credit Number" })
+                <div class="row">
+                    <div class="edit-merchant-inner-section col-lg-6">
+                        <div class="input-part" id="Three">
+                            @Html.LabelFor(m => m.Cash, "Cash")
+                            @Html.TextBoxFor(m => m.Cash, new { @class = "form-control text-field", placeholder = "Enter Cash", style = "width: 80%; margin-right: 523px;", onKeyUp = "PAYCashfun()" })
+                        </div>
+                        <p id="pcerror" style="color: red;"></p>
                     </div>
                 </div>
-                <div class="edit-merchant-inner-section">
-                    <div class="input-part" id="one1">
-                        @Html.LabelFor(m => m.CreditNoteDate, "Credit Note Date :")
-                        @Html.TextBoxFor(m => m.CreditNoteDate, new { @class = "form-control", type = "date" })
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part" id="one">
+                            @Html.LabelFor(m => m.CreditNoteRefNo, "Credit Note Number :")
+                            @Html.TextBoxFor(m => m.CreditNoteRefNo, new { @class = "form-control text-field", placeholder = "Enter Credit Number", onKeyUp = "creditnotereffun()" })
+                        </div>
+                        <p id="Creditnoteerror" style="color: red;"></p>
                     </div>
-                </div>
-                <div class="edit-merchant-inner-section">
-                    <div class="input-part" id="one2">
-                        @Html.LabelFor(m => m.CreditNoteValue, "Credit Note Value :")
-                        @Html.TextBoxFor(m => m.CreditNoteValue, new { @class = "form-control text-field", placeholder = "Enter Credit Credit" })
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part" id="one1">
+                            @Html.LabelFor(m => m.CreditNoteDate, "Credit Note Date :")
+                            @Html.TextBoxFor(m => m.CreditNoteDate, new { @class = "form-control", type = "date", onchange = "creditnotedatefun()" })
+                        </div>
+                        <p id="Creditdateerror" style="color: red;"></p>
                     </div>
-                </div>
-                <div class="edit-merchant-inner-section">
-                    <div class="input-part" id="two">
-                        @Html.LabelFor(m => m.PaymentAmount, "Payment Amount:")
-                        @Html.TextBoxFor(m => m.PaymentAmount, new { @class = "form-control text-field", placeholder = "Enter Amount" })
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part" id="one2">
+                            @Html.LabelFor(m => m.CreditNoteValue, "Credit Note Value :")
+                            @Html.TextBoxFor(m => m.CreditNoteValue, new { @class = "form-control text-field", placeholder = "Enter Credit Amount", onKeyUp = "creditnotevaluefun()" })
+                        </div>
+                        <p id="Creditvalerror" style="color: red;"></p>
                     </div>
-                </div>
-                <div class="edit-merchant-inner-section">
-                    <div class="input-part" id="two1">
-                        @Html.LabelFor(m => m.PaymentRefNo, "Payment Ref No :")
-                        @Html.TextBoxFor(m => m.PaymentRefNo, new { @class = "form-control text-field", placeholder = "Enter Payment RefNo" })
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part" id="two">
+                            @Html.LabelFor(m => m.PaymentAmount, "Payment Amount:")
+                            @Html.TextBoxFor(m => m.PaymentAmount, new { @class = "form-control text-field", placeholder = "Enter Amount", onKeyUp = "Payablepayfun()" })
+                        </div>
+                        <p id="Payablepayerror" style="color: red;"></p>
                     </div>
-                </div>
-                <div class="edit-merchant-inner-section col-lg-6">
-                    <div class="input-part" id="Three">
-                        @Html.LabelFor(m => m.Cash, "Cash")
-                        @Html.TextBoxFor(m => m.Cash, new { @class = "form-control text-field", placeholder = "Enter Cash", style = "width: 80%; margin-right: 523px;" })
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part" id="two1">
+                            @Html.LabelFor(m => m.PaymentRefNo, "Payment Ref No :")
+                            @Html.TextBoxFor(m => m.PaymentRefNo, new { @class = "form-control text-field", placeholder = "Enter Payment RefNo", onKeyUp = "Payablepayreffun()" })
+                        </div>
+                        <p id="Payablepayreferror" style="color: red;"></p>
                     </div>
+
                 </div>
+
             </div>
         </div>
-        <div class="d-flex justify-content-center">
-            <button class="btn btn-success" id="makepayment" onclick="Save()">Make Payment</button>
+        <div id="payablecash">
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-success" id="makepayment" onclick="Save(); PAYCashfun()">Make Payment</button>
+            </div>
+        </div>
+        <div id="credit">
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-success" id="makepayment" onclick="Save(); Payablecreditfun()">Make Payment</button>
 
+            </div>
+        </div>
+        <div id="Payablepayment">
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-success" id="makepayment" onclick="Save(); Payablepaysfun()">Make Payment</button>
+
+            </div>
         </div>
 
     </div>
 
 
     <script src="~/Content/js/custom.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+    <script src="~/Content/js/Validation.js"></script>
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function () {
@@ -156,6 +196,9 @@
             $("#one1").hide();
             $("#one2").hide();
             $("#Three").hide();
+            $("#payablecash").hide();
+            $("#credit").hide();
+            $("#Payablepayment").hide();
             $(document).on("click", "#paymentid", function () {
                 var data = $("#paymentid").val();
                 if (data == 2) {
@@ -165,6 +208,12 @@
                     $("#two").hide();
                     $("#two1").hide();
                     $("#Three").hide();
+                    $('#pcerror').text("");
+                    $('#Payablepayerror').text("");
+                    $('#Payablepayreferror').text("");
+                    $("#payablecash").hide();
+                    $("#credit").show();
+                    $("#Payablepayment").hide();
                 }
                 else if (data == 1 || data == 4 || data == 5 || data == 6) {
                     $("#two").show();
@@ -172,7 +221,14 @@
                     $("#one").hide();
                     $("#one1").hide();
                     $("#one2").hide();
+                    $('#pcerror').text("");
+                    $('#Creditdateerror').text("");
+                    $('#Creditnoteerror').text("");
+                    $('#Creditvalerror').text("");
                     $("#Three").hide();
+                    $("#payablecash").hide();
+                    $("#credit").hide();
+                    $("#Payablepayment").show();
                 }
                 else if (data == 3) {
                     $("#Three").show();
@@ -180,7 +236,15 @@
                     $("#two1").hide();
                     $("#one").hide();
                     $("#one1").hide();
+                    $('#Creditdateerror').text("");
+                    $('#Creditnoteerror').text("");
+                    $('#Creditvalerror').text("");
+                    $('#Payablepayerror').text("");
+                    $('#Payablepayreferror').text("");
                     $("#one2").hide();
+                    $("#payablecash").show();
+                    $("#credit").hide();
+                    $("#Payablepayment").hide();
                 }
                 else {
                     $("#two").hide();
@@ -188,76 +252,107 @@
                     $("#one").hide();
                     $("#one1").hide();
                     $("#one2").hide();
+                    $("#payablecash").hide();
+                    $("#credit").hide();
+                    $("#Payablepayment").hide();
                     $("#Three").hide();
                 }
             });
         });
 
         function Save() {
-            debugger;
-            if (@Model.GrnBalanceAmount == "0.00") {
-                alert("Full payment done already");
+            var PaymentRefNo = $("#PaymentRefNo").val();
+            var CreditNoteRefNo = $("#CreditNoteRefNo").val();
+            var CreditNoteValue = $("#CreditNoteValue").val();
+            var CreditNoteDate = $("#CreditNoteDate").val();
+            var PaymentAmount = $("#PaymentAmount").val();
+            var Cash = $("#Cash").val();
+            var filter = /^[0-9]+(\.[0-9]+)?$/;
+            if (filter.test(Cash) || (filter.test(PaymentAmount) && PaymentRefNo != "") || (filter.test(CreditNoteValue) && CreditNoteRefNo != "" && CreditNoteDate != "")) {
+                if (@Model.GrnBalanceAmount == "0.00") {
+                    alert("Full payment done already");
+                }
+                else {
+
+                    var Supplier = "@Model.Supplier";
+                    var Supplierid = "@Model.SupplierId";
+                    var PaymentDate = "@Model.PaymentDate";
+                    var paymentid = $("#paymentid").val();
+                    var GrnRefNumber = "@Model.GrnRefNumber";
+                    var GrnDate = "@Model.GrnDate";
+                    var GrnDueDate = "@Model.GrnDueDate";
+                    var GrnAmount = "@Model.GrnAmount";
+                    var GrnPaidAmount = "@Model.GrnPaidAmount";
+                    var GrnBalanceAmount = "@Model.GrnBalanceAmount";
+                    var IsTransactionOnHold = $("#IsTransactionOnHold").val();
+
+                    var Id = "@Model.Id";
+
+                    var formdata = new FormData();
+                    formdata.append("Supplier", Supplier);
+                    formdata.append("Supplierid", Supplierid);
+                    formdata.append("PaymentDate", PaymentDate);
+                    formdata.append("PaymentAmount", PaymentAmount);
+                    formdata.append("GrnRefNumber", GrnRefNumber);
+                    formdata.append("GrnDate", GrnDate);
+                    formdata.append("GrnDueDate", GrnDueDate);
+                    formdata.append("GrnAmount", GrnAmount);
+                    formdata.append("GrnPaidAmount", GrnPaidAmount);
+                    formdata.append("GrnBalanceAmount", GrnBalanceAmount);
+                    formdata.append("IsTransactionOnHold", IsTransactionOnHold);
+                    formdata.append("PaymentRefNo", PaymentRefNo);
+                    formdata.append("CreditNoteRefNo", CreditNoteRefNo);
+                    formdata.append("CreditNoteValue", CreditNoteValue);
+                    formdata.append("CreditNoteDate", CreditNoteDate);
+                    formdata.append("paymentid", paymentid);
+                    formdata.append("Cash", Cash);
+                    formdata.append("Id", Id);
+                    $.ajax({
+                        type: 'POST',
+                        url: '/SupplierTransaction/SupplierTransactionDataInsert',
+                        contentType: false,
+                        processData: false,
+                        dataType: 'html',
+                        data: formdata,
+                        success: function (values) {
+                            var data = JSON.parse(values);
+                            if (data === "success") {
+                                Swal.fire({
+                                    title: 'Success!!',
+                                    text: 'Your Payment has Done Successful!',
+                                    icon: 'success',
+                                    timer: 2000,
+                                    timerProgressBar: true,
+                                    showConfirmButton: false
+                                });
+                                setTimeout(function () {
+                                    location.href = "/SupplierTransaction/SupplierTransactionGrid";
+                                    return false;
+                                }, 1500);
+                            }
+                            else if (data === "Done") {
+                                alert("Full payment done already");
+                            }
+                            else if (data == "Incorrect") {
+                                alert("Give a correct payment");
+                            }
+
+                        }
+
+                    });
+
+                }
             }
             else {
-
-                var Supplier = "@Model.Supplier";
-                var Supplierid = "@Model.SupplierId";
-                var PaymentDate = "@Model.PaymentDate";
-                var PaymentAmount = $("#PaymentAmount").val();
-                var GrnRefNumber = "@Model.GrnRefNumber";
-                var GrnDate = "@Model.GrnDate";
-                var GrnDueDate = "@Model.GrnDueDate";
-                var GrnAmount = "@Model.GrnAmount";
-                var GrnPaidAmount = "@Model.GrnPaidAmount";
-                var GrnBalanceAmount = "@Model.GrnBalanceAmount";
-                var IsTransactionOnHold = $("#IsTransactionOnHold").val();
-                var PaymentRefNo = $("#PaymentRefNo").val();
-                var CreditNoteRef = $("#CreditNoteRef").val();
-                var CreditNoteValue = $("#CreditNoteValue").val();
-                var CreditNoteDate = $("#paymentid").val();
-                var paymentid = $("#paymentid").val();
-                var Cash = $("#Cash").val();
-                var Id = "@Model.Id";
-
-                var formdata = new FormData();
-                formdata.append("Supplier", Supplier);
-                formdata.append("Supplierid", Supplierid);
-                formdata.append("PaymentDate", PaymentDate);
-                formdata.append("PaymentAmount", PaymentAmount);
-                formdata.append("GrnRefNumber", GrnRefNumber);
-                formdata.append("GrnDate", GrnDate);
-                formdata.append("GrnDueDate", GrnDueDate);
-                formdata.append("GrnAmount", GrnAmount);
-                formdata.append("GrnPaidAmount", GrnPaidAmount);
-                formdata.append("GrnBalanceAmount", GrnBalanceAmount);
-                formdata.append("IsTransactionOnHold", IsTransactionOnHold);
-                formdata.append("PaymentRefNo", PaymentRefNo);
-                formdata.append("CreditNoteRef", CreditNoteRef);
-                formdata.append("CreditNoteValue", CreditNoteValue);
-                formdata.append("CreditNoteDate", CreditNoteDate);
-                formdata.append("paymentid", paymentid);
-                formdata.append("Cash", Cash);
-                formdata.append("Id", Id);
-                debugger;
-
-                $.ajax({
-                    type: 'POST',
-                    url: '/SupplierTransaction/SupplierTransactionDataInsert',
-                    contentType: false,
-                    processData: false,
-                    dataType: 'html',
-                    data: formdata,
-                    success: function (data) {
-
-                        alert('Saved Successfully.');
-
-                        location.href = "/SupplierTransaction/SupplierTransactionGrid";
-                        return false;
-
-                    }
-
+                $("#alert").append(
+                    '<div class="alert alert-danger">' +
+                    '<strong>Alert!</strong> Please enter ledger Details ' +
+                    '<strong id="close">x</strong>' +
+                    '</div>'
+                );
+                $(document).on('click', '#close', function () {
+                    $(".alert-danger").hide();
                 });
-
             }
         }
     </script>

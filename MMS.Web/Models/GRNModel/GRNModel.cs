@@ -13,6 +13,7 @@ namespace MMS.Web.Models.GRNModel
     {
         public int GrnCartId { get; set; }
         public int PoHeaderId { get; set; }
+        public int grnnumber { get; set; }
         public int PoDetailId { get; set; }
         public decimal? PoQuantity { get; set; }
         public string ProductCode { get; set; }

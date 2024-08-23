@@ -20,7 +20,7 @@ namespace MMS.Core.Entities
             public string ProductionCode { get; set; }
 
             [Column("productionqty")]
-            public decimal ProductionQty { get; set; }
+            public decimal? ProductionQty { get; set; }
 
             [Column("productionstatus")]
             public int ProductionStatus { get; set; }

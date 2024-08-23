@@ -10,7 +10,7 @@ namespace MMS.Repository.ViewModel
     {
         public int ProductionId { get; set; }
         public string ProductionCode { get; set; }
-        public decimal ProductionQty { get; set; }
+        public decimal? ProductionQty { get; set; }
         public decimal RequiredQty { get; set; }
         public string ProductName { get; set; }
         public string ProductCode { get; set; }

@@ -50,10 +50,7 @@
 
                     <div class="form-floating">
                         <select id="InvHDNumber" class="form-select">
-                            @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.invoisenoListdata())
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
+                            <option value="0">Please Select Invoice No</option>
                         </select>
                         <label for="floatingSelectGrid">Invoice Number</label>
                     </div>
@@ -159,15 +156,15 @@
                                         <td class="veh1-5" style="width: 12%; text-align: right;">@i.InvHDNumber</td>
                                         <td class="veh1-5" style="width: 12%;">@i.InvDate.ToString("dd/MM/yyyy")</td>
                                         <td class="veh1-5" style="width: 12%; text-align: right; ">@string.Format("{0:0.00}",i.InvAmount)</td>
-                                        @if (i.customertransaction == null)
+                                        @if (i.InvPaidAmount == null)
                                         {
                                             <td class="veh1-5" style="width: 12%; text-align: right; ">0</td>
                                             <td class="veh1-5" style="width: 12%; text-align: right; ">@string.Format("{0:0.00}", i.InvAmount)</td>
                                         }
-                                        else if (i.customertransaction != null)
+                                        else if (i.InvPaidAmount != null)
                                         {
-                                    <td class="veh1-5" style="width: 12%; text-align: right; ">@string.Format("{0:0.00}", i.customertransaction.InvPaidAmount)</td>
-                                    <td class="veh1-5" style="width: 12%; text-align: right; ">@string.Format("{0:0.00}", i.customertransaction.InvBalanceAmount)</td>
+                                    <td class="veh1-5" style="width: 12%; text-align: right; ">@string.Format("{0:0.00}", i.InvPaidAmount)</td>
+                                    <td class="veh1-5" style="width: 12%; text-align: right; ">@string.Format("{0:0.00}", i.InvBalanceAmount)</td>
                                         }
                                         @*<td class="veh1-5" style="width: 12%;">@i.RefItems</td>*@
                                     <td class="veh1-5" style="width: 12%; ">@string.Format("{0:0.00}", i.RefQuantity) / @i.RefItems</td>
@@ -175,14 +172,6 @@
                                         <td id="paynow" onclick="booking('@i.InvHDNumber')">
                                             <div><img src="~/Content/assets/images/payment-method.png" id="paynows" /></div>
                                         </td>
-                                        @*<td><button class="btn btn-success" id="paynow" onclick="booking('@i.Id')" title="PayNow">Get Payment</button></td>*@
-                                        @*<td>
-                                                <button class="btn btn-success"
-                                                        onclick="booking('${item.Id}')"
-                                                        title="PayNow">
-                                                    Get Payment
-                                                </button>
-                                            </td>*@
                                     </tr>
                                     count++;
                                 }
@@ -306,31 +295,31 @@
         }
         function Search() {
             var buyerid = $("#buyerid").val();
-            var invRefNumber = $("#InvRefNumber").val();
+            var InvHDNumber = $("#InvHDNumber").val();
             $.ajax({
                 type: 'GET',
                 url: '/CustomerTransaction/CustomerTransactionsearch',
-                data: { Buyerid: buyerid, InvRefNumber: invRefNumber },
+                data: { Buyerid: buyerid, InvRefNumber: InvHDNumber },
                 dataType: 'json',
                 success: function (data) {
                     $("tbody").empty();
                     var count = 1;
                     $.each(data, function (i, item) {
                         const formattedDate = convertToReadableDate(item.InvDate);
-                        const invPaidAmount = item.customertransaction?.InvPaidAmount ?? 0;
-                        const InvAmount = item.customertransaction?.InvBalanceAmount ?? item.InvAmount ?? 0;
+                        const invPaidAmount = item.InvPaidAmount ?? 0;
+                        const InvAmount = item.InvPaidAmount?.InvBalanceAmount ?? item.InvBalanceAmount ?? 0;
                         $("tbody").append(`
                                                       <tr class="font-14">
                                                           <td class="veh1-5">${count}</td>
-                                                          <td class="veh1-5" style="width: 12%;">${item.BuyerMaster.BuyerFullName}</td>
-                                                          <td class="veh1-5" style="width: 12%;">${item.InvRefNumber}</td>
+                                                          <td class="veh1-5" style="width: 12%; text-align: left;">${item.BuyerMaster.BuyerFullName}</td>
+                                                          <td class="veh1-5" style="width: 12%; text-align: right;">${item.InvHDNumber}</td>
                                                           <td class="veh1-5" style="width: 12%;">${formattedDate}</td>
-                                                          <td class="veh1-5" style="width: 12%;">${item.InvAmount}</td>
-                                                          <td class="veh1-5" style="width: 12%;">${invPaidAmount}</td>
-                                                          <td class="veh1-5" style="width: 12%;">${InvAmount}</td>
+                                                          <td class="veh1-5" style="width: 12%; text-align: right;">${item.InvAmount}</td>
+                                                          <td class="veh1-5" style="width: 12%; text-align: right;">${invPaidAmount}</td>
+                                                          <td class="veh1-5" style="width: 12%; text-align: right;">${InvAmount}</td>
                                                           <td class="veh1-5" style="width: 12%;">${item.RefItems} / ${item.RefQuantity}</td>
-                                                          <td id="paynow"  onclick="booking('${item.Id}')">
-                                                          <div><img src="/Content/assets/images/payment-method.png" id="paynows" /></div>
+                                                          <td id="paynow"  onclick="booking('${item.InvHDNumber}')">
+                                                          <div><img src="/Content/assets/images/payment-method.png" id="paynows" "/></div>
                                                            </td>
                                                       </tr>
                                                   `);
@@ -359,7 +348,30 @@
 
     </script>
 
-
+    <script>
+        $(document).ready(function () {
+            $("#buyerid").change(function () {
+                var buyerid = $('#buyerid').val();
+                $.ajax({
+                    url: '/CustomerTransaction/Getbuyerno',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { id: buyerid },
+                    success: function (values) {
+                        $("#InvHDNumber").html("");
+                        $("#InvHDNumber").append(
+                            $('<option></option>').val(0).html("Please Select Invoice No")
+                        );
+                        $.each(values, function (i, order) {
+                            $("#InvHDNumber").append(
+                                $('<option></option>').val(order.invoicehd_id).html(order.invoicehd_id)
+                            );
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 
 </body>
 </html>

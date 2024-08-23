@@ -43,6 +43,15 @@ namespace MMS.Repository.Managers
             }
             return billOfMaterial;
         }
+        public subassembly Getproductid(int proID)
+        {
+            subassembly billOfMaterial = new subassembly();
+            if (proID != null)
+            {
+                billOfMaterial = subassemblyRepository.Table.Where(x => x.ProductId == proID && x.IsDeleted == true).FirstOrDefault();
+            }
+            return billOfMaterial;
+        }
         public bool Put(subassembly arg)
         {
             bool result = false;

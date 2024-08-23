@@ -100,13 +100,18 @@
                         </thead>
                         @if (Model != null)
                         {
-                            int count = 1;
                             <tbody>
+                                @{
+                                    int currentPage = ViewBag.CurrentPage ?? 1;
+                                    int pageSize = ViewBag.PageSize ?? 8;
+                                    int totalItems = Model.Count();
+                                    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+                                }
                                 @foreach (var i in Model)
                                 {
 
                                     <tr class="font-14">
-                                        <td class="veh1-5"style="width: 2%;">@count</td>
+                                        <td class="veh1-5" style="width: 2%;">@startSerialNumber</td>
                                         <td class="veh1-5" style="width: 2%;text-align:left;">@i.Bomno</td>
                                         <td class="veh1-5" style="width: 2%; text-align: left;">@i.Description</td>
                                         <td class="veh1-5" style="width: 2%;">
@@ -121,12 +126,12 @@
                                             </span>
                                         </td>
                                     </tr>
-                                    count++;
+                                    startSerialNumber++;
                                 }
 
                             </tbody>
 
-                        }
+                                    }
                     </table>
                 </div>
                 <div class="row manage_customer_show">
@@ -148,7 +153,7 @@
                                 <li class="page-item">
                                     <a href="##" id="previousPage" class="page-link">Previous</a>
                                 </li>
-                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                @for (int i = 1; i <= ViewBag.TotalPage; i++)
                                 {
                                     <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
                                         <a href="@Url.Action("BOMMaterialListGrid", "BillOfMaterial", new { page = i })" class="page-link">@i</a>
@@ -264,7 +269,7 @@
         }
         function Delete(arg) {
        $.ajax({
-           type: "DELETE",
+           type: "POST",
            url: ' @Url.Action("BOMGridDelete", "BillOfMaterial")',
            data: { BomId: arg },
            success: function (values) {

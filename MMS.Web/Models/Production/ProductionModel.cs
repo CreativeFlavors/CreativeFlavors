@@ -14,9 +14,9 @@ namespace MMS.Web.Models.Production
     public class ProductionModel
     {
         public int ProductionId { get; set; }
-        public DateTime? ProductionDate { get; set; }
+        public DateTime? ProductionDate { get; set; } = DateTime.Today;
         public string ProductionCode { get; set; }
-        public decimal ProductionQty { get; set; }
+        public decimal? ProductionQty { get; set; }
         public int ProductionStatus { get; set; }
         public int ProductionSubassemblyStatus {  get; set; }
         public int ProductId { get; set; }

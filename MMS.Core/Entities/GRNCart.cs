@@ -79,5 +79,7 @@ namespace MMS.Core.Entities
         public string DeletedBy { get; set; }
         [Column("deleteddate")]
         public DateTime? DeletedDate { get; set; }
+        [Column("grnnumber")]
+        public int GRNNumber { get; set; }
     }
 }

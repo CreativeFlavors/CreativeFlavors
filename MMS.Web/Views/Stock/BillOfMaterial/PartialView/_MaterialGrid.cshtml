@@ -197,7 +197,7 @@
     <script>
         function Deletemat(arg) {
             $.ajax({
-                type: "DELETE",
+                type: "POST",
                 url: '/BillOfMaterial/BOMMaterialDelete',
                 data: { BOMMaterialID: arg },
                 success: function (values) {
@@ -222,7 +222,7 @@
             var bomid = "@Model.Bomid";
 
            $.ajax({
-                type: "PUT",
+                type: "GET",
                url: '/BillOfMaterial/EditBOMmaterialDetails',
                data: { BOMMaterialID: arg, BOMID: bomid },
                success: function (data) {
@@ -231,6 +231,7 @@
                    $("#mat").show();
                    $("#productSUB").hide();
                    $("#sub").hide();
+                   $("#subreq").hide();
                    $("#add1").prop("disabled", true);
                 }
             });
@@ -240,7 +241,7 @@
     <script>
         function Deleteass(arg) {
     $.ajax({
-        type: "DELETE",
+        type: "POST",
         url: ' @Url.Action("BOMsubassemblyDelete", "BillOfMaterial")',
         data: { BOMsubassemblyid: arg },
         success: function (values) {
@@ -257,7 +258,7 @@
         function Editass(arg) {
             var bomid ="@Model.Bomid";
            $.ajax({
-                type: "PUT",
+                type: "GET",
                url: '/BillOfMaterial/EditSubassemblyDetails',
                data: { BOMsubassemblyID: arg, BOMID: bomid },
                success: function (data) {
@@ -266,9 +267,11 @@
                    $('#add').prop('checked', false);
                    $('#add1').prop('checked', true);
                    $("#mat").hide();
+                   $("#matreq").hide();
                    $("#uom").hide();
                    $("#product").hide();
                    $("#sub").show();
+                   $("#subreq").show();
                    $("#add").prop("disabled", true);
                 }
             });
@@ -291,22 +294,18 @@
                             $.each(values, function (i, item) {
                                 $("#materialgrid").append(`
                       <tr class="font-14">
-                      <td class="veh1-5">MA</td>
-                      <td class="veh-4" style="width:12%;">
-                        <span class="table_icons">
-                            <img src="/Content/assets/images/edit-icon.png" onclick="Edit('${item.Bommaterialid}')" />
-                         </span>
-                        <span class="table_icons">
-                            <img src="/Content/assets/images/delete-icon.png" onclick="Delete('${item.Bommaterialid}')" />
-                        </span>
-                      </td>
+                      <td class="veh1-5" style="width: 12%;">MA</td>
                       <td class="veh1-5" style="width: 12%;">${item.productname}</td>
                       <td class="veh1-5" style="width: 12%;">${item.Requiredqty}</td>
-                      <td class="veh1-5" style="width: 12%;">${item.MaterialNames}</td>
-                      <td class="veh1-5" style="width: 12%;">${item.materialcategory}</td>
-                       <td class="veh1-5" style="width: 12%;">${item.materialgroup}</td>
                        <td class="veh1-5" style="width: 12%;">${item.UOMName}</td>
-
+                                   <td class="veh-4" style="width:12%;">
+              <span class="table_icons">
+                  <img src="/Content/assets/images/edit-icon.png" onclick="Edit('${item.Bommaterialid}')" />
+               </span>
+              <span class="table_icons">
+                  <img src="/Content/assets/images/delete-icon.png" onclick="Delete('${item.Bommaterialid}')" />
+              </span>
+            </td>
 
                       </tr>
                        `);

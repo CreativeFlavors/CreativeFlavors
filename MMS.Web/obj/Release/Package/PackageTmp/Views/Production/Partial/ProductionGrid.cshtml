@@ -14,7 +14,7 @@
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    @*<link href="~/Content/css1/font-awesome.min.css" rel="stylesheet" />*@
+    <link href="~/Content/css1/font-awesome.min.css" rel="stylesheet" />
     <style>
         input[type=text] {
             padding: 12px;
@@ -84,6 +84,11 @@
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
+                                </th>   <th scope="col">
+                                    <span>Product Code</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
                                 </th>
                                 <th scope="col">
                                     <span>Batch Code</span>
@@ -99,6 +104,12 @@
                                 </th>
                                 <th scope="col">
                                     <span>Required Qty</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <span>Production Status</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
@@ -125,11 +136,13 @@
                                 {
                                     <tr class="font-14">
                                         <td>@startSerialNumber</td>
-                                        <td>@item.ProductName</td>
-                                        <td>@item.ProductionCode</td>
-                                        <td>@item.ProductionQty</td>
-                                        <td>@item.RequiredQty</td>
-                                        <td>@item.ProductionType</td>
+                                        <td style="text-align:left;">@item.ProductName</td>
+                                        <td style="text-align:left;">@item.ProductCode</td>
+                                        <td style="text-align:left;">@item.ProductionCode</td>
+                                        <td style="text-align:right;">@item.ProductionQty</td>
+                                        <td style="text-align:right;">@item.RequiredQty</td>
+                                        <td style="text-align:left;">@item.ProductionStatus</td>
+                                        <td style="background-color: @(item.ProductionType == "Production" ? "#c3e6cb" : "#f5c6cb");width: 6px;">@item.ProductionType</td>
                                         <td class="veh-1 edit-del-wrap">
                                             @if (@item.ProductionType == "Production")
                                             {
@@ -152,10 +165,10 @@
                     <div class="font-14 manage_customer_show_I col-xl-6">
                         <span>Showing </span>
                         <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
-                            <option value="5" @(ViewBag.PageSize == 5 ? "selected" : "")>5</option>
-                            <option value="10" @(ViewBag.PageSize == 10 ? "selected" : "")>10</option>
                             <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
-                            <option value="20" @(ViewBag.PageSize == 20 ? "selected" : "")>20</option>
+                            <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
+                            <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
+                            <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
                         </select>
 
 
@@ -170,7 +183,7 @@
                                 @for (int i = 1; i <= ViewBag.TotalPages; i++)
                                 {
                                     <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                        <a href="@Url.Action("ProductionGrid", "Production", new { page = i })" class="page-link">@i</a>
+                                        <a href="@Url.Action("ProductionMaster", "Production", new { page = i })" class="page-link">@i</a>
                                     </li>
                                 }
                                 <li class="page-item">
@@ -200,10 +213,14 @@
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#Production").attr('checked', true);
+        });
   $(document).ready(function() {
     $('#manage_customer_show_no').change(function() {
         var pageSize = parseInt($(this).val());
-        window.location.href = "@Url.Action("ProductionGrid", "Production")?pageSize=" + pageSize;
+        window.location.href = "@Url.Action("ProductionMaster", "Production")?pageSize=" + pageSize;
     });
 
     $('#previousPage').click(function(e) {
@@ -211,17 +228,17 @@
         var currentPage = parseInt('@ViewBag.CurrentPage');
         if (currentPage > 1) {
             var previousPage = currentPage - 1;
-            window.location.href = "@Url.Action("ProductionGrid", "Production")?page=" + previousPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+            window.location.href = "@Url.Action("ProductionMaster", "Production")?page=" + previousPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
         }
     });
 
-    $('#nextPage').click(function(e) {
+      $('#nextPage').click(function (e) {
         e.preventDefault();
         var currentPage = parseInt('@ViewBag.CurrentPage');
         var totalPages = parseInt('@ViewBag.TotalPages');
         if (currentPage < totalPages) {
             var nextPage = currentPage + 1;
-            window.location.href = "@Url.Action("ProductionGrid", "Production")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+            window.location.href = "@Url.Action("ProductionMaster", "Production")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
         }
     });
 });
@@ -241,9 +258,13 @@
                         $("tbody").append(`
                          <tr class="font-14">
                              <td>${count}</td>
-                             <td>${item.product.ProductName}</td>
-                             <td>${item.ProductionCode}</td>
-                             <td>${item.ProductionQty}</td>
+                             <td style="text-align:left;">${item.ProductName}</td>
+                             <td style="text-align:left;">${item.ProductCode}</td>
+                             <td style="text-align:left;">${item.ProductionCode}</td>
+                             <td style="text-align:right;">${item.ProductionQty}</td>
+                              <td style="text-align:right;">${item.RequiredQty}</td>
+                              <td style="text-align:left;";>${item.ProductionStatus}</td>
+                              <td style="background-color: ${item.ProductionType == "Production" ? "#c3e6cb" : "#f5c6cb"};width: 6px;">${item.ProductionType}</td>
                              <td class="veh-1 edit-del-wrap">
                                  <a href="javascript:void(0)" onclick="Edit('${item.ProductionId}')" class="watchlist-edit" title="Edit">
                                  <img src="/Content/assets/images/edit-icon.png" />

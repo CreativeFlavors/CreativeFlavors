@@ -1,6 +1,7 @@
 ﻿using MMS.Common;
 using MMS.Core.Entities;
 using MMS.Data;
+using MMS.Data.Mapping;
 using MMS.Repository.Service;
 using System;
 using System.Collections.Generic;
@@ -42,7 +43,12 @@ namespace MMS.Repository.Managers
             obj = GRNDetailserrep.Table.ToList<GRNDetails>();
             return obj;
         }
-
+        public List<GRNDetails> GetGRNdtId(int id)
+        {
+            List<GRNDetails> PoHeader = new List<GRNDetails>();
+            PoHeader = GRNDetailserrep.Table.Where(x => x.PoDetailId == id).ToList();
+            return PoHeader;
+            }
         public void Dispose()
         {
             throw new NotImplementedException();

@@ -97,14 +97,14 @@ namespace MMS.Repository.Managers
             }
 
         }
-        public List<GRNCart> GetgrncartHD(int id)
+        public List<GRNCart> GetgrncartHD(int id,int grnno)
         {
             try
             {
                 List<GRNCart> GRNCart = new List<GRNCart>();
                 if (id != null)
                 {
-                    GRNCart = GRNCartrep.Table.Where(x => x.poheaderid == id && x.IsDeleted == true).ToList();
+                    GRNCart = GRNCartrep.Table.Where(x => x.poheaderid == id && x.IsDeleted == true && x.Status ==1 && x.GRNNumber == grnno).ToList();
                 }
                 return GRNCart;
             }
@@ -114,11 +114,11 @@ namespace MMS.Repository.Managers
             }
 
         }
-        public bool Putstatussuccess()
+        public bool Putstatussuccess(int GRNN0)
         {
             bool result = false;
 
-            List<GRNCart> models = GRNCartrep.Table.Where(x => x.Status == 1 && x.IsDeleted == true).ToList();
+            List<GRNCart> models = GRNCartrep.Table.Where(x => x.Status == 1 && x.IsDeleted == true && x.GRNNumber == GRNN0).ToList();
 
             if (models != null && models.Count > 0)
             {
@@ -161,7 +161,7 @@ namespace MMS.Repository.Managers
         public GRNCart Put(GRNCart arg)
         {
             GRNCart GRNCart = new GRNCart();
-            GRNCart model = GRNCartrep.Table.Where(p => p.podetailid == arg.podetailid).FirstOrDefault();
+            GRNCart model = GRNCartrep.Table.Where(p => p.podetailid == arg.podetailid && p.Status == 1 && p.IsDeleted == true).FirstOrDefault();
             if (model != null)
             {
                 model.Quantity = arg.Quantity;
@@ -180,6 +180,7 @@ namespace MMS.Repository.Managers
             }
             return GRNCart;
         }
+
         public GRNCart Delete(int id)
         {
             GRNCart GRNCart = new GRNCart();

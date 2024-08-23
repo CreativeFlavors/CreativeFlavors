@@ -94,13 +94,26 @@ namespace MMS.Repository.Managers
             }
             return salesorder;
         }
-    
-        public List<SalesorderCart> GetsalesorderList(int customerid)
+        public int? GetNextsoNumberFromDatabase()
+        {
+            int? latestNumber = 0; 
+            try
+            {
+                latestNumber = salesorderrep.Table.Max(p => p.salesordernumber);
+                latestNumber++;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return latestNumber;
+        }
+        public List<SalesorderCart> GetsalesorderList(int customerid, int salesid)
         {
             List<SalesorderCart> salesorder = new List<SalesorderCart>();
             try
             {
-                salesorder = salesorderrep.SearchSalesordercart(customerid);
+                salesorder = salesorderrep.SearchSalesordercart(customerid, salesid);
 
             }
             catch (Exception ex)
@@ -109,10 +122,10 @@ namespace MMS.Repository.Managers
             }
             return salesorder;
         }
-        public List<salesordercart> GetsalesorderCartList(int customerid)
+        public List<salesordercart> GetsalesorderCartList(int customerid, int salesordernumber)
         {
             List<salesordercart> salesorder = new List<salesordercart>();
-                 salesorder = salesorderrep.Table.Where(x => x.customerid== customerid && x.Status == 1 && x.isdeleted == true).ToList();
+                 salesorder = salesorderrep.Table.Where(x => x.customerid== customerid && x.Status == 1 && x.isdeleted == true && x.salesordernumber == salesordernumber).ToList();
             return salesorder;
         }
         public bool Putstatus()
@@ -196,6 +209,7 @@ namespace MMS.Repository.Managers
             {
                 salesordercart model = salesorderrep.GetById(id);
                 model.isdeleted = false;
+                model.Status = 0;
                 model.Deletedby = "admin";
                 model.Deleteddate = DateTime.Now;
                 salesorderrep.Update(model);

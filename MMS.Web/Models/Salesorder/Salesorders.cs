@@ -17,8 +17,10 @@ namespace MMS.Web.Models
     public class Salesorders 
     {
         public int SalesorderId { get; set; }
+        public int salesordernumber { get; set; }
         public int itemdc { get; set; }
         public int itemInvoiced { get; set; }
+        public int salesorderno { get; set; }
         public int SalesorderId_DT { get; set; }
         public int SalesorderId_HD { get; set; }
         public int BuyerName { get; set; }

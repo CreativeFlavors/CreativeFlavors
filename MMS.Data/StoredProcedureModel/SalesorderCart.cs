@@ -12,6 +12,7 @@ namespace MMS.Data.StoredProcedureModel
     {
         [Column("salesorderid")]
         public int salesorderid { get; set; }
+ 
         [Column("buyerfullname")]
         public string buyerfullname { get; set; }
         [Column("productname")]

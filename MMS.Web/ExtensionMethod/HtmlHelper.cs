@@ -1789,8 +1789,8 @@ namespace MMS.Web.ExtensionMethod
             List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.PoheaderId).Select(
                                                   item => new System.Web.Mvc.SelectListItem()
                                                   {
-                                                      Text = item.PoheaderId.ToString(),
-                                                      Value = item.PoheaderId.ToString()
+                                                      Text = item.PoNumber.ToString(),
+                                                      Value = item.PoNumber.ToString()
                                                   }).ToList();
             var ShotName = new System.Web.Mvc.SelectListItem()
             {
@@ -1891,8 +1891,8 @@ namespace MMS.Web.ExtensionMethod
             List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.IndentHeaderId).Select(
                                                   item => new System.Web.Mvc.SelectListItem()
                                                   {
-                                                      Text = item.IndentHeaderId.ToString(),
-                                                      Value = item.IndentHeaderId.ToString()
+                                                      Text = item.IndentNo.ToString(),
+                                                      Value = item.IndentNo.ToString()
                                                   }).ToList();
             var ShotName = new System.Web.Mvc.SelectListItem()
             {

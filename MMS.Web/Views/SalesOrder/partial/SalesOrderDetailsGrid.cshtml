@@ -47,7 +47,7 @@
 
             <div class="table-responsive reports_table_responsive">
                 <ol class="breadcrumb font-20 d-flex justify-content-center">
-                    <li class="breadcrumb-item " aria-current="page" style="font-size: 112%;">SalesOrder Product Details</li>
+                    <li class="breadcrumb-item " aria-current="page" style="font-size: 112%;">Sales Order Product Details</li>
                 </ol>
                 <div class="d-flex justify-content-evenly mt-4">
                     <div class="form-floating">
@@ -62,10 +62,7 @@
 
                     <div class="form-floating">
                         <select id="salesorderno" class="form-select">
-                            @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.salesorderno())
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
+                                <option value="">Please select SO</option>
                         </select>
                         <label for="floatingSelectGrid">SO Number</label>
                     </div>
@@ -168,13 +165,18 @@
                         </thead>
                         @if (Model != null && Model.Count() > 0)
                         {
-                            int count = 1;
                             <tbody>
+                                @{
+                                    int currentPage = ViewBag.CurrentPage ?? 1;
+                                    int pageSize = ViewBag.PageSize ?? 8;
+                                    int totalItems = Model.Count();
+                                    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+                                }
                                 @foreach (var i in Model)
                                 {
 
                                     <tr class="font-14">
-                                        <td class="veh1-5">@count</td>
+                                        <td class="veh1-5">@startSerialNumber</td>
                                         <td class="veh1-5" style="width: 3%; text-align:center;">@i.SalesorderId</td>
                                         <td class="veh1-5" style="width: 2%; text-align:center;">@i.salesorderdate.ToString("dd/MM/yyyy")</td>
                                         <td class="veh1-5" style="width: 12%; text-align:left;">@i.BuyerNames</td>
@@ -195,7 +197,7 @@
                                         <td class="veh1-5" style="width: 12%;" onclick="Check('@i.SalesorderId_DT')"> <button class="btn btn-secondary" id="Check">Check</button></td>
 
                                     </tr>
-                                    count++;
+                                    startSerialNumber++;
                                 }
 
                             </tbody>
@@ -344,7 +346,7 @@
                 success: function (values) {
                     $("#salesorderno").html("");
                     $("#salesorderno").append(
-                        $('<option></option>').val(0).html("Please Select")
+                        $('<option></option>').val(0).html("Please Select SO")
                     );
                     $.each(values, function (i, order) {
                         $("#salesorderno").append(
@@ -365,12 +367,11 @@
                 success: function (data) {
                     $("tbody").empty();
                     var count = 1;
-
                     $.each(data, function (i, item) {
                         var date = new Date(item.salesorderdate);
                         const formattedDate = convertToReadableDate(item.salesorderdate);
                         var formattedQuantity = (item.quantity).toFixed(2);
-                        var formattedDiscountValue = (item.discountvalue).toFixed(2);
+                        var formattedDiscountValue = (item.discountvalue);
                         var formattedSubtotal = (item.Subtotal).toFixed(2);
                         var formattedTaxValue = (item.TaxValue).toFixed(2);
                         var formattedGrandtotal = (item.Grandtotal).toFixed(2);

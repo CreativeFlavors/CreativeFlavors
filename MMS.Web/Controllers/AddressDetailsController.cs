@@ -30,9 +30,8 @@ namespace MMS.Web.Controllers
             return View(model);
         }
         [HttpGet]
-        public ActionResult AddressDetailsGrid(int pageno = 1)
+        public ActionResult AddressDetailsGrid(int page = 1, int pageSize = 15)
         {
-            int pageSize = 8;
             Addressdetails model = new Addressdetails();
             CustAddressMangers custAddressMangers = new CustAddressMangers();
             var Addressdetailslist = custAddressMangers.Get();
@@ -41,7 +40,7 @@ namespace MMS.Web.Controllers
             StatelistManager StatelistManager = new StatelistManager();
             CitylistManager cityListmanager = new CitylistManager();
             BuyerManager BuyerManager = new BuyerManager();
-            var totalList = (from d in Addressdetailslist
+            var totaldata = (from d in Addressdetailslist
                              join d1 in countryListmanager.Get() on d.Country equals d1.Id
                              join s in StatelistManager.Get() on d.State equals s.Id
                              join c in cityListmanager.Get() on d.City equals c.Id
@@ -73,23 +72,21 @@ namespace MMS.Web.Controllers
                                  
                              }).ToList();
 
-            totalList = totalList.OrderByDescending(d => d.AddressId).ToList();
-            var totaldatacount = totalList.Count();
-            var totalpagecount = (int)Math.Ceiling((double)totaldatacount / pageSize);
-            totalList = totalList.Skip((pageno - 1) * pageSize).Take(pageSize).ToList();
+            var totalCount = totaldata.Count();
 
-            ViewBag.startpage = pageno > 1 ? pageno - 1 : 1;
-            ViewBag.endpage = pageno < totalpagecount ? pageno + 1 : totalpagecount;
+            int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
-            if (ViewBag.startpage == 1 && ViewBag.startpage + 2 <= totalpagecount)
-                ViewBag.endpage = ViewBag.startpage + 6;
-            if (ViewBag.endpage == totalpagecount && ViewBag.endpage - 2 >= 1)
-                ViewBag.startpage = ViewBag.endpage - 6;
+            int startIndex = (page - 1) * pageSize;
+            int endIndex = Math.Min(startIndex + pageSize - 1, totalCount - 1);
+            totaldata = totaldata.OrderByDescending(s => s.AddressId)
+                         .Skip(startIndex)
+                         .Take(pageSize)
+                         .ToList();
+            ViewBag.TotalPages = totalPages;
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
 
-            ViewBag.currentpage = pageno;
-            ViewBag.nextpageno = pageno + 1;
-
-            return PartialView("Partial/AddressDetailsGrid", totalList);
+            return PartialView("Partial/AddressDetailsGrid", totaldata);
         }
         public ActionResult AddressDetails()
         {

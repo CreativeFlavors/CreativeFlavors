@@ -42,7 +42,7 @@ namespace MMS.Web.Controllers
 
             int startIndex = (page - 1) * pageSize;
             int endIndex = Math.Min(startIndex + pageSize - 1, totalCount - 1);
-            totaldata = totaldata.OrderByDescending(d => d.ProductName)
+            totaldata = totaldata.OrderByDescending(d => d.SupplierId)
                          .Skip(startIndex)
                          .Take(pageSize)
                          .ToList();

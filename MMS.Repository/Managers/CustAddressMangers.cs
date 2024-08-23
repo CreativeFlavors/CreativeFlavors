@@ -158,7 +158,7 @@ namespace MMS.Repository.Managers
             CustAddress oCustAddress = new CustAddress();
             if (buyerid != 0)
             {
-                oCustAddress = CustAddressRepository.Table.Where(x => x.BuyerId == buyerid).SingleOrDefault();
+                oCustAddress = CustAddressRepository.Table.Where(x => x.BuyerId == buyerid && x.Active == true).SingleOrDefault();
             }
             return oCustAddress;
         }

@@ -56,14 +56,6 @@
                     <p class="font-16">@Model.buyercode</p>
                 </div>
                 <div class="customers-details-inner">
-                    <p class="font-16">Quote Number</p>
-                    <p class="font-16"></p>
-                </div>
-                <div class="customers-details-inner">
-                    <p class="font-16">Quote Date</p>
-                    <p class="font-16"></p>
-                </div>
-                <div class="customers-details-inner">
                     <p class="font-16">So Number</p>
                     <p class="font-16">@Model.Sonumber</p>
                 </div>
@@ -75,12 +67,13 @@
                     <p class="font-16">Invoice Number</p>
                     <p class="font-16">@Model.InvHDNumber</p>
                 </div>
-            </div>
-            <div class="customers-details">
                 <div class="customers-details-inner">
                     <p class="font-16">Invoice Date</p>
                     <p class="font-16">@Model.InvDate.ToString("dd/MM/yyyy")</p>
                 </div>
+            </div>
+            <div class="customers-details">
+
                 <div class="customers-details-inner">
                     <p class="font-16"> Quantity / Invoice Item </p>
                     <p class="font-16">@string.Format("{0:0.00}", Model.RefQuantity) <b> / </b> @Model.RefItems</p>
@@ -124,49 +117,77 @@
             </div>
 
             <div class="edit-merchant">
-                <div class="edit-merchant-inner-section">
-                    <div class="input-part" id="one">
-                        @Html.LabelFor(m => m.Debitnoteref, "Debit Note Number :")
-                        @Html.TextBoxFor(m => m.Debitnoteref, new { @class = "form-control text-field", placeholder = "Enter Debit Number" })
+                <div class="row">
+                    <div class="edit-merchant-inner-section">
+                        <div class="input-part" id="Three">
+                            @Html.LabelFor(m => m.Cash, "Cash")
+                            @Html.TextBoxFor(m => m.Cash, new { @class = "form-control text-field", placeholder = "Enter Payment RefNo", onKeyUp = "Cashfun()" })
+                        </div>
+                        <p id="cerror" style="color: red;"></p>
                     </div>
                 </div>
-                <div class="edit-merchant-inner-section">
-                    <div class="input-part" id="one1">
-                        @Html.LabelFor(m => m.Debitnotedate, "Debit Note Date :")
-                        @Html.TextBoxFor(m => m.Debitnotedate, new { @class = "form-control", type = "date" })
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part" id="one">
+                            @Html.LabelFor(m => m.Debitnoteref, "Debit Note Number :")
+                            @Html.TextBoxFor(m => m.Debitnoteref, new { @class = "form-control text-field", placeholder = "Enter Debit Number", onKeyUp = "Debitnotereffun()" })
+                        </div>
+                        <p id="debitnoteerror" style="color: red;"></p>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part" id="one1">
+                            @Html.LabelFor(m => m.Debitnotedate, "Debit Note Date :")
+                            @Html.TextBoxFor(m => m.Debitnotedate, new { @class = "form-control", type = "date", onchange = "Debitnotedatefun()" })
+                        </div>
+                        <p id="Debitdateerror" style="color: red;"></p>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part" id="one2">
+                            @Html.LabelFor(m => m.Debitnotevalue, "Debit Note Value :")
+                            @Html.TextBoxFor(m => m.Debitnotevalue, new { @class = "form-control text-field", placeholder = "Enter Debit Value", onKeyUp = "Debitnotevaluefun()" })
+                        </div>
+                        <p id="Debitvalerror" style="color: red;"></p>
                     </div>
                 </div>
-                <div class="edit-merchant-inner-section">
-                    <div class="input-part" id="one2">
-                        @Html.LabelFor(m => m.Debitnotevalue, "Debit Note Value :")
-                        @Html.TextBoxFor(m => m.Debitnotevalue, new { @class = "form-control text-field", placeholder = "Enter Debit Value" })
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part" id="two">
+                            @Html.LabelFor(m => m.PaymentAmount, "Payment Amount:")
+                            @Html.TextBoxFor(m => m.PaymentAmount, new { @class = "form-control text-field", placeholder = "Enter Amount", onKeyUp = "payfun()" })
+                        </div>
+                        <p id="payerror" style="color: red;"></p>
                     </div>
-                </div>
-                <div class="edit-merchant-inner-section">
-                    <div class="input-part" id="two">
-                        @Html.LabelFor(m => m.PaymentAmount, "Payment Amount:")
-                        @Html.TextBoxFor(m => m.PaymentAmount, new { @class = "form-control text-field", placeholder = "Enter Amount" })
-                    </div>
-                </div>
-                <div class="edit-merchant-inner-section">
-                    <div class="input-part" id="two1">
-                        @Html.LabelFor(m => m.PaymentRefNo, "Payment Ref No :")
-                        @Html.TextBoxFor(m => m.PaymentRefNo, new { @class = "form-control text-field", placeholder = "Enter Payment RefNo" })
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part" id="two1">
+                            @Html.LabelFor(m => m.PaymentRefNo, "Payment Ref No :")
+                            @Html.TextBoxFor(m => m.PaymentRefNo, new { @class = "form-control text-field", placeholder = "Enter Payment RefNo", onKeyUp = "payreffun()" })
+                        </div>
+                        <p id="payreferror" style="color: red;"></p>
                     </div>
                 </div>
 
             </div>
-            <div class="edit-merchant-inner-section">
-                <div class="input-part" id="Three">
-                    @Html.LabelFor(m => m.Cash, "Cash")
-                    @Html.TextBoxFor(m => m.Cash, new { @class = "form-control text-field", placeholder = "Enter Payment RefNo" })
-                </div>
-            </div>
-        </div>
-        <div class="d-flex justify-content-center">
-            <button class="btn btn-success" id="makepayment" onclick="Save()">Make Payment</button>
 
         </div>
+        <div id="debit">
+            <div class="d-flex justify-content-center" >
+                <button class="btn btn-success" id="makepayment" onclick="Save(); debitreffun()">Make Payment</button>
+
+            </div>
+        </div>
+        <div id="amountcash">
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-success" id="makepayment" onclick="Save(); Cashfun()">Make Payment</button>
+            </div>
+        </div>
+
+        <div id="payment">
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-success" id="makepayment" onclick="Save(); paysfun()">Make Payment</button>
+
+            </div>
+        </div>
+
 
     </div>
 
@@ -176,7 +197,7 @@
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+    <script src="~/Content/js/Validation.js"></script>
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -187,12 +208,22 @@
             $("#one1").hide();
             $("#one2").hide();
             $("#Three").hide();
+            $("#payment").hide();
+            $("#amountcash").hide();
+            $("#debit").hide();
             $(document).on("click", "#paymentid", function () {
                 var data = $("#paymentid").val();
                 if (data == 2) {
                     $("#one").show();
                     $("#one1").show();
                     $("#one2").show();
+                    $('#cerror').text("");
+                    $('#payerror').text("");
+                    $('#payreferror').text("");
+                    $("#payment").hide();
+                    $("#amountcash").hide();
+                    $("#debit").show();
+                    $("#two").hide();
                     $("#two").hide();
                     $("#two1").hide();
                     $("#Three").hide();
@@ -201,6 +232,13 @@
                     $("#two").show();
                     $("#two1").show();
                     $("#one").hide();
+                    $('#Debitdateerror').text("");
+                    $('#debitnoteerror').text("");
+                    $('#Debitvalerror').text("");
+                    $('#cerror').text("");
+                    $("#payment").show();
+                    $("#amountcash").hide();
+                    $("#debit").hide();
                     $("#one1").hide();
                     $("#one2").hide();
                     $("#Three").hide();
@@ -209,6 +247,14 @@
                     $("#Three").show();
                     $("#two").hide();
                     $("#two1").hide();
+                    $('#Debitdateerror').text("");
+                    $('#debitnoteerror').text("");
+                    $('#Debitvalerror').text("");
+                    $('#payerror').text("");
+                    $('#payreferror').text("");
+                    $("#payment").hide();
+                    $("#amountcash").show();
+                    $("#debit").hide();
                     $("#one").hide();
                     $("#one1").hide();
                     $("#one2").hide();
@@ -217,6 +263,15 @@
                     $("#two").hide();
                     $("#two1").hide();
                     $("#one").hide();
+                    $('#Debitdateerror').text("");
+                    $('#debitnoteerror').text("");
+                    $('#Debitvalerror').text("");
+                    $('#payerror').text("");
+                    $('#payreferror').text("");
+                    $('#cerror').text("");
+                    $("#payment").hide();
+                    $("#amountcash").hide();
+                    $("#debit").hide();
                     $("#one1").hide();
                     $("#one2").hide();
                     $("#Three").hide();
@@ -226,8 +281,12 @@
         function Save() {
             var Cash = $("#Cash").val();
             var PaymentAmount = $("#PaymentAmount").val();
+            var Debitnoteref = $("#Debitnoteref").val();
             var Debitnotevalue = $("#Debitnotevalue").val();
-            if (Cash != "" || PaymentAmount != "" || Debitnotevalue != "") {
+            var Debitnotedate = $("#Debitnotedate").val();
+            var PaymentRefNo = $("#PaymentRefNo").val();
+            var filter = /^[0-9]+(\.[0-9]+)?$/;
+            if (filter.test(Cash) || (filter.test(PaymentAmount) && PaymentRefNo != "") || (filter.test(Debitnotevalue) && Debitnoteref != "" && Debitnotedate != "")) {
 
             if (@Model.InvBalanceAmount == "0.00") {
                 alert("Full payment done already");
@@ -243,10 +302,7 @@ var InvAmount = "@Model.InvAmount";
 var InvPaidAmount = "@Model.InvPaidAmount";
 var InvBalanceAmount = "@Model.InvBalanceAmount";
 var IsCustomerOnHold = $("#IsCustomerOnHold").val();
-var PaymentRefNo = $("#PaymentRefNo").val();
-                var Debitnoteref = $("#Debitnoteref").val();
-                var Debitnotevalue = $("#Debitnotevalue").val();
-                var Debitnotedate = $("#Debitnotedate").val();
+
 var paymentid = $("#paymentid").val();
 var Cash = $("#Cash").val();
 var Id = "@Model.Id";
@@ -278,10 +334,7 @@ $.ajax({
     data: formdata,
     success: function (values) {
         var data = JSON.parse(values);
-        if (data === "Payless") {
-            alert("Provide the accurate ledger amount");
-        }
-        else {
+        if (data === "success") {
             Swal.fire({
                 title: 'Success!!',
                 text: 'Your Payment has Done Successful!',
@@ -295,7 +348,13 @@ $.ajax({
                 return false;
             }, 1500);
         }
-       
+        else if (data === "Done") {
+            alert("Full payment done already");
+        }
+        else if (data == "Incorrect") {
+            alert("Give a correct payment");
+        }
+
     }
 
 });
@@ -304,7 +363,7 @@ $.ajax({
             else {
                 $("#alert").append(
                     '<div class="alert alert-danger">' +
-                    '<strong>Alert!</strong> Please enter ledger amount ' +
+                    '<strong>Alert!</strong> Please enter ledger Details ' +
                     '<strong id="close">x</strong>' +
                     '</div>'
                 );

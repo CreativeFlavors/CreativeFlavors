@@ -30,24 +30,16 @@ namespace MMS.Core.Entities
 
         [Column("price")]
         public decimal? Price { get; set; }
+        [Column("weight")]
+        public decimal? weight { get; set; }
+        [Column("cost")]
+        public decimal? cost { get; set; }
 
         [Column("bomno")]
         public int BomNo { get; set; }
 
-        //[Column("imagename")]
-        //public string ImageName { get; set; }
-
-        //[Column("imagepath")]
-        //public string ImagePath { get; set; }
-
         [Column("isactive")]
         public bool IsActive { get; set; }
-
-        [Column("createddate")]
-        public DateTime? CreatedDate { get; set; }
-
-        [Column("updateddate")]
-        public DateTime? UpdatedDate { get; set; }
 
         [Column("createdby")]
         public string CreatedBy { get; set; }

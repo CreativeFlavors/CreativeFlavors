@@ -98,6 +98,37 @@ namespace MMS.Repository.Managers
 
             return result;
         }
+        public bool update(BatchStock arg)
+        {
+            bool result = false;
+            try
+            {
+                BatchStock model = BatchStockrep.Table.Where(p => p.productid == arg.productid).FirstOrDefault();
+                if (model != null)
+                {
+                    model.Quantity = arg.Quantity;
+                    model.BatchCode = arg.BatchCode;
+                    model.AltBatchCode = arg.AltBatchCode;
+                    model.ExpiryDate = arg.ExpiryDate;
+                    model.UpdatedDate = DateTime.Now;
+                    string username = "admin";
+                    model.UpdatedBy = username;
+                    BatchStockrep.Update(model);
+                    result = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                result = false;
+            }
+
+            return result;
+        }
         public List<FineshedgoodsReport> Fineshedgoods_Report()
         {
             List<FineshedgoodsReport> FineshedgoodsReport = new List<FineshedgoodsReport>();
@@ -127,14 +158,11 @@ namespace MMS.Repository.Managers
             obj = BatchStockrep.Table.ToList<BatchStock>();
             return obj;
         }
-        public BatchStock GetmaterialOpeningMaterialID(int? productid)
+        public List<BatchStock> GetmaterialOpeningMaterialID(int? productid)
         {
-            BatchStock materialOpeningMaster = new BatchStock();
-            if (productid != 0)
-            {
-                materialOpeningMaster = BatchStockrep.Table.Where(x => x.productid == productid ).FirstOrDefault();
-            }
-            return materialOpeningMaster;
+            List<BatchStock> obj = new List<BatchStock>();
+            obj = BatchStockrep.Table.Where(x => x.productid == productid ).ToList();
+            return obj;
         }
 
         public BatchStock GetBatchProductMaterialStock(int productid)
@@ -152,7 +180,7 @@ namespace MMS.Repository.Managers
             List<BatchStock> materialOpeningMaster = new List<BatchStock>();
             if (productid != 0)
             {
-                materialOpeningMaster = BatchStockrep.Table.Where(x => x.productid == productid).ToList();
+                materialOpeningMaster = BatchStockrep.Table.Where(x => x.productid == productid).ToList().OrderByDescending(x => x.CreatedDate).ToList();
             }
             return materialOpeningMaster;
         }

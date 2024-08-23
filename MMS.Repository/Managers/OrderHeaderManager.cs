@@ -25,10 +25,22 @@ namespace MMS.Repository.Managers
         {
             throw new NotImplementedException();
         }
-
-        public orderheader_hd GettypeId(int id)
+        public List<orderheader_hd> GettypeId(int id)
         {
-            throw new NotImplementedException();
+            List<orderheader_hd> orderheader_hd = new List<orderheader_hd>();
+            try
+            {
+                if (id != 0)
+                {
+                    orderheader_hd = OrderHeaderrep.Table.Where(x => x.CustomerId == id).ToList();
+                }
+                return orderheader_hd;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
         }
         public orderheader_hd Get(int id)
         {

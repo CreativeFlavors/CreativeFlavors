@@ -24,10 +24,224 @@
 
 
 
-<script src="~/Content/js/custom.js"></script>
+<script src="~/Content/js/dropdown.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
 <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+<script src="~/Content/js/Validation.js"></script>
 
+<script>
+    $(document).ready(function () {
+        $("#ProductName").change(function () {
+            debugger;
+            var buyerid = $('#ProductName').val();
+            if (buyerid != "") {
+                $(".alert-danger").hide();
+                $.ajax({
+                    url: '/SalesOrder/ProductidDetail',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { id: buyerid },
+                    success: function (Values) {
+                        $("#subtotal").val("");
+                        $("#subtotal1").text("");
+                        $("#TaxValue").val("");
+                        $("#TaxValue1").text("");
+                        $("#Grandtotal").val("");
+                        $("#quantity").val("");
+                        $("#discountperid").val("");
+                        $("#Grandtotal1").text("");
+                        $("#discountvalue").val("");
+                        $("#docdiscountvalue1").text("");
+                        $("#Total_Price").val("");
+                        $("#Total_Subtotal").val("");
+                        $("#Total_discountval").val("");
+                        $("#Total_TaxValue").val("");
+                        $("#Total_Grandtotal").val("");
+                        $("#productname").text(Values.ProductName);
+                        $("#productcode").text(Values.ProductCode);
+                        $("#Price").val(Values.Price);
+                        $("#Price1").text(Values.Price);
+                        $("#uomtype").text(Values.UomMaster.ShortUnitName);
+                        $("#taxper").text(Values.TaxTypeMaster.TaxValue);
+
+                        $("#quantity").keyup(function () {
+                            var quantity = $('#quantity').val();
+                            var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+                            var ProductID = $("#ProductName").val();
+                            var buyerid = $("#BuyerName").val();
+                            var formdata = new FormData();
+                            formdata.append("buyerid", buyerid);
+                            formdata.append("ProductID", ProductID);
+                            formdata.append("quantity", quantity);
+                            formdata.append("currencyOption", currencyOption);
+                            if (quantity != "") {
+                                $.ajax({
+                                    url: '/SalesOrder/Calculationdetails',
+                                    type: 'POST',
+                                    contentType: false,
+                                    processData: false,
+                                    dataType: 'html',
+                                    data: formdata,
+                                    success: function (response) {
+                                        var data = JSON.parse(response);
+                                        $("#subtotal1").text(data.Subtotal);
+                                        $("#TaxValue1").text(data.TaxValue);
+                                        $("#Grandtotal1").text(data.Grandtotal);
+                                        $("#Total_Price").val(data.Total_Price);
+                                        $("#Total_Subtotal").val(data.Total_Subtotal);
+                                        $("#Total_discountval").val(data.Total_discountval);
+                                        $("#Total_TaxValue").val(data.Total_TaxValue);
+                                        $("#Total_Grandtotal").val(data.Total_Grandtotal);
+                                    }
+
+                                });
+                            }
+                            else {
+                                $("#subtotal1").text("");
+                                $("#TaxValue1").text("");
+                                $("#Grandtotal1").text("");
+                                $("#Total_Price").val("");
+                                $("#Total_Subtotal").val("");
+                                $("#Total_discountval").val("");
+                                $("#Total_TaxValue").val("");
+                                $("#Total_Grandtotal").val("");
+                            }
+                        });
+
+                        $("#discountperid").keyup(function () {
+                            var quantity = $('#quantity').val();
+                            var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+                            var ProductID = $("#ProductName").val();
+                            var buyerid = $("#BuyerName").val();
+                            var discountperid = $('#discountperid').val();
+                            var formdata = new FormData();
+                            formdata.append("buyerid", buyerid);
+                            formdata.append("ProductID", ProductID);
+                            formdata.append("discountperid", discountperid);
+                            formdata.append("quantity", quantity);
+                            formdata.append("currencyOption", currencyOption);
+                            var filter = /^[0-9]+$/;
+                            if (discountperid != "") {
+                                if (discountperid != "" && quantity != "" && filter.test(discountperid) && filter.test(quantity)) {
+                                    if (discountperid <= 100) {
+                                        $('#discountperid').css('border', '#fff');
+                                        $.ajax({
+                                            url: '/SalesOrder/Calculationdetails',
+                                            type: 'POST',
+                                            contentType: false,
+                                            processData: false,
+                                            dataType: 'html',
+                                            data: formdata,
+                                            success: function (response) {
+                                                $("#subtotal1").text("");
+                                                $("#TaxValue1").text("");
+                                                $("#Grandtotal1").text("");
+                                                $("#Total_Price").val("");
+                                                $("#Total_Subtotal").val("");
+                                                $("#Total_discountval").val("");
+                                                $("#Total_TaxValue").val("");
+                                                $("#Total_Grandtotal").val("");
+                                                var data = JSON.parse(response);
+                                                $("#subtotal1").text(data.Subtotal);
+                                                $("#TaxValue1").text(data.TaxValue);
+                                                $("#Grandtotal1").text(data.Grandtotal);
+                                                $("#docdiscountvalue1").text(data.discountvalue);
+                                                $("#Total_Price").val(data.Total_Price);
+                                                $("#Total_Subtotal").val(data.Total_Subtotal);
+                                                $("#Total_discountval").val(data.Total_discountval);
+                                                $("#Total_TaxValue").val(data.Total_TaxValue);
+                                                $("#Total_Grandtotal").val(data.Total_Grandtotal);
+                                            }
+
+                                        });
+                                    }
+                                    else {
+                                        $("#subtotal1").text("");
+                                        $("#TaxValue1").text("");
+                                        $("#Grandtotal1").text("");
+                                        $("#Total_Price").val("");
+                                        $("#docdiscountvalue1").text("");
+                                        $("#Total_Subtotal").val("");
+                                        $("#Total_discountval").val("");
+                                        $("#Total_TaxValue").val("");
+                                        $("#Total_Grandtotal").val("");
+                                        $('#discountperid').css("border", "3px solid red");
+                                        alert("Discount must be less than 100");
+                                    }
+                                }
+                                else {
+                                    $('#discountperid').css("border", "3px solid red");
+                                }
+                            }
+                            else {
+                                $('#discountperid').css('border', '#fff');
+
+                            }
+
+
+                        });
+                    }
+                });
+            }
+            else {
+                $("#docdiscountvalue1").text("");
+                $("#discountvalue").val("");
+                $("#productname").text("");
+                $("#productcode").text("");
+                $("#Price1").text("");
+                $("#Price").val("");
+                $("#uomtype").text("");
+                $("#taxper").text("");
+                $("#subtotal1").text("");
+                $("#Subtotal").val("");
+                $("#TaxValue1").text("");
+                $("#TaxValue").val("");
+                $("#Grandtotal").val("");
+                $("#Grandtotal1").text("");
+
+            }
+
+        });
+
+        $("#BuyerName").change(function () {
+            var buyerid = $('#BuyerName').val();
+            $.ajax({
+                url: '/SalesOrder/Getcustomeraddress',
+                type: "GET",
+                dataType: "JSON",
+                data: { id: buyerid },
+                success: function (data) {
+                    $(".alert-danger").hide();
+                    if (data && data.Add1) {
+                        var addressParts = data.Add1.split(",");
+
+                        var addr1 = addressParts[0] ? addressParts[0].trim() : "";
+                        var addr2 = addressParts[1] ? addressParts[1].trim() : "";
+                        var addr3 = addressParts[2] ? addressParts[2].trim() : "";
+                        var addr4 = addressParts[3] ? addressParts[3].trim() : "";
+
+                        $("#libilingadd1").html(addr1);
+                        $("#libilingadd2").html(addr2);
+                        $("#libilingadd3").html(addr3);
+                        $("#libilingadd4").html(addr4);
+
+                        var addressParts1 = data.Add2.split(",");
+
+                        var addr1 = addressParts1[0] ? addressParts1[0].trim() : "";
+                        var addr2 = addressParts1[1] ? addressParts1[1].trim() : "";
+                        var addr3 = addressParts1[2] ? addressParts1[2].trim() : "";
+                        var addr4 = addressParts1[3] ? addressParts1[3].trim() : "";
+
+                        $("#libilingad1").html(addr1);
+                        $("#libilingad2").html(addr2);
+                        $("#libilingad3").html(addr3);
+                        $("#libilingad4").html(addr4);
+                    }
+                },
+            });
+        });
+    });
+</script>

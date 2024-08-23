@@ -95,65 +95,35 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-4 col-md-6 col-sm-12">
+                        @Html.HiddenFor(m => m.salesordernumber)
                         <div class="input-part">
                             <label class="font-14" for="#BuyerName">Buyer Name</label>
-                            @Html.DropDownListFor(m => m.BuyerName, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field " })
+                            @Html.DropDownListFor(m => m.BuyerName, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field ", onchange = "BuyerNamefun()" })
                         </div>
+                        <p id="berror" style="color: red;"></p>
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="#ProductName">List Of Product item</label>
-                            <select id="ProductName" class="sel-dropdown" data-option="hidden">
-                                @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.ProductName())
+                            <select id="ProductName" class="sel-dropdown " data-option="hidden" onchange="ProductNamefun()">
+                                @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.ProductmFINName())
                                 {
                                     <option value="@item.Value">@item.Text</option>
                                 }
                             </select>
                         </div>
+                        <p id="perror" style="color: red;"></p>
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12 d-flex justify-content-center">
                         <div class="checkbox-wrapper-55" style=" margin-top: 6%;">
-                            <label class="rocker rocker-small" >
+                            <label class="rocker rocker-small">
                                 <input type="checkbox" id="currencyToggle">
                                 <span class="switch-left" value="USD">USD</span>
                                 <span class="switch-right" value="ZAR">ZAR</span>
                             </label>
                         </div>
                     </div>
-
-                    @*<div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="input-part">
-                                <label class="font-14" for="#Name">Quote Date Quote Ref No</label>
-                                <input class="font-15" type="text" name="email" id="Name">
-                            </div>
-                        </div>*@
-
-                    @*<div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="input-part">
-                                <label class="font-14" for="#ProductName">List Of Purchase item</label>
-                                <select id="ProductName" class="sel-dropdown" data-option="hidden">
-                                    @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.ProductName())
-                                    {
-                                    <option value="@item.Value">@item.Text</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>*@
                 </div>
-                @*<div class="row">
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="input-part">
-                                <label class="font-14" for="#ProductName">Discount Percentage</label>
-                                <select id="ProductNacme" class="sel-dropdown" data-option="hidden">
-                                    @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.BuyerName())
-                                    {
-                                    <option value="@item.Value">@item.Text</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-
-                    </div>*@
                 <table style="width:100%" class="salesOrder">
                     <thead>
                         <tr>
@@ -176,21 +146,23 @@
                         <tr>
                             <td style="background-color: #e9ecef" id="productname"></td>
                             <td style="background-color: #e9ecef" id="productcode"></td>
-                            <td>@Html.TextBoxFor(m => m.quantity, new { @class = "form-control" })</td>
+                            <td>@Html.TextBoxFor(m => m.quantity, new { @class = "form-control", onKeyUp = "quantityvalidate()" })</td>
                             <td style="background-color: #e9ecef" id="uomtype"></td>
                             <td style="background-color: #e9ecef" id="Price1"></td>
-                            <td>@Html.TextBoxFor(m => m.discountperid, new { @class = "form-control" })</td>
+                            <td>@Html.TextBoxFor(m => m.discountperid, new { @class = "form-control", onKeyUp = "disvalidate()" })</td>
                             <td style="background-color: #e9ecef" id="docdiscountvalue1"></td>
                             <td style="background-color: #e9ecef" id="subtotal1"></td>
                             <td style="background-color: #e9ecef" id="taxper"></td>
                             <td style="background-color: #e9ecef" id="TaxValue1"></td>
                             <td style="background-color: #e9ecef" id="Grandtotal1"></td>
                             <td style="background-color: #e9ecef">
-                                <button class="fill-color font-15" onclick="Save()">Add</button>
+                                <button class="fill-color font-15" onclick="Save(); order()">Add</button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
+                <p id="error2" style="color: red; margin: 0px 40%;"></p>
+                <p id="error1" style="color: red; margin: 1px 301px;"></p>
                 <div>
                     <div>
                         @{Html.RenderPartial("~/Views/SalesOrder/partial/salesorderproducts.cshtml", Model);}
@@ -241,32 +213,55 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-2 col-md-6 col-sm-12" id="billingadd">
-                        <div class="input-part">
-                            <h5 class="light-text">Billing-address</h5>
-                            <ul>
-                                <li id="libilingadd1"></li>
-                                <li id="libilingadd2"></li>
-                                <li id="libilingadd3"></li>
-                                <li id="libilingadd4"></li>
-                            </ul>
+                <div class="row mt-3">
+                    @if (Model.Billingadd == null)
+                    {
+                        <div class="col-lg-2 col-md-6 col-sm-12" id="billingadd">
+                            <div class="input-part">
+                                <h5 class="light-text">Billing-address</h5>
+                                <ul>
+                                    <li id="libilingadd1"></li>
+                                    <li id="libilingadd2"></li>
+                                    <li id="libilingadd3"></li>
+                                    <li id="libilingadd4"></li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-lg-2 col-md-6 col-sm-12" id="billingadd">
-                        <div class="input-part">
-                            <h5 class="light-text">Shipping-Address</h5>
-                            <ul>
-                                <li id="libilingad1"></li>
-                                <li id="libilingad2"></li>
-                                <li id="libilingad3"></li>
-                                <li id="libilingad4"></li>
-                            </ul>
+                        <div class="col-lg-2 col-md-6 col-sm-12" id="billingadd">
+                            <div class="input-part">
+                                <h5 class="light-text">Shipping-Address</h5>
+                                <ul>
+                                    <li id="libilingad1"></li>
+                                    <li id="libilingad2"></li>
+                                    <li id="libilingad3"></li>
+                                    <li id="libilingad4"></li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
+                    }
+                    else
+                    {
+                        <div class="col-lg-2 col-md-6 col-sm-12" id="billingadd">
+                            <div class="input-part">
+                                <h5 class="light-text">Billing-address</h5>
+                                <ul>
+                                    <li id="libilingadd1">@Model.Billingadd</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-6 col-sm-12" id="billingadd">
+                            <div class="input-part">
+                                <h5 class="light-text">Shipping-Address</h5>
+                                <ul>
+                                    <li id="libilingad1">@Model.shippingadd</li>
+                                </ul>
+                            </div>
+                        </div>
+                    }
+
                 </div>
                 <div class="inner-section-button">
-                    <button class="fill-color font-15" onclick="confirmorder()">
+                    <button class="fill-color font-15" onclick="confirmorder(); conforder()">
                         Confirm Order
                     </button>
                     <button class="border-color font-15" onclick="cancel()">
@@ -280,14 +275,13 @@
 
 
     <!-- page-contents end -->
-    <script src="~/Content/js/custom.js"></script>
     <script src="~/Content/js/dropdown.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Content/js/Validation.js"></script>
 
     <script>
         new TomSelect("#ProductName", {
@@ -304,6 +298,7 @@
                 direction: "asc"
             }
         });
+
         $(document).ready(function () {
             $("#currencyToggle").change(function () {
                 var currencyOption = $(this).is(':checked') ? $('.switch-left').attr('value') : $('.switch-right').attr('value');
@@ -311,7 +306,9 @@
                 var ProductID = $("#ProductName").val();
                 var buyerid = $("#BuyerName").val();
                 var discountperid = $('#discountperid').val();
+                var salesordernumber = $("#salesordernumber").val();
                 var formdata = new FormData();
+                formdata.append("salesordernumber", salesordernumber);
                 formdata.append("buyerid", buyerid);
                 formdata.append("ProductID", ProductID);
                 formdata.append("discountperid", discountperid);
@@ -338,7 +335,7 @@
                             $("#subtotal1").text(data.Subtotal);
                             $("#TaxValue1").text(data.TaxValue);
                             $("#Grandtotal1").text(data.Grandtotal);
-                            $("#docdiscountvalue1").text(data.TaxValue);
+                            $("#docdiscountvalue1").text(data.discountvalue);
                             $("#Total_Price").val(data.Total_Price);
                             $("#Total_Subtotal").val(data.Total_Subtotal);
                             $("#Total_discountval").val(data.Total_discountval);
@@ -393,19 +390,22 @@
                         dataType: "JSON",
                         data: { id: buyerid },
                         success: function (Values) {
-                            $("#subtotal").val("");
+                            $("#productcode").text("");
+                            $("#productname").text("");
                             $("#subtotal1").text("");
-                            $("#TaxValue").val("");
+                            $("#taxper").text("");
+                            $("#Price1").text("");
                             $("#TaxValue1").text("");
-                            $("#Grandtotal").val("");
+                            $("#uomtype").text("");
+                            $("#quantity").val("");
+                            $("#discountperid").val("");
                             $("#Grandtotal1").text("");
-                            $("#discountvalue").val("");
                             $("#docdiscountvalue1").text("");
                             $("#productname").text(Values.ProductName);
                             $("#productcode").text(Values.ProductCode);
                             $("#Price").val(Values.Price);
                             $("#Price1").text(Values.Price);
-                            $("#uomtype").text(Values.UomMaster.LongUnitName);
+                            $("#uomtype").text(Values.UomMaster.ShortUnitName);
                             $("#taxper").text(Values.TaxTypeMaster.TaxValue);
 
                             $("#quantity").keyup(function () {
@@ -413,7 +413,9 @@
                                 var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
                                 var ProductID = $("#ProductName").val();
                                 var buyerid = $("#BuyerName").val();
+                                var salesordernumber = $("#salesordernumber").val();
                                 var formdata = new FormData();
+                                formdata.append("salesordernumber", salesordernumber);
                                 formdata.append("buyerid", buyerid);
                                 formdata.append("ProductID", ProductID);
                                 formdata.append("quantity", quantity);
@@ -451,61 +453,79 @@
                                     $("#Total_Grandtotal").val("");
                                 }
                             });
-                
+
                             $("#discountperid").keyup(function () {
                                 var quantity = $('#quantity').val();
                                 var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
                                 var ProductID = $("#ProductName").val();
                                 var buyerid = $("#BuyerName").val();
                                 var discountperid = $('#discountperid').val();
+                                var salesordernumber = $("#salesordernumber").val();
                                 var formdata = new FormData();
+                                formdata.append("salesordernumber", salesordernumber);
                                 formdata.append("buyerid", buyerid);
                                 formdata.append("ProductID", ProductID);
                                 formdata.append("discountperid", discountperid);
                                 formdata.append("quantity", quantity);
                                 formdata.append("currencyOption", currencyOption);
-                                if (discountperid != "" || quantity != "") {
-                                    $.ajax({
-                                        url: '/SalesOrder/Calculationdetails',
-                                        type: 'POST',
-                                        contentType: false,
-                                        processData: false,
-                                        dataType: 'html',
-                                        data: formdata,
-                                        success: function (response) {
+                                var filter = /^[0-9]+$/;
+                                if (discountperid != "") {
+                                    if (discountperid != "" && quantity != "" && filter.test(discountperid) && filter.test(quantity)) {
+                                        if (discountperid <= 100) {
+                                            $('#discountperid').css('border', '#fff');
+                                            $.ajax({
+                                                url: '/SalesOrder/Calculationdetails',
+                                                type: 'POST',
+                                                contentType: false,
+                                                processData: false,
+                                                dataType: 'html',
+                                                data: formdata,
+                                                success: function (response) {
+                                                    $("#subtotal1").text("");
+                                                    $("#TaxValue1").text("");
+                                                    $("#Grandtotal1").text("");
+                                                    $("#Total_Price").val("");
+                                                    $("#Total_Subtotal").val("");
+                                                    $("#Total_discountval").val("");
+                                                    $("#Total_TaxValue").val("");
+                                                    $("#Total_Grandtotal").val("");
+                                                    var data = JSON.parse(response);
+                                                    $("#subtotal1").text(data.Subtotal);
+                                                    $("#TaxValue1").text(data.TaxValue);
+                                                    $("#Grandtotal1").text(data.Grandtotal);
+                                                    $("#docdiscountvalue1").text(data.discountvalue);
+                                                    $("#Total_Price").val(data.Total_Price);
+                                                    $("#Total_Subtotal").val(data.Total_Subtotal);
+                                                    $("#Total_discountval").val(data.Total_discountval);
+                                                    $("#Total_TaxValue").val(data.Total_TaxValue);
+                                                    $("#Total_Grandtotal").val(data.Total_Grandtotal);
+                                                }
+
+                                            });
+                                        }
+                                        else {
                                             $("#subtotal1").text("");
                                             $("#TaxValue1").text("");
                                             $("#Grandtotal1").text("");
                                             $("#Total_Price").val("");
+                                            $("#docdiscountvalue1").text("");
                                             $("#Total_Subtotal").val("");
                                             $("#Total_discountval").val("");
                                             $("#Total_TaxValue").val("");
                                             $("#Total_Grandtotal").val("");
-                                            var data = JSON.parse(response);
-                                            $("#subtotal1").text(data.Subtotal);
-                                            $("#TaxValue1").text(data.TaxValue);
-                                            $("#Grandtotal1").text(data.Grandtotal);
-                                            $("#docdiscountvalue1").text(data.TaxValue);
-                                            $("#Total_Price").val(data.Total_Price);
-                                            $("#Total_Subtotal").val(data.Total_Subtotal);
-                                            $("#Total_discountval").val(data.Total_discountval);
-                                            $("#Total_TaxValue").val(data.Total_TaxValue);
-                                            $("#Total_Grandtotal").val(data.Total_Grandtotal);
+                                            $('#discountperid').css("border", "3px solid red");
+                                            alert("Discount must be less than 100");
                                         }
-
-                                    });
+                                    }
+                                    else {
+                                        $('#discountperid').css("border", "3px solid red");
+                                    }
                                 }
                                 else {
-                                    $("#subtotal1").text("");
-                                    $("#TaxValue1").text("");
-                                    $("#Grandtotal1").text("");
-                                    $("#Total_Price").val("");
-                                    $("#docdiscountvalue1").text("");
-                                    $("#Total_Subtotal").val("");
-                                    $("#Total_discountval").val("");
-                                    $("#Total_TaxValue").val("");
-                                    $("#Total_Grandtotal").val("");
+                                    $('#discountperid').css('border', '#fff');
+
                                 }
+
 
                             });
                         }
@@ -597,11 +617,11 @@
             var ProductID = $("#ProductName").val();
             var buyerid = $("#BuyerName").val();
             $(".alert-danger").hide();
-            if (quantity != "" && ProductID != "") {
+            if (ProductID != "") {
                 if (buyerid != "") {
                     var buyerid = $("#BuyerName").val();
                     var ProductID = $("#ProductName").val();
-
+                    var salesordernumber = $("#salesordernumber").val();
                     var quantity = $("#quantity").val();
                     var discountperid = $("#discountperid").val();
                     var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
@@ -610,40 +630,172 @@
 
                     var formdata = new FormData();
                     formdata.append("buyerid", buyerid);
+                    formdata.append("salesordernumber", salesordernumber);
                     formdata.append("ProductID", ProductID);
                     formdata.append("quantity", quantity);
                     formdata.append("currencyOption", currencyOption);
                     formdata.append("discountperid", discountperid);
                     formdata.append("Specialinstruction", Specialinstruction);
                     formdata.append("Additionalcommends", Additionalcommends);
+                    var filter = /^[0-9]+$/;
+                    if (discountperid === "") {
+                        if (quantity !== "" && filter.test(quantity)) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '/SalesOrder/SalesorderDetails',
+                                contentType: false,
+                                processData: false,
+                                dataType: 'html',
+                                data: formdata, 
+                                success: function (values) {
+                                    $("#BuyerName").prop("disabled", true);
+                                    var data = JSON.parse(values);
+                                    if (data.AlertMessage === "Added Successfully") {
+                                        Swal.fire({
+                                            title: 'Success!!',
+                                            text: 'Added Successfully!',
+                                            icon: 'success',
+                                            timer: 1500,
+                                            timerProgressBar: true,
+                                            showConfirmButton: false
+                                        });
 
-                    $.ajax({
-                        type: 'POST',
-                        url: '/SalesOrder/SalesorderDetails',
-                        contentType: false,
-                        processData: false,
-                        dataType: 'html',
-                        data: formdata,
-                        success: function (values) {
-                            $("#BuyerName").prop("disabled", true);
-                            var data = JSON.parse(values);
-                            if (data.AlertMessage === "Added Successfully") {
-                                Swal.fire({
-                                    title: 'Success!!',
-                                    text: 'Added Successfully!',
-                                    icon: 'success',
-                                    timer: 1500,
-                                    timerProgressBar: true,
-                                    showConfirmButton: false
-                                });
-                                setTimeout(function () {
-                                    window.location.href = "/SalesOrder/SalesOrderDetails?id=" + data.customerid;
-                                    return false;
-                                }, 1500);
-                            }
+                                        setTimeout(function () {
+                                            var custid = data.customerid;
+                                            var salesno = data.salesorderno;
+                                            $.ajax({
+                                                type: 'GET',
+                                                url: '/SalesOrder/updateSalesOrderDetails',
+                                                dataType: 'json', // Expecting JSON response
+                                                data: { id: custid, salesid: salesno },
+                                                success: function (data) {
+                                                    $("#productcode").text("");
+                                                    $("#productname").text("");
+                                                    $("#subtotal1").text("");
+                                                    $("#taxper").text("");
+                                                    $("#Price1").text("");
+                                                    $("#TaxValue1").text("");
+                                                    $("#uomtype").text("");
+                                                    $("#ProductName").val($("#ProductName option:first").val());
+                                                    $("#quantity").val("");
+                                                    $("#discountperid").val("");
+                                                    $("#Grandtotal1").text("");
+                                                    $("#docdiscountvalue1").text("");
+                                                    $("#salesordernumber").val(data.salesordernumber);
+                                                    $('#newordergrid').empty();
+                                                    var html = '';
+                                                    $.each(data.salesorderList, function (index, item) {
+                                                        html += '<tr>';
+                                                        html += '<td>' + (index + 1) + '</td>';
+                                                        html += '<td>' + item.productname + '</td>';
+                                                        html += '<td>' + item.price + '</td>';
+                                                        html += '<td>' + item.quantity + '</td>';
+                                                        html += '<td>' + item.discountvalue + '</td>';
+                                                        html += '<td>' + item.subtotal + '</td>';
+                                                        html += '<td>' + item.taxvalue + '</td>';
+                                                        html += '<td>' + item.totalprice + '</td>';
+                                                        html += '<td class="veh-4" style="width:12%;">';
+                                                        html += '<span class="table_icons">';
+                                                        html += '<img src="/Content/assets/images/delete-icon.png" onclick="Delete(\'' + item.salesorderid + '\')" />';
+                                                        html += '</span>';
+                                                        html += '</td>';
+                                                        html += '</tr>';
+                                                    });
+                                                    $('#newordergrid').append(html);
+                                                },
+                                                error: function (xhr, status, error) {
+                                                    console.error('Error fetching sales order details:', error);
+                                                }
+                                            });
+                                        }, 1500);
+                                    }
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error('Error adding sales order details:', error);
+                                }
+                            });
                         }
 
-                    });
+                    }
+
+                    else {
+                        if (quantity != "" && discountperid != "" && filter.test(quantity) && filter.test(discountperid)) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '/SalesOrder/SalesorderDetails',
+                                contentType: false,
+                                processData: false,
+                                dataType: 'html',
+                                data: formdata, // Ensure formdata is correctly initialized
+                                success: function (values) {
+                                    $("#BuyerName").prop("disabled", true);
+                                    var data = JSON.parse(values);
+                                    if (data.AlertMessage === "Added Successfully") {
+                                        Swal.fire({
+                                            title: 'Success!!',
+                                            text: 'Added Successfully!',
+                                            icon: 'success',
+                                            timer: 1500,
+                                            timerProgressBar: true,
+                                            showConfirmButton: false
+                                        });
+
+                                        setTimeout(function () {
+                                            var custid = data.customerid;
+                                            var salesno = data.salesorderno;
+                                            $.ajax({
+                                                type: 'GET',
+                                                url: '/SalesOrder/updateSalesOrderDetails',
+                                                dataType: 'json', // Expecting JSON response
+                                                data: { id: custid, salesid: salesno },
+                                                success: function (data) {
+                                                    $("#productcode").text("");
+                                                    $("#productname").text("");
+                                                    $("#subtotal1").text("");
+                                                    $("#taxper").text("");
+                                                    $("#Price1").text("");
+                                                    $("#TaxValue1").text("");
+                                                    $("#uomtype").text("");
+                                                    $("#ProductName").val($("#ProductName option:first").val());
+                                                    $("#quantity").val("");
+                                                    $("#discountperid").val("");
+                                                    $("#Grandtotal1").text("");
+                                                    $("#docdiscountvalue1").text("");
+                                                    $("#salesordernumber").val(data.salesordernumber);
+                                                    $('#newordergrid').empty();
+                                                    var html = '';
+                                                    $.each(data.salesorderList, function (index, item) {
+                                                        html += '<tr>';
+                                                        html += '<td>' + (index + 1) + '</td>';
+                                                        html += '<td>' + item.productname + '</td>';
+                                                        html += '<td>' + item.price + '</td>';
+                                                        html += '<td>' + item.quantity + '</td>';
+                                                        html += '<td>' + item.discountvalue + '</td>';
+                                                        html += '<td>' + item.subtotal + '</td>';
+                                                        html += '<td>' + item.taxvalue + '</td>';
+                                                        html += '<td>' + item.totalprice + '</td>';
+                                                        html += '<td class="veh-4" style="width:12%;">';
+                                                        html += '<span class="table_icons">';
+                                                        html += '<img src="/Content/assets/images/delete-icon.png" onclick="Delete(\'' + item.salesorderid + '\')" />';
+                                                        html += '</span>';
+                                                        html += '</td>';
+                                                        html += '</tr>';
+                                                    });
+                                                    $('#newordergrid').append(html);
+                                                },
+                                                error: function (xhr, status, error) {
+                                                    console.error('Error fetching sales order details:', error);
+                                                }
+                                            });
+                                        }, 1500);
+                                    }
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error('Error adding sales order details:', error);
+                                }
+                            });
+                        }
+                    }
                 }
                 else {
                     $("#alert").append(
@@ -671,6 +823,51 @@
             }
 
         }
+        function Delete(arg) {
+            var buyerid = $("#BuyerName").val();
+            var salesordernumber = $("#salesordernumber").val();
+            $.ajax({
+                type: "POST",
+                url: '/SalesOrder/SODelete',
+                data: { SOId: arg, Buyerid: buyerid, Salesordernumber: salesordernumber },
+                success: function (values) {
+                    if (values.AlertMessage === "Success") {
+                        alert("Deleted Successfully.");
+                        setTimeout(function () {
+                            $('#newordergrid').empty();
+                            if (Array.isArray(values.SalesOrderList) && values.SalesOrderList.length > 0) {
+                                var html = '';
+                                $.each(values.SalesOrderList, function (index, item) {
+                                    html += '<tr>';
+                                    html += '<td>' + (index + 1) + '</td>';
+                                    html += '<td>' + item.productname + '</td>';
+                                    html += '<td>' + item.price + '</td>';
+                                    html += '<td>' + item.quantity + '</td>';
+                                    html += '<td>' + item.discountvalue + '</td>';
+                                    html += '<td>' + item.subtotal + '</td>';
+                                    html += '<td>' + item.taxvalue + '</td>';
+                                    html += '<td>' + item.totalprice + '</td>';
+                                    html += '<td class="veh-4" style="width:12%;">';
+                                    html += '<span class="table_icons">';
+                                    html += '<img src="/Content/assets/images/delete-icon.png" onclick="Delete(\'' + item.salesorderid + '\')" />';
+                                    html += '</span>';
+                                    html += '</td>';
+                                    html += '</tr>';
+                                });
+                                $('#newordergrid').append(html);
+                            } else {
+                                $('#newordergrid').html('<tr><td colspan="9">No records found</td></tr>');
+                            }
+                        }, 1000);
+                    } else {
+                        alert("Failed to delete.");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert("An error occurred: " + xhr.responseText);
+                }
+            });
+        }
         function confirmorder() {
             var buyerid = $("#BuyerName").val();
             var Total_Price = $("#Total_Price").val();
@@ -679,6 +876,7 @@
             var Total_TaxValue = $("#Total_TaxValue").val();
             var Total_Grandtotal = $("#Total_Grandtotal").val();
             var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+            var salesordernumber = $("#salesordernumber").val();
             var Specialinstruction = $("#Specialinstruction").val();
             var Additionalcommends = $("#Additionalcommends").val();
             var courencyoption = $("#currencyToggle").val();
@@ -690,6 +888,7 @@
             formdata.append("currencyOption", currencyOption);
             formdata.append("Total_Subtotal", Total_Subtotal);
             formdata.append("Total_Grandtotal", Total_Grandtotal);
+            formdata.append("salesordernumber", salesordernumber);
             formdata.append("Specialinstruction", Specialinstruction);
             formdata.append("Additionalcommends", Additionalcommends);
             formdata.append("courencyoption", courencyoption);
@@ -737,7 +936,7 @@
             $("#ProductName").change(function () {
                 var buyerid = $("#BuyerName").val();
                 var ProductName = $("#ProductName").val();
-
+                var Salesordernumber = $("#salesordernumber").val();
                 if ((ProductName != "") && (buyerid != "")) {
                     var buyerid = $("#BuyerName").val();
                     var ProductName = $("#ProductName").val();
@@ -745,7 +944,7 @@
                     $.ajax({
                         type: 'GET',
                         url: '/SalesOrder/Alreadychoosenproduct',
-                        data: { Buyerid: buyerid, productName: ProductName },
+                        data: { Buyerid: buyerid, productName: ProductName, Salesorder: Salesordernumber },
                         dataType: 'json',
                         success: function (data) {
                             if (data == 1) {

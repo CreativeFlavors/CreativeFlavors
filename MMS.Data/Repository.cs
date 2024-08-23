@@ -283,6 +283,19 @@ namespace MMS.Data
         {
             var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.Salesorder_Grid>("SELECT * FROM salesorder_Grid()").ToList();
             return ResultList;
+        }  
+        public List<MMS.Data.StoredProcedureModel.ProductGrid> Get_ProductGrid()
+        {
+            try
+            {
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.ProductGrid>("SELECT * FROM get_product_details()").ToList();
+                return ResultList;
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
+
         }
         public List<MMS.Data.StoredProcedureModel.FineshedgoodsReport> Fineshedgoods()
         {
@@ -324,11 +337,11 @@ namespace MMS.Data
                 throw;
             }
         }
-        public List<MMS.Data.StoredProcedureModel.SalesorderCart> SearchSalesordercart(int customerid)
+        public List<MMS.Data.StoredProcedureModel.SalesorderCart> SearchSalesordercart(int customerid,int salesid)
         {
             try
             {
-                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.SalesorderCart>("SELECT * FROM get_salesorders_cart(@p0)", customerid).ToList();
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.SalesorderCart>("SELECT * FROM get_salesorders_cart(@p0,@p1)", customerid, salesid).ToList();
                 return ResultList;
             }
             catch (Exception ex)
@@ -337,11 +350,23 @@ namespace MMS.Data
             }
         }
 
-        public List<MMS.Data.StoredProcedureModel.IndentCartsp> Getindentcart()
+        public List<MMS.Data.StoredProcedureModel.get_indent> Getindentcart()
         {
             try
             {
-                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.IndentCartsp>("SELECT * FROM get_indentcart()").ToList();
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.get_indent>("SELECT * FROM get_indent()").ToList();
+                return ResultList;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+        public List<MMS.Data.StoredProcedureModel.get_indentcart> Getindentcarts()
+        {
+            try
+            {
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.get_indentcart>("SELECT * FROM get_indentcart()").ToList();
                 return ResultList;
             }
             catch (Exception ex)
@@ -760,7 +785,18 @@ namespace MMS.Data
             var ResultList = context.Database.SqlQuery<PurchaseOrderGrid>("SELECT * FROM purchaseordergrid()").ToList();
             return ResultList;
         }
-
+        public List<MMS.Data.StoredProcedureModel.GRNGrids> GetGRNGridList()
+        {
+            try
+            {
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.GRNGrids>("SELECT * FROM get_grn_Grid()").ToList();
+                return ResultList;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
         public List<GRNGrid> GetPurchaseOrderGrid(string Filter)
         {
             var ResultList = context.Database.SqlQuery<GRNGrid>("Execute GrnGrid @Search={0}", Filter).ToList();

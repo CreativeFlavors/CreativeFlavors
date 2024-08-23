@@ -63,6 +63,26 @@ namespace MMS.Repository.Managers
                 result = false;
             }
             return result;
+        } 
+        public bool Put(preproduction arg)
+        {
+            preproduction model = preproductionrepos.Table.Where(m=>m.ProductId == arg.ProductId).FirstOrDefault();
+            bool result = false;
+            try
+            {
+                model.Qty = arg.Qty;
+                string username = "admin";
+                model.CreatedBy = username;
+                model.CreatedDate = DateTime.Now;
+                preproductionrepos.Update(model);
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                result = false;
+            }
+            return result;
         }
         public temp_production GetPro(int? id)
         {
@@ -79,6 +99,15 @@ namespace MMS.Repository.Managers
             if (proid != null && SOid != null)
             {
                 tempro = tempproductionrep.Table.Where(x => x.SalesOrderId == SOid && x.ProductId == proid).ToList();
+            }
+            return tempro;
+        }  
+        public List<preproduction> GetPreproductpro(int proid)
+        {
+            List<preproduction> tempro = new List<preproduction>();
+            if (proid != null)
+            {
+                tempro = preproductionrepos.Table.Where(x => x.ProductId == proid).ToList().OrderByDescending(x=>x.CreatedDate).ToList();
             }
             return tempro;
         }

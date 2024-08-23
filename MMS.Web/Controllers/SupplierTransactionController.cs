@@ -20,38 +20,41 @@ namespace MMS.Web.Controllers
     public class SupplierTransactionController : Controller
     {
         [HttpGet]
-        public ActionResult SupplierTransactionGrid(int page = 1, int pageSize = 8)
+        public ActionResult SupplierTransactionGrid(int page = 1, int pageSize = 15)
         {
             SupplierTransaction model = new SupplierTransaction();
 
-            GrnManagerNew manager = new GrnManagerNew();
+            GRNHeaderManager manager = new GRNHeaderManager();
             var suppliertransactionlist = manager.Get();
 
             SupplierMasterManager supplierMasterManager = new SupplierMasterManager();
-            var data1=supplierMasterManager.Get();
+            var data1 = supplierMasterManager.Get();
 
             SupplierTransactionManager supplierTransactionManager = new SupplierTransactionManager();
-            var data2=supplierTransactionManager.Get();
+            var data2 = supplierTransactionManager.Get();
 
             paymentmethodmanager paymentmethodmanager = new paymentmethodmanager();
             var data3 = paymentmethodmanager.Get();
 
             List<SupplierTransaction> totalList = new List<SupplierTransaction>();
 
-
             foreach (var item in suppliertransactionlist)
             {
                 SupplierTransaction supplierTransaction = new SupplierTransaction();
-
+                decimal? paid = 0;
                 supplierTransaction.GrnDate = item.GrnDate;
-                supplierTransaction.GrnAmount = item.TotalCost;
-                supplierTransaction.GrnRefNumber = item.GrnNo;
-                supplierTransaction.Grnqty = item.QtyAsPerDc;
-                supplierTransaction.Id = item.GrnNo;
-                supplierTransaction.SupplierMaster = data1.Where(W => W.SupplierMasterId == item.SupplierNameId).ToList().FirstOrDefault();
-                supplierTransaction.suppliertransaction = data2.Where(W => W.GrnRefNumber == item.GrnNo).ToList().FirstOrDefault();
-
-
+                supplierTransaction.GrnAmount = item.total_unitprice;
+                supplierTransaction.GrnRefNumber = item.GRNNumber;
+                supplierTransaction.Grnqty = item.Quantity;
+                supplierTransaction.Id = item.GrnHeaderId;
+                supplierTransaction.SupplierMaster = data1.Where(W => W.SupplierMasterId == item.SupplierId).ToList().FirstOrDefault();
+                List<supplierTransaction> suppliertransactions = data2.Where(W => W.GrnRefNumber == item.GRNNumber).ToList();
+                foreach (var i in suppliertransactions)
+                {
+                    paid += i.GrnPaidAmount;
+                }
+                supplierTransaction.GrnPaidAmount = paid;
+                supplierTransaction.GrnBalanceAmount = item.total_unitprice - paid;
                 totalList.Add(supplierTransaction);
 
             }
@@ -77,170 +80,139 @@ namespace MMS.Web.Controllers
         {
             SupplierTransaction model = new SupplierTransaction();
 
-            GrnManagerNew manager = new GrnManagerNew();
+            GRNHeaderManager manager = new GRNHeaderManager();
             SupplierMasterManager suppliermastermanager = new SupplierMasterManager();
             AccounttypeManager accounttypeManager = new AccounttypeManager();
             SupplierTransactionManager supplierTransactionManager = new SupplierTransactionManager();
 
             var data = manager.Get(id);
-            var supid = data.SupplierNameId;
+            var supid = data.SupplierId;
             var data1 = suppliermastermanager.GetSupplierMasterId(supid);
-            var supplier = data.SupplierNameId;
+            var supplier = data.SupplierId;
             var acctype = data1.accounttypeid;
             var daylist = accounttypeManager.GettypeId(acctype);
-            var balance= supplierTransactionManager.GettypeId(id);
+            var balance = supplierTransactionManager.GettypeId(id);
             var Termdays = daylist.TermDays;
 
-            model.GrnRefNumber = data.GrnNo;
+            model.GrnRefNumber = data.GRNNumber;
             model.Supplier = data1.SupplierName;
             model.SupplierCode = data1.SupplierCode;
             model.GrnDate = data.GrnDate;
-            model.Grnqty = data.QtyAsPerDc;
-            model.GrnAmount = data.TotalCost;
-            model.PoDate = data.PoDate;
-            model.PoNo = data.PoNO;
-            model.GrnDueDate = data.GrnDueDate;
-            model.SupplierId= supid;
-
-            if (balance != null)
+            model.Grnqty = data.Quantity;
+            model.GrnAmount = data.total_unitprice;
+            model.PoDate = data.PoDate ?? DateTime.MinValue;
+            model.PoNo = data.PoNumber;
+            model.GrnDueDate = data.GrnDate;
+            model.SupplierId = supid;
+            decimal? bal = 0;
+            if (balance.Count() != 0)
             {
-                model.GrnBalanceAmount = balance.GrnBalanceAmount;
-                model.GrnPaidAmount = balance.GrnPaidAmount;
-                model.Id = balance.Id;
+                foreach (var item in balance)
+                {
+                    bal += item.GrnPaidAmount;
+                }
+                model.GrnBalanceAmount = data.total_unitprice - bal;
+                model.GrnPaidAmount = bal;
+
             }
             else
             {
-                model.GrnBalanceAmount = data.TotalCost;
+                model.GrnBalanceAmount = data.total_unitprice;
 
             }
 
             var PaymentDates = data.GrnDate;
-            string paymentDatesString = PaymentDates; // Assuming PaymentDates is the string representation of the date
-            DateTime startDate = DateTime.Parse(paymentDatesString);
+            DateTime startDate = (PaymentDates);
             model.PaymentDate = startDate.AddDays(Termdays);
             return PartialView("SupplierTransaction", model);
         }
 
-       
+
         [HttpPost]
         public ActionResult SupplierTransactionDataInsert(SupplierTransaction model)
         {
+            string AlertMessage = "";
 
-            if (model.Id == 0)
+            supplierTransaction supplierTransactionEntity = new supplierTransaction();
+
+            SupplierTransactionManager supplierTransactionManager = new SupplierTransactionManager();
+
+            SupplierMasterManager supplierMasterManager = new SupplierMasterManager();
+            var balance = supplierTransactionManager.GettypeId(model.GrnRefNumber);
+            decimal? bal = 0;
+            if (balance.Count() != 0)
             {
-                supplierTransaction supplierTransactionEntity = new supplierTransaction();
-
-                SupplierTransactionManager supplierTransactionManager = new SupplierTransactionManager();
-
-                SupplierMasterManager supplierMasterManager = new SupplierMasterManager();
-
-                if (model.Cash != null)
+                foreach (var item in balance)
                 {
-                    supplierTransactionEntity.GrnBalanceAmount = model.GrnAmount - model.Cash;
-                    supplierTransactionEntity.GrnPaidAmount = model.Cash;
+                    bal += item.GrnPaidAmount;
                 }
-                else if (model.PaymentAmount != null && model.PaymentAmount != 0)
-                {
-                    supplierTransactionEntity.GrnBalanceAmount = model.GrnAmount - model.PaymentAmount;
-                    supplierTransactionEntity.GrnPaidAmount = model.PaymentAmount;
-                }
-                else if (model.CreditNoteValue != null)
-                {
-                    supplierTransactionEntity.GrnBalanceAmount = model.GrnAmount - model.CreditNoteValue;
-                    supplierTransactionEntity.GrnPaidAmount = model.CreditNoteValue;
-                }
-
-                supplierTransactionEntity.SupplierId = model.SupplierId;
-                supplierTransactionEntity.PaymentDate = model.PaymentDate;
-                supplierTransactionEntity.PaymentAmount = model.PaymentAmount;
-                supplierTransactionEntity.GrnRefNumber = model.GrnRefNumber;
-                supplierTransactionEntity.GrnDate = model.GrnDate;
-                supplierTransactionEntity.GrnDueDate = model.GrnDueDate;
-                supplierTransactionEntity.GrnAmount = model.GrnAmount;
-                //supplierTransactionEntity.GrnPaidAmount = model.GrnPaidAmount;
-                //supplierTransactionEntity.GrnBalanceAmount = model.GrnBalanceAmount;
-                supplierTransactionEntity.IsTransactionOnHold = model.IsTransactionOnHold;
-                supplierTransactionEntity.PaymentRefNo = model.PaymentRefNo;
-                supplierTransactionEntity.CreditNoteRef = model.CreditNoteRef;
-                supplierTransactionEntity.CreditNoteValue = model.CreditNoteValue;
-                supplierTransactionEntity.CreditNoteDate = model.CreditNoteDate;
-                supplierTransactionEntity.CreatedDate = DateTime.Now;
-                //supplierTransactionEntity.UpdatedDate = DateTime.Now;
-                //supplierTransactionEntity.CreatedBy = model.CreatedBy;
-                //supplierTransactionEntity.UpdatedBy = model.UpdatedBy;
-                supplierTransactionEntity.paymentid = model.paymentid;
-                supplierTransactionEntity.Cash = model.Cash;
-
-                DateTime grnDate = DateTime.ParseExact(model.GrnDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                string formattedGrnDate = grnDate.ToString("yyyy-MM-dd");
-                supplierTransactionEntity.GrnDate = formattedGrnDate;
-
-                supplierTransactionManager.Post(supplierTransactionEntity);
-
+            }
+            if (bal == model.GrnAmount)
+            {
+                AlertMessage = "Done";
+                return Json(AlertMessage, JsonRequestBehavior.AllowGet);
             }
 
-            else
+            if (model.Cash != null)
             {
-                supplierTransaction supplierTransactionEntity = new supplierTransaction();
-
-                SupplierTransactionManager supplierTransactionManager = new SupplierTransactionManager();
-
-                SupplierMasterManager supplierMasterManager = new SupplierMasterManager();
-
-                if (model.Cash != null)
+                var money = model.Cash + bal;
+                var totalamount = model.GrnAmount;
+                var balanceamount = totalamount - money;
+                supplierTransactionEntity.GrnBalanceAmount = balanceamount;
+                supplierTransactionEntity.GrnPaidAmount = model.Cash;
+                if (money > totalamount)
                 {
-                    supplierTransactionEntity.GrnBalanceAmount = model.GrnBalanceAmount - model.Cash;
-                    supplierTransactionEntity.GrnPaidAmount = model.Cash;
+                    AlertMessage = "Incorrect";
+                    return Json(AlertMessage, JsonRequestBehavior.AllowGet);
                 }
-                else if (model.PaymentAmount != null && model.PaymentAmount != null)
-                {
-                    var totalamount = model.GrnBalanceAmount;
-                    var money = model.PaymentAmount;
-                    supplierTransactionEntity.GrnBalanceAmount = totalamount - money;
-          
-                    supplierTransactionEntity.GrnPaidAmount = model.PaymentAmount;
-                }
-                else if (model.CreditNoteValue != null)
-                {
-                    supplierTransactionEntity.GrnBalanceAmount = model.GrnBalanceAmount - model.CreditNoteValue;
-                    supplierTransactionEntity.GrnPaidAmount = model.CreditNoteValue;
-                }
-                supplierTransactionEntity.Id= model.Id;
-                supplierTransactionEntity.SupplierId = model.SupplierId;
-                supplierTransactionEntity.PaymentDate = model.PaymentDate;
-                supplierTransactionEntity.PaymentAmount = model.PaymentAmount;
-                supplierTransactionEntity.GrnRefNumber = model.GrnRefNumber;
-                supplierTransactionEntity.GrnDate = model.GrnDate;
-                supplierTransactionEntity.GrnDueDate = model.GrnDueDate;
-                supplierTransactionEntity.GrnAmount = model.GrnAmount;
-                //supplierTransactionEntity.GrnPaidAmount = model.GrnPaidAmount;
-                //supplierTransactionEntity.GrnBalanceAmount = model.GrnBalanceAmount;
-                supplierTransactionEntity.IsTransactionOnHold = model.IsTransactionOnHold;
-                supplierTransactionEntity.PaymentRefNo = model.PaymentRefNo;
-                supplierTransactionEntity.CreditNoteRef = model.CreditNoteRef;
-                supplierTransactionEntity.CreditNoteValue = model.CreditNoteValue;
-                supplierTransactionEntity.CreditNoteDate = model.CreditNoteDate;
-                supplierTransactionEntity.CreatedDate = DateTime.Now;
-                //supplierTransactionEntity.UpdatedDate = DateTime.Now;
-                //supplierTransactionEntity.CreatedBy = model.CreatedBy;
-                //supplierTransactionEntity.UpdatedBy = model.UpdatedBy;
-                supplierTransactionEntity.paymentid = model.paymentid;
-                supplierTransactionEntity.Cash = model.Cash;
-
-                DateTime grnDate = DateTime.ParseExact(model.GrnDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                string formattedGrnDate = grnDate.ToString("yyyy-MM-dd");
-                supplierTransactionEntity.GrnDate = formattedGrnDate;
-
-                supplierTransactionManager.Put(supplierTransactionEntity);
-
             }
-
-
-
-
-            return PartialView("SupplierTransactionGrid");
+            else if (model.PaymentAmount != null && model.PaymentAmount != 0)
+            {
+                var money = model.PaymentAmount + bal;
+                var totalamount = model.GrnAmount;
+                var balanceamount = totalamount - money;
+                supplierTransactionEntity.GrnBalanceAmount = balanceamount;
+                supplierTransactionEntity.GrnPaidAmount = model.PaymentAmount;
+                if (money > totalamount)
+                {
+                    AlertMessage = "Incorrect";
+                    return Json(AlertMessage, JsonRequestBehavior.AllowGet);
+                }
+            }
+            else if (model.CreditNoteValue != null)
+            {
+                var money = model.CreditNoteValue + bal;
+                var totalamount = model.GrnAmount;
+                var balanceamount = totalamount - money;
+                supplierTransactionEntity.GrnBalanceAmount = balanceamount;
+                supplierTransactionEntity.GrnPaidAmount = model.CreditNoteValue;
+                if (money > totalamount)
+                {
+                    AlertMessage = "Incorrect";
+                    return Json(AlertMessage, JsonRequestBehavior.AllowGet);
+                }
+            }
+            supplierTransactionEntity.SupplierId = model.SupplierId;
+            supplierTransactionEntity.PaymentDate = model.PaymentDate;
+            supplierTransactionEntity.PaymentAmount = model.PaymentAmount;
+            supplierTransactionEntity.GrnRefNumber = model.GrnRefNumber;
+            supplierTransactionEntity.GrnDate = model.GrnDate;
+            supplierTransactionEntity.GrnDueDate = model.GrnDueDate;
+            supplierTransactionEntity.GrnAmount = model.GrnAmount;
+            supplierTransactionEntity.IsTransactionOnHold = model.IsTransactionOnHold;
+            supplierTransactionEntity.PaymentRefNo = model.PaymentRefNo;
+            supplierTransactionEntity.CreditNoteRef = model.CreditNoteRefNo;
+            supplierTransactionEntity.CreditNoteValue = model.CreditNoteValue;
+            supplierTransactionEntity.CreditNoteDate = model.CreditNoteDate;
+            supplierTransactionEntity.CreatedDate = DateTime.Now;
+            supplierTransactionEntity.paymentid = model.paymentid;
+            supplierTransactionEntity.Cash = model.Cash;
+            supplierTransactionEntity.GrnDate = model.GrnDate;
+            supplierTransactionManager.Post(supplierTransactionEntity);
+            AlertMessage = "success";
+            return Json(AlertMessage, JsonRequestBehavior.AllowGet);
         }
-
+        #region filterion
 
         [HttpGet]
         public ActionResult SupplierTransactionSearch(int Supplierid)
@@ -249,7 +221,7 @@ namespace MMS.Web.Controllers
             {
                 SupplierTransaction model = new SupplierTransaction();
 
-                GrnManagerNew manager = new GrnManagerNew();
+                GRNHeaderManager manager = new GRNHeaderManager();
                 var suppliertransactionlist = manager.Get();
 
                 SupplierMasterManager supplierMasterManager = new SupplierMasterManager();
@@ -266,17 +238,23 @@ namespace MMS.Web.Controllers
 
                 foreach (var item in suppliertransactionlist)
                 {
-                    if (item.SupplierNameId == Supplierid)
+                    if (item.SupplierId == Supplierid)
                     {
                         SupplierTransaction supplierTransaction = new SupplierTransaction();
-
+                        decimal? paid = 0;
                         supplierTransaction.GrnDate = item.GrnDate;
-                        supplierTransaction.GrnAmount = item.TotalCost;
-                        supplierTransaction.GrnRefNumber = item.GrnNo;
-                        supplierTransaction.Grnqty = item.QtyAsPerDc;
-                        supplierTransaction.Id = item.GrnNo;
-                        supplierTransaction.SupplierMaster = data1.Where(W => W.SupplierMasterId == item.SupplierNameId).ToList().FirstOrDefault();
-                        supplierTransaction.suppliertransaction = data2.Where(W => W.GrnRefNumber == item.GrnNo).ToList().FirstOrDefault();
+                        supplierTransaction.GrnAmount = item.total_unitprice;
+                        supplierTransaction.GrnRefNumber = item.GRNNumber;
+                        supplierTransaction.Grnqty = item.Quantity;
+                        supplierTransaction.Id = item.GrnHeaderId;
+                        supplierTransaction.SupplierMaster = data1.Where(W => W.SupplierMasterId == item.SupplierId).ToList().FirstOrDefault();
+                        List<supplierTransaction> suppliertransactions = data2.Where(W => W.GrnRefNumber == item.GRNNumber).ToList();
+                        foreach (var i in suppliertransactions)
+                        {
+                            paid += i.GrnPaidAmount;
+                        }
+                        supplierTransaction.GrnPaidAmount = paid;
+                        supplierTransaction.GrnBalanceAmount = item.total_unitprice - paid;
                         totalList.Add(supplierTransaction);
                     }
                 }
@@ -288,8 +266,14 @@ namespace MMS.Web.Controllers
                 return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
+        public ActionResult Getsupplierno(int id)
+        {
+            GRNHeaderManager GRNHeaderManager = new GRNHeaderManager();
+            var data = GRNHeaderManager.GetsupplierId(id);
+            return Json(data, JsonRequestBehavior.AllowGet);
+        }
 
-
+        #endregion
 
     }
 }

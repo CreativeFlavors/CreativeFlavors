@@ -84,6 +84,8 @@ namespace MMS.Repository.Managers
                 string username = "admin";
                 arg.CreatedBy = username;
                 arg.CreatedDate = DateTime.Now;
+                arg.Status = 1;
+                arg.IsActive = true;
                 indentcartRepository.Insert(arg);
                 result = true;
             }
@@ -199,10 +201,9 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                IndentCart model = indentcartRepository.GetById(indentcartid);
-                //model.IsActive = false;
-
-                indentcartRepository.Delete(model);
+                Indentdetail model = indentdetailRepository.GetById(indentcartid);
+                model.IsActive = false;
+                indentdetailRepository.Update(model);
                 result = true;
             }
             catch (Exception ex)
@@ -213,14 +214,14 @@ namespace MMS.Repository.Managers
 
             return result;
         }
-        public IndentCart Getindentcartid(int? indentcartid)
+        public Indentdetail Getindentcartid(int? indentcartid)
         {
-            IndentCart Indentcartlist = new IndentCart();
+            Indentdetail Indentcartlist = new Indentdetail();
             if (indentcartid != 0)
             {
                 try
                 {
-                    Indentcartlist = indentcartRepository.Table.Where(x => x.IndentCartId == indentcartid).FirstOrDefault();
+                    Indentcartlist = indentdetailRepository.Table.Where(x => x.IndentDetailId == indentcartid).FirstOrDefault();
                 }
                 catch (Exception ex)
                 {
@@ -229,6 +230,7 @@ namespace MMS.Repository.Managers
             }
             return Indentcartlist;
         }
+
         public IndentCart Getindentcard(int materialnameid)
         {
             IndentCart Indentcartlist = new IndentCart();
@@ -245,12 +247,26 @@ namespace MMS.Repository.Managers
             return Indentcartlist;
         }
 
-        public List<IndentCartsp> GetindentcartList()
+        public List<get_indent> GetindentcartList()
         {
-            List<IndentCartsp> indentlistcart = new List<IndentCartsp>();
+            List<get_indent> indentlistcart = new List<get_indent>();
             try
             {
                 indentlistcart = indentcartRepository.Getindentcart();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return indentlistcart;
+        }  
+        public List<get_indentcart> GetindentcartLists()
+        {
+            List<get_indentcart> indentlistcart = new List<get_indentcart>();
+            try
+            {
+                indentlistcart = indentcartRepository.Getindentcarts().Where(m=>m.isactive == true && m.status == 1).ToList();
 
             }
             catch (Exception ex)
@@ -298,7 +314,7 @@ namespace MMS.Repository.Managers
         public List<Indentdetail> GetIndentdetailsList(int? indentheaderid)
         {
             List<Indentdetail> indentdetails = new List<Indentdetail>();
-            indentdetails = indentdetailRepository.Table.Where(x => x.IndentHeaderId == indentheaderid).ToList();
+            indentdetails = indentdetailRepository.Table.Where(x => x.IndentNo == indentheaderid).ToList();
             return indentdetails;
         }
 

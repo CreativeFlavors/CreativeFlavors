@@ -25,6 +25,7 @@ namespace MMS.Data.Mapping
             Property(t => t.Quantity).HasColumnName("quantity");
             Property(t => t.DiscountValue).HasColumnName("discountvalue");
             Property(t => t.SubtotalValue).HasColumnName("subtotalvalue");
+            Property(t => t.GRNNumber).HasColumnName("grnnumber");
             Property(t => t.TaxValue).HasColumnName("taxvalue");
             Property(t => t.TotalValue).HasColumnName("totalvalue");
             Property(t => t.IsFulfilled).HasColumnName("isfulfilled");

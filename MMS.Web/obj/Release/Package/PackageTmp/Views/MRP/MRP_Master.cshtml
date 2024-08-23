@@ -1,6 +1,11 @@
 ﻿@model IEnumerable<MMS.Web.Models.Salesorders>
 @using MMS.Web.Models
-
+@{
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int pageSize = ViewBag.PageSize ?? 8;
+    int totalItems = Model.Count();
+    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -76,32 +81,23 @@
                             <li class="table-header">
                                 <div class="col col-1">SI.NO</div>
                                 <div class="col col-1">Product</div>
-                                <div class="col col-1">Sales_Qty / SubAss_Qty</div>
-                                <div class="col col-1">Available Stock</div>
+                                <div class="col col-1">SO_Qty</div>
+                                <div class="col col-1">Avail Stock</div>
                                 <div class="col col-1">procurement</div>
                                 <div class="col col-1">Duedate</div>
-                                <div class="col col-1">Production</div>
-                                <div class="col col-1">Pro_Duedate</div>
+                                <div class="col col-1">Prod_qty</div>
+                                <div class="col col-1">Prod_Duedate</div>
                                 <div class="col col-1">Status</div>
                                 <div class="col col-1">Check</div>
                             </li>
                             @if (Model != null)
                             {
-                                int count = 1;
                                 foreach (var i in Model)
                                 {
                                     <li class="table-row header">
-                                        <div class="col col-1 ">@count</div>
+                                        <div class="col col-1 ">@startSerialNumber</div>
                                         <div class="col col-1" id="Name">@i.ProductName</div>
-
-                                        @if (i.subassemblyqty != null)
-                                        {
-                                            <div class="col col-1">@string.Format("{0:0.00}", (i.SalesQuantity)) / @i.subassemblyqty</div>
-                                        }
-                                        else
-                                        {
-                                            <div class="col col-1">@i.SalesQuantity / - </div>
-                                        }
+                                        <div class="col col-1">@i.SalesQuantity </div>
                                         <div class="col col-1">@i.AvailableStock</div>
                                         @if (i.SalesQuantity >= i.AvailableStock)
                                         {
@@ -129,7 +125,7 @@
                                             <img src="~/Content/assets/images/plus1.png" id="plus" class="toggle-image" />
                                         </div>
                                     </li>
-                                    count++;
+                                    startSerialNumber++;                   
                                     <li class="hidden-content">
                                         <div class="manage_customers_table_in_responsive mt-3" style="height:230px; overflow: auto;" id="form">
                                             <div id="table-wrapper">
@@ -157,7 +153,16 @@
                                                                 {
                                                                     <tr>
                                                                         <td class="underline1" style=" text-align: left; width: 15%;">@j.MaterialNames</td>
-                                                                        <td class="underline1" style=" text-align: center; width: 1%;"><span id="ma">Mat</span></td>
+                                                                        @if (j.producttype == "MAT")
+                                                                        {
+                                                                            <td class="underline1" style=" text-align: center; width: 1%;"><span id="ma">Mat</span></td>
+
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <td class="underline" style="text-align: center; width: 2%;"><span id="subassem">Sub</span></td>
+
+                                                                        }
                                                                         <td class="underline1" style=" text-align: right; width: 2%;">@string.Format("{0:0.00}", (j.RequiredQty))</td>
 
 
@@ -172,13 +177,14 @@
                                                                         @if (j.AvailableStock != null)
                                                                         {
 
-                                                                            if (j.AvailableStock <= Math.Round((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()), 3))
+                                                                            if (j.AvailableStock >= Math.Round((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()), 3))
                                                                             {
-                                                                                <td class="underline1" style=" width: 1%; text-align: right; color:red">@Math.Round((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()), 3)</td>
+
+                                                                                <td class="underline1" style=" width: 1%; text-align: right; ">@Math.Round((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()), 3)</td>
                                                                             }
                                                                             else
                                                                             {
-                                                                                <td class="underline1" style=" width: 1%; text-align: right;">@Math.Round((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()), 3)</td>
+                                                                                <td class="underline1" style=" width: 1%; text-align: right; color: red">@Math.Round((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()), 3)</td>
                                                                             }
                                                                         }
                                                                         else
@@ -190,7 +196,7 @@
                                                                         @if (j.AvailableStock != null)
                                                                         {
 
-                                                                            if (j.AvailableStock <= Math.Round((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()), 3))
+                                                                            if (j.AvailableStock <= Math.Round((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()), 4))
                                                                             {
                                                                                 <td class="underline1" style=" width: 1%; text-align: right; color:red">@string.Format("{0:0.00}", ((i.SalesQuantity.GetValueOrDefault() * j.RequiredQty.GetValueOrDefault()) - (j.AvailableStock)))</td>
                                                                             }
@@ -243,98 +249,7 @@
 
                                                                     </tr>
                                                                 }
-                                                                @if (i.mrp_subassembly_Lists != null)
-                                                                {
-                                                                    foreach (var k in i.mrp_subassembly_Lists)
-                                                                    {
-                                                                        <tr>
-                                                                            <td class="underline" style="text-align: left; width: 1%;">@k.MaterialNames</td>
-                                                                            <td class="underline" style="text-align: center; width: 2%;"><span id="subassem">Sub</span></td>
-                                                                            <td class="underline" style="text-align: right; width: 2%;">@string.Format("{0:0.00}", (k.RequiredQty))</td>
 
-                                                                            @if (k.AvailableStock != null)
-                                                                            {
-                                                                                <td class="underline" style="text-align: right; width: 2%;">@k.AvailableStock</td>
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                <td class="underline" style="text-align: right; width: 2%;">Not added</td>
-                                                                            }
-                                                                            @if (k.AvailableStock != null)
-                                                                            {
-                                                                                if (k.AvailableStock <= Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()), 3))
-                                                                                {
-                                                                                    <td class="underline1" style=" width: 1%; text-align: right; color:red">@Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()), 3)</td>
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    <td class="underline1" style=" width: 1%; text-align: right;">@Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()), 3)</td>
-                                                                                }
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                <td class="underline1" style=" width: 1%; text-align: right; color:red">@Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()), 3)</td>
-                                                                            }
-
-                                                                            @if (k.AvailableStock != null)
-                                                                            {
-                                                                                if (k.AvailableStock <= Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()), 3))
-                                                                                {
-                                                                                    <td class="underline" style="text-align: right; width:2%; color:red">
-                                                                                        @Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()) - (k.AvailableStock ?? 0))
-                                                                                    </td>
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    <td style="color: #b9b1b1;  width: 1%; text-align: right;">0</td>
-                                                                                }
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                <td class="underline1" style=" width: 1%; text-align: right; color:red">@Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()), 3)</td>
-                                                                            }
-
-                                                                            <td class="underline" style="text-align: center; width: 2%;">@k.UOMName</td>
-                                                                            @if ((k.total_indent_qty) != null)
-                                                                            {
-                                                                                <td class="underline1" style=" text-align: right; width: 1%; ">@string.Format("{0:0.00}", (k.total_indent_qty))</td>
-                                                                            }
-                                                                            else if (k.AvailableStock <= Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()), 3) && (k.total_indent_qty) == null)
-                                                                            {
-                                                                                <td style="color: #dc3545; width: 1%; text-align: right;">Raise Indent</td>
-
-                                                                            }
-                                                                            else if (k.AvailableStock == null)
-                                                                            {
-                                                                                <td style="color: #dc3545; width: 1%; text-align: right;">Raise Indent</td>
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                <td style="color: #b9b1b1;  width: 1%; text-align: right;">0</td>
-                                                                            }
-                                                                            <td class="underline" style="text-align: center; width:2%;">-</td>
-                                                                            <td class="underline" style="text-align: center; width:2%;">-</td>
-
-                                                                            @if (k.AvailableStock == null || k.AvailableStock.GetValueOrDefault() == 0.00m)
-                                                                            {
-                                                                                <td style=" text-align: center; width: 2%;"><span id="nostock">No stock</span></td>
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                if (k.AvailableStock >= Math.Round((i.subassemblyqty.GetValueOrDefault() * k.RequiredQty.GetValueOrDefault()), 3))
-                                                                                {
-                                                                                    <td style=" text-align: center; width: 2%;"><span id="ready">Ready</span></td>
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    <td style=" text-align: center; width: 2%;"><span id="stockadd">Less stock</span></td>
-                                                                                }
-
-                                                                            }
-                                                                        </tr>
-
-                                                                    }
-                                                                }
 
                                                             </tbody>
 
@@ -354,10 +269,10 @@
                         <div class="font-14 manage_customer_show_I col-xl-6">
                             <span>Showing </span>
                             <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
-                                <option value="6" @(ViewBag.PageSize == 6 ? "selected" : "")>6</option>
-                                <option value="12" @(ViewBag.PageSize == 12 ? "selected" : "")>12</option>
-                                <option value="18" @(ViewBag.PageSize == 18 ? "selected" : "")>18</option>
-                                <option value="24" @(ViewBag.PageSize == 24 ? "selected" : "")>24</option>
+                                <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
+                                <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
+                                <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
+                                <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
                             </select>
 
 

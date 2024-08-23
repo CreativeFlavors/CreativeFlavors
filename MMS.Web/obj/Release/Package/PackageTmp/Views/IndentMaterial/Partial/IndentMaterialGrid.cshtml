@@ -1,4 +1,4 @@
-﻿@model MMS.Data.StoredProcedureModel.IndentCartsp
+﻿@model MMS.Data.StoredProcedureModel.get_indent
 @using MMS.Repository.Managers
 
 <!DOCTYPE html>
@@ -14,7 +14,7 @@
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    @*<link href="~/Content/css1/font-awesome.min.css" rel="stylesheet" />*@
+    <link href="~/Content/css1/font-awesome.min.css" rel="stylesheet" />
     <style>
         input[type=text] {
             padding: 12px;
@@ -133,15 +133,15 @@
 
                                     <tr class="font-14">
                                         <td>@startSerialNumber</td>
-                                        <td>@item.ProductName</td>
-                                        <td>@item.StoreName</td>
-                                        <td>@item.UomName</td>
-                                        <td>@item.TaxName</td>
-                                        <td>@item.Price</td>
-                                        <td>@item.IndentNumber</td>
+                                        <td style="text-align:left">@item.ProductName</td>
+                                        <td style="text-align:left">@item.StoreName</td>
+                                        <td style="text-align:left">@item.UomName</td>
+                                        <td style="text-align:left">@item.TaxName</td>
+                                        <td style="text-align:right">@item.Price</td>
+                                        <td style="text-align:right">@item.IndentNumber</td>
                                         <td class="veh-1 edit-del-wrap">
                                             @*<a href="javascript:void(0)" onclick="Edit('@item.IndentCartId')" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>*@
-                                            <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.IndentCartId')" class="watchlist-delete" title="Delete"><img src="~/Content/assets/images/delete-icon.png" /></a>
+                                            <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.indentdetailid')" class="watchlist-delete" title="Delete"><img src="~/Content/assets/images/delete-icon.png" /></a>
                                             @*<td><button class="btn btn-success" id="paynow" onclick="paynow('@item.Id')" title="PayNow">Pay Now</button></td>*@
                                         </td>
 
@@ -159,10 +159,10 @@
                     <div class="font-14 manage_customer_show_I col-xl-6">
                         <span>Showing </span>
                         <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
-                            <option value="5" @(ViewBag.PageSize == 5 ? "selected" : "")>5</option>
-                            <option value="10" @(ViewBag.PageSize == 10 ? "selected" : "")>10</option>
                             <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
-                            <option value="20" @(ViewBag.PageSize == 20 ? "selected" : "")>20</option>
+                            <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
+                            <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
+                            <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
                         </select>
 
 
@@ -207,6 +207,10 @@
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#indent").attr('checked', true);
+        });
   $(document).ready(function() {
     $('#manage_customer_show_no').change(function() {
         var pageSize = parseInt($(this).val());

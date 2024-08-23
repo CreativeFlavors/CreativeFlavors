@@ -41,6 +41,12 @@ namespace MMS.Repository.Managers
             List<PoHeader> PoHeader = new List<PoHeader>();
             PoHeader = poheaderRepository.Table.Where(x => x.SupplierId == id).ToList();
             return PoHeader;
+        }  
+        public PoDetail GetDTId(int id)
+        {
+            PoDetail PoHeader = new PoDetail();
+            PoHeader = podetailRepository.Table.Where(x => x.PodetailId == id).FirstOrDefault();
+            return PoHeader;
         }
         public List<PODetails> GetPODetails()
         {
@@ -73,7 +79,35 @@ namespace MMS.Repository.Managers
             }
             return result;
         }
+              
+        public bool Put(PoDetail arg)
+        {
+            bool result = false;
+            try
+            {
+                PoDetail model = podetailRepository.Table.Where(p => p.PodetailId == arg.PodetailId).FirstOrDefault();
+                if (model != null)
+                {
+                    model.grn_qty = arg.grn_qty;
+                    model.UpdatedDate = DateTime.Now;
+                    string username = "admin";
+                    model.UpdatedBy = username;
+                    podetailRepository.Update(model);
+                    result = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                result = false;
+            }
 
+            return result;
+        }
         public bool PutIndentPoMapping(IndentPoMapping arg)
         {
             bool result = false;
@@ -188,6 +222,28 @@ namespace MMS.Repository.Managers
             }
 
             return result;
+        } 
+        public bool Deletepodt(int indentpoid)
+        {
+            bool result = false;
+            try
+            {
+                PoDetail model = podetailRepository.GetById(indentpoid);
+
+                model.DeletedDate = DateTime.Now;
+                string username = "admin";
+                model.DeletedBy = username;
+                model.IsActive = false;
+                podetailRepository.Update(model);
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                result = false;
+            }
+
+            return result;
         }
         public List<PoHeader> Get()
         {
@@ -210,6 +266,23 @@ namespace MMS.Repository.Managers
                 try
                 {
                     Indentpolist = indentpomappingRepository.Table.Where(x => x.IndentPoMapId == indentpomapid).FirstOrDefault();
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+            }
+            return Indentpolist;
+        }         
+
+        public PoDetail Getpoid(int PodetailId)
+        {
+            PoDetail Indentpolist = new PoDetail();
+            if (PodetailId != 0)
+            {
+                try
+                {
+                    Indentpolist = podetailRepository.Table.Where(x => x.PodetailId == PodetailId).FirstOrDefault();
                 }
                 catch (Exception ex)
                 {

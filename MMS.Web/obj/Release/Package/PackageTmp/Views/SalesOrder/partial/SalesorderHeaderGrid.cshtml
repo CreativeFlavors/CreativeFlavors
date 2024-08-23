@@ -22,12 +22,16 @@
         .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
             padding: 16px;
         }
+        #reports_search4_container button, #transaction_reports_search4_container button, #static_report_search4_container button {
+            padding: 12px 29px;
+            color: #FFFFFF;
+        }
     </style>
 </head>
 <body>
     <div id="summery">
         <ol class="breadcrumb font-20 d-flex justify-content-center">
-            <li class="breadcrumb-item " aria-current="page" style=" font-size: 112%;">SalesOrder Summery</li>
+            <li class="breadcrumb-item " aria-current="page" style=" font-size: 112%;">Sales Order Summery</li>
         </ol>
         <div class="d-flex justify-content-evenly mt-4">
             <div class="form-floating">
@@ -42,10 +46,7 @@
 
             <div class="form-floating">
                 <select id="salesorderno" class="form-select">
-                    @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.salesorderno())
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
+                        <option value="">Please Select SO</option>
                 </select>
                 <label for="floatingSelectGrid">SO Number</label>
             </div>
@@ -66,9 +67,8 @@
 
             <div id="transaction_reports_search4_container" class="reports_search_container_btn">
                 <a href="/SalesOrder/SalesOrderDetails">
-                    <button type="button" class="manage_customers_btn font-15" id="add">
-                        ADD
-                    </button>
+                    <button class="button-71" role="button">ADD</button>
+
                 </a>
             </div>
         </div>
@@ -126,32 +126,32 @@
                             </span>
                         </th>
                         <th scope="col">
-                            <span>Total_Price</span>
+                            <span>ORG PRICE</span>
                             <span>
                                 <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                             </span>
                         </th>
                         <th scope="col">
-                            <span>Total_DisValue</span>
+                            <span>DISC VALUE</span>
                             <span>
                                 <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                             </span>
                         </th>
                         <th scope="col">
-                            <span>Sub Total</span>
+                            <span>SUB TOTAL</span>
                             <span>
                                 <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                             </span>
                         </th>
 
                         <th scope="col">
-                            <span>Tax Amount</span>
+                            <span>TAX VALUE</span>
                             <span>
                                 <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                             </span>
                         </th>
                         <th scope="col">
-                            <span>Grand Price</span>  <span>
+                            <span>TOTAL AMOUNT</span>  <span>
                                 <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                             </span>
                         </th>
@@ -159,13 +159,18 @@
                 </thead>
                 @if (Model != null && Model.Count() > 0)
                 {
-                    int count = 1;
                     <tbody>
+                        @{
+                            int currentPage = ViewBag.CurrentPage ?? 1;
+                            int pageSize = ViewBag.PageSize ?? 8;
+                            int totalItems = Model.Count();
+                            int startSerialNumber = (currentPage - 1) * pageSize + 1;
+                        }
                         @foreach (var i in Model)
                         {
 
                             <tr class="font-14">
-                                <td class="veh1-5">@count</td>
+                                <td class="veh1-5">@startSerialNumber</td>
                                 <td class="veh1-5" style="width: 3%; text-align:center;">@i.SalesorderId_HD</td>
                                 <td class="veh1-5" style="width: 2%; text-align:center;">@i.salesorderdate.ToString("dd/MM/yyyy")</td>
                                 <td class="veh1-5" style="width: 12%; text-align:left;">@i.BuyerMaster.BuyerFullName</td>
@@ -201,7 +206,7 @@
                                 <td class="veh1-5" style="width: 12%; text-align: right;">@string.Format("{0:0.00}", i.Total_Grandtotal)</td>
 
                             </tr>
-                            count++;
+                            startSerialNumber++;
                         }
 
                     </tbody>
@@ -332,7 +337,7 @@
                 success: function (values) {
                     $("#salesorderno").html("");
                     $("#salesorderno").append(
-                        $('<option></option>').val(0).html("Please Select")
+                        $('<option></option>').val(0).html("Please Select SO")
                     );
                     $.each(values, function (i, order) {
                         $("#salesorderno").append(
@@ -358,7 +363,7 @@
                         const formattedDate = convertToReadableDate(item.salesorderdate);
                         var formattedQuantity = (item.quantity).toFixed(2);
                         var Total_Price = (item.Total_Price).toFixed(2);
-                        var formattedDiscountValue = (item.Total_discountval).toFixed(2);
+                        var formattedDiscountValue = (item.Total_discountval);
                         var formattedSubtotal = (item.Total_Subtotal).toFixed(2);
                         var formattedTaxValue = (item.Total_TaxValue).toFixed(2);
                         var formattedGrandtotal = (item.Total_Grandtotal).toFixed(2);

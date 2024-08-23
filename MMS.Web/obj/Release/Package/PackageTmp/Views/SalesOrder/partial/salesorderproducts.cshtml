@@ -106,33 +106,7 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @if (Model.salesorderList != null)
-                                {
-                                    var count = 1;
-                                    foreach (var i in Model.salesorderList)
-                                    {
-                                        <tr>
-                                            <td id="taxper">@count</td>
-                                            <td id="Grandtotal1">@i.productname</td>
-                                            <td id="taxper">@i.price</td>
-                                            <td id="TaxValue1">@i.quantity</td>
-                                            <td id="Grandtotal1">@i.discountvalue</td>
-                                            <td id="taxper">@i.subtotal</td>
-                                            <td id="TaxValue1">@i.taxvalue</td>
-                                            <td id="Grandtotal1">@i.totalprice</td>
-                                            <td class="veh-4" style="width:12%;">
-                                                <span class="table_icons">
-                                                    <img src="~/Content/assets/images/delete-icon.png" onclick="Delete('@i.salesorderid')" />
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        count++;
-                                    }
-
-                                }
-
-
+                            <tbody id="newordergrid">
                             </tbody>
                         </table>
                     </div>
@@ -148,15 +122,36 @@
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
     <script>
         function Delete(arg) {
+            var buyerid = $("#BuyerName").val();
+            var salesordernumber = $("#salesordernumber").val();
             $.ajax({
-                type: "DELETE",
+                type: "POST",
                 url: '/SalesOrder/SODelete',
-                data: { SOId: arg },
+                data: { SOId: arg, Buyerid: buyerid, Salesordernumber: salesordernumber },
                 success: function (values) {
                     if (values.AlertMessage === "Success") {
                         alert("Deleted Successfully.");
                         setTimeout(function () {
-                            location.reload();
+                            $('#newordergrid').empty();
+                            var html = '';
+                            $.each(values.salesorderList, function (index, item) {
+                                html += '<tr>';
+                                html += '<td>' + (index + 1) + '</td>';
+                                html += '<td>' + item.productname + '</td>';
+                                html += '<td>' + item.price + '</td>';
+                                html += '<td>' + item.quantity + '</td>';
+                                html += '<td>' + item.discountvalue + '</td>';
+                                html += '<td>' + item.subtotal + '</td>';
+                                html += '<td>' + item.taxvalue + '</td>';
+                                html += '<td>' + item.totalprice + '</td>';
+                                html += '<td class="veh-4" style="width:12%;">';
+                                html += '<span class="table_icons">';
+                                html += '<img src="/Content/assets/images/delete-icon.png" onclick="Delete(\'' + item.salesorderid + '\')" />';
+                                html += '</span>';
+                                html += '</td>';
+                                html += '</tr>';
+                            });
+                            $('#newordergrid').append(html);
                         }, 1000);
                     } else {
                         alert("Failed to delete.");
