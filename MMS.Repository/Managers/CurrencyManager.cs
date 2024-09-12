@@ -23,6 +23,20 @@ namespace MMS.Repository.Managers
                 CurrencyRepository = unitOfWork.Repository<CurrencyMaster>();
             CurrencyRepository1 = unitOfWork.Repository<currency>();
 
+
+        }
+        public List<currency> Getcurrency()
+        {
+            List<currency> Supplier_master = new List<currency>();
+            try
+            {
+                Supplier_master = CurrencyRepository1.Table.ToList<currency>();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return Supplier_master;
         }
         public bool Post(CurrencyMaster arg)
             {

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace MMS.Repository.Managers
 {
@@ -24,7 +25,7 @@ namespace MMS.Repository.Managers
             DeliveryChallan_hd salesorder = new DeliveryChallan_hd();
             try
             {
-                string username = "admin";
+                string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.CreatedBy = username;
                 arg.CreatedDate = DateTime.Now;
                 arg.Status = 0;

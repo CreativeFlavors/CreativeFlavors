@@ -19,23 +19,28 @@
 </div>
 
 <script src="~/Content/js/custom.js"></script>
-
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
 <script src="~/Content/js/bootstrap.bundle.min.js"></script>
 <script src="~/Content/js/Validation.js"></script>
 
-
 <script>
     function Save() {
+        var addressvarient = $("#addressvarient").val();
+        if (addressvarient == 0) {
+            var AddressType = 0;
+        } else {
+            var AddressType = $("#AddressType").val();
+        }
         var AddressId = $("#AddressId").val();
+        var suppAddressId = $("#suppAddressId").val();
         var BuyerId = $("#BuyerId").val();
+        var SupplierId = $("#SupplierId").val();
         var AddressType = $("#AddressType").val();
         var Add1 = $("#Add1").val();
         var Add2 = $("#Add2").val();
         var Add3 = $("#Add3").val();
         var City = $("#City").val();
+        var vatnumber = $("#vatnumber").val();
         var Country = $("#Country").val();
         var State = $("#State").val();
         var ZipCode = $("#ZipCode").val();
@@ -45,14 +50,18 @@
         var Notes = $("#Notes").val();
         var formdata = new FormData();
         formdata.append("AddressId", AddressId);
+        formdata.append("suppAddressId", suppAddressId);
         formdata.append("BuyerId", BuyerId);
+        formdata.append("SupplierId", SupplierId);
+        formdata.append("vatnumber", vatnumber);
         formdata.append("AddressType", AddressType);
         formdata.append("Add1", Add1);
         formdata.append("Add2", Add2);
+        formdata.append("addressvarient", addressvarient);
         formdata.append("Add3", Add3);
-        formdata.append("City", City);
-        formdata.append("State", State);
-        formdata.append("Country", Country);
+        formdata.append("CityId", City);
+        formdata.append("StateId", State);
+        formdata.append("CountryId", Country);
         formdata.append("ZipCode", ZipCode);
         formdata.append("ContactName", ContactName);
         formdata.append("Email", Email);
@@ -60,71 +69,111 @@
         formdata.append("Notes", Notes);
         var filter = /^[0-9]{10}$/;
         var zipfilter = /^[0-9]{6}$/;
-        var phoneregx = /^[A-Za-z]*$/;
+        var phoneregx = /^[a-zA-Z\s\.]*$/;
         var email = /^(([^<>()[\]\\.,;:\s"]+(\.[^<>()[\]\\.,;:\s"]+)*)|.(".+"))((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        if ((ZipCode != "" && BuyerId != "" && AddressType != "" && Add1 != "" && Add2 != "" && City != "" && ContactName != "" && Notes != "" && State != "" && Country != "") && (filter.test(Phone) && zipfilter.test(ZipCode) && email.test(Email) && phoneregx.test(ContactName))) {
-            if (AddressId == "0") {
-                $.ajax({
-                    type: 'POST',
-                    url: '/AddressDetails/CustAddressInsert',
-                    contentType: false,
-                    processData: false,
-                    dataType: 'html',
-                    data: formdata,
-                    success: function (data) {
+        if ((ZipCode != "" && (BuyerId != "" || SupplierId != "") && (AddressType != "" || AddressType == "") && Add1 != "" && Add2 != "" && City != "" &&
+            ContactName != "" && Notes != "" && State != "" && Country != "") && (filter.test(Phone) && vatnumber != "" &&
+                zipfilter.test(ZipCode) && email.test(Email) && phoneregx.test(ContactName))) {
+            if (Add1.length < 100 && Add2.length < 100 && Add3.length < 100) {
+                if (suppAddressId == "0") {
+                    if (AddressId == "0") {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/AddressDetails/CustAddressInsert',
+                            contentType: false,
+                            processData: false,
+                            dataType: 'html',
+                            data: formdata,
+                            success: function (data) {
+                                var val = JSON.parse(data);
+                                if (val == "Success") {
+                                    alert('Saved Successfully.');
+                                    location.href = "/AddressDetails/AddressMaster";
+                                    return false;
+                                }
+                                else if (val == "already") {
+                                    alert('Already Exist Single Address.');
+                                    return false;
+                                }
+                                else {
+                                    alert('Save process Failed.');
+                                    location.href = "/AddressDetails/AddressDetails";
+                                    return false;
+                                }
 
-                        if (data.addresid != "" || data.addresid != 0) {
-                            alert('Saved Successfully.');
-                            location.href = "/AddressDetails/AddressMaster";
-                            return false;
-                        }
-                        else if (data.addresid == 0 && data.addresid != "") {
-                            alert('Already Exist in the database.');
-                            return false;
-                        }
-                        else {
-                            alert('Save process Failed.');
-                            location.href = "/AddressDetails/AddressDetails";
-                            return false;
-                        }
-
-                    },
-                    error: function (ex) {
-                        alert('Already Exist in the database.');
+                            },
+                            error: function (ex) {
+                                alert('Already Exist in the database.');
+                            }
+                        });
                     }
-                });
+                    else {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/AddressDetails/Update',
+                            contentType: false,
+                            processData: false,
+                            dataType: 'html',
+                            data: formdata,
+                            success: function (data) {
+
+                                if (data.addresid != "" || data.addresid != 0) {
+                                    alert('Update Successfully.');
+                                    location.href = "/AddressDetails/AddressMaster";
+                                    return false;
+                                }
+                                else {
+                                    alert('Update process Failed.');
+                                    location.href = "/AddressDetails/AddressDetails";
+                                    return false;
+                                }
+
+                            },
+                            error: function (ex) {
+                                alert('Update process Failed in the database.');
+                            }
+                        });
+                    }
+                }
+                else {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/AddressDetails/Updatesupplier',
+                        contentType: false,
+                        processData: false,
+                        dataType: 'html',
+                        data: formdata,
+                        success: function (data) {
+
+                            if (data.addresid != "" || data.addresid != 0) {
+                                alert('Update Successfully.');
+                                location.href = "/AddressDetails/AddressMaster";
+
+                                return false;
+                            }
+                            else {
+                                alert('Update process Failed.');
+                                location.href = "/AddressDetails/AddressDetails";
+                                return false;
+                            }
+
+                        },
+                        error: function (ex) {
+                            alert('Update process Failed in the database.');
+                        }
+                    });
+
+
+                }
+
             }
             else {
-                $.ajax({
-                    type: 'POST',
-                    url: '/AddressDetails/Update',
-                    contentType: false,
-                    processData: false,
-                    dataType: 'html',
-                    data: formdata,
-                    success: function (data) {
-
-                        if (data.addresid != "" || data.addresid != 0) {
-                            alert('Update Successfully.');
-                            location.href = "/AddressDetails/AddressMaster";
-                            return false;
-                        }
-                        else {
-                            alert('Update process Failed.');
-                            location.href = "/AddressDetails/AddressDetails";
-                            return false;
-                        }
-
-                    },
-                    error: function (ex) {
-                        alert('Update process Failed in the database.');
-                    }
-                });
+                alert("Enter all feild correctly");
             }
-
-        }
-        else {
-            alert("Enter all feild correctly");
         }
     }
+
 </script>
+
+
+    

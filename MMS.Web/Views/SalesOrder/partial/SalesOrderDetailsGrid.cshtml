@@ -22,6 +22,7 @@
         .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
             padding: 6px;
         }
+
         #reports_search4_container button, #transaction_reports_search4_container button, #static_report_search4_container button {
             padding: 12px 29px;
             color: #FFFFFF;
@@ -29,7 +30,6 @@
     </style>
 </head>
 <body>
-
     <div class="main-page">
         <div id="transaction_report" class="reports common_Manage_subMerchant">
             <nav class="reports_customers_head d-flex justify-content-between" aria-label="breadcrumb">
@@ -62,7 +62,7 @@
 
                     <div class="form-floating">
                         <select id="salesorderno" class="form-select">
-                                <option value="">Please select SO</option>
+                            <option value="">Please select SO</option>
                         </select>
                         <label for="floatingSelectGrid">SO Number</label>
                     </div>
@@ -195,11 +195,18 @@
                                         <td class="veh1-5" style="width: 12%; text-align: right;">@string.Format("{0:0.00}", i.TaxValue)</td>
                                         <td class="veh1-5" style="width: 12%; text-align: right;">@string.Format("{0:0.00}", i.Grandtotal)</td>
                                         <td class="veh1-5" style="width: 12%;" onclick="Check('@i.SalesorderId_DT')"> <button class="btn btn-secondary" id="Check">Check</button></td>
-
+                                        <td class="veh1-5" style="width: 12%;" onclick="Download('@i.SalesorderId_HD')"><button class="btn btn-secondary" id="Download">Download</button></td>
                                     </tr>
                                     startSerialNumber++;
                                 }
 
+                            </tbody>
+
+                        }
+                        else
+                        {
+                            <tbody>
+                                <tr><td colspan="15">No records found</td></tr>
                             </tbody>
 
                         }
@@ -332,6 +339,26 @@
                     }
                 });
             }
+
+
+        function Download(arg) {
+            $('#myModal').hide();
+
+            $.ajax({
+                type: 'GET',
+
+                url: '/SalesOrder/OrderDetailDownload',
+                data: { id: arg },
+
+                success: function (response) {
+                    console.log(response);
+
+                    if (response.success == true) {
+                        window.location.href = '/SalesOrder/DownloadInvoice';
+                    }
+                }
+            });
+        }
     </script>
 
     <script>
@@ -377,23 +404,27 @@
                         var formattedGrandtotal = (item.Grandtotal).toFixed(2);
 
                         $("tbody").append(`
-                                <tr class="font-14">
-                                    <td class="veh1-5">${count}</td>
-                                    <td class="veh1-5" style="width: 3%;text-align:center;">${item.SalesorderId}</td>
-                                    <td class="veh1-5" style="width: 2%;text-align:center;">${formattedDate}</td>
-                                    <td class="veh1-5" style="width: 12%;text-align:left;">${item.BuyerNames}</td>
-                                    <td class="veh1-5" style="width: 24%;text-align:left;">${item.ProductName}</td>
-                                    <td class="veh1-5" style="width: 12%;text-align:left;">${item.ProductCode}</td>
-                                    <td class="veh1-5" style="width: 12%;text-align:center;">${formattedQuantity} / ${item.Uomname}</td>
-                                    <td class="veh1-5" style="width: 12%;text-align:right;">${formattedDiscountValue}</td>
-                                    <td class="veh1-5" style="width: 12%;text-align:right;">${formattedSubtotal}</td>
-                                    <td class="veh1-5" style="width: 12%;text-align:right;">${formattedTaxValue}</td>
-                                    <td class="veh1-5" style="width: 12%;text-align:right;">${formattedGrandtotal}</td>
-                                    <td class="veh1-5" style="width: 12%;" onclick="Check('${item.SalesorderId_DT}')">
-                                        <button class="btn btn-secondary" id="Check">Check</button>
-                                    </td>
-                                </tr>
-                            `);
+                                    <tr class="font-14">
+                                        <td class="veh1-5">${count}</td>
+                                        <td class="veh1-5" style="width: 3%;text-align:center;">${item.SalesorderId}</td>
+                                        <td class="veh1-5" style="width: 2%;text-align:center;">${formattedDate}</td>
+                                        <td class="veh1-5" style="width: 12%;text-align:left;">${item.BuyerNames}</td>
+                                        <td class="veh1-5" style="width: 24%;text-align:left;">${item.ProductName}</td>
+                                        <td class="veh1-5" style="width: 12%;text-align:left;">${item.ProductCode}</td>
+                                        <td class="veh1-5" style="width: 12%;text-align:center;">${formattedQuantity} / ${item.Uomname}</td>
+                                        <td class="veh1-5" style="width: 12%;text-align:right;">${formattedDiscountValue}</td>
+                                        <td class="veh1-5" style="width: 12%;text-align:right;">${formattedSubtotal}</td>
+                                        <td class="veh1-5" style="width: 12%;text-align:right;">${formattedTaxValue}</td>
+                                        <td class="veh1-5" style="width: 12%;text-align:right;">${formattedGrandtotal}</td>
+                                        <td class="veh1-5" style="width: 12%;" onclick="Check('${item.SalesorderId_DT}')">
+                                            <button class="btn btn-secondary" id="Check">Check</button>
+                                        </td>
+                                        <td class="veh1-5" style="width: 12%;">
+                                           <button class="btn btn-secondary" onclick="Download('${item.SalesorderId_HD}')">Download</button>
+                                            </td>
+
+                                    </tr>
+                                `);
                         count++;
                     });
                 }

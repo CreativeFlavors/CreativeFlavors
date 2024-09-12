@@ -1,12 +1,17 @@
-﻿@model MMS.Web.Models.SupplierMasterModel.SupplierMasterModel
-@using MMS.Repository.Managers
-@using MMS.Core.Entities
+﻿@model  IEnumerable<MMS.Web.Models.SupplierMasterModel.SupplierModel>
 @{
-
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int pageSize = ViewBag.PageSize ?? 9;
+    int totalItems = Model.Count();
+    int startSerialNumber = (currentPage - 1) * pageSize + 1;
 }
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +19,7 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
+
     <style>
         .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
             padding: 16px;
@@ -21,6 +27,13 @@
 
         img#paynows {
             width: 26%;
+        }
+
+        .page-item.active .page-link {
+            z-index: 3;
+            color: #fff;
+            background-color: #4472C4;
+            border-color: #0d6efd;
         }
 
         .manage_customers_table_responsive, .reports .reports_table_responsive {
@@ -39,20 +52,28 @@
         }
     </style>
 </head>
+
 <body>
     <div class="main-page">
         <div id="transaction_report" class="reports common_Manage_subMerchant">
-            <h3>Supplier Master</h3>
-            <div class="table-responsive reports_table_responsive">
-                <div class="d-flex justify-content-between">
-                    <div class="customer_manage_search_container">
-                        <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Contact Name">
-                    </div>
-                    <a href="/SupplierMaterial/SupplierMaterial_Details">
-                        <button type="button" class="manage_customers_btn font-15" id="add" style="color: white; margin-top: 14%;">
+            <div class="d-flex justify-content-between align-items-center manage_customers_head">
+                <div class="manage_customers_main_head">
+                    <h6 class="font-20">Supplier info</h6>
+                </div>
+                <div>
+                    <a href="/SupplierMaster/SupplierMasterDetails">
+                        <button type="button" class="manage_customers_btn font-15" id="add" style="color:white;">
                             ADD
                         </button>
                     </a>
+                </div>
+            </div>
+
+
+
+            <div class="table-responsive reports_table_responsive">
+                <div class="customer_manage_search_container">
+                    <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Supplier Name">
                 </div>
 
                 <div class="manage_customers_table_in_responsive" id="form">
@@ -63,205 +84,349 @@
                                 <th scope="col">
                                     <span>Si.No</span>
                                     <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        <span>
+                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        </span>
                                     </span>
+
                                 </th>
+
                                 <th scope="col">
-                                    <span> Supplier Code</span>
+                                    <span>Supplier Name</span>
                                     <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        <span>
+                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        </span>
                                     </span>
+
                                 </th>
+
                                 <th scope="col">
-                                    <span> Supplier Name</span>
+                                    <span>Supplier Code</span>
                                     <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        <span>
+                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        </span>
                                     </span>
+
                                 </th>
+
+
+
+
                                 <th scope="col">
-                                    <span> Designation</span>
+                                    <span>Telephone</span>
                                     <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        <span>
+                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        </span>
                                     </span>
+
                                 </th>
+
+
+
                                 <th scope="col">
-                                    <span>Information</span>
+                                    <span>Email Contact</span>
                                     <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        <span>
+                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        </span>
                                     </span>
-                                </th><th scope="col">
-                                         <span> Currency</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
+
                                 </th>
+
+
+
                                 <th scope="col">
-                                         <span> Mobile No</span>
+                                    <span>Account Name</span>
                                     <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span><th scope="col">
-                                               <span> Contact Person</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        <span>
+                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        </span>
                                     </span>
+
                                 </th>
+
+
+
+
+                                <th scope="col">
+                                    <span>Zip Code</span>
+                                    <span>
+                                        <span>
+                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        </span>
+                                    </span>
+
+                                </th>
+
                                 <th scope="col">
                                     <span>Status</span>
                                 </th>
+
                             </tr>
+
+
                         </thead>
-                        @if (Model.SupplierMasterList.Count > 0 && Model.SupplierMasterList != null)
+                        @if (Model != null && Model.Count() > 0)
                         {
-                            int count = 1;
+
                             <tbody>
-
-
-                                @foreach (var SupplierMaster in Model.SupplierMasterList)
+                                @foreach (var suppplier in Model)
                                 {
-                                    <tr>
-                                        <td class="veh-1">@count</td>
-                                        <td class="veh-1" style="width: 12%;"> @SupplierMaster.SupplierCode</td>
-                                        <td class="veh-2" style="width: 12%;">@SupplierMaster.SupplierName</td>
-                                        <td class="veh-3" style="width: 12%;">@SupplierMaster.Designation</td>
-                                        <td class="veh-4" style="width: 12%;">@SupplierMaster.OtherInformation</td>
-                                        <td class="veh-5" style="width: 12%;">@SupplierMaster.Currency</td>
-                                        <td class="veh-7" style="width: 12%;">@SupplierMaster.Mobile</td>
-                                        <td class="veh-8" style="width: 12%;">@SupplierMaster.ContactPerson</td>
+
+                                    <tr class="font-14">
+                                        <td class="veh-1">@startSerialNumber</td>
+                                        <td class="veh-2" style="width: 12%; text-align:left"> @suppplier.Suppliername</td>
+                                        <td class="veh-2" style="width: 12%; text-align:left">@suppplier.suppliercode</td>
+                                        <td class="veh-2" style="width: 12%; text-align:left">@suppplier.Telephone1</td>
+                                        <td class="veh-2" style="width: 12%; text-align:left">@suppplier.EmailContact</td>
+                                        <td class="veh-2" style="width: 12%; text-align:left">@suppplier.AccountName</td>
+                                        <td class="veh-2" style="width: 12%; text-align:left">@suppplier.PhysicalCode</td>
                                         <td class="veh-4" style="width:12%;">
                                             <span class="table_icons">
-                                                <img src="~/Content/assets/images/edit-icon.png" onclick="Edit('@SupplierMaster.SupplierMasterId')" />
+                                                <img src="~/Content/assets/images/edit-icon.png" onclick="Edit('@suppplier.SupplierId')" />
                                             </span>
                                             <span class="table_icons">
-                                                <img src="~/Content/assets/images/delete-icon.png" onclick="Delete('@SupplierMaster.SupplierMasterId')" />
+                                                <img src="~/Content/assets/images/delete-icon.png" onclick="Delete('@suppplier.SupplierId')" />
                                             </span>
                                         </td>
+
                                     </tr>
-                                    count++;
+                                    startSerialNumber++;
                                 }
-
                             </tbody>
-
                         }
-                    </table>
+ 
+                        </table>
                 </div>
-                <div class="row manage_customer_show">
-                    <div class="col-xl-6 manage_customer_show_II">
-                        <nav class="float-xl-start">
-                            <ul class="pagination font-14">
-                                @if (ViewBag.startpage != null && ViewBag.endpage != null)
-                                {
-                                    <li class="page-item">
-                                        <a class="page-link" id="left" value="@(ViewBag.currentpage-1)">Previous</a>
-                                    </li>
-                                    for (int i = ViewBag.startpage; i <= ViewBag.endpage; i++)
-                                    {
-                                        <li class="page-item">
-                                            <a class="page-link" id="number" value="@i">@i</a>
-                                        </li>
 
-                                    }
-                                    <li class=" page-item">
-                                        <a class="page-link" id="right" value="@(ViewBag.currentpage+1)">Next</a>
+                <div class="row manage_customer_show">
+                    <div class="font-14 manage_customer_show_I col-xl-6">
+                        <span>Showing</span>
+                        <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
+                            <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
+                            <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
+                            <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
+                            <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
+                        </select>
+
+                    </div>
+
+                    <div class="col-xl-6 manage_customer_show_II">
+                        <nav class="float-xl-end">
+                            <ul class="pagination font-14">
+                                <li class="page-item">
+                                    <a href="" id="previousPage" class="page-link">Previous</a>
+                                </li>
+                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == currentPage ? "active" : "")">
+                                        <a href="" data-page="@i" class="page-link" id="Number">@i</a>
                                     </li>
                                 }
+                                <li class="page-item">
+                                    <a class="page-link" id="nextPage" data-current-page="1" href="">Next</a>
+                                </li>
                             </ul>
                         </nav>
                     </div>
                 </div>
             </div>
-
         </div>
-
     </div>
+
+
+
+    <script src="~/Content/js/custom.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+
     <script>
-    $(document).ajaxStart(function () {
-        $(".loader-overlay").css("display", "block");
-    });
 
-    $(document).ajaxComplete(function () {
-        $(".loader-overlay").css("display", "none");
-    });
-    $(window).load(function () {
-        $('.loader-overlay').fadeOut('fast');
-    });
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#suppliername").attr('checked', true);
 
-    $(function () {
-        setTimeout(function () { $("#spn_error").fadeOut(1500); }, 5000);
-
-    })
-    function Search() {
-        $.ajax({
-            type: "POST",
-            url: ' @Url.Action("Search", "SupplierMaster")',
-            data: { filter: $('#SeaarchID').val() },
-            success: function (data) {
-
-                $(".veh-tablewrap").html(data);
-                $(".veh-tablewrap").show();
-                $('#DivShow').hide();
-                $('#EditColorPartial').hide();
-            }
-        });
-    }
-
-    function Cancel() {
-        $('#EditColorPartial').hide();
-        $('.veh-tablecont').css('display', 'block');
-    }
-    function Add() {
-        $('.veh-tablecont').css('display', 'none');
-        $.ajax({
-            type: "POST",
-            url: ' @Url.Action("SupplierMasterDetails", "SupplierMaster")',
-            data: { SupplierMasterId: 0 },
-            success: function (data) {
-                $("#EditColorPartial").html(data);
-                $("#EditColorPartial").show();
-            }
         });
 
-    }
-    function Edit(arg) {
-        $('.veh-tablecont').css('display', 'none');
-        $.ajax({
-            type: "POST",
-            url: ' @Url.Action("SupplierMasterDetails", "SupplierMaster")',
-            data: { SupplierMasterId: arg },
-            success: function (data) {
-                $("#EditColorPartial").html(data);
-                $("#EditColorPartial").show();
-            }
-        });
+        var currentPage = @(currentPage);
 
-    }
-        function Delete(arg) {
-            debugger;
-        var answer = confirm("Are you sure want to delete?");
-        if (answer) {
+          $(document).ready(function () {
+
+              $(document).on('change', '#manage_customer_show_no', function () {
+                  var pageSize = parseInt($(this).val());
+                  //var pageSize = this.value;
+                  $.ajax({
+                      type: 'GET',
+                       url: '@Url.Action("SupplierMasterGrid", "SupplierMaster")',
+                      data: { pageSize: pageSize },
+                      success: function (data) {
+
+                          $('.main-page').html(data);
+                      }
+                  });
+
+              });
+
+             //next page
+              $(document).on('click', '#nextPage', function () {
+                          //var currentPage = @(ViewBag.CurrentPage);
+                  //var currentPage = parseInt('@ViewBag.CurrentPage');
+
+                            var totalPages = parseInt('@ViewBag.TotalPages');
+                             if (currentPage < totalPages) {
+                              var nextPage = currentPage + 1;
+                              $.ajax({
+                                  type: 'GET',
+                                  url: '@Url.Action("SupplierMasterGrid", "SupplierMaster")',
+                                  data: { page: nextPage, pageSize: parseInt('@ViewBag.PageSize') },
+                                  success: function (data) {
+                                      $('.main-page').html(data);
+                                      currentPage = nextPage;
+                                      console.log(currentPage)
+                                  }
+                              });
+
+                           }
+              });
+
+
+                //previous page
+              $(document).on('click', '#previousPage', function () {
+                  //var currentPage = parseInt('@ViewBag.CurrentPage');
+                  if (currentPage > 1) {
+                      var previousPage = currentPage - 1;
+                      console.log(`Previous page: ${previousPage}`);
+                      $.ajax({
+                          type: 'GET',
+                          url: '@Url.Action("SupplierMasterGrid", "SupplierMaster")',
+                          data: { page: previousPage, pageSize: parseInt('@ViewBag.PageSize') },
+                          success: function (data) {
+                              $('.main-page').html(data);
+                              currentPage = previousPage;
+                              console.log('Preiouscurrentpage:$(currentPage)');
+                          }
+                      });
+                  }
+              });
+
+
+
+             //for number list
+              $(document).on('click', '#Number', function () {
+
+                  //var page = $(this).data('page');
+                  var pageNumber = $(this).attr('data-page');
+                  currentPage = parseInt(pageNumber);
+                  console.log(currentPage);
+                  loadGridData(pageNumber);
+                  });
+          });
+
+           function loadGridData(page) {
+
+              $.ajax({
+                  type: 'GET',
+                  url: '@Url.Action("SupplierMasterGrid", "SupplierMaster")',
+                  data: { page: page },
+                  success: function (data) {
+                      $('.main-page').html(data);
+                  }
+              });
+            }
+
+    </script>
+
+
+
+    <script>
+        //search
+        $(document).ready(function () {
+            $("#customer_manage_search").keyup(function () {
+
+                var suppliersearch = $("#customer_manage_search").val();
+                $.ajax({
+                    type: 'GET',
+                    url: '/SupplierMaster/Search',
+                    data: { filter: suppliersearch },
+                    contentType: 'application/json',
+                    success: function (response) {
+                        $("tbody").empty();
+                        var count = 1;
+                        $.each(response, function (i, item) {
+                            $("tbody").append(`
+                                    <tr class="font-14">
+                                        <td class="veh1-5">${count}</td>
+                                        <td class="veh1-5" style="width: 12%; text-align:left">${item.Suppliername}</td>
+                                        <td class="veh1-5" style="width: 12%; text-align:left">${item.suppliercode}</td>
+                                        <td class="veh1-5" style="width: 12%; text-align:left">${item.Telephone1}</td>
+                                        <td class="veh1-5" style="width: 12%; text-align:left">${item.EmailContact}</td>
+                                        <td class="veh1-5" style="width: 12%; text-align:left">${item.AccountName}</td>
+                                        <td class="veh1-5" style="width: 12%; text-align:left">${item.PhysicalCode}</td>
+                                        <td class="veh-4" style="width:12%;">
+                                            <span class="table_icons">
+                                                <img src="/Content/assets/images/edit-icon.png" onclick="Edit('${item.SupplierId}')" />
+                                            </span>
+                                            <span class="table_icons">
+                                                <img src="/Content/assets/images/delete-icon.png" onclick="Delete('${item.SupplierId}')" />
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `);
+                            count++;
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        //get supplier buy id
+
+        function Edit(id) {
+            $('.main-page').hide();
             $.ajax({
                 type: 'POST',
-                url: ' @Url.Action("Delete", "SupplierMaster")',
-                data: { BuyerMasterId: arg },
-                success: function (data) {
-                    if (data == "Success") {
-                        alert('Deleted Successfully.');
-                        location.href = "/SupplierMaster/SupplierMaster";
-                        return false;
-                    }
-                    else {
-                        alert('Color Details deletion failed.');
-                    }
-
-                },
-                error: function (ex) {
-                    alert('This Color Already Exist in the database.');
+                url: '@Url.Action("GetSupplierById", "SupplierMaster")',
+                data: { id: id },
+                success: function (response) {
+                    $(".main-page").html(response);
+                    $(".main-page").show();
                 }
             });
         }
-        else {
-            return false;
-        }
-    }
 
+
+
+        function Delete(id) {
+            var answer = confirm("Are u sure want to delete");
+            if (answer) {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("Delete", "SupplierMaster")',
+                    data: { id: id },
+                    success: function (response) {
+                        alert("Delete Successfully");
+                        window.location.href = '/SupplierMaster/SupplierMaster';
+                        return false;
+                    },
+                    else: function (ex) {
+                        alert('This address Already Exist in the database.');
+                    }
+                });
+            }
+            else {
+                return false;
+            }
+        }
 
     </script>
+
+</body>
+</html>
+

@@ -1,6 +1,4 @@
-﻿using Excel.Log;
-using iTextSharp.text;
-using Microsoft.Ajax.Utilities;
+﻿using iText.Layout.Properties;
 using MMS.Core.Entities;
 using MMS.Repository.Managers;
 using MMS.Repository.Managers.StockManager;
@@ -13,15 +11,19 @@ using MMS.Web.Models.TempsalesorderModel;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.EnterpriseServices;
-using System.EnterpriseServices.CompensatingResourceManager;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.UI;
-using static iTextSharp.text.pdf.AcroFields;
-
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+using MMS.Data.Mapping;
+using MMS.Repository.ViewModel;
+using MMS.Repository.Service;
+using iText.IO.Image;
+using iText.Layout.Borders;
 namespace MMS.Web.Controllers
 {
     public class SalesOrderController : Controller
@@ -48,6 +50,7 @@ namespace MMS.Web.Controllers
                 salesorder.SalesorderId = i.salesorderid;
                 salesorder.salesorderdate = i.salesorderdate;
                 salesorder.SalesorderId_DT = i.salesorderid_dt;
+                salesorder.SalesorderId_HD = i.salesorderid_hd;
                 salesorder.quantity = i.quantity;
                 salesorder.discountvalue = i.discount_value;
                 salesorder.Subtotal = i.subtotal;
@@ -80,7 +83,7 @@ namespace MMS.Web.Controllers
         {
             SalesorderHD_Manager salesorderManager = new SalesorderHD_Manager();
             SalesorderDT_Manager SalesorderDT_Manager = new SalesorderDT_Manager();
-            BuyerManager BuyerManager = new BuyerManager();
+            BuyerMasterManager BuyerManager = new BuyerMasterManager();
             var data1 = BuyerManager.Get();
             List<Salesorders> totalList = new List<Salesorders>();
             var data = salesorderManager.Get();
@@ -168,8 +171,8 @@ namespace MMS.Web.Controllers
                     tax += i.taxvalue;
                     grandtotal += i.totalprice;
                 }
-                model.Billingadd = data.Add1;
-                model.shippingadd = data.Add2;
+                //model.Billingadd = data.Add1;
+                //model.shippingadd = data.Add2;
                 model.Total_Price = price;
                 model.Total_Subtotal = subtotal;
                 model.Total_discountval = discount;
@@ -230,8 +233,12 @@ namespace MMS.Web.Controllers
             Temp_salesorderManager temp_SalesorderManager1 = new Temp_salesorderManager();
             SalesorderDT_Manager salesorderManager = new SalesorderDT_Manager();
             var sts = salesorderManager.GetSO(sodt);
-            var st1 = temp_SalesorderManager1.GetProd(id, sts.Salesorderid_hd);
-            if (st1.Count() != 0)
+            List<Temp_Indent> tempro = new List<Temp_Indent>();
+            if (sts != null)
+            {
+                tempro = temp_SalesorderManager1.GetProd(id, sts.Salesorderid_hd);
+            }
+            if (tempro.Count() != 0)
             {
                 return Json(new { data = "Failer" }, JsonRequestBehavior.AllowGet);
             }
@@ -295,21 +302,25 @@ namespace MMS.Web.Controllers
         {
             Temp_productionManager Temp_productionManager = new Temp_productionManager();
             var st1 = Temp_productionManager.GetPro(id);
-            var sts = Temp_productionManager.GetProd(proid, st1.SalesOrderId);
+            List<temp_production> obj = new List<temp_production>();
+            if (st1 != null)
+            {
+                obj = Temp_productionManager.GetProd(proid, st1.SalesOrderId);
+            }
 
-            if (sts.Count() != 0)
+            if (obj.Count() != 0)
             {
                 return Json(new { data = "Failer" }, JsonRequestBehavior.AllowGet);
             }
             SalesorderDT_Manager salesorderManager = new SalesorderDT_Manager();
             subassemblyManager subassemblyManager = new subassemblyManager();
             ProductManager productManager = new ProductManager();
+            temp_production temp_production = new temp_production();
             Parentbom_materialManager bOMMaterialListManager = new Parentbom_materialManager();
             var st = salesorderManager.GetSO(sodt);
             var product = productManager.GetId(st.productid);
             var bommaterial = bOMMaterialListManager.GetMaterialList(product.BomNo);
             var submaterial = subassemblyManager.GetMaterialList(product.BomNo);
-            temp_production temp_production = new temp_production();
             preproduction preproduction = new preproduction();
             foreach (var item in bommaterial)
             {
@@ -394,9 +405,13 @@ namespace MMS.Web.Controllers
         {
             Temp_productionManager Temp_productionManager = new Temp_productionManager();
             SalesorderDT_Manager salesorderManager = new SalesorderDT_Manager();
+            List<temp_production> tempro = new List<temp_production>();
             var st = salesorderManager.GetSO(SOid);
-            var st1 = Temp_productionManager.GetProd(proid, st.Salesorderid_hd);
-            if (st1.Count() != 0)
+            if (st != null)
+            {
+                tempro = Temp_productionManager.GetProd(proid, st.Salesorderid_hd);
+            }
+            if (tempro.Count() != 0)
             {
                 return Json(new { data = "Failer" }, JsonRequestBehavior.AllowGet);
             }
@@ -457,8 +472,12 @@ namespace MMS.Web.Controllers
             Temp_salesorderManager Temp_productionManager = new Temp_salesorderManager();
             SalesorderDT_Manager salesorderManager = new SalesorderDT_Manager();
             var sts = salesorderManager.GetSO(SOid);
-            var st1 = Temp_productionManager.GetProd(proid, sts.Salesorderid_hd);
-            if (st1.Count() != 0)
+            List<Temp_Indent> tempro = new List<Temp_Indent>();
+            if (sts != null)
+            {
+                tempro = Temp_productionManager.GetProd(proid, sts.Salesorderid_hd);
+            }
+            if (tempro.Count() != 0)
             {
                 return Json(new { data = "Failer" }, JsonRequestBehavior.AllowGet);
             }
@@ -638,11 +657,12 @@ namespace MMS.Web.Controllers
         [HttpPost]
         public ActionResult SalesorderDetails(Salesorders model)
         {
+            string AlertMessage = "";
             SalesorderManager salesorderManager = new SalesorderManager();
             salesordercart salesorder = new salesordercart();
             ProductManager productManager = new ProductManager();
             TaxTypeManager taxTypeManager = new TaxTypeManager();
-            BuyerManager buyerManager = new BuyerManager();
+            BuyerMasterManager buyerManager = new BuyerMasterManager();
 
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
             decimal? conversionval = 0;
@@ -675,8 +695,27 @@ namespace MMS.Web.Controllers
             {
                 salesorder.salesordernumber = model.salesordernumber;
             }
+            CustAddressMangers custAddressMangers = new CustAddressMangers();
             var product = productManager.GetId(model.ProductID);
             var tax = taxTypeManager.GetTaxMasterId(product.TaxMasterId);
+            var shipping = custAddressMangers.GetCustAddressbuyeridshipp(model.buyerid);
+            var billing = custAddressMangers.GetCustAddressbuyerid(model.buyerid);
+            if (shipping == null && billing == null)
+            {
+                AlertMessage = "Not Existed";
+                return Json(new { AlertMessage = AlertMessage }, JsonRequestBehavior.AllowGet);
+            }
+            else if (shipping == null)
+            {
+                AlertMessage = "Not Existed";
+                return Json(new { AlertMessage = AlertMessage }, JsonRequestBehavior.AllowGet);
+
+            }
+            else if (billing == null)
+            {
+                AlertMessage = "Not Existed";
+                return Json(new { AlertMessage = AlertMessage }, JsonRequestBehavior.AllowGet);
+            }
             var addreddcode = buyerManager.GetBuyerMasterId(model.buyerid);
             salesorder.ProductNameid = model.ProductID;
             salesorder.ProductCode = product.ProductCode;
@@ -693,8 +732,8 @@ namespace MMS.Web.Controllers
             salesorder.originalquotedate = DateTime.Now;
             salesorder.custaddcode = addreddcode.BuyerCode;
             salesorder.producttype_id = product.ProductType;
-            salesorder.custbillcode = addreddcode.BuyerAddress1;
-            salesorder.custshipcode = addreddcode.BuyerAddress2;
+            salesorder.custbillcode = billing.Addresshd_id.ToString();
+            salesorder.custshipcode = shipping.Addresshd_id.ToString();
             var unitprice = product.Price * conversionval;
             salesorder.taxinclusive = true;
             salesorder.isactive = true;
@@ -702,7 +741,6 @@ namespace MMS.Web.Controllers
             var qty = model.quantity;
             var discount = model.discountperid;
             int intVal = int.Parse(taxper);
-            string AlertMessage = "";
             if ((model.quantity != null) && (discount != null))
             {
                 var subtotal = qty * unitprice;
@@ -730,7 +768,7 @@ namespace MMS.Web.Controllers
             salesorder = salesorderManager.Post(salesorder);
 
             AlertMessage = "Added Successfully";
-            return Json(new { customerid = salesorder.customerid, AlertMessage = AlertMessage,salesorderno= salesorder.salesordernumber }, JsonRequestBehavior.AllowGet);
+            return Json(new { customerid = salesorder.customerid, AlertMessage = AlertMessage, salesorderno = salesorder.salesordernumber }, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
         public ActionResult ConfirmSalesorder(Salesorders model)
@@ -840,6 +878,7 @@ namespace MMS.Web.Controllers
                 salesorder.SalesorderId = i.salesorderid;
                 salesorder.salesorderdate = i.salesorderdate;
                 salesorder.SalesorderId_DT = i.salesorderid_dt;
+                salesorder.SalesorderId_HD = i.salesorderid_hd;
                 salesorder.quantity = i.quantity;
                 salesorder.discountvalue = i.discount_value;
                 salesorder.Subtotal = i.subtotal;
@@ -858,7 +897,7 @@ namespace MMS.Web.Controllers
         {
             SalesorderHD_Manager salesorderManager = new SalesorderHD_Manager();
             SalesorderDT_Manager salesorderDT_manager = new SalesorderDT_Manager();
-            BuyerManager BuyerManager = new BuyerManager();
+            BuyerMasterManager BuyerManager = new BuyerMasterManager();
             var data1 = BuyerManager.Get();
             List<Salesorders> totalList = new List<Salesorders>();
             var data = salesorderManager.Get();
@@ -924,8 +963,32 @@ namespace MMS.Web.Controllers
         {
             CustAddressMangers custAddressMangers = new CustAddressMangers();
             var data = custAddressMangers.GetCustAddressbuyerid(id);
-
-            return Json(data, JsonRequestBehavior.AllowGet);
+            string address1 = "";
+            if(data != null)
+            {
+                var data1 = custAddressMangers.GetCustbuyerid(id ,data.Addresshd_id);
+                if(data1 != null)
+                {
+                    address1 = data1.address1;
+                }
+            }
+            return Json(address1, JsonRequestBehavior.AllowGet);
+        }
+        [HttpGet]
+        public ActionResult Getcustomeraddressship(int id)
+        {
+            CustAddressMangers custAddressMangers = new CustAddressMangers();
+            var data = custAddressMangers.GetCustAddressbuyeridshipp(id);
+            string address1 = "";
+            if(data != null)
+            {
+                var data1 = custAddressMangers.GetCustbuyeridship(id ,data.Addresshd_id);
+                if(data1 != null)
+                {
+                    address1 = data1.address1;
+                }
+            }
+            return Json(address1, JsonRequestBehavior.AllowGet);
         }
         public ActionResult Getbuyerorderno(int id)
         {
@@ -935,14 +998,163 @@ namespace MMS.Web.Controllers
         }
         public ActionResult buyernamesearch(string filter)
         {
-            List<BuyerMaster> buyerMasters = new List<BuyerMaster>();
-            BuyerManager buyerManager = new BuyerManager();
+            List<BuyerMaster1> buyerMasters = new List<BuyerMaster1>();
+            BuyerMasterManager buyerManager = new BuyerMasterManager();
             var data = buyerManager.Get();
-            buyerMasters = data.Where(x => x.BuyerFullName.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
+            buyerMasters = data.Where(x => x.CustomerName.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
             var Addressdetailslist = buyerMasters;
             return Json(Addressdetailslist, JsonRequestBehavior.AllowGet);
         }
 
         #endregion
+        #region pdf 
+        //download pdf
+        public byte[] GeneratePDF(Salesorders salesordersinvoice)
+        {          
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                PdfWriter writer = new PdfWriter(stream);
+                PdfDocument pdf = new PdfDocument(writer);
+                Document document = new Document(pdf);
+
+
+                string imageURL = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content/assets/images/creative.jpg");
+
+                ImageData data = ImageDataFactory.Create(imageURL);
+
+                Image image = new Image(data);
+                image.SetWidth(UnitValue.CreatePercentValue(25));
+                image.SetHorizontalAlignment(HorizontalAlignment.RIGHT);
+
+                document.Add(image);
+                Paragraph header = new Paragraph("Creative Flavors International ").SetTextAlignment(TextAlignment.CENTER).SetFontSize(15);
+                header.SetFixedPosition(36, 770, 550);
+                document.Add(header);
+                document.Add(new Paragraph("" +
+              "25 Roma Street\r\nCosmo Business Park\r\nCosmo City")
+
+              .SetTextAlignment(TextAlignment.CENTER)
+              .SetFontSize(10));
+
+
+
+               document.Add(new Paragraph("SALES ORDER:")          
+              .SetTextAlignment(TextAlignment.LEFT)
+              .SetFontSize(20));
+
+
+
+                //// Invoice data
+                document.Add(new Paragraph($"Order Number: {salesordersinvoice.SalesorderId}"));
+                document.Add(new Paragraph($"Salesorder Date: {salesordersinvoice.salesorderdate}"));
+                document.Add(new Paragraph($"Buyer Name: {salesordersinvoice.BuyerNames}"));   
+
+                //// Table for invoice items
+                Table table = new Table(8);
+
+                table.SetWidth(UnitValue.CreatePercentValue(100));
+                table.AddHeaderCell("Product Name ");
+                table.AddHeaderCell("Customer Name");
+                table.AddHeaderCell("Product Code ");
+                table.AddHeaderCell("Qty/UOM ");
+                table.AddHeaderCell("Discount");
+                table.AddHeaderCell("Sub Total ");
+                table.AddHeaderCell("Tax Amount ");
+                table.AddHeaderCell("Total Price ");
+
+                //value for grid
+                table.AddCell(new Cell().Add(new Paragraph(salesordersinvoice.ProductName)));
+                table.AddCell(new Cell().Add(new Paragraph(salesordersinvoice.BuyerNames)));
+                table.AddCell(new Cell().Add(new Paragraph(salesordersinvoice.ProductCode)));
+                table.AddCell(new Cell().Add(new Paragraph(string.Format("{0:0.00}", salesordersinvoice.quantity) + "/" + salesordersinvoice.Uomname)));
+                table.AddCell(new Cell().Add(new Paragraph(string.Format("{0:0.00}", salesordersinvoice.discountvalue))));
+                table.AddCell(new Cell().Add(new Paragraph(string.Format("{0:0.00}", salesordersinvoice.Subtotal))));
+                table.AddCell(new Cell().Add(new Paragraph(string.Format("{0:0.00}", salesordersinvoice.TaxValue))));
+                table.AddCell(new Cell().Add(new Paragraph(string.Format("{0:0.00}", salesordersinvoice.Grandtotal))));
+                
+                //Add the Table to the PDF Document
+                document.Add(table);
+
+                // Close the Document
+                document.Close();
+                return stream.ToArray();
+            }
+        }
+
+        [HttpGet]
+        public ActionResult OrderDetailDownload(int id)
+        {
+           
+            SalesorderDT_Manager salesorderManager = new SalesorderDT_Manager();
+            List<Salesorders> totaldata = new List<Salesorders>();
+
+            var totallist = salesorderManager.salesorder_Grid();
+            foreach (var i in totallist)
+            {
+                Salesorders salesorder = new Salesorders();
+                salesorder.SalesorderId = i.salesorderid;
+                salesorder.salesorderdate = i.salesorderdate;
+                salesorder.SalesorderId_DT = i.salesorderid_dt;
+                salesorder.SalesorderId_HD = i.salesorderid_hd;
+
+                salesorder.quantity = i.quantity;
+                salesorder.discountvalue = i.discount_value;
+                salesorder.Subtotal = i.subtotal;
+                salesorder.TaxValue = i.taxvalue;
+                salesorder.Grandtotal = i.totalprice;
+                salesorder.Uomname = i.long_unit_name;
+                salesorder.BuyerNames = i.buyer_full_name;
+                salesorder.ProductName = i.productname;
+                salesorder.ProductCode = i.productcode;
+                totaldata.Add(salesorder);
+            }
+            var singleInvoice = totallist.Where(x => x.salesorderid == id).FirstOrDefault();
+            if (singleInvoice != null)
+            {
+                Salesorders singleinvoicesalesorders = new Salesorders();
+                singleinvoicesalesorders.SalesorderId = singleInvoice.salesorderid;
+                singleinvoicesalesorders.salesorderdate = singleInvoice.salesorderdate;
+                singleinvoicesalesorders.SalesorderId_DT = singleInvoice.salesorderid_dt;
+                singleinvoicesalesorders.SalesorderId_HD = singleInvoice.salesorderid_hd;
+
+                singleinvoicesalesorders.quantity = singleInvoice.quantity;
+                singleinvoicesalesorders.discountvalue = singleInvoice.discount_value;
+                singleinvoicesalesorders.Subtotal = singleInvoice.subtotal;
+                singleinvoicesalesorders.TaxValue = singleInvoice.taxvalue;
+                singleinvoicesalesorders.Grandtotal = singleInvoice.totalprice;
+                singleinvoicesalesorders.Uomname = singleInvoice.long_unit_name;
+                singleinvoicesalesorders.BuyerNames = singleInvoice.buyer_full_name;
+                singleinvoicesalesorders.ProductName = singleInvoice.productname;
+                singleinvoicesalesorders.ProductCode = singleInvoice.productcode;
+
+               
+                //Call the GeneratePDF method passing the Invoice Data
+                var pdfFile = GeneratePDF(singleinvoicesalesorders);
+
+               Session["File"] = pdfFile;
+              
+                // Convert the PDF file to a base64 string
+                string pdfBase64 = Convert.ToBase64String(pdfFile);
+                return Json(new { success = true, pdfFile = pdfBase64, fileName = "salesorderInvoice.pdf" }, JsonRequestBehavior.AllowGet);
+            }
+            return View();
+
+        }
+
+        public ActionResult DownloadInvoice()
+        {
+
+            // Retrieve the PDF file from the session
+            byte[] pdfFile = (byte[])Session["File"];
+
+            // Return the PDF file as a FileContentResult
+            return File(pdfFile, "application/pdf", "SalesOrder.pdf");
+        }
+
+
+        #endregion
     }
+
+
 }

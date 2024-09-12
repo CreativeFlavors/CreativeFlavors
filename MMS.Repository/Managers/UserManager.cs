@@ -199,52 +199,61 @@ namespace MMS.Repository.Managers
             }
         }
 
-        public bool ChangetheForpasswordPut(Users arg)
+        public string ChangetheForpasswordPut(Users arg)
         {
-            bool result = false;
-            try
+            string Alertmessage = "";
+            Users model = userRepository.Table.Where(x => x.Email.ToLower().Trim().Equals(arg.Email.ToLower().Trim())).FirstOrDefault();
+            if (model != null)
             {
-                Users model = userRepository.Table.Where(p => p.Email == arg.Email).FirstOrDefault();
-                if (model != null)
+                var confirm = userRepository.Table.Where(x => x.Email.ToLower().Trim().Equals(arg.Email.ToLower().Trim())&&x.Password.ToLower().Trim().Equals(arg.Password.ToLower().Trim())).FirstOrDefault();
+                if (confirm != null)
                 {
-                    if (HttpContext.Current.Session["UserName"] != null)
-                    {
-                        string username = HttpContext.Current.Session["UserName"].ToString();
-                        model.UpdatedBy = username;
-                    }
-                    if (arg.Password == "" || arg.Password == null)
-                    {
-                        //model.Password = Cryptography.CreateRandomPassword(6);
-                        model.Password = arg.Password;
-                    }
-                    else
-                    {
-                        model.Password = arg.Password;
-                    }
+                    Alertmessage = "Success";
+                    HttpContext.Current.Session["UserEmail"] = confirm.Email;
+                    HttpContext.Current.Session["UserName"] = confirm.FirstName;
+                    HttpContext.Current.Session["LastName"] = confirm.LastName;
+                    HttpContext.Current.Session["UserType"] = confirm.UserType;
+                    UserTypeManager userTypeManager = new UserTypeManager();
+                    var usertypename = userTypeManager.Get().Where(m=>m.UserTypeID == confirm.UserType).FirstOrDefault();
 
-                    userRepository.Update(arg);
-                    result = true;
-                    //if (arg.Password == "" || arg.Password == null)
-                    //{
-                    //    string urername = model.FirstName + model.LastName;
-                    //    string host = HttpContext.Current.Request.Url.Host;
-                    //    EmailHelper.SendResetPasswordEmailMsg("test@gmail.com", "New Password from Enco Shoes", model.Password, urername, host);
-                    //}
-                    //EmailHelper.SendMessageWithAttachment("", "Karthikpalanisamy90@gmail.com","New Password from Enco Shoes", "Password : " + model.Password + "","","","");
-
+                    if (usertypename != null)
+                    {
+                        HttpContext.Current.Session["UserTypename"] = usertypename.UserTypeDesc;
+                    }
                 }
                 else
                 {
-                    return false;
+                    Alertmessage = "passwrong";
                 }
-
             }
-            catch (Exception ex)
+            else
             {
-                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                Alertmessage = "incorrectEP";
             }
-            return result;
+            return Alertmessage;
         }
+        public Users GetLogin()
+        {
+            Users user = new Users();
 
+            if (HttpContext.Current?.Session != null)
+            {
+                if (HttpContext.Current.Session["UserName"] != null)
+                {
+                    string username = HttpContext.Current.Session["UserName"].ToString();
+                    string LastName = HttpContext.Current.Session["LastName"].ToString();
+                    string UserType = HttpContext.Current.Session["UserType"].ToString();
+                    user.FirstName = username;
+                    user.LastName = LastName;
+                    user.UserType = int.Parse(UserType);
+                }
+            }
+            else
+            {
+
+            }
+
+            return user;
+        }
     }
 }

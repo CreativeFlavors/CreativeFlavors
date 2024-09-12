@@ -16,6 +16,8 @@ namespace MMS.Data.StoredProcedureModel
         public string RefInvoiceNumber { get; set; }
         [Column("items")]
         public int Items { get; set; }
+        [Column("grnnumber")]
+        public int grnnumber { get; set; }
         [Column("GrnDate")]
         public decimal? Quantity { get; set; }
         [Column("unitprice")]

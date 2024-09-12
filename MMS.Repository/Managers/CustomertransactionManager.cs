@@ -31,7 +31,7 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                string username = "admin";
+                string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.CreatedBy = username;
                 arg.CreatedDate = DateTime.Now;
                 customertransactionrep.Insert(arg);

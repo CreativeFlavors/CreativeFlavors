@@ -1,6 +1,11 @@
 ﻿@model IEnumerable<MMS.Web.Models.CustomerTransaction.Customertransaction>
 @using MMS.Repository.Managers
-
+@{
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int pageSize = ViewBag.PageSize ?? 8;
+    int totalItems = Model.Count();
+    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,7 +20,7 @@
         img#paynows {
             width: 26%;
         }
-   /*     .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
+        /*     .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
             padding: 20px;
         }*/
         .page-item.active .page-link {
@@ -127,11 +132,11 @@
                                     </span>
                                 </th>
                                 @*<th scope="col">
-                                        <span>Ledger</span>
-                                        <span>
-                                            <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
-                                        </span>
-                                    </th>*@
+                    <span>Ledger</span>
+                    <span>
+                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                    </span>
+                </th>*@
                                 <th scope="col">
                                     <span>Qty / Invoice Item </span>
                                     <span>
@@ -145,17 +150,25 @@
                         </thead>
                         @if (Model != null && Model.Count() > 0)
                         {
-                            int count = 1;
+
                             <tbody>
                                 @foreach (var i in Model)
                                 {
 
                                     <tr class="font-14">
-                                        <td class="veh1-5">@count</td>
-                                        <td class="veh1-5" style="width: 12%; text-align:left;">@i.BuyerMaster.BuyerFullName</td>
+                                        <td class="veh1-5">@startSerialNumber</td>
+                                        @if (i.BuyerMaster != null)
+                                        {
+                                            <td class="veh1-5" style="width: 12%; text-align:left;">@i.BuyerMaster.CustomerName</td>
+
+                                        }
+                                        else
+                                        {
+                                            <td class="veh1-5" style="width: 12%; text-align:left;"></td>
+                                        }
                                         <td class="veh1-5" style="width: 12%; text-align: right;">@i.InvHDNumber</td>
                                         <td class="veh1-5" style="width: 12%;">@i.InvDate.ToString("dd/MM/yyyy")</td>
-                                        <td class="veh1-5" style="width: 12%; text-align: right; ">@string.Format("{0:0.00}",i.InvAmount)</td>
+                                        <td class="veh1-5" style="width: 12%; text-align: right; ">@string.Format("{0:0.00}", i.InvAmount)</td>
                                         @if (i.InvPaidAmount == null)
                                         {
                                             <td class="veh1-5" style="width: 12%; text-align: right; ">0</td>
@@ -163,19 +176,26 @@
                                         }
                                         else if (i.InvPaidAmount != null)
                                         {
-                                    <td class="veh1-5" style="width: 12%; text-align: right; ">@string.Format("{0:0.00}", i.InvPaidAmount)</td>
-                                    <td class="veh1-5" style="width: 12%; text-align: right; ">@string.Format("{0:0.00}", i.InvBalanceAmount)</td>
+                                            <td class="veh1-5" style="width: 12%; text-align: right; ">@string.Format("{0:0.00}", i.InvPaidAmount)</td>
+                                            <td class="veh1-5" style="width: 12%; text-align: right; ">@string.Format("{0:0.00}", i.InvBalanceAmount)</td>
                                         }
                                         @*<td class="veh1-5" style="width: 12%;">@i.RefItems</td>*@
-                                    <td class="veh1-5" style="width: 12%; ">@string.Format("{0:0.00}", i.RefQuantity) / @i.RefItems</td>
+                                        <td class="veh1-5" style="width: 12%; ">@string.Format("{0:0.00}", i.RefQuantity) / @i.RefItems</td>
 
                                         <td id="paynow" onclick="booking('@i.InvHDNumber')">
                                             <div><img src="~/Content/assets/images/payment-method.png" id="paynows" /></div>
                                         </td>
                                     </tr>
-                                    count++;
+                                    startSerialNumber++;
                                 }
 
+                            </tbody>
+
+                        }
+                        else
+                        {
+                            <tbody>
+                                <tr><td colspan="9">No records found</td></tr>
                             </tbody>
 
                         }
@@ -309,20 +329,20 @@
                         const invPaidAmount = item.InvPaidAmount ?? 0;
                         const InvAmount = item.InvPaidAmount?.InvBalanceAmount ?? item.InvBalanceAmount ?? 0;
                         $("tbody").append(`
-                                                      <tr class="font-14">
-                                                          <td class="veh1-5">${count}</td>
-                                                          <td class="veh1-5" style="width: 12%; text-align: left;">${item.BuyerMaster.BuyerFullName}</td>
-                                                          <td class="veh1-5" style="width: 12%; text-align: right;">${item.InvHDNumber}</td>
-                                                          <td class="veh1-5" style="width: 12%;">${formattedDate}</td>
-                                                          <td class="veh1-5" style="width: 12%; text-align: right;">${item.InvAmount}</td>
-                                                          <td class="veh1-5" style="width: 12%; text-align: right;">${invPaidAmount}</td>
-                                                          <td class="veh1-5" style="width: 12%; text-align: right;">${InvAmount}</td>
-                                                          <td class="veh1-5" style="width: 12%;">${item.RefItems} / ${item.RefQuantity}</td>
-                                                          <td id="paynow"  onclick="booking('${item.InvHDNumber}')">
-                                                          <div><img src="/Content/assets/images/payment-method.png" id="paynows" "/></div>
-                                                           </td>
-                                                      </tr>
-                                                  `);
+                                                              <tr class="font-14">
+                                                                  <td class="veh1-5">${count}</td>
+                                                                  <td class="veh1-5" style="width: 12%; text-align: left;">${item.BuyerMaster.BuyerFullName}</td>
+                                                                  <td class="veh1-5" style="width: 12%; text-align: right;">${item.InvHDNumber}</td>
+                                                                  <td class="veh1-5" style="width: 12%;">${formattedDate}</td>
+                                                                  <td class="veh1-5" style="width: 12%; text-align: right;">${item.InvAmount}</td>
+                                                                  <td class="veh1-5" style="width: 12%; text-align: right;">${invPaidAmount}</td>
+                                                                  <td class="veh1-5" style="width: 12%; text-align: right;">${InvAmount}</td>
+                                                                  <td class="veh1-5" style="width: 12%;">${item.RefItems} / ${item.RefQuantity}</td>
+                                                                  <td id="paynow"  onclick="booking('${item.InvHDNumber}')">
+                                                                  <div><img src="/Content/assets/images/payment-method.png" id="paynows" "/></div>
+                                                                   </td>
+                                                              </tr>
+                                                          `);
                         count++;
                     });
                 },

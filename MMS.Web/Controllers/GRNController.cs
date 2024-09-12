@@ -16,6 +16,7 @@ using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using static MMS.Web.Controllers.Report.GrnGstReportController;
 
 namespace MMS.Web.Controllers
 {
@@ -39,6 +40,7 @@ namespace MMS.Web.Controllers
                 model.RefInvoiceNumber = item.RefInvoiceNumber;
                 model.item = item.Items;
                 model.Quantity = item.Quantity;
+                model.grnnumber = item.grnnumber;
                 model.UnitPrice = item.UnitPrice;
                 model.PoHeaderId = item.PoHeaderId;
                 model.SubTotal = item.SubTotal;
@@ -750,11 +752,11 @@ namespace MMS.Web.Controllers
             return Json(data, JsonRequestBehavior.AllowGet);
         }
         [HttpGet]
-        public ActionResult GRNSearch(int filter)
+        public ActionResult GRNSearch(string filter)
         {
             GRNHeaderManager headerManager = new GRNHeaderManager();
             var grndetails = headerManager.GetgrnList();
-            var list = grndetails.Where(x => x.PoHeaderId == filter).ToList();
+            var list = grndetails.Where(x => x.PoHeaderId.ToString().ToLower().Trim().Contains(filter.ToString().ToLower().Trim())).ToList();
             List<GRNModel> totalList = new List<GRNModel>();
 
             foreach (var item in list)
@@ -767,6 +769,7 @@ namespace MMS.Web.Controllers
                 model.UnitPrice = item.UnitPrice;
                 model.PoHeaderId = item.PoHeaderId;
                 model.SubTotal = item.SubTotal;
+                model.grnnumber = item.grnnumber;
                 model.TaxValue = item.TaxValue;
                 model.DiscountValue = item.DiscountValue;
                 model.TotalValue = item.TotalValue;

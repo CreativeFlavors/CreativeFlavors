@@ -1,231 +1,466 @@
-﻿@model MMS.Web.Models.BuyerMaserModel.BuyerMasterModel
+﻿@model  IEnumerable<MMS.Web.Models.BuyerMaserModel.BuyerMasterModel>
 @using MMS.Core.Entities
+@using MMS.Repository.Managers
+
 @{
-    MMS.Repository.Managers.CountryManager countryManager = new MMS.Repository.Managers.CountryManager();
-    CountryMaster countryMaster = new CountryMaster();
-    MMS.Repository.Managers.CurrencyManager currencyManager = new MMS.Repository.Managers.CurrencyManager();
-    CurrencyMaster currencyMaster = new CurrencyMaster();
-    MMS.Repository.Managers.AgentManager agentManager = new MMS.Repository.Managers.AgentManager();
-    AgentMaster agentMaster = new AgentMaster();
-    
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int pageSize = ViewBag.PageSize ?? 15;
+    int count = (currentPage - 1) * pageSize + 1;
 }
-<div class="veh-tablewrap">
-    <div class="veh-tablecont">
-        <div id="sortMsg" style="text-align: center; color: Red;"></div>
-        <div class="table-responsive table-td-padding padding-lr-6px table-row-bg">
-            <table class="veh-table sep-table-style table" id="empTable">
-                <thead>
-                    <tr class="color-code-top-btn">
-                        <td colspan="13">
-                            <input type="text" id="SeaarchID" placeholder="Search.." /><input type="button" value="Add" onclick="Add()">
-                            <input type="button" value="Search" onclick="Search()">
-                        </td>
-                    </tr>
-                    <tr>
-                        <th class="veh-1">
-                            Si. No
-                        </th>
-                        <th class="veh-1">
-                            BuyerCode
-                        </th>
-                        <th class="veh-2">
-                            Buyer Full Name
-                        </th>
-                        <th class="veh-3">
-                            Buyer Short Name
-                        </th>
-                        <th class="veh-4">
-                            Buyer Address
-                        </th>
-                        <th class="veh-5">
-                            Buyer Country
-                        </th>
-                        <th class="veh-6">
-                            Buyer Currency
-                        </th>
-                        <th class="veh-7">
-                            Agent Name
-                        </th>
-                        <th class="veh-8">
-                            Agent Address
-                        </th>
-                        <th class="veh-10">
-                            Agent Country
-                        </th>
-                        <th class="veh-11">
-                            Agent Currency
-                        </th>
-                        <th class="veh-12">
-                            Edit / Delete
-                        </th>
-                    </tr>
-                </thead>
-                @if (Model.BuyerMasterList != null && Model.BuyerMasterList.Count > 0)
-            {
-                int count = 1;
-                <tbody>
 
-                    @foreach (var BuyerMaster in Model.BuyerMasterList)
-                    {
-                        countryMaster = countryManager.GetCountryMasterId(BuyerMaster.Country);
-                        currencyMaster = currencyManager.GetCurrentMasterId(BuyerMaster.Currency);
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
 
-                        agentMaster = agentManager.GetAgentMasterId(BuyerMaster.AgentName);
+    <style>
+        .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
+            padding: 16px;
+        }
 
-                        string address = BuyerMaster.BuyerAddress1 + ", " + BuyerMaster.BuyerAddress2 + ", " + BuyerMaster.BuyerPincode;
-                        string AggentAddress = BuyerMaster.AgentAddress1 + ", " + BuyerMaster.AgentAddress2 + ", " + BuyerMaster.AgentPincode;
-                <tr>
-                    <td class="veh-1">@count</td>
-                    <td class="veh-2" onclick="" style="width: 22%;">@BuyerMaster.BuyerCode</td>
-                    <td class="veh-3" style="width: 22%;">@BuyerMaster.BuyerFullName</td>
-                    <td class="veh-4" style="width: 22%;">@BuyerMaster.BuyerShortName</td>
-                    <td class="veh-5" style="width: 22%;">@address</td>
-                    <td class="veh-6">@countryMaster.LongCountryName</td>
-                    <td class="veh-7">@currencyMaster.LongForm</td>
-                    <td class="veh-8">@agentMaster.AgentFullName</td>
-                    <td class="veh-9">@AggentAddress</td>
-                    <td class="veh-10">@BuyerMaster.AgentCountry</td>
-                    <td class="veh-11">@BuyerMaster.AgentCurrency</td>
+        img#paynows {
+            width: 26%;
+        }
 
-                    <td class="veh-1 edit-del-wrap">
-                        <a href="javascript:void(0)" onclick="Edit('@BuyerMaster.BuyerMasterId')" class="watchlist-edit" title="Edit"></a>
-                        <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@BuyerMaster.BuyerMasterId')" class="watchlist-delete" title="Delete"></a>
+        .manage_customers_table_responsive, .reports .reports_table_responsive {
+            padding: 1px 15px 13px;
+            box-sizing: border-box;
+            overflow-x: unset;
+        }
 
-                    </td>
-                </tr>
-                        count++;
-                    }
+        .sub_merchants .merchant_btn, .manage_customers .manage_customers_btn, .common_Manage_subMerchant .manage_customers_btn {
+            background: #4472C4;
+            border-radius: 5px;
+            padding: 11px 61px;
+            border: 1px solid transparent;
+            font-style: normal;
+            font-weight: 500;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="main-page">
+        <div id="transaction_report" class="reports common_Manage_subMerchant">
+            <div class="d-flex justify-content-between align-items-center manage_customers_head">
+                <div class="manage_customers_main_head">
+                    <h6 class="font-20">Buyer info</h6>
+                </div>
+                <div>
+                    <a href="/BuyerMater/BuyerMasteDetails">
+                        <button type="button" class="manage_customers_btn font-15" id="add" style="color:white;">
+                            ADD
+                        </button>
+                    </a>
+                </div>
+            </div>
+
+            <div class="table-responsive reports_table_responsive">
+                <div class="customer_manage_search_container">
+                    <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Buyer Name">
+                </div>
+
+                <div class="manage_customers_table_in_responsive" id="form">
+
+                    <table class="table table-striped text-center">
+                        <thead>
+                            <tr class="font-16">
+                                <th scope="col">
+                                    <span>Si.No</span>
+                                    <span>
+                                        <span>
+                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        </span>
+                                    </span>
+
+                                </th>
+                                <th scope="col">
+                                    <span>BuyerCode</span>
+                                    <span>
+                                        <span>
+                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        </span>
+                                    </span>
+
+                                </th>
+
+                                <th scope="col">
+                                    <span>BuyerName</span>
+                                    <span>
+                                        <span>
+                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        </span>
+                                    </span>
+
+                                </th>
+                                <th scope="col">
+                                    <span>Account</span>
+                                    <span>
+                                        <span>
+                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        </span>
+                                    </span>
+
+                                </th>
 
 
-                </tbody>
-                <tfoot class="footer-pager">
-                    <tr>
-                        <td colspan="4">
-                            <div id="pager">
-                                <form>
-                                    <img src="@Url.Content("~/Content/images/first.png")" class="first" />
-                                    <img src="@Url.Content("~/Content/images/prev.png")" class="prev" />
-                                    <input type="text" class="pagedisplay" />
-                                    <img src="@Url.Content("~/Content/images/next.png")" class="next" />
-                                    <img src="@Url.Content("~/Content/images/last.png")" class="last" />
-                                    <select class="pagesize">
-                                        <option selected="selected" value="5">5</option>
-                                        <option value="10">10</option>
-                                        <option value="20">20</option>
-                                        <option value="30">30</option>
-                                        <option value="40">40</option>
-                                    </select>
-                                </form>
-                            </div>
+                                <th scope="col">
+                                    <span>Physical1</span>
+                                    <span>
+                                        <span>
+                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        </span>
+                                    </span>
 
-                        </td>
+                                </th>
 
-                    </tr>
 
-                </tfoot>
 
-            }
-            
-            </table>
-            @if (Model.BuyerMasterList != null && Model.BuyerMasterList.Count == 0)
-            {
-                <div style="color: red; font-size: 16px; text-align: center; width: 100%;">No Records Found</div>
-            }
+                                <th scope="col">
+                                    <span>Telephone1</span>
+                                    <span>
+                                        <span>
+                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        </span>
+                                    </span>
+
+                                </th>
+
+
+
+                                <th scope="col">
+                                    <span>EmailContact</span>
+                                    <span>
+                                        <span>
+                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                        </span>
+                                    </span>
+
+                                </th>
+
+
+                                <th scope="col">
+                                    <span>Status</span>
+                                </th>
+
+                            </tr>
+                        </thead>
+
+                        @if (Model != null && Model.Count() > 0)
+                        {
+
+
+                            <tbody>
+                                @foreach (var customer in Model)
+                                {
+                                    <tr>
+                                        <td class="veh-1">@count</td>
+                                        <td class="veh-2" style="width: 12%; text-align:left"> @customer.BuyerCode</td>
+                                        <td class="veh-2" style="width: 12%; text-align:left">@customer.CustomerName</td>
+                                        <td class="veh-2" style="width: 12%; text-align:left">@customer.Account</td>
+                                        <td class="veh-2" style="width: 12%; text-align:left">@customer.Physical1</td>
+                                        <td class="veh-2" style="width: 12%; text-align:left">@customer.Telephone1</td>
+                                        <td class="veh-2" style="width: 12%; text-align:left">@customer.EmailContact</td>
+                                        <td class="veh-4" style="width:12%;">
+                                            <span class="table_icons">
+                                                <img src="~/Content/assets/images/edit-icon.png" onclick="Edit('@customer.BuyerMasterId')" />
+                                            </span>
+                                            <span class="table_icons">
+                                                <img src="~/Content/assets/images/delete-icon.png" onclick="Delete('@customer.BuyerMasterId')" />
+                                            </span>
+                                        </td>
+
+                                    </tr>
+                                    count++;
+                                }
+                            </tbody>
+                        }
+                        else
+                        {
+                            <tbody>
+                                <tr><td colspan="9">No records found</td></tr>
+                            </tbody>
+
+                        }
+                    </table>
+                </div>
+
+                <div class="row  manage_customer_show">
+                    <div class="font-14 manage_customer_show_I col-xl-6">
+                        <span>Showing</span>
+                        <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
+                            <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
+                            <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
+                            <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
+                            <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
+                        </select>
+                    </div>
+
+                    <div class="col-xl-6 manage_customer_show_II">
+                        <nav class="float-xl-end">
+                            <ul class="pagination font-14">
+                                <li class="page-item">
+                                    <a id="previousPage" class="page-link">Previous</a>
+                                </li>
+                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == currentPage ? "active" : "")">
+                                        <a data-page="@i" class="page-link" id="Number">@i</a>
+                                    </li>
+                                    @*<li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                            <a href="@Url.Action("BuyerMasterGird", "BuyerMater", new { page = i })" class="page-link" id="Number">@i</a>
+                                        </li>*@
+                                }
+                                <li class="page-item">
+                                    <a class="page-link" id="nextPage" data-current-page="1">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+            </div>
         </div>
-        </div>
-
-    <div id="EditColorPartial">
-        @Html.Partial("Partial/BuyerMasteDetails", Model)
     </div>
 
 
-</div>
 
+    <div id="EditBuyerMaster">
 
-<script>
-    $(document).ajaxStart(function () {
-        $(".loader-overlay").css("display", "block");
-    });
+    </div>
 
-    $(document).ajaxComplete(function () {
-        $(".loader-overlay").css("display", "none");
-    });
-    $(window).load(function () {
-        $('.loader-overlay').fadeOut('fast');
-    });
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+            integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    function Search() {
-        $.ajax({
-            type: "POST",
-            url: ' @Url.Action("Search", "BuyerMater")',
-            data: { filter: $('#SeaarchID').val() },
-            success: function (data) {
-                 
-                $(".veh-tablewrap").html(data);
-                $(".veh-tablewrap").show();
-                $('#DivShow').hide();
-                $('#EditColorPartial').hide();
-            }
-        });
-    }
-   
-    function Cancel() {
-       
-        location.reload();
-    }
-    function Add() {
-        $('.veh-tablecont').hide();
-        $.ajax({
-            type: "POST",
-            url: ' @Url.Action("BuyerMasteDetails", "BuyerMater")',
-            data: { BuyerMasterId: 0 },
-            success: function (data) {
-                $("#EditColorPartial").html(data);
-                $("#EditColorPartial").show();
-            }
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Content/js/custom.js"></script>
+    <script src="~/Content/js/Validation.js"></script>
+
+    <script>
+
+         currentPage = @(currentPage);
+
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#BuyerMater").attr('checked', true);
         });
 
-    }
-    function Edit(arg) {
-        $('.veh-tablecont').hide();
-        $.ajax({
-            type: "POST",
-            url: ' @Url.Action("BuyerMasteDetails", "BuyerMater")',
-            data: { BuyerMasterId: arg },
-            success: function (data) {
-                $("#EditColorPartial").html(data);
-                $("#EditColorPartial").show();
-            }
-        });
 
-    }
-    function Delete(arg) {
-        var answer = confirm("Are you sure want to delete?");
-        if (answer) {
-            $.ajax({
-                type: 'POST',
-                url: ' @Url.Action("Delete", "BuyerMater")',
-                data: { BuyerMasterId: arg },
-                success: function (data) {
-                    if (data == "Success") {
-                        alert('Deleted Successfully.');
-                        location.href = "/BuyerMater/BuyerMater";
-                        return false;
+        //searchg
+        $(document).ready(function () {
+
+            $("#customer_manage_search").keyup(function () {
+                var buyersearch = $("#customer_manage_search").val();
+                console.log(buyersearch);
+                $.ajax({
+                    type: 'GET',
+                    url: '/BuyerMater/Search',
+                    data: { filter: buyersearch },
+                    contentType: 'application/json',
+                    success: function (response) {
+                        console.log(response);
+                        var sortedResponse = response.sort(function (a, b) {
+                            console.log(sortedResponse);
+                            return b.BuyerMasterId - a.BuyerMasterId;
+                        });
+                        $("tbody").empty();
+                        var count = 1;
+                        $.each(sortedResponse, function (i, item) {
+                            console.log(response);
+                            $("tbody").append(`
+                                <tr>                                <td class="veh-1">${count}</td>
+                                <td class="veh-2" style="width: 12%; text-align:left">${item.BuyerCode}</td>
+                                <td class="veh-2" style="width: 12%; text-align:left">${item.CustomerName}</td>
+                                <td class="veh-2" style="width: 12%; text-align:left">${item.Account}</td>
+                                 <td class="veh-2" style="width: 12%; text-align:left">${item.Physical1}</td>
+                                 <td class="veh-2" style="width: 12%; text-align:left">${item.Telephone1}</td>
+                                 <td class="veh-2" style="width: 12%; text-align:left">${item.EmailContact}</td>
+
+                                 <td class="veh-4" style="width:12%;">
+                                        <span class="table_icons">
+                                            <img src="/Content/assets/images/edit-icon.png" onclick="Edit('${item.BuyerMasterId}')" />
+                                        </span>
+                                        <span class="table_icons">
+                                            <img src="/Content/assets/images/delete-icon.png" onclick="Delete('${item.BuyerMasterId}')" />
+                                        </span>
+                                    </td>
+                                </tr>
+
+                            `);
+                            count++;
+
+                        });
                     }
-                    else {
-                        alert('Color Details deletion failed.');
-                    }
+                });
+            });
+        });
 
-                },
-                error: function (ex) {
-                    alert('This Color Already Exist in the database.');
+
+        //nof of page size
+        $(document).ready(function () {
+
+            $(document).on('change', '#manage_customer_show_no', function () {
+                var pageSize = parseInt($(this).val());
+                //var pageSize = this.value;
+                $.ajax({
+                    type: 'GET',
+                     url: '@Url.Action("BuyerMasterGird", "BuyerMater")',
+                    data: { pageSize: pageSize },
+                    success: function (data) {
+                        $('.main-page').html(data);
+                    }
+                });
+
+            });
+
+            //next page
+            $(document).on('click', '#nextPage', function () {
+                        //var currentPage = @(ViewBag.CurrentPage);
+                        //var currentPage = parseInt('@ViewBag.CurrentPage');
+
+                        var totalPages = parseInt('@ViewBag.TotalPages');
+                        if (currentPage < totalPages) {
+                            var nextPage = currentPage + 1;
+                            $.ajax({
+                                type: 'GET',
+                                url: '@Url.Action("BuyerMasterGird", "BuyerMater")',
+                                data: { page: nextPage, pageSize: parseInt('@ViewBag.PageSize') },
+                                success: function (data) {
+                                    $('.main-page').html(data);
+                                    currentPage = nextPage;
+                                    console.log(currentPage)
+                                }
+                            });
+
+                         }
+             });
+
+             //previous page
+            $(document).on('click', '#previousPage', function () {
+                //var currentPage = parseInt('@ViewBag.CurrentPage');
+                if (currentPage > 1) {
+                    console.log(currentPage);
+                    var previousPage = currentPage - 1;
+                    $.ajax({
+                        type: 'GET',
+                        url: '@Url.Action("BuyerMasterGird", "BuyerMater")',
+                        data: { page: previousPage, pageSize: parseInt('@ViewBag.PageSize') },
+                        success: function (data) {
+                            $('.main-page').html(data);
+                            currentPage = previousPage;
+
+                        }
+                    });
                 }
             });
-        }
-        else {
-            return false;
-        }
-    }
+
+            //for number list
+
+            $(document).on('click', '#Number', function () {
+
+                //var page = $(this).data('page');
+                var pageNumber = $(this).attr('data-page');
+                currentPage = parseInt(pageNumber);
+                console.log(currentPage);
+                loadGridData(pageNumber);
+                });
+        });
+
+             function loadGridData(page) {
+
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("BuyerMasterGird", "BuyerMater")',
+                    data: { page: page },
+                    success: function (data) {
+                        console.log(data);
+                        $('.main-page').html(data);
+                        $(".main-page").show();
+                    }
+                });
+            }
+
+    </script>
 
 
-</script>
+    <script>
+
+        @*//get the id*@
+        function Edit(id) {
+            $('.main-page').hide();
+            $("#EditBuyerMaster").hide();
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("GetbyIdBuyermasterDetails","BuyerMater")',
+                data: { id: id },
+                success: function (response)
+                {
+                    console.log(response);
+                    //$("#EditBuyerMaster").html(response);
+                    //$("EditBuyerMaster").show();
+
+                    $(".main-page").html(response);
+                    $(".main-page").show();
+
+                    //var html = $(response).filter('div#BuyermasteDetails').html();
+
+
+
+                    @*setTimeout(function () {
+                        console.log("Loading validation script");
+                         $.getScript('@Url.Content("~/Content/js/validation.js")');
+                       }, 0);*@
+
+
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error: " + error);
+                }
+           });
+
+        }
+
+
+        //get id for delete
+
+        function Delete(arg) {
+            var answer = confirm("are u sure wanto delete");
+
+            if (answer) {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("Delete", "BuyerMater")',
+                    data: { id: arg },
+                    success: function (response) {
+                        if (response == "Success") {
+                            alert("deleted successfully");
+                            window.location.href = '/BuyerMater/BuyerMater';
+                            return false;
+                        }
+                        else {
+                            alert("deletion failed");
+                        }
+                    },
+                    error: function (ex) {
+                        alert('This address Already Exist in the database.');
+                    }
+                });
+            }
+            else {
+                return false;
+            }
+        }
+    </script>
+
+
+
+</body>
+</html>

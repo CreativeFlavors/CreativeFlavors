@@ -23,7 +23,7 @@ namespace MMS.Data.Mapping
             Property(t => t.IsDeleted);
             Property(t => t.DeletedBy);
             Property(t => t.DeletedDate);
-            ToTable("tbl_UserType");
+            ToTable("usertypemaster");
           }
     }
 }

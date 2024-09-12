@@ -16,8 +16,6 @@ using MMS.Web.ExtensionMethod;
 
 namespace MMS.Web.Controllers
 {
-    [CustomFilter]
-    //  [SessionExpire]
     public class AccountsController : Controller
     {
         #region Accounts View
@@ -29,7 +27,7 @@ namespace MMS.Web.Controllers
             return View(vm);
         }
 
-       public ActionResult DashBoard()
+        public ActionResult DashBoard()
         {
             return View();
         }
@@ -40,50 +38,17 @@ namespace MMS.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult LogIn(Models.AccountModel.AccountModel user)
+        public ActionResult LogIn(AccountModel user)
         {
-            bool result = false;
-            string SuccessMsg = "";
-            if (ModelState.IsValid)
-            {
-                Users users = new Users();
-                UserManager userManager = new UserManager();
-                if(user.Forgotpassword== "Forgotpassword")
-                {
-                    users.Email = user.Email;
-                    users.Password = user.Password;
-                    result = userManager.ChangetheForpasswordPut(users);
-                    SuccessMsg = "Password Updated Successfully !";
-                }
-                //if (user.Password == "resetpwd")
-                //{
-                //    users.Email = user.Email;
-                //    result = userManager.Put(users);
-                //    SuccessMsg = "Password Resetted Successfully & New Password sent to your EmailId !";
-                //}
-                else
-                {
-                    result = userManager.IsValidateUser(user.Email, user.Password);
-                    SuccessMsg = "Entered Username and Password is Invalid !";
-                }
-            }
-            if (result == true)
-            {
-                if (user.Password == "resetpwd")
-                {
-                    TempData["msg"] = "<script>alert('" + SuccessMsg + "')</script>";
-                    return View();
-                }
-                else
-                {
-                    return RedirectToAction("Index");
-                }
-            }
-            else
-            {
-                TempData["msg"] = "<script>alert('" + SuccessMsg + "')</script>";
-                return View();
-            }
+
+            Users users = new Users();
+            UserManager userManager = new UserManager();
+            users.Email = user.Email;
+            users.Password = user.Password;
+            var result = userManager.ChangetheForpasswordPut(users);
+
+            return Json(result, JsonRequestBehavior.AllowGet);
+
         }
 
         public ActionResult LoginValidation(Models.AccountModel.AccountModel user)
@@ -159,7 +124,7 @@ namespace MMS.Web.Controllers
                 users_ = userManager.GetUserID(accountModel.UserID);
                 if (users_ != null)
                 {
-                    
+
                     users_.FirstName = accountModel.FirstName;
                     users_.LastName = accountModel.LastName;
                     users_.Email = accountModel.Email;
@@ -397,12 +362,12 @@ namespace MMS.Web.Controllers
         //public ActionResult Forgotpasswordnewformate(string email,string password)
         //{
         //    bool result = false;
-           
+
         //    if (ModelState.IsValid)
         //    {
         //        UserManager userManager = new UserManager();
         //         result =userManager.ChangetheForpasswordPut(email, password);
-                
+
         //    }
 
         //    return Json(result,JsonRequestBehavior.AllowGet);

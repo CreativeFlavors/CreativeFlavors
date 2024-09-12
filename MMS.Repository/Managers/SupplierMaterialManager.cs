@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace MMS.Repository.Managers
 {
@@ -58,7 +59,7 @@ namespace MMS.Repository.Managers
             {
                 SupplierMaterial model = suppliermaterialRepository.GetById(id);
                 model.IsActive = false;
-                model.UpdatedBy = "admin";//HttpContext.Current.Session["UserName"].ToString();
+                model.UpdatedBy = HttpContext.Current.Session["UserName"].ToString();
                 model.UpdatedDate = DateTime.Now;
                 suppliermaterialRepository.Update(model);
                 result = true;
@@ -76,7 +77,7 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                string username = "admin";
+                string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.CreatedBy = username;
                 //arg.UpdatedBy = username;
                 arg.CreatedDate = DateTime.Now;
@@ -104,7 +105,7 @@ namespace MMS.Repository.Managers
                     model.Categoryid = arg.Categoryid;
                     model.TaxId = arg.TaxId;
                     model.UpdatedDate = DateTime.Now;
-                    string username = "admin";
+                    string username = HttpContext.Current.Session["UserName"].ToString();
 
                     model.UpdatedBy = username;
                     suppliermaterialRepository.Update(model);

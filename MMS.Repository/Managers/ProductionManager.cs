@@ -37,7 +37,7 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                string username = "admin";
+                string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.CreatedBy = username;
                 arg.CreatedDate = DateTime.Now;
                 productionrep.Insert(arg);
@@ -100,7 +100,7 @@ namespace MMS.Repository.Managers
                     //{
                     //    model.UpdatedBy = username;
                     //}
-                    model.UpdatedBy ="Admin";
+                    model.UpdatedBy = HttpContext.Current.Session["UserName"].ToString();
                     productionrep.Update(model);
                     result = true;
                 }

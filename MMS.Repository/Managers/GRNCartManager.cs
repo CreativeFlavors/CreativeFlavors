@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace MMS.Repository.Managers
 {
@@ -44,7 +45,7 @@ namespace MMS.Repository.Managers
             GRNCart salesorder = new GRNCart();
             try
             {
-                string username = "admin";
+                string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.CreatedBy = username;
                 arg.CreatedDate = DateTime.Now;
                 arg.Status = 1;
@@ -172,7 +173,7 @@ namespace MMS.Repository.Managers
                 model.DiscountValue = arg.DiscountValue;
                 model.ExpiryDate = arg.ExpiryDate;
                 model.UpdatedDate = DateTime.Now;
-                string username = "admin";
+                string username = HttpContext.Current.Session["UserName"].ToString();
 
                 model.UpdatedBy = username;
                 GRNCartrep.Update(model);
@@ -188,7 +189,7 @@ namespace MMS.Repository.Managers
             {
                 GRNCart model = GRNCartrep.GetById(id);
                 model.IsDeleted = false;
-                model.DeletedBy = "admin";
+                model.DeletedBy = HttpContext.Current.Session["UserName"].ToString();
                 model.DeletedDate = DateTime.Now;
                 GRNCartrep.Update(model);
                 GRNCart = model;

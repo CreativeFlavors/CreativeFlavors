@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace MMS.Repository.Managers
 {
@@ -42,7 +43,7 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                string username = "admin";
+                string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.CreatedBy = username;
                 arg.CreatedDate = DateTime.Now;
                 productrep.Insert(arg);
@@ -82,7 +83,7 @@ namespace MMS.Repository.Managers
                     model.StoreId = arg.StoreId;
                     model.MaterialCategoryMasterId = arg.MaterialCategoryMasterId;
                     model.UpdatedDate = DateTime.Now;
-                    model.UpdatedBy = "admin";
+                    model.UpdatedBy = HttpContext.Current.Session["UserName"].ToString();
                     productrep.Update(model);
                     result = true;
                 }
@@ -194,7 +195,7 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                string username = "admin";
+                string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.CreatedBy = username;
                 arg.CreatedDate = DateTime.Now;
                 productrep.Insert(arg);

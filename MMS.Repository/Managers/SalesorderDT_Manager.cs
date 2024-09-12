@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace MMS.Repository.Managers
 {
@@ -49,7 +50,7 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                string username = "admin";
+                string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.createdby = username;
                 arg.CreatedDate = DateTime.Now;
                 salesorderhdrep.Insert(arg);
@@ -105,7 +106,7 @@ namespace MMS.Repository.Managers
                 {
                     model.dc_qty = arg.dc_qty;
                     model.UpdatedDate = DateTime.Now;
-                    string username = "admin";
+                    string username = HttpContext.Current.Session["UserName"].ToString();
                     model.Updatedby = username;
                     salesorderhdrep.Update(model);
                     result = true;
@@ -133,7 +134,7 @@ namespace MMS.Repository.Managers
                 {
                     model.Invoice_qty = arg.Invoice_qty;
                     model.UpdatedDate = DateTime.Now;
-                    string username = "admin";
+                    string username = HttpContext.Current.Session["UserName"].ToString();
                     model.Updatedby = username;
                     salesorderhdrep.Update(model);
                     result = true;

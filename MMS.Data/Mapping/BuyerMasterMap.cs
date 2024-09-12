@@ -9,56 +9,58 @@ using System.Threading.Tasks;
 
 namespace MMS.Data.Mapping
 {
-   public class BuyerMasterMap:EntityTypeConfiguration<BuyerMaster>
+    public class BuyerMasterMap : EntityTypeConfiguration<BuyerMaster1>
     {
-       public BuyerMasterMap()
+        public BuyerMasterMap()
         {
-            HasKey(t => t.BuyerMasterId);
-            Property(t => t.BuyerMasterId).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            Property(t => t.BuyerCode).IsRequired();
-            Property(t => t.BuyerFullName).IsRequired();
-            Property(t => t.BuyerShortName).IsRequired();
-            Property(t => t.Currency).IsRequired();
-            Property(t => t.BuyerAddress1).IsRequired();
-            Property(t => t.BuyerAddress2);
-            Property(t => t.BuyerPincode);
-            Property(t => t.Country).IsRequired();
-            Property(t => t.ContactPersion).IsRequired();
-            Property(t => t.Designation).IsRequired();
-            Property(t => t.ContactNoo).IsRequired();
-            Property(t => t.EmailID).IsRequired();
-            Property(t => t.STNoHead).IsRequired();
-            Property(t => t.CGTNoHead).IsRequired();
-            Property(t => t.DeliverAddress1).IsRequired();
-            Property(t => t.DeliverAddress2);
-            Property(t => t.Pincode);
-            Property(t => t.AgentName).IsRequired();
-            Property(t => t.AgentAddress1).IsRequired();
-            Property(t => t.AgentAddress2);
-            Property(t => t.AgentPincode);
-            Property(t => t.AgentCountry).IsRequired();
-            Property(t => t.AgentCurrency).IsRequired();
+            ToTable("buyermaster1", "public");
 
-            Property(t => t.PaymentsTerms).IsRequired();
-            Property(t => t.DeliveryTerms).IsRequired();
-            Property(t => t.Insurance).IsRequired();
-            Property(t => t.DelierTo).IsRequired();
-            Property(t => t.Brand).IsRequired();
-            Property(t => t.ShipmentTo).IsRequired();
-            Property(t => t.ShimentMode).IsRequired();
-            Property(t => t.CountryStamp).IsRequired();
-            Property(t => t.accountypeid);
+            HasKey(t => t.BuyerMasterId);
+
+            Property(t => t.BuyerMasterId)
+                .HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity)
+                .IsRequired();
+
+            Property(t => t.CustomerName).IsRequired();
+            Property(t => t.Account).IsRequired();
+            Property(t => t.AccountName).IsRequired();
+            Property(t => t.AccountDescription).IsRequired();
+            Property(t => t.SwiftCode).IsRequired();
+            Property(t => t.Physical1).IsRequired();
+            
+            Property(t => t.PhysicalCode).IsRequired();           
+            Property(t => t.CurrencyId).IsRequired();
+            Property(t => t.Telephone1).IsRequired();
+            Property(t => t.Telephone2).IsRequired();
+            Property(t => t.EmailContact).IsRequired();
+            Property(t => t.EmailAccounts).IsRequired();
+            Property(t => t.EmailEmergency).IsRequired();
+            Property(t => t.AccountTypeId).IsRequired();
+            Property(t => t.VatNumber).IsRequired();
+            Property(t => t.RegNumber).IsRequired();     
+     
+            Property(t => t.CreditLimit).IsRequired();
+            Property(t => t.ChargeInterest).IsRequired();
+            Property(t => t.Interest).IsRequired(); 
+            Property(t => t.TaxTypeId).IsRequired();
+            Property(t => t.ForeignCurrency).IsRequired();      
+          
+            Property(t => t.OnHold);
+            Property(t => t.Active);
             Property(t => t.CreatedDate);
             Property(t => t.UpdatedDate);
             Property(t => t.CreatedBy);
             Property(t => t.UpdatedBy);
             Property(t => t.IsDeleted);
+            Property(t => t.BuyerCode).IsRequired();
+            Property(t => t.BuyerShortName).IsRequired();
+      
             Property(t => t.DeletedBy);
             Property(t => t.DeletedDate);
-            Property(t => t.CreditExposure);
-            Property(t => t.CreditDays);
-            ToTable("BuyerMaster");
-          
+            Property(t => t.DateAdded).IsRequired();
+            Property(t=>t.DcBalance).IsRequired();
+            Property(t => t.ForeignDcBalance).IsRequired();
+
         }
     }
 }

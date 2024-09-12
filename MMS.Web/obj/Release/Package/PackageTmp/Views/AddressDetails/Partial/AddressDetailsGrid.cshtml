@@ -1,5 +1,5 @@
-﻿@using MMS.Core.Entities
-@model IEnumerable<MMS.Web.Models.Addressdetails.Addressdetails>
+﻿@model MMS.Web.Models.Addressdetails.Addressdetails
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,13 +12,37 @@
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
     <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
 
+
     <style>
+        .mt-4 {
+            margin-top: 1.5rem !important;
+        }
+
+        .border {
+            border: 1px solid #dee2e6 !important;
+        }
+
+        .justify-content-between {
+            justify-content: space-between !important;
+        }
+
+        .d-flex {
+            display: flex !important;
+        }
+
         .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
             padding: 16px;
         }
 
         img#paynows {
             width: 26%;
+        }
+
+        .page-item.active .page-link {
+            z-index: 3;
+            color: #fff;
+            background-color: #4472C4;
+            border-color: #0d6efd;
         }
 
         .manage_customers_table_responsive, .reports .reports_table_responsive {
@@ -35,6 +59,45 @@
             font-style: normal;
             font-weight: 500;
         }
+
+        ul li {
+            list-style-type: none;
+            padding: 2px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            background-color: #198754;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+            .switch::after {
+                content: '';
+                position: absolute;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background-color: white;
+                top: 1px;
+                left: 1px;
+                transition: all 0.3s;
+            }
+
+        .checkbox:checked + .switch::after {
+            left: 20px;
+        }
+
+        .checkbox:checked + .switch {
+            background-color: #dc3545;
+        }
+
+        .checkbox {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -43,8 +106,19 @@
         <div id="transaction_report" class="reports common_Manage_subMerchant">
             <div class="d-flex justify-content-between align-items-center manage_customers_head">
                 <div class="manage_customers_main_head">
-                    <h6 class="font-20">Customers Details</h6>
+                    <h6 class="font-20">Buyer Address Details</h6>
                 </div>
+                <div class="radioSection">
+                    <label for="add">
+                        <input type="radio" name="yes" id="add" style="cursor: pointer;" checked>
+                        Buyer Address
+                    </label>
+                    <label for="add1">
+                        <input type="radio" name="yes" id="add1" style="cursor: pointer;">
+                        Supplier Address
+                    </label>
+                </div>
+
                 <div>
                     <a href="/AddressDetails/AddressDetails">
                         <button type="button" class="manage_customers_btn font-15" id="add" style="color:white;">
@@ -53,144 +127,13 @@
                     </a>
                 </div>
             </div>
-
-            <div class="table-responsive reports_table_responsive">
-                <div class="customer_manage_search_container">
-                    <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Contact Name">
-                </div>
-                <div class="manage_customers_table_in_responsive" id="form">
-
-                    <table class="table table-striped text-center">
-                        <thead>
-                            <tr class="font-16">
-                                <th scope="col">
-                                    <span>Si.No</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>Buyer Name</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>Contact Name</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>Country</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>State</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>City</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>Zip Code</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>Email</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>Phone Number</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>Status</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        @if (Model != null && Model.Count() > 0)
-                        {
-                            int count = 1;
-                            <tbody>
-
-                                @foreach (var address in Model)
-                                {
-
-                                    <tr>
-                                        <td class="veh-1">@count</td>
-                                        <td class="veh-2" style="width: 12%; text-align:left">@address.BuyerMaster.BuyerFullName</td>
-                                        <td class="veh-3" style="width: 12%; text-align:left" ">@address.ContactName</td>
-                                        <td class="veh-5" style="width: 12%; text-align:left" ">@address.countries.Name</td>
-                                        <td class="veh-4" style="width: 12%; text-align:left" ">@address.states.Statename</td>
-                                        <td class="veh-4" style="width: 12%; text-align:left" ">@address.cities.Cityname</td>
-                                        <td class="veh-3" style="width: 12%; text-align:center" ">@address.ZipCode</td>
-                                        <td class="veh-4" style="width: 12%; text-align:left" ">@address.Email</td>
-                                        <td class="veh-4" style="width: 12%;">@address.Phone</td>
-                                        <td class="veh-4" style="width:12%;">
-                                            <span class="table_icons">
-                                                <img src="~/Content/assets/images/edit-icon.png" onclick="Edit('@address.AddressId')" />
-                                            </span>
-                                            <span class="table_icons">
-                                                <img src="~/Content/assets/images/delete-icon.png" onclick="Delete('@address.AddressId')" />
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    count++;
-                                }
-                            </tbody>
-
-                        }
-                    </table>
-                </div>
-                <div class="row manage_customer_show">
-                    <div class="font-14 manage_customer_show_I col-xl-6">
-                        <span>Showing </span>
-                        <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
-                            <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
-                            <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
-                            <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
-                            <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
-                        </select>
-                    </div>
-
-                    <div class="col-xl-6 manage_customer_show_II">
-                        <nav class="float-xl-end">
-                            <ul class="pagination font-14">
-                                <li class="page-item">
-                                    <a href="" id="previousPage" class="page-link">Previous</a>
-                                </li>
-                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                                {
-                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                        <a href="@Url.Action("AddressMaster", "AddressDetails", new { page = i })" class="page-link">@i</a>
-                                    </li>
-                                }
-                                <li class="page-item">
-                                    <a class="page-link" id="nextPage" href="">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-
-                </div>
+            <div class="" id="buyergrid">
+                @{Html.RenderPartial("~/Views/AddressDetails/Partial/BuyerAddressGrid.cshtml", Model);}
             </div>
-
+            <div class="" id="suppliergrid">
+                @{Html.RenderPartial("~/Views/AddressDetails/Partial/SupplierAddressGrid.cshtml", Model);}
+            </div>
         </div>
-
     </div>
     <script src="~/Content/js/custom.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -203,116 +146,163 @@
         $(window).on("load", function () {
             $(".report-inner-section").addClass("transection");
             $("#Address").attr('checked', true);
-
-        });
-    </script>
-    <script>
-        $(document).ready(function () {
-            $('#manage_customer_show_no').change(function() {
-        var pageSize = parseInt($(this).val());
-        window.location.href = "@Url.Action("AddressMaster", "AddressDetails")?pageSize=" + pageSize;
-    });
-
-    $('#previousPage').click(function(e) {
-        e.preventDefault();
-        var currentPage = parseInt('@ViewBag.CurrentPage');
-        if (currentPage > 1) {
-            var previousPage = currentPage - 1;
-            window.location.href = "@Url.Action("AddressMaster", "AddressDetails")?page=" + previousPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
-        }
-    });
-
-    $('#nextPage').click(function(e) {
-        e.preventDefault();
-        var currentPage = parseInt('@ViewBag.CurrentPage');
-        var totalPages = parseInt('@ViewBag.TotalPages');
-        if (currentPage < totalPages) {
-            var nextPage = currentPage + 1;
-            window.location.href = "@Url.Action("AddressMaster", "AddressDetails")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
-        }
-    });
-            $("#customer_manage_search").keyup(function () {
-                var customerearch = $("#customer_manage_search").val();
-
-                $.ajax({
-                    type: 'GET',
-                    url: '/AddressDetails/Search',
-                    data: { filter: customerearch },
-                    contentType: 'application/json',
-                    success: function (values) {
-                        $("tbody").empty();
-                        var count = 1;
-                        $.each(values, function (i, item) {
-                            $("tbody").append(`
-                         <tr class="font-14">
-                         <td class="veh1-5">${count}</td>
-                         <td class="veh1-5" style="width: 12%; text-align:left">${item.BuyerMaster.BuyerFullName}</td>
-                         <td class="veh1-5" style="width: 12%; text-align:left">${item.ContactName}</td>
-                         <td class="veh1-5" style="width: 12%; text-align:left">${item.countries.Name}</td>
-                         <td class="veh1-5" style="width: 12%; text-align:left">${item.states.Statename}</td>
-                         <td class="veh1-5" style="width: 12%; text-align:left">${item.cities.Cityname}</td>
-                         <td class="veh1-5" style="width: 12%; text-align:center">${item.ZipCode}</td>
-                         <td class="veh1-5" style="width: 12%; text-align:left">${item.Email}</td>
-                         <td class="veh1-5" style="width: 12%; ">${item.Phone}</td>
-                         <td class="veh-4" style="width:12%;">
-                         <span class="table_icons">
-                             <img src="/Content/assets/images/edit-icon.png" onclick="Edit('${item.AddressId}')" />
-                         </span>
-                         <span class="table_icons">
-                             <img src="/Content/assets/images/delete-icon.png" onclick="Delete('${item.AddressId}')" />
-                            </span>
-                         </td>
-                         </tr>
-                          `);
-                            count++;
-                        });
-                    }
-                });
+            $("#Address").on("change", function () {
+                if ($(this).is(':checked')) {
+                    window.location.href = $("#addressLink").attr('href');
+                }
             });
         });
     </script>
     <script>
-function Delete(arg) {
-     var answer = confirm("Are you sure want to delete?");
-     if (answer) {
-         $.ajax({
-             type: 'POST',
-             url: ' @Url.Action("Delete", "AddressDetails")',
-             data: { AddressId: arg },
-             success: function (data) {
-                 if (data == "Success") {
-                     alert('Deleted Successfully.');
-                     location.href = "/AddressDetails/AddressMaster";
-                     return false;
-                 }
-                 else {
-                     alert('address Details deletion failed.');
-                 }
+        $(document).ready(function () {
+            $("#suppliergrid").hide();
+            $('#add1').click(function () {
+                $("#buyergrid").hide();
+                $("#suppliergrid").show();
+            });
+            $('#add').click(function () {
+                $("#buyergrid").show();
+                $("#suppliergrid").hide();
+            });
 
-             },
-             error: function (ex) {
-                 alert('This address Already Exist in the database.');
-             }
-         });
-     }
-     else {
-         return false;
-     }
+        });
+    </script>
+    
+    <script>
+
+function Edit(arg) {
+    $('.main-page').hide();
+    $.ajax({
+        type: "POST",
+        url: '@Url.Action("EditAddressDetails", "AddressDetails")',
+        data: { AddressId: arg },
+        success: function (data) {
+            $(".main-page").html(data);
+            $(".main-page").show();
+            $("#Supplier").hide();
+            $('#add').prop('checked', true);
+            $('#add1').prop('checked', false);
+        }
+    });
+        }
+
+function Editsupp(arg) {
+    $('.main-page').hide();
+    $.ajax({
+        type: "POST",
+        url: '@Url.Action("EditsupplierAddressDetails", "AddressDetails")',
+        data: { AddressId: arg },
+        success: function (data) {
+            $(".main-page").html(data);
+            $(".main-page").show();
+            $("#Buyer").hide();
+            $("#Supplier").show();
+            $('#add').prop('checked', false);
+            $('#add1').prop('checked', true);
+        }
+    });
+        }
+
+
+$(document).ready(function () {
+    $('.checkboxb1').change(function () {
+        var addressId = $(this).data('address-id');
+        var isChecked = $(this).is(':checked');
+        performAjaxRequest(addressId, !isChecked);
+    });
+    $('.checkbox.checkboxs1').change(function () {
+        var addressId = $(this).data('addressval-id');
+        var isChecked = $(this).is(':checked');
+        performAjaxRequestsuppler(addressId, !isChecked);
+    });
+
+    $('.addresses').change(function () {
+        var addressId = $(this).data('address-id');
+        var isChecked = $(this).is(':checked');
+        performstatus(addressId, !isChecked);
+    });
+    $('.addresses1').change(function () {
+        var addressId = $(this).data('address-id');
+        var isChecked = $(this).is(':checked');
+        performsupplierstatus(addressId, !isChecked);
+    });
+});
+
+ function performAjaxRequest(addressId, isChecked) {
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("Delete", "AddressDetails")',
+        data: { AddressId: addressId, IsChecked: isChecked },
+        success: function (data) {
+            if (data === "Success") {
+            } else {
+                alert('Address Details deletion failed.');
+            }
+        },
+        error: function () {
+            alert('Error occurred during the delete operation.');
+        }
+    });
+ }
+            function performAjaxRequestsuppler(addressId, isChecked) {
+    $.ajax({
+        type: 'POST',
+        url: '/AddressDetails/Deletesupplier',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify({ AddressId: addressId, IsChecked: isChecked }),
+        success: function (response) {
+            if (response === "Success") {
+                console.log('Address Details deletion succeeded.');
+            } else {
+                alert('Address Details deletion failed.');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error occurred during the delete operation:', error);
+            alert('Error occurred during the delete operation.');
+        }
+    });
+}
+
+function performstatus(addressId, isChecked) {
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("updatestatus", "AddressDetails")',
+        data: JSON.stringify({ AddressId: addressId, IsChecked: isChecked }),
+        contentType: 'application/json; charset=utf-8',
+        success: function (data) {
+            if (data === "Success") {
+                // Handle success
+            } else {
+                alert('Address Details status update failed.');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('AJAX error: ', status, error);
+        }
+    });
  }
 
+function performsupplierstatus(addressId, isChecked) {
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("updatesupplierstatus", "AddressDetails")',
+        data: JSON.stringify({ AddressId: addressId, IsChecked: isChecked }),
+        contentType: 'application/json; charset=utf-8',
+        success: function (data) {
+            if (data === "Success") {
+                // Handle success
+            } else {
+                alert('Address Details status update failed.');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('AJAX error: ', status, error);
+        }
+    });
+}
 
-  function Edit(arg) {
-            $('.main-page').hide();
-       $.ajax({
-           type: "POST",
-           url: ' @Url.Action("EditAddressDetails", "AddressDetails")',
-           data: { AddressId: arg },
-           success: function (data) {
-               $(".main-page").html(data);
-               $(".main-page").show();
-           }
-       });
-   }
+
     </script>
 
 

@@ -1,0 +1,327 @@
+﻿@model MMS.Web.Models.Addressdetails.Addressdetails
+@{
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int pageSize = ViewBag.totalPagessupp ?? 8;
+    int totalItems = Model.AddressdetailssupplierLists.Count();
+    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+
+}
+<html>
+<head>
+    <title>Buyer address</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
+    <style>
+        .caret {
+            display: inline-block;
+            width: 0;
+            margin-top: -15%;
+            height: 0;
+            margin-left: 94%;
+            vertical-align: middle;
+            border-top: 13px dashed;
+            border-top: 7px solid;
+            border-right: 7px solid transparent;
+            border-left: 7px solid transparent;
+        }
+
+        .page-item.active .page-link {
+            z-index: 3;
+            color: #fff;
+            background-color: #4472C4;
+            border-color: #0d6efd;
+        }
+
+        #manage_customer_show_no2, #list_report_show_no, #static_report_show_no {
+            border: 1px solid #6C7686;
+            border-radius: 3px;
+            color: #3A3A3A;
+            padding: 3px 3px 3px 10px;
+            width: 60px;
+            display: inline;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div class="table-responsive reports_table_responsive">
+        <div class="col-lg-4 col-md-4 col-sm-8">
+            <div class="input-box">
+                @Html.DropDownListFor(m => m.suppliernameadd, MMS.Web.ExtensionMethod.HtmlHelper.SupplierfullName(), new { @class = "select-style text-field" })
+
+                <span class="caret"></span>
+            </div>
+        </div>
+
+        <div class="summery">
+            @if (Model.AddressdetailssupplierLists != null && Model.AddressdetailssupplierLists.Count() > 0)
+            {
+
+                foreach (var address in Model.AddressdetailssupplierLists)
+                {
+                    <div class="borders mt-4" style=" border-color: #eae9e9; border-style: solid;">
+                        <div style="padding: 18px; display: flex; justify-content: space-between;">
+                            <label for="@address.addresshd_id">
+                                @if (address.IsActive == true)
+                                {
+                                    <input type="checkbox" class="addresses1" id="status-@address.addresshd_id" data-address-id="@address.addresshd_id" style="cursor: pointer;" checked />
+                                }
+                                else
+                                {
+                                    <input type="checkbox" class="addresses1" id="status-@address.addresshd_id" data-address-id="@address.addresshd_id" style="cursor: pointer;" />
+                                }
+                                @if (address.suppliername != null)
+                                {
+                                    <b style="margin-left: 19px; text-transform: uppercase;">@address.suppliername - @address.suppliercode</b>
+                                }
+                                else
+                                {
+                                    <b style="margin-left: 19px; text-transform: uppercase;"></b>
+                                }
+                            </label>
+                            @if (address.addtypename != null)
+                            {
+                                <b style="background-color: #ffe2e2; padding: 7px 22px; color: #970000; border-radius: 4px; text-transform: uppercase; ">@address.addtypename</b>
+                            }
+                            else
+                            {
+                                <b style="background-color: #ffe2e2; padding: 7px 22px; color: #970000; border-radius: 4px; text-transform: uppercase; ">Company Address</b>
+                            }
+                        </div>
+                        <div style=" margin: 6px 55px 16px; margin-top: -18px;">
+                            <ul>
+                                <li>
+                                    @address.Address1
+                                </li>
+                                <li>Zip Code : @address.zipcode</li>
+                                <li>Phone    : @address.Phone</li>
+                                <li>Email    : @address.Email</li>
+                            </ul>
+                        </div>
+                        <div style=" padding: 1px 79px 35px; margin-top: -70px; display: flex; justify-content: end;">
+
+                            <div style="margin-top:8px;">
+                                <span class="table_icons" style="padding: 7px 9px;">
+                                    <img src="~/Content/Images/editpng.png" onclick="Editsupp('@address.addresshd_id')" style="width: 34px; height: 31px; margin-top: -10px;" />
+                                </span>
+                                @if (@address.IsDeleted == true)
+                                {
+                                    <input type="checkbox" class="checkbox checkboxs1" id="delete1-@address.addresshd_id" data-addressval-id="@address.addresshd_id" />
+                                    <label for="delete1-@address.addresshd_id" class="switch"></label>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" class="checkbox checkboxs1" id="delete1-@address.addresshd_id" data-addressval-id="@address.addresshd_id" checked />
+                                    <label for="delete1-@address.addresshd_id" class="switch"></label>
+                                }
+
+                            </div>
+                        </div>
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="borders mt-2" style=" border-color: #eae9e9; border-style: solid;">
+                    <div style="padding: 10px; display: flex; justify-content: space-between;">
+
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <p>No records found</p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="row manage_customer_show">
+            <div class="font-14 manage_customer_show_I col-xl-6">
+                <span>Showing </span>
+                <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no2" aria-label="select example">
+                    <option value="8" @(ViewBag.totalPagessupp == 8 ? "selected" : "")>8</option>
+                    <option value="16" @(ViewBag.totalPagessupp == 16 ? "selected" : "")>16</option>
+                    <option value="24" @(ViewBag.totalPagessupp == 24 ? "selected" : "")>24</option>
+                    <option value="32" @(ViewBag.totalPagessupp == 32 ? "selected" : "")>32</option>
+                </select>
+            </div>
+
+            <div class="col-xl-6 manage_customer_show_II">
+                <nav class="float-xl-end">
+                    <ul class="pagination font-14">
+                        <li class="page-item">
+                            <a href="" id="previousPage" class="page-link">Previous</a>
+                        </li>
+                        @for (int i = 1; i <= ViewBag.totalPagessupp; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a href="#" class="page-link" data-page="@i" id="page-link">@i</a>
+                            </li>
+                        }
+                        <li class="page-item">
+                            <a class="page-link" id="nextPage" href="">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+        </div>
+    </div>
+    <script src="~/Content/js/custom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="~/Content/js/Validation.js"></script>
+    <script src="~/Content/js/dropdown.js"></script>
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        new TomSelect("#suppliernameadd", {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#suppliernameadd").on('input', function () {
+                var customerearch = $("#suppliernameadd").val();
+                $.ajax({
+                    type: 'GET',
+                    url: '/AddressDetails/Searchsuppllier',
+                    data: { filter: customerearch },
+                    success: function (values) {
+                        $(".summery").empty();
+                        if (values != 0) {
+                            $.each(values, function (i, item) {
+                                var addressId = item.addresshd_id;
+                                var isActive = item.IsActive;
+                                var isDeleted = item.IsDeleted;
+                                var addressType = item.addtypename ? item.addtypename : "Company Address";
+
+                                var rowHtml = `
+                      <div class="borders mt-4" style=" border-color: #eae9e9; border-style: solid;">
+                          <div style="padding: 18px;display: flex; justify-content: space-between;">
+                              <label for="status-${addressId}">
+                                  <input type="checkbox" class="addresses1" id="status-${addressId}" data-address-id="${addressId}" style="cursor: pointer;" ${isActive ? 'checked' : ''} />
+                                  <b style="margin-left: 19px; text-transform: uppercase;">${item.suppliername} - ${item.suppliercode}</b>
+                              </label>
+                              <b style="background-color: #ffe2e2; padding: 7px 22px; color: #970000; border-radius: 4px; text-transform: uppercase;">${addressType}</b>
+                          </div>
+                          <div style="margin: 6px 55px 16px; margin-top: -18px;">
+                              <ul>
+                                  <li>${item.address1}</li>
+                                  <li>Zip Code: ${item.ZipCode}</li>
+                                  <li>Phone: ${item.Phone}</li>
+                                  <li>Email: ${item.Email}</li>
+                              </ul>
+                          </div>
+                          <div style="padding: 1px 79px 35px; margin-top: -70px;   display: flex;justify-content: end;">
+                              <div style="margin-top:8px;">
+                                  <span class="table_icons" style="padding: 7px 9px;">
+                                      <img src="/Content/Images/editpng.png" onclick="Editsupp('${addressId}')" style="width: 34px; height: 31px; margin-top: -10px;" />
+                                  </span>
+                                  <input type="checkbox" class="checkbox checkboxs1" id="delete-${addressId}" data-address-id="${addressId}" ${isDeleted ? '' : 'checked'} />
+                                  <label for="delete-${addressId}" class="switch"></label>
+                              </div>
+                          </div>
+                      </div>
+                  `;
+                                $(".summery").append(rowHtml);
+                            });
+                        }
+                        else {
+                            var rowHtml = ` <div class="borders mt-2" style=" border-color: #eae9e9; border-style: solid;">
+     <div style="padding: 10px; display: flex; justify-content: space-between;">
+
+     </div>
+     <div class="d-flex justify-content-center">
+         <p>No records found</p>
+     </div>
+ </div>`;
+
+                            $(".summery").append(rowHtml);
+                        }
+
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+  $(document).ready(function() {
+      $('#manage_customer_show_no2').change(function () {
+          var PageSize = parseInt($(this).val());
+          debugger;
+        $.ajax({
+            url: '/AddressDetails/AddressDetailssupplierGrid',
+            type: "GET",
+            dataType: "JSON",
+            data: { pageSize: PageSize },
+            success: function (values) {
+                $("#summery").html(values).show();
+            }
+        });
+    });
+      $("#page-link").click(function(e){
+          e.preventDefault();
+            var page = $(this).data("page");
+
+            $.ajax({
+                 url: "@Url.Action("AddressDetailssupplierGrid", "AddressDetails")",
+                type: "GET",
+                data: { page: page },
+                success: function(data){
+                    $("#summery").html(data).show();
+                }
+            });
+        });
+      $('#previousPage').click(function(e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        if (currentPage > 1) {
+            var previousPage = currentPage - 1;
+            $.ajax({
+                url: '/AddressDetails/AddressDetailssupplierGrid',
+                type: "GET",
+                dataType: "JSON",
+                data: { page: previousPage, pageSize:parseInt('@ViewBag.PageSize') },
+                success: function (values) {
+                    $("#summery").html(values).show();
+                }
+            });
+        }
+    });
+
+    $('#nextPage').click(function(e) {
+        e.preventDefault();
+        debugger;
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        var totalPages = parseInt('@ViewBag.TotalPages');
+        if (currentPage < totalPages) {
+            var nextPage = currentPage + 1;
+             $.ajax({
+                 url: '/AddressDetails/AddressDetailssupplierGrid',
+                  type: "GET",
+                  dataType: "JSON",
+                   data: { page: nextPage, pageSize:parseInt('@ViewBag.PageSize') },
+                  success: function (values) {
+                       $("#summery").html(values).show();
+                  }
+             });
+        }
+    });
+
+
+});
+
+    </script>
+
+</body>
+</html>
+

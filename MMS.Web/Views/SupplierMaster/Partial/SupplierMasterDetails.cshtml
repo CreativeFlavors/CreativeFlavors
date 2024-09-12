@@ -1,664 +1,484 @@
-﻿@model MMS.Web.Models.SupplierMasterModel.SupplierMasterModel
-@{
-    int id = Model.SupplierMasterId;
-    Session["SupplierMasterId"] = id;
-    Model.SupplierCode = Model.SupplierCode;
-    var listhide = "";
-    if (Model.MaterialGroupList == null)
-    {
+﻿@model MMS.Web.Models.SupplierMasterModel.SupplierModel
 
-        listhide = "display: none";
-    }
-    else
-    {
-        listhide = "";
-    }
+<!DOCTYPE html>
+<html>
 
-}
+<head>
 
-<style>
-    .right-form-section {
-        width: 98% !important;
-    }
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
 
-    .ui-multiselect {
-        width: 100% !important;
-        position: relative !important;
-        background: #fff;
-        border-radius: 0px;
-        border: 2px solid #dedede;
-        color: #8a8c8c;
-        font-size: 14px;
-    }
+</head>
 
-    .ui-icon {
-        position: absolute !important;
-        right: 0;
-        top: 4px;
-    }
+<body>
 
-    .ui-multiselect {
-        position: relative !important;
-    }
+    <div class="main-page">
+        <section class="inner-section">
+            <div class="edit-customer">
+                <a href="/SupplierMaster/SupplierMaster">
+                    <div class="back-button"><img src="~/Content/assets/images/choose-plan.png" alt="back arrow"></div>
+                </a>
+                <h2 class=" font-20">Supplier info</h2>
 
-    .ui-multiselect-menu {
-        position: absolute;
-        display: none;
-    }
-
-    .ui-widget-content {
-        width: 200px !important;
-        height: 200px !important;
-        overflow: auto !important;
-    }
-</style>
-<style>
-    [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
-        position: static !important;
-    }
-</style>
-<div class="right-form-section clearfix" id="DivShow">
-    <form class="form-inline" role="form">
-        <ul class="nav nav-tabs">
-            <li class="active"><a data-toggle="tab" href="#step1">Supplier</a></li>
-            <li><a data-toggle="tab" href="#step2">Details</a></li>
-            <li><a data-toggle="tab" href="#step3">Order terms</a></li>
-            <li><a data-toggle="tab" href="#step4">Commercial Details</a></li>
-        </ul>
-
-        <div class="tab-content">
-
-            @Html.HiddenFor(x => x.SupplierMasterId)
-
-            <div id="step1" class="tab-pane fade in active">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Supplier Code</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.SupplierCode, new { @readonly = true, @class = "form-control text-field", @style = "  width: 178px;" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Supplier Name</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.SupplierName, new { @class = "form-control text-field", @style = "  width: 178px;" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Currency</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.DropDownListFor(m => m.Currency, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "select-style text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Address</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.AddressLine1, new { @class = "form-control text-field", @style = "  width: 178px;" })
-                                        @Html.TextBoxFor(m => m.AddressLine2, new { @class = "form-control text-field", @style = "  width: 178px;" })
-                                        @Html.TextBoxFor(m => m.AddressLine3, new { @class = "form-control text-field", @style = "  width: 178px;" })
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Country</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.DropDownListFor(m => m.Country, MMS.Web.ExtensionMethod.HtmlHelper.CountryName(), new { @class = "select-style text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal fade" id="auto_search" role="dialog">
-                                <div class="modal-dialog modal-sm">
-                                    <div class="modal-content">
-                                        <div class="modal-header sear_head">
-                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                            <h4 class="modal-title">Material Name List</h4>
-                                        </div>
-                                        <div class="modal-body sear_body">
-                                            <ul class="mater_listers">
-                                                @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.MaterialMasterName().Where(x => x.Value != ""))
-                                                {
-                                                    <li id="@item.Value">@item.Text</li>
-                                                }
-                                            </ul>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button id="materialOpenId" type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Supplier Type</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @if (Model != null && Model.IsDomestic != null && Model.IsDomestic != false)
-                                        {
-                                            <input type="checkbox" id="IsDomestic" name="IsDomestic" checked="checked" value="true"><label for="IsDomestic">Domestic</label>
-                                        }
-                                        else
-                                        {
-
-                                            @Html.CheckBoxFor(x => x.IsDomestic)<label for="IsDomestic">Domestic</label>
-                                        }
-                                        @if (Model != null && Model.IsImport != null && Model.IsImport != false)
-                                        {
-                                            <input type="checkbox" id="IsImport" name="IsImport" checked="checked" value="true"><label for="IsImport">Import</label>
-                                        }
-                                        else
-                                        {
-
-                                            @Html.CheckBoxFor(x => x.IsImport)<label for="IsImport">Import</label>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-md-6" style="margin-top: 20px;">
-
-                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
-                                <label class="form-label col-lg-5 col-md-5 "> Material Group Name</label>
-                                <div class="col-mg-6 col-lg-6 col-sm-12">
-                                    @if (Model.MaterialGroupList != null)
-                                    {
-                                        @Html.ListBoxFor(model => Model.MaterialSelectedItemId, new MultiSelectList(Model.MaterialGroupList, "Value", "Text"), new { @id = "MaterialSelectedItemId", @class = "GroupItem" })
-
-                                    }
-                                    else
-                                    {
-                                        @Html.ListBoxFor(model => Model.MaterialGroupList, new MultiSelectList(Model.MaterialGroupList, "Value", "Text"), new { @id = "MaterialSelectedItemId" })
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-md-6" style="margin-top: 20px;">
-
-                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
-                                <label class="form-label col-lg-5 col-md-5 ">  Material Name</label>
-                                <div class="col-mg-6 col-lg-6 col-sm-12">
-                                    @if (Model.materialList != null)
-                                    {
-                                        @Html.ListBoxFor(model => Model.SelectedItemId, new MultiSelectList(Model.materialList, "Value", "Text"), new { @id = "SelectedItemId" })
-                                    }
-                                    else
-                                    {
-                                        @Html.ListBoxFor(model => Model.materialList, new MultiSelectList(Model.materialList, "Value", "Text"), new { @id = "SelectedItemId" })
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-md-6" style="margin-top: 20px;">
-                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
-                                <label class="form-label col-lg-5 col-md-5 ">Supplier GSTN</label>
-                                <div class="col-mg-6 col-lg-6 col-sm-12">
-                                    @Html.TextBoxFor(model => model.SupplierGSTIN, new { @class = "form-control text-field", @style = "width: 178px;" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-md-6" style="margin-top: 20px;">
-                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
-                                <label class="form-label col-lg-5 col-md-5 ">Credit Limit</label>
-                                <div class="col-mg-6 col-lg-6 col-sm-12">
-                                    @Html.TextBoxFor(model => model.CreditLimit, new { @class = "form-control text-field", @style = "width: 178px;" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-md-6" style="margin-top: 20px;">
-                            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
-                                <label class="form-label col-lg-5 col-md-5 ">Credit Days</label>
-                                <div class="col-mg-6 col-lg-6 col-sm-12">
-                                    @Html.TextBoxFor(model => model.CreditDays, new { @class = "form-control text-field", @style = "width: 178px;" })
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
-
-            <div id="step2" class="tab-pane fade">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Contact Person</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.ContactPerson, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Designation</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.Designation, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Mobile</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control text-field", onkeypress = "return isNumberKey(event)", @maxlength = 10 })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Phone</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.LandLine, new { @class = "form-control text-field", onkeypress = "return isNumberKey(event)" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Fax</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.Fax, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Email</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">ST NO Head</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.StNo, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">CST NO Head</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.CstNo, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label class="form-label" for="text">Range</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.Range, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label class="form-label" for="text">Division</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.Division, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label class="form-label" for="text">P.L.A No</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.PLANo, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label class="form-label" for="text">EOC No</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.EOCNo, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label class="form-label" for="text">Regn.No</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.RegnNo, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
+            <div class="edit-section">
+                <h3 class="font-20">Basic Information</h3>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#Account">Supplier Name</label>
+                            @Html.TextBoxFor(m => m.Suppliername, new { @class = "form-control text-field", placeholder = "Enter the Supplier Name", onkeyup = "Suppliernamefun()" })
+                            <p class="text-danger" id="SuppliernameResult"></p>
                         </div>
                     </div>
-                </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#Account">Supplier Code</label>
+                            @Html.TextBoxFor(m => m.suppliercode, new { @class = "form-control text-field", placeholder = "Enter the Supplier Code", onkeyup = "SupplierCodefun()" })
+                            <p class="text-danger" id="suppCodetResult"></p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#Account">Account Number</label>
+                            @Html.TextBoxFor(m => m.Account, new { @class = "form-control text-field", placeholder = "Enter the Account Number", onkeyup = "Accountfun()" })
+                            @Html.HiddenFor(m => m.SupplierId)
+                            <p class="text-danger" id="AccountResult"></p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#AccountName">Account Name</label>
+                            @Html.TextBoxFor(m => m.AccountName, new { @class = "form-control text-field", placeholder = "Enter the Account Name", onkeyup = "AccountNamefun()" })
+                            <p class="text-danger" id="AccountNameResult"></p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#AccountDescription">Account Description</label>
+                            @Html.TextBoxFor(m => m.AccountDescription, new { @class = "form-control text-field", placeholder = "Enter the Account Description", onkeyup = "AccountDescriptionfun()" })
+                            <p class="text-danger" id="AccountDescriptionNameResult"></p>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#EmailContact">Email Contact</label>
+                            @Html.TextBoxFor(m => m.EmailContact, new { @class = "form-control text-field", placeholder = "Enter the Email Contact", onkeyup = "EmailContactfun()" })
+                            <p class="text-danger" id="EmailResult"></p>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#Physical1">Address</label>
+                            @Html.TextAreaFor(m => m.Physical1, new { @class = "form-control text-field", placeholder = "Enter the Address", onkeyup = "Physical1fun()" })
+                            <p class="text-danger" id="Physical1Result"></p>
+                        </div>
+                    </div>
+
+                    @*<div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="input-part">
+                <label class="font-14" for="#Physical2">Physical Address 2</label>
+                @Html.TextAreaFor(m => m.Physical2, new { @class = "form-control text-field", placeholder = "Enter the Physical Address 2", onkeyup = "Physical2fun()" })
+                <p class="text-danger" id="Physical2Reult"></p>
             </div>
+        </div>
 
-            <div id="step3" class="tab-pane fade">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Payment Terms</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.PaymentTerms, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Delivery Terms</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.DeliveryTerms, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Packing Details</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.PackingDetails, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Insurance</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.Insurance, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Port Of Loading</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.PortOfLoading, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Despatch Through</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.DespatchThrough, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Freight</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.DropDownListFor(m => m.Freight, MMS.Web.ExtensionMethod.HtmlHelper.Freight(), new { @class = "form-control text-field" })
-                                        @Html.DropDownListFor(m => m.FreightName, MMS.Web.ExtensionMethod.HtmlHelper.FreightName(), new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Form</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.DropDownListFor(m => m.Form1, MMS.Web.ExtensionMethod.HtmlHelper.FormName(), new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">If Form is Applicable then Form Name</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.FormName, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label class="form-label" for="text">Forwarder</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextAreaFor(m => m.Forwarder, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="input-part">
+                <label class="font-14" for="#Physical3">Physical Address 3</label>
+                @Html.TextAreaFor(m => m.Physical3, new { @class = "form-control text-field", placeholder = "Enter the Physical Address 3", onkeyup = "Physical3fun()" })
+                <p class="text-danger" id="Physical3Result"></p>
             </div>
+        </div>
 
-            <div id="step4" class="tab-pane fade">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Bank Name</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.BankName, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Bank Address</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextAreaFor(m => m.BankAddress, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Bank Code</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.BankCode, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Swift Code</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.SwiftCode, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Account Number</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.AccountNumber, new { @class = "form-control text-field", onkeypress = "return isNumberKey(event)" })
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="input-part">
+                <label class="font-14" for="#Physical4">Physical Address 4</label>
+                @Html.TextAreaFor(m => m.Physical4, new { @class = "form-control text-field", placeholder = "Enter the Physical Address 4", onkeyup = "Physical4fun()" })
+                <p class="text-danger" id="Physical4Result"></p>
+            </div>
+        </div>
 
-                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-12 no-padding">
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">IBAN</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextBoxFor(m => m.IBAN, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field-section">
-                                <div class="form-group">
-                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-12">
-                                        <label for="text" class="form-label">Other Information</label>
-                                    </div>
-                                    <div class="col-md-7 col-sm-7 col-lg-7 col-xs-12">
-                                        @Html.TextAreaFor(m => m.OtherInformation, new { @class = "form-control text-field" })
-                                    </div>
-                                </div>
-                            </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="input-part">
+                <label class="font-14" for="#Physical5">Physical Address 5</label>
+                @Html.TextAreaFor(m => m.Physical5, new { @class = "form-control text-field", placeholder = "Enter the Physical Address 5", onkeyup = "Physical5fun()" })
+                <p class="text-danger" id="Physical5Result"></p>
+            </div>
+        </div>*@
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#PhysicalCode">Zip Code</label>
+                            @Html.TextBoxFor(m => m.PhysicalCode, new { @class = "form-control text-field", placeholder = "Enter the Zip Code", onkeyup = "PhysicalCodefun()" })
+                            <p class="text-danger" id="PhysicalCodeResult"></p>
                         </div>
                     </div>
-                </div>
+
+
+                    @*<div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="input-part">
+                <label class="font-14" for="#Postal1">Postal Address 1</label>
+                @Html.TextAreaFor(m => m.Postal1, new { @class = "form-control text-field", placeholder = "Enter the Postal Address 1", onkeyup = "Postal1fun()" })
+                <p class="text-danger" id="Postal1Result"></p>
             </div>
 
         </div>
 
-        <div class="form-footer">
-            <div class="row">
-                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
-                    <input type="button" onclick="Cancel()" style="cursor: pointer;" class="btn-style" title="Back" value="Back">
-                    @if (Model != null && Model.SupplierMasterId != 0)
-                    {
-
-                        <input type="button" onclick="Update()" style="cursor: pointer;" id="SupplierMasterId" class="btn-style" title="Update" value="Update">
-                    }
-                    else
-                    {
-                        <input type="button" onclick="Save()" style="cursor: pointer;" title="Save" class="btn-style" value="Save">
-                    }
-                </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="input-part">
+                <label class="font-14" for="#Postal2">Postal Address 2</label>
+                @Html.TextAreaFor(m => m.Postal2, new { @class = "form-control text-field", placeholder = "Enter the Postal Address 2", onkeyup = "Postal2fun()" })
+                <p class="text-danger" id="Postal2Result"></p>
             </div>
         </div>
-    </form>
-</div>
+
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="input-part">
+                <label class="font-14" for="#Postal3">Postal Address 3</label>
+                @Html.TextAreaFor(m => m.Postal3, new { @class = "form-control text-field", placeholder = "Enter the Postal Address 3", onkeyup = "Postal3fun()" })
+                <p class="text-danger" id="Postal3Result"></p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="input-part">
+                <label class="font-14" for="#Postal4">Postal Address 4</label>
+                @Html.TextAreaFor(m => m.Postal4, new { @class = "form-control text-field", placeholder = "Enter the Postal Address 4", onkeyup = "Postal4fun()" })
+                <p class="text-danger" id="Postal4Result"></p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="input-part">
+                <label class="font-14" for="#Postal5">Postal Address 5</label>
+                @Html.TextAreaFor(m => m.Postal5, new { @class = "form-control text-field", placeholder = "Enter the Postal Address 5", onkeyup = "Postal5fun()" })
+                <p class="text-danger" id="Postal5Result"></p>
+            </div>
+        </div>
 
 
-<script>
-    $(document).ajaxStart(function () {
-        $(".loader-overlay").css("display", "block");
-    });
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="input-part">
+                <label class="font-14" for="#PostalCode">Postal Code</label>
+                @Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control text-field", placeholder = "Enter the Postal Code", onkeyup = "PostalCodefun()" })
+                <p class="text-danger" id="PostalCodeResult"></p>
+            </div>
+        </div>*@
 
-    $(document).ajaxComplete(function () {
-        $(".loader-overlay").css("display", "none");
-    });
-    $(window).load(function () {
-        $('.loader-overlay').fadeOut('fast');
-    });
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#Telephone1">Telephone 1</label>
+                            @Html.TextBoxFor(m => m.Telephone1, new { @class = "form-control text-field", placeholder = "Enter the Telephone 1", onkeyup = "Telephone1fun()" })
+                            <p class="text-danger" id="Telephone1Result"></p>
+                        </div>
+                    </div>
 
-    $(function () {
-        $(".GroupItem").multiselect({
-            click: function (event, ui) {
-                alert('qwere')
-            }
-        });
-    });
-    $(".GroupItem").click(function () {
-        alert("ok");
-    });
-    $(document).ready(function () {
-        $("#MaterialSelectedItemId").multiselect({
-            classes: "materialID"
-        });
-        $("#SelectedItemId").multiselect({
-            classes: "materialNameID"
-        });
 
-    });
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#Telephone2">Telephone 2</label>
+                            @Html.TextBoxFor(m => m.Telephone2, new { @class = "form-control text-field", placeholder = "Enter the Telephone 2", onkeyup = "Telephone2fun()" })
+                            <p class="text-danger" id="Telephone2Result"></p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#EmailAccounts">Email Accounts</label>
+                            @Html.TextBoxFor(m => m.EmailAccounts, new { @class = "form-control text-field", placeholder = "Enter the Email Accounts", onkeyup = "EmailAccountsfun()" })
+                            <p class="text-danger" id="EmailAccountsResult"></p>
+                        </div>
+                    </div>
 
-    $(".ui-widget.materialID input[type='checkbox']").change(function () {
-        var MaterialGroupMasterId = "";
-        $(".ui-widget.materialID input[type='checkbox']").each(function () {
-            if ($(this).prop("checked") == true) {
-                MaterialGroupMasterId = MaterialGroupMasterId + "," + $(this).val();
-            }
-        });
-        setTimeout(function () {
-            $.ajax({
-                url: '/SupplierMaster/MaterialGroupCheckboxeails',
-                type: "GET",
-                dataType: "JSON",
-                data: { MaterialGroupMasterId: MaterialGroupMasterId.slice(1) },
-                success: function (cities) {
-                    $("#SelectedItemId").html("");
-                    $.each(cities, function (i, city) {
 
-                        $("#SelectedItemId").append(
-                            $('<option></option>').html(city.MaterialDescription).attr("value", city.MaterialMasterID));
-                    });
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#EmailEmergency">Email Emergency</label>
+                            @Html.TextBoxFor(m => m.EmailEmergency, new { @class = "form-control text-field", placeholder = "Enter the Email Emergency", onkeyup = "EmailEmergencyfun()" })
+                            <p class="text-danger" id="EmergencyNameResult"></p>
+                        </div>
+                    </div>
+                    @*<div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="input-part">
+                <label class="font-14" for="#AccountTypeId">Account Type </label>
+                @Html.TextBoxFor(m => m.AccountTypeId, new { @class = "form-control text-field", placeholder = "Enter the Account Type Id" })
+                <p class="text-danger" id="CustomerNameResult"></p>
+            </div>
+        </div>*@
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#VatNumber">Vat Number</label>
+                            @Html.TextBoxFor(m => m.VatNumber, new { @class = "form-control text-field", placeholder = "Enter the Vat Number", onkeyup = "VatNumberfun()" })
+                            <p class="text-danger" id="VatResult"></p>
+                        </div>
+                    </div>
 
-                    setTimeout(function () {
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#RegNumber">Reg Number</label>
+                            @Html.TextBoxFor(m => m.RegNumber, new { @class = "form-control text-field", placeholder = "Enter the Reg Number", onkeyup = "RegNumberfun()" })
+                            <p class="text-danger" id="RegResult"></p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#DcBalance">DcBalance</label>
+                            @Html.TextBoxFor(m => m.DcBalance, new { @class = "form-control text-field", placeholder = "Enter theDcBalance", onkeyup = "DcBalancebom()" })
+                            <p class="text-danger" id="DcBalanceNameResult"></p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#CreditLimit">Credit Limit</label>
+                            @Html.TextBoxFor(m => m.CreditLimit, new { @class = "form-control text-field", placeholder = "Enter the Credit Limit", onkeyup = "CreditLimitfun()" })
+                            <p class="text-danger" id="CreditResult"></p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#AccountTypeId">Account Type </label>
+                            @Html.DropDownListFor(m => m.AccountTypeId, MMS.Web.ExtensionMethod.HtmlHelper.accountypeName(), new { @class = "select-style text-field", onchange = "accountypefun()" })
+                            <p class="text-danger" id="AccountTypResult"></p>
+                        </div>
+                    </div>
 
-                        $("#SelectedItemId").multiselect("refresh");
-                    }, 500);
+                    @*<div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="radio">
+                <label class="font-14" for="#ChargeInterest">Charge Interest</label>
+                @if (Model.ChargeInterest == false)
+                {
+                    <div class="radioSection">
+                        <label for="add"> <input type="radio" value="true" name="yes" id="ChargeInterest" style=" cursor: pointer;" onclick="ChargeinResultfun()"> Yes </label>
+                        <label for="add1"><input type="radio" value="false" name="yes" id="ChargeInterest" checked style=" cursor: pointer;" onclick="ChargeinResultfun()"> NO</label>
+                    </div>
                 }
-            });
-        }, 300);
-    });
-</script>
+                else
+                {
+                    <div class="radioSection">
+                        <label for="add"> <input type="radio" value="true" name="yes" id="ChargeInterest" style=" cursor: pointer;" checked onclick="ChargeinResultfun()"> Yes </label>
+                        <label for="add1"><input type="radio" value="false" name="yes" id="ChargeInterest" style=" cursor: pointer;" onclick="ChargeinResultfun()"> NO</label>
+                    </div>
+                }
 
-<script>
+                <p class="text-danger" id="ChargeinResult"></p>
+            </div>
+        </div>*@
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#Interest">Interest</label>
+                            @Html.TextBoxFor(m => m.Interest, new { @class = "form-control text-field", placeholder = "Enter the Interest", onkeyup = "Interestfun()" })
+                            <p class="text-danger" id="inResult"></p>
+                        </div>
+                    </div>
 
-</script>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#TaxTypeId">Tax Type </label>
+                            @Html.DropDownListFor(m => m.TaxTypeId, MMS.Web.ExtensionMethod.HtmlHelper.GetTaxRef(), new { @class = "select-style text-field", onchange = "TaxTypeIdfun()" })
+                            <p class="text-danger" id="TaxTypeIdResult"></p>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#CurrencyID">Currency</label>
+                            @Html.DropDownListFor(m => m.CurrencyID, MMS.Web.ExtensionMethod.HtmlHelper.CurrencyName(), new { @class = "select-style text-field", onchange = "CurrencyIDfun()" })
+                            <p class="text-danger" id="CurrencyIDResult"></p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#ForeignCurrency">ForeignCurrency</label>
+                            @Html.DropDownListFor(m => m.ForeignCurrency, MMS.Web.ExtensionMethod.HtmlHelper.forCurrencyName(), new { @class = "select-style text-field", onchange = "ForeignCurrencyfun()" })
+                            <p class="text-danger" id="ForeignCurrencyNameResult"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+
+                </div>
+                <div class="inner-section-button mt-4">
+
+                    <button type="submit" class="fill-color font-15" onclick="Save(); confirmsupplier();">
+                        SAVE
+                    </button>
+
+                    <a href="/SupplierMaster/SupplierMaster">
+                        <button class="border-color font-15">
+                            CANCEL
+                        </button>
+                    </a>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+
+    <script src="~/Content/js/custom.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="~/Content/js/Validation.js"></script>
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#suppliername").attr('checked', true);
+
+        });
+
+    </script>
+
+    <script>
+        function Save() {
+            var SupplierId = $("#SupplierId").val();
+            var Account = $("#Account").val();
+            var suppliercode = $("#suppliercode").val();
+            var Suppliername = $("#Suppliername").val();
+            var AccountName = $("#AccountName").val();
+            var AccountTypeId = $("#AccountTypeId").val();
+            var AccountDescription = $("#AccountDescription").val();
+            var Physical1 = $("#Physical1").val();
+            var PhysicalCode = $("#PhysicalCode").val();
+            var Telephone1 = $("#Telephone1").val();
+            var Telephone2 = $("#Telephone2").val();
+            var EmailContact = $("#EmailContact").val();
+            var EmailAccounts = $("#EmailAccounts").val();
+            var EmailEmergency = $("#EmailEmergency").val();
+            var VatNumber = $("#VatNumber").val();
+            var RegNumber = $("#RegNumber").val();
+            var DcBalance = $("#DcBalance").val();
+            var CreditLimit = $("#CreditLimit").val();
+            var Interest = $("#Interest").val();
+            var TaxTypeId = $("#TaxTypeId").val();
+            var ForeignCurrency = $("#ForeignCurrency").val();
+            var CurrencyID = $("#CurrencyID").val();
+            var formdata = new FormData();
+            formdata.append("SupplierId", SupplierId);
+            formdata.append("Account", Account);
+            formdata.append("AccountName", AccountName);
+            formdata.append("AccountTypeId", AccountTypeId);
+            formdata.append("Suppliername", Suppliername);
+            formdata.append("suppliercode", suppliercode);
+            formdata.append("AccountDescription", AccountDescription);
+            formdata.append("Physical1", Physical1);
+            formdata.append("PhysicalCode", PhysicalCode);
+            formdata.append("Telephone1", Telephone1);
+            formdata.append("Telephone2", Telephone2);
+            formdata.append("EmailContact", EmailContact);
+            formdata.append("EmailAccounts", EmailAccounts);
+            formdata.append("EmailEmergency", EmailEmergency);
+            formdata.append("VatNumber", VatNumber);
+            formdata.append("RegNumber", RegNumber);
+            formdata.append("DcBalance", DcBalance);
+            formdata.append("CreditLimit", CreditLimit);
+            formdata.append("Interest", Interest);
+            formdata.append("TaxTypeId", TaxTypeId);
+            formdata.append("ForeignCurrency", ForeignCurrency);
+            formdata.append("CurrencyID", CurrencyID);
+            var filter = /^[0-9]+(\.[0-9]+)?$/;
+            var filter1 = /^[0-9]{6}$/;
+            var z1 = /^[0-9]*$/;
+            var filter2 = /(?:\(?\+\d{2}\)?\s*)?\d+(?:[ -]*\d+)*$/;
+            var phoneregx = /^[a-zA-Z\s\.]*$/;
+            var addressRegx = /^[a-zA-Z\s\/]*$/;
+            var email = /^(([^<>()[\]\\.,;:\s"]+(\.[^<>()[\]\\.,;:\s"]+)*)|.(".+"))((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            if (Account != "" && CurrencyID != "" && ForeignCurrency != "" && TaxTypeId != "" && Interest != ""
+                && CreditLimit != "" && DcBalance != "" && RegNumber != "" && VatNumber != ""
+                && EmailEmergency != "" && EmailAccounts != "" && EmailContact != "" && AccountTypeId != "" && Telephone2 != "" && Telephone1 != ""
+                && PhysicalCode != "" && Physical1 != "" && AccountDescription != "" && suppliercode != "" && Suppliername != "" && AccountName != "" &&
+                filter.test(DcBalance) && filter.test(CreditLimit) && filter.test(Interest) && filter1.test(PhysicalCode) && filter2.test(Telephone2) && filter2.test(Telephone2) &&
+                email.test(EmailEmergency) && email.test(EmailAccounts) && email.test(EmailContact) && phoneregx.test(Suppliername) &&
+                addressRegx.test(Physical1)) {
+                if (Physical1.length < 100 && z1.test(Account) && phoneregx.test(AccountName)) {
+                    if (SupplierId == "0") {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/SupplierMaster/SupplierMaster',
+                            contentType: false,
+                            processData: false,
+                            dataType: 'html',
+                            data: formdata,
+                            success: function (data) {
+                                var value = JSON.parse(data);
+                                if (value == "Saved") {
+                                    alert('Saved Successfully.');
+                                    window.location.href = "/SupplierMaster/SupplierMaster";
+                                    return false;
+                                }
+                                else if (value == "SupplierThere") {
+                                    alert('Supplier Name Already There');
+                                }
+                                else if (value == "Suppliercode") {
+                                    alert('Supplier Code Already There');
+                                }
+                                else {
+                                    alert('Save process Failed.');
+                                    return false;
+                                }
+
+                            },
+                            error: function (ex) {
+                                alert('Already Exist in the database.');
+                            }
+
+                        });
+                    }
+                    else {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/SupplierMaster/SupplierMaster',
+                            contentType: false,
+                            processData: false,
+                            dataType: 'html',
+                            data: formdata,
+                            success: function (data) {
+                                var value = JSON.parse(data);
+                                if (value == "Updated") {
+                                    alert('Updated Successfully.');
+                                    window.location.href = "/SupplierMaster/SupplierMaster";
+                                    return false;
+                                }
+                                else if (value == "SupplierThere") {
+                                    alert('Supplier Name and Code must be unique');
+                                }
+                                else if (value == "Suppliercode") {
+                                    alert('Supplier Code Already There');
+                                }
+                                else {
+                                    alert('Save process Failed.');
+                                    return false;
+                                }
+
+
+                            }
+
+
+                        });
+
+
+                    }
+                }
+            }
+            else {
+                //    alert("Please enter all feild");
+            }
+        }
+
+    </script>
+
+</body>
+</html>
+

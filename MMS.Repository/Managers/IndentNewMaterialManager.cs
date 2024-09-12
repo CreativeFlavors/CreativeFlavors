@@ -213,6 +213,24 @@ namespace MMS.Repository.Managers
             }
 
             return result;
+        }     
+        public bool Deletechange(int? indentcartid)
+        {
+            bool result = false;
+            try
+            {
+                Indentdetail model = indentdetailRepository.GetById(indentcartid);
+                model.IsActive = true;
+                indentdetailRepository.Update(model);
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                result = false;
+            }
+
+            return result;
         }
         public Indentdetail Getindentcartid(int? indentcartid)
         {

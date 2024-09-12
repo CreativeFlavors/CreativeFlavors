@@ -10,6 +10,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace MMS.Repository.Managers
 {
@@ -56,7 +57,7 @@ namespace MMS.Repository.Managers
             Salesorder_hd salesorder = new Salesorder_hd();
             try
             {
-                string username = "admin";
+                string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.createdby = username;
                 arg.CreatedDate = DateTime.Now;
                 arg.Status = true;

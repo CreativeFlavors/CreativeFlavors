@@ -11,8 +11,8 @@ namespace MMS.Core.Entities
     public class CustAddress : BaseEntity
     {
         [System.ComponentModel.DataAnnotations.Key]
-        [Column("addressid")]
-        public int AddressId { get; set; }
+        [Column("addresshd_id")]
+        public int Addresshd_id { get; set; }
 
         [Column("buyerid")]
         public int BuyerId { get; set; }
@@ -20,30 +20,8 @@ namespace MMS.Core.Entities
         [Column("addresstype")]
         public int AddressType { get; set; }
 
-        [Column("add1")]
-        public string Add1 { get; set; }
-
-        [Column("add2")]
-        public string Add2 { get; set; }
-
-        [Column("add3")]
-        public string Add3 { get; set; }
-
-        [Column("isdefault")]
-        public bool IsDefault { get; set; }
-
-        [Column("city")]
-        public int City { get; set; }
-
-        [Column("state")]
-        public int State { get; set; }
-
-        [Column("country")]
-        public int Country { get; set; }
-
-        [Column("zipcode")]
-        public string ZipCode { get; set; }
-
+        [Column("addressvarient")]
+        public int? addressvarient { get; set; }
         [Column("contactname")]
         public string ContactName { get; set; }
 
@@ -57,28 +35,28 @@ namespace MMS.Core.Entities
         public string Notes { get; set; }
 
         [Column("cityid")]
-        public int CityId { get; set; } = 0;
+        public int CityId { get; set; } 
 
         [Column("stateid")]
-        public int StateId { get; set; } = 0;
+        public int StateId { get; set; } 
 
         [Column("countryid")]
-        public int CountryId { get; set; } = 0;
+        public int CountryId { get; set; }
 
-        [Column("active")]
-        public bool Active { get; set; }
-
-        [Column("createddate")]
-        public DateTime? CreatedDate { get; set; }
-
-        [Column("updateddate")]
-        public DateTime? UpdatedDate { get; set; }
+        [Column("isactive")]
+        public bool isActive { get; set; } = false;
+        [Column("isdeleted")]
+        public bool isdeleted { get; set; } = true;
+        [Column("deleteddate")]
+        public DateTime? deleteddate { get; set; }
 
         [Column("createdby")]
         public string CreatedBy { get; set; }
 
         [Column("updatedby")]
         public string UpdatedBy { get; set; }
+        [Column("deletedby")]
+        public string deletedby { get; set; }
 
     }
 }

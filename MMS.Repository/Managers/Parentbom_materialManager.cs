@@ -11,6 +11,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace MMS.Repository.Managers
 {
@@ -45,7 +46,7 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                string username = "admin";
+                string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.CreatedBy = username;
                 arg.CreatedDate = DateTime.Now;
                 parentbom_materialRepository.Insert(arg);
@@ -73,7 +74,7 @@ namespace MMS.Repository.Managers
                     model.ProductId = arg.ProductId;;
                     model.RequiredQty = arg.RequiredQty;
                     model.UpdatedDate = DateTime.Now;
-                    string username = "admin";
+                    string username = HttpContext.Current.Session["UserName"].ToString();
                     model.UpdatedBy = username;
                     parentbom_materialRepository.Update(model);
                     result = true;
@@ -179,7 +180,7 @@ namespace MMS.Repository.Managers
             {
                 parentbom_material model = parentbom_materialRepository.GetById(id);
                 model.IsDelete = false;
-                model.DeletedBy = "admin";
+                model.DeletedBy = HttpContext.Current.Session["UserName"].ToString();
                 model.DeletedDate = DateTime.Now;
                 parentbom_materialRepository.Update(model);
                 result = true;

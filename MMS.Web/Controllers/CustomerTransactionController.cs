@@ -28,15 +28,13 @@ namespace MMS.Web.Controllers
 
             OrderHeaderManager manager = new OrderHeaderManager();
             var Customertransactionlist = manager.Get();
-            BuyerManager BuyerManager = new BuyerManager();
+            BuyerMasterManager BuyerManager = new BuyerMasterManager();
             var data1 = BuyerManager.Get();
             CustomertransactionManager customertransactionmanager = new CustomertransactionManager();
             var data2 = customertransactionmanager.Get();
             paymentmethodmanager paymentmethodmanager = new paymentmethodmanager();
             var data3 = paymentmethodmanager.Get();
-
             List<Customertransaction> totalList = new List<Customertransaction>();
-
             foreach (var item in Customertransactionlist)
             {
                 decimal? paid = 0;
@@ -84,20 +82,20 @@ namespace MMS.Web.Controllers
             SalesorderDT_Manager SalesorderDT_Manager = new SalesorderDT_Manager();
             OrderDetailsManager orderDetailsManager = new OrderDetailsManager();
             OrderHeaderManager OrderHeaderManager = new OrderHeaderManager();
-            BuyerManager BuyerManager = new BuyerManager();
+            BuyerMasterManager BuyerManager = new BuyerMasterManager();
             AccounttypeManager accounttypeManager = new AccounttypeManager();
             CustomertransactionManager Customertransactions = new CustomertransactionManager();
             var orderhd = OrderHeaderManager.Get(id);
             var orderDT = orderDetailsManager.Get(orderhd.invoicehd_id);
             var buyer = BuyerManager.GetBuyerMasterId(orderhd.CustomerId);
             var SODT = SalesorderDT_Manager.GetSO(orderDT.SalesOrderId_dt);
-            var daylist = accounttypeManager.GettypeId(buyer.accountypeid);
+            var daylist = accounttypeManager.GettypeId(buyer.AccountTypeId);
             var balance = Customertransactions.GetiNId(id);
 
             var Termdays = daylist.TermDays;
 
             model.InvHDNumber = orderhd.invoicehd_id;
-            model.customer = buyer.BuyerFullName;
+            model.customer = buyer.CustomerName;
             model.buyercode = buyer.BuyerCode;
             model.InvDate = orderhd.invoicedate;
             model.RefItems = orderhd.invoice_items;
@@ -214,7 +212,7 @@ namespace MMS.Web.Controllers
 
             OrderHeaderManager manager = new OrderHeaderManager();
             var Customertransactionlist = manager.Get();
-            BuyerManager BuyerManager = new BuyerManager();
+            BuyerMasterManager BuyerManager = new BuyerMasterManager();
             var data1 = BuyerManager.Get();
             CustomertransactionManager customertransactionmanager = new CustomertransactionManager();
             var data2 = customertransactionmanager.Get();

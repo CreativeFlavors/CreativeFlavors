@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.UI.WebControls;
 
 namespace MMS.Repository.Managers
@@ -81,7 +82,7 @@ namespace MMS.Repository.Managers
             salesordercart salesorder  = new salesordercart();
             try
             {
-                string username = "admin";
+                string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.createdby = username;
                 arg.CreatedDate = DateTime.Now;
                 arg.Status = 1;
@@ -210,7 +211,7 @@ namespace MMS.Repository.Managers
                 salesordercart model = salesorderrep.GetById(id);
                 model.isdeleted = false;
                 model.Status = 0;
-                model.Deletedby = "admin";
+                model.Deletedby = HttpContext.Current.Session["UserName"].ToString();
                 model.Deleteddate = DateTime.Now;
                 salesorderrep.Update(model);
                 result = true;

@@ -250,6 +250,19 @@ namespace MMS.Web.Controllers
                 indentnewMaterialManager.Delete(indentcartid);
             }
             return Json(status, JsonRequestBehavior.AllowGet);
+        }  
+        public ActionResult IndentDeletechange(int indentcartid)
+        {
+            Indentdetail indentCart = new Indentdetail();
+            string status = "";
+            IndentNewMaterialManager indentnewMaterialManager = new IndentNewMaterialManager();
+            indentCart = indentnewMaterialManager.Getindentcartid(indentcartid);
+            if (indentCart.IndentDetailId == indentcartid)
+            {
+                status = "Success";
+                indentnewMaterialManager.Deletechange(indentcartid);
+            }
+            return Json(status, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]

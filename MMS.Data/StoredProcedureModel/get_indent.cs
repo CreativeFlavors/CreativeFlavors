@@ -36,6 +36,8 @@ namespace MMS.Data.StoredProcedureModel
         public decimal? RequiredQty { get; set; }
 
         [Column("indentnumber")]
-        public int IndentNumber { get; set; }
+        public int IndentNumber { get; set; } 
+        [Column("isactive")]
+        public bool isactive { get; set; }
     }
 }

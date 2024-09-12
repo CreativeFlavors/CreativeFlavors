@@ -47,7 +47,7 @@ namespace MMS.Data.StoredProcedureModel
         [Column("buyer_full_name")]
         public string buyer_full_name { get; set; }
         [Column("buyerid")]
-        public int Buyerid { get; set; }
+        public int? Buyerid { get; set; }
         [Column("productid")]
         public int productid { get; set; }
         [Column("bomno")]

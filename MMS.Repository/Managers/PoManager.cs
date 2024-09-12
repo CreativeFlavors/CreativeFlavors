@@ -66,7 +66,7 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                string username = "admin";
+                string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.CreatedBy = username;
                 arg.CreatedDate = DateTime.Now;
                 indentpomappingRepository.Insert(arg);
@@ -90,7 +90,7 @@ namespace MMS.Repository.Managers
                 {
                     model.grn_qty = arg.grn_qty;
                     model.UpdatedDate = DateTime.Now;
-                    string username = "admin";
+                    string username = HttpContext.Current.Session["UserName"].ToString();
                     model.UpdatedBy = username;
                     podetailRepository.Update(model);
                     result = true;
@@ -146,7 +146,7 @@ namespace MMS.Repository.Managers
                     indentPoMapping.CreatedDate = arg.CreatedDate;
                     indentPoMapping.UpdatedDate = DateTime.Now;
                     //model.CreatedBy = "";
-                    string username = "admin";
+                    string username = HttpContext.Current.Session["UserName"].ToString();
                     arg.UpdatedBy = username;
                     indentPoMapping.UpdatedBy = arg.UpdatedBy;
                     //model.UpdatedBy = username;
@@ -171,7 +171,7 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                string username = "admin";
+                string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.CreatedBy = username;
                 arg.CreatedDate = DateTime.Now;
                 poheaderRepository.Insert(arg);
@@ -190,7 +190,7 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                string username = "admin";
+                string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.CreatedBy = username;
                 arg.CreatedDate = DateTime.Now;
                 podetailRepository.Insert(arg);
@@ -231,7 +231,7 @@ namespace MMS.Repository.Managers
                 PoDetail model = podetailRepository.GetById(indentpoid);
 
                 model.DeletedDate = DateTime.Now;
-                string username = "admin";
+                string username = HttpContext.Current.Session["UserName"].ToString();
                 model.DeletedBy = username;
                 model.IsActive = false;
                 podetailRepository.Update(model);

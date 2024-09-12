@@ -1,5 +1,11 @@
 ﻿@using MMS.Core.Entities
 @model IEnumerable<MMS.Web.Models.SupplierMaterialModel.SupplierMaterialModel>
+@{
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int pageSize = ViewBag.PageSize ?? 8;
+    int totalItems = Model.Count();
+    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -116,14 +122,13 @@
                         </thead>
                         @if (Model != null && Model.Count() > 0)
                         {
-                            int count = 1;
                             <tbody>
 
                                 @foreach (var sup in Model)
                                 {
 
                                     <tr>
-                                        <td class="veh-1" style="width: 12%;">@count</td>
+                                        <td class="veh-1" style="width: 12%;">@startSerialNumber</td>
                                         <td class="veh-2" style="width: 12%; text-align: left;">@sup.suppliername</td>
                                         <td class="veh-2" style="width: 12%;text-align:left;">@sup.categoryname</td>
                                         <td class="veh-3" style="width: 12%; text-align: left;">@sup.ProductName</td>
@@ -139,72 +144,80 @@
                                             </span>
                                         </td>
                                     </tr>
-                                    count++;
+                                    startSerialNumber++;
                                 }
+
+                            </tbody>
+
+                        }
+                        else
+                        {
+                            <tbody>
+                                <tr><td colspan="9">No records found</td></tr>
                             </tbody>
 
                         }
                     </table>
-                </div>
-                <div class="row manage_customer_show">
-                    <div class="font-14 manage_customer_show_I col-xl-6">
-                        <span>Showing </span>
-                        <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
-                            <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
-                            <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
-                            <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
-                            <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
-                        </select>
-
-
                     </div>
+                    <div class="row manage_customer_show">
+                        <div class="font-14 manage_customer_show_I col-xl-6">
+                            <span>Showing </span>
+                            <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
+                                <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
+                                <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
+                                <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
+                                <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
+                            </select>
 
-                    <div class="col-xl-6 manage_customer_show_II">
-                        <nav class="float-xl-end">
-                            <ul class="pagination font-14">
-                                <li class="page-item">
-                                    <a href="##" id="previousPage" class="page-link">Previous</a>
-                                </li>
-                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                                {
-                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                        <a href="#" class="page-link" data-page="@i">@i</a>
+
+                        </div>
+
+                        <div class="col-xl-6 manage_customer_show_II">
+                            <nav class="float-xl-end">
+                                <ul class="pagination font-14">
+                                    <li class="page-item">
+                                        <a href="##" id="previousPage" class="page-link">Previous</a>
                                     </li>
-                                }
-                                <li class="page-item">
-                                    <a class="page-link" id="nextPage" href="##">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
+                                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                    {
+                                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                            <a href="#" class="page-link" data-page="@i">@i</a>
+                                        </li>
+                                    }
+                                    <li class="page-item">
+                                        <a class="page-link" id="nextPage" href="##">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+
                     </div>
+                </div>
 
+            </div>
+            <div id='myModal' class='modal'>
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div id='details' class="myModalContent"></div>
+                    </div>
                 </div>
             </div>
 
-        </div>
-        <div id='myModal' class='modal'>
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div id='details' class="myModalContent"></div>
-                </div>
-            </div>
-        </div>
+            <script src="~/Content/js/custom.js"></script>
+            <link href="~/Content/css1/sweetalert.css" rel="stylesheet" />
 
-        <script src="~/Content/js/custom.js"></script>
-        <link href="~/Content/css1/sweetalert.css" rel="stylesheet" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+            <script>
+                $(window).on("load", function () {
+                    $(".report-inner-section").addClass("transection");
+                    $("#supplier").attr('checked', true);
+                });
 
-        <script src="~/Content/js/bootstrap.bundle.min.js"></script>
-        <script>
-            $(window).on("load", function () {
-                $(".report-inner-section").addClass("transection");
-                $("#supplier").attr('checked', true);
-            });
+            </script>
 
-        </script>
-
-        <script>
+            <script>
             $(document).ready(function () {
                 $(document).on("click", "#add", function () {
                     $.ajax({
@@ -321,8 +334,8 @@
      }
  });
             });
-        </script>
-        <script>
+            </script>
+            <script>
   function Delete(arg) {
     var answer = confirm("Are you sure you want to delete?");
     if (answer) {
@@ -370,10 +383,10 @@ function Edit(arg) {
 }
 
 
-        </script>
+            </script>
 
 
-</body>
+    </body>
 </html>
 
 

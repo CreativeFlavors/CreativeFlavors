@@ -534,6 +534,24 @@ namespace MMS.Web.ExtensionMethod
             };
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
+        }   
+        public static SelectList accountypeName()
+        {
+            AccounttypeManager orderTypeManager = new AccounttypeManager();
+            List<System.Web.Mvc.SelectListItem> items = orderTypeManager.Get().OrderBy(x => x.Id).Select(
+                                    item => new System.Web.Mvc.SelectListItem()
+                                    {
+                                        Text = item.AccountAbbr,
+                                        Value = item.Id.ToString()
+                                    }
+                                    ).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
         }
 
         public static SelectList leatherStoreWithMaterialName()
@@ -896,6 +914,24 @@ namespace MMS.Web.ExtensionMethod
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");
 
+        }    
+        public static SelectList forCurrencyName()
+        {
+            CurrencyManager Manager = new CurrencyManager();
+            List<System.Web.Mvc.SelectListItem> items = Manager.Getcurrency().OrderBy(x => x.id).Select(
+                                                 item => new System.Web.Mvc.SelectListItem()
+                                                 {
+                                                     Text = item.currencycode,
+                                                     Value = item.id.ToString()
+                                                 }).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+
         }
         public static SelectList MaterialGroupName()
         {
@@ -1006,12 +1042,30 @@ namespace MMS.Web.ExtensionMethod
         }
         public static SelectList SupplierName()
         {
-            SupplierMasterManager Manager = new SupplierMasterManager();
-            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.SupplierName).Select(
+            Supplier_masterManager Manager = new Supplier_masterManager();
+            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.SupplierId).Select(
                                                  item => new System.Web.Mvc.SelectListItem()
                                                  {
-                                                     Text = item.SupplierName,
-                                                     Value = Convert.ToString(item.SupplierMasterId)
+                                                     Text = item.Suppliername,
+                                                     Value = Convert.ToString(item.SupplierId)
+                                                 }).ToList();
+            var ColorName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select Supplier"
+            };
+            items.Insert(0, ColorName);
+            return new SelectList(items, "Value", "Text");
+
+        }    
+        public static SelectList SupplierfullName()
+        {
+            Supplier_masterManager Manager = new Supplier_masterManager();
+            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.SupplierId).Select(
+                                                 item => new System.Web.Mvc.SelectListItem()
+                                                 {
+                                                     Text = item.Suppliername,
+                                                     Value = item.Suppliername
                                                  }).ToList();
             var ColorName = new System.Web.Mvc.SelectListItem()
             {
@@ -1768,17 +1822,34 @@ namespace MMS.Web.ExtensionMethod
         }
         public static SelectList BuyerName()
         {
-            BuyerManager Manager = new BuyerManager();
-            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.BuyerFullName).Select(
+            BuyerMasterManager Manager = new BuyerMasterManager();
+            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.CustomerName).Select(
                                                   item => new System.Web.Mvc.SelectListItem()
                                                   {
-                                                      Text = item.BuyerFullName,
+                                                      Text = item.CustomerName,
                                                       Value = item.BuyerMasterId.ToString()
                                                   }).ToList();
             var ShotName = new System.Web.Mvc.SelectListItem()
             {
                 Value = "",
                 Text = "Please Select Buyer"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }     
+        public static SelectList BuyerNames()
+        {
+            BuyerMasterManager Manager = new BuyerMasterManager();
+            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.CustomerName).Select(
+                                                  item => new System.Web.Mvc.SelectListItem()
+                                                  {
+                                                      Text = item.CustomerName,
+                                                      Value = item.CustomerName
+                                                  }).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Search By Buyer Name"
             };
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");

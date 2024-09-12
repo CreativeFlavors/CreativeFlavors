@@ -142,7 +142,7 @@ namespace MMS.Web.Controllers
             userslist = userManager.Get();
             if (userslist != null)
             {
-                userslist = userslist.Where(x => x.FirstName.ToLower().Contains(filter.ToLower()) || x.LastName.ToLower().Contains(filter.ToLower()) || x.Email.ToLower().Contains(filter.ToLower()) || x.UserType.ToLower().Contains(filter.ToLower())).ToList();
+                userslist = userslist.Where(x => x.FirstName.ToLower().Contains(filter.ToLower()) || x.LastName.ToLower().Contains(filter.ToLower()) || x.Email.ToLower().Contains(filter.ToLower()) || x.UserType.ToString().ToLower().Contains(filter.ToLower())).ToList();
             }
             
             model.UserList = userslist;

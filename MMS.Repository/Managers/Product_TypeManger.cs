@@ -26,7 +26,7 @@ namespace MMS.Repository.Managers
             Product_Type productType = new Product_Type();
             try
             {
-                string username = "1";//HttpContext.Current.Session["UserName"].ToString();
+                string username = HttpContext.Current.Session["UserName"].ToString();//HttpContext.Current.Session["UserName"].ToString();
                 arg.CreatedBy = username;
                 // arg.UpdatedBy = username;
                 arg.CreatedDate = DateTime.Now;

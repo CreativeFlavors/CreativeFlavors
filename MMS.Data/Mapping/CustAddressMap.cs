@@ -12,18 +12,11 @@ namespace MMS.Data.Mapping
     public class CustAddressMap : EntityTypeConfiguration<CustAddress>
     {
         public CustAddressMap() {
-            HasKey(t => t.AddressId);
-            Property(t => t.AddressId).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            Property(t => t.BuyerId).IsRequired();
-            Property(t => t.AddressType).IsRequired();
-            Property(t => t.Add1).IsRequired();
-            Property(t => t.Add2);
-            Property(t => t.Add3);
-            Property(t => t.IsDefault).IsRequired();
-            Property(t => t.City).IsRequired();
-            Property(t => t.State).IsRequired();
-            Property(t => t.Country).IsRequired();
-            Property(t => t.ZipCode).IsRequired();
+            HasKey(t => t.Addresshd_id);
+            Property(t => t.Addresshd_id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            Property(t => t.BuyerId);
+            Property(t => t.AddressType);
+            Property(t => t.addressvarient);
             Property(t => t.ContactName).IsRequired();
             Property(t => t.Email).IsRequired();
             Property(t => t.Phone).IsRequired();
@@ -31,10 +24,13 @@ namespace MMS.Data.Mapping
             Property(t => t.CityId).IsRequired();
             Property(t => t.StateId).IsRequired();
             Property(t => t.CountryId).IsRequired();
-            Property(t => t.Active).IsRequired();
+            Property(t => t.isActive).IsRequired();
             Property(t => t.CreatedDate);
             Property(t => t.UpdatedDate);
+            Property(t => t.deletedby);     
+            Property(t => t.deleteddate);
             Property(t => t.CreatedBy);
+            Property(t => t.isdeleted);
             Property(t => t.UpdatedBy);
             ToTable("CustAddress");
         }

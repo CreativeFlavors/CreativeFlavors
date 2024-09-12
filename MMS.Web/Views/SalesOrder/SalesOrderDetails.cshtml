@@ -75,6 +75,18 @@
         #alert {
             margin-left: 24%;
         }
+        .caret {
+            display: inline-block;
+            width: 0;
+            margin-top: -17%;
+            height: 0;
+            margin-left: 94%;
+            vertical-align: middle;
+            border-top: 13px dashed;
+            border-top: 7px solid;
+            border-right: 7px solid transparent;
+            border-left: 7px solid transparent;
+        }
     </style>
 </head>
 
@@ -96,14 +108,15 @@
                 <div class="row">
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         @Html.HiddenFor(m => m.salesordernumber)
-                        <div class="input-part">
+                        <div class="input-box">
                             <label class="font-14" for="#BuyerName">Buyer Name</label>
                             @Html.DropDownListFor(m => m.BuyerName, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field ", onchange = "BuyerNamefun()" })
+                            <span class="caret"></span>
                         </div>
                         <p id="berror" style="color: red;"></p>
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
-                        <div class="input-part">
+                        <div class="input-box">
                             <label class="font-14" for="#ProductName">List Of Product item</label>
                             <select id="ProductName" class="sel-dropdown " data-option="hidden" onchange="ProductNamefun()">
                                 @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.ProductmFINName())
@@ -111,6 +124,8 @@
                                     <option value="@item.Value">@item.Text</option>
                                 }
                             </select>
+                            <span class="caret"></span>
+
                         </div>
                         <p id="perror" style="color: red;"></p>
                     </div>
@@ -218,7 +233,9 @@
                     {
                         <div class="col-lg-2 col-md-6 col-sm-12" id="billingadd">
                             <div class="input-part">
-                                <h5 class="light-text">Billing-address</h5>
+                                <h5 class="light-text">
+                                    Billing-address
+                                </h5>
                                 <ul>
                                     <li id="libilingadd1"></li>
                                     <li id="libilingadd2"></li>
@@ -227,9 +244,13 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="col-lg-2 col-md-6 col-sm-12" id="billingadd">
+                        <div class="col-lg-3 col-md-6 col-sm-12" id="billingadd">
                             <div class="input-part">
-                                <h5 class="light-text">Shipping-Address</h5>
+                                <h5 class="light-text">
+                                    Shipping-Address   <span class="table_icons" style="padding: 7px 9px;">
+                                        <img src="~/Content/Images/editpng.png" style=" width: 26px; height: 25px; margin-top: -10px;" id="editbuyeraddress" />
+                                    </span>
+                                </h5>
                                 <ul>
                                     <li id="libilingad1"></li>
                                     <li id="libilingad2"></li>
@@ -560,8 +581,8 @@
                     data: { id: buyerid },
                     success: function (data) {
                         $(".alert-danger").hide();
-                        if (data && data.Add1) {
-                            var addressParts = data.Add1.split(",");
+                        if (data != null) {
+                            var addressParts = data.split(",");
 
                             var addr1 = addressParts[0] ? addressParts[0].trim() : "";
                             var addr2 = addressParts[1] ? addressParts[1].trim() : "";
@@ -572,8 +593,21 @@
                             $("#libilingadd2").html(addr2);
                             $("#libilingadd3").html(addr3);
                             $("#libilingadd4").html(addr4);
-
-                            var addressParts1 = data.Add2.split(",");
+                        }
+                    },
+                });
+            });
+            $("#BuyerName").change(function () {
+                var buyerid = $('#BuyerName').val();
+                $.ajax({
+                    url: '/SalesOrder/Getcustomeraddressship',
+                    type: "GET",
+                    dataType: "JSON",
+                    data: { id: buyerid },
+                    success: function (data) {
+                        $(".alert-danger").hide();
+                        if (data != null) {
+                            var addressParts1 = data.split(",");
 
                             var addr1 = addressParts1[0] ? addressParts1[0].trim() : "";
                             var addr2 = addressParts1[1] ? addressParts1[1].trim() : "";
@@ -646,7 +680,7 @@
                                 contentType: false,
                                 processData: false,
                                 dataType: 'html',
-                                data: formdata, 
+                                data: formdata,
                                 success: function (values) {
                                     $("#BuyerName").prop("disabled", true);
                                     var data = JSON.parse(values);
@@ -708,6 +742,9 @@
                                                 }
                                             });
                                         }, 1500);
+                                    }
+                                    else if (data.AlertMessage === "Not Existed") {
+                                        alert("Address Not added");
                                     }
                                 },
                                 error: function (xhr, status, error) {
@@ -788,6 +825,9 @@
                                                 }
                                             });
                                         }, 1500);
+                                    }
+                                    else if (data.AlertMessage === "Not Existed") {
+                                        alert("Address Not added");
                                     }
                                 },
                                 error: function (xhr, status, error) {
@@ -955,6 +995,20 @@
                 }
             });
 
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#editbuyeraddress").on('click', function () {
+                var buyerid = $("#BuyerName").val();
+                if (buyerid != "") {
+                    window.location.href = "@Url.Action("Searchsalesorder", "AddressDetails")?Buyerid=" + buyerid;
+                }
+                else {
+                    alert("Buyer Not selected");
+                }
+            });
         });
     </script>
 </body>

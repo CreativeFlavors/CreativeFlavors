@@ -12,9 +12,6 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-    @*<link href="~/Content/css1/font-awesome.min.css" rel="stylesheet" />*@
     <style>
         input[type=text] {
             padding: 12px;
@@ -46,11 +43,7 @@
 </head>
 <body>
     <div class="main-page">
-
-
-        <!-- page-contents here -->
-
-        <div class="manage_customers">
+        <div id="transaction_report" class="reports common_Manage_subMerchant">
             <div class="d-flex justify-content-between align-items-center manage_customers_head">
                 <div class="manage_customers_main_head">
                     <h6 class="font-20">Purchase Order List</h6>
@@ -63,11 +56,10 @@
                     </a>
                 </div>
             </div>
-            <div class="table-responsive manage_customers_table_responsive">
-                <div class="customer_manage_search_containers" style="width:40%;">
-                    <input type="text" placeholder="Search by Supplier Name" id="SearchID" name="search2">
-                    <button class="buttonone" onclick="Search()" title="Filter" type="submit"><i class="fa fa-search"></i></button>
+            <div class="table-responsive reports_table_responsive">
+                <div class="customer_manage_search_container">
 
+                    <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Product Name">
                 </div>
                 <div class="manage_customers_table_in_responsive">
                     <table class="table table-striped text-center">
@@ -197,10 +189,7 @@
 
 
 
-
     <script src="~/Content/js/custom.js"></script>
-
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
@@ -237,35 +226,36 @@
 });
     </script>
     <script>
-        function Search() {
+        $("#customer_manage_search").keyup(function () {
+            var bomsearch = $("#customer_manage_search").val();
             $.ajax({
                 type: "GET",
                 url: '/Po/PoSearch',
-                data: { filter: $('#SearchID').val() },
+                data: { filter: bomsearch },
                 dataType: 'json',
                 success: function (data) {
                     $("tbody").empty();
                     var count = 1;
                     $.each(data, function (i, item) {
                         $("tbody").append(`
-                            <tr class="font-14">
-                                <td>${count}</td>
-                                <td>${item.ProductName}</td>
-                                <td>${item.StoreName}</td>
-                                <td>${item.UomName}</td>
-                                <td>${item.SupplierName}</td>
-                                <td>${item.UnitPrice}</td>
-                                <td>${item.PoNumber}</td>
-                                <td class="veh-1 edit-del-wrap">
-                                 <a href="javascript:void(0)" onclick="Edit('${item.podetail}')" class="watchlist-edit" title="Edit">
-                                 <img src="/Content/assets/images/edit-icon.png" /></a>
+                                <tr class="font-14">
+                                    <td>${count}</td>
+                                    <td style="text-align:left">${item.ProductName}</td>
+                                    <td style="text-align:left">${item.StoreName}</td>
+                                    <td style="text-align:left">${item.UomName}</td>
+                                    <td style="text-align:left">${item.SupplierName}</td>
+                                    <td style="text-align:right">${item.UnitPrice}</td>
+                                    <td style="text-align:right">${item.PoNumber}</td>
+                                    <td class="veh-1 edit-del-wrap">
+                                     <a href="javascript:void(0)" onclick="Edit('${item.podetail}')" class="watchlist-edit" title="Edit">
+                                     <img src="/Content/assets/images/edit-icon.png" /></a>
 
-                                    <a href="javascript:void(0)" onclick="Delete('${item.podetail}')" class="watchlist-delete" title="Delete">
-                                        <img src="/Content/assets/images/delete-icon.png" />
-                                    </a>
-                                </td>
-                            </tr>
-                        `);
+                                        <a href="javascript:void(0)" onclick="Delete('${item.podetail}')" class="watchlist-delete" title="Delete">
+                                            <img src="/Content/assets/images/delete-icon.png" />
+                                        </a>
+                                    </td>
+                                </tr>
+                            `);
                         count++;
                     });
                 },
@@ -273,7 +263,8 @@
                     console.error("Error occurred:", status, error);
                 }
             });
-        }
+        });
+
 
         function Delete(arg) {
             var answer = confirm("Are you sure want to delete?");

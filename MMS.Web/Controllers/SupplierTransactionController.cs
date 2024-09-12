@@ -27,7 +27,7 @@ namespace MMS.Web.Controllers
             GRNHeaderManager manager = new GRNHeaderManager();
             var suppliertransactionlist = manager.Get();
 
-            SupplierMasterManager supplierMasterManager = new SupplierMasterManager();
+            Supplier_masterManager supplierMasterManager = new Supplier_masterManager();
             var data1 = supplierMasterManager.Get();
 
             SupplierTransactionManager supplierTransactionManager = new SupplierTransactionManager();
@@ -47,7 +47,7 @@ namespace MMS.Web.Controllers
                 supplierTransaction.GrnRefNumber = item.GRNNumber;
                 supplierTransaction.Grnqty = item.Quantity;
                 supplierTransaction.Id = item.GrnHeaderId;
-                supplierTransaction.SupplierMaster = data1.Where(W => W.SupplierMasterId == item.SupplierId).ToList().FirstOrDefault();
+                supplierTransaction.SupplierMaster = data1.Where(W => W.SupplierId == item.SupplierId).ToList().FirstOrDefault();
                 List<supplierTransaction> suppliertransactions = data2.Where(W => W.GrnRefNumber == item.GRNNumber).ToList();
                 foreach (var i in suppliertransactions)
                 {
@@ -81,22 +81,22 @@ namespace MMS.Web.Controllers
             SupplierTransaction model = new SupplierTransaction();
 
             GRNHeaderManager manager = new GRNHeaderManager();
-            SupplierMasterManager suppliermastermanager = new SupplierMasterManager();
+            Supplier_masterManager suppliermastermanager = new Supplier_masterManager();
             AccounttypeManager accounttypeManager = new AccounttypeManager();
             SupplierTransactionManager supplierTransactionManager = new SupplierTransactionManager();
 
             var data = manager.Get(id);
             var supid = data.SupplierId;
-            var data1 = suppliermastermanager.GetSupplierMasterId(supid);
+            var data1 = suppliermastermanager.getsupplierId(supid);
             var supplier = data.SupplierId;
-            var acctype = data1.accounttypeid;
+            var acctype = data1.AccountTypeId;
             var daylist = accounttypeManager.GettypeId(acctype);
             var balance = supplierTransactionManager.GettypeId(id);
             var Termdays = daylist.TermDays;
 
             model.GrnRefNumber = data.GRNNumber;
-            model.Supplier = data1.SupplierName;
-            model.SupplierCode = data1.SupplierCode;
+            model.Supplier = data1.Suppliername;
+            model.SupplierCode = data1.suppliercode;
             model.GrnDate = data.GrnDate;
             model.Grnqty = data.Quantity;
             model.GrnAmount = data.total_unitprice;
@@ -137,7 +137,7 @@ namespace MMS.Web.Controllers
 
             SupplierTransactionManager supplierTransactionManager = new SupplierTransactionManager();
 
-            SupplierMasterManager supplierMasterManager = new SupplierMasterManager();
+            Supplier_masterManager supplierMasterManager = new Supplier_masterManager();
             var balance = supplierTransactionManager.GettypeId(model.GrnRefNumber);
             decimal? bal = 0;
             if (balance.Count() != 0)
@@ -224,7 +224,7 @@ namespace MMS.Web.Controllers
                 GRNHeaderManager manager = new GRNHeaderManager();
                 var suppliertransactionlist = manager.Get();
 
-                SupplierMasterManager supplierMasterManager = new SupplierMasterManager();
+                Supplier_masterManager supplierMasterManager = new Supplier_masterManager();
                 var data1 = supplierMasterManager.Get();
 
                 SupplierTransactionManager supplierTransactionManager = new SupplierTransactionManager();
@@ -247,7 +247,7 @@ namespace MMS.Web.Controllers
                         supplierTransaction.GrnRefNumber = item.GRNNumber;
                         supplierTransaction.Grnqty = item.Quantity;
                         supplierTransaction.Id = item.GrnHeaderId;
-                        supplierTransaction.SupplierMaster = data1.Where(W => W.SupplierMasterId == item.SupplierId).ToList().FirstOrDefault();
+                        supplierTransaction.SupplierMaster = data1.Where(W => W.SupplierId == item.SupplierId).ToList().FirstOrDefault();
                         List<supplierTransaction> suppliertransactions = data2.Where(W => W.GrnRefNumber == item.GRNNumber).ToList();
                         foreach (var i in suppliertransactions)
                         {

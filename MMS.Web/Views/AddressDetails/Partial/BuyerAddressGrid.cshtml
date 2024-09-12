@@ -1,0 +1,308 @@
+﻿@model MMS.Web.Models.Addressdetails.Addressdetails
+@{
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int pageSize = ViewBag.PageSize ?? 8;
+    int totalItems = Model.AddressdetailbuyerLists.Count();
+    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+
+}
+<html>
+<head>
+    <title>Buyer address</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
+    <style>
+        .caret {
+            display: inline-block;
+            width: 0;
+            margin-top: -15%;
+            height: 0;
+            margin-left: 94%;
+            vertical-align: middle;
+            border-top: 13px dashed;
+            border-top: 7px solid;
+            border-right: 7px solid transparent;
+            border-left: 7px solid transparent;
+        }
+
+        .page-item.active .page-link {
+            z-index: 3;
+            color: #fff;
+            background-color: #4472C4;
+            border-color: #0d6efd;
+        }
+    </style>
+</head>
+<body>
+    <div class="table-responsive reports_table_responsive">
+        <div class="col-lg-4 col-md-4 col-sm-8">
+            <div class="input-box">
+                @Html.DropDownListFor(m => m.buyername, MMS.Web.ExtensionMethod.HtmlHelper.BuyerNames(), new { @class = "select-style text-field " })
+
+                <span class="caret"></span>
+            </div>
+        </div>
+
+        <div class="dataappend ">
+            @if (Model.AddressdetailbuyerLists != null && Model.AddressdetailbuyerLists.Count() > 0)
+            {
+
+                foreach (var address in Model.AddressdetailbuyerLists)
+                {
+                    <div class="borders mt-2" style=" border-color: #eae9e9; border-style: solid;">
+                        <div style="padding: 18px; display: flex; justify-content: space-between;">
+                            <label for="@address.addresshd_id">
+                                @if (address.IsActive == true)
+                                {
+                                    <input type="checkbox" class="addresses" id="status-@address.addresshd_id" data-address-id="@address.addresshd_id" style="cursor: pointer;" checked />
+                                }
+                                else
+                                {
+                                    <input type="checkbox" class="addresses" id="status-@address.addresshd_id" data-address-id="@address.addresshd_id" style="cursor: pointer;" />
+                                }
+                                @if (address.CustomerName != null)
+                                {
+                                    <b style="margin-left: 19px; text-transform: uppercase;">@address.CustomerName - @address.BuyerCode</b>
+                                }
+                                else
+                                {
+                                    <b style="margin-left: 19px; text-transform: uppercase;"></b>
+                                }
+                            </label>
+                            @if (address.addtypename != null)
+                            {
+                                <b style="background-color: #ffe2e2; padding: 7px 22px; color: #970000; border-radius: 4px; text-transform: uppercase; ">@address.addtypename</b>
+                            }
+                            else
+                            {
+                                <b style="background-color: #ffe2e2; padding: 7px 22px; color: #970000; border-radius: 4px; text-transform: uppercase; ">Company Address</b>
+                            }
+                        </div>
+                        <div style=" margin: 6px 55px 16px; margin-top: -18px;">
+                            <ul>
+                                <li>
+                                    @address.Address1
+                                </li>
+                                <li>Zip Code : @address.zipcode</li>
+                                <li>Phone    : @address.Phone</li>
+                                <li>Email    : @address.Email</li>
+                            </ul>
+                        </div>
+                        <div style=" padding: 1px 79px 35px; margin-top: -70px; display: flex; justify-content: end;">
+
+                            <div style="margin-top:8px;">
+                                <span class="table_icons" style="padding: 7px 9px;">
+                                    <img src="~/Content/Images/editpng.png" onclick="Edit('@address.addresshd_id')" style="width: 34px; height: 31px; margin-top: -10px;" />
+                                </span>
+                                @if (@address.IsDeleted == true)
+                                {
+                                    <input type="checkbox" class="checkbox checkboxb1" id="delete-@address.addresshd_id" data-address-id="@address.addresshd_id" />
+                                    <label for="delete-@address.addresshd_id" class="switch"></label>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" class="checkbox checkboxb1" id="delete-@address.addresshd_id" data-address-id="@address.addresshd_id" checked />
+                                    <label for="delete-@address.addresshd_id" class="switch"></label>
+                                }
+
+                            </div>
+                        </div>
+
+                    </div>
+                }
+            }
+            else
+            {
+        <div class="borders mt-2" style=" border-color: #eae9e9; border-style: solid;">
+            <div style="padding: 10px; display: flex; justify-content: space-between;">
+
+            </div>
+            <div class="d-flex justify-content-center">
+                <p>No records found</p>
+            </div>
+        </div>
+            }
+
+        </div>
+
+        <div class="row manage_customer_show">
+            <div class="font-14 manage_customer_show_I col-xl-6">
+                <span>Showing </span>
+                <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
+                    <option value="8" @(ViewBag.PageSize == 8 ? "selected" : "")>8</option>
+                    <option value="16" @(ViewBag.PageSize == 16 ? "selected" : "")>16</option>
+                    <option value="24" @(ViewBag.PageSize == 24 ? "selected" : "")>24</option>
+                    <option value="32" @(ViewBag.PageSize == 32 ? "selected" : "")>32</option>
+                </select>
+            </div>
+
+            <div class="col-xl-6 manage_customer_show_II">
+                <nav class="float-xl-end">
+                    <ul class="pagination font-14">
+                        <li class="page-item">
+                            <p id="previousPage12" class="page-link">Previous</p>
+                        </li>
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a href="@Url.Action("AddressMaster", "AddressDetails", new { page = i })" class="page-link" id="page-link1">@i</a>
+                            </li>
+                        }
+                        <li class="page-item">
+                            <p class="page-link" id="nextPage12">Next</p>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+        </div>
+    </div>
+    <script src="~/Content/js/custom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="~/Content/js/Validation.js"></script>
+    <script src="~/Content/js/dropdown.js"></script>
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        new TomSelect("#buyername", {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            }
+        });
+   
+    </script>
+
+    <script>
+  $(document).ready(function() {
+    $('#manage_customer_show_no').change(function() {
+      var PageSize = parseInt($(this).val());
+      $.ajax({
+        url: '/AddressDetails/AddressMaster',
+        type: "GET",
+        dataType: "JSON",
+        data: { pageSize: PageSize },
+        success: function(values) {
+            $("#dataappend").html(values).show();
+        }
+      });
+    });
+
+    // Handle previous page button click
+    $('#previousPage12').click(function(e) {
+      e.preventDefault();
+      var currentPage = parseInt('@ViewBag.CurrentPage');
+      if (currentPage > 1) {
+        var previousPage = currentPage - 1;
+        $.ajax({
+          url: '/AddressDetails/AddressMaster',
+          type: "GET",
+          dataType: "JSON",
+          data: { page: previousPage, pageSize: parseInt('@ViewBag.PageSize') },
+          success: function(values) {
+              $("#dataappend").html(values).show();
+          }
+        });
+      }
+    });
+
+    // Handle next page button click
+      $('#nextPage12').click(function (e) {
+      e.preventDefault();
+      var currentPage = parseInt('@ViewBag.CurrentPage');
+      var totalPages = parseInt('@ViewBag.TotalPages');
+      if (currentPage < totalPages) {
+        var nextPage = currentPage + 1;
+        $.ajax({
+          url: '/AddressDetails/AddressMaster',
+          type: "GET",
+          dataType: "JSON",
+          data: { page: nextPage, pageSize: parseInt('@ViewBag.PageSize') },
+          success: function(values) {
+              $("#dataappend").html(values).show();
+          }
+        });
+      }
+    });
+
+  });
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+            $("#buyername").on('input', function () {
+                var customerearch = $("#buyername").val();
+                $.ajax({
+                    type: 'GET',
+                    url: '/AddressDetails/Search',
+                    data: { filter: customerearch },
+                    success: function (values) {
+                        $(".dataappend").empty();
+                        if (values != 0) {
+                        $.each(values, function (i, item) {
+                            var addressId = item.AddressId;
+                            var isActive = item.Active;
+                            var isDeleted = item.isdeleted;
+                            var addressType = item.AddressTypes ? item.AddressTypes.AddTypeName : "Company Address";
+
+                            var rowHtml = `
+                                      <div class="borders mt-4" style=" border-color: #eae9e9; border-style: solid;">
+                                          <div style="padding: 18px;display: flex; justify-content: space-between;">
+                                              <label for="status-${addressId}">
+                                                  <input type="checkbox" class="addresses" id="status-${addressId}" data-address-id="${addressId}" style="cursor: pointer;" ${isActive ? 'checked' : ''} />
+                                                  <b style="margin-left: 19px; text-transform: uppercase;">${item.BuyerMaster.CustomerName} - ${item.BuyerMaster.BuyerCode}</b>
+                                              </label>
+                                              <b style="background-color: #ffe2e2; padding: 7px 22px; color: #970000; border-radius: 4px; text-transform: uppercase;">${addressType}</b>
+                                          </div>
+                                          <div style="margin: 6px 55px 16px; margin-top: -18px;">
+                                              <ul>
+                                                  <li>${item.Customer_Addresses.address1}</li>
+                                                  <li>Zip Code: ${item.Customer_Addresses.ZipCode}</li>
+                                                  <li>Phone: ${item.Phone}</li>
+                                                  <li>Email: ${item.Email}</li>
+                                              </ul>
+                                          </div>
+                                          <div style="padding: 1px 79px 35px; margin-top: -70px;   display: flex;justify-content: end;">
+                                              <div style="margin-top:8px;">
+                                                  <span class="table_icons" style="padding: 7px 9px;">
+                                                      <img src="/Content/Images/editpng.png" onclick="Edit('${addressId}')" style="width: 34px; height: 31px; margin-top: -10px;" />
+                                                  </span>
+                                                  <input type="checkbox" class="checkbox" id="delete-${addressId}" data-address-id="${addressId}" ${isDeleted ? '' : 'checked'} />
+                                                  <label for="delete-${addressId}" class="switch"></label>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  `;
+                            $(".dataappend").append(rowHtml);
+                        });
+                        }
+                        else {
+                            var rowHtml = ` <div class="borders mt-2" style=" border-color: #eae9e9; border-style: solid;">
+    <div style="padding: 10px; display: flex; justify-content: space-between;">
+
+    </div>
+    <div class="d-flex justify-content-center">
+        <p>No records found</p>
+    </div>
+</div>`;
+
+                            $(".dataappend").append(rowHtml);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
+
+

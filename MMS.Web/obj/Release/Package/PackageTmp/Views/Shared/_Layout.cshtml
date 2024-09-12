@@ -1,4 +1,27 @@
 ﻿
+@{
+    string username = "";
+    string LastName = "";
+    string UserType = "";
+    if (HttpContext.Current.Session != null)
+    {
+        if (HttpContext.Current.Session["UserName"] != null)
+        {
+            username = HttpContext.Current.Session["UserName"].ToString();
+            LastName = HttpContext.Current.Session["LastName"].ToString();
+            UserType = HttpContext.Current.Session["UserTypename"].ToString();
+
+        }
+        else
+        {
+            Response.Redirect("/Accounts/LogIn");
+        }
+    }
+    else
+    {
+        Response.Redirect("/Accounts/LogIn");
+    }
+}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,13 +35,17 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
-
+    <style>
+        .radio {
+            display: none;
+        }
+    </style>
 </head>
-
 <body>
     <div class="dashboard">
         <div class="mob-logo">
-            <a href="#">
+            <a href="">
+                @username
                 <img src="~/Content/assets/images/Logo.png" alt="logo" class="img-fluid" />
             </a>
         </div>
@@ -62,15 +89,24 @@
                     </a>
                 </li>
                 <div class="report-inner-section">
-                    <a href="/AddressDetails/AddressMaster">
-                <li class="font-15 "><input type="radio" name="Address" id="Address"><label for="Address">Customer Address</label></li>
+
+
+                    <a href="/CategoryMaster/CategoryMaster">
+                <li class="font-15 "><input type="radio" name="Category" id="Category" class="radio"><label for="Category">Category</label></li>
+                </a>
+                <a href="/BuyerMater/BuyerMater">
+                <li class="font-15 "><input type="radio" name="BuyerMater" id="BuyerMater" class="radio"><label for="BuyerMater">Buyer</label></li>
+                </a>
+
+                <a href="/SupplierMaster/SupplierMaster">
+                <li class="font-15 "><input type="radio" name="supplier" id="suppliername" class="radio"><label for="supplier">Supplier</label></li>
+                </a>
+                <a href="/AddressDetails/AddressMaster">
+                <li class="font-15 "><input type="radio" name="Address" id="Address" class="radio"><label for="Address">Buyer & Supplier Address</label></li>
                 </a>
                 <a href="/SupplierMaterial/SupplierMaster">
-                <li class="font-15 "><input type="radio" name="supplier" id="supplier"><label for="supplier">Supplier Materials</label></li>
+                <li class="font-15 "><input type="radio" name="supplier" id="supplier" class="radio"><label for="supplier">Supplier Materials</label></li>
                 </a>
-                @*<a href="/SupplierMaster/SupplierMaster">
-                <li class="font-15 "><input type="radio" name="supplier" id="suppliername"><label for="supplier">Supplier</label></li>
-                </a>*@
 
         </div>
         <li class="menu-item report-section">
@@ -91,28 +127,28 @@
         </li>
         <div class="report-inner-section">
             <a href="/BillOfMaterial/BOMMaterialListGrid">
-                <li class="font-15 "><input type="radio" name="BOM" id="BOM"><label for="BOM">BOM</label></li>
+                <li class="font-15 "><input type="radio" name="BOM" id="BOM" class="radio"><label for="BOM">BOM</label></li>
             </a>
             <a href="/Product/Productmaster">
-                <li class="font-15 "><input type="radio" name="Products" id="Products"><label for="Products">Products</label></li>
+                <li class="font-15 "><input type="radio" name="Products" id="Products" class="radio"><label for="Products">Products</label></li>
             </a>
             <a href="/SalesOrder/SalesOrderMaster">
-                <li class="font-15 "><input type="radio" name="order" id="order"><label for="order">Sales Order</label></li>
+                <li class="font-15 "><input type="radio" name="order" id="order" class="radio"><label for="order">Sales Order</label></li>
             </a>
             <a href="/MRP/MRP_Master">
-                <li class="font-15 "><input type="radio" name="mrp" id="mrp"><label for="mrp">MRP</label></li>
+                <li class="font-15 "><input type="radio" name="mrp" id="mrp" class="radio"><label for="mrp">MRP</label></li>
             </a>
             <a href="/IndentMaterial/IndentMaterialMaster">
-                <li class="font-15 "><input type="radio" name="indent" id="indent"><label for="indent">Indent</label></li>
+                <li class="font-15 "><input type="radio" name="indent" id="indent" class="radio"><label for="indent">Indent</label></li>
             </a>
             <a href="/Po/PoMaster">
-                <li class="font-15 "><input type="radio" name="po" id="po"><label for="po">Purchase Order</label></li>
+                <li class="font-15 "><input type="radio" name="po" id="po" class="radio"><label for="po">Purchase Order</label></li>
             </a>
             <a href="/GRN/GRNMaster">
-                <li class="font-15 "><input type="radio" name="GRN" id="GRN"><label for="GRN">GRN</label></li>
+                <li class="font-15 "><input type="radio" name="GRN" id="GRN" class="radio"><label for="GRN">GRN</label></li>
             </a>
             <a href="/Deliverychallan/DCMaster">
-                <li class="font-15 "><input type="radio" name="dc" id="dc"><label for="dc">Delivery Challan & Invoice</label></li>
+                <li class="font-15 "><input type="radio" name="dc" id="dc" class="radio"><label for="dc">Delivery Challan & Invoice</label></li>
             </a>
         </div>
 
@@ -133,10 +169,10 @@
         </li>
         <div class="report-inner-section">
             <a href="/CustomerTransaction/Customermaster">
-                <li class="font-15 "><input type="radio" name="recive" id="recive"><label for="recive">Accounts Receivables</label> </li>
+                <li class="font-15 "><input type="radio" name="recive" id="recive" class="radio"><label for="recive">Accounts Receivables</label> </li>
             </a>
             <a href="/SupplierTransaction/SupplierTransactionGrid">
-                <li class="font-15 "><input type="radio" name="Payable" id="Payable"><label for="Payable">Account Payable</label></li>
+                <li class="font-15 "><input type="radio" name="Payable" id="Payable" class="radio"><label for="Payable">Account Payable</label></li>
             </a>
         </div>
 
@@ -158,13 +194,10 @@
         </li>
         <div class="report-inner-section">
             <a href="/PreProductionReport/PreProductionReportMaster">
-                <li class="font-15 "><input type="radio" name="Accounts" id="PreProduction"><label for="PreProduction">PreProduction Plan</label></li>
+                <li class="font-15 "><input type="radio" name="Accounts" id="PreProduction" class="radio"><label for="PreProduction">PreProduction Plan</label></li>
             </a>
-
-        </div>
-        <div class="report-inner-section">
             <a href="/Production/ProductionMaster">
-                <li class="font-15 "><input type="radio" name="Accounts" id="Production"><label for="Production">Production & SubAssembly</label></li>
+                <li class="font-15 "><input type="radio" name="Accounts" id="Production" class="radio"><label for="Production">Production & SubAssembly</label></li>
             </a>
 
         </div>
@@ -187,13 +220,13 @@
         </li>
         <div class="report-inner-section">
             <a href="/FinishedGoodReport/FinishedGoodMaster">
-                <li class="font-15 "><input type="radio" name="Accounts" id="FinishedGoods"><label for="FinishedGoods">FinishedGoods Inventory</label></li>
+                <li class="font-15 "><input type="radio" name="Accounts" id="FinishedGoods" class="radio"><label for="FinishedGoods">FinishedGoods Inventory</label></li>
             </a>
 
         </div>
 
         <li class="menu-item">
-            <a href="login.html" class="">
+            <a href="/Accounts/LogOut">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
                     <path fill-rule="evenodd" clip-rule="evenodd"
                           d="M15.8149 15.2703C15.4815 15.6513 14.9023 15.69 14.5214 15.3566C14.1404 15.0232 14.1017 14.444 14.4351 14.0631L16.3132 11.9167H7.33333C6.82708 11.9167 6.41667 11.5063 6.41667 11C6.41667 10.4938 6.82708 10.0834 7.33333 10.0834H16.3132L14.4351 7.93701C14.1017 7.55601 14.1404 6.97689 14.5214 6.64351C14.9023 6.31014 15.4815 6.34875 15.8149 6.72975L19.0232 10.3964C19.3256 10.742 19.3256 11.2581 19.0232 11.6037L15.8149 15.2703ZM7.33333 3.66671C7.8396 3.66671 8.25 3.25631 8.25 2.75004C8.25 2.24378 7.8396 1.83337 7.33333 1.83337H4.58333C3.57081 1.83337 2.75 2.65418 2.75 3.66671V18.3334C2.75 19.3459 3.57081 20.1667 4.58333 20.1667H7.33333C7.8396 20.1667 8.25 19.7563 8.25 19.25C8.25 18.7438 7.8396 18.3334 7.33333 18.3334H4.58333V3.66671H7.33333Z"
@@ -205,7 +238,7 @@
             </a>
         </li>
         </ul>
-        <p class="footer font-14 ">2022 © Copyrights | Bluecommerce</p>
+        <p class="footer font-14 ">2024 © Copyrights | Bluecommerce</p>
     </div>
     <div class="right-part">
         <div class="dash-head d-flex justify-content-between align-items-center">
@@ -223,73 +256,37 @@
                     </div>
                     <div class="mob-profile d-flex align-items-center">
                         <div class="profile-icon">
-                            <span class="icon">
-                                <img src="~/Content/assets/images/profile-img.png" alt="profile" />
-                            </span>
+                            <!--<span class="icon">-->
+                            @*<img src="~/Content/assets/images/profile-img.png" alt="profile" />*@
+                            <!--</span>-->
                         </div>
                         <div class="profile-details">
                             <div class="profile-name d-flex align-items-center">
-                                <h6 class="font-14">Dalton</h6>
-
-                                <span><img src="~/Content/assets/images/dropdown.png" alt="dropdown" /></span>
+                                @*<h6 class="font-14">Dalton</h6>*@
+                                @*<span><img src="~/Content/assets/images/dropdown.png" alt="dropdown" /></span>*@
                             </div>
-                            <div class="profile-desg">
-                                <p class="font-14">Merchant</p>
-                            </div>
+                            @*<div class="profile-desg">
+                                    <p class="font-14">Merchant</p>
+                                </div>*@
                         </div>
 
                     </div>
                 </div>
             </div>
             <div class="profile d-flex align-items-center">
-                <div class="notification-icon" data-stag="2"></div>
-
                 <div class="profile-icon">
                     <span class="icon">
-                        <img src="~/Content/assets/images/profile-img.png" alt="profile" />
+                        <label><b>@UserType</b></label>
                     </span>
                 </div>
                 <div class="profile-details">
                     <div class="profile-name d-flex align-items-center">
-                        <h6 class="font-14">Dalton</h6>
-                        <span><img src="~/Content/assets/images/dropdown.png" alt="dropdown" /></span>
+                        <h6 class="font-14">@username</h6>
                     </div>
                     <div class="profile-desg">
-                        <p class="font-14">Merchant</p>
+                        <p class="font-14">@LastName</p>
                     </div>
                 </div>
-                <!-- popup section in profile  -->
-                <div class="my-profile-popup">
-                    <a href="MyProfile.html">
-                        <p>
-                            <span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="24" viewBox="0 0 22 24" fill="none">
-                                    <path d="M14.6182 11.1284C16.1538 10.0084 17.1539 8.19581 17.1539 6.15384C17.1539 2.76061 14.3933 0 11 0C7.60679 0 4.84618 2.76061 4.84618 6.15384C4.84618 8.19581 5.84616 10.0084 7.38188 11.1284C3.56438 12.5892 0.846191 16.2905 0.846191 20.6154C0.846191 22.4817 2.36452 24 4.2308 24H17.7692C19.6355 24 21.1538 22.4817 21.1538 20.6154C21.1538 16.2905 18.4357 12.5892 14.6182 11.1284ZM6.69235 6.15384C6.69235 3.77859 8.62477 1.84617 11 1.84617C13.3753 1.84617 15.3077 3.77859 15.3077 6.15384C15.3077 8.52909 13.3753 10.4616 11 10.4616C8.62477 10.4616 6.69235 8.52909 6.69235 6.15384ZM17.7692 22.1538H4.2308C3.3825 22.1538 2.69236 21.4637 2.69236 20.6153C2.69236 16.0344 6.41911 12.3076 11.0001 12.3076C15.581 12.3076 19.3078 16.0344 19.3078 20.6153C19.3077 21.4637 18.6176 22.1538 17.7692 22.1538Z"
-                                          fill="#4472C4"></path>
-                                </svg>
-                            </span>My Profile
-                        </p>
-                    </a>
-                    <a href="SubscriptionPlan.html">
-                        <p>
-                            <span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                    <g clip-path="url(#clip0_113_336)">
-                                        <path d="M23.671 7.06814C23.3875 6.82613 22.9874 6.77513 22.6521 6.93834L17.5219 9.43584L12.7082 3.88575C12.5302 3.68044 12.2718 3.5625 12 3.5625C11.7282 3.5625 11.4699 3.68044 11.2918 3.88575L6.47809 9.4358L1.3479 6.9383C1.0126 6.77512 0.612573 6.82608 0.328979 7.06809C0.0453853 7.31011 -0.0678647 7.6972 0.0405572 8.05392L3.60306 19.7727C3.7231 20.1676 4.08728 20.4375 4.50001 20.4375H19.5C19.9127 20.4375 20.2769 20.1676 20.3969 19.7727L23.9594 8.05397C24.0679 7.69725 23.9546 7.31016 23.671 7.06814ZM18.8051 18.5625H5.19484L2.45964 9.56494L6.30442 11.4367C6.68617 11.6225 7.14488 11.5287 7.42299 11.208L12 5.93086L16.5771 11.208C16.8551 11.5287 17.314 11.6225 17.6956 11.4367L21.5404 9.56494L18.8051 18.5625Z"
-                                              fill="#6C7686"></path>
-                                    </g>
-                                    <defs>
-                                        <clipPath id="clip0_113_336">
-                                            <rect width="24" height="24" fill="white"></rect>
-                                        </clipPath>
-                                    </defs>
-                                </svg>
-                            </span>My Subscription
-                        </p>
-                    </a>
-                </div>
-
-                <!-- popup section end  -->
             </div>
         </div>
         <div class="main-page">
@@ -315,79 +312,8 @@
 
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
     <script src="~/Content/js/custom.js"></script>
-    <script>
-        var myConfig = {
-            "type": "ring",
-            "title": {
-            },
+    <script src="~/Content/js/Validation.js"></script>
 
-            "plot": {
-                "value-box": {
-                    "text": " $%pie-total-value",
-                    "placement": "center",
-                    "font-color": "black",
-                    "font-size": 35,
-                    "white-space": "wrap",
-                    "font-family": "'Poppins', sans-serif",
-                    "font-weight": "normal",
-                    "rules": [{
-                        "rule": "%p != 0",
-                        "visible": false
-                    }]
-                },
-                "tooltip": {
-                    "text": "(%npv%)",
-                    "font-color": "black",
-                    "font-family": "'Poppins', sans-serif",
-                    "text-alpha": 1,
-                    "background-color": "white",
-                    "alpha": 0.7,
-                    "border-width": 1,
-                    "border-color": "#cccccc",
-                    "line-style": "solid",
-                    "border-radius": "10px",
-                    "padding": "10%",
-                    "placement": "node:center"
-                },
-                "slice": "75%",
-                "border-width": 1,
-                "border-color": "#cccccc",
-                "line-style": "dotted"
-            },
-            "plotarea": {
-                "margin-top": "12%"
-            },
-            "series": [
-                {
-                    "values": [8102],
-                    "background-color": "#FEC400",
-                    "text": "yellow"
-                },
-
-                {
-                    "values": [12153],
-                    "background-color": "#28CD97",
-                    "text": "green "
-                },
-                {
-                    "values": [60765],
-                    "background-color": "#4472C4",
-                    "text": "blue"
-                },
-            ]
-        };
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const menuItems = document.querySelectorAll(".menu-items .menu-item");
-            menuItems.forEach(item => {
-                item.addEventListener("click", () => {
-                    menuItems.forEach(el => el.classList.remove("active"));
-                    item.classList.add("active");
-                });
-            });
-        });
-
-    </script>
 </body>
 
 </html>

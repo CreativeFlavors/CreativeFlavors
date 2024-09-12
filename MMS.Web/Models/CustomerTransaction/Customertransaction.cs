@@ -33,7 +33,7 @@ namespace MMS.Web.Models.CustomerTransaction
         public DateTime? SoDate { get; set; }
         public DateTime? Debitnotedate { get; set; } 
         public decimal? Debitnotevalue { get; set; }
-        public BuyerMaster BuyerMaster { get; set; } = null;
+        public BuyerMaster1 BuyerMaster { get; set; } = null;
         public paymentmethod paymentmethod { get; set; } = null;
         public customertransaction customertransaction { get; set; } = null;
         public List<customertransaction> customerList { get; set; }

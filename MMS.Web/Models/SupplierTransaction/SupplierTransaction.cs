@@ -34,7 +34,7 @@ namespace MMS.Web.Models.SupplierTransaction
         public string UpdatedBy { get; set; }
         public DateTime? CreditNoteDate { get; set; }
         public decimal? CreditNoteValue { get; set; }
-        public SupplierMaster SupplierMaster { get; set; }
+        public Supplier_master SupplierMaster { get; set; }
 
         public paymentmethod paymentmethod { get; set; } = null;
         public List<supplierTransaction> suppliertransaction { get; set; }

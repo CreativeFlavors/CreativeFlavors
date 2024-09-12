@@ -80,11 +80,18 @@
                                     </span>
                                 </th>
                                 <th scope="col">
+                                    <span>GRN NO</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th>
+                                <th scope="col">
                                     <span>PO NO</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
-                                </th>  <th scope="col">
+                                </th>
+                                <th scope="col">
                                     <span>GRN Date</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
@@ -141,32 +148,44 @@
                             </tr>
                         </thead>
                         @if (Model != null && Model.Count() > 0)
-                            {
-                                int count = 1;
-                                <tbody>
+                        {
+                            <tbody>
+                                @{
+                                    int currentPage = ViewBag.CurrentPage ?? 1;
+                                    int pageSize = ViewBag.PageSize ?? 8;
+                                    int totalItems = Model.Count();
+                                    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+                                }
+                                @foreach (var i in Model)
+                                {
 
-                                    @foreach (var i in Model)
-                                    {
+                                    <tr>
+                                        <td class="veh-1">@startSerialNumber</td>
+                                        <td class="veh-2" style="width: 12%;text-align:left;">@i.suppliername</td>
+                                        <td class="veh-2" style="width: 12%;text-align:right;">@i.grnnumber</td>
+                                        <td class="veh-2" style="width: 12%; text-align: right;">@i.PoHeaderId</td>
+                                        <td class="veh-3" style="width: 12%; text-align: center;">@i.GrnDate.ToString("dd/MM/yyyy")</td>
+                                        <td class="veh-5" style="width: 12%; text-align: right;">@i.RefInvoiceNumber</td>
+                                        <td class="veh-4" style="width: 12%; text-align: right;">@i.item</td>
+                                        <td class="veh-4" style="width: 12%; text-align: right; ">@i.Quantity</td>
+                                        <td class="veh-3" style="width: 12%; text-align: right;">@i.UnitPrice</td>
+                                        <td class="veh-4" style="width: 12%; text-align: right; ">@i.SubTotal</td>
+                                        <td class="veh-4" style="width: 12%; text-align: right;">@i.TaxValue</td>
+                                        <td class="veh-3" style="width: 12%; text-align: right;">@i.DiscountValue</td>
+                                        <td class="veh-4" style="width: 12%; text-align: right; ">@i.TotalValue</td>
+                                    </tr>
+                                    startSerialNumber++;
+                                }
+                            </tbody>
 
-                                        <tr>
-                                            <td class="veh-1">@count</td>
-                                            <td class="veh-2" style="width: 12%;text-align:left;">@i.suppliername</td>
-                                            <td class="veh-2" style="width: 12%;text-align:left;">@i.PoHeaderId</td>
-                                            <td class="veh-3" style="width: 12%; text-align: center;">@i.GrnDate.ToString("dd/MM/yyyy")</td>
-                                            <td class="veh-5" style="width: 12%; text-align: right;">@i.RefInvoiceNumber</td>
-                                            <td class="veh-4" style="width: 12%; text-align: right;">@i.item</td>
-                                            <td class="veh-4" style="width: 12%; text-align: right; ">@i.Quantity</td>
-                                            <td class="veh-3" style="width: 12%; text-align: right;">@i.UnitPrice</td>
-                                            <td class="veh-4" style="width: 12%; text-align: right; ">@i.SubTotal</td>
-                                            <td class="veh-4" style="width: 12%; text-align: right;">@i.TaxValue</td>
-                                            <td class="veh-3" style="width: 12%; text-align: right;">@i.DiscountValue</td>
-                                            <td class="veh-4" style="width: 12%; text-align: right; ">@i.TotalValue</td>
-                                        </tr>
-                                        count++;
-                                    }
-                                </tbody>
+                        }
+                        else
+                        {
+                            <tbody>
+                                <tr><td colspan="15">No records found</td></tr>
+                            </tbody>
 
-                            }
+                        }
                     </table>
                 </div>
                 <div class="row manage_customer_show">
@@ -224,7 +243,6 @@
         $(document).ready(function () {
             $("#customer_manage_search").keyup(function () {
                 var prosearch = $("#customer_manage_search").val();
-
                 $.ajax({
                     type: 'GET',
                     url: '/GRN/GRNSearch',
@@ -241,6 +259,7 @@
                                          <tr class="font-14">
                          <td class="veh1-5">${count}</td>
                          <td class="veh1-5" style="width: 12%;text-align:left;">${item.suppliername}</td>
+                         <td class="veh1-5" style="width: 12%;text-align:right;">${item.grnnumber}</td>
                          <td class="veh1-5" style="width: 12%;text-align:right;">${item.PoHeaderId}</td>
                          <td class="veh1-5" style="width: 12%;">${formattedDate}</td>
                          <td class="veh1-5" style="width: 12%;text-align:right;">${item.RefInvoiceNumber}</td>

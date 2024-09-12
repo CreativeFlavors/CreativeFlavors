@@ -29,7 +29,7 @@ namespace MMS.Web.Controllers
         public ActionResult DeliverychallanGrid(int page = 1, int pageSize = 5)
         {
             SalesorderHD_Manager salesorderManager = new SalesorderHD_Manager();
-            BuyerManager BuyerManager = new BuyerManager();
+            BuyerMasterManager BuyerManager = new BuyerMasterManager();
             SalesorderDT_Manager SalesorderDT_Manager = new SalesorderDT_Manager();
             var data1 = BuyerManager.Get();
             List<Salesorders> totalList = new List<Salesorders>();
@@ -232,8 +232,8 @@ namespace MMS.Web.Controllers
             }
             var custadd = custAddressMangers.GetCustAddressbuyerid(headerdata.customerid);
             models.itemdc = counts;
-            models.shippingadd = custadd.Add1;
-            models.Billingadd = custadd.Add2;
+            //models.shippingadd = custadd.Add1;
+            //models.Billingadd = custadd.Add2;
             models.BuyerName = headerdata.customerid;
             models.SalesorderId = headerdata.salesorderid_hd;
             models.SalesorderId_HD = headerdata.salesorderid_hd;
@@ -327,7 +327,7 @@ namespace MMS.Web.Controllers
             CurrencyManager currencyManager = new CurrencyManager();
             ProductManager productManager = new ProductManager();
             TaxTypeManager taxTypeManager = new TaxTypeManager();
-            BuyerManager buyerManager = new BuyerManager();
+            BuyerMasterManager buyerManager = new BuyerMasterManager();
             Salesorder_dt salesorder_Dt = new Salesorder_dt();
             Salesorders model = new Salesorders();
             SalesorderDT_Manager salesorderDT_manager = new SalesorderDT_Manager();
@@ -386,10 +386,13 @@ namespace MMS.Web.Controllers
                         count++;
                     }
                 }
+                CustAddressMangers custAddressMangers = new CustAddressMangers();
                 var DT = salesorderDT_manager.GetSO(Convert.ToInt32(i.SalesorderId_DT));
                 var product = productManager.GetId(Convert.ToInt32(i.ProductID));
                 var tax = taxTypeManager.GetTaxMasterId(product.TaxMasterId);
                 var addreddcode = buyerManager.GetBuyerMasterId(Convert.ToInt32(buyerid));
+                var shipping = custAddressMangers.GetCustAddressbuyeridshipp(model.buyerid);
+                var billing = custAddressMangers.GetCustAddressbuyerid(model.buyerid);
 
                 deliveryChallanDt.DCid_hd = headerid.DCid_hd;
                 deliveryChallanDt.SalesOrderId_dt = (Convert.ToInt32(i.SalesorderId_DT));
@@ -404,8 +407,8 @@ namespace MMS.Web.Controllers
                 deliveryChallanDt.DCDate = DateTime.Now;
                 deliveryChallanDt.CurrencyId = currencyid.id;
                 deliveryChallanDt.CustAddCode = addreddcode.BuyerCode;
-                deliveryChallanDt.CustBillCode = addreddcode.BuyerAddress1;
-                deliveryChallanDt.CustShipCode = addreddcode.BuyerAddress2;
+                deliveryChallanDt.CustBillCode = billing.Addresshd_id.ToString();
+                deliveryChallanDt.CustShipCode = shipping.Addresshd_id.ToString();
                 var unitprice = product.Price * conversionval;
                 deliveryChallanDt.IsActive = true;
                 var taxper = tax.TaxValue;
@@ -463,7 +466,7 @@ namespace MMS.Web.Controllers
         public ActionResult Search(int customerid, int SOid)
         {
             SalesorderHD_Manager salesorderManager = new SalesorderHD_Manager();
-            BuyerManager BuyerManager = new BuyerManager();
+            BuyerMasterManager BuyerManager = new BuyerMasterManager();
             SalesorderDT_Manager SalesorderDT_Manager = new SalesorderDT_Manager();
             var data1 = BuyerManager.Get();
             List<Salesorders> totalList = new List<Salesorders>();

@@ -12,9 +12,6 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-    <link href="~/Content/css1/font-awesome.min.css" rel="stylesheet" />
     <style>
         input[type=text] {
             padding: 12px;
@@ -46,11 +43,7 @@
 </head>
 <body>
     <div class="main-page">
-
-
-        <!-- page-contents here -->
-
-        <div class="manage_customers">
+        <div id="transaction_report" class="reports common_Manage_subMerchant">
             <div class="d-flex justify-content-between align-items-center manage_customers_head">
                 <div class="manage_customers_main_head">
                     <h6 class="font-20">Production List</h6>
@@ -63,11 +56,9 @@
                     </a>
                 </div>
             </div>
-            <div class="table-responsive manage_customers_table_responsive">
-                <div class="customer_manage_search_containers" style="width:40%;">
-                    <input type="text" placeholder="Search by Product Name" id="SeaarchID" name="search2">
-                    <button class="buttonone" onclick="Search()" title="Filter" type="submit"><i class="fa fa-search"></i></button>
-
+            <div class="table-responsive reports_table_responsive">
+                <div class="customer_manage_search_container">
+                    <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Product Name">
                 </div>
                 <div class="manage_customers_table_in_responsive">
                     <table class="table table-striped text-center">
@@ -84,7 +75,8 @@
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
-                                </th>   <th scope="col">
+                                </th>
+                                <th scope="col">
                                     <span>Product Code</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
@@ -245,33 +237,33 @@
     </script>
 
     <script>
-        function Search() {
-            $.ajax({
+        $("#customer_manage_search").keyup(function () {
+            var customerearch = $("#customer_manage_search").val(); $.ajax({
                 type: "GET",
                 url: '/Production/ProductionSearch',
-                data: { filter: $('#SeaarchID').val() },
+                data: { filter: customerearch },
                 dataType: 'json',
                 success: function (data) {
                     $("tbody").empty();
                     var count = 1;
                     $.each(data, function (i, item) {
                         $("tbody").append(`
-                         <tr class="font-14">
-                             <td>${count}</td>
-                             <td style="text-align:left;">${item.ProductName}</td>
-                             <td style="text-align:left;">${item.ProductCode}</td>
-                             <td style="text-align:left;">${item.ProductionCode}</td>
-                             <td style="text-align:right;">${item.ProductionQty}</td>
-                              <td style="text-align:right;">${item.RequiredQty}</td>
-                              <td style="text-align:left;";>${item.ProductionStatus}</td>
-                              <td style="background-color: ${item.ProductionType == "Production" ? "#c3e6cb" : "#f5c6cb"};width: 6px;">${item.ProductionType}</td>
-                             <td class="veh-1 edit-del-wrap">
-                                 <a href="javascript:void(0)" onclick="Edit('${item.ProductionId}')" class="watchlist-edit" title="Edit">
-                                 <img src="/Content/assets/images/edit-icon.png" />
-                                 </a>
-                             </td>
-                         </tr>
-                     `);
+                             <tr class="font-14">
+                                 <td>${count}</td>
+                                 <td style="text-align:left;">${item.ProductName}</td>
+                                 <td style="text-align:left;">${item.ProductCode}</td>
+                                 <td style="text-align:left;">${item.ProductionCode}</td>
+                                 <td style="text-align:right;">${item.ProductionQty}</td>
+                                  <td style="text-align:right;">${item.RequiredQty}</td>
+                                  <td style="text-align:left;";>${item.ProductionStatus}</td>
+                                  <td style="background-color: ${item.ProductionType == "Production" ? "#c3e6cb" : "#f5c6cb"};width: 6px;">${item.ProductionType}</td>
+                                 <td class="veh-1 edit-del-wrap">
+                                     <a href="javascript:void(0)" onclick="Edit('${item.ProductionId}')" class="watchlist-edit" title="Edit">
+                                     <img src="/Content/assets/images/edit-icon.png" />
+                                     </a>
+                                 </td>
+                             </tr>
+                         `);
                         count++;
                     });
                 },
@@ -279,7 +271,8 @@
                     console.error("Error occurred:", status, error);
                 }
             });
-        }
+        });
+
 
         function Edit(productionId, isProduction) {
             if (isProduction) {

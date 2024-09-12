@@ -116,6 +116,19 @@ namespace MMS.Web.Controllers
             }
             else
             {
+                //var totallist = ProductManager.Product_Grid();
+                //var productList = totallist.Where(x => x.product_name.ToLower().Contains(model.ProductName.ToLower()) && x.Productype.ToString().ToLower().Contains(model.ProductType.ToString().ToLower())).ToList();
+                //if (productList.Count() >= 2)
+                //{
+                //    status = "ProductThere";
+                //    return Json(status, JsonRequestBehavior.AllowGet);
+                //}
+                //var productListcode = totallist.Where(x => x.product_code.ToLower().Contains(model.ProductCode.ToLower()) && x.Productype.ToString().ToLower().Contains(model.ProductType.ToString().ToLower())).ToList();
+                //if (productList.Count() >= 2)
+                //{
+                //    status = "ProductcodetThere";
+                //    return Json(status, JsonRequestBehavior.AllowGet);
+                //}
                 ProductManager productManager = new ProductManager();
                 productEntity.ProductId = model.ProductId;
                 productEntity.ProductCode = model.ProductCode;

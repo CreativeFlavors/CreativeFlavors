@@ -1,409 +1,314 @@
-﻿using MMS.Common;
-using MMS.Core.Entities;
+﻿using MMS.Core.Entities;
+using MMS.Data.StoredProcedureModel;
 using MMS.Repository.Managers;
 using MMS.Web.Models.BuyerMaserModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace MMS.Web.Controllers
 {
-    [CustomFilter]
+
     public class BuyerMaterController : Controller
     {
-        #region Accounts View
 
-        [HttpGet]
+       // #region Accounts View
+
+      
         public ActionResult BuyerMater()
         {
             BuyerMasterModel vm = new BuyerMasterModel();
             return View(vm);
         }
-        public ActionResult BuyerMasterGird()
-        {
-            BuyerMasterModel vm = new BuyerMasterModel();
-            BuyerManager buyerManager = new BuyerManager();
-            vm.BuyerMasterList = buyerManager.Get();
-
-            return PartialView("Partial/BuyerMasterGird", vm);
-        }
-
-        [HttpPost]
-        public ActionResult BuyerMasteDetails(int BuyerMasterId)
-        {
-            BuyerManager buyerManager = new BuyerManager();
-            BuyerMaster buyerMaster = new BuyerMaster();
-            BuyerMasterModel model = new BuyerMasterModel();
-            buyerMaster = buyerManager.GetBuyerMasterId(BuyerMasterId);
-            int ID = MMS.Web.ExtensionMethod.HtmlHelper.getAutoGenerateBuyerID();
-
-            if (buyerMaster != null && buyerMaster.BuyerMasterId != 0)
-            {
-                model.BuyerMasterId = buyerMaster.BuyerMasterId;
-                model.BuyerFullName = buyerMaster.BuyerFullName;
-                model.BuyerShortName = buyerMaster.BuyerShortName;
-                model.Currency = buyerMaster.Currency;
-                model.BuyerAddress1 = buyerMaster.BuyerAddress1;
-                model.BuyerAddress2 = buyerMaster.BuyerAddress2;
-                model.BuyerPincode = buyerMaster.BuyerPincode;
-                model.Country = buyerMaster.Country;
-                model.ContactPersion = buyerMaster.ContactPersion;
-                model.Designation = buyerMaster.Designation;
-                model.ContactNoo = buyerMaster.ContactNoo;
-                model.EmailID = buyerMaster.EmailID;
-                model.STNoHead = buyerMaster.STNoHead;
-                model.CGTNoHead = buyerMaster.CGTNoHead;
-                model.DeliverAddress1 = buyerMaster.DeliverAddress1;
-                model.DeliverAddress2 = buyerMaster.DeliverAddress2;
-                model.Pincode = buyerMaster.Pincode;
-                model.AgentName = buyerMaster.AgentName;
-                model.AgentAddress1 = buyerMaster.AgentAddress1;
-                model.AgentAddress2 = buyerMaster.AgentAddress2;
-                model.AgentPincode = buyerMaster.AgentPincode;
-                model.AgentCountry = buyerMaster.AgentCountry;
-                model.AgentCurrency = buyerMaster.AgentCurrency;
-                model.PaymentsTerms = buyerMaster.PaymentsTerms;
-                model.DeliveryTerms = buyerMaster.DeliveryTerms;
-                model.Pincode = buyerMaster.Pincode;
-                model.Insurance = buyerMaster.Insurance;
-                model.DelierTo = buyerMaster.DelierTo;
-                model.Brand = buyerMaster.Brand;
-                model.ShipmentTo = buyerMaster.ShipmentTo;
-                model.ShimentMode = buyerMaster.ShimentMode;
-                model.CountryStamp = buyerMaster.CountryStamp;
-                model.CreatedDate = buyerMaster.CreatedDate;
-                model.UpdatedDate = buyerMaster.UpdatedDate;
-            }
-            if (model.BuyerMasterId != 0)
-            {
-                model.BuyerCode = buyerMaster.BuyerCode;
-            }
-            else
-            {
-                ID++;
-                model.BuyerCode = "BUY" + ID;
-            }
-            return PartialView("Partial/BuyerMasteDetails", model);
-        }
-
-        [HttpPost]
-        public ActionResult AgentModelDetail(string agentName)
-        {
-            CurrencyManager currencyManager = new CurrencyManager();
-            CurrencyMaster currencyMaster = new CurrencyMaster();
-            AgentManager agentManager = new AgentManager();
-            AgentMaster agentMaster = new AgentMaster();
-            agentMaster = agentManager.GetAgent(agentName);
-            currencyMaster = currencyManager.GetCurrentMasterId(agentMaster.Currency);
-            string addrs1 = "";
-            string addrs2 = "";
-            string addrs3 = "";
-            string address = string.Empty;
-
-            if (agentMaster != null && agentMaster.AddressLine1 != null)
-            {
-                addrs1 = agentMaster.AddressLine1.Trim();
-              address = addrs1 + ",";
-                
-            }
-            if (agentMaster != null && agentMaster.AddressLine2 != null)
-            {
-                addrs2 = agentMaster.AddressLine2.Trim();
-                 address  +=  addrs2 + ",";
-            }
-            if (agentMaster != null && agentMaster.AddressLine3 != null)
-            {
-                addrs3 = agentMaster.AddressLine3.Trim();
-                address  += addrs3 + ",";
-            }
-            return Json(new { AddressLine1 = address, Currency = currencyMaster.LongForm, CountryMasterId = agentMaster.CountryMasterId }, JsonRequestBehavior.AllowGet);
-        }
-
-        #endregion
-        #region BuyderModel View
 
         [HttpGet]
-        public ActionResult BuyerModel()
+        public ActionResult BuyerMasteDetails()
         {
-            BuyerModels vm = new BuyerModels();
-            return View(vm);
+            BuyerMasterModel vm = new BuyerMasterModel();
+            return View("Partial/BuyerMasteDetails", vm);
         }
-        public ActionResult BuyerModelGrid()
-        {
-            BuyerModels vm = new BuyerModels();
-            BuyerModelManager buyerManager = new BuyerModelManager();
-            vm.BuyerModelList = buyerManager.Get();
 
-            return PartialView("Partial/BuyerModelGrid", vm);
-        }
-        [HttpPost]
-        public ActionResult BuyerModelDetails(int BuyerModelID)
+        //get data using sp
+        [HttpGet]
+        public ActionResult BuyerMasterGird(int? page, int pageSize = 15)
         {
-            BuyerModelManager buyerModelManager = new BuyerModelManager();
-            BuyerModel buyerModel = new BuyerModel();
-            BuyerModels model = new BuyerModels();
-            buyerModel = buyerModelManager.GetBuyerModelID(BuyerModelID);
-            int ID = Web.ExtensionMethod.HtmlHelper.getAutoGenerateBuyerModelID();
-            if (buyerModel != null && buyerModel.BuyerModelID != 0)
+            BuyerMasterManager buyerMasterManager = new BuyerMasterManager();
+            var buyers = buyerMasterManager.GetBuyerModels();
+
+            var totaldata = buyers.Select(b => new BuyerMasterModel
             {
-                model.BuyerModelID = buyerModel.BuyerModelID;
-                model.BuyerModelCode = model.BuyerModelID.ToString();
-                model.BuyerModelName = buyerModel.BuyerModelName;
-                model.Remarks = buyerModel.Remarks;
+                BuyerMasterId = b.BuyerMasterId,
+                BuyerCode = b.BuyerCode,
+                CustomerName = b.CustomerName,
+                Account = b.Account,
+                Physical1 = b.Physical1,
+                Telephone1 = b.Telephone1,
+                EmailContact = b.EmailContact
 
+            }).ToList();
+
+            if (!page.HasValue)
+            {
+                page = 1;
             }
-            if (model.BuyerModelID != 0)
+            var totalCount = totaldata.Count();
+
+            int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+            int startIndex = (int)((page - 1) * pageSize);
+            //int endIndex = Math.Min(startIndex + pageSize - 1, totalCount - 1);
+            int endIndex = startIndex + pageSize;
+
+
+            totaldata = totaldata.OrderByDescending(b => b.BuyerMasterId)
+                                   .Skip(startIndex)
+                                   .Take(endIndex)
+                                    .ToList();
+
+            ViewBag.TotalPages = totalPages;
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
+
+
+            return PartialView("Partial/BuyerMasterGird", totaldata);
+
+        }
+
+
+        //post the data 
+        [HttpPost]
+        public ActionResult BuyerModel(BuyerMasterModel model)
+        {
+            BuyerMasterManager _buyerMasterManager = new BuyerMasterManager();
+
+            List<BuyerModel_SP> existingbuyers = new List<BuyerModel_SP>();           
+
+             existingbuyers = _buyerMasterManager.GetBuyerModels();
+
+            if(existingbuyers != null)
             {
-                model.BuyerModelCode = "BMC" + buyerModel.BuyerModelID.ToString();
+                for (int i = 0; i < existingbuyers.Count; i++)
+                {
+                    if (existingbuyers[i].BuyerCode.ToLower() == model.BuyerCode.ToLower() && existingbuyers[i].CustomerName.ToLower() == model.CustomerName.ToLower())
+                    {
+                        return Json(new { message = "already exist" });
+                    }
+                }
+            }
+            BuyerModel_SP buyerMaster = new BuyerModel_SP();
+
+
+            buyerMaster.CustomerName = model.CustomerName;           
+            buyerMaster.Account = model.Account;
+            buyerMaster.AccountName = model.AccountName;
+            buyerMaster.AccountDescription = model.AccountDescription;
+            buyerMaster.SwiftCode = model.SwiftCode;
+            buyerMaster.Physical1 = model.Physical1;         
+            buyerMaster.PhysicalCode = model.PhysicalCode;           
+            buyerMaster.CurrencyId = model.CurrencyId;
+            buyerMaster.Telephone1 = model.Telephone1;
+            buyerMaster.Telephone2 = model.Telephone2;
+            buyerMaster.EmailContact = model.EmailContact;
+            buyerMaster.EmailAccounts = model.EmailAccounts;
+            buyerMaster.EmailEmergency = model.EmailEmergency;
+            buyerMaster.AccountTypeId = model.AccountTypeId;
+            buyerMaster.VatNumber = model.VatNumber;
+            buyerMaster.RegNumber = model.RegNumber;
+            buyerMaster.CreditLimit = model.CreditLimit;
+            buyerMaster.ChargeInterest = true;
+            buyerMaster.Interest = model.Interest;       
+            buyerMaster.TaxTypeId = model.TaxTypeId;
+            buyerMaster.ForeignCurrency = model.ForeignCurrency;
+            buyerMaster.OnHold = true;
+            buyerMaster.Active = true;
+            buyerMaster.UpdatedDate = null;
+            buyerMaster.UpdatedBy = null;
+            buyerMaster.IsDeleted = false;
+            buyerMaster.BuyerCode = model.BuyerCode;
+            buyerMaster.BuyerShortName = model.BuyerShortName;
+            buyerMaster.DeletedBy = null;
+            buyerMaster.DeletedDate = null;
+            buyerMaster.DcBalance = model.DcBalance;
+            buyerMaster.ForeignDcBalance = model.ForeignDcBalance;
+            buyerMaster.Website = model.Website;
+
+            var result = _buyerMasterManager.post(buyerMaster);
+
+            if (result == true)
+            {
+                return Json(new { success = true, message = "Saved Successfully" }, JsonRequestBehavior.AllowGet);
             }
             else
             {
-                ID++;
-                model.BuyerModelCode = "BMC" + ID;
+                return Json(new { success = false, message = "Save process Failed" }, JsonRequestBehavior.AllowGet);
             }
-            return PartialView("Partial/BuyerModelDetails", model);
-        }
+            return null;
 
-        #region Curd Opertion
+        }  
 
+       
         [HttpPost]
-        public ActionResult BuyerModel(BuyerModels model)
+        public ActionResult GetbyIdBuyermasterDetails(int id)
         {
-            BuyerModel buyerMasters = new BuyerModel();
-            if (ModelState.IsValid)
+            BuyerMasterManager _buyerMasterManager = new BuyerMasterManager();
+            try
             {
-                BuyerModel buyerModel = new BuyerModel();
-                BuyerModelManager buyerModelManager = new BuyerModelManager();
-                buyerModel = buyerModelManager.GetBuyerModel(model.BuyerModelName);
-                if (buyerModel == null)
-                {
-                    buyerMasters.BuyerModelID = model.BuyerModelID;
-                    buyerMasters.BuyerModelName = model.BuyerModelName;
-                    buyerMasters.Remarks = model.Remarks;
-                    buyerMasters.CreatedDate = DateTime.Now;
-                    buyerMasters.UpdatedDate = DateTime.Now;
-                    buyerModelManager.Post(buyerMasters);
-                }
-                else if (buyerModel != null && buyerModel.BuyerModelName == model.BuyerModelName && buyerModel.BuyerModelID == 0)
-                {
-                    buyerModel.BuyerModelID = 0;
-                    return Json(buyerModel, JsonRequestBehavior.AllowGet);
-                }
-                else
-                {
-                    return Json(buyerMasters, JsonRequestBehavior.AllowGet);
-                }
+               
+                BuyerMasterModel dtomodel = new BuyerMasterModel();
+                BuyerModel_SP buyerModel_SP = new BuyerModel_SP();
+               // dtomodel.BuyerMasterList = _buyerMasterManager.Get();
 
+                var  buyermanager= _buyerMasterManager.GetSingleBuyerModel(id);
+
+                if( buyermanager != null ) 
+                {
+                    dtomodel.BuyerMasterId = buyermanager.BuyerMasterId;
+                    dtomodel.BuyerCode = buyermanager.BuyerCode;
+                    dtomodel.BuyerShortName = buyermanager.BuyerShortName;
+                    dtomodel.CustomerName = buyermanager.CustomerName;
+                    dtomodel.Account = buyermanager.Account;
+                    dtomodel.AccountName = buyermanager.AccountName;
+                    dtomodel.AccountDescription = buyermanager.AccountDescription;
+                    dtomodel.SwiftCode = buyermanager.SwiftCode;
+                    dtomodel.Physical1 = buyermanager.Physical1;
+                    dtomodel.PhysicalCode = buyermanager.PhysicalCode;
+                    dtomodel.CurrencyId = buyermanager.CurrencyId;
+                    dtomodel.Telephone1 = buyermanager.Telephone1;
+                    dtomodel.Telephone2 = buyermanager.Telephone2;
+                    dtomodel.EmailContact = buyermanager.EmailContact;
+                    dtomodel.EmailAccounts = buyermanager.EmailAccounts;
+                    dtomodel.EmailEmergency = buyermanager.EmailEmergency;
+                    dtomodel.AccountTypeId = buyermanager.AccountTypeId;
+                    dtomodel.VatNumber = buyermanager.VatNumber;
+                    dtomodel.RegNumber = buyermanager.RegNumber;
+                    dtomodel.CreditLimit = buyermanager.CreditLimit;
+                    dtomodel.ChargeInterest = buyermanager.ChargeInterest;
+                    dtomodel.Interest = buyermanager.Interest;
+                    dtomodel.DateAdded = buyermanager.DateAdded;
+                    dtomodel.TaxTypeId = buyermanager.TaxTypeId;
+                    dtomodel.ForeignCurrency = buyermanager.ForeignCurrency;
+                    dtomodel.DcBalance = buyermanager.DcBalance;
+                    dtomodel.ForeignDcBalance = buyermanager.ForeignDcBalance;
+                    dtomodel.Website = buyermanager.Website;               
+
+                }
+                return PartialView("Partial/BuyerMasteDetails", dtomodel);
             }
-            return Json(buyerMasters, JsonRequestBehavior.AllowGet);
-        }
-        [HttpPost]
-        public ActionResult BuyerModelUpdate(BuyerModels model)
-        {
-            BuyerModel buyerMasters = new BuyerModel();
-            if (ModelState.IsValid)
+            catch (Exception ex)
             {
-                BuyerModel buyerModel = new BuyerModel();
-                BuyerModelManager buyerModelManager = new BuyerModelManager();
-                buyerModel = buyerModelManager.GetBuyerModelID(model.BuyerModelID);
-                if (buyerModel!= null)
-                {
-                    buyerMasters.BuyerModelID = model.BuyerModelID;
-                    buyerMasters.BuyerModelName = model.BuyerModelName;
-                    buyerMasters.Remarks = model.Remarks;
-                    buyerMasters.CreatedDate = buyerModel.CreatedDate;
-                    buyerMasters.UpdatedDate = DateTime.Now;
-                    buyerModelManager.Put(buyerMasters);
-                }
-                else
-                {
-                    return Json(buyerMasters, JsonRequestBehavior.AllowGet);
-                }
 
+                throw ex;
             }
-
-            return Json(buyerMasters, JsonRequestBehavior.AllowGet);
+            return null;
         }
-        public ActionResult BuyerModelDelete(int BuyerModelID)
-        {
-            BuyerModel buyerMasters = new BuyerModel();
-            string status = "";
-            BuyerModelManager buyerModelManager = new BuyerModelManager();
-            buyerMasters = buyerModelManager.GetBuyerModelID(BuyerModelID);
-            if (buyerMasters != null)
-            {
-                status = "Success";
-                buyerModelManager.Delete(buyerMasters.BuyerModelID);
-            }
-            return Json(status, JsonRequestBehavior.AllowGet);
-        }
-        public ActionResult BuyerModelSearch(string filter)
-        {
-            List<BuyerModel> buyerModelList = new List<BuyerModel>();
-            BuyerModelManager buyerModelManager = new BuyerModelManager();
-            buyerModelList = buyerModelManager.Get();
-            buyerModelList = buyerModelList.Where(x => x.BuyerModelName.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
-            BuyerModels model_ = new BuyerModels();
-            model_.BuyerModelList = buyerModelList;
-            return PartialView("Partial/BuyerModelGrid", model_);
-        }
-        #endregion
-        #endregion
-        #region Curd Operation
-        [HttpPost]
-        public ActionResult BuyerMater(BuyerMasterModel model)
-        {
-            BuyerMaster buyerMasters = new BuyerMaster();
-            if (ModelState.IsValid)
-            {
-                BuyerMaster buyerMaster = new BuyerMaster();
-                BuyerManager buyerManager = new BuyerManager();
-                buyerMaster = buyerManager.GetBuyerFullName(model.BuyerFullName);
-                int ID = MMS.Web.ExtensionMethod.HtmlHelper.getAutoGenerateBuyerID();
-                ID++;
 
-                if (buyerMaster == null)
-                {
-                    buyerMasters.BuyerMasterId = model.BuyerMasterId;
-                    buyerMasters.BuyerCode = "BUY" + ID;
-                    buyerMasters.BuyerFullName = model.BuyerFullName;
-                    buyerMasters.BuyerShortName = model.BuyerShortName;
-                    buyerMasters.Currency = model.Currency;
-                    buyerMasters.BuyerAddress1 = model.BuyerAddress1;
-                    buyerMasters.BuyerAddress2 = model.BuyerAddress2;
-                    buyerMasters.BuyerPincode = model.BuyerPincode;
-                    buyerMasters.Country = model.Country;
-                    buyerMasters.ContactPersion = model.ContactPersion;
-                    buyerMasters.Designation = model.Designation;
-                    buyerMasters.ContactNoo = model.ContactNoo;
-                    buyerMasters.EmailID = model.EmailID;
-                    buyerMasters.STNoHead = model.STNoHead;
-                    buyerMasters.CGTNoHead = model.CGTNoHead;
-                    buyerMasters.DeliverAddress1 = model.DeliverAddress1;
-                    buyerMasters.DeliverAddress2 = model.DeliverAddress2;
-                    buyerMasters.Pincode = model.Pincode;
-                    buyerMasters.AgentName = model.AgentName;
-                    buyerMasters.AgentAddress1 = model.AgentAddress1;
-                    buyerMasters.AgentAddress2 = model.AgentAddress2;
-                    buyerMasters.AgentPincode = model.AgentPincode;
-                    buyerMasters.AgentCountry = model.AgentCountry;
-                    buyerMasters.AgentCurrency = model.AgentCurrency;
-                    buyerMasters.PaymentsTerms = model.PaymentsTerms;
-                    buyerMasters.DeliveryTerms = model.DeliveryTerms;
-                    buyerMasters.Pincode = model.Pincode;
-                    buyerMasters.Insurance = model.Insurance;
-                    buyerMasters.DelierTo = model.DelierTo;
-                    buyerMasters.Brand = model.Brand;
-                    buyerMasters.ShipmentTo = model.ShipmentTo;
-                    buyerMasters.ShimentMode = model.ShimentMode;
-                    buyerMasters.CountryStamp = model.CountryStamp;
-                    buyerMasters.CreatedDate = DateTime.Now;
-                    buyerMasters.CreatedBy = model.CreatedBy;
-                    buyerMasters.CreditExposure = model.CreditExposure;
-                    buyerMasters.CreditDays = model.CreditDays;
-
-                    buyerManager.Post(buyerMasters);
-                }
-                else if (buyerMaster != null && buyerMaster.BuyerFullName == model.BuyerFullName && model.BuyerMasterId == 0)
-                {
-                    buyerMaster.BuyerMasterId = 0;
-                    return Json(buyerMaster, JsonRequestBehavior.AllowGet);
-                }
-                else
-                {
-                    return Json(buyerMasters, JsonRequestBehavior.AllowGet);
-                }
-
-            }
-            return Json(buyerMasters, JsonRequestBehavior.AllowGet);
-        }
+        //update the employee
         [HttpPost]
         public ActionResult Update(BuyerMasterModel model)
         {
-            BuyerMaster BuyerMasters = new BuyerMaster();
-            if (ModelState.IsValid)
-            {
-                BuyerMaster buyerMaster = new BuyerMaster();
-                BuyerManager buyerManager = new BuyerManager();
-                buyerMaster = buyerManager.GetBuyerMasterId(model.BuyerMasterId);
-                if (buyerMaster != null)
-                {
-                    BuyerMasters.BuyerMasterId = model.BuyerMasterId;
-                    BuyerMasters.BuyerCode = model.BuyerCode;
-                    BuyerMasters.BuyerFullName = model.BuyerFullName;
-                    BuyerMasters.BuyerShortName = model.BuyerShortName;
-                    BuyerMasters.Currency = model.Currency;
-                    BuyerMasters.BuyerAddress1 = model.BuyerAddress1;
-                    BuyerMasters.BuyerAddress2 = model.BuyerAddress2;
-                    BuyerMasters.BuyerPincode = model.BuyerPincode;
-                    BuyerMasters.Country = model.Country;
-                    BuyerMasters.ContactPersion = model.ContactPersion;
-                    BuyerMasters.Designation = model.Designation;
-                    BuyerMasters.ContactNoo = model.ContactNoo;
-                    BuyerMasters.EmailID = model.EmailID;
-                    BuyerMasters.STNoHead = model.STNoHead;
-                    BuyerMasters.CGTNoHead = model.CGTNoHead;
-                    BuyerMasters.DeliverAddress1 = model.DeliverAddress1;
-                    BuyerMasters.DeliverAddress2 = model.DeliverAddress2;
-                    BuyerMasters.ContactNoo = model.ContactNoo;
-                    BuyerMasters.AgentName = model.AgentName;
-                    BuyerMasters.AgentAddress1 = model.AgentAddress1;
-                    BuyerMasters.AgentAddress2 = model.AgentAddress2;
-                    BuyerMasters.AgentPincode = model.AgentPincode;
-                    BuyerMasters.AgentCountry = model.AgentCountry;
-                    BuyerMasters.AgentCurrency = model.AgentCurrency;
-                    BuyerMasters.PaymentsTerms = model.PaymentsTerms;
-                    BuyerMasters.DeliveryTerms = model.DeliveryTerms;
-                    BuyerMasters.Pincode = model.Pincode;
-                    BuyerMasters.Insurance = model.Insurance;
-                    BuyerMasters.DelierTo = model.DelierTo;
-                    BuyerMasters.Brand = model.Brand;
-                    BuyerMasters.ShipmentTo = model.ShipmentTo;
-                    BuyerMasters.ShimentMode = model.ShimentMode;
-                    BuyerMasters.CountryStamp = model.CountryStamp;
-                    BuyerMasters.CreatedDate = buyerMaster.CreatedDate;
-                    BuyerMasters.UpdatedDate = DateTime.Now;
-                    BuyerMasters.CreditExposure = model.CreditExposure;
-                    BuyerMasters.CreditDays = model.CreditDays;
-                    buyerManager.Put(BuyerMasters);
-                }
-                else
-                {
-                    return Json(BuyerMasters, JsonRequestBehavior.AllowGet);
-                }
+            BuyerMasterManager _buyerMasterManager = new BuyerMasterManager();
+            try
+            {     
+                var existingBuyer = _buyerMasterManager.GetSingleBuyerModel(model.BuyerMasterId);
 
+                if (model != null)
+                {
+
+                    existingBuyer.BuyerMasterId = model.BuyerMasterId;        
+                    existingBuyer.CustomerName = model.CustomerName;
+                    existingBuyer.Account = model.Account;
+                    existingBuyer.AccountName = model.AccountName;
+                    existingBuyer.AccountDescription = model.AccountDescription;
+                    existingBuyer.SwiftCode = model.SwiftCode;
+                    existingBuyer.Physical1 = model.Physical1;
+                  
+                    existingBuyer.PhysicalCode = model.PhysicalCode;
+                   
+                    existingBuyer.CurrencyId = model.CurrencyId;
+                    existingBuyer.Telephone1 = model.Telephone1;
+                    existingBuyer.Telephone2 = model.Telephone2;
+                    existingBuyer.EmailContact = model.EmailContact;
+                    existingBuyer.EmailAccounts = model.EmailAccounts;
+                    existingBuyer.EmailEmergency = model.EmailEmergency;
+                    existingBuyer.AccountTypeId = model.AccountTypeId;
+                    existingBuyer.VatNumber = model.VatNumber;
+                    existingBuyer.RegNumber = model.RegNumber;
+                    existingBuyer.CreditLimit = model.CreditLimit;
+                    existingBuyer.ChargeInterest = true;
+                    existingBuyer.Interest = model.Interest;
+                    existingBuyer.TaxTypeId = model.TaxTypeId;
+                    existingBuyer.ForeignCurrency = model.ForeignCurrency;
+                    existingBuyer.OnHold = true;
+                    existingBuyer.Active = true;
+                    existingBuyer.BuyerCode = model.BuyerCode;
+                    existingBuyer.BuyerShortName = model.BuyerShortName;
+                    existingBuyer.DcBalance = model.DcBalance;
+                    existingBuyer.Website = model.Website;
+                    var result = _buyerMasterManager.Putbuyer(existingBuyer);
+                   
+
+                    if (result == true)
+                    {                  
+                        return Json(new { AlertMessage = "Updated", JsonRequestBehavior.AllowGet });
+                    }
+                }
             }
-            return Json(BuyerMasters, JsonRequestBehavior.AllowGet);
-        }
-        public ActionResult Delete(int BuyerMasterId)
-        {
-            BuyerMaster buyerMaster = new BuyerMaster();
-            string status = "";
-            BuyerManager buyerManager = new BuyerManager();
-            buyerMaster = buyerManager.GetBuyerMasterId(BuyerMasterId);
-            if (buyerMaster != null)
+            catch (Exception)
             {
-                status = "Success";
-                buyerManager.Delete(buyerMaster.BuyerMasterId);
+
+                throw;
             }
-            return Json(status, JsonRequestBehavior.AllowGet);
+            return null;
         }
-        #endregion
-        #region Helper Method
+
+        //delete the employee
+        public ActionResult Delete(int id)
+        {
+            BuyerMasterManager _buyerMasterManager = new BuyerMasterManager();
+            try
+            {
+                string status = "";
+                //var result = _buyerMasterManager.GetSingleBuyerModel(id);
+                if(id != 0)
+                {                    
+                    _buyerMasterManager.Deletebuyer(id);
+                    status = "Success";
+                }
+                return Json(status, JsonRequestBehavior.AllowGet);
+             
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            return View();
+        }
+
+        //search
         public ActionResult Search(string filter)
         {
-            List<BuyerMaster> buyerMasterList = new List<BuyerMaster>();
-            BuyerManager buyerManager = new BuyerManager();
-            buyerMasterList = buyerManager.Get();
-            buyerMasterList = buyerMasterList.Where(x => x.BuyerCode.ToLower().Trim().Contains(filter.ToLower().Trim()) || x.BuyerFullName.ToLower().Trim().Contains(filter.ToLower().Trim()) || x.BuyerShortName.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
-            BuyerMasterModel model = new BuyerMasterModel();
-            model.BuyerMasterList = buyerMasterList;
-            return PartialView("Partial/BuyerMasterGird", model);
+            BuyerMasterManager _buyerMasterManager = new BuyerMasterManager();
+
+            List<BuyerMasterModel> filterbuyerMasterModels = new List<BuyerMasterModel>();
+
+            var buyermasterlist = _buyerMasterManager.GetBuyerModels();
+            var filterlist = buyermasterlist.Where(x => x.CustomerName.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
+            foreach (var item in filterlist)
+            {
+                BuyerMasterModel model = new BuyerMasterModel();
+                model.BuyerMasterId = item.BuyerMasterId;
+                model.BuyerCode = item.BuyerCode;
+                model.CustomerName = item.CustomerName;
+                model.Account = item.Account;
+                model.Physical1 = item.Physical1;
+                model.Telephone1 = item.Telephone1;
+                model.EmailContact = item.EmailContact;
+                filterbuyerMasterModels.Add(model);
+            }
+            return Json(filterbuyerMasterModels, JsonRequestBehavior.AllowGet);           
         }
-        
-        #endregion
 
     }
 }

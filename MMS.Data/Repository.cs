@@ -17,6 +17,8 @@ using MMS.Core.Entities;
 using MMS.Core.Entities.GateEntry;
 using System.Diagnostics;
 using System.Security.Cryptography;
+using Npgsql;
+using MMS.Data.Mapping;
 
 //using MMS.Web.Models;
 
@@ -283,7 +285,17 @@ namespace MMS.Data
         {
             var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.Salesorder_Grid>("SELECT * FROM salesorder_Grid()").ToList();
             return ResultList;
+        }   
+        public List<MMS.Data.StoredProcedureModel.Buyeraddress> Get_Buyeraddress_Grid()
+        {
+            var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.Buyeraddress>("SELECT * FROM Buyeraddress()").ToList();
+            return ResultList;
         }  
+        public List<MMS.Data.StoredProcedureModel.supplieraddress> Get_supplieraddress_Grid()
+        {
+            var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.supplieraddress>("SELECT * FROM supplieraddress()").ToList();
+            return ResultList;
+        }
         public List<MMS.Data.StoredProcedureModel.ProductGrid> Get_ProductGrid()
         {
             try
@@ -291,7 +303,7 @@ namespace MMS.Data
                 var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.ProductGrid>("SELECT * FROM get_product_details()").ToList();
                 return ResultList;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw;
             }
@@ -301,13 +313,13 @@ namespace MMS.Data
         {
             var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.FineshedgoodsReport>("SELECT * FROM Fineshedgoods_report()").ToList();
             return ResultList;
-        } 
+        }
         public List<MMS.Data.StoredProcedureModel.SupplierMaterialgrid> suppliermaterial()
         {
             var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.SupplierMaterialgrid>("SELECT * FROM suppliermaterial()").ToList();
             return ResultList;
         }
-         public List<MMS.Data.StoredProcedureModel.GRNCarlist> GRNCartlist(int poheader)
+        public List<MMS.Data.StoredProcedureModel.GRNCarlist> GRNCartlist(int poheader)
         {
             var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.GRNCarlist>("SELECT * FROM get_grn_cart(@p0)", poheader).ToList();
             return ResultList;
@@ -329,15 +341,15 @@ namespace MMS.Data
         {
             try
             {
-                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.Parentbommatertial> ("SELECT * FROM get_bom_materials(@p0)",bom_id).ToList();
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.Parentbommatertial>("SELECT * FROM get_bom_materials(@p0)", bom_id).ToList();
                 return ResultList;
             }
-          catch(Exception ex)   
+            catch (Exception ex)
             {
                 throw;
             }
         }
-        public List<MMS.Data.StoredProcedureModel.SalesorderCart> SearchSalesordercart(int customerid,int salesid)
+        public List<MMS.Data.StoredProcedureModel.SalesorderCart> SearchSalesordercart(int customerid, int salesid)
         {
             try
             {
@@ -386,7 +398,7 @@ namespace MMS.Data
             {
                 throw;
             }
-        }     
+        }
         public List<MMS.Data.StoredProcedureModel.PODetails> GetPODetailsList()
         {
             try
@@ -504,6 +516,7 @@ namespace MMS.Data
             var ResultList = context.Database.SqlQuery<MMS.Core.Entities.Stock.GRN_EntityModel>("Execute GRNGrid @GrnNo ={0}", GrnNo).ToList();
             return ResultList;
         }
+
 
         public List<MMS.Core.Entities.Stock.ApprovedPriceListMasterGrid> SearchApprovedPriceList(string SupplierName)
         {
@@ -981,10 +994,211 @@ namespace MMS.Data
         {
             context.Database.SqlQuery<Int32>("SELECT update_probomid(@p0,@p1)", pbomid, materialid).SingleOrDefault();
         }
+
+
+        //for buyer master 
+
+        //get the list of values
+        public List<MMS.Data.StoredProcedureModel.BuyerModel_SP> GetBuyerModels()
+        {
+            var result = context.Database.SqlQuery<BuyerModel_SP>("select * from buyer_model_get_sp()").ToList();
+            return result;
+        }
+
+
+        //get single buyermaster by id
+
+        public MMS.Data.StoredProcedureModel.BuyerModel_SP GetBuyerById(int id)
+        {
+            var result = context.Database.SqlQuery<BuyerModel_SP>("SELECT * FROM public.buyer_model_get_by_id_sp(@P0)", id).FirstOrDefault();
+            return result;
+        }
+
+        //post buyer maste rusing sp
+
+        public bool InsertBuyerModel(BuyerModel_SP buyerModel_SP)
+        {
+            try
+            {
+                var parameter = new[]
+                {
+                  
+                    new NpgsqlParameter("_customer_name", buyerModel_SP.CustomerName),
+                    new NpgsqlParameter("_account", buyerModel_SP.Account),
+                    new NpgsqlParameter("_account_name", buyerModel_SP.AccountName),
+                    new NpgsqlParameter("_account_description", buyerModel_SP.AccountDescription),
+                     new NpgsqlParameter("_swift_code", buyerModel_SP.SwiftCode),
+                    new NpgsqlParameter("_physical1", buyerModel_SP.Physical1),
+                 
+                    new NpgsqlParameter("_physical_code", buyerModel_SP.PhysicalCode),
+                  
+                     new NpgsqlParameter("_currency_id", buyerModel_SP.CurrencyId),
+                    
+                    new NpgsqlParameter("_telephone1", buyerModel_SP.Telephone1),
+                    new NpgsqlParameter("_telephone2", buyerModel_SP.Telephone2),
+                    new NpgsqlParameter("_email_contact", buyerModel_SP.EmailContact),
+                    new NpgsqlParameter("_email_accounts", buyerModel_SP.EmailAccounts),
+                    new NpgsqlParameter("_email_emergency", buyerModel_SP.EmailEmergency),
+                    new NpgsqlParameter("_account_type_id", buyerModel_SP.AccountTypeId),
+                    new NpgsqlParameter("_vat_number", buyerModel_SP.VatNumber),
+                    new NpgsqlParameter("_reg_number", buyerModel_SP.RegNumber),
+                     new NpgsqlParameter("_credit_limit", buyerModel_SP.CreditLimit),
+                     new NpgsqlParameter("_charge_interest", buyerModel_SP.ChargeInterest),
+                    new NpgsqlParameter("_interest", buyerModel_SP.Interest),
+                    new NpgsqlParameter("_tax_type_id", buyerModel_SP.TaxTypeId),                   
+              
+                    new NpgsqlParameter("_foreign_currency", buyerModel_SP.ForeignCurrency),
+                    new NpgsqlParameter("_on_hold", buyerModel_SP.OnHold),
+                    new NpgsqlParameter("_active", buyerModel_SP.Active),                  
+                new NpgsqlParameter("_created_date", buyerModel_SP.CreatedDate),
+                      new NpgsqlParameter("_updated_date",DBNull.Value),
+                        new NpgsqlParameter("_created_by", buyerModel_SP.CreatedBy),
+                        new NpgsqlParameter("_updated_by", DBNull.Value),
+                        new NpgsqlParameter("_is_deleted", buyerModel_SP.IsDeleted),
+                            new NpgsqlParameter("_buyer_code", buyerModel_SP.BuyerCode),
+                    new NpgsqlParameter("_buyer_short_name", buyerModel_SP.BuyerShortName),
+                        new NpgsqlParameter("_deleted_by", DBNull.Value),
+                        new NpgsqlParameter("_deleted_date", DBNull.Value),
+                              new NpgsqlParameter("_date_added", buyerModel_SP.DateAdded),
+                            new NpgsqlParameter("_dc_balance", buyerModel_SP.DcBalance),
+                                new NpgsqlParameter("_foreign_dc_balance", 1),
+                                new NpgsqlParameter("_website",buyerModel_SP.Website),
+                                new NpgsqlParameter("_onholddate",buyerModel_SP.OnHoldDate)
+                };
+                var result = context.Database.SqlQuery<bool>("SELECT public.buyer_model_post_sp1 (@_customer_name,@_account,@_account_name,@_account_description,@_swift_code,@_physical1,@_physical_code,@_currency_id,@_telephone1,@_telephone2,@_email_contact,@_email_accounts,@_email_emergency,@_account_type_id,@_vat_number,@_reg_number,@_credit_limit,@_charge_interest,@_interest,@_tax_type_id,@_foreign_currency,@_on_hold,@_active,@_created_date,@_updated_date,@_created_by,@_updated_by,@_is_deleted,@_buyer_code,@_buyer_short_name,@_deleted_by,@_deleted_date,@_date_added,@_dc_balance,@_foreign_dc_balance,@_website,@_onholddate)", parameter).FirstOrDefault();
+                return result;
+            }
+
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        //update buyermaster using sp
+
+
+        public bool Updatebuyer(BuyerMaster1 buyerModel_SP)
+        {
+            try
+            {
+                var parameter = new[]
+               {
+                      new NpgsqlParameter("_buyermasterid", buyerModel_SP.BuyerMasterId),
+                    new NpgsqlParameter("_customer_name", buyerModel_SP.CustomerName),
+                    new NpgsqlParameter("_account", buyerModel_SP.Account),
+                    new NpgsqlParameter("_account_name", buyerModel_SP.AccountName),
+                    new NpgsqlParameter("_account_description", buyerModel_SP.AccountDescription),
+                     new NpgsqlParameter("_swift_code", buyerModel_SP.SwiftCode),
+                    new NpgsqlParameter("_physical1", buyerModel_SP.Physical1),
+                  
+                    new NpgsqlParameter("_physical_code", buyerModel_SP.PhysicalCode),
+                  
+                     new NpgsqlParameter("_currency_id", buyerModel_SP.CurrencyId),
+
+                    new NpgsqlParameter("_telephone1", buyerModel_SP.Telephone1),
+                    new NpgsqlParameter("_telephone2", buyerModel_SP.Telephone2),
+                    new NpgsqlParameter("_email_contact", buyerModel_SP.EmailContact),
+                    new NpgsqlParameter("_email_accounts", buyerModel_SP.EmailAccounts),
+                    new NpgsqlParameter("_email_emergency", buyerModel_SP.EmailEmergency),
+                    new NpgsqlParameter("_account_type_id", buyerModel_SP.AccountTypeId),
+                    new NpgsqlParameter("_vat_number", buyerModel_SP.VatNumber),
+                    new NpgsqlParameter("_reg_number", buyerModel_SP.RegNumber),
+                     new NpgsqlParameter("_credit_limit", buyerModel_SP.CreditLimit),
+                     new NpgsqlParameter("_charge_interest", buyerModel_SP.ChargeInterest),
+                    new NpgsqlParameter("_interest", buyerModel_SP.Interest),
+                    new NpgsqlParameter("_tax_type_id", buyerModel_SP.TaxTypeId),
+
+                    new NpgsqlParameter("_foreign_currency", buyerModel_SP.ForeignCurrency),
+                    new NpgsqlParameter("_on_hold", buyerModel_SP.OnHold),
+                    new NpgsqlParameter("_active", buyerModel_SP.Active),
+                new NpgsqlParameter("_created_date", buyerModel_SP.CreatedDate),
+                      new NpgsqlParameter("_updated_date", buyerModel_SP.UpdatedDate),
+                        new NpgsqlParameter("_created_by", buyerModel_SP.CreatedBy),
+                        new NpgsqlParameter("_updated_by", buyerModel_SP.UpdatedBy),
+                        new NpgsqlParameter("_is_deleted", buyerModel_SP.IsDeleted),
+                            new NpgsqlParameter("_buyer_code", buyerModel_SP.BuyerCode),
+                    new NpgsqlParameter("_buyer_short_name", buyerModel_SP.BuyerShortName),
+                        new NpgsqlParameter("_deleted_by", DBNull.Value),
+                        new NpgsqlParameter("_deleted_date", DBNull.Value),
+                              new NpgsqlParameter("_date_added", buyerModel_SP.DateAdded),
+                            new NpgsqlParameter("_dc_balance", buyerModel_SP.DcBalance),
+                                new NpgsqlParameter("_foreign_dc_balance", buyerModel_SP.ForeignDcBalance),
+                                new NpgsqlParameter("_website",buyerModel_SP.Website),
+                                new NpgsqlParameter("_onholddate",buyerModel_SP.OnHoldDate)
+                };
+                var result = context.Database.SqlQuery<bool>("SELECT public.buyer_model_update_sp1 (@_buyermasterid,@_customer_name,@_account,@_account_name,@_account_description,@_swift_code,@_physical1,@_physical_code,@_currency_id,@_telephone1,@_telephone2,@_email_contact,@_email_accounts,@_email_emergency,@_account_type_id,@_vat_number,@_reg_number,@_credit_limit,@_charge_interest,@_interest,@_tax_type_id,@_foreign_currency,@_on_hold,@_active,@_created_date,@_updated_date,@_created_by,@_updated_by,@_is_deleted,@_buyer_code,@_buyer_short_name,@_deleted_by,@_deleted_date,@_date_added,@_dc_balance,@_foreign_dc_balance,@_website,@_onholddate)", parameter).FirstOrDefault();
+                return result;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+
+        //delete supplier master using sp
+        public bool deletebuyer(BuyerModel_SP buyerModel_SP)
+        {
+            var paramter = new[]
+            {
+                 new NpgsqlParameter("_buyermasterid",buyerModel_SP.BuyerMasterId),
+                new NpgsqlParameter("_is_deleted",buyerModel_SP.IsDeleted),
+                new NpgsqlParameter("_active",buyerModel_SP.Active),
+                new NpgsqlParameter("_deleted_by",buyerModel_SP.DeletedBy),
+                new NpgsqlParameter("_deleted_date",buyerModel_SP.DeletedDate)
+            };
+            var result= context.Database.SqlQuery<bool>("SELECT public.buyer_model_delete_sp1 (@_buyermasterid,@_is_deleted,@_active,@_deleted_by,@_deleted_date)", paramter).FirstOrDefault();
+            return result;
+        }
+
+
         public List<MMS.Core.Entities.ProductionBOM> GetProductionbom()
         {
             var ResultList = context.Database.SqlQuery<MMS.Core.Entities.ProductionBOM>("SELECT * FROM get_productionbom_data()").ToList();
             return ResultList;
         }
+
+
+        public bool InsertSupplier(Supplier_master spPostSupplier)
+        {
+            var parameters = new[]
+            {
+       new NpgsqlParameter("@p_suppliername", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = spPostSupplier.Suppliername ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_suppliercode", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = spPostSupplier.suppliercode ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_account", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = spPostSupplier.Account ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_accountname", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = spPostSupplier.AccountName ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_accountdescription", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = spPostSupplier.AccountDescription ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_physical1", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = spPostSupplier.Physical1 ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_physicalcode", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = spPostSupplier.PhysicalCode ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_telephone1", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = spPostSupplier.Telephone1 ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_telephone2", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = spPostSupplier.Telephone2 ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_emailcontact", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = spPostSupplier.EmailContact ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_emailaccounts", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = spPostSupplier.EmailAccounts ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_emailemergency", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = spPostSupplier.EmailEmergency ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_accounttypeid", NpgsqlTypes.NpgsqlDbType.Integer) { Value = spPostSupplier.AccountTypeId },
+        new NpgsqlParameter("@p_vatnumber", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = spPostSupplier.VatNumber ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_regnumber", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = spPostSupplier.RegNumber ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_dcbalance", NpgsqlTypes.NpgsqlDbType.Numeric) { Value = spPostSupplier.DcBalance ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_creditlimit", NpgsqlTypes.NpgsqlDbType.Numeric) { Value = spPostSupplier.CreditLimit ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_interest", NpgsqlTypes.NpgsqlDbType.Numeric) { Value = spPostSupplier.Interest ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_taxtypeid", NpgsqlTypes.NpgsqlDbType.Integer) { Value = spPostSupplier.TaxTypeId },
+        new NpgsqlParameter("@p_foreigncurrency", NpgsqlTypes.NpgsqlDbType.Integer) { Value = spPostSupplier.ForeignCurrency },
+        new NpgsqlParameter("@p_currencyid", NpgsqlTypes.NpgsqlDbType.Integer) { Value = spPostSupplier.CurrencyID },
+        new NpgsqlParameter("@p_onhold", NpgsqlTypes.NpgsqlDbType.Boolean) { Value = spPostSupplier.OnHold },
+        new NpgsqlParameter("@p_active", NpgsqlTypes.NpgsqlDbType.Boolean) { Value = spPostSupplier.isActive },
+        new NpgsqlParameter("@p_createdby", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = spPostSupplier.createdby ?? (object)DBNull.Value },
+        new NpgsqlParameter("@p_createddate", NpgsqlTypes.NpgsqlDbType.Timestamp) { Value = spPostSupplier.CreatedDate ?? (object)DBNull.Value }
+    };
+
+            var result = context.Database.SqlQuery<bool>(
+                "SELECT public.insert_supplier_master(@p_suppliername, @p_suppliercode, @p_account, @p_accountname, @p_accountdescription, @p_physical1, @p_physicalcode, @p_telephone1, @p_telephone2, @p_emailcontact, @p_emailaccounts, @p_emailemergency, @p_accounttypeid, @p_vatnumber, @p_regnumber, @p_dcbalance, @p_creditlimit, @p_interest, @p_taxtypeid, @p_foreigncurrency, @p_currencyid, @p_onhold, @p_active, @p_createdby, @p_createddate)",
+            parameters).FirstOrDefault();
+
+            return result;
+        }
+
     }
 }

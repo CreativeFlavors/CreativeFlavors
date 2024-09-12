@@ -38,8 +38,8 @@ namespace MMS.Web.Controllers.Stock
             }
             var custadd = custAddressMangers.GetCustAddressbuyerid(headerdata.customerid);
             models.itemInvoiced = counts;
-            models.shippingadd = custadd.Add1;
-            models.Billingadd = custadd.Add2;
+            //models.shippingadd = custadd.Add1;
+            //models.Billingadd = custadd.Add2;
             models.BuyerName = headerdata.customerid;
             models.SalesorderId = headerdata.salesorderid_hd;
             models.SalesorderId_HD = headerdata.salesorderid_hd;
@@ -252,7 +252,7 @@ namespace MMS.Web.Controllers.Stock
             CurrencyManager currencyManager = new CurrencyManager();
             ProductManager productManager = new ProductManager();
             TaxTypeManager taxTypeManager = new TaxTypeManager();
-            BuyerManager buyerManager = new BuyerManager();
+            BuyerMasterManager buyerManager = new BuyerMasterManager();
             Salesorder_dt salesorder_Dt = new Salesorder_dt();
             Salesorders model = new Salesorders();
             SalesorderDT_Manager salesorderDT_manager = new SalesorderDT_Manager();
@@ -313,11 +313,16 @@ namespace MMS.Web.Controllers.Stock
                         count++;
                     }
                 }
+                CustAddressMangers custAddressMangers = new CustAddressMangers();
+
                 var DT = salesorderDT_manager.GetSO(Convert.ToInt32(i.SalesorderId_DT));
                 var product = productManager.GetId(Convert.ToInt32(i.ProductID));
                 var tax = taxTypeManager.GetTaxMasterId(product.TaxMasterId);
-                var addreddcode = buyerManager.GetBuyerMasterId(Convert.ToInt32(buyerid));
+                int buyer11 = Convert.ToInt32(buyerid);
+                var addreddcode = buyerManager.GetBuyerMasterId(buyer11);
 
+                var shipping = custAddressMangers.GetCustAddressbuyeridshipp(model.buyerid);
+                var billing = custAddressMangers.GetCustAddressbuyerid(model.buyerid);
                 orderdetails.invoicehd_id = headerid.invoicehd_id;
                 orderdetails.SalesOrderId_dt = (Convert.ToInt32(i.SalesorderId_DT));
                 orderdetails.ProductId = (Convert.ToInt32(i.ProductID));
@@ -331,8 +336,8 @@ namespace MMS.Web.Controllers.Stock
                 orderdetails.invoicedate = DateTime.Now;
                 orderdetails.CurrencyId = currencyid.id;
                 orderdetails.CustAddCode = addreddcode.BuyerCode;
-                orderdetails.CustBillCode = addreddcode.BuyerAddress1;
-                orderdetails.CustShipCode = addreddcode.BuyerAddress2;
+                orderdetails.CustBillCode = billing.Addresshd_id.ToString();
+                orderdetails.CustShipCode = shipping.Addresshd_id.ToString();
                 var unitprice = product.Price * conversionval;
                 orderdetails.IsActive = true;
                 var taxper = tax.TaxValue;

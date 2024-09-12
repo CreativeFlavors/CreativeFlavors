@@ -9,8 +9,8 @@ namespace MMS.Repository.Service
 {
     internal interface ICusAddreess
     {
-        bool Post(CustAddress arg);
-        bool Put(CustAddress arg);
+        CustAddress Post(CustAddress arg);
+        CustAddress Put(CustAddress arg);
         bool Delete(int id);
         CustAddress Get(int id);
     }

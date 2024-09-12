@@ -12,9 +12,6 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-    <link href="~/Content/css1/font-awesome.min.css" rel="stylesheet" />
     <style>
         input[type=text] {
             padding: 12px;
@@ -46,11 +43,7 @@
 </head>
 <body>
     <div class="main-page">
-
-
-        <!-- page-contents here -->
-
-        <div class="manage_customers">
+        <div id="transaction_report" class="reports common_Manage_subMerchant">
             <div class="d-flex justify-content-between align-items-center manage_customers_head">
                 <div class="manage_customers_main_head">
                     <h6 class="font-20">Indent List</h6>
@@ -63,11 +56,9 @@
                     </a>
                 </div>
             </div>
-            <div class="table-responsive manage_customers_table_responsive">
-                <div class="customer_manage_search_containers" style="width:40%;">
-                    <input type="text" placeholder="Search by Product Name" id="SearchID" name="search2">
-                    <button class="buttonone" onclick="Search()" title="Filter" type="submit"><i class="fa fa-search"></i></button>
-
+            <div class="table-responsive reports_table_responsive">
+                <div class="customer_manage_search_container">
+                    <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Product Name">
                 </div>
                 <div class="manage_customers_table_in_responsive">
                     <table class="table table-striped text-center">
@@ -132,19 +123,39 @@
                                 {
 
                                     <tr class="font-14">
-                                        <td>@startSerialNumber</td>
-                                        <td style="text-align:left">@item.ProductName</td>
-                                        <td style="text-align:left">@item.StoreName</td>
-                                        <td style="text-align:left">@item.UomName</td>
-                                        <td style="text-align:left">@item.TaxName</td>
-                                        <td style="text-align:right">@item.Price</td>
-                                        <td style="text-align:right">@item.IndentNumber</td>
-                                        <td class="veh-1 edit-del-wrap">
-                                            @*<a href="javascript:void(0)" onclick="Edit('@item.IndentCartId')" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>*@
-                                            <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.indentdetailid')" class="watchlist-delete" title="Delete"><img src="~/Content/assets/images/delete-icon.png" /></a>
-                                            @*<td><button class="btn btn-success" id="paynow" onclick="paynow('@item.Id')" title="PayNow">Pay Now</button></td>*@
-                                        </td>
+                                        <td style="width: 5%;">@startSerialNumber</td>
+                                        <td style="text-align: left; width: 15%;">@item.ProductName</td>
+                                        <td style="text-align: left; width: 15%;">@item.StoreName</td>
+                                        <td style="text-align: left; width: 4%;">@item.UomName</td>
+                                        <td style="text-align: left; width: 4%; ">@item.TaxName</td>
+                                        <td style="text-align: right; width: 5%;">@item.Price</td>
+                                        <td style="text-align: right; width: 4%;">@item.IndentNumber</td>
+                                        @*<td class="veh-1 edit-del-wrap">
+                                        <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.indentdetailid')" class="watchlist-delete" title="Delete"><img src="~/Content/assets/images/delete-icon.png" /></a>
+                                    </td>*@
+                                        @if (item.isactive == true)
+                                        {
+                                            <td style="width: 8%; text-align: -webkit-center; ">
+                                                <div class="checkbox-wrapper-3">
+                                                    <input type="checkbox" class="cbx-checkbox" id="cbx-@item.indentdetailid" />
+                                                    <label for="cbx-@item.indentdetailid" class="toggle">
+                                                        <span onclick="Delete('@item.indentdetailid')"></span>
+                                                    </label>
+                                                </div>
+                                            </td>
 
+                                        }
+                                        else
+                                        {
+                                            <td style="width: 8%; text-align: -webkit-center; ">
+                                                <div class="checkbox-wrapper-3">
+                                                    <input type="checkbox" id="cbx-@item.indentdetailid" class="cbx-checkbox" checked />
+                                                    <label for="cbx-@item.indentdetailid" class="toggle">
+                                                        <span onclick="Deletechange('@item.indentdetailid')"></span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        }
 
                                     </tr>
                                     startSerialNumber++;
@@ -194,13 +205,13 @@
 
         </div>
     </div>
-
+    </div>
 
 
 
 
     <script src="~/Content/js/custom.js"></script>
-    
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
@@ -238,32 +249,38 @@
 });
     </script>
     <script>
-        function Search() {
+        $("#customer_manage_search").keyup(function () {
+            var bomsearch = $("#customer_manage_search").val();
             $.ajax({
                 type: "GET",
                 url: '/IndentMaterial/IndentSearch',
-                data: { filter: $('#SearchID').val() }, 
+                data: { filter: bomsearch },
                 dataType: 'json',
                 success: function (data) {
                     $("tbody").empty();
                     var count = 1;
                     $.each(data, function (i, item) {
+                        var deleteCell = `
+                                        <div class="checkbox-wrapper-3">
+                                            <input type="checkbox" class="cbx-checkbox" id="cbx-${item.indentdetailid}" ${item.isactive ? '' : 'checked'} />
+                                            <label for="cbx-${item.indentdetailid}" class="toggle">
+                                                <span onclick="Delete('${item.indentdetailid}')"></span>
+                                            </label>
+                                        </div>
+                                  `;
+
                         $("tbody").append(`
-                            <tr class="font-14">
-                                <td>${count}</td>
-                                <td>${item.ProductName}</td>
-                                <td>${item.StoreName}</td>
-                                <td>${item.UomName}</td>
-                                <td>${item.TaxName}</td>
-                                <td>${item.Price}</td>
-                                <td>${item.IndentNumber}</td>
-                                <td class="veh-1 edit-del-wrap">
-                                    <a href="javascript:void(0)" onclick="Delete('${item.IndentCartId}')" class="watchlist-delete" title="Delete">
-                                        <img src="/Content/assets/images/delete-icon.png" />
-                                    </a>
-                                </td>
-                            </tr>
-                        `);
+                                        <tr class="font-14">
+                                            <td style="width: 5%;">${count}</td>
+                                            <td style="text-align: left;  width: 15%;">${item.ProductName}</td>
+                                            <td style="text-align: left; width: 15%;">${item.StoreName}</td>
+                                            <td style="text-align: left;width: 4%;">${item.UomName}</td>
+                                            <td style="text-align: left;width: 4%;">${item.TaxName}</td>
+                                            <td style="text-align: right;width: 5%;">${item.Price}</td>
+                                            <td style="text-align: right;width: 4%;">${item.IndentNumber}</td>
+                                            <td td style="width: 8%; text-align: -webkit-center; ">${deleteCell}</td>
+                                        </tr>
+                                    `);
                         count++;
                     });
                 },
@@ -271,35 +288,36 @@
                     console.error("Error occurred:", status, error);
                 }
             });
-        }
+        });
+
 
         function Delete(arg) {
-            var answer = confirm("Are you sure want to delete?");
-            if (answer) {
-                $.ajax({
-                    type: 'GET',
-                    url: '/IndentMaterial/IndentDelete',
-                    data: { IndentCartId: arg },
-                    success: function (data) {
-                        if (data == "Success") {
-                            alert('Indent Deleted Successfully.');
-                            location.reload();
-                            return false;
-                        }
-                        else {
-                            alert('Product deletion failed.');
-                        }
-
-                    },
-                    error: function (ex) {
-                        alert('This product Already Exist in the database.');
-                    }
-                });
-            }
-            else {
-                return false;
-            }
+            $.ajax({
+                type: 'GET',
+                url: '/IndentMaterial/IndentDelete',
+                data: { IndentCartId: arg },
+                success: function (data) {
+                    location.reload();
+                },
+                error: function (ex) {
+                    alert('This product Already Exist in the database.');
+                }
+            });
         }
+        function Deletechange(arg) {
+            $.ajax({
+                type: 'GET',
+                url: '/IndentMaterial/IndentDeletechange',
+                data: { IndentCartId: arg },
+                success: function (data) {
+                    location.reload();
+                },
+                error: function (ex) {
+                    alert('This product Already Exist in the database.');
+                }
+            });
+        }
+
     </script>
 
 

@@ -78,7 +78,7 @@ namespace MMS.Web.Models
         public UomMaster UomMaster { get; set; }
         public TaxTypeMaster TaxTypeMaster { get; set; }
         public product product { get; set; }
-        public BuyerMaster BuyerMaster { get; set; }
+        public BuyerMaster1 BuyerMaster { get; set; }
         [Column("conversionvalue")]
         public decimal ConversionValue { get; set; } = 0;
         public string currencyOption { get; set; }
