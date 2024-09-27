@@ -196,13 +196,13 @@ namespace MMS.Repository.Managers
             }
             return Indentheaderlist;
         }
-        public bool Delete(int? indentcartid)
+        public bool Delete(int? indentcartid , bool IsChecked)
         {
             bool result = false;
             try
             {
                 Indentdetail model = indentdetailRepository.GetById(indentcartid);
-                model.IsActive = false;
+                model.IsActive = IsChecked;
                 indentdetailRepository.Update(model);
                 result = true;
             }
@@ -332,7 +332,7 @@ namespace MMS.Repository.Managers
         public List<Indentdetail> GetIndentdetailsList(int? indentheaderid)
         {
             List<Indentdetail> indentdetails = new List<Indentdetail>();
-            indentdetails = indentdetailRepository.Table.Where(x => x.IndentNo == indentheaderid).ToList();
+            indentdetails = indentdetailRepository.Table.Where(x => x.IndentNo == indentheaderid && x.IsActive == true).ToList();
             return indentdetails;
         }
 

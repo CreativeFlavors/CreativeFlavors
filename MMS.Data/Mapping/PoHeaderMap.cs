@@ -18,7 +18,8 @@ namespace MMS.Data.Mapping
             Property(t => t.PoheaderId).HasColumnName("poheaderid").HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             Property(t => t.PoDate).HasColumnName("podate");
             Property(t => t.SupplierId).HasColumnName("supplierid");
-            Property(t => t.Items).HasColumnName("items");
+            Property(t => t.items).HasColumnName("items");
+            Property(t => t.qty).HasColumnName("qty");
             Property(t => t.TotalDiscountValue).HasColumnName("total_discountvalue");
             Property(t => t.TotalSubtotalValue).HasColumnName("total_subtotalvalue");
             Property(t => t.TotalTaxValue).HasColumnName("total_taxvalue");

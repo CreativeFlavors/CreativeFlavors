@@ -20,10 +20,12 @@ namespace MMS.Core.Entities
         public DateTime? PoDate { get; set; }
 
         [Column("supplierid")]
-        public int SupplierId { get; set; }
-
+        public int? SupplierId { get; set; }  
         [Column("items")]
-        public decimal? Items { get; set; }
+        public int? items { get; set; }
+
+        [Column("qty")]
+        public decimal? qty { get; set; }
 
         [Column("total_discountvalue")]
         public decimal? TotalDiscountValue { get; set; }
@@ -77,6 +79,6 @@ namespace MMS.Core.Entities
         public decimal? TotalPrice { get; set; }
 
         [Column("ponumber")]
-        public int PoNumber { get; set; }
+        public int? PoNumber { get; set; }
     }
 }

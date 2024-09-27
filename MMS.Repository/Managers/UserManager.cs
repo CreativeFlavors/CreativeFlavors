@@ -70,16 +70,16 @@ namespace MMS.Repository.Managers
             bool result = false;
             try
             {
-                List<Users> user = new List<Users>();
+                Users user = new Users();
                 string PasswordSalt = Encryptdata(Password);
                 string Password_ = Decryptdata(PasswordSalt);
 
-                user = userRepository.Table.Where(P => P.Email.ToLower() == UserName.ToLower() && P.Password == Password_).ToList<Users>();              
-                if (user.Count > 0)
+                user = userRepository.Table.Where(P => P.Email.ToLower() == UserName.ToLower() && P.Password == Password_).FirstOrDefault<Users>();              
+                if (user != null)
                 {
-                    HttpContext.Current.Session["UserEmail"] = user.FirstOrDefault().Email;
-                    HttpContext.Current.Session["UserName"] = (user.FirstOrDefault().FirstName + " " + user.FirstOrDefault().LastName).ToString();
-                    HttpContext.Current.Session["UserType"] = user[0].UserType;
+                    HttpContext.Current.Session["UserEmail"] = user.Email;
+                    HttpContext.Current.Session["UserName"] = (user.FirstName + " " + user.LastName).ToString();
+                    HttpContext.Current.Session["UserType"] = user.UserType;
                     result = true;
                 }
             }
@@ -202,7 +202,7 @@ namespace MMS.Repository.Managers
         public string ChangetheForpasswordPut(Users arg)
         {
             string Alertmessage = "";
-            Users model = userRepository.Table.Where(x => x.Email.ToLower().Trim().Equals(arg.Email.ToLower().Trim())).FirstOrDefault();
+            Users model = userRepository.Table.Where(x => x.Email.Trim().Equals(arg.Email.Trim())).FirstOrDefault();
             if (model != null)
             {
                 var confirm = userRepository.Table.Where(x => x.Email.ToLower().Trim().Equals(arg.Email.ToLower().Trim())&&x.Password.ToLower().Trim().Equals(arg.Password.ToLower().Trim())).FirstOrDefault();

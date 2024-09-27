@@ -38,6 +38,39 @@
             background-color: #4472C4;
             border-color: #0d6efd;
         }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 33px;
+            height: 16px;
+            background-color: #198754;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+            .switch::after {
+                content: '';
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background-color: white;
+                top: 3px;
+                left: 5px;
+                transition: all 0.3s;
+            }
+
+        .checkbox:checked + .switch::after {
+            left: 18px;
+        }
+
+        .checkbox:checked + .switch {
+            background-color: #dc3545;
+        }
+
+        .checkbox {
+            display: none;
+        }
     </style>
 
 </head>
@@ -133,29 +166,19 @@
                                         @*<td class="veh-1 edit-del-wrap">
                                         <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.indentdetailid')" class="watchlist-delete" title="Delete"><img src="~/Content/assets/images/delete-icon.png" /></a>
                                     </td>*@
+                                    <td style="width: 4%;">
+
                                         @if (item.isactive == true)
                                         {
-                                            <td style="width: 8%; text-align: -webkit-center; ">
-                                                <div class="checkbox-wrapper-3">
-                                                    <input type="checkbox" class="cbx-checkbox" id="cbx-@item.indentdetailid" />
-                                                    <label for="cbx-@item.indentdetailid" class="toggle">
-                                                        <span onclick="Delete('@item.indentdetailid')"></span>
-                                                    </label>
-                                                </div>
-                                            </td>
-
+                                            <input type="checkbox" class="checkbox checkboxb1" id="delete-@item.indentdetailid" data-indent-id="@item.indentdetailid" />
+                                            <label for="delete-@item.indentdetailid" class="switch"></label>
                                         }
                                         else
                                         {
-                                            <td style="width: 8%; text-align: -webkit-center; ">
-                                                <div class="checkbox-wrapper-3">
-                                                    <input type="checkbox" id="cbx-@item.indentdetailid" class="cbx-checkbox" checked />
-                                                    <label for="cbx-@item.indentdetailid" class="toggle">
-                                                        <span onclick="Deletechange('@item.indentdetailid')"></span>
-                                                    </label>
-                                                </div>
-                                            </td>
+                                            <input type="checkbox" class="checkbox checkboxb1" id="delete-@item.indentdetailid" data-indent-id="@item.indentdetailid" checked />
+                                            <label for="delete-@item.indentdetailid" class="switch"></label>
                                         }
+                                    </td>
 
                                     </tr>
                                     startSerialNumber++;
@@ -222,7 +245,12 @@
             $(".report-inner-section").addClass("transection");
             $("#indent").attr('checked', true);
         });
-  $(document).ready(function() {
+        $(document).ready(function () {
+            $("tbody").on("change", ".checkbox", function () {
+                var addressId = $(this).data('indent-id');
+                var isChecked = $(this).is(':checked');
+                performAjaxRequest(addressId, !isChecked);
+            });
     $('#manage_customer_show_no').change(function() {
         var pageSize = parseInt($(this).val());
         window.location.href = "@Url.Action("IndentMaterialMaster", "IndentMaterial")?pageSize=" + pageSize;
@@ -260,15 +288,6 @@
                     $("tbody").empty();
                     var count = 1;
                     $.each(data, function (i, item) {
-                        var deleteCell = `
-                                        <div class="checkbox-wrapper-3">
-                                            <input type="checkbox" class="cbx-checkbox" id="cbx-${item.indentdetailid}" ${item.isactive ? '' : 'checked'} />
-                                            <label for="cbx-${item.indentdetailid}" class="toggle">
-                                                <span onclick="Delete('${item.indentdetailid}')"></span>
-                                            </label>
-                                        </div>
-                                  `;
-
                         $("tbody").append(`
                                         <tr class="font-14">
                                             <td style="width: 5%;">${count}</td>
@@ -278,8 +297,13 @@
                                             <td style="text-align: left;width: 4%;">${item.TaxName}</td>
                                             <td style="text-align: right;width: 5%;">${item.Price}</td>
                                             <td style="text-align: right;width: 4%;">${item.IndentNumber}</td>
-                                            <td td style="width: 8%; text-align: -webkit-center; ">${deleteCell}</td>
-                                        </tr>
+               <td class="veh-4" style="width:4%;">
+<span class="table_icons" style="padding: 7px 9px;">
+    <img src="/Content/Images/editpng.png" onclick="Edit('${item.indentdetailid}')" style="width: 34px; height: 31px; margin-top: -10px;" />
+</span>
+<input type="checkbox" class="checkbox" id="delete-${item.indentdetailid}" data-indent-id="${item.indentdetailid}" ${item.isactive ? '' : 'checked'} />
+<label for="delete-${item.indentdetailid}" class="switch"></label>
+               </td>                                        </tr>
                                     `);
                         count++;
                     });
@@ -290,33 +314,24 @@
             });
         });
 
+ function performAjaxRequest(addressId, isChecked) {
+   $.ajax({
+       type: 'POST',
+       url: '@Url.Action("IndentDelete", "IndentMaterial")',
+       data: { indentcartid: addressId, IsChecked: isChecked },
+       success: function (data) {
+           if (data === "Success") {
+           } else {
+               alert('Indent Details deletion failed.');
+           }
+       },
+       error: function () {
+           alert('Error occurred during the delete operation.');
+       }
+   });
+}
 
-        function Delete(arg) {
-            $.ajax({
-                type: 'GET',
-                url: '/IndentMaterial/IndentDelete',
-                data: { IndentCartId: arg },
-                success: function (data) {
-                    location.reload();
-                },
-                error: function (ex) {
-                    alert('This product Already Exist in the database.');
-                }
-            });
-        }
-        function Deletechange(arg) {
-            $.ajax({
-                type: 'GET',
-                url: '/IndentMaterial/IndentDeletechange',
-                data: { IndentCartId: arg },
-                success: function (data) {
-                    location.reload();
-                },
-                error: function (ex) {
-                    alert('This product Already Exist in the database.');
-                }
-            });
-        }
+
 
     </script>
 

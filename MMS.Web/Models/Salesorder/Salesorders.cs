@@ -25,12 +25,26 @@ namespace MMS.Web.Models
         public int SalesorderId_HD { get; set; }
         public int BuyerName { get; set; }
         public string BuyerNames { get; set; }
+        public string BuyerAddress { get; set; }
+        public string vatnum { get; set; }
+        public string accountno { get; set; }
+        public string accountname { get; set; }
+        public string branch { get; set; }
+        public string contact { get; set; }
+        public string email { get; set; }
+        public string regnum { get; set; }
+        public string teli { get; set; }
         public int materialname { get; set; }
         public int MaterialCategoryMasterId { get; set; }
         public string ProductCode { get; set; }
         public string ProductName { get; set; }
         public string shippingadd { get; set; }
+        public string shippingcode { get; set; }
+        public string SwiftCode { get; set; }
+        public string PhysicalCode { get; set; }
+
         public string Billingadd { get; set; }
+        public string Billingcode { get; set; }
         public int ProductID { get; set; }
         public string productype { get; set; }
         public string Bomno { get; set; }
@@ -61,6 +75,7 @@ namespace MMS.Web.Models
         public string Uomname { get; set; }
         public int item { get; set; }
         public DateTime quotedate { get; set; }
+        public DateTime? fullfilldate { get; set; }
         public DateTime salesorderdate { get; set; }
         public int custaddcode { get; set; }
         public int custshipcode { get; set; }
@@ -74,7 +89,7 @@ namespace MMS.Web.Models
         public DateTime? ProductionDueDate { get; set; }
         public decimal? ProductionQty { get; set; }
         public string Status { get; set; }
-        public DateTime createddate { get; set; }
+        public DateTime? createddate { get; set; }
         public UomMaster UomMaster { get; set; }
         public TaxTypeMaster TaxTypeMaster { get; set; }
         public product product { get; set; }
@@ -83,6 +98,7 @@ namespace MMS.Web.Models
         public decimal ConversionValue { get; set; } = 0;
         public string currencyOption { get; set; }
         public List<ParentBillofMaterial>  bOMMaterialListModels { get; set; }
+        public List<Salesorder_Grid> Salesorder_Gridlist { get; set; }
         public List<mrp_material_list> mrp_Material_Lists { get; set; }
         public List<mrp_subassembly_list> mrp_subassembly_Lists { get; set; }
         public List<SalesorderCart> salesorderList { get; set; }

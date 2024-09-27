@@ -33,7 +33,7 @@ namespace MMS.Web.Controllers
             return View(model);
         }
         [HttpGet]
-        public ActionResult AddressDetailsGrid(int page = 1, int pageSize = 15)
+        public ActionResult AddressDetailsGrid(int page = 1, int pageSize = 8)
         {
             CustAddressMangers custAddressMangers = new CustAddressMangers();
             Addressdetails model = new Addressdetails();

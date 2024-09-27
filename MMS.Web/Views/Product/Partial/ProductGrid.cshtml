@@ -17,12 +17,14 @@
         input[type=text] {
             padding: 12px;
             font-size: 17px;
-/*            border: 1px solid grey;
-*/            width: 80%;
+            /*            border: 1px solid grey;
+        */ width: 80%;
         }
+
         .sub_merchant_head, .manage_customers_head {
             margin-bottom: 0px;
         }
+
         .customer_manage_search_container {
             margin-top: -6px;
             margin-left: 10px;
@@ -30,6 +32,7 @@
             position: relative;
             width: 360px;
         }
+
         .buttonone {
             float: right;
             width: 20%;
@@ -71,7 +74,41 @@
 
             #Addproducts:hover {
                 background: linear-gradient(to top, #4472c4 0%, #0d6efd 100%);
+               
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 33px;
+            height: 16px;
+            background-color: #198754;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+            .switch::after {
+                content: '';
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background-color: white;
+                top: 3px;
+                left: 5px;
+                transition: all 0.3s;
             }
+
+        .checkbox:checked + .switch::after {
+            left: 18px;
+        }
+
+        .checkbox:checked + .switch {
+            background-color: #dc3545;
+        }
+
+        .checkbox {
+            display: none;
+        }
     </style>
 
 </head>
@@ -175,11 +212,25 @@
                                         {
                                             <td>-</td>
                                         }
-                                        <td class="veh-1 edit-del-wrap">
-                                            <a href="javascript:void(0)" onclick="Edit('@item.ProductId')" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
-                                            <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.ProductId')" class="watchlist-delete" title="Delete"><img src="~/Content/assets/images/delete-icon.png" /></a>
+                                        @*<td class="veh-1 edit-del-wrap">
+                                                <a href="javascript:void(0)" onclick="Edit('@item.ProductId')" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
+                                                <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.ProductId')" class="watchlist-delete" title="Delete"><img src="~/Content/assets/images/delete-icon.png" /></a>
+                                            </td>*@
+                                        <td class="veh-4">
+                                            <span class="table_icons">
+                                                <img src="~/Content/Images/editpng.png" onclick="Edit('@item.ProductId') " style="width: 24px; height: 24px; margin-top: -10px; " />
+                                            </span>
+                                            @if (item.IsActive == true)
+                                            {
+                                                <input type="checkbox" class="checkbox checkboxb1" id="delete-@item.ProductId" data-product-id="@item.ProductId" />
+                                                <label for="delete-@item.ProductId" class="switch"></label>
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" class="checkbox checkboxb1" id="delete-@item.ProductId" data-product-id="@item.ProductId" checked />
+                                                <label for="delete-@item.ProductId" class="switch"></label>
+                                            }
                                         </td>
-
 
                                     </tr>
                                     startSerialNumber++;
@@ -263,7 +314,12 @@
     </script>
 
     <script>
-  $(document).ready(function() {
+        $(document).ready(function () {
+            $("tbody").on("change", ".checkbox", function () {
+                var addressId = $(this).data('product-id');
+                var isChecked = $(this).is(':checked');
+                performAjaxRequest(addressId, !isChecked);
+            });
     $('#manage_customer_show_no').change(function() {
         var pageSize = parseInt($(this).val());
         window.location.href = "@Url.Action("Productmaster", "Product")?pageSize=" + pageSize;
@@ -331,33 +387,53 @@
             });
         }
 
-        function Delete(arg) {
-            var answer = confirm("Are you sure want to delete?");
-            if (answer) {
-                $.ajax({
-                    type: 'GET',
-                    url: '/Product/ProductDelete',
-                    data: { productid: arg },
-                    success: function (data) {
-                        if (data == "Success") {
-                            alert('Product Deleted Successfully.');
-                            location.reload();
-                            return false;
-                        }
-                        else {
-                            alert('Product deletion failed.');
-                        }
 
-                    },
-                    error: function (ex) {
-                        alert('This product Already Exist in the database.');
-                    }
-                });
-            }
-            else {
-                return false;
-            }
-        }
+
+        function performAjaxRequest(addressId, isChecked) {
+   $.ajax({
+       type: 'POST',
+       url: '@Url.Action("ProductDelete", "Product")',
+       data: { productid: addressId, IsChecked: isChecked },
+       success: function (data) {
+           if (data === "Success") {
+           } else {
+               alert('Product Details deletion failed.');
+           }
+       },
+       error: function () {
+           alert('Error occurred during the delete operation.');
+       }
+   });
+}
+
+
+        //function Delete(arg) {
+        //    var answer = confirm("Are you sure want to delete?");
+        //    if (answer) {
+        //        $.ajax({
+        //            type: 'GET',
+        //            url: '/Product/ProductDelete',
+        //            data: { productid: arg },
+        //            success: function (data) {
+        //                if (data == "Success") {
+        //                    alert('Product Deleted Successfully.');
+        //                    location.reload();
+        //                    return false;
+        //                }
+        //                else {
+        //                    alert('Product deletion failed.');
+        //                }
+
+        //            },
+        //            error: function (ex) {
+        //                alert('This product Already Exist in the database.');
+        //            }
+        //        });
+        //    }
+        //    else {
+        //        return false;
+        //    }
+        //}
 
         $("#customer_manage_search").keyup(function () {
             var productsearch = $("#customer_manage_search").val();
@@ -377,25 +453,24 @@
                             var data = "-"
                         }
                         $("tbody").append(`
-                                        <tr class="font-14">
-                                            <td>${count}</td>
-                                            <td style="text-align:left">${item.CategoryName}</td>
-                                            <td style="text-align:left">${item.ProductCode}</td>
-                                            <td style="text-align:left">${item.ProductName}</td>
-                                            <td style="text-align:right">${item.taxname}</td>
-                                            <td style="text-align:left">${item.uom}</td>
-                                            <td style="text-align:right">${item.Price}</td>
-                                            <td style="text-align:left">${data}</td>
-                                            <td class="veh-1 edit-del-wrap">
-                                                <a href="javascript:void(0)" onclick="Edit('${item.ProductId}')" class="watchlist-edit" title="Edit">
-                                                    <img src="/Content/assets/images/edit-icon.png" />
-                                                </a>
-                                                <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('${item.ProductId}')" class="watchlist-delete" title="Delete">
-                                                    <img src="/Content/assets/images/delete-icon.png" />
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    `);
+                                                <tr class="font-14">
+                                                    <td>${count}</td>
+                                                    <td style="text-align:left">${item.CategoryName}</td>
+                                                    <td style="text-align:left">${item.ProductCode}</td>
+                                                    <td style="text-align:left">${item.ProductName}</td>
+                                                    <td style="text-align:right">${item.taxname}</td>
+                                                    <td style="text-align:left">${item.uom}</td>
+                                                    <td style="text-align:right">${item.Price}</td>
+                                                    <td style="text-align:left">${data}</td>
+                                                    <td class="veh-1 edit-del-wrap">
+                                                     <span class="table_icons" style="padding: 7px 9px;">
+                                                           <img src="/Content/Images/editpng.png" onclick="Edit('${item.ProductId}')" style="width: 34px; height: 31px; margin-top: -10px;" />
+                                                              </span>
+                                                          <input type="checkbox" class="checkbox" id="delete-${item.ProductId}" data-product-id="${item.ProductId}" ${item.IsActive ? '' : 'checked'} />
+                                                        <label for="delete-${item.ProductId}" class="switch"></label>
+                                                    </td>
+                                                </tr>
+                                            `);
                         count++;
                     });
                 },

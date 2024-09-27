@@ -12,10 +12,7 @@ namespace MMS.Data.StoredProcedureModel
     public class Buyeraddress
     {
         public int addresshd_id { get; set; } 
-        public int buyermasterid { get; set; } 
-
-        public string ContactName { get; set; }
-
+        public int? buyermasterid { get; set; } 
         public string Email { get; set; }
 
         public string Phone { get; set; }
@@ -25,6 +22,7 @@ namespace MMS.Data.StoredProcedureModel
         public bool IsActive { get; set; }
 
         public string CustomerName { get; set; }
+        public string contactname { get; set; }
 
         public string BuyerCode { get; set; }
 

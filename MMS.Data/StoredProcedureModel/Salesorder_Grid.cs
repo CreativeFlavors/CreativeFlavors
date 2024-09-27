@@ -51,7 +51,12 @@ namespace MMS.Data.StoredProcedureModel
         [Column("productid")]
         public int productid { get; set; }
         [Column("bomno")]
-        public string bomno { get; set; }
+        public string bomno { get; set; }     
+        [Column("billingadd")]
+        public string billingadd { get; set; }    
+        [Column("shippingadd")]
+        public string shippingadd { get; set; }
+
 
     }
 }

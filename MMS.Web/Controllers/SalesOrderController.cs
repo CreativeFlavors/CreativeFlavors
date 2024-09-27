@@ -24,6 +24,12 @@ using MMS.Repository.ViewModel;
 using MMS.Repository.Service;
 using iText.IO.Image;
 using iText.Layout.Borders;
+using MMS.Web.Models.BuyerMaserModel;
+using iTextSharp.text.html.simpleparser;
+using System.Text;
+using iText.Html2pdf;
+using Antlr.Runtime.Tree;
+using MMS.Data.StoredProcedureModel;
 namespace MMS.Web.Controllers
 {
     public class SalesOrderController : Controller
@@ -33,42 +39,22 @@ namespace MMS.Web.Controllers
 
         public ActionResult SalesOrderMaster()
         {
-            SalesorderManager salesorderManager = new SalesorderManager();
-            //var bOMMaterial = salesorderManager.Putstatus();
             return View();
         }
         [HttpGet]
         public ActionResult SalesOrderGrid(int page = 1, int pageSize = 15)
         {
             SalesorderDT_Manager salesorderManager = new SalesorderDT_Manager();
-            List<Salesorders> totaldata = new List<Salesorders>();
-
+            SalesorderHD_Manager SalesorderHD_Manager = new SalesorderHD_Manager();
+            Salesorders model = new Salesorders();
             var totallist = salesorderManager.salesorder_Grid();
-            foreach (var i in totallist)
-            {
-                Salesorders salesorder = new Salesorders();
-                salesorder.SalesorderId = i.salesorderid;
-                salesorder.salesorderdate = i.salesorderdate;
-                salesorder.SalesorderId_DT = i.salesorderid_dt;
-                salesorder.SalesorderId_HD = i.salesorderid_hd;
-                salesorder.quantity = i.quantity;
-                salesorder.discountvalue = i.discount_value;
-                salesorder.Subtotal = i.subtotal;
-                salesorder.TaxValue = i.taxvalue;
-                salesorder.Grandtotal = i.totalprice;
-                salesorder.Uomname = i.long_unit_name;
-                salesorder.BuyerNames = i.buyer_full_name;
-                salesorder.ProductName = i.productname;
-                salesorder.ProductCode = i.productcode;
-                totaldata.Add(salesorder);
-            }
-            var totalCount = totaldata.Count();
+            var totalCount = totallist.Count();
 
             int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
             int startIndex = (page - 1) * pageSize;
             int endIndex = Math.Min(startIndex + pageSize - 1, totalCount - 1);
-            totaldata = totaldata.OrderByDescending(s => s.SalesorderId_DT)
+            totallist = totallist.OrderByDescending(s => s.salesorderid_dt)
                          .Skip(startIndex)
                          .Take(pageSize)
                          .ToList();
@@ -76,21 +62,15 @@ namespace MMS.Web.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
 
-            return PartialView("partial/SalesOrderDetailsGrid", totaldata);
-        }
-        [HttpGet]
-        public ActionResult salesorderheader(int page = 1, int pageSize = 15)
-        {
-            SalesorderHD_Manager salesorderManager = new SalesorderHD_Manager();
-            SalesorderDT_Manager SalesorderDT_Manager = new SalesorderDT_Manager();
             BuyerMasterManager BuyerManager = new BuyerMasterManager();
             var data1 = BuyerManager.Get();
-            List<Salesorders> totalList = new List<Salesorders>();
-            var data = salesorderManager.Get();
+            List<Salesorders> totalListheader = new List<Salesorders>();
+            var data = SalesorderHD_Manager.Get();
+
             foreach (var i in data)
             {
-                Salesorders model = new Salesorders();
-                var salesorderdt = SalesorderDT_Manager.GetSOIdS(i.salesorderid_hd);
+                Salesorders models = new Salesorders();
+                var salesorderdt = salesorderManager.GetSOIdS(i.salesorderid_hd);
                 var counts = 0;
                 decimal? dc_qty = 0;
                 decimal? Invoice_qty = 0;
@@ -106,36 +86,129 @@ namespace MMS.Web.Controllers
                         Invoice_qty += k.Invoice_qty;
                     }
                 }
-                model.dc_qty = dc_qty;
-                model.itemdc = counts;
-                model.invoice_qty = Invoice_qty;
-                model.SalesorderId_HD = i.salesorderid_hd;
-                model.salesorderdate = i.Salesorderdate;
-                model.item = i.items;
-                model.quantity = i.quantity;
-                model.Total_Price = i.Total_price;
-                model.Total_discountval = i.Total_disamount;
-                model.Total_Grandtotal = i.grand_total;
-                model.Total_Subtotal = i.Total_subtotal;
-                model.Total_TaxValue = i.Total_taxamount;
-                model.BuyerMaster = data1.Where(W => W.BuyerMasterId == i.customerid).ToList().FirstOrDefault();
-                totalList.Add(model);
+                models.dc_qty = dc_qty;
+                models.itemdc = counts;
+                models.invoice_qty = Invoice_qty;
+                models.SalesorderId_HD = i.salesorderid_hd;
+                models.salesorderdate = i.Salesorderdate;
+                models.item = i.items;
+                models.quantity = i.quantity;
+                models.Status = i.Status;
+                models.fullfilldate = i.fullfilldate;
+                models.Total_Price = i.Total_price;
+                models.Total_discountval = i.Total_disamount;
+                models.Total_Grandtotal = i.grand_total;
+                models.Total_Subtotal = i.Total_subtotal;
+                models.Total_TaxValue = i.Total_taxamount;
+                models.BuyerMaster = data1.Where(W => W.BuyerMasterId == i.customerid).ToList().FirstOrDefault();
+                totalListheader.Add(models);
             }
-            var totalCount = totalList.Count();
+            var totalCountsummary = totalListheader.Count();
+
+            int totalPagessummary = (int)Math.Ceiling((double)totalCountsummary / pageSize);
+
+            int startIndexsummary = (page - 1) * pageSize;
+            int endIndexsummary = Math.Min(startIndexsummary + totalPagessummary - 1, totalCountsummary - 1);
+            totalListheader = totalListheader.OrderByDescending(s => s.SalesorderId_HD)
+                         .Skip(startIndexsummary)
+                         .Take(pageSize)
+                         .ToList();
+            ViewBag.TotalPagessummary = totalPagessummary;
+            ViewBag.CurrentPagesummary = page;
+            ViewBag.PageSizesummary = pageSize;
+
+
+            model.Salesorder_Gridlist = totallist;
+            model.salesorderLists= totalListheader;
+            return PartialView("~/Views/SalesOrder/partial/SalesorderGrid.cshtml", model);
+        }
+        [HttpGet]
+        public ActionResult salesorderheader(int page = 1, int pageSize = 15)
+        {
+            Salesorders model = new Salesorders();
+            SalesorderDT_Manager salesorderManager = new SalesorderDT_Manager();
+            SalesorderHD_Manager SalesorderHD_Manager = new SalesorderHD_Manager();
+            BuyerMasterManager BuyerManager = new BuyerMasterManager();
+            var data1 = BuyerManager.Get();
+            List<Salesorders> totalListheader = new List<Salesorders>();
+            var data = SalesorderHD_Manager.Get();
+
+            foreach (var i in data)
+            {
+                Salesorders models = new Salesorders();
+                var salesorderdt = salesorderManager.GetSOIdS(i.salesorderid_hd);
+                var counts = 0;
+                decimal? dc_qty = 0;
+                decimal? Invoice_qty = 0;
+                foreach (var k in salesorderdt)
+                {
+                    if (k.dc_qty != null)
+                    {
+                        counts++;
+                        dc_qty += k.dc_qty;
+                    }
+                    if (k.Invoice_qty != null)
+                    {
+                        Invoice_qty += k.Invoice_qty;
+                    }
+                }
+                models.dc_qty = dc_qty;
+                models.itemdc = counts;
+                models.invoice_qty = Invoice_qty;
+                models.SalesorderId_HD = i.salesorderid_hd;
+                models.salesorderdate = i.Salesorderdate;
+                models.item = i.items;
+                models.Status = i.Status;
+                models.fullfilldate = i.fullfilldate;
+                models.quantity = i.quantity;
+                models.Total_Price = i.Total_price;
+                models.Total_discountval = i.Total_disamount;
+                models.Total_Grandtotal = i.grand_total;
+                models.Total_Subtotal = i.Total_subtotal;
+                models.Total_TaxValue = i.Total_taxamount;
+                models.BuyerMaster = data1.Where(W => W.BuyerMasterId == i.customerid).ToList().FirstOrDefault();
+                totalListheader.Add(models);
+            }
+            var totalCountsummary = totalListheader.Count();
+
+            int totalPagessummary = (int)Math.Ceiling((double)totalCountsummary / pageSize);
+
+            int startIndexsummary = (page - 1) * pageSize;
+            int endIndexsummary = Math.Min(startIndexsummary + totalPagessummary - 1, totalCountsummary - 1);
+            totalListheader = totalListheader.OrderByDescending(s => s.SalesorderId_HD)
+                         .Skip(startIndexsummary)
+                         .Take(pageSize)
+                         .ToList();
+            ViewBag.TotalPagessummary = totalPagessummary;
+            ViewBag.CurrentPagesummary = page;
+            ViewBag.PageSizesummary = pageSize;
+            model.salesorderLists = totalListheader;
+
+            return PartialView("~/Views/SalesOrder/partial/SalesorderHeaderGrid.cshtml", model);
+        }     
+        [HttpGet]
+        public ActionResult salesorderDetailsgrid(int page = 1, int pageSize = 15)
+        {
+            SalesorderDT_Manager salesorderManager = new SalesorderDT_Manager();
+            SalesorderHD_Manager SalesorderHD_Manager = new SalesorderHD_Manager();
+            Salesorders model = new Salesorders();
+            var totallist = salesorderManager.salesorder_Grid();
+            var totalCount = totallist.Count();
 
             int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
             int startIndex = (page - 1) * pageSize;
             int endIndex = Math.Min(startIndex + pageSize - 1, totalCount - 1);
-            totalList = totalList.OrderByDescending(s => s.SalesorderId_HD)
+            totallist = totallist.OrderByDescending(s => s.salesorderid_dt)
                          .Skip(startIndex)
                          .Take(pageSize)
                          .ToList();
             ViewBag.TotalPages = totalPages;
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
+            model.Salesorder_Gridlist = totallist;
 
-            return PartialView("partial/SalesOrderHeaderGrid", totalList);
+            return PartialView("~/Views/SalesOrder/partial/SalesOrderDetailsGrid.cshtml", model);
         }
         [HttpGet]
         public ActionResult SalesOrderDetails()
@@ -890,10 +963,10 @@ namespace MMS.Web.Controllers
                 salesorder.ProductCode = i.productcode;
                 totaldata.Add(salesorder);
             }
-
-            return Json(totaldata, JsonRequestBehavior.AllowGet);
+            var salesorderdetails = totaldata.OrderByDescending(m => m.SalesorderId_DT);
+            return Json(salesorderdetails, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult search(int? customerid, int? SOid)
+        public ActionResult search(Salesorders models)
         {
             SalesorderHD_Manager salesorderManager = new SalesorderHD_Manager();
             SalesorderDT_Manager salesorderDT_manager = new SalesorderDT_Manager();
@@ -925,6 +998,8 @@ namespace MMS.Web.Controllers
                 model.SalesorderId = i.salesorderid_hd;
                 model.salesorderdate = i.Salesorderdate;
                 model.item = i.items;
+                model.Status = i.Status;
+                model.fullfilldate = i.fullfilldate;
                 model.quantity = i.quantity;
                 model.Total_Price = i.Total_price;
                 model.buyerid = i.customerid;
@@ -935,10 +1010,73 @@ namespace MMS.Web.Controllers
                 model.BuyerMaster = data1.Where(W => W.BuyerMasterId == i.customerid).ToList().FirstOrDefault();
                 totalList.Add(model);
             }
-            var filteredList = (customerid == null || SOid == null)
-              ? totalList
-              : totalList.Where(J => J.buyerid == customerid && J.SalesorderId == SOid);
-            return Json(filteredList, JsonRequestBehavior.AllowGet);
+            if (models.BuyerName != 0)
+            {
+                if (models.createddate != null && models.fullfilldate != null)
+                {
+                    var indentpomappingsps = totalList
+.Where(x =>
+    x.SalesorderId.ToString().ToLower().Contains(models.salesorderno.ToString().ToLower()) &&
+    x.buyerid == models.BuyerName &&
+    x.createddate.HasValue && models.createddate.HasValue &&
+    x.createddate.Value.Date == models.createddate.Value.Date &&
+    x.fullfilldate.HasValue && models.fullfilldate.HasValue &&
+    x.fullfilldate.Value.Date == models.fullfilldate.Value.Date &&
+    x.Status == models.Status)
+
+    .ToList();
+
+                    return Json(indentpomappingsps, JsonRequestBehavior.AllowGet);
+                }
+                else if (models .createddate == null && models.fullfilldate == null)
+                {
+                    if (models.createddate == null && models.fullfilldate == null && models.salesorderno == 0)
+                    {
+                        var indentpomappingsps = totalList
+.Where(x =>
+x.buyerid == models.BuyerName &&
+x.Status == models.Status)
+.ToList();
+                        return Json(indentpomappingsps, JsonRequestBehavior.AllowGet);
+                    }
+                    else if (models.createddate == null && models.fullfilldate == null && models.Status == null)
+                    {
+                        var indentpomappingsps = totalList
+.Where(x =>
+x.SalesorderId.ToString().ToLower().Contains(models.salesorderno.ToString().ToLower()) &&
+x.buyerid == models.BuyerName)
+.ToList();
+
+                        return Json(indentpomappingsps, JsonRequestBehavior.AllowGet);
+                    }
+                    else
+                    {
+                        var indentpomappingsps = totalList
+.Where(x =>
+x.SalesorderId.ToString().ToLower().Contains(models.salesorderno.ToString().ToLower()) &&
+x.buyerid == models.BuyerName &&
+x.Status == models.Status)
+.ToList();
+
+                        return Json(indentpomappingsps, JsonRequestBehavior.AllowGet);
+                    }
+                }
+                else
+                {
+                    var indentpomappingsps = totalList
+.Where(x =>
+x.SalesorderId.ToString().ToLower().Contains(models.salesorderno.ToString().ToLower()) &&
+x.buyerid == models.BuyerName &&
+    x.createddate.HasValue && models.createddate.HasValue &&
+    x.createddate.Value.Date == models.createddate.Value.Date &&
+x.Status == models.Status)
+.ToList();
+                    return Json(indentpomappingsps, JsonRequestBehavior.AllowGet);
+                }
+
+            }
+            return Json(totalList, JsonRequestBehavior.AllowGet);
+
         }
         [HttpGet]
         public ActionResult Alreadychoosenproduct(int Buyerid, int productName,int Salesorder)
@@ -990,168 +1128,237 @@ namespace MMS.Web.Controllers
             }
             return Json(address1, JsonRequestBehavior.AllowGet);
         }
+        [HttpGet]
         public ActionResult Getbuyerorderno(int id)
         {
             SalesorderHD_Manager SalesorderHD_Manager = new SalesorderHD_Manager();
             var data = SalesorderHD_Manager.GettypeId(id);
             return Json(data, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult buyernamesearch(string filter)
+        #endregion
+        #region PDF Download
+        private string InsertLineBreaks(string text, int wordsPerLine)
         {
-            List<BuyerMaster1> buyerMasters = new List<BuyerMaster1>();
-            BuyerMasterManager buyerManager = new BuyerMasterManager();
-            var data = buyerManager.Get();
-            buyerMasters = data.Where(x => x.CustomerName.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
-            var Addressdetailslist = buyerMasters;
-            return Json(Addressdetailslist, JsonRequestBehavior.AllowGet);
+            var words = text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var sb = new StringBuilder();
+
+            for (int i = 0; i < words.Length; i++)
+            {
+                if (i > 0 && i % wordsPerLine == 0)
+                {
+                    sb.Append("<br/>"); // Insert a line break
+                }
+                sb.Append(words[i] + " ");
+            }
+
+            return sb.ToString().Trim(); // Trim to remove the last space
         }
 
-        #endregion
-        #region pdf 
-        //download pdf
         public byte[] GeneratePDF(Salesorders salesordersinvoice)
-        {          
+        {
+            var htmlContent = new StringBuilder();
+            string imageURL = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content/assets/images/creative.png");
 
-            using (MemoryStream stream = new MemoryStream())
+
+            htmlContent.Append("<html><head>");
+            htmlContent.Append("<style>");
+            htmlContent.Append("body { font-family: Arial, sans-serif; margin: 0; padding: 0; height: 100%; }");
+            htmlContent.Append(".main-page h1, h3 { margin: 0; }");
+            htmlContent.Append("table { width: 100%; border-collapse: collapse; margin: 10px 0; }");
+            htmlContent.Append("th, td { padding: 5px; border: 1px solid black; text-align: left; font-size: 12px; border-bottom: 1px solid #fff;}");
+            htmlContent.Append(".bottom1 { border-top: 1px solid black; padding: 8px; }");
+            htmlContent.Append(".border2 { border-right: 1px solid black;border-bottom: 1px solid #fff; }");
+            htmlContent.Append(".inner-section { padding: 10px; background: #FFFFFF; border-radius: 5px; }");
+            htmlContent.Append("#rightline { border-left: 1px solid #fff;border-right: 1px solid #fff;border-top: 1px solid #fff; }");
+
+            htmlContent.Append(".edit-section { overflow: auto; }");
+            htmlContent.Append(".image-container { text-align: left; }");
+            htmlContent.Append(".image-container img { max-width: 200px; margin-left: 50px; }");
+            htmlContent.Append("@media print { @page { size: A4; margin: 10mm; } }");
+            htmlContent.Append("</style>");
+            htmlContent.Append("</head><body>");
+            htmlContent.Append("<div class='page'>");
+            htmlContent.Append("<div class='content'>");
+            htmlContent.Append("<div class='main-page'>");
+            htmlContent.Append("<section class='inner-section'>");
+            htmlContent.Append("<div class='edit-section'>");
+            htmlContent.Append("<div style='display: flex; justify-content: space-between;'>");
+            htmlContent.Append("<div>");
+            htmlContent.Append("<table style='width: 100%; border-radius: 10px; border: 1px solid black; border-bottom-width: thick; margin-top: 38px;'>");
+            htmlContent.Append("<tr><th>Document Number</th><th style='text-align: center;'>Date</th></tr>");
+            htmlContent.Append("<tr><td style='text-align: center;'>").Append(salesordersinvoice.SalesorderId_HD).Append("</td>");
+            htmlContent.Append("<td>").Append(salesordersinvoice.salesorderdate.ToString("yyyy-MM-dd")).Append("</td></tr>");
+            htmlContent.Append("</table>");
+            htmlContent.Append("<h3>Sales Order</h3>");
+            htmlContent.Append("</div>");
+            htmlContent.Append("<div>");
+            htmlContent.Append("<h3><u style='margin-left: 100px;'>Creative Flavors International (PTY) Ltd</u></h3>");
+            htmlContent.Append("<div style='display: flex; justify-content: space-evenly;'>");
+            htmlContent.Append("<div>");
+            htmlContent.Append("<header>");
+            htmlContent.Append("<div class='clearfix' style='margin-left: 120px; margin-top: 10px;'>");
+            htmlContent.Append("<div style='font-size: 13px;'>").Append(InsertLineBreaks(salesordersinvoice.BuyerAddress, 2)).Append("</div>");
+            htmlContent.Append("<div style='font-size: 13px;'>").Append(salesordersinvoice.PhysicalCode).Append("</div>");
+            htmlContent.Append("</header>");
+            htmlContent.Append("</div>");
+            htmlContent.Append("<div>");
+            htmlContent.Append("<header>");
+            htmlContent.Append("<div class='clearfix' style='margin-left: 40px; margin-top: 10px;'>");
+            htmlContent.Append("<div style='font-size: 13px;'><b>Tel:</b> ").Append(salesordersinvoice.teli).Append("</div>");   
+            htmlContent.Append("<div style='font-size: 13px;'><b>Reg No:</b> ").Append(salesordersinvoice.regnum).Append("</div>");
+            htmlContent.Append("<div style='font-size: 13px;'><b>Vat No:</b> ").Append(salesordersinvoice.vatnum).Append("</div>");
+            htmlContent.Append("</header>");
+            htmlContent.Append("</div>");
+            htmlContent.Append("</div>");
+            htmlContent.Append("</div>");
+            htmlContent.Append($"<div class='image-container'><img src='file:///{imageURL}' alt='Creative Image' style='float: right;' /></div>");
+            htmlContent.Append("</div>");
+            htmlContent.Append("<table style='margin-top: 40px';    padding: 17px; >");
+            htmlContent.Append("<tr><th style='text-align:left;border-right: 1px solid #fff;'>BUYER NAME:</th><th style='text-align:left;border-right: 1px solid #fff;'> ").Append(salesordersinvoice.BuyerNames).Append("</th><th style='text-align:left;border-right: 1px solid #fff;'>Billing Address:</th><th style='text-align:left'>Shipping Address:</th></tr>");
+            htmlContent.Append("<tr><th style='text-align:left;border-right: 1px solid #fff;'>ACCOUNT NO:</th><td style='text-align:left;border-right: 1px solid #fff;'> ").Append(salesordersinvoice.accountno).Append("</td><td style='text-align:left;border-right: 1px solid #fff;'>").Append(InsertLineBreaks(salesordersinvoice.Billingadd, 4)).Append("</td><td style='text-align:left;'>").Append(InsertLineBreaks(salesordersinvoice.shippingadd, 4)).Append("</td></tr>");
+            htmlContent.Append("<tr><th style='text-align:left;border-right: 1px solid #fff;'>CONTACT:</th><td style='text-align:left;border-right: 1px solid #fff;'> ").Append(salesordersinvoice.contact).Append("</td><td style='text-align:left;border-right: 1px solid #fff;'></td><td style='text-align:left;'></td></tr>");
+            htmlContent.Append("<tr><th style='text-align:left;border-right: 1px solid #fff;'>TELEPHONE:</th><td style='text-align:left;border-right: 1px solid #fff;'> ").Append(salesordersinvoice.teli).Append("</td><td style='text-align:left;border-right: 1px solid #fff;'></td><td style='text-align:left;'></td></tr>");
+            htmlContent.Append("<tr><th style='text-align:left;border-bottom: 1px solid black;border-right: 1px solid #fff;'>E-MAIL:</th><td style='text-align:left;border-bottom: 1px solid black;border-right: 1px solid #fff;'> ").Append(salesordersinvoice.email).Append("</td><td style='text-align:left;border-bottom: 1px solid black;border-right: 1px solid #fff;'id='rightline'><b>CODE : </b>").Append(salesordersinvoice.Billingcode).Append("</td><td style='text-align:left;border-bottom: 1px solid black;border-top: 1px solid #fff;'><b>CODE : </b> ").Append(salesordersinvoice.shippingcode).Append("</td></tr>");
+            htmlContent.Append("<tr class='bottom1'><td style='border-bottom: 1px solid black;border-right: 1px solid #fff;'></td><td style='border-bottom: 1px solid black;border-right: 1px solid #fff;'><b>Currency:</b>  ").Append(salesordersinvoice.currencyOption).Append("</td><td style='border-bottom: 1px solid black;border-right: 1px solid #fff;'><b>ORDER REFERENCE #:</b></td><td style='border-bottom: 1px solid black;'><b>ACCOUNT TERMS:</b> Current</td></tr>");
+            htmlContent.Append("</table>");
+            htmlContent.Append("<div style='height: 200px; overflow: auto;'>");
+            htmlContent.Append("<table >");
+            htmlContent.Append("<thead>");
+            htmlContent.Append("<tr><th id='rightline'>PRODUCT CODE</th><th id='rightline'>PRODUCT NAME</th><th id='rightline'>QUANTITY</th><th id='rightline'>UNIT PRICE</th><th id='rightline'>DISCOUNT</th><th id='rightline'>TAX</th><th id='rightline'>NET PRICE</th></tr>");
+            htmlContent.Append("</thead>");
+            htmlContent.Append("<tbody>");
+            htmlContent.Append("<tr><td id='rightline'> ").Append(salesordersinvoice.ProductCode).Append("</td><td id='rightline'>").Append(salesordersinvoice.ProductName).Append(" wefw</td><td style='text-align: center;' id='rightline'> ").Append(salesordersinvoice.quantity).Append(" kg</td><td id='rightline' style='text-align: center;'> $").Append(salesordersinvoice.Price).Append("</td><td id='rightline' style='text-align: center;'> $").Append(salesordersinvoice.discountvalue).Append("</td><td id='rightline' style='text-align: center;'> $").Append(salesordersinvoice.TaxValue).Append("</td><td id='rightline' style='text-align: center;'> $").Append(salesordersinvoice.Grandtotal).Append("</td></tr>");
+            htmlContent.Append("</tbody>");
+            htmlContent.Append("</table>");
+            htmlContent.Append("</div>");
+            htmlContent.Append("<table>");
+            htmlContent.Append("<tr><th colspan='2' style='text-align:center; border-bottom: 1px solid black;'>ZIP CODE: ").Append(salesordersinvoice.PhysicalCode).Append("</th><th class='border2'>Goods received.</th><th class='border2'>Creative Flavors Control:</th><td>Sub Total : $").Append(salesordersinvoice.Subtotal).Append("</td></tr>");
+            htmlContent.Append("<tr><td class='border2'><b>RSA BANKING DETAILS</b></td><td class='border2'><b>INTERNATIONAL BANKING DETAILS</b></td><td class='border2'>Date : _______________</td><td class='border2'>Name : _______________</td><td class='border2'>Discount : $").Append(salesordersinvoice.discountvalue).Append("</td></tr>");
+            htmlContent.Append("<tr><td class='border2'>").Append(salesordersinvoice.accountname).Append("</td><td class='border2'>").Append(salesordersinvoice.accountname).Append("</td><td class='border2'>Signed : ______________</td><td class='border2'>Signed : ______________</td><td class='border2'>Unit Price : $").Append(salesordersinvoice.Price).Append("</td></tr>");
+            htmlContent.Append("<tr><td class='border2'>Account : ").Append(salesordersinvoice.accountno).Append("</td><td class='border2'>Account :").Append(salesordersinvoice.accountno).Append("</td><td class='border2'>Name : _______________</td><td class='border2'></td><td class='border2'>Tax : $").Append(salesordersinvoice.TaxValue).Append("</td></tr>");
+            htmlContent.Append("<tr><td style='border-bottom: 1px solid #58606d;' class='border2'>Switch Code : ").Append(salesordersinvoice.SwiftCode).Append("</td><td style='border-bottom: 1px solid #58606d;' class='border2'>Switch Code : ").Append(salesordersinvoice.SwiftCode).Append("</td><td style='border-bottom: 1px solid #58606d;' class='border2'></td><td style='border-bottom: 1px solid #58606d;' class='border2'></td><td style='border-bottom: 1px solid #58606d;' class='border2'><b>TOTAL</b> : <b> $").Append(salesordersinvoice.Grandtotal).Append("</b></td></tr>");
+            htmlContent.Append("</table>");
+            htmlContent.Append("</div>");
+            htmlContent.Append("</section>");
+            htmlContent.Append("</div>");
+            htmlContent.Append("</div>");
+            htmlContent.Append("</div>");
+            htmlContent.Append("</body></html>");
+
+
+            using (var memoryStream = new MemoryStream())
             {
-                PdfWriter writer = new PdfWriter(stream);
-                PdfDocument pdf = new PdfDocument(writer);
-                Document document = new Document(pdf);
+                using (var pdfWriter = new PdfWriter(memoryStream))
+                {
+                    // Create a PDF document with custom page size
+                    var pdfDocument = new PdfDocument(pdfWriter);
 
+                    // Define custom page size (e.g., A4 size with increased width)
+                    var pageSize = new iText.Kernel.Geom.PageSize(750, 660); // width, height in points
+                    var document = new Document(pdfDocument, pageSize);
 
-                string imageURL = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content/assets/images/creative.jpg");
+                    using (var htmlStream = new MemoryStream(Encoding.UTF8.GetBytes(htmlContent.ToString())))
+                    {
+                        // Convert HTML to PDF and write to the document
+                        HtmlConverter.ConvertToPdf(htmlStream, pdfDocument);
+                    }
 
-                ImageData data = ImageDataFactory.Create(imageURL);
+                    document.Close();
+                }
 
-                Image image = new Image(data);
-                image.SetWidth(UnitValue.CreatePercentValue(25));
-                image.SetHorizontalAlignment(HorizontalAlignment.RIGHT);
-
-                document.Add(image);
-                Paragraph header = new Paragraph("Creative Flavors International ").SetTextAlignment(TextAlignment.CENTER).SetFontSize(15);
-                header.SetFixedPosition(36, 770, 550);
-                document.Add(header);
-                document.Add(new Paragraph("" +
-              "25 Roma Street\r\nCosmo Business Park\r\nCosmo City")
-
-              .SetTextAlignment(TextAlignment.CENTER)
-              .SetFontSize(10));
-
-
-
-               document.Add(new Paragraph("SALES ORDER:")          
-              .SetTextAlignment(TextAlignment.LEFT)
-              .SetFontSize(20));
-
-
-
-                //// Invoice data
-                document.Add(new Paragraph($"Order Number: {salesordersinvoice.SalesorderId}"));
-                document.Add(new Paragraph($"Salesorder Date: {salesordersinvoice.salesorderdate}"));
-                document.Add(new Paragraph($"Buyer Name: {salesordersinvoice.BuyerNames}"));   
-
-                //// Table for invoice items
-                Table table = new Table(8);
-
-                table.SetWidth(UnitValue.CreatePercentValue(100));
-                table.AddHeaderCell("Product Name ");
-                table.AddHeaderCell("Customer Name");
-                table.AddHeaderCell("Product Code ");
-                table.AddHeaderCell("Qty/UOM ");
-                table.AddHeaderCell("Discount");
-                table.AddHeaderCell("Sub Total ");
-                table.AddHeaderCell("Tax Amount ");
-                table.AddHeaderCell("Total Price ");
-
-                //value for grid
-                table.AddCell(new Cell().Add(new Paragraph(salesordersinvoice.ProductName)));
-                table.AddCell(new Cell().Add(new Paragraph(salesordersinvoice.BuyerNames)));
-                table.AddCell(new Cell().Add(new Paragraph(salesordersinvoice.ProductCode)));
-                table.AddCell(new Cell().Add(new Paragraph(string.Format("{0:0.00}", salesordersinvoice.quantity) + "/" + salesordersinvoice.Uomname)));
-                table.AddCell(new Cell().Add(new Paragraph(string.Format("{0:0.00}", salesordersinvoice.discountvalue))));
-                table.AddCell(new Cell().Add(new Paragraph(string.Format("{0:0.00}", salesordersinvoice.Subtotal))));
-                table.AddCell(new Cell().Add(new Paragraph(string.Format("{0:0.00}", salesordersinvoice.TaxValue))));
-                table.AddCell(new Cell().Add(new Paragraph(string.Format("{0:0.00}", salesordersinvoice.Grandtotal))));
-                
-                //Add the Table to the PDF Document
-                document.Add(table);
-
-                // Close the Document
-                document.Close();
-                return stream.ToArray();
+                // Return the PDF as a byte array
+                return memoryStream.ToArray();
             }
         }
+
+
 
         [HttpGet]
         public ActionResult OrderDetailDownload(int id)
         {
-           
             SalesorderDT_Manager salesorderManager = new SalesorderDT_Manager();
-            List<Salesorders> totaldata = new List<Salesorders>();
+            BuyerMasterManager _buyerMasterManager = new BuyerMasterManager();
+            CurrencyManager Manager = new CurrencyManager();
 
-            var totallist = salesorderManager.salesorder_Grid();
-            foreach (var i in totallist)
-            {
-                Salesorders salesorder = new Salesorders();
-                salesorder.SalesorderId = i.salesorderid;
-                salesorder.salesorderdate = i.salesorderdate;
-                salesorder.SalesorderId_DT = i.salesorderid_dt;
-                salesorder.SalesorderId_HD = i.salesorderid_hd;
-
-                salesorder.quantity = i.quantity;
-                salesorder.discountvalue = i.discount_value;
-                salesorder.Subtotal = i.subtotal;
-                salesorder.TaxValue = i.taxvalue;
-                salesorder.Grandtotal = i.totalprice;
-                salesorder.Uomname = i.long_unit_name;
-                salesorder.BuyerNames = i.buyer_full_name;
-                salesorder.ProductName = i.productname;
-                salesorder.ProductCode = i.productcode;
-                totaldata.Add(salesorder);
-            }
-            var singleInvoice = totallist.Where(x => x.salesorderid == id).FirstOrDefault();
+            var singleInvoice = salesorderManager.salesorder_Grid().FirstOrDefault(x => x.salesorderid_dt == id);
             if (singleInvoice != null)
             {
-                Salesorders singleinvoicesalesorders = new Salesorders();
-                singleinvoicesalesorders.SalesorderId = singleInvoice.salesorderid;
-                singleinvoicesalesorders.salesorderdate = singleInvoice.salesorderdate;
-                singleinvoicesalesorders.SalesorderId_DT = singleInvoice.salesorderid_dt;
-                singleinvoicesalesorders.SalesorderId_HD = singleInvoice.salesorderid_hd;
+                Salesorders salesorders = new Salesorders
+                {
+                    SalesorderId = singleInvoice.salesorderid,
+                    salesorderdate = singleInvoice.salesorderdate,
+                    SalesorderId_DT = singleInvoice.salesorderid_dt,
+                    SalesorderId_HD = singleInvoice.salesorderid_hd,
+                    quantity = singleInvoice.quantity,
+                    discountvalue = singleInvoice.discount_value,
+                    Subtotal = singleInvoice.subtotal,
+                    TaxValue = singleInvoice.taxvalue,
+                    Grandtotal = singleInvoice.totalprice,
+                    Price = singleInvoice.unitprice,
+                    Uomname = singleInvoice.long_unit_name,
+                    BuyerNames = singleInvoice.buyer_full_name,
+                    ProductName = singleInvoice.productname,
+                    ProductCode = singleInvoice.productcode
+                };
 
-                singleinvoicesalesorders.quantity = singleInvoice.quantity;
-                singleinvoicesalesorders.discountvalue = singleInvoice.discount_value;
-                singleinvoicesalesorders.Subtotal = singleInvoice.subtotal;
-                singleinvoicesalesorders.TaxValue = singleInvoice.taxvalue;
-                singleinvoicesalesorders.Grandtotal = singleInvoice.totalprice;
-                singleinvoicesalesorders.Uomname = singleInvoice.long_unit_name;
-                singleinvoicesalesorders.BuyerNames = singleInvoice.buyer_full_name;
-                singleinvoicesalesorders.ProductName = singleInvoice.productname;
-                singleinvoicesalesorders.ProductCode = singleInvoice.productcode;
 
-               
-                //Call the GeneratePDF method passing the Invoice Data
-                var pdfFile = GeneratePDF(singleinvoicesalesorders);
+                var buyermanager = _buyerMasterManager.GetSingleBuyerModel(singleInvoice.Buyerid);
+                if (buyermanager != null)
+                {
+                    CustAddressMangers custAddressMangers = new CustAddressMangers();
+                    var data12 = custAddressMangers.GetCustbuyeridship(buyermanager.BuyerMasterId, int.Parse(singleInvoice.shippingadd));
+                    if (data12 != null)
+                    {
+                        salesorders.shippingadd = data12.address1;
+                        salesorders.shippingcode = data12.ZipCode;
+                    }
+                    var data2 = custAddressMangers.GetCustbuyerid(buyermanager.BuyerMasterId, int.Parse(singleInvoice.billingadd));
+                    if (data2 != null)
+                    {
+                        salesorders.Billingadd = data2.address1;
+                        salesorders.Billingcode = data2.ZipCode;
 
-               Session["File"] = pdfFile;
-              
+                    }
+                    var currency = Manager.Getcurrency().Where(m => m.id == buyermanager.ForeignCurrency).FirstOrDefault();
+                    salesorders.teli = buyermanager.Telephone1;
+                    salesorders.regnum = buyermanager.RegNumber;
+                    salesorders.vatnum = buyermanager.VatNumber;
+                    salesorders.BuyerAddress = buyermanager.Physical1;
+                    salesorders.PhysicalCode = buyermanager.PhysicalCode;
+                    salesorders.accountno = buyermanager.Account;
+                    salesorders.contact = buyermanager.EmailContact;
+                    salesorders.SwiftCode = buyermanager.SwiftCode;
+                    salesorders.email = buyermanager.EmailEmergency;
+                    salesorders.accountname = buyermanager.AccountName;
+                    salesorders.branch = buyermanager.AccountDescription;
+                    salesorders.currencyOption = currency.currencyname;
+                }
+
+                // Generate the PDF
+                var pdfFile = GeneratePDF(salesorders);
+
+                // Store the PDF file in session
+                Session["File"] = pdfFile;
+
                 // Convert the PDF file to a base64 string
                 string pdfBase64 = Convert.ToBase64String(pdfFile);
                 return Json(new { success = true, pdfFile = pdfBase64, fileName = "salesorderInvoice.pdf" }, JsonRequestBehavior.AllowGet);
             }
-            return View();
-
+            return Json(new { success = false, message = "Invoice not found" }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult DownloadInvoice()
         {
-
             // Retrieve the PDF file from the session
             byte[] pdfFile = (byte[])Session["File"];
 
+            if (pdfFile == null)
+            {
+                return HttpNotFound("File not found");
+            }
             // Return the PDF file as a FileContentResult
             return File(pdfFile, "application/pdf", "SalesOrder.pdf");
         }
-
 
         #endregion
     }

@@ -412,7 +412,7 @@ namespace MMS.Repository.Managers
             }
             return oCustAddress;
         }
-        public CustAddress GetCustAddressbuyerid(int buyerid)
+        public CustAddress GetCustAddressbuyerid(int? buyerid)
         {
             CustAddress oCustAddress = new CustAddress();
             if (buyerid != 0)
@@ -421,7 +421,7 @@ namespace MMS.Repository.Managers
             }
             return oCustAddress;
         } 
-        public CustAddress GetCustAddressbuyeridshipp(int buyerid)
+        public CustAddress GetCustAddressbuyeridshipp(int? buyerid)
         {
             CustAddress oCustAddress = new CustAddress();
             if (buyerid != 0)
@@ -436,7 +436,7 @@ namespace MMS.Repository.Managers
             if (buyerid != 0)
             {
                 oCustAddress = Customer_AddressRepository.Table.Where(x => x.Buyerid == buyerid && x.Addresshd_id == addhd && x.addresstypeid == 3 ).FirstOrDefault();
-            }
+                }
             return oCustAddress;
         }    
         public Customer_Addresses GetCustbuyeridship(int buyerid,int addhd)

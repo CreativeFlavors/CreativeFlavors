@@ -16,6 +16,7 @@ using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Services.Description;
 using static MMS.Web.Controllers.Report.GrnGstReportController;
 
 namespace MMS.Web.Controllers
@@ -119,7 +120,7 @@ namespace MMS.Web.Controllers
                 List<PODetails> totaldata = new List<PODetails>();
                 var POList = poManager.GetPODetails();
                 var POHeaderlist = poManager.Get().Where(m => m.PoNumber == POno).FirstOrDefault();
-                var totalist = POList.Where(m => m.PoNumber == POno).ToList();
+                var totalist = POList.Where(m => m.PoNumber == POno && m.isactive == true).ToList();
 
                 foreach (var i in totalist)
                 {
@@ -375,6 +376,7 @@ namespace MMS.Web.Controllers
         [HttpPost]
         public ActionResult ConfirmGRN(GRNModel model)
         {
+            var stount = 0;
             var AlertMessage = "";
             PoManager PoManager = new PoManager();
             BatchStockManager batchStockManager = new BatchStockManager();
@@ -488,6 +490,15 @@ namespace MMS.Web.Controllers
                         poDetail.PodetailId = i.podetailid;
                         var data = GRNDetailsManager.POST(GRNDetails);
                         PoManager.Put(poDetail);
+                        var poqty = PoManager.GetDTId(i.podetailid);
+                        if(poqty.Quantity > (i.Quantity + quantitys))
+                        {
+                            stount--;
+                        }
+                        else if (poqty.Quantity == (i.Quantity + quantitys))
+                        {
+                            stount++;
+                        }
                         BatchStock batchStock = new BatchStock();
                         batchStock.SupplierId = headerid.SupplierId;
                         batchStock.StoreCode = i.StoreCode;
@@ -512,6 +523,15 @@ namespace MMS.Web.Controllers
                         poDetail.PodetailId = i.podetailid;
                         var data = GRNDetailsManager.POST(GRNDetails);
                         PoManager.Put(poDetail);
+                        var poqty = PoManager.GetDTId(i.podetailid);
+                        if (poqty.Quantity > i.Quantity)
+                        {
+                            stount--;
+                        }
+                        else if (poqty.Quantity == i.Quantity)
+                        {
+                            stount++;
+                        }
                         BatchStock batchStock = new BatchStock();
                         batchStock.SupplierId = headerid.SupplierId;
                         batchStock.StoreCode = i.StoreCode;
@@ -531,6 +551,15 @@ namespace MMS.Web.Controllers
                         batchStockManager.POST(batchStock);
                         AlertMessage = "Confirm Order";
                     }
+           
+                }
+                if (count > stount)
+                {
+                    var PO_partialstatus = PoManager.PutPartialPoHeader(model.PoHeaderId);
+                }
+                else if (count == stount)
+                {
+                    var PO_partialstatus = PoManager.PutfulfilledPoHeader(model.PoHeaderId);
 
                 }
                 var bOMMaterial = GrnManager.Putstatussuccess(model.grnnumber);

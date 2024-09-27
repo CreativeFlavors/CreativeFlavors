@@ -12,10 +12,10 @@ namespace MMS.Repository.Service
     {
        //using sp
         bool post(BuyerModel_SP buyerMaster);
-
+            
         List<BuyerModel_SP> GetBuyerModels();
 
-        BuyerModel_SP GetSingleBuyerModel(int id);
+        BuyerModel_SP GetSingleBuyerModel(int? id);
 
         bool Putbuyer(BuyerModel_SP buyermaster);
 

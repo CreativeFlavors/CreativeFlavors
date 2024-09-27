@@ -29,6 +29,7 @@ namespace MMS.Web.Models.StockModel
         public string Lastbom { get; set; }
 
         public bool IsActive { get; set; } = true;
+        public bool isdeleted{ get; set; } 
 
         public string Createdby { get; set; }
 

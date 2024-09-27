@@ -1,5 +1,4 @@
-﻿﻿@model MMS.Data.StoredProcedureModel.IndentPoMappingsp
-@using MMS.Repository.Managers
+﻿﻿@model  MMS.Web.Models.Po.PoModel
 
 <!DOCTYPE html>
 <html lang="en">
@@ -38,6 +37,39 @@
             background-color: #4472C4;
             border-color: #0d6efd;
         }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 33px;
+            height: 16px;
+            background-color: #198754;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+            .switch::after {
+                content: '';
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background-color: white;
+                top: 3px;
+                left: 5px;
+                transition: all 0.3s;
+            }
+
+        .checkbox:checked + .switch::after {
+            left: 18px;
+        }
+
+        .checkbox:checked + .switch {
+            background-color: #dc3545;
+        }
+
+        .checkbox {
+            display: none;
+        }
     </style>
 
 </head>
@@ -48,6 +80,16 @@
                 <div class="manage_customers_main_head">
                     <h6 class="font-20">Purchase Order List</h6>
                 </div>
+                <div class="radioSection">
+                    <label for="add">
+                        <input type="radio" name="yes" id="add" style="cursor: pointer;" checked>
+                        Details
+                    </label>
+                    <label for="add1">
+                        <input type="radio" name="yes" id="add1" style="cursor: pointer;">
+                        Summery
+                    </label>
+                </div>
                 <div>
                     <a href="/Po/PoDetails">
                         <button class="btn btn-success" id="AddPo" title="Po">
@@ -56,131 +98,13 @@
                     </a>
                 </div>
             </div>
-            <div class="table-responsive reports_table_responsive">
-                <div class="customer_manage_search_container">
-
-                    <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Product Name">
+            <div>
+                <div class="" id="Detailgrid">
+                    @{Html.RenderPartial("~/Views/Po/Partial/DetailsGrid.cshtml");}
                 </div>
-                <div class="manage_customers_table_in_responsive">
-                    <table class="table table-striped text-center">
-                        <thead>
-                            <tr class="font-16">
-                                <th scope="col">
-                                    <span>S.No</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>Product Name</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>Store Name</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>Uom</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>Supplier Name</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>Price</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>Po Number</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col"><span>STATUS</span></th>
-                            </tr>
-                        </thead>
-                        @if (ViewBag.Productslist != null)
-                        {
-                            <tbody>
-                                @{
-                                    int currentPage = ViewBag.CurrentPage ?? 1;
-                                    int pageSize = ViewBag.PageSize ?? 9;
-                                    int totalItems = ViewBag.Productslist.Count;
-                                    int startSerialNumber = (currentPage - 1) * pageSize + 1;
-                                }
-
-                                @foreach (var item in ViewBag.Productslist)
-                                {
-
-                                    <tr class="font-14">
-                                        <td>@startSerialNumber</td>
-                                        <td style="text-align:left">@item.ProductName</td>
-                                        <td style="text-align:left">@item.StoreName</td>
-                                        <td style="text-align:left">@item.UomName</td>
-                                        <td style="text-align:left">@item.SupplierName</td>
-                                        <td style="text-align:right">@item.UnitPrice</td>
-                                        <td style="text-align:right">@item.PoNumber</td>
-                                        <td class="veh-1 edit-del-wrap">
-                                            <a href="javascript:void(0)" onclick="Edit('@item.podetail')" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
-                                            <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.podetail')" class="watchlist-delete" title="Delete"><img src="~/Content/assets/images/delete-icon.png" /></a>
-                                            @*<td><button class="btn btn-success" id="paynow" onclick="paynow('@item.Id')" title="PayNow">Pay Now</button></td>*@
-                                        </td>
-
-
-                                    </tr>
-                                    startSerialNumber++;
-                                }
-                            </tbody>
-                        }
-
-                    </table>
+                <div class="" id="summerygrid">
+                    @{Html.RenderPartial("~/Views/Po/Partial/SummeryGrid.cshtml", Model);}
                 </div>
-                <div class="row manage_customer_show">
-                    <div class="font-14 manage_customer_show_I col-xl-6">
-                        <span>Showing </span>
-                        <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
-                            <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
-                            <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
-                            <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
-                            <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
-                        </select>
-
-
-                    </div>
-
-                    <div class="col-xl-6 manage_customer_show_II">
-                        <nav class="float-xl-end">
-                            <ul class="pagination font-14">
-                                <li class="page-item">
-                                    <a href="##" id="previousPage" class="page-link">Previous</a>
-                                </li>
-                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                                {
-                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                        <a href="@Url.Action("PoMaster", "Po", new { page = i })" class="page-link">@i</a>
-                                    </li>
-                                }
-                                <li class="page-item">
-                                    <a class="page-link" id="nextPage" href="##">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-
-                </div>
-
-
             </div>
 
         </div>
@@ -194,38 +118,28 @@
 
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
 
+
     <script>
         $(window).on("load", function () {
             $(".report-inner-section").addClass("transection");
             $("#po").attr('checked', true);
         });
-  $(document).ready(function() {
-    $('#manage_customer_show_no').change(function() {
-        var pageSize = parseInt($(this).val());
-        window.location.href = "@Url.Action("PoMaster", "Po")?pageSize=" + pageSize;
-    });
-
-    $('#previousPage').click(function(e) {
-        e.preventDefault();
-        var currentPage = parseInt('@ViewBag.CurrentPage');
-        if (currentPage > 1) {
-            var previousPage = currentPage - 1;
-            window.location.href = "@Url.Action("PoMaster", "Po")?page=" + previousPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
-        }
-    });
-
-    $('#nextPage').click(function(e) {
-        e.preventDefault();
-        var currentPage = parseInt('@ViewBag.CurrentPage');
-        var totalPages = parseInt('@ViewBag.TotalPages');
-        if (currentPage < totalPages) {
-            var nextPage = currentPage + 1;
-            window.location.href = "@Url.Action("PoMaster", "Po")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
-        }
-    });
-});
     </script>
     <script>
+        $("tbody").on("change", ".checkbox", function () {
+            var addressId = $(this).data('po-id');
+            var isChecked = $(this).is(':checked');
+            performAjaxRequest(addressId, !isChecked);
+        });
+        $("#summerygrid").hide();
+        $("#add1").click(function () {
+            $("#summerygrid").show();
+            $("#Detailgrid").hide();
+        });
+        $("#add").click(function () {
+            $("#summerygrid").hide();
+            $("#Detailgrid").show();
+        });
         $("#customer_manage_search").keyup(function () {
             var bomsearch = $("#customer_manage_search").val();
             $.ajax({
@@ -234,10 +148,10 @@
                 data: { filter: bomsearch },
                 dataType: 'json',
                 success: function (data) {
-                    $("tbody").empty();
+                    $("#details").empty();
                     var count = 1;
                     $.each(data, function (i, item) {
-                        $("tbody").append(`
+                        $("#details").append(`
                                 <tr class="font-14">
                                     <td>${count}</td>
                                     <td style="text-align:left">${item.ProductName}</td>
@@ -246,14 +160,14 @@
                                     <td style="text-align:left">${item.SupplierName}</td>
                                     <td style="text-align:right">${item.UnitPrice}</td>
                                     <td style="text-align:right">${item.PoNumber}</td>
-                                    <td class="veh-1 edit-del-wrap">
-                                     <a href="javascript:void(0)" onclick="Edit('${item.podetail}')" class="watchlist-edit" title="Edit">
-                                     <img src="/Content/assets/images/edit-icon.png" /></a>
+                                    <td class="veh-4" style="width:12%;">
+ <span class="table_icons" style="padding: 7px 9px;">
+     <img src="/Content/Images/editpng.png" onclick="Edit('${item.podetail}')" style="width: 34px; height: 31px; margin-top: -10px;" />
+ </span>
+ <input type="checkbox" class="checkbox" id="delete-${item.podetail}" data-po-id="${item.podetail}" ${item.isactive ? '' : 'checked'} />
+ <label for="delete-${item.podetail}" class="switch"></label>
+                </td>
 
-                                        <a href="javascript:void(0)" onclick="Delete('${item.podetail}')" class="watchlist-delete" title="Delete">
-                                            <img src="/Content/assets/images/delete-icon.png" />
-                                        </a>
-                                    </td>
                                 </tr>
                             `);
                         count++;
@@ -263,42 +177,31 @@
                     console.error("Error occurred:", status, error);
                 }
             });
+
         });
-
-
-        function Delete(arg) {
-            var answer = confirm("Are you sure want to delete?");
-            if (answer) {
-                $.ajax({
-                    type: 'POST',
-                    url: '/Po/PoDelete',
-                    data: { poId: arg },
-                    success: function (data) {
-                        if (data == "Success") {
-                            alert('PO Deleted Successfully.');
-                            location.reload();
-                            return false;
-                        }
-                        else {
-                            alert('PO deletion failed.');
-                        }
-
-                    },
-                    error: function (ex) {
-                        alert('This PO Already Exist in the database.');
-                    }
-                });
-            }
-            else {
-                return false;
-            }
-        }
 
         function Edit(podetail) {
 
             window.location.href = "/Po/PoIndentEdit?indentpomapid=" + podetail;
 
         }
+
+        function performAjaxRequest(addressId, isChecked) {
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("PoDelete","Po")',
+        data: { poId: addressId, IsChecked: isChecked },
+        success: function (data) {
+            if (data === "Success") {
+            } else {
+                alert('Po Details deletion failed.');
+            }
+        },
+        error: function () {
+            alert('Error occurred during the delete operation.');
+        }
+    });
+ }
     </script>
 
 

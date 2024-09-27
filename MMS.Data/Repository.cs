@@ -410,6 +410,18 @@ namespace MMS.Data
             {
                 throw;
             }
+        }      
+        public List<MMS.Data.StoredProcedureModel.purchaceorderheader> GetPOHeaderList()
+        {
+            try
+            {
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.purchaceorderheader>("SELECT * FROM purchaceorderheader()").ToList();
+                return ResultList;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public List<MMS.Data.StoredProcedureModel.mrp_material_list> mrpMaterialList1(int? productid)

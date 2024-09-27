@@ -57,6 +57,10 @@ namespace MMS.Data.StoredProcedureModel
         [Column("productid")]
         public int productid { get; set; }
         [Column("discountpercentage")]
-        public decimal? discountpercentage { get; set; }
+        public decimal? discountpercentage { get; set; } 
+        [Column("isactive")]
+        public bool isactive { get; set; }
+        [Column("indentqty")]
+        public decimal? indentqty { get; set; }
     }
 }

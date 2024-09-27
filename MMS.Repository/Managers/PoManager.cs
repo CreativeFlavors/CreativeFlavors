@@ -60,6 +60,19 @@ namespace MMS.Repository.Managers
                 Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
             return PoDetail;
+        }    
+        public List<purchaceorderheader> GetPOHeader()
+        {
+            List<purchaceorderheader> PoDetail = new List<purchaceorderheader>();
+            try
+            {
+                PoDetail = podetailRepository.GetPOHeaderList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return PoDetail;
         }
         public bool PostIndentPoMapping(IndentPoMapping arg)
         {
@@ -108,49 +121,129 @@ namespace MMS.Repository.Managers
 
             return result;
         }
-        public bool PutIndentPoMapping(IndentPoMapping arg)
+        public bool PutPodetail(PoDetail arg)
         {
             bool result = false;
             try
             {
                 ProductManager productManager = new ProductManager();
                 product product = new product();
-                product = productManager.GetId(arg.ProductId);
-                IndentPoMapping indentPoMapping = indentpomappingRepository.Table.Where(p => p.IndentPoMapId == arg.IndentPoMapId).FirstOrDefault();
-                if (indentPoMapping != null)
+                var products = productManager.GetId(arg.ProductId);
+                PoDetail indentPoMapping = podetailRepository.Table.Where(p => p.PodetailId == arg.PodetailId).FirstOrDefault();
+                if (indentPoMapping != null )
                 {
-                    indentPoMapping.IndentPoMapId = arg.IndentPoMapId;
+                    indentPoMapping.PodetailId = arg.PodetailId;
                     indentPoMapping.SupplierId = arg.SupplierId;
                     indentPoMapping.ProductId = arg.ProductId;
-                    indentPoMapping.IndentId = (int)arg.IndentNumber;
-                    indentPoMapping.IndentProductId = arg.ProductId;
-                    indentPoMapping.StoreCode = product.StoreId;
+                    indentPoMapping.IndentNumber = (int)arg.IndentNumber;
+                    indentPoMapping.ProductId = arg.ProductId;
+                    indentPoMapping.StoreCode = products.StoreId;
                     indentPoMapping.UnitPrice = arg.UnitPrice;
-                    indentPoMapping.IndentQty = arg.IndentQty;
-                    indentPoMapping.PoQty = arg.PoQty;
-                    indentPoMapping.PoDate = arg.PoDate;
-                    indentPoMapping.Status = arg.Status;
-                    indentPoMapping.IsActive = true;
-                    indentPoMapping.WithIndentReference = true;
-                    indentPoMapping.UomId = product.UomMasterId;
+                    indentPoMapping.Quantity = arg.Quantity;
                     indentPoMapping.TaxValue = arg.TaxValue;
                     indentPoMapping.DiscountPercentage = arg.DiscountPercentage;
                     indentPoMapping.TaxPercentage = arg.TaxPercentage;
                     indentPoMapping.DiscountValue = arg.DiscountValue;
                     indentPoMapping.Subtotal = arg.Subtotal;
                     indentPoMapping.TotalValue = arg.TotalValue;
-                    indentPoMapping.TaxInclusive = true;
                     indentPoMapping.PoNumber = arg.PoNumber;
-                    indentPoMapping.IndentNumber = arg.IndentNumber;
-
-                    indentPoMapping.CreatedDate = arg.CreatedDate;
                     indentPoMapping.UpdatedDate = DateTime.Now;
-                    //model.CreatedBy = "";
                     string username = HttpContext.Current.Session["UserName"].ToString();
                     arg.UpdatedBy = username;
                     indentPoMapping.UpdatedBy = arg.UpdatedBy;
-                    //model.UpdatedBy = username;
-                    indentpomappingRepository.Update(indentPoMapping);
+                    podetailRepository.Update(indentPoMapping);
+                    result = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                result = false;
+            }
+
+            return result;
+        }   
+        public bool PutPoHeader(PoHeader arg)
+        {
+            bool result = false;
+            try
+            {
+                PoHeader indentPoMapping = poheaderRepository.Table.Where(p => p.PoNumber == arg.PoNumber).FirstOrDefault();
+                if (indentPoMapping != null)
+                {
+                    indentPoMapping.PoNumber = arg.PoNumber;
+                    indentPoMapping.SupplierId = arg.SupplierId;
+                    indentPoMapping.TotalDiscountValue = (int)arg.TotalDiscountValue;
+                    indentPoMapping.TotalSubtotalValue = arg.TotalSubtotalValue;
+                    indentPoMapping.TotalTotalValue = arg.TotalTotalValue;
+                    indentPoMapping.TotalTaxValue = arg.TotalTaxValue;
+                    indentPoMapping.SupplierId = arg.SupplierId;
+                    indentPoMapping.UpdatedDate = DateTime.Now;
+                    string username = HttpContext.Current.Session["UserName"].ToString();
+                    arg.UpdatedBy = username;
+                    indentPoMapping.UpdatedBy = arg.UpdatedBy;
+                    poheaderRepository.Update(indentPoMapping);
+                    result = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                result = false;
+            }
+
+            return result;
+        }
+        public bool PutPartialPoHeader(int poheader)
+        {
+            bool result = false;
+            try
+            {
+                PoHeader indentPoMapping = poheaderRepository.Table.Where(p => p.PoNumber == poheader).FirstOrDefault();
+                if (indentPoMapping != null)
+                {
+                    indentPoMapping.Status = "Partial";
+                    indentPoMapping.UpdatedDate = DateTime.Now;
+                    string username = HttpContext.Current.Session["UserName"].ToString();
+                    indentPoMapping.UpdatedBy = username;
+                    poheaderRepository.Update(indentPoMapping);
+                    result = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                result = false;
+            }
+
+            return result;
+        }      
+        public bool PutfulfilledPoHeader(int poheader)
+        {
+            bool result = false;
+            try
+            {
+                PoHeader indentPoMapping = poheaderRepository.Table.Where(p => p.PoNumber == poheader).FirstOrDefault();
+                if (indentPoMapping != null)
+                {
+                    indentPoMapping.Status = "Full-Fill";
+                    indentPoMapping.FulfillDate = DateTime.Now;
+                    indentPoMapping.UpdatedDate = DateTime.Now;
+                    string username = HttpContext.Current.Session["UserName"].ToString();
+                    indentPoMapping.UpdatedBy = username;
+                    poheaderRepository.Update(indentPoMapping);
                     result = true;
                 }
                 else
@@ -173,6 +266,7 @@ namespace MMS.Repository.Managers
             {
                 string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.CreatedBy = username;
+                arg.Status = "Open";
                 arg.CreatedDate = DateTime.Now;
                 poheaderRepository.Insert(arg);
                 result = true;
@@ -222,8 +316,8 @@ namespace MMS.Repository.Managers
             }
 
             return result;
-        } 
-        public bool Deletepodt(int indentpoid)
+        }   
+        public bool Deletepodt(int indentpoid ,bool IsChecked)
         {
             bool result = false;
             try
@@ -233,7 +327,7 @@ namespace MMS.Repository.Managers
                 model.DeletedDate = DateTime.Now;
                 string username = HttpContext.Current.Session["UserName"].ToString();
                 model.DeletedBy = username;
-                model.IsActive = false;
+                model.IsActive = IsChecked;
                 podetailRepository.Update(model);
                 result = true;
             }
@@ -311,6 +405,19 @@ namespace MMS.Repository.Managers
             try
             {
                 indentlistcart = indentpomappingRepository.GetindentPoMapping().Where(x => x.IndentPoMapId == indentpomapid).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+            return indentlistcart;
+        }     
+        public PODetails GetindendetailsId(int indentDTid)
+        {
+            PODetails indentlistcart = new PODetails();
+            try
+            {
+                indentlistcart = podetailRepository.GetPODetailsList().Where(x => x.podetail == indentDTid).FirstOrDefault();
             }
             catch (Exception ex)
             {

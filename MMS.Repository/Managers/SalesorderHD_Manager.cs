@@ -27,7 +27,63 @@ namespace MMS.Repository.Managers
         {
             throw new NotImplementedException();
         }
+        public bool PutPartialSoHeader(int poheader)
+        {
+            bool result = false;
+            try
+            {
+                Salesorder_hd indentPoMapping = salesorderhdrep.Table.Where(p => p.salesorderid_hd == poheader).FirstOrDefault();
+                if (indentPoMapping != null)
+                {
+                    indentPoMapping.Status = "Partial";
+                    indentPoMapping.UpdatedDate = DateTime.Now;
+                    string username = HttpContext.Current.Session["UserName"].ToString();
+                    indentPoMapping.Updatedby = username;
+                    salesorderhdrep.Update(indentPoMapping);
+                    result = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                result = false;
+            }
 
+            return result;
+        }
+        public bool PutfulfilledSoHeader(int poheader)
+        {
+            bool result = false;
+            try
+            {
+                Salesorder_hd indentPoMapping = salesorderhdrep.Table.Where(p => p.salesorderid_hd == poheader).FirstOrDefault();
+                if (indentPoMapping != null)
+                {
+                    indentPoMapping.Status = "Full-Fill";
+                    indentPoMapping.fullfilldate = DateTime.Now;
+                    indentPoMapping.UpdatedDate = DateTime.Now;
+                    string username = HttpContext.Current.Session["UserName"].ToString();
+                    indentPoMapping.Updatedby = username;
+                    salesorderhdrep.Update(indentPoMapping);
+                    result = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message.ToString(), this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                result = false;
+            }
+
+            return result;
+        }
         public List<Salesorder_hd> Get()
         {
             List<Salesorder_hd> obj = new List<Salesorder_hd>();
@@ -60,7 +116,7 @@ namespace MMS.Repository.Managers
                 string username = HttpContext.Current.Session["UserName"].ToString();
                 arg.createdby = username;
                 arg.CreatedDate = DateTime.Now;
-                arg.Status = true;
+                arg.Status = "Open";
                 salesorderhdrep.Insert(arg);
                 salesorder = arg;
             }

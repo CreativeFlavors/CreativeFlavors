@@ -53,11 +53,11 @@ $(document).ready(function () {
         }
     })
     // slideing menu
-    $(".report-section").click(function () {
-        console.log("dddd");
-        console.log($(this).index(), "value");
-        $(this).next(".report-inner-section").slideToggle();
-    })
+    //$(".report-section").click(function () {
+    //    console.log("dddd");
+    //    console.log($(this).index(), "value");
+    //    $(this).next(".report-inner-section").slideToggle();
+    //})
 
     $(".profile-icon,.profile-details").click(function () {
         $(".my-profile-popup").slideToggle();

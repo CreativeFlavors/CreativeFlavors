@@ -11,7 +11,7 @@ namespace MMS.Repository.Service
     {
         bool Post(product arg);
 
-        bool Delete(int productid);
+        bool Delete(int productid, bool IsChecked);
         List<product> Get();
     }
 }

@@ -36,6 +36,7 @@ namespace MMS.Data.Mapping
             Property(t => t.IsActive).HasColumnName("isactive");
             Property(t => t.CreatedBy).HasColumnName("createdby");
             Property(t => t.DeletedBy).HasColumnName("deletedby");
+            Property(t => t.indentqty).HasColumnName("indentqty");
             Property(t => t.UpdatedBy).HasColumnName("updatedby");
             Property(t => t.Status).HasColumnName("status");
             Property(t => t.TaxInclusive).HasColumnName("taxinclusive");

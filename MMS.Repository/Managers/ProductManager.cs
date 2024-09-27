@@ -101,15 +101,15 @@ namespace MMS.Repository.Managers
             return result;
         }
 
-        public bool Delete(int productid)
+        public bool Delete(int productid, bool IsChecked)
         {
             bool result = false;
             try
             {
                 product model = productrep.GetById(productid);
-                //model.IsActive = false;
+                model.IsActive = IsChecked;
 
-                productrep.Delete(model);
+                productrep.Update(model);
                 result = true;
             }
             catch (Exception ex)

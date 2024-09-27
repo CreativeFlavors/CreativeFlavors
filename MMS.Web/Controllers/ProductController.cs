@@ -47,6 +47,7 @@ namespace MMS.Web.Controllers
                 product.uom= i.uom;
                 product.Price = i.Price;
                 product.BomNo1 = i.bom_no;
+                product.IsActive = i.isactive;
                 totaldata.Add(product);
             }
             var totalCount = totaldata.Count();
@@ -183,8 +184,8 @@ namespace MMS.Web.Controllers
             return PartialView("Partial/Product", model);
 
         }
-
-        public ActionResult ProductDelete(int productid)
+        [HttpPost]
+        public ActionResult ProductDelete(int productid, bool IsChecked)
         {
             product products = new product();
             string status = "";
@@ -193,7 +194,7 @@ namespace MMS.Web.Controllers
             if (products.ProductId == productid)
             {
                 status = "Success";
-                manager.Delete(productid);
+                manager.Delete(productid, IsChecked);
             }
             return Json(status, JsonRequestBehavior.AllowGet);
         }
@@ -205,11 +206,12 @@ namespace MMS.Web.Controllers
             List<Product> totaldata = new List<Product>();
 
             var totallist = ProductManager.Product_Grid();
-            var productList = totallist.Where(x => x.product_name.ToLower().Contains(filter.ToLower()) || x.product_code.ToLower().Contains(filter.ToLower())).ToList();
+            var productList = totallist.Where(x => x.product_name.ToLower().Contains(filter.ToLower()) || x.product_code.ToLower().Contains(filter.ToLower())).OrderByDescending(m=>m.ProductId).ToList();
 
             foreach (var i in productList)
             {
                 Product product = new Product();
+                product.ProductId = i.ProductId;
                 product.CategoryName = i.CategoryName;
                 product.ProductCode = i.product_code;
                 product.ProductName = i.product_name;
@@ -218,6 +220,7 @@ namespace MMS.Web.Controllers
                 product.uom = i.uom;
                 product.Price = i.Price;
                 product.BomNo1 = i.bom_no;
+                product.IsActive = i.isactive;
                 totaldata.Add(product);
             }
 

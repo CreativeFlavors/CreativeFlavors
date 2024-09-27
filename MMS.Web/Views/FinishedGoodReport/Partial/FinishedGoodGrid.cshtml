@@ -1,5 +1,11 @@
 ﻿@using MMS.Core.Entities
 @model IEnumerable<MMS.Web.Models.FinishedGoods.FinishedGoodModel>
+          @{
+          int currentPage = ViewBag.CurrentPage ?? 1;
+          int pageSize = ViewBag.PageSize ?? 9;
+          int totalItems = Model.Count();
+          int startSerialNumber = (currentPage - 1) * pageSize + 1;
+      }
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,12 +30,14 @@
             box-sizing: border-box;
             overflow-x: unset;
         }
+
         .page-item.active .page-link {
             z-index: 3;
             color: #fff;
             background-color: #4472C4;
             border-color: #0d6efd;
         }
+
         .sub_merchants .merchant_btn, .manage_customers .manage_customers_btn, .common_Manage_subMerchant .manage_customers_btn {
             background: #4472C4;
             border-radius: 5px;
@@ -120,14 +128,14 @@
                         </thead>
                         @if (Model != null && Model.Count() > 0)
                         {
-                            int count = 1;
+
                             <tbody>
 
                                 @foreach (var i in Model)
                                 {
 
                                     <tr>
-                                        <td class="veh-1">@count</td>
+                                        <td class="veh-1">@startSerialNumber</td>
                                         <td class="veh-2" style="width: 12%;text-align:left;">@i.ProductName</td>
                                         <td class="veh-3" style="width: 12%; text-align: left;">@i.ProductCode</td>
                                         <td class="veh-5" style="width: 12%; text-align: left;">@i.ProductTypeName</td>
@@ -137,7 +145,7 @@
                                         <td class="veh-4" style="width: 12%; text-align: right; ">@i.Quantity</td>
                                         <td class="veh-4" style="width: 12%; text-align: left;">@i.ShortUnitName</td>
                                     </tr>
-                                    count++;
+                                    startSerialNumber++;
                                 }
                             </tbody>
 
@@ -217,18 +225,18 @@
                         var count = 1;
                         $.each(values, function (i, item) {
                             $("tbody").append(`
-                         <tr class="font-14">
-         <td class="veh1-5">${count}</td>
-         <td class="veh1-5" style="width: 12%; text-align:left;">${item.ProductName}</td>
-         <td class="veh1-5" style="width: 12%; text-align:left;">${item.ProductCode}</td>
-         <td class="veh1-5" style="width: 12%; text-align:left;">${item.ProductTypeName}</td>
-         <td class="veh1-5" style="width: 12%; text-align:right;">${item.Price}</td>
-         <td class="veh1-5" style="width: 12%; text-align:right;">${item.Cost}</td>
-         <td class="veh1-5" style="width: 12%; text-align:left;">${item.StoreName}</td>
-         <td class="veh1-5" style="width: 12%; text-align:right;">${item.Quantity}</td>
-         <td class="veh1-5" style="width: 12%; text-align:left;">${item.ShortUnitName}</td>
-                        </tr>
-                         `);
+                             <tr class="font-14">
+             <td class="veh1-5">${count}</td>
+             <td class="veh1-5" style="width: 12%; text-align:left;">${item.ProductName}</td>
+             <td class="veh1-5" style="width: 12%; text-align:left;">${item.ProductCode}</td>
+             <td class="veh1-5" style="width: 12%; text-align:left;">${item.ProductTypeName}</td>
+             <td class="veh1-5" style="width: 12%; text-align:right;">${item.Price}</td>
+             <td class="veh1-5" style="width: 12%; text-align:right;">${item.Cost}</td>
+             <td class="veh1-5" style="width: 12%; text-align:left;">${item.StoreName}</td>
+             <td class="veh1-5" style="width: 12%; text-align:right;">${item.Quantity}</td>
+             <td class="veh1-5" style="width: 12%; text-align:left;">${item.ShortUnitName}</td>
+                            </tr>
+                             `);
                             count++;
                         });
                     }

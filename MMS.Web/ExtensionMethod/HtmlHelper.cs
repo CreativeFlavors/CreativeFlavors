@@ -1052,7 +1052,7 @@ namespace MMS.Web.ExtensionMethod
             var ColorName = new System.Web.Mvc.SelectListItem()
             {
                 Value = "",
-                Text = "Please Select Supplier"
+                Text = "Select Supplier"
             };
             items.Insert(0, ColorName);
             return new SelectList(items, "Value", "Text");
@@ -1874,7 +1874,7 @@ namespace MMS.Web.ExtensionMethod
         public static SelectList ProductName()
         {
             ProductManager Manager = new ProductManager();
-            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.ProductName).Select(
+            List<System.Web.Mvc.SelectListItem> items = Manager.Get().Where(m=>m.IsActive ==true).OrderBy(x => x.ProductName).Select(
                                                   item => new System.Web.Mvc.SelectListItem()
                                                   {
                                                       Text = item.ProductName,
@@ -1892,7 +1892,7 @@ namespace MMS.Web.ExtensionMethod
         {
             ProductManager Manager = new ProductManager();
             List<product> products = Manager.Get();
-            var filteredProducts = products.Where(p => p.ProductType == 1).OrderBy(p => p.ProductName).ToList();
+            var filteredProducts = products.Where(p => p.ProductType == 1).Where(m => m.IsActive == true).OrderBy(p => p.ProductName).ToList();
             List<System.Web.Mvc.SelectListItem> items = filteredProducts.Select(
                                                  item => new System.Web.Mvc.SelectListItem()
                                                  {
@@ -1914,7 +1914,7 @@ namespace MMS.Web.ExtensionMethod
         {
             ProductManager Manager = new ProductManager();
             List<product> products = Manager.Get();
-            var filteredProducts = products.Where(p => p.ProductType == 3).OrderBy(p => p.ProductName).ToList();
+            var filteredProducts = products.Where(p => p.ProductType == 3 && p.IsActive == true).OrderBy(p => p.ProductName).ToList();
             List<System.Web.Mvc.SelectListItem> items = filteredProducts.Select(
                                                  item => new System.Web.Mvc.SelectListItem()
                                                  {
@@ -1937,7 +1937,7 @@ namespace MMS.Web.ExtensionMethod
         {
             ProductManager Manager = new ProductManager();
             List<product> products = Manager.Get();
-            var filteredProducts = products.Where(p => p.ProductType == 2).OrderBy(p => p.ProductName).ToList();
+            var filteredProducts = products.Where(p => p.ProductType == 2 && p.IsActive == true).OrderBy(p => p.ProductName).ToList();
             List<System.Web.Mvc.SelectListItem> items = filteredProducts.Select(
                                                  item => new System.Web.Mvc.SelectListItem()
                                                  {
@@ -1959,7 +1959,7 @@ namespace MMS.Web.ExtensionMethod
         public static SelectList IndentDetailNo()
         {
             IndentNewMaterialManager Manager = new IndentNewMaterialManager();
-            List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.IndentHeaderId).Select(
+            List<System.Web.Mvc.SelectListItem> items = Manager.Get().Where(m => m.IsActive == true).OrderBy(x => x.IndentHeaderId).Select(
                                                   item => new System.Web.Mvc.SelectListItem()
                                                   {
                                                       Text = item.IndentNo.ToString(),
@@ -2494,7 +2494,7 @@ namespace MMS.Web.ExtensionMethod
         public static SelectList GetBomno()
         {
             ParentbomManager parentbom = new ParentbomManager();
-            List<System.Web.Mvc.SelectListItem> items = parentbom.Get().Where(x => x.BomNo != null).OrderBy(x => x.BomNo).Select(
+            List<System.Web.Mvc.SelectListItem> items = parentbom.Get().Where(x => x.BomNo != null && x.IsDelete == true).OrderBy(x => x.BomNo).Select(
                                                   item => new System.Web.Mvc.SelectListItem()
                                                   {
                                                       Text = item.BomNo,
@@ -3745,7 +3745,7 @@ namespace MMS.Web.ExtensionMethod
         {
             SubAssemblyMasterManagers Manager = new SubAssemblyMasterManagers();
             List<System.Web.Mvc.SelectListItem> _items = new List<System.Web.Mvc.SelectListItem>();
-            List<System.Web.Mvc.SelectListItem> items = Manager.GetSubAssemblyMaster().OrderBy(x => x.Id).Select(
+            List<System.Web.Mvc.SelectListItem> items = Manager.GetSubAssemblyMaster().Where(m=>m.IsActive == true).OrderBy(x => x.Id).Select(
                                     item => new System.Web.Mvc.SelectListItem()
                                     {
                                         Text = item.ProductName.ToString(),

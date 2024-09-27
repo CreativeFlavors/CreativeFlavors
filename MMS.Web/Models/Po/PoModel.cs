@@ -25,6 +25,7 @@ namespace MMS.Web.Models.Po
         public DateTime? UpdatedDate { get; set; }
         public bool IsActive { get; set; }
         public string CreatedBy { get; set; }
+        public string suppliername { get; set; }
         public string DeletedBy { get; set; }
         public string UpdatedBy { get; set; }
         public bool WithIndentReference { get; set; }   
@@ -62,7 +63,8 @@ namespace MMS.Web.Models.Po
         public string ProductName {  get; set; }
         public string Productcode {  get; set; }
         public List<IndentPoMapping> DataList { get; set; }
-        public IndentPoMappingsp DataListsp { get; set; }
+        public List<purchaceorderheader> purchaceorderheaders { get; set; }
+        public PODetails DataListsp { get; set; }
     
 
     public class DataItem

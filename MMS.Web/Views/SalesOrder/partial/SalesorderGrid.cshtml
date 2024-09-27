@@ -1,0 +1,112 @@
+﻿
+@model MMS.Web.Models.Salesorders
+@using MMS.Repository.Managers
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <style>
+
+        .page-item.active .page-link {
+            z-index: 3;
+            color: #fff;
+            background-color: #4472C4;
+            border-color: #0d6efd;
+        }
+
+        .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
+            padding: 6px;
+        }
+
+        #reports_search4_container button, #transaction_reports_search4_container button, #static_report_search4_container button {
+            padding: 12px 29px;
+            color: #FFFFFF;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="main-page">
+        <div id="transaction_report" class="reports common_Manage_subMerchant">
+            <nav class="reports_customers_head" aria-label="breadcrumb">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <ol class="breadcrumb font-20">
+                            <li class="breadcrumb-item " aria-current="page">Sales Order</li>
+                        </ol>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <div class="checkbox-wrapper-8">
+                            <input class="tgl tgl-skewed" id="cb3-8" type="checkbox" onclick="Filter()" style="display: none; " />
+                            <label class="tgl-btn"  data-tg-on="Details" data-tg-off="Summary" for="cb3-8" id="toggleBtn"></label>
+                        </div>
+                    </div>
+                    <div id="transaction_reports_search4_container" class="reports_search_container_btn">
+                        <a href="/SalesOrder/SalesOrderDetails">
+                            <button class="button-71 manage_customers_btn font-15" role="button">ADD</button>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+            <div>
+                <div class="" id="Detailgrid">
+                    @{Html.RenderPartial("~/Views/SalesOrder/partial/SalesOrderDetailsGrid.cshtml", Model);}
+                </div>
+                <div class="" id="summerygrid">
+                    @{Html.RenderPartial("~/Views/SalesOrder/partial/SalesorderHeaderGrid.cshtml", Model);}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="~/Content/js/custom.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#summerygrid").hide();
+
+        });
+    </script>
+
+    <script>
+        document.getElementById('toggleBtn').addEventListener('click', function () {
+            var toggleState = this.getAttribute('data-tg-off');
+            if (toggleState === "Summary") {
+                this.setAttribute('data-tg-on', 'Details');
+                this.setAttribute('data-tg-off', 'Details');
+                $("#Detailgrid").hide();
+                $("#summerygrid").show();
+
+            } else {
+                $("#summerygrid").hide();
+                $("#Detailgrid").show();
+                this.setAttribute('data-tg-off', 'Summary');
+
+            }
+        });
+
+    </script>
+    <script>
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#order").attr('checked', true);
+        });
+    </script>
+
+
+</body>
+</html>
+
+

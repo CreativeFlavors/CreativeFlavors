@@ -95,6 +95,8 @@ namespace MMS.Core.Entities
         public int IndentNumber { get; set; }
 
         [Column("taxpercentage")]
-        public decimal? TaxPercentage { get; set; }
+        public decimal? TaxPercentage { get; set; }   
+        [Column("indentqty")]
+        public decimal? indentqty { get; set; }
     }
 }

@@ -1500,32 +1500,6 @@ $(document).on('keyup', '#SwiftCode', _ValidateSwiftCode);
 
 
 
-////physical1 validation
-
-const ValidateAddressValidation = (physical1) => {
-    return physical1.match(/^[A-Za-z0-9\s]+$/);
-}
-
-const _ValidateAddressValidation = () => {
-    const physical1result = document.getElementById("Physical1Result");
-    const physical1resultvalue = document.getElementById("Physical1");
-    const physical1 = physical1resultvalue.value;
-
-    physical1result.textContent = '';
-    if (!ValidateAddressValidation(physical1)) {
-        physical1result.textContent = physical1 + 'is invalid';
-        if (physical1.trim() === '') {
-            physical1result.textContent = '';
-        }
-        physical1result.style.color = 'red';
-        physical1result.style.display = 'block';
-        return false;
-    }
-    return true;
-}
-$(document).on('keyup', '#Physical1', _ValidateAddressValidation);
-//document.getElementById("Physical1").addEventListener('keyup', _ValidateAddressValidation);
-
 
 
 
@@ -1819,38 +1793,7 @@ const _DcBalanceResult = () => {
 
 }
 $(document).on('keyup', '#DcBalance', _DcBalanceResult);
-//document.getElementById("DcBalance").addEventListener('keyup', _DcBalanceResult);
 
-
-//foreign dcbalance  validation
-
-//const ForeignDcBalanceResult = (foreigndcbalance) => {
-//    return foreigndcbalance.match(/^[0-9]+(\.[0-9]+)?$/);
-//};
-
-//const _ForeignDcBalanceResult = () => {
-//    const foreigndcbalanceresult = document.getElementById("ForeignDcBalanceResult");
-//    const foreigndcbalanceresultvalue = document.getElementById("ForeignDcBalance");
-//    const foreigndcbalance = foreigndcbalanceresultvalue.value;
-
-//    foreigndcbalanceresult.textContent = '';
-
-//    if (!ForeignDcBalanceResult(foreigndcbalance)) {
-//        foreigndcbalanceresult.textContent = foreigndcbalance + 'is invalid';
-//        if (foreigndcbalance.trim() === '') {
-//            foreigndcbalanceresult.textContent = '';
-//        }
-//        foreigndcbalanceresult.style.color = 'red';
-//        foreigndcbalanceresult.style.display = 'block';
-//        return false;
-//    }
-//    return true;
-
-//}
-//$(document).on('keyup', '#ForeignDcBalance', _ForeignDcBalanceResult);
-//document.getElementById("ForeignDcBalance").addEventListener('keyup', _ForeignDcBalanceResult);
-
-//website validation
 
 const ValidateWebsite = (website) => {
     return website.match(/^https?:\/\/[a-zA-Z0-9.-]+(?:\:[0-9]+)?(?:\/.*)?$/);
@@ -1889,7 +1832,7 @@ function areAllFieldsValid() {
     //    }
     //});
     if (validate() == false || validateName() == false || ValidateBuyerCode() == false || ValidateCustomerName() == false || _ValidateAccount() == false || _ValidateAccountName() == false || _ValidateAccountDescription() == false
-        || _ValidateSwiftCode() == false || _ValidateAddressValidation() == false || _ValidatePhysicalCode() == false || _ValidateTelephone1() == false || _ValidateTelephone2() == false || _validateEmailAccount() == false || _validateEmailEmergency() == false
+        || _ValidateSwiftCode() == false  || _ValidateTelephone1() == false || _ValidateTelephone2() == false || _validateEmailAccount() == false || _validateEmailEmergency() == false
         || _ValidateVatNumber() == false || _validateRegNo() == false || _validateCreditLimit() == false || _validateInterest() == false || _DcBalanceResult() == false 
         || _ValidateWebsite() == false) {
         allFieldsValid = false;
@@ -2060,7 +2003,6 @@ function Save() {
             }
         }
         else {
-            alert("validation js alert");
             alert('Please fill in all required fields.');
             return false;
         }
@@ -2199,20 +2141,6 @@ function Save() {
 
 
 
-        if (Physical1 == "") {
-            $("#Physical1Result").text("Please enter physical1");
-            $("#Physical1Result").show();
-            errorFields.push("Physical1");
-        }
-        $("#Physical1").on("keyup blur", function () {
-            if ($(this).val() != "") {
-                $("#Physical1Result").hide();
-                _ValidateAddressValidation();
-            } else {
-                $("#Physical1Result").text("Please enter physical1");
-                $("#Physical1Result").show();
-            }
-        });
 
 
 

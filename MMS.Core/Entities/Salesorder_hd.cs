@@ -38,11 +38,13 @@ namespace MMS.Core.Entities
         [Column("updatedby")]
         public string Updatedby { get; set; }
         [Column("status")]
-        public bool Status { get; set; }
+        public string Status { get; set; }
         [Column("deletedby")]
         public string deletedby { get; set; }
         [Column("deleteddate")]
-        public DateTime? DeletedDate { get; set; }
+        public DateTime? DeletedDate { get; set; }   
+        [Column("fullfilldate")]
+        public DateTime? fullfilldate { get; set; }
         [Column("isdeleted")]
         public bool IsDeleted{ get; set; } = true;
 

@@ -237,8 +237,8 @@ namespace MMS.Web.Controllers
             }
             return Json(null, JsonRequestBehavior.AllowGet);
         }
-
-        public ActionResult IndentDelete(int indentcartid)
+        [HttpPost]
+        public ActionResult IndentDelete(int indentcartid , bool IsChecked)
         {
             Indentdetail indentCart = new Indentdetail();
             string status = "";
@@ -247,20 +247,7 @@ namespace MMS.Web.Controllers
             if (indentCart.IndentDetailId == indentcartid)
             {
                 status = "Success";
-                indentnewMaterialManager.Delete(indentcartid);
-            }
-            return Json(status, JsonRequestBehavior.AllowGet);
-        }  
-        public ActionResult IndentDeletechange(int indentcartid)
-        {
-            Indentdetail indentCart = new Indentdetail();
-            string status = "";
-            IndentNewMaterialManager indentnewMaterialManager = new IndentNewMaterialManager();
-            indentCart = indentnewMaterialManager.Getindentcartid(indentcartid);
-            if (indentCart.IndentDetailId == indentcartid)
-            {
-                status = "Success";
-                indentnewMaterialManager.Deletechange(indentcartid);
+                indentnewMaterialManager.Delete(indentcartid, IsChecked);
             }
             return Json(status, JsonRequestBehavior.AllowGet);
         }

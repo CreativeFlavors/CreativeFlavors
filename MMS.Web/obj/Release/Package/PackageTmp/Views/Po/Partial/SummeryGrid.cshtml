@@ -1,0 +1,399 @@
+﻿﻿@model  MMS.Web.Models.Po.PoModel
+@{
+    int currentPage = ViewBag.CurrentPagesummary ?? 1;
+    int pageSize = ViewBag.PageSizesummary ?? 9;
+    int totalItems = Model.purchaceorderheaders.Count();
+    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+}
+<style>
+    .form-floating > .form-control, .form-floating > .form-select {
+        padding-top: 16px !important;
+        height: 53px;
+        width: 134%;
+    }
+    .form-floating label {
+        padding: 0;
+        background: #fff;
+        height: fit-content;
+        opacity: 4 !important;
+        left: 20px;
+        top: -3px;
+        width: 100%;
+    }
+</style>
+<div id="posummary">
+
+    <div class="table-responsive reports_table_responsive">
+        @*<div class="customer_manage_search_container">
+
+            <input type="text" class="font-14 searching" name="search_manage_customers" id="customer_manage_search" placeholder="search by Purchase Order No">
+
+        </div>*@
+        <ol class="breadcrumb font-20 d-flex justify-content-center">
+            <li class="breadcrumb-item " aria-current="page" style="font-size: 112%;">Purchase Order Summery</li>
+        </ol>
+        <div class="d-flex justify-content-evenly mt-4">
+            <div class="form-floating">
+                <select id="SupplierId" class="form-select">
+                    @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.SupplierName())
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+                <label for="floatingSelectGrid">Supplier Name</label>
+            </div>
+            <div class="form-floating">
+                <select id="PoHeaderId" class="form-select">
+                    <option value="0">Select PO NO</option>
+                </select>
+                <label for="floatingSelectGrid">Purchase Order No</label>
+            </div>
+            <div class="form-floating">
+                <select id="Status" class="form-select">
+                    <option value="">Please Select</option>
+                    <option value="Open">Open</option>
+                    <option value="Partial">Partial</option>
+                    <option value="Full-Fill">Full-Fill</option>
+                </select>
+
+                <label for="floatingSelectGrid">PO_Status</label>
+            </div>
+            <div class="form-floating">
+                <input type="date" class="form-control" id="PODate" />
+                <label for="PODate">From Date</label>
+            </div>
+            <div class="form-floating">
+                <input type="date" class="form-control" id="PODueDate" />
+                <label for="PODueDate">To Date</label>
+            </div>
+            <div id="transaction_reports_search4_container" class="reports_search_container_btn">
+                <button type="button" id="filter" class="manage_customers_btn font-15">
+                    FILTER
+
+                </button>
+            </div>
+        </div>
+        <div class="manage_customers_table_in_responsive">
+            <table class="table table-striped text-center">
+                <thead>
+                    <tr class="font-16">
+                        <th scope="col">
+                            <span>S.No</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>PO No</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>Supplier Code</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>Supplier Name</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>         
+                        <th scope="col">
+                            <span>Items</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>    
+                        <th scope="col">
+                            <span>Qty</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>Discount</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>Subtotal</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>Taxvalue</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>Total value</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>PO Created Date</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>Status</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                        <th scope="col">
+                            <span>Fullfill Date</span>
+                            <span>
+                                <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                            </span>
+                        </th>
+                    </tr>
+                </thead>
+                @if (Model.purchaceorderheaders.Count() != 0)
+                {
+                    <tbody id="summary">
+
+
+                        @foreach (var item in Model.purchaceorderheaders)
+                        {
+
+                            <tr class="font-14">
+                                <td>@startSerialNumber</td>
+                                <td style="text-align:left">@item.ponumber</td>
+                                <td style="text-align:left">@item.suppliercode</td>
+                                <td style="text-align:left">@item.suppliername</td>
+                                <td style="text-align: right">@item.items</td>
+                                <td style="text-align: right">@item.qty</td>
+                                <td style="text-align: right">@item.discountvalue</td>
+                                <td style="text-align:right">@item.subtotalvalue</td>
+                                <td style="text-align:right">@item.taxvalue</td>
+                                <td style="text-align:right">@item.totalvalue</td>
+                                <td style="text-align:center">@((item.createddate != null) ? item.createddate.Value.ToString("dd/MM/yyyy") : "N/A")</td>
+                                <td style="text-align:right">@item.status</td>
+                                <td style="text-align:center">@((item.fullfilldate != null) ? item.fullfilldate.Value.ToString("dd/MM/yyyy") : "N/A")</td>
+
+
+                            </tr>
+                            startSerialNumber++;
+                        }
+                    </tbody>
+                }
+
+            </table>
+        </div>
+        <div class="row manage_customer_show">
+            <div class="font-14 manage_customer_show_I col-xl-6">
+                <span>Showing </span>
+                <select class="form-select font-16" name="manage_summary_page_size" id="manage_summary_page_size" aria-label="select example">
+                    <option value="15" @(ViewBag.PageSizesummary == 15 ? "selected" : "")>15</option>
+                    <option value="30" @(ViewBag.PageSizesummary == 30 ? "selected" : "")>30</option>
+                    <option value="45" @(ViewBag.PageSizesummary == 45 ? "selected" : "")>45</option>
+                    <option value="60" @(ViewBag.PageSizesummary == 60 ? "selected" : "")>60</option>
+                </select>
+
+
+            </div>
+
+            <div class="col-xl-6 manage_customer_show_II">
+                <nav class="float-xl-end">
+                    <ul class="pagination font-14" id="paginationSummary">
+                        <li class="page-item">
+                            <a href="#" id="previousPage" class="page-link">Previous</a>
+                        </li>
+                        @for (int i = 1; i <= ViewBag.TotalPagessummary; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPagesummary ? "active" : "")">
+                                <a href="#" class="page-link" data-page="@i">@i</a>
+                            </li>
+                        }
+                        <li class="page-item">
+                            <a href="#" class="page-link" id="nextPage">Next</a>
+                        </li>
+                    </ul>
+
+                </nav>
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+<script src="~/Content/js/custom.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="~/Content/js/Validation.js"></script>
+<script src="~/Content/js/dropdown.js"></script>
+<script src="~/Content/js/bootstrap.bundle.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#manage_summary_page_size').change(function () {
+            $("#Detailgrid").hide();
+            var pageSize = parseInt($('#manage_summary_page_size').val());
+            $.ajax({
+                url: '/Po/POSummaryGrid',
+                type: "GET",
+                data: { pageSize: pageSize },
+                success: function (data) {
+                    $("#posummary").html(data).show();
+                },
+                error: function () {
+                    alert('Error loading data');
+                }
+            });
+        });
+    // Click event for page links
+        $(document).on("click", "#paginationSummary .page-link[data-page]", function (e) {
+        e.preventDefault();
+        $("#Detailgrid").hide();
+        var page = $(this).data("page");
+        $.ajax({
+            url: '@Url.Action("POSummaryGrid", "Po")',
+            type: "GET",
+            data: { page: page },
+            success: function(data) {
+                $("#posummary").html(data).show();
+            }
+        });
+        });
+
+          // Previous page button
+        $('#previousPage').click(function (e) {
+      e.preventDefault();
+      var currentPage = parseInt('@ViewBag.CurrentPagesummary');
+      if (currentPage > 1) {
+          var previousPage = currentPage - 1;
+          var pageSize = parseInt('@ViewBag.PageSizesummary');
+          $.ajax({
+              url: '/Po/POSummaryGrid',
+              type: "GET",
+              data: { page: previousPage, pageSize: pageSize },
+              success: function (values) {
+                  $("#posummary").html(values).show();
+              },
+              error: function () {
+                  alert('Error loading data');
+              }
+          });
+      }
+  });
+
+  // Next page button
+        $('#nextPage').click(function (e) {
+      e.preventDefault();
+      var currentPage = parseInt('@ViewBag.CurrentPagesummary');
+      var totalPages = parseInt('@ViewBag.TotalPagessummary');
+      if (currentPage < totalPages) {
+          var nextPage = currentPage + 1;
+          var pageSize = parseInt('@ViewBag.PageSizesummary');
+          $.ajax({
+              url: '/Po/POSummaryGrid',
+              type: "GET",
+              data: { page: nextPage, pageSize: pageSize },
+              success: function (values) {
+                  $("#posummary").html(values).show();
+              },
+              error: function () {
+                  alert('Error loading data');
+              }
+          });
+      }
+  });
+        $("#SupplierId").change(function () {
+            var SupplierId = $("#SupplierId").val();
+            $.ajax({
+                type: 'GET',
+                url: '/Po/Getpono',
+                data: { id: SupplierId },
+                contentType: 'application/json',
+                success: function (values) {
+                    $("#PoHeaderId").empty();
+                    $("#PoHeaderId").append(
+                        $('<option></option>').val(0).html("Select PO NO")
+                    );
+                    $.each(values, function (i, item) {
+                        $("#PoHeaderId").append(
+                            $('<option></option>').val(item.PoNumber).html(item.PoNumber));
+                    });
+                }
+            });
+        });
+
+        $(document).on("click", "#filter", function () {
+            var SupplierId = $("#SupplierId").val();
+            var PoHeaderId = $("#PoHeaderId").val();
+            var Status = $("#Status").val();
+            var CreatedDate = $("#PODate").val();
+            var FulfillDate = $("#PODueDate").val(); 
+
+            var formdata = new FormData();
+            formdata.append("SupplierId", SupplierId);
+            formdata.append("PoNumber", PoHeaderId);
+            formdata.append("Status", Status);
+            formdata.append("CreatedDate", CreatedDate)
+            formdata.append("FulfillDate", FulfillDate);
+            $.ajax({
+                type: "POST",
+                url: '/Po/PoSearchsummary',
+                contentType: false,
+                processData: false,
+                dataType: 'html',
+                data: formdata,
+                success: function (Values) {
+                    $("#summary").empty();
+                    var data = JSON.parse(Values);
+                    let startSerialNumber = 1;
+                    if (Array.isArray(data) && data.length > 0) {
+                        $.each(data, function (i, item) {
+                            const formattedDate = convertToReadableDate(item.createddate);
+                            const formattedDate1 = item.fullfilldate ? convertToReadableDate(item.fullfilldate) : "N/A";
+
+                            $("#summary").append(`
+                <tr class="font-14">
+                    <td>${startSerialNumber}</td>
+                    <td style="text-align:left">${item.ponumber}</td>
+                    <td style="text-align:left">${item.suppliercode}</td>
+                    <td style="text-align:left">${item.suppliername}</td>
+                    <td style="text-align:left">${item.items}</td>
+                    <td style="text-align:left">${item.qty}</td>
+                    <td style="text-align:left">${item.discountvalue}</td>
+                    <td style="text-align:right">${item.subtotalvalue}</td>
+                    <td style="text-align:right">${item.taxvalue}</td>
+                    <td style="text-align:right">${item.totalvalue}</td>
+                    <td class="veh1-5" style="text-align:center;">${formattedDate}</td>
+                    <td style="text-align:right">${item.status}</td>
+                    <td class="veh1-5" style="text-align:center;">${formattedDate1}</td>
+                </tr>
+            `);
+                            startSerialNumber++;
+                        });
+                    } else {
+                        $("#summary").append(`<tr><td colspan="14">No records found.</td></tr>`);
+                    }
+                }
+            });
+        });
+
+    });
+    function convertToReadableDate(dateString) {
+        const match = dateString.match(/\d+/);
+        if (match) {
+            const timestamp = parseInt(match[0], 10);
+            const date = new Date(timestamp);
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        return "Invalid Date";
+    }
+</script>

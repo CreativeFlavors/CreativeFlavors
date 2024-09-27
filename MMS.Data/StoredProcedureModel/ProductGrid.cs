@@ -30,6 +30,8 @@ namespace MMS.Data.StoredProcedureModel
         [Column("bom_no")]  
         public string bom_no { get; set; }   
         [Column("productype")]
-        public int Productype { get; set; }
+        public int Productype { get; set; } 
+        [Column("isactive")]
+        public bool isactive { get; set; }
     }
 }

@@ -317,8 +317,9 @@ namespace MMS.Web.Controllers
             return PartialView("Partial/DC_Details", models);
         }
         [HttpPost]
-        public JsonResult DC_Post(string buyerid, string currencyOption, decimal Total_Price, decimal Total_Subtotal, decimal Total_TaxValue, decimal Total_discountval, decimal Total_Grandtotal, string salesOrderData)
+        public JsonResult DC_Post(string buyerid, string currencyOption, decimal Total_Price, decimal Total_Subtotal, decimal Total_TaxValue, decimal Total_discountval, decimal Total_Grandtotal, string salesOrderData,int SalesorderId)
         {
+            var val = 0;
             var salesOrderList = JsonConvert.DeserializeObject<List<SalesOrderItem>>(salesOrderData);
             var AlertMessage = "";
             DeliveryChallanHD_Manager deliveryChallanHD_Manager = new DeliveryChallanHD_Manager();
@@ -328,6 +329,7 @@ namespace MMS.Web.Controllers
             ProductManager productManager = new ProductManager();
             TaxTypeManager taxTypeManager = new TaxTypeManager();
             BuyerMasterManager buyerManager = new BuyerMasterManager();
+            SalesorderHD_Manager salesorderHD_manager = new SalesorderHD_Manager();
             Salesorder_dt salesorder_Dt = new Salesorder_dt();
             Salesorders model = new Salesorders();
             SalesorderDT_Manager salesorderDT_manager = new SalesorderDT_Manager();
@@ -436,6 +438,14 @@ namespace MMS.Web.Controllers
                         AlertMessage = "Confirm Order";
                         deliveryChallanDt_Manager.POST(deliveryChallanDt);
                         salesorderDT_manager.Put(salesorder_Dt);
+                        if(DT.quantity == (Convert.ToInt32(i.Quantity)) + quantitys)
+                        {
+                            val++;
+                        }
+                        else if ((DT.quantity > (Convert.ToInt32(i.Quantity)) + quantitys))
+                        {
+                            val--;
+                        }
                     }
                     else if ((Convert.ToInt32(i.Quantity)) != 0)
                     {
@@ -455,9 +465,21 @@ namespace MMS.Web.Controllers
             }
             if (nowinvoised == invoisedcount)
             {
+                var PO_partialstatus = salesorderHD_manager.PutfulfilledSoHeader(SalesorderId);
                 AlertMessage = "Full Invoised";
                 return Json(AlertMessage, JsonRequestBehavior.AllowGet);
             }
+
+            if (invoisedcount > val)
+            {
+                var PO_partialstatus1 = salesorderHD_manager.PutPartialSoHeader(SalesorderId);
+            }
+            else if (invoisedcount == val)
+            {
+                var PO_partialstatus = salesorderHD_manager.PutfulfilledSoHeader(SalesorderId);
+
+            }
+
             return Json(AlertMessage, JsonRequestBehavior.AllowGet);
         }
 

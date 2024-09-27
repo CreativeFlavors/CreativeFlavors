@@ -42,6 +42,7 @@ namespace MMS.Web.Controllers.Stock
                 parentBillofMaterial.Bomno = i.BomNo;
                 parentBillofMaterial.Description = i.Description;
                 parentBillofMaterial.Date = i.Date;
+                parentBillofMaterial.isdeleted = i.IsDelete;
                 totalList.Add(parentBillofMaterial);
             }
             var totalCount = totalList.Count();
@@ -63,7 +64,7 @@ namespace MMS.Web.Controllers.Stock
             ParentbomManager ParentbomManager = new ParentbomManager();
             var data = ParentbomManager.Get();
             var list = data.Where(x => x.BomNo.ToLower().Trim().Contains(filter.ToLower().Trim())).ToList();
-            var detailslist = list;
+            var detailslist = list.OrderByDescending(m =>m.BomId);
             foreach (var i in detailslist)
             {
                 ParentBillofMaterial parentBillofMaterial = new ParentBillofMaterial();
@@ -71,6 +72,7 @@ namespace MMS.Web.Controllers.Stock
                 parentBillofMaterial.Bomno = i.BomNo;
                 parentBillofMaterial.Description = i.Description;
                 parentBillofMaterial.Date = i.Date;
+                parentBillofMaterial.isdeleted = i.IsDelete;
                 ParentBillofMaterial.Add(parentBillofMaterial);
             }
 
@@ -144,7 +146,7 @@ namespace MMS.Web.Controllers.Stock
                     parentbom parentboms = new parentbom();
                     ParentbomManager manager = new ParentbomManager();
                     parentboms.BomNo = model.Bomno;
-                    parentboms.Description = model.Description;
+                    parentboms.Description = model.Bomno;
                     parentboms.Date = DateTime.Now;
                     parentboms.LastBom = model.Lastbom;
                     string AlertMessage = "";
@@ -177,7 +179,7 @@ namespace MMS.Web.Controllers.Stock
                     subassemblyManager subassemblyManager = new subassemblyManager();
                     ParentbomManager manager = new ParentbomManager();
                     parentboms.BomNo = model.Bomno;
-                    parentboms.Description = model.Description;
+                    parentboms.Description = model.Bomno;
                     parentboms.Date = DateTime.Now;
                     parentboms.LastBom = model.Lastbom;
                     string AlertMessage = "";
@@ -206,7 +208,7 @@ namespace MMS.Web.Controllers.Stock
 
                 ParentbomManager manager = new ParentbomManager();
                 parentboms.BomNo = model.Bomno;
-                parentboms.Description = model.Description;
+                parentboms.Description = model.Bomno;
                 parentboms.Date = model.Date;
                 parentboms.LastBom = model.Lastbom;
                 string AlertMessage = "";
@@ -240,7 +242,7 @@ namespace MMS.Web.Controllers.Stock
                     Parentbom_materialManager parentbom_MaterialManager = new Parentbom_materialManager();
                     ParentbomManager manager = new ParentbomManager();
                     parentboms.BomNo = model.Bomno;
-                    parentboms.Description = model.Description;
+                    parentboms.Description = model.Bomno;
                     parentboms.Date =DateTime.Now;
                     parentboms.LastBom = model.Lastbom;
                     string AlertMessage = "";
@@ -302,7 +304,7 @@ namespace MMS.Web.Controllers.Stock
                 Parentbom_materialManager parentbom_materialManager1 = new Parentbom_materialManager();
                 ParentbomManager manager = new ParentbomManager();
                 parentboms.BomNo = model.Bomno;
-                parentboms.Description = model.Description;
+                parentboms.Description = model.Bomno;
                 string AlertMessage = "";
                 var totallist1 = parentbom_materialManager1.Get();
                 var productListcode = totallist1.Where(x => x.ProductId.ToString().ToLower().Contains(model.Productid.ToString().ToLower()) && x.BomID.ToString().ToLower().Contains(model.Bomid.ToString().ToLower())).ToList();
@@ -417,7 +419,7 @@ namespace MMS.Web.Controllers.Stock
             return PartialView("~/Views/Stock/BillOfMaterial/BillOfMaterialDetails.cshtml", model);
         }
         [HttpPost]
-        public ActionResult BOMGridDelete(int BomId)
+        public ActionResult BOMGridDelete(int BomId, bool IsChecked)
         {
             ParentbomManager ParentbomManager = new ParentbomManager();
             string status = "";
@@ -426,7 +428,7 @@ namespace MMS.Web.Controllers.Stock
             if (parentbom != null)
             {
                 status = "Success";
-                ParentbomManager.Delete(parentbom.BomId);
+                ParentbomManager.Delete(parentbom.BomId, IsChecked);
             }
             return Json(status, JsonRequestBehavior.AllowGet);
         }

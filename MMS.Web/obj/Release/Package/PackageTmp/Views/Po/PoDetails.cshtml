@@ -680,7 +680,6 @@
                             if (data && data.Success) {
                                 if (data.message === "Inserted") {
                                     alert("PO Added successful");
-                                    debugger;
                                     // Update table with new indents for the current IndentNo
                                     updateIndentTable(data.Indents);
                                 }
@@ -854,7 +853,6 @@
     </script>
     <script>
     $(document).ready(function () {
-        debugger;
     var data = @Html.Raw(ViewBag.DataListJson); // Deserialize server-side serialized JSON
     console.log('Data received:', data);
 
@@ -862,18 +860,18 @@
     tbody.empty();
 
         var row = '<tr>' +
-            '<td>' + data.ProductName + '</td>' +
+            '<td id="Productid_' + data.productid + '">' + data.ProductName + '</td>' +
             '<td>' + data.StoreName + '</td>' +
             '<td>' + data.UomName + '</td>' +
             '<td>' + data.UnitPrice + '</td>' +
-            '<td>' + data.IndentQty + '</td>' +
-            '<td><input type="text" class="form-control po-qty" id="PoQty_' + data.IndentPoMapId + '" value="' + data.PoQty + '" /></td>' +
-            '<td>' + data.TaxPercentage + '</td>' +
-            '<td><input type="text" class="form-control tax-value" id="TaxValue_' + data.IndentPoMapId + '" readonly value="' + data.TaxValue + '" /></td>' +
-            '<td><input type="text" class="form-control discount-percentage" id="DiscountPercentage_' + data.IndentPoMapId + '" value="' + data.DiscountPercentage + '" /></td>' +
-            '<td><input type="text" class="form-control discount-value" id="DiscountValue_' + data.IndentPoMapId + '" readonly value="' + data.DiscountValue + '" /></td>' +
-            '<td><input type="text" class="form-control subtotal" id="Subtotal_' + data.IndentPoMapId + '" readonly value="' + data.SubtotalValue + '" /></td>' +
-            '<td><input type="text" class="form-control total-value" id="TotalValue_' + data.IndentPoMapId + '" readonly value="' + data.TotalValue + '" /></td>' +
+            '<td>' + data.indentqty + '</td>' +
+            '<td><input type="text" class="form-control po-qty" id="PoQty_' + data.podetail + '" value="' + data.PoQty + '" /></td>' +
+            '<td>' + data.taxpercentage + '</td>' +
+            '<td><input type="text" class="form-control tax-value" id="TaxValue_' + data.podetail + '" readonly value="' + data.TaxValue + '" /></td>' +
+            '<td><input type="text" class="form-control discount-percentage" id="DiscountPercentage_' + data.podetail + '" value="' + data.discountpercentage + '" /></td>' +
+            '<td><input type="text" class="form-control discount-value" id="DiscountValue_' + data.podetail + '" readonly value="' + data.DiscountValue + '" /></td>' +
+            '<td><input type="text" class="form-control subtotal" id="Subtotal_' + data.podetail + '" readonly value="' + data.SubtotalValue + '" /></td>' +
+            '<td><input type="text" class="form-control total-value" id="TotalValue_' + data.TotalValue + '" readonly value="' + data.TotalValue + '" /></td>' +
             '<td><button type="button" class="btn btn-primary btn-sm saveEdit-btn">Save</button></td>' +
             '</tr>';
 
@@ -888,11 +886,11 @@
     // Bind click event to dynamically generated "Save" buttons
     tbody.on('click', '.saveEdit-btn', function () {
         var index = $(this).data('index');
-        var indentPoMapId = data.IndentPoMapId;
+        var podetail = data.podetail;
         var row = $(this).closest('tr');
         data.PoQty = parseFloat(row.find('.po-qty').val());
         data.DiscountPercentage = parseFloat(row.find('.discount-percentage').val());
-        SaveItem(indentPoMapId, data);
+        SaveItem(podetail, data);
     });
 
     // Initial calculations
@@ -949,29 +947,37 @@ function updateCalculations() {
     $('#Total_TotalValue').val(grandTotal.toFixed(2));
     }
 
-        function SaveItem(indentPoMapId, data) {
-            debugger;
-            var PoQty = $('#PoQty_' + indentPoMapId).val();
-            var DiscountPercentage = $('#DiscountPercentage_' + indentPoMapId).val();
-            var TaxValue = $('#TaxValue_' + indentPoMapId).val();
-            var DiscountValue = $('#DiscountValue_' + indentPoMapId).val();
-            var Subtotal = $('#Subtotal_' + indentPoMapId).val();
-            var TotalValue = $('#TotalValue_' + indentPoMapId).val();
+        function SaveItem(podetail, data) {
+            var PoQty = $('#PoQty_' + podetail).val();
+            var DiscountPercentage = $('#DiscountPercentage_' + podetail).val();
+            var TaxValue = $('#TaxValue_' + podetail).val();
+            var DiscountValue = $('#DiscountValue_' + podetail).val();
+            var Subtotal = $('#Subtotal_' + podetail).val();
+            var TotalValue = $('#TotalValue_' + podetail).val();
+            var ProductId = data.productid;
 
             var SupplierId = $('#SupplierId').val();
-            var ProductId = data.ProductId;
             var StoreCode = data.StoreCode;
             var UnitPrice = data.UnitPrice;
             var IndentQty = data.IndentQty;
             var PoDate = $('#PoDate').val();
             var UomId = data.UomId;
-            var TaxPercentage = data.TaxPercentage;
+            var TaxPercentage = data.taxpercentage;
             var PoNumber = $('#PoNumber').val();
             var IndentNumber = $('#IndentNumber').val();
-             var IndentPoMapId = data.IndentPoMapId
-
+            var podetail = data.podetail;
+            var Total_Price = $('#Total_Price').val();
+            var Total_DiscountValue = $('#Total_DiscountValue').val();
+            var Total_SubtotalValue = $('#Total_SubtotalValue').val();
+            var Total_TaxValue = $('#Total_TaxValue').val();
+            var Total_TotalValue = $('#Total_TotalValue').val();
             var formData = new FormData();
-            formData.append("IndentPoMapId", IndentPoMapId);
+            formData.append("Total_Price", Total_Price);
+            formData.append("Total_DiscountValue", Total_DiscountValue);
+            formData.append("Total_SubtotalValue", Total_SubtotalValue);
+            formData.append("Total_TaxValue", Total_TaxValue);
+            formData.append("Total_TotalValue", Total_TotalValue);
+            formData.append("PodetailId", podetail);
             formData.append("SupplierId", SupplierId);
             formData.append("ProductId", ProductId);
             formData.append("StoreCode", StoreCode);
@@ -991,7 +997,7 @@ function updateCalculations() {
 
             $.ajax({
                 type: 'POST',
-                url: '/Po/SavePoIndentMapping',
+                url: '/Po/SaveConfirmPo',
                 contentType: false,
                 processData: false,
                 dataType: 'json',

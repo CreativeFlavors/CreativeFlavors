@@ -52,13 +52,13 @@ namespace MMS.Repository.Managers
             }
             return billOfMaterial;
         }
-        public bool Delete(int id)
+        public bool Delete(int id, bool IsChecked)
         {
             bool result = false;
             try
             {
                 parentbom model = parentbomRepository.GetById(id);
-                model.IsDelete = false;
+                model.IsDelete = IsChecked;
                 model.DeletedBy = HttpContext.Current.Session["UserName"].ToString();
                 model.DeletedDate = DateTime.Now;
                 parentbomRepository.Update(model);
@@ -77,7 +77,7 @@ namespace MMS.Repository.Managers
             parentbom billOfMaterial = new parentbom();
             if (BOMID != null)
             {
-                billOfMaterial = parentbomRepository.Table.Where(x => x.BomId == BOMID && x.IsDelete == true).FirstOrDefault();
+                billOfMaterial = parentbomRepository.Table.Where(x => x.BomId == BOMID ).FirstOrDefault();
             }
             return billOfMaterial;
         }
@@ -104,7 +104,7 @@ namespace MMS.Repository.Managers
             List<parentbom> customertransaction = new List<parentbom>();
             try
             {
-                customertransaction = parentbomRepository.Table.ToList<parentbom>().Where(x => x.IsDelete == true).ToList();
+                customertransaction = parentbomRepository.Table.ToList<parentbom>().ToList();
             }
             catch (Exception ex)
             {

@@ -42,7 +42,7 @@ namespace MMS.Web.Controllers
                 BuyerCode = b.BuyerCode,
                 CustomerName = b.CustomerName,
                 Account = b.Account,
-                Physical1 = b.Physical1,
+                Physical1 = b.PhysicalCode,
                 Telephone1 = b.Telephone1,
                 EmailContact = b.EmailContact
 
@@ -302,7 +302,7 @@ namespace MMS.Web.Controllers
                 model.BuyerCode = item.BuyerCode;
                 model.CustomerName = item.CustomerName;
                 model.Account = item.Account;
-                model.Physical1 = item.Physical1;
+                model.Physical1 = item.PhysicalCode;
                 model.Telephone1 = item.Telephone1;
                 model.EmailContact = item.EmailContact;
                 filterbuyerMasterModels.Add(model);

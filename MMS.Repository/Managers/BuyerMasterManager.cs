@@ -66,7 +66,7 @@ namespace MMS.Repository.Managers
 
         //get sinle employee by using sp
 
-        public BuyerModel_SP GetSingleBuyerModel(int id) 
+        public BuyerModel_SP GetSingleBuyerModel(int? id) 
         {
             List<BuyerModel_SP> buyerMaster1 = new List<BuyerModel_SP>();
             try

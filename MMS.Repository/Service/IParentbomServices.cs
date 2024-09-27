@@ -11,6 +11,5 @@ namespace MMS.Repository.Service
     {
         parentbom Post(parentbom arg);
         bool Put(parentbom arg);
-        bool Delete(int id);
     }
 }
