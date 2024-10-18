@@ -96,7 +96,8 @@ namespace MMS.Web.Models
         public BuyerMaster1 BuyerMaster { get; set; }
         [Column("conversionvalue")]
         public decimal ConversionValue { get; set; } = 0;
-        public string currencyOption { get; set; }
+        public int? currencyOption { get; set; }
+        public string currencytype{ get; set; }
         public List<ParentBillofMaterial>  bOMMaterialListModels { get; set; }
         public List<Salesorder_Grid> Salesorder_Gridlist { get; set; }
         public List<mrp_material_list> mrp_Material_Lists { get; set; }

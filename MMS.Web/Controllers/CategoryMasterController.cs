@@ -83,14 +83,8 @@ namespace MMS.Web.Controllers
             var MaterialCatgoryList = CategorymasterManager.Get();
             if(model.MaterialCategoryMasterId == 0)
             {
-                var productList = MaterialCatgoryList.Where(x => x.CategoryName.ToLower().Contains(model.CategoryName.ToLower()) && x.CategoryCode.ToString().ToLower().Contains(model.CategoryCode.ToString().ToLower())).ToList();
-                if (productList.Count() != 0)
-                {
-                    Altermessage = "alreadythereall";
-                    return Json(Altermessage, JsonRequestBehavior.AllowGet);
-                }
-                var productListcode = MaterialCatgoryList.Where(x => x.CategoryName.ToLower().Contains(model.CategoryName.ToLower())).ToList();
-                if (productList.Count() != 0)
+                var productListcode = MaterialCatgoryList.Where(x => x.CategoryCode.ToLower().Contains(model.CategoryCode.ToLower())).ToList();
+                if (productListcode.Count() != 0)
                 {
                     Altermessage = "CategoryCodeThere";
                     return Json(Altermessage, JsonRequestBehavior.AllowGet);
@@ -110,7 +104,7 @@ namespace MMS.Web.Controllers
                 CategoryMaster.CategoryId = model.MaterialCategoryMasterId;
                 CategorymasterManager.Put(CategoryMaster);
                 Altermessage = "Updated";
-            }
+            } 
             return Json(Altermessage, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]

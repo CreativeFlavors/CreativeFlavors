@@ -393,6 +393,15 @@ namespace MMS.Repository.Managers
                 oCustAddress = Customer_AddressRepository.Table.Where(x => x.Addresshd_id == AddressId).FirstOrDefault();
             }
             return oCustAddress;
+        }       
+        public Customer_Addresses GetCustAddsuppId(int AddressId)
+        {
+            Customer_Addresses oCustAddress = new Customer_Addresses();
+            if (AddressId != 0)
+            {
+                oCustAddress = Customer_AddressRepository.Table.Where(x => x.suppaddresshdid == AddressId).FirstOrDefault();
+            }
+            return oCustAddress;
         }  
         public Customer_Addresses GetCustAddIds(int AddressId,int buyeid)
         {
@@ -408,7 +417,7 @@ namespace MMS.Repository.Managers
             Customer_Addresses oCustAddress = new Customer_Addresses();
             if (AddressId != 0)
             {
-                oCustAddress = Customer_AddressRepository.Table.Where(x => x.Addresshd_id == AddressId && x.supplierid == supp).FirstOrDefault();
+                oCustAddress = Customer_AddressRepository.Table.Where(x => x.suppaddresshdid == AddressId && x.supplierid == supp).FirstOrDefault();
             }
             return oCustAddress;
         }

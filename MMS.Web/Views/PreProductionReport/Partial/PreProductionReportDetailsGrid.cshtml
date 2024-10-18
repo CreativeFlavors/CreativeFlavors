@@ -1,5 +1,4 @@
 ﻿@model MMS.Web.Models.Temp_Production.Temp_ProductionModel
-@using MMS.Repository.Managers
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -47,13 +46,16 @@
 </head>
 <body>
 
-    <div id="details">       
+    <div id="detailsgrid">
+        <div class="table-responsive reports_table_responsive">
+
             <ol class="breadcrumb font-20 d-flex justify-content-center">
                 <li class="breadcrumb-item " aria-current="page" style="font-size: 112%;">Pre-Production Details</li>
             </ol>
             <div class="customer_manage_search_containers" style="width:40%;">
-                <input type="text" placeholder="Search by Product Name" id="SearchID" name="search2">
-                <button class="buttonone" onclick="Search()" title="Filter" type="submit"><i class="fa fa-search"></i></button>
+                <div class="customer_manage_search_container">
+                    <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search" placeholder="search by Product Name">
+                </div>
 
             </div>
             <div class="manage_customers_table_in_responsive mt-3" id="form">
@@ -95,27 +97,34 @@
                             </th>
                         </tr>
                     </thead>
-                    @if (ViewBag.Productions != null)
+                    @if (Model.temp_ProductionModel1.Count() > 0)
                     {
-                        <tbody>
+                        <tbody id="headers">
                             @{
-                                int currentPage = ViewBag.CurrentPage ?? 1;
-                                int pageSize = ViewBag.PageSize ?? 8;
-                                int totalItems = ViewBag.Productions.Count;
+                                int currentPage = ViewBag.CurrentPage1 ?? 1;
+                                int pageSize = ViewBag.TotalPages1 ?? 8;
+                                int totalItems = Model.temp_ProductionModel1.Count();
                                 int startSerialNumber = (currentPage - 1) * pageSize + 1;
                             }
-                            @foreach (var item in ViewBag.Productions)
+                            @foreach (var item in Model.temp_ProductionModel1)
                             {
                                 <tr class="font-14">
-                                    <td>@startSerialNumber</td>
-                                    <td>@item.SalesOrderId</td>
-                                    <td>@item.BuyerName</td>
-                                    <td>@item.ProductName</td>
-                                    <td>@item.ProductTypeName</td>
+                                    <td style="width: 5%;">@startSerialNumber</td>
+                                    <td style="text-align: center; width: 5%;">@item.SalesOrderId</td>
+                                    <td style="text-align: left; width: 10%;">@item.BuyerName</td>
+                                    <td style="text-align: left; width: 10%;">@item.ProductName</td>
+                                    <td style="text-align: left; width: 10%;">@item.ProductTypeName</td>
                                 </tr>
                                 startSerialNumber++;
-                            }
+                                }
+                            </tbody>
+                    }
+                    else
+                    {
+                        <tbody>
+                            <tr><td colspan="15">No records found</td></tr>
                         </tbody>
+
                     }
                 </table>
             </div>
@@ -123,34 +132,35 @@
             <div class="row manage_customer_show">
                 <div class="font-14 manage_customer_show_I col-xl-6">
                     <span>Showing </span>
-                    <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
-                        <option value="5" @(ViewBag.PageSize == 5 ? "selected" : "")>5</option>
-                        <option value="10" @(ViewBag.PageSize == 10 ? "selected" : "")>10</option>
+                    <select class="form-select font-16" name="manage_details_page_size" id="manage_details_page_size" aria-label="select example">
                         <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
-                        <option value="20" @(ViewBag.PageSize == 20 ? "selected" : "")>20</option>
+                        <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
+                        <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
+                        <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
                     </select>
                 </div>
 
                 <div class="col-xl-6 manage_customer_show_II">
                     <nav class="float-xl-end">
-                        <ul class="pagination font-14">
+                        <ul class="pagination font-14" id="paginationDetails">
                             <li class="page-item">
-                                <a href="##" id="previousPage" class="page-link">Previous</a>
+                                <a href="#" id="previousPage1" class="page-link">Previous</a>
                             </li>
-                            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                            @for (int i = 1; i <= ViewBag.TotalPages1; i++)
                             {
-                                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                    <a href="#" class="page-link">@i</a>
+                                <li class="page-item @(i == ViewBag.CurrentPage1 ? "active" : "")">
+                                    <a href="#" class="page-link" data-page="@i">@i</a>
                                 </li>
                             }
                             <li class="page-item">
-                                <a class="page-link" id="nextPage" href="##">Next</a>
+                                <a href="#" id="nextPage1" class="page-link">Next</a>
                             </li>
                         </ul>
                     </nav>
                 </div>
             </div>
         </div>
+    </div>
 
 
     <script src="~/Content/js/custom.js"></script>
@@ -162,85 +172,109 @@
             $(".report-inner-section").addClass("transection");
             $("#PreProduction").attr('checked', true);
         });
-        $(document).ready(function () {
-            $('#manage_customer_show_no').change(function () {
-                var PageSize = parseInt($(this).val());
-                $.ajax({
-                    url: '/PreProductionReport/PreProductionReportDetailsGrid',
-                    type: "GET",
-                    dataType: "JSON",
-                    data: { pageSize: PageSize },
-                    success: function (values) {
-                        $("#summery").html(values).show();
-                    }
-                });
-            });
-        $(".page-link").click(function(e){
-          e.preventDefault();
-          var page = $(this).data("page");
+            $(document).ready(function () {
 
-          $.ajax({
-              url: "@Url.Action("PreProductionReportDetailsGrid", "PreProductionReport")",
-              type: "GET",
-              data: { page: page },
-              success: function(data){
-                  $("#summery").html(data).show();
-              }
-          });
-      });
+            $('#manage_details_page_size').change(function () {
+        var pageSize = parseInt($('#manage_details_page_size').val());
+        $.ajax({
+            url: '/PreProductionReport/PreProductionReportDetailsGrid',
+            type: "GET",
+            data: { pageSize: pageSize },
+            success: function (data) {
+                $("#detailsgrid").html(data).show();
+            },
+            error: function () {
+                alert('Error loading data');
+            }
+        });
+    });
 
-   $('#previousPage').click(function(e) {
-      e.preventDefault();
-      var currentPage = parseInt('@ViewBag.CurrentPage');
-      if (currentPage > 1) {
-          var previousPage = currentPage - 1;
-          $.ajax({
-              url: '/PreProductionReport/PreProductionReportDetailsGrid',
-              type: "GET",
-              dataType: "JSON",
-              data: { page: previousPage, pageSize:parseInt('@ViewBag.PageSize') },
-              success: function (values) {
-                  $("#summery").html(values).show();
-              }
-          });
-      }
-  });
-
-        $('#nextPage').click(function (e) {
-          debugger;
+    // Pagination click handler
+    $(document).on("click", "#paginationDetails .page-link[data-page]", function (e) {
         e.preventDefault();
-        var currentPage = parseInt('@ViewBag.CurrentPage');
-        var totalPages = parseInt('@ViewBag.TotalPages');
+        var page = $(this).data("page");
+        var pageSize = parseInt($('#manage_details_page_size').val());
+        $.ajax({
+            url: '/PreProductionReport/PreProductionReportDetailsGrid',
+            type: "GET",
+            data: { page: page, pageSize: pageSize },
+            success: function (data) {
+                $("#detailsgrid").html(data).show();
+            },
+            error: function () {
+                alert('Error loading data');
+            }
+        });
+    });
+
+    // Previous page button
+    $('#previousPage1').click(function (e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage1');
+        if (currentPage > 1) {
+            var previousPage = currentPage - 1;
+            var pageSize = parseInt('@ViewBag.PageSize');
+            $.ajax({
+                url: '/PreProductionReport/PreProductionReportDetailsGrid',
+                type: "GET",
+                data: { page: previousPage, pageSize: pageSize },
+                success: function (values) {
+                    $("#detailsgrid").html(values).show();
+                },
+                error: function () {
+                    alert('Error loading data');
+                }
+            });
+        }
+    });
+
+    // Next page button
+    $('#nextPage1').click(function (e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage1');
+        var totalPages = parseInt('@ViewBag.TotalPages1');
         if (currentPage < totalPages) {
             var nextPage = currentPage + 1;
-            window.location.href = "@Url.Action("PreProductionReportDetailsGrid", "PreProductionReport")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
+            var pageSize = parseInt('@ViewBag.PageSize');
+            $.ajax({
+                url: '/PreProductionReport/PreProductionReportDetailsGrid',
+                type: "GET",
+                data: { page: nextPage, pageSize: pageSize },
+                success: function (values) {
+                    $("#detailsgrid").html(values).show();
+                },
+                error: function () {
+                    alert('Error loading data');
+                }
+            });
         }
     });
 });
     </script>
 
     <script>
-        function Search() {
+        $(document).ready(function () {
+
+        $("#customer_manage_search").keyup(function () {
+            var bomsearch = $("#customer_manage_search").val();
             $.ajax({
                 type: "GET",
                 url: '/PreProductionReport/PreProductionReportSearch',
-                data: { filter: $('#SearchID').val() },
+                data: { filter: bomsearch },
                 dataType: 'json',
                 success: function (data) {
-                    $("tbody").empty();
+                    $("#headers").empty();
                     var count = 1;
                     $.each(data, function (i, item) {
-                        $("tbody").append(`
-                             <tr class="font-14">
-                                 <td>${count}</td>
-                                 <td>${item.SalesOrderId}</td>
-                                 <td>${item.BuyerName}</td>
-                                 <td>${item.ProductName}</td>
-                                 <td>${item.ProductItem}</td>
-                                 <td>${item.ProductTypeName}</td>
-                                 <td>${item.ProductionType}</td>
-                             </tr>
-                         `);
+                        $("#headers").append(`
+                                         <tr class="font-14">
+                                             <td style="width: 5%;">${count}</td>
+                                             <td style="text-align:right;width: 5%">${item.SalesOrderId}</td>
+                                             <td style="text-align:left; width: 15%;">${item.BuyerName}</td>
+                                             <td style="text-align:left; width: 15%;">${item.ProductName}</td>
+                                             <td style="text-align:left; width: 15%;">${item.ProductTypeName}</td>
+                                         </tr>
+                                     `);
                         count++;
                     });
                 },
@@ -248,7 +282,8 @@
                     console.error("Error occurred:", status, error);
                 }
             });
-        }
+        });
+        });
 
     </script>
 

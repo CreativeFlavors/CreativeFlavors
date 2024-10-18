@@ -19,6 +19,7 @@ namespace MMS.Web.Models.Product
         public string ProductDesc { get; set; }
         public int TaxMasterId { get; set; }
         public string CategoryName { get; set; }
+        public string productypeName { get; set; }
         public int UomMasterId { get; set; }
         public decimal? Price { get; set; }
         public int BomNo { get; set; }

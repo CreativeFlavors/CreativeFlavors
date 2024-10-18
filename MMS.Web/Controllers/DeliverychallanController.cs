@@ -63,6 +63,7 @@ namespace MMS.Web.Controllers
                 model.Total_Price = i.Total_price;
                 model.Total_discountval = i.Total_disamount;
                 model.Total_Grandtotal = i.grand_total;
+                model.currencyOption = i.currencyid;
                 model.Total_Subtotal = i.Total_subtotal;
                 model.Total_TaxValue = i.Total_taxamount;
                 model.BuyerMaster = data1.Where(W => W.BuyerMasterId == i.customerid).ToList().FirstOrDefault();
@@ -97,19 +98,22 @@ namespace MMS.Web.Controllers
             TaxTypeManager taxTypeManager = new TaxTypeManager();
             Salesorders salesorders = new Salesorders();
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
+            CurrencyManager currencyManager = new CurrencyManager();
+
             decimal? conversionval = 0;
             int id = 0;
-            if (model.currencyOption.ToUpper() != "ZAR")
+            if (model.currencyOption != 0)
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                var ConversionValue = currencyManager.GetCurrencycunversion().Where(m => m.Id == model.currencyOption).FirstOrDefault();
+                conversionval = ConversionValue.ConversionValue;
+                id = ConversionValue.Id;
             }
             else
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                //var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
+                //conversionval = ConversionValue.conversionvalue;
+                //id = ConversionValue.id;
+                conversionval = 1;
             }
 
             var product = productManager.GetId(model.ProductID);
@@ -157,20 +161,19 @@ namespace MMS.Web.Controllers
             ProductManager productManager = new ProductManager();
             TaxTypeManager taxTypeManager = new TaxTypeManager();
             Salesorders salesorders = new Salesorders();
+            CurrencyManager currencyManager = new CurrencyManager();
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
             decimal? conversionval = 0;
             int id = 0;
-            if (model.currencyOption.ToUpper() != "ZAR")
+            if (model.currencyOption != 0)
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                var ConversionValue = currencyManager.GetCurrencycunversion().Where(m => m.Id == model.currencyOption).FirstOrDefault();
+                conversionval = ConversionValue.ConversionValue;
+                id = ConversionValue.Id;
             }
             else
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                conversionval = 1;
             }
 
             var product = productManager.GetId(model.ProductID);
@@ -240,6 +243,7 @@ namespace MMS.Web.Controllers
             models.Total_Price = Math.Round((decimal)headerdata.Total_price, 2);
             models.salesorderdate = headerdata.Salesorderdate;
             models.quantity = headerdata.quantity;
+            models.currencyOption = headerdata.currencyid;
             models.Final_Grandtotal = headerdata.grand_total;
             models.item = headerdata.items;
             List<Salesorders> totaldata = new List<Salesorders>();
@@ -317,7 +321,7 @@ namespace MMS.Web.Controllers
             return PartialView("Partial/DC_Details", models);
         }
         [HttpPost]
-        public JsonResult DC_Post(string buyerid, string currencyOption, decimal Total_Price, decimal Total_Subtotal, decimal Total_TaxValue, decimal Total_discountval, decimal Total_Grandtotal, string salesOrderData,int SalesorderId)
+        public JsonResult DC_Post(string buyerid, int currencyOption, decimal Total_Price, decimal Total_Subtotal, decimal Total_TaxValue, decimal Total_discountval, decimal Total_Grandtotal, string salesOrderData,int SalesorderId)
         {
             var val = 0;
             var salesOrderList = JsonConvert.DeserializeObject<List<SalesOrderItem>>(salesOrderData);
@@ -336,17 +340,15 @@ namespace MMS.Web.Controllers
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
             decimal? conversionval = 0;
             int id = 0;
-            if (currencyOption.ToUpper() != "ZAR")
+            if (currencyOption != 0)
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                var ConversionValue = currencyManager.GetCurrencycunversion().Where(m => m.Id == currencyOption).FirstOrDefault();
+                conversionval = ConversionValue.ConversionValue;
+                id = ConversionValue.Id;
             }
             else
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                conversionval = 1;
             }
 
             DeliveryChallan_hd DeliveryChallanHd = new DeliveryChallan_hd();
@@ -355,6 +357,7 @@ namespace MMS.Web.Controllers
             DeliveryChallanHd.TotalPrice = Total_Price;
             DeliveryChallanHd.TotalSubtotal = Total_Subtotal;
             DeliveryChallanHd.TotalTaxAmount = Total_TaxValue;
+            DeliveryChallanHd.currencyid = currencyOption;
             DeliveryChallanHd.TotalDisAmount = Total_discountval;
             DeliveryChallanHd.GrandTotal = Total_Grandtotal;
             DeliveryChallanHd.IsActive = true;
@@ -375,7 +378,6 @@ namespace MMS.Web.Controllers
 
             var headerid = deliveryChallanHD_Manager.POST(DeliveryChallanHd);
             DeliveryChallan_dt deliveryChallanDt = new DeliveryChallan_dt();
-            var currencyid = currencyManager.GetContainCurrencyid(currencyOption);
             foreach (var i in salesOrderList)
             {
                 var dc_dt = deliveryChallanDt_Manager.GetSOId(Convert.ToInt32(i.SalesorderId_DT));
@@ -407,7 +409,7 @@ namespace MMS.Web.Controllers
                 deliveryChallanDt.DiscountPer = DT.Discountperid;
                 deliveryChallanDt.UnitPrice = product.Price;
                 deliveryChallanDt.DCDate = DateTime.Now;
-                deliveryChallanDt.CurrencyId = currencyid.id;
+                deliveryChallanDt.CurrencyId = currencyOption;
                 deliveryChallanDt.CustAddCode = addreddcode.BuyerCode;
                 deliveryChallanDt.CustBillCode = billing.Addresshd_id.ToString();
                 deliveryChallanDt.CustShipCode = shipping.Addresshd_id.ToString();

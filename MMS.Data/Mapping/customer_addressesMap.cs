@@ -16,6 +16,7 @@ namespace MMS.Data.Mapping
             HasKey(t => t.addressdt_id);
             Property(t => t.addressdt_id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             Property(t => t.Addresshd_id);
+            Property(t => t.suppaddresshdid);
             Property(t => t.addresstypeid).HasColumnName("addresstypeid");
 
             Property(t => t.Buyerid)

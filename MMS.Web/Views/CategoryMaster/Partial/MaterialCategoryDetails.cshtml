@@ -11,7 +11,8 @@
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
     <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -31,7 +32,7 @@
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="#Account">Category Name</label>
-                            @Html.TextBoxFor(m => m.CategoryName, new { @class = "form-control text-field", placeholder = "Enter the Supplier Name", onkeyup = "categoryfun()" })
+                            @Html.TextBoxFor(m => m.CategoryName, new { @class = "form-control text-field", placeholder = "Enter the Category Name", onkeyup = "categoryfun()" })
                             <p class="text-danger" id="error31"></p>
                             @Html.HiddenFor(m => m.MaterialCategoryMasterId)
                         </div>
@@ -39,7 +40,7 @@
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="#Account">Category Code</label>
-                            @Html.TextBoxFor(m => m.CategoryCode, new { @class = "form-control text-field", placeholder = "Enter the Supplier Code", onkeyup = "categoryCod()" })
+                            @Html.TextBoxFor(m => m.CategoryCode, new { @class = "form-control text-field", placeholder = "Enter the Category Code", onkeyup = "categoryCod()" })
                             <p class="text-danger" id="error"></p>
                         </div>
                     </div>
@@ -48,7 +49,7 @@
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="#AccountTypeId">Category Type </label>
-                            @Html.DropDownListFor(m => m.Categorytype, MMS.Web.ExtensionMethod.HtmlHelper.ProductType(), new { @class = "select-style text-field", onchange = "categorytypeCod()" })
+                            @Html.DropDownListFor(m => m.Categorytype, MMS.Web.ExtensionMethod.HtmlHelper.CategoryType(), new { @class = "select-style text-field", onchange = "categorytypeCod()" })
                             <p class="text-danger" id="error3"></p>
                         </div>
                     </div>
@@ -64,14 +65,14 @@
                             @if (Model != null && Model.MaterialCategoryMasterId != 0)
                             {
 
-                                <button type="submit" class="fill-color font-15" onclick="Save(); category();">
+                                <button type="submit" class="fill-color font-15" onclick="Save(); categorysave();">
                                     Update
                                 </button>
 
                             }
                             else
                             {
-                                <button type="submit" class="fill-color font-15" onclick="Save(); category();">
+                                <button type="submit" class="fill-color font-15" onclick="Save(); categorysave();">
                                     SAVE
                                 </button>
                             }
@@ -81,6 +82,10 @@
             </div>
 
         </section>
+
+        <div id="toast"></div>
+
+
     </div>
 
 
@@ -95,15 +100,15 @@
             $("#Category").attr('checked', true);
         });
     </script>
+
     <script>
         function Save() {
             var Categorytype = $("#Categorytype").val();
             var CategoryCode = $("#CategoryCode").val();
             var CategoryName = $("#CategoryName").val();
             var MaterialCategoryMasterId = $("#MaterialCategoryMasterId").val();
-
-            if (CategoryName !== "" && CategoryCode !== "" && Categorytype !== "") {
-                // Create form data
+            var phoneregx = /^[a-zA-Z\s\.]*$/;
+            if (CategoryName !== "" && CategoryCode !== "" && Categorytype !== "" && phoneregx.test(CategoryName)) {
                 var formData = {
                     Categorytype: Categorytype,
                     CategoryCode: CategoryCode,
@@ -111,42 +116,31 @@
                     MaterialCategoryMasterId: MaterialCategoryMasterId
                 };
 
-                // Determine URL based on presence of MaterialCategoryMasterId
                 var url = '/CategoryMaster/MaterialCategoryDetailsInsert';
 
-                // Perform AJAX request
                 $.ajax({
                     type: 'POST',
                     url: url,
-                    contentType: 'application/json', // Set content type based on your data format
+                    contentType: 'application/json',
                     dataType: 'html',
-                    data: JSON.stringify(formData), // Convert formData to JSON if contentType is 'application/json'
+                    data: JSON.stringify(formData),
                     success: function (data) {
                         if (data.includes("Success")) {
-                            alert("Saved successfully");
+                            sessionStorage.setItem("showToast", "success");
                             location.href = "/CategoryMaster/CategoryMaster";
                         } else if (data.includes("Updated")) {
-                            alert("Updated successfully");
+                            sessionStorage.setItem("showToast", "updated");
                             location.href = "/CategoryMaster/CategoryMaster";
                         } else if (data.includes("CategoryCodeThere")) {
-                            alert("Category Name already exists");
-                        } else if (data.includes("alreadythereall")) {
-                            alert("Already Added");
-                        } else {
-                            alert('Operation failed. Please try again.');
+                            showErrorToast();
                         }
-                        setTimeout(function () {
-                            location.reload();
-                        }, 1000);
-                    },
-                    error: function (xhr, status, error) {
-                        alert('Update process failed: ' + error);
                     }
                 });
-            } 
+            }
         }
 
     </script>
+
 </body>
 </html>
 

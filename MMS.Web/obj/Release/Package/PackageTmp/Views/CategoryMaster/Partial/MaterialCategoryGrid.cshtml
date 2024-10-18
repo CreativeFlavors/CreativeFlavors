@@ -19,7 +19,8 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
     <style>
         .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
             padding: 16px;
@@ -141,7 +142,11 @@
                                         {
                                             <td class="veh-2" style="width: 12%; text-align:left">Finished Goods</td>
                                         }
-                                        else if (suppplier.Categorytype == 2 || suppplier.Categorytype == 3)
+                                        else if (suppplier.Categorytype == 2)
+                                        {
+                                    <td class="veh-2" style="width: 12%; text-align:left">Production Sub Assembly</td>
+                                        }
+                                        else if (suppplier.Categorytype == 3)
                                         {
                                             <td class="veh-2" style="width: 12%; text-align:left">Raw Material</td>
                                         }
@@ -197,9 +202,7 @@
             </div>
         </div>
     </div>
-
-
-
+    <div id="toast"></div>
     <script src="~/Content/js/custom.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -210,6 +213,20 @@
             $(".report-inner-section").addClass("transection");
             $("#Category").attr('checked', true);
 
+        });
+        $(document).ready(function () {
+            if (sessionStorage.getItem("showToast") === "success") {
+                showSuccessToast();
+                sessionStorage.removeItem("showToast");
+            }
+            else if (sessionStorage.getItem("showToast") === "updated") {
+                showupdateToast();
+                sessionStorage.removeItem("showToast");
+            }
+            else if (sessionStorage.getItem("showToast") === "deleted") {
+                showdeletedToast();
+                sessionStorage.removeItem("showToast");
+            }
         });
 
     </script>
@@ -297,21 +314,21 @@
                             }
 
                             $("tbody").append(`
-                            <tr class="font-14">
-                                <td class="veh1-5"style="width: 12%; ">${count}</td>
-                                <td class="veh1-5" style="width: 12%; text-align:left">${item.CategoryCode}</td>
-                                <td class="veh1-5" style="width: 12%; text-align:left">${item.CategoryName}</td>
-                                <td class="veh-2" style="width: 12%; text-align:left">${categoryTypeText}</td>
-                                <td class="veh-4" style="width:12%;">
-                                    <span class="table_icons">
-                                        <img src="/Content/assets/images/edit-icon.png" onclick="Edit('${item.MaterialCategoryMasterId}')" />
-                                    </span>
-                                    <span class="table_icons">
-                                        <img src="/Content/assets/images/delete-icon.png" onclick="Delete('${item.MaterialCategoryMasterId}')" />
-                                    </span>
-                                </td>
-                            </tr>
-                        `);
+                                                    <tr class="font-14">
+                                                        <td class="veh1-5"style="width: 12%; ">${count}</td>
+                                                        <td class="veh1-5" style="width: 12%; text-align:left">${item.CategoryCode}</td>
+                                                        <td class="veh1-5" style="width: 12%; text-align:left">${item.CategoryName}</td>
+                                                        <td class="veh-2" style="width: 12%; text-align:left">${categoryTypeText}</td>
+                                                        <td class="veh-4" style="width:12%;">
+                                                            <span class="table_icons">
+                                                                <img src="/Content/assets/images/edit-icon.png" onclick="Edit('${item.MaterialCategoryMasterId}')" />
+                                                            </span>
+                                                            <span class="table_icons">
+                                                                <img src="/Content/assets/images/delete-icon.png" onclick="Delete('${item.MaterialCategoryMasterId}')" />
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                `);
                             count++;
                         });
                     }
@@ -340,25 +357,16 @@
 
 
         function Delete(id) {
-            var answer = confirm("Are u sure want to delete");
-            if (answer) {
                 $.ajax({
                     type: 'POST',
                     url: '@Url.Action("Delete", "CategoryMaster")',
                     data: { CategoryId: id },
                     success: function (response) {
-                        alert("Delete Successfully");
-                        window.location.href = '/CategoryMaster/CategoryMaster';
+                        sessionStorage.setItem("showToast", "deleted");
+                        location.href = "/CategoryMaster/CategoryMaster";
                         return false;
-                    },
-                    else: function (ex) {
-                        alert('This address Already Exist in the database.');
                     }
                 });
-            }
-            else {
-                return false;
-            }
         }
 
     </script>

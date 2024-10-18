@@ -12,19 +12,9 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
     <style>
-        .alert {
-            position: relative;
-            padding: 5px 1rem;
-        }
-
-        .alert-danger {
-            color: #842029;
-            background-color: #f8d7da;
-            border-color: #f5c2c7;
-            width: 119%;
-        }
-
         strong#close {
             margin-left: 16%;
             cursor: pointer;
@@ -101,9 +91,6 @@
         <div class="edit-section">
             <div class="d-flex">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Ledger</h1>
-                <div id="alert">
-
-                </div>
             </div>
 
             @*<div class="radioSection">
@@ -170,7 +157,7 @@
 
         </div>
         <div id="debit">
-            <div class="d-flex justify-content-center" >
+            <div class="d-flex justify-content-center">
                 <button class="btn btn-success" id="makepayment" onclick="Save(); debitreffun()">Make Payment</button>
 
             </div>
@@ -191,7 +178,7 @@
 
     </div>
 
-
+    <div id="toast"></div>
     <script src="~/Content/js/custom.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 
@@ -289,7 +276,7 @@
             if (filter.test(Cash) || (filter.test(PaymentAmount) && PaymentRefNo != "") || (filter.test(Debitnotevalue) && Debitnoteref != "" && Debitnotedate != "")) {
 
             if (@Model.InvBalanceAmount == "0.00") {
-                alert("Full payment done already");
+                showsfullpaymentToast();
             }
             else {
                 var buyerid ="@Model.buyerid";
@@ -349,10 +336,10 @@ $.ajax({
             }, 1500);
         }
         else if (data === "Done") {
-            alert("Full payment done already");
+            showsfullpaymentToast();
         }
         else if (data == "Incorrect") {
-            alert("Give a correct payment");
+            showscrtpaymentToast();
         }
 
     }
@@ -360,20 +347,6 @@ $.ajax({
 });
             }
             }
-            else {
-                $("#alert").append(
-                    '<div class="alert alert-danger">' +
-                    '<strong>Alert!</strong> Please enter ledger Details ' +
-                    '<strong id="close">x</strong>' +
-                    '</div>'
-                );
-                $(document).on('click', '#close', function () {
-                    $(".alert-danger").hide();
-                });
-            }
-
-
-
         }
 
     </script>

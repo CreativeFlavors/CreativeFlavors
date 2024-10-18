@@ -18,7 +18,8 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
     <style>
         .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
             padding: 16px;
@@ -235,7 +236,7 @@
     <div id="EditBuyerMaster">
 
     </div>
-
+    <div id="toast"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
             integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -246,6 +247,20 @@
 
     <script>
 
+        $(document).ready(function () {
+            if (sessionStorage.getItem("showToast") === "success") {
+                showSuccessToast();
+                sessionStorage.removeItem("showToast");
+            }
+            else if (sessionStorage.getItem("showToast") === "updated") {
+                showupdateToast();
+                sessionStorage.removeItem("showToast");
+            }
+            else if (sessionStorage.getItem("showToast") === "deleted") {
+                showdeletedToast();
+                sessionStorage.removeItem("showToast");
+            }
+        });
          currentPage = @(currentPage);
 
         $(window).on("load", function () {
@@ -403,22 +418,8 @@
                 data: { id: id },
                 success: function (response)
                 {
-                    console.log(response);
-                    //$("#EditBuyerMaster").html(response);
-                    //$("EditBuyerMaster").show();
-
                     $(".main-page").html(response);
                     $(".main-page").show();
-
-                    //var html = $(response).filter('div#BuyermasteDetails').html();
-
-
-
-                    @*setTimeout(function () {
-                        console.log("Loading validation script");
-                         $.getScript('@Url.Content("~/Content/js/validation.js")');
-                       }, 0);*@
-
 
                 },
                 error: function (xhr, status, error) {
@@ -432,31 +433,21 @@
         //get id for delete
 
         function Delete(arg) {
-            var answer = confirm("are u sure wanto delete");
-
-            if (answer) {
                 $.ajax({
                     type: 'POST',
                     url: '@Url.Action("Delete", "BuyerMater")',
                     data: { id: arg },
                     success: function (response) {
                         if (response == "Success") {
-                            alert("deleted successfully");
+                            sessionStorage.setItem("showToast", "deleted");
                             window.location.href = '/BuyerMater/BuyerMater';
                             return false;
                         }
                         else {
-                            alert("deletion failed");
+                            showdeleteprocessToast();
                         }
-                    },
-                    error: function (ex) {
-                        alert('This address Already Exist in the database.');
                     }
                 });
-            }
-            else {
-                return false;
-            }
         }
     </script>
 

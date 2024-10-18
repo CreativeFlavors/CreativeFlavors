@@ -11,7 +11,8 @@
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
     <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
 
     <style>
         .mt-4 {
@@ -135,6 +136,8 @@
             </div>
         </div>
     </div>
+    <div id="toast"></div>
+
     <script src="~/Content/js/custom.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="~/Content/js/Validation.js"></script>
@@ -155,6 +158,18 @@
     </script>
     <script>
         $(document).ready(function () {
+            if (sessionStorage.getItem("showToast") === "success") {
+                showSuccessToast();
+                sessionStorage.removeItem("showToast");
+            }
+            else if (sessionStorage.getItem("showToast") === "updated") {
+                showupdateToast();
+                sessionStorage.removeItem("showToast");
+            }
+            else if (sessionStorage.getItem("showToast") === "updatedsingle") {
+                showaddToast();
+                sessionStorage.removeItem("showToast");
+            }
             $("#suppliergrid").hide();
             $('#add1').click(function () {
                 $("#buyergrid").hide();
@@ -167,7 +182,7 @@
 
         });
     </script>
-    
+
     <script>
 
 function Edit(arg) {
@@ -234,12 +249,15 @@ function Editsupp(arg) {
         data: { AddressId: addressId, IsChecked: isChecked },
         success: function (data) {
             if (data === "Success") {
-            } else {
-                alert('Address Details deletion failed.');
+                showactivatedToast();
+
             }
-        },
-        error: function () {
-            alert('Error occurred during the delete operation.');
+            else if (data === "failer") {
+                showsdeactivatedToast();
+            }
+            else {
+                showdeleteprocessToast();
+            }
         }
     });
  }
@@ -249,16 +267,20 @@ function Editsupp(arg) {
         url: '/AddressDetails/Deletesupplier',
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify({ AddressId: addressId, IsChecked: isChecked }),
-        success: function (response) {
-            if (response === "Success") {
-                console.log('Address Details deletion succeeded.');
-            } else {
-                alert('Address Details deletion failed.');
+        success: function (data) {
+            if (data === "Success") {
+                showactivatedToast();
+
+            }
+            else if (data === "failer") {
+                showsdeactivatedToast();
+            }
+            else {
+                showdeleteprocessToast();
             }
         },
         error: function (xhr, status, error) {
             console.error('Error occurred during the delete operation:', error);
-            alert('Error occurred during the delete operation.');
         }
     });
 }
@@ -271,9 +293,14 @@ function performstatus(addressId, isChecked) {
         contentType: 'application/json; charset=utf-8',
         success: function (data) {
             if (data === "Success") {
-                // Handle success
-            } else {
-                alert('Address Details status update failed.');
+                showactivatedToast();
+
+            }
+            else if (data === "failer") {
+                showsdeactivatedToast();
+            }
+            else {
+                showdeleteprocessToast();
             }
         },
         error: function (xhr, status, error) {
@@ -290,9 +317,14 @@ function performsupplierstatus(addressId, isChecked) {
         contentType: 'application/json; charset=utf-8',
         success: function (data) {
             if (data === "Success") {
-                // Handle success
-            } else {
-                alert('Address Details status update failed.');
+                showactivatedToast();
+
+            }
+            else if (data === "failer") {
+                showsdeactivatedToast();
+            }
+            else {
+                showdeleteprocessToast();
             }
         },
         error: function (xhr, status, error) {

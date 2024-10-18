@@ -49,8 +49,8 @@ namespace MMS.Repository.Managers
             {
                 CategoryMaster model = CatRepository.GetById(id);
                 model.IsDeleted = false;
-                model.UpdatedBy = HttpContext.Current.Session["UserName"].ToString();
-                model.UpdatedDate = DateTime.Now;
+                model.DeletedBy = HttpContext.Current.Session["UserName"].ToString();
+                model.DeletedDate = DateTime.Now;
                 CatRepository.Update(model);
                 result = true;
             }

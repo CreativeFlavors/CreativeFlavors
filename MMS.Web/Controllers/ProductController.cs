@@ -43,6 +43,7 @@ namespace MMS.Web.Controllers
                 product.ProductName = i.product_name;
                 product.ProductDesc = i.product_desc;
                 product.ProductId = i.ProductId;
+                product.productypeName = i.producttypename;
                 product.taxname = i.TaxValue;
                 product.uom= i.uom;
                 product.Price = i.Price;
@@ -82,14 +83,14 @@ namespace MMS.Web.Controllers
             if (model.ProductId == 0)
             {
                 var totallist = ProductManager.Product_Grid();
-                var productList = totallist.Where(x => x.product_name.ToLower().Contains(model.ProductName.ToLower()) && x.Productype.ToString().ToLower().Contains(model.ProductType.ToString().ToLower())).ToList();
-                if (productList.Count() != 0)
-                {
-                    status = "ProductThere";
-                    return Json(status, JsonRequestBehavior.AllowGet);
-                }
+                //var productList = totallist.Where(x => x.product_name.ToLower().Contains(model.ProductName.ToLower()) && x.Productype.ToString().ToLower().Contains(model.ProductType.ToString().ToLower())).ToList();
+                //if (productList.Count() != 0)
+                //{
+                //    status = "ProductThere";
+                //    return Json(status, JsonRequestBehavior.AllowGet);
+                //}
                 var productListcode = totallist.Where(x => x.product_code.ToLower().Contains(model.ProductCode.ToLower()) && x.Productype.ToString().ToLower().Contains(model.ProductType.ToString().ToLower())).ToList();
-                if (productList.Count() != 0)
+                if (productListcode.Count() != 0)
                 {
                     status = "ProductcodetThere";
                     return Json(status, JsonRequestBehavior.AllowGet);
@@ -193,7 +194,14 @@ namespace MMS.Web.Controllers
             products = manager.GetId(productid);
             if (products.ProductId == productid)
             {
-                status = "Success";
+                if (IsChecked == true)
+                {
+                    status = "Success";
+                }
+                else
+                {
+                    status = "failer";
+                }
                 manager.Delete(productid, IsChecked);
             }
             return Json(status, JsonRequestBehavior.AllowGet);

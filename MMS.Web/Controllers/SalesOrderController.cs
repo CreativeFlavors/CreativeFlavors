@@ -639,23 +639,25 @@ namespace MMS.Web.Controllers
         public ActionResult Calculationdetails(Salesorders model)
         {
             SalesorderManager salesorderManager = new SalesorderManager();
+            CurrencyManager currencyManager = new CurrencyManager();
             ProductManager productManager = new ProductManager();
             TaxTypeManager taxTypeManager = new TaxTypeManager();
             Salesorders salesorders = new Salesorders();
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
             decimal? conversionval = 0;
             int id = 0;
-            if (model.currencyOption.ToUpper() != "ZAR")
+            if (model.currencyOption != 0 && model.currencyOption != null)
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                var ConversionValue = currencyManager.GetCurrencycunversion().Where(m=>m.Id == model.currencyOption).FirstOrDefault();
+                conversionval = ConversionValue.ConversionValue;
+                id = ConversionValue.Id;
             }
             else
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                //var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
+                //conversionval = ConversionValue.conversionvalue;
+                //id = ConversionValue.id;
+                conversionval = 1;
             }
 
             var product = productManager.GetId(model.ProductID);
@@ -736,21 +738,20 @@ namespace MMS.Web.Controllers
             ProductManager productManager = new ProductManager();
             TaxTypeManager taxTypeManager = new TaxTypeManager();
             BuyerMasterManager buyerManager = new BuyerMasterManager();
+            CurrencyManager currencyManager = new CurrencyManager();
 
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
             decimal? conversionval = 0;
             int id = 0;
-            if (model.currencyOption.ToUpper() != "ZAR")
+            if (model.currencyOption != 0 && model.currencyOption != null)
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                var ConversionValue = currencyManager.GetCurrencycunversion().Where(m => m.Id == model.currencyOption).FirstOrDefault();
+                conversionval = ConversionValue.ConversionValue;
+                id = ConversionValue.Id;
             }
             else
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                conversionval = 1;
             }
             if (model.salesordernumber == 0)
             {
@@ -773,6 +774,8 @@ namespace MMS.Web.Controllers
             var tax = taxTypeManager.GetTaxMasterId(product.TaxMasterId);
             var shipping = custAddressMangers.GetCustAddressbuyeridshipp(model.buyerid);
             var billing = custAddressMangers.GetCustAddressbuyerid(model.buyerid);
+            var data = salesorderManager.Get();
+            var filter = data.Where(m => m.customerid == model.buyerid && m.ProductNameid == model.ProductID && m.Status == 1 && m.isdeleted == true && m.salesordernumber == model.salesordernumber).ToList();
             if (shipping == null && billing == null)
             {
                 AlertMessage = "Not Existed";
@@ -788,6 +791,12 @@ namespace MMS.Web.Controllers
             {
                 AlertMessage = "Not Existed";
                 return Json(new { AlertMessage = AlertMessage }, JsonRequestBehavior.AllowGet);
+            }
+            else if(filter.Count() != 0)
+            {
+                AlertMessage = "Already";
+                return Json(new { AlertMessage = AlertMessage }, JsonRequestBehavior.AllowGet);
+
             }
             var addreddcode = buyerManager.GetBuyerMasterId(model.buyerid);
             salesorder.ProductNameid = model.ProductID;
@@ -847,7 +856,6 @@ namespace MMS.Web.Controllers
         public ActionResult ConfirmSalesorder(Salesorders model)
         {
             var AlertMessage = "";
-
             SalesorderManager salesorderManager = new SalesorderManager();
             SalesorderHD_Manager salesorderHD_Manager = new SalesorderHD_Manager();
             SalesorderDT_Manager salesorderDT = new SalesorderDT_Manager();
@@ -871,6 +879,7 @@ namespace MMS.Web.Controllers
                 salesorder_Hd.Total_taxamount = model.Total_TaxValue;
                 salesorder_Hd.Total_disamount = model.Total_discountval;
                 salesorder_Hd.grand_total = model.Total_Grandtotal;
+                salesorder_Hd.currencyid = model.currencyOption;
                 salesorder_Hd.isactive = true;
                 decimal? quantity = 0;
 
@@ -884,7 +893,7 @@ namespace MMS.Web.Controllers
 
                 foreach (var i in productlist)
                 {
-                    var currencyid = currencyManager.GetContainCurrencyid(model.currencyOption);
+                    var currencyid = currencyManager.GetConversionValueid(model.currencyOption);
                     Salesorder_dt salesorder_Dt = new Salesorder_dt();
                     salesorder_Dt.Salesorderid_hd = headerid.salesorderid_hd;
                     salesorder_Dt.Customerid = headerid.customerid;
@@ -902,7 +911,7 @@ namespace MMS.Web.Controllers
                     salesorder_Dt.Discountvalue = i.Discountvalue;
                     salesorder_Dt.Specialinstruction = i.Specialinstruction;
                     salesorder_Dt.Additionalcommends = i.Additionalcommends;
-                    salesorder_Dt.currencyid = currencyid.id;
+                    salesorder_Dt.currencyid = currencyid.Id;
                     salesorder_Dt.salesorderdate = i.salesorderdate;
                     salesorder_Dt.custaddcode = i.custaddcode;
                     salesorder_Dt.custshipcode = i.custshipcode;
@@ -1331,7 +1340,7 @@ x.Status == models.Status)
                     salesorders.email = buyermanager.EmailEmergency;
                     salesorders.accountname = buyermanager.AccountName;
                     salesorders.branch = buyermanager.AccountDescription;
-                    salesorders.currencyOption = currency.currencyname;
+                    salesorders.currencytype = currency.currencyname;
                 }
 
                 // Generate the PDF

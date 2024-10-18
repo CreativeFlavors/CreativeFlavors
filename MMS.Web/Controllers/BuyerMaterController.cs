@@ -90,9 +90,9 @@ namespace MMS.Web.Controllers
             {
                 for (int i = 0; i < existingbuyers.Count; i++)
                 {
-                    if (existingbuyers[i].BuyerCode.ToLower() == model.BuyerCode.ToLower() && existingbuyers[i].CustomerName.ToLower() == model.CustomerName.ToLower())
+                    if (existingbuyers[i].BuyerCode.ToLower() == model.BuyerCode.ToLower())
                     {
-                        return Json(new { message = "already exist" });
+                        return Json(new { AlertMessage = "already exist" });
                     }
                 }
             }
@@ -137,14 +137,12 @@ namespace MMS.Web.Controllers
 
             if (result == true)
             {
-                return Json(new { success = true, message = "Saved Successfully" }, JsonRequestBehavior.AllowGet);
+                return Json(new { AlertMessage = "saved", JsonRequestBehavior.AllowGet });
             }
             else
             {
-                return Json(new { success = false, message = "Save process Failed" }, JsonRequestBehavior.AllowGet);
+                return Json(new { AlertMessage = "saved", JsonRequestBehavior.AllowGet });
             }
-            return null;
-
         }  
 
        
@@ -200,7 +198,6 @@ namespace MMS.Web.Controllers
 
                 throw ex;
             }
-            return null;
         }
 
         //update the employee

@@ -44,5 +44,7 @@ namespace MMS.Web.Models.Temp_Production
         public int Producttype { get; set; }
         public string ProductTypeName { get; set; }
         public string ProductionType { get; set; }
+         public List< Temp_ProductionModel> temp_ProductionModel { get; set; }
+         public List< Temp_ProductionModel> temp_ProductionModel1 { get; set; }
     }
 }

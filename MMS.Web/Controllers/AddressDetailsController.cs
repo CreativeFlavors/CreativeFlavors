@@ -181,6 +181,7 @@ namespace MMS.Web.Controllers
                 oCustAddress.CreatedDate = DateTime.Now;
                 var postdata = oCustAddressMangers.Post(oCustAddress);
                 addid = postdata.Addresshd_id;
+                customer_Addresses.Addresshd_id = addid;
             }
             else if (model.SupplierId != 0)
             {
@@ -189,7 +190,7 @@ namespace MMS.Web.Controllers
                 {
                     if (data.addressvarient == 0)
                     {
-                        Alertmessage = "already";
+                        Alertmessage = "supplieralready";
                         return Json(Alertmessage, JsonRequestBehavior.AllowGet);
                     }
                 }
@@ -206,10 +207,11 @@ namespace MMS.Web.Controllers
                 supplierAddress.CreatedDate = DateTime.Now;
                 var postdata = oCustAddressMangers.PostSupplier(supplierAddress);
                 addid = postdata.supplieradd_id;
+                customer_Addresses.suppaddresshdid = addid;
+
             }
             customer_Addresses.Buyerid = model.BuyerId;
             customer_Addresses.supplierid = model.SupplierId;
-            customer_Addresses.Addresshd_id = addid;
             customer_Addresses.address1 = model.Add1;
             customer_Addresses.addresstypeid = model.AddressType;
             customer_Addresses.address2 = model.Add2;
@@ -270,7 +272,7 @@ namespace MMS.Web.Controllers
             CustAddress objCustAddress = new CustAddress();
             CustAddressMangers oCustAddressMangers = new CustAddressMangers();
             objCustAddress = oCustAddressMangers.GetCustAddressId(model.SupplierId);
-            customer_Addresses = oCustAddressMangers.GetCustAddId(model.suppAddressId);
+            customer_Addresses = oCustAddressMangers.GetCustAddsuppId(model.suppAddressId);
             if (model != null)
             {
                 oCustAddress.supplieradd_id = model.suppAddressId;
@@ -287,7 +289,7 @@ namespace MMS.Web.Controllers
                 oCustAddress.isActive =true;
                 oCustAddress.UpdatedDate = DateTime.Now;
                 oCustAddressMangers.Putsupplier(oCustAddress);
-                customer_Addresses.Addresshd_id = model.AddressId;
+                customer_Addresses.suppaddresshdid = model.AddressId;
                 customer_Addresses.addresstypeid = model.AddressType;
                 customer_Addresses.supplierid = model.SupplierId;
                 customer_Addresses.address1 = model.Add1;
@@ -313,7 +315,14 @@ namespace MMS.Web.Controllers
             oCustAddress = oCustAddressMangers.GetCustAddressbuyerhdid(AddressId);
             if (AddressId != 0)
             {
-                status = "Success";
+                if(IsChecked == true)
+                {
+                    status = "Success";
+                }
+                else
+                {
+                    status = "failer";
+                }
                 oCustAddressMangers.Delete(oCustAddress.Addresshd_id, IsChecked);
             }
 
@@ -328,7 +337,14 @@ namespace MMS.Web.Controllers
             oCustAddress = oCustAddressMangers.GetsuppAddresshdId(AddressId);
             if (AddressId != 0)
             {
-                status = "Success";
+                if (IsChecked == true)
+                {
+                    status = "Success";
+                }
+                else
+                {
+                    status = "failer";
+                }
                 oCustAddressMangers.Deletesupplier(oCustAddress.supplieradd_id, IsChecked);
             }
 
@@ -343,7 +359,15 @@ namespace MMS.Web.Controllers
             oCustAddress = oCustAddressMangers.GetCustAddressbuyerhdid(AddressId);
             if (AddressId != 0)
             {
-                status = "Success";
+                if (IsChecked == true)
+                {
+                    status = "failer";
+                }
+                else if (IsChecked == false)
+                {
+                    status = "Success";
+
+                }
                 oCustAddressMangers.updateactive(oCustAddress.Addresshd_id, IsChecked);
             }
             return Json(status, JsonRequestBehavior.AllowGet);
@@ -357,7 +381,15 @@ namespace MMS.Web.Controllers
             oCustAddress = oCustAddressMangers.GetsuppAddresshdId(AddressId);
             if (AddressId != 0)
             {
-                status = "Success";
+                if (IsChecked == true)
+                {
+                    status = "failer";
+                }
+                else if (IsChecked == false)
+                {
+                    status = "Success";
+
+                }
                 oCustAddressMangers.updatesupplieractive(oCustAddress.supplieradd_id, IsChecked);
             }
             return Json(status, JsonRequestBehavior.AllowGet);

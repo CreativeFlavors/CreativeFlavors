@@ -16,6 +16,8 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
     <style>
         img#paynows {
             width: 26%;
@@ -69,14 +71,14 @@
 
                         <label for="floatingSelectGrid">Status</label>
                     </div>
-                    <div class="form-floating">
+                    @*<div class="form-floating">
                         <input type="date" class="form-control" id="InvDate" />
                         <label for="InvDate">From Date</label>
                     </div>
                     <div class="form-floating">
                         <input type="date" class="form-control" id="InvDueDate" />
                         <label for="InvDueDate">To Date</label>
-                    </div>
+                    </div>*@
 
                     <div id="transaction_reports_search4_container" class="reports_search_container_btn">
                         <button type="button" id="filter" class="manage_customers_btn font-15" onclick="Search()">
@@ -132,11 +134,11 @@
                                     </span>
                                 </th>
                                 @*<th scope="col">
-                    <span>Ledger</span>
-                    <span>
-                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
-                    </span>
-                </th>*@
+                                        <span>Ledger</span>
+                                        <span>
+                                            <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
+                                        </span>
+                                    </th>*@
                                 <th scope="col">
                                     <span>Qty / Invoice Item </span>
                                     <span>
@@ -250,9 +252,10 @@
         </div>
     </div>
 
-
+    <div id="toast"></div>
 
     <script src="~/Content/js/custom.js"></script>
+    <script src="~/Content/js/Validation.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
@@ -316,7 +319,10 @@
         function Search() {
             var buyerid = $("#buyerid").val();
             var InvHDNumber = $("#InvHDNumber").val();
-            $.ajax({
+            if (buyerid == "" && InvHDNumber == "0") {
+                var buyerid = 0;
+                var InvHDNumber = 0;
+            }            $.ajax({
                 type: 'GET',
                 url: '/CustomerTransaction/CustomerTransactionsearch',
                 data: { Buyerid: buyerid, InvRefNumber: InvHDNumber },
@@ -329,20 +335,20 @@
                         const invPaidAmount = item.InvPaidAmount ?? 0;
                         const InvAmount = item.InvPaidAmount?.InvBalanceAmount ?? item.InvBalanceAmount ?? 0;
                         $("tbody").append(`
-                                                              <tr class="font-14">
-                                                                  <td class="veh1-5">${count}</td>
-                                                                  <td class="veh1-5" style="width: 12%; text-align: left;">${item.BuyerMaster.BuyerFullName}</td>
-                                                                  <td class="veh1-5" style="width: 12%; text-align: right;">${item.InvHDNumber}</td>
-                                                                  <td class="veh1-5" style="width: 12%;">${formattedDate}</td>
-                                                                  <td class="veh1-5" style="width: 12%; text-align: right;">${item.InvAmount}</td>
-                                                                  <td class="veh1-5" style="width: 12%; text-align: right;">${invPaidAmount}</td>
-                                                                  <td class="veh1-5" style="width: 12%; text-align: right;">${InvAmount}</td>
-                                                                  <td class="veh1-5" style="width: 12%;">${item.RefItems} / ${item.RefQuantity}</td>
-                                                                  <td id="paynow"  onclick="booking('${item.InvHDNumber}')">
-                                                                  <div><img src="/Content/assets/images/payment-method.png" id="paynows" "/></div>
-                                                                   </td>
-                                                              </tr>
-                                                          `);
+                                                                      <tr class="font-14">
+                                                                          <td class="veh1-5">${count}</td>
+                                                                          <td class="veh1-5" style="width: 12%; text-align: left;">${item.BuyerMaster != null ? item.BuyerMaster.CustomerName : ""}</td>
+                                                                          <td class="veh1-5" style="width: 12%; text-align: right;">${item.InvHDNumber}</td>
+                                                                          <td class="veh1-5" style="width: 12%;">${formattedDate}</td>
+                                                                          <td class="veh1-5" style="width: 12%; text-align: right;">${item.InvAmount}</td>
+                                                                          <td class="veh1-5" style="width: 12%; text-align: right;">${invPaidAmount}</td>
+                                                                          <td class="veh1-5" style="width: 12%; text-align: right;">${InvAmount}</td>
+                                                                          <td class="veh1-5" style="width: 12%;">${item.RefItems} / ${item.RefQuantity}</td>
+                                                                          <td id="paynow"  onclick="booking('${item.InvHDNumber}')">
+                                                                          <div><img src="/Content/assets/images/payment-method.png" id="paynows" "/></div>
+                                                                           </td>
+                                                                      </tr>
+                                                                  `);
                         count++;
                     });
                 },

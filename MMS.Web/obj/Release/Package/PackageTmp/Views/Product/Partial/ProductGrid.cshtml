@@ -7,12 +7,13 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alain Dashboard</title>
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
-    <link rel="stylesheet" href="./css/custom.css">
-    <link rel="stylesheet" href="./css/responsive.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="./css/variables.css">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
     <style>
         input[type=text] {
             padding: 12px;
@@ -54,7 +55,7 @@
 
         #Addproducts {
             border-radius: 5px;
-            background: linear-gradient(to top, #4472c4 0%, #0d6efd 100%);
+            background-color: #4472c4;
             border: none;
             height: 40px;
             margin-block: 18px;
@@ -72,10 +73,7 @@
             text-decoration: none;
         }
 
-            #Addproducts:hover {
-                background: linear-gradient(to top, #4472c4 0%, #0d6efd 100%);
-               
-        }
+
         .switch {
             position: relative;
             display: inline-block;
@@ -120,7 +118,7 @@
                     <h6 class="font-20">Products</h6>
                 </div>
                 <div>
-                    <button class="btn" id="Addproducts" onclick="Addproducts()" title="Add Products">ADD Products</button>
+                    <button class="manage_customers_btn font-15" id="Addproducts" onclick="Addproducts()" >ADD Products</button>
 
                 </div>
             </div>
@@ -152,6 +150,12 @@
                                 </th>
                                 <th scope="col">
                                     <span>Product Name</span>
+                                    <span>
+                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                    </span>
+                                </th> 
+                                <th scope="col">
+                                    <span>Product Type</span>
                                     <span>
                                         <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
                                     </span>
@@ -201,6 +205,7 @@
                                         <td style="text-align:left">@item.CategoryName</td>
                                         <td style="text-align:left">@item.ProductCode</td>
                                         <td style="text-align:left">@item.ProductName</td>
+                                        <td style="text-align:left">@item.productypeName</td>
                                         <td style="text-align:left">@item.taxname</td>
                                         <td style="text-align:left">@item.uom</td>
                                         <td style="text-align:right">@item.Price</td>
@@ -210,7 +215,7 @@
                                         }
                                         else
                                         {
-                                            <td>-</td>
+                                            <td style="text-align:left">-</td>
                                         }
                                         @*<td class="veh-1 edit-del-wrap">
                                                 <a href="javascript:void(0)" onclick="Edit('@item.ProductId')" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
@@ -297,6 +302,7 @@
         </div>
     </div>
 
+    <div id="toast"></div>
 
 
     <script src="~/Content/js/custom.js"></script>
@@ -306,7 +312,7 @@
 
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
     <script>
-        $(window).on("load", function () {
+         $(window).on("load", function () {
             $(".report-inner-section").addClass("transection");
             $("#Products").attr('checked', true);
 
@@ -315,6 +321,15 @@
 
     <script>
         $(document).ready(function () {
+            if (sessionStorage.getItem("showToast") === "success") {
+                showSuccessToast();
+                sessionStorage.removeItem("showToast");
+            }
+            else if (sessionStorage.getItem("showToast") === "updated") {
+                showupdateToast();
+                sessionStorage.removeItem("showToast");
+            }
+           
             $("tbody").on("change", ".checkbox", function () {
                 var addressId = $(this).data('product-id');
                 var isChecked = $(this).is(':checked');
@@ -396,12 +411,14 @@
        data: { productid: addressId, IsChecked: isChecked },
        success: function (data) {
            if (data === "Success") {
-           } else {
-               alert('Product Details deletion failed.');
+               showactivatedToast();
            }
-       },
-       error: function () {
-           alert('Error occurred during the delete operation.');
+           else if (data === "failer") {
+               showsdeactivatedToast();
+           }
+           else {
+               showdeleteprocessToast();
+           }
        }
    });
 }
@@ -458,6 +475,7 @@
                                                     <td style="text-align:left">${item.CategoryName}</td>
                                                     <td style="text-align:left">${item.ProductCode}</td>
                                                     <td style="text-align:left">${item.ProductName}</td>
+                                                    <td style="text-align:left">${item.productypeName}</td>
                                                     <td style="text-align:right">${item.taxname}</td>
                                                     <td style="text-align:left">${item.uom}</td>
                                                     <td style="text-align:right">${item.Price}</td>

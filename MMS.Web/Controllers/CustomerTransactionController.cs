@@ -41,7 +41,7 @@ namespace MMS.Web.Controllers
 
                 Customertransaction customertransaction = new Customertransaction();
                 customertransaction.InvDate = item.invoicedate;
-                customertransaction.InvAmount = item.TotalPrice;
+                customertransaction.InvAmount = item.GrandTotal;
                 customertransaction.InvHDNumber = item.invoicehd_id;
                 customertransaction.RefItems = item.invoice_items;
                 customertransaction.RefQuantity = item.Quantity;
@@ -52,7 +52,7 @@ namespace MMS.Web.Controllers
                     paid += i.InvPaidAmount;
                 }
                 customertransaction.InvPaidAmount = paid;
-                customertransaction.InvBalanceAmount = item.TotalPrice - paid;
+                customertransaction.InvBalanceAmount = item.GrandTotal - paid;
                 totalList.Add(customertransaction);
             }
 
@@ -100,7 +100,7 @@ namespace MMS.Web.Controllers
             model.InvDate = orderhd.invoicedate;
             model.RefItems = orderhd.invoice_items;
             model.RefQuantity = orderhd.Quantity;
-            model.InvAmount = orderhd.TotalPrice;
+            model.InvAmount = orderhd.GrandTotal;
             model.Sonumber = SODT.Salesorderid_hd;
             model.InvDueDate = orderhd.invoicedate;
             model.SoDate = SODT.salesorderdate;
@@ -112,13 +112,13 @@ namespace MMS.Web.Controllers
                 {
                     bal += item.InvPaidAmount;
                 }
-                model.InvBalanceAmount = orderhd.TotalPrice - bal;
+                model.InvBalanceAmount = orderhd.GrandTotal - bal;
                 model.InvPaidAmount = bal;
 
             }
             else
             {
-                model.InvBalanceAmount = orderhd.TotalPrice;
+                model.InvBalanceAmount = orderhd.GrandTotal;
             }
             var PaymentDate = orderhd.invoicedate;
             DateTime startDate = PaymentDate;
@@ -211,7 +211,7 @@ namespace MMS.Web.Controllers
             Customertransaction model1 = new Customertransaction();
 
             OrderHeaderManager manager = new OrderHeaderManager();
-            var Customertransactionlist = manager.Get();
+            var Customertransactionlist = manager.Get().OrderByDescending(m => m.invoicehd_id);
             BuyerMasterManager BuyerManager = new BuyerMasterManager();
             var data1 = BuyerManager.Get();
             CustomertransactionManager customertransactionmanager = new CustomertransactionManager();
@@ -223,15 +223,14 @@ namespace MMS.Web.Controllers
 
             foreach (var item in Customertransactionlist)
             {
-                if (item.CustomerId == Buyerid && item.invoicehd_id == INvRefNumber)
-                {
                     decimal? paid = 0;
                     Customertransaction customertransaction = new Customertransaction();
                     customertransaction.InvDate = item.invoicedate;
-                    customertransaction.InvAmount = item.TotalPrice;
+                    customertransaction.InvAmount = item.GrandTotal;
                     customertransaction.InvHDNumber = item.invoicehd_id;
                     customertransaction.RefItems = item.invoice_items;
                     customertransaction.RefQuantity = item.Quantity;
+                    customertransaction.buyerid = item.CustomerId;
                     customertransaction.BuyerMaster = data1.Where(W => W.BuyerMasterId == item.CustomerId).ToList().FirstOrDefault();
                     List<customertransaction> customertransactions = data2.Where(W => W.InvRefNumber == item.invoicehd_id).ToList();
                     foreach (var i in customertransactions)
@@ -239,13 +238,14 @@ namespace MMS.Web.Controllers
                         paid += i.InvPaidAmount;
                     }
                     customertransaction.InvPaidAmount = paid;
-                    customertransaction.InvBalanceAmount = item.TotalPrice - paid;
+                    customertransaction.InvBalanceAmount = item.GrandTotal - paid;
                     totalList.Add(customertransaction);
-                }
             }
+            var roundtoatlist = (Buyerid == 0 && INvRefNumber == 0)
+         ? totalList
+         : totalList.Where(m => m.buyerid == Buyerid && m.InvHDNumber == INvRefNumber);
 
-
-            return Json(totalList, JsonRequestBehavior.AllowGet);
+            return Json(roundtoatlist, JsonRequestBehavior.AllowGet);
         }
         public ActionResult Getbuyerno(int id)
         {

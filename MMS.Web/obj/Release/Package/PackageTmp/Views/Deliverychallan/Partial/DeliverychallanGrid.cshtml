@@ -11,6 +11,8 @@
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
     <link href="~/Content/css1/mrp.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
     <style>
         .page-item.active .page-link {
             z-index: 3;
@@ -209,13 +211,13 @@
 
         </div>
     </div>
+    <div id="toast"></div>
 
     <script src="~/Content/js/custom.js"></script>
-
-
+    <script src="~/Content/js/dropdown.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Content/js/Validation.js"></script>
     <script>
 
         $(window).on("load", function () {
@@ -226,7 +228,14 @@
     </script>
     <script>
         $(document).ready(function () {
-
+            if (sessionStorage.getItem("showToast") === "success") {
+                showDCToast();
+                sessionStorage.removeItem("showToast");
+            }
+            else if (sessionStorage.getItem("showToast") === "success1") {
+                showInvoiceToast();
+                sessionStorage.removeItem("showToast");
+            }
 
       $('#manage_customer_show_no').change(function () {
           $('#DC').hide();
@@ -323,7 +332,11 @@
 
     <script>
         function confirmorder() {
-            var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+            //var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+            var currencyOption = $("#currencyOption").val();
+            if (currencyOption == "") {
+                var currencyOption = 0;
+            }
             var buyerid = $("#BuyerName").val();
             var totaltax = $("#Total_TaxValue").val();
             var totaldis = $("#Total_discountval").val();
@@ -366,12 +379,11 @@
                 success: function (values) {
                     var data = JSON.parse(values);
                     if (data === "Confirm Order") {
-                        alert("DC Applied successfully!");
+                        sessionStorage.setItem("showToast", "success");
                         window.location.href = "/deliverychallan/DCMaster";
                     }
                     else if (data == "Full Invoised") {
-                        alert("There is no stock for DC");
-                        return false;
+                        showdNOSTOCKToast();
                     }
 
                 }
@@ -389,8 +401,12 @@
                     $quantityInput.val(quantityValue - 1);
 
                     var quantity = (quantityValue - 1);
-                    var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+                    //var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
                     var buyerid = $("#BuyerName").val();
+                    var currencyOption = $("#currencyOption").val();
+                    if (currencyOption == "") {
+                        var currencyOption = 0;
+                    }
                     var row = $(this).closest('tr');
                     var ProductID = row.find('#productid').text();
                     var discountval = row.find('#discount').text();
@@ -400,10 +416,11 @@
                     var totaldgrand = $("#Total_Grandtotal").val();
                     var formdata = new FormData();
                     formdata.append("buyerid", buyerid);
+                    formdata.append("currencyOption", currencyOption);
                     formdata.append("ProductID", ProductID);
                     formdata.append("discountval", discountval);
                     formdata.append("quantity", quantity);
-                    formdata.append("currencyOption", currencyOption);
+                    //formdata.append("currencyOption", currencyOption);
 
                     formdata.append("Total_Subtotal", totalsub);
                     formdata.append("Total_TaxValue", totaltax);
@@ -451,7 +468,11 @@
                     $quantityInput.val(quantityValue + 1);
 
                     var quantity = (quantityValue + 1);
-                    var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+                    var currencyOption = $("#currencyOption").val();
+                    if (currencyOption == "") {
+                        var currencyOption = 0;
+                    }
+                    //var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
                     var buyerid = $("#BuyerName").val();
                     var row = $(this).closest('tr');
                     var ProductID = row.find('#productid').text();
@@ -544,57 +565,57 @@
                             var formattedGrandtotal = (item.Total_Grandtotal).toFixed(2);
                             var discountvalue = formattedDiscountValue != 0 ? `<li> Discount --> <strong>${formattedDiscountValue}</strong></li>` : `<li> Discount --> <strong>0.00</strong></li>`;
                             var row = `  <div class="container1 mt-4">
-                                  <div class="column"style="    padding: 27px 6% 35px;
-                        width: calc(33.3% - 30px);">
-                              <div class="pricing-card  basic">
-                                  <div class="pricing-header">
-                                      <span class="plan-title">${item.BuyerMaster.BuyerFullName}</span>
-                                      <div class="price-circle">
-                                          <span class="price-title">
-                                              <span>${formattedQuantity}</span>
-                                          </span>
-                                          <span class="info">Total-Qty</span>
-                                      </div>
-                                  </div>
-                                  <div class="badge-box">
-                                      <span>Order no & Date <br /><b style="color:olivedrab"><b style="color:darkblue;">${item.SalesorderId} </b>-- ${formattedDate}</b> </span>
-                                  </div>
-                                  <ul id="ul">
-                                      <li>
-                                          Items --> <strong>${item.item} / ${item.item} </strong>
-                                      </li>
-                                      <li>
-                                          DC-Items  --> <strong>${item.itemdc}</strong>
-                                      </li>
-                                      <li>
-                                          Invoice-Items  --> <strong>${item.itemInvoiced}</strong>
-                                      </li>
-                                      <li>
-                                          Unit Price  --> <strong>${Total_Price}</strong>
-                                      </li>
-                                      ${discountvalue}
-                                      <li>
-                                          Sub Total --> <strong>${formattedSubtotal}</strong>
-                                      </li>
-                                      <li>
-                                          Tax Amount --> <strong>${formattedTaxValue}</strong>
-                                      </li>
-                                      <li>
-                                          Grand Price --> <strong>${formattedGrandtotal}</strong>
-                                      </li>
-                                  </ul>
-                                  <div class="d-flex justify-content-between">
-                                      <div class="buy-button-box" onclick="Edit('${item.SalesorderId}')">
-                                          <b class="buy-nows" id="DCapply">Issue DC</b>
-                                      </div>
-                                      <div class="buy-button-box" onclick="InvoiceEdit('${item.SalesorderId}')">
-                                          <b class="buy-now" id="DCapply">Raise Invoice</b>
-                                      </div>
-                                  </div>
+                                          <div class="column"style="    padding: 27px 6% 35px;
+                                width: calc(33.3% - 30px);">
+                                      <div class="pricing-card  basic">
+                                          <div class="pricing-header">
+                                              <span class="plan-title">${item.BuyerMaster.BuyerFullName}</span>
+                                              <div class="price-circle">
+                                                  <span class="price-title">
+                                                      <span>${formattedQuantity}</span>
+                                                  </span>
+                                                  <span class="info">Total-Qty</span>
+                                              </div>
+                                          </div>
+                                          <div class="badge-box">
+                                              <span>Order no & Date <br /><b style="color:olivedrab"><b style="color:darkblue;">${item.SalesorderId} </b>-- ${formattedDate}</b> </span>
+                                          </div>
+                                          <ul id="ul">
+                                              <li>
+                                                  Items --> <strong>${item.item} / ${item.item} </strong>
+                                              </li>
+                                              <li>
+                                                  DC-Items  --> <strong>${item.itemdc}</strong>
+                                              </li>
+                                              <li>
+                                                  Invoice-Items  --> <strong>${item.itemInvoiced}</strong>
+                                              </li>
+                                              <li>
+                                                  Unit Price  --> <strong>${Total_Price}</strong>
+                                              </li>
+                                              ${discountvalue}
+                                              <li>
+                                                  Sub Total --> <strong>${formattedSubtotal}</strong>
+                                              </li>
+                                              <li>
+                                                  Tax Amount --> <strong>${formattedTaxValue}</strong>
+                                              </li>
+                                              <li>
+                                                  Grand Price --> <strong>${formattedGrandtotal}</strong>
+                                              </li>
+                                          </ul>
+                                          <div class="d-flex justify-content-between">
+                                              <div class="buy-button-box" onclick="Edit('${item.SalesorderId}')">
+                                                  <b class="buy-nows" id="DCapply">Issue DC</b>
+                                              </div>
+                                              <div class="buy-button-box" onclick="InvoiceEdit('${item.SalesorderId}')">
+                                                  <b class="buy-now" id="DCapply">Raise Invoice</b>
+                                              </div>
+                                          </div>
 
-                              </div>
-                          </div>
-                                </div>                      `;
+                                      </div>
+                                  </div>
+                                        </div>                      `;
 
                             $("#form").append(row);
                             count++;

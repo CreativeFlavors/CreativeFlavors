@@ -90,17 +90,31 @@ namespace MMS.Web.Controllers
             }
             return View("~/Views/GRN/Partial/GRN_Details.cshtml", model);
         }
-        public ActionResult GetPODetails(int POno)
+        public ActionResult GetPODetails(int POno, int currency)
         {
             GRNCartManager gRNCartManager = new GRNCartManager();
             gRNCartManager.Putcancelsuccess();
             GRNModel model = new GRNModel();
+            SalesorderManager salesorderManager = new SalesorderManager();
+            CurrencyManager currencyManager = new CurrencyManager();
             PoManager poManager = new PoManager();
             GRNCartManager GRNCartManager = new GRNCartManager();
             GRNDetailsManager gRNDetailsManager = new GRNDetailsManager();
             GRNHeaderManager gRNHeaderManager = new GRNHeaderManager();
             PoManager PoManager = new PoManager();
-
+            string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
+            decimal? conversionval = 0;
+            if (currency != 0)
+            {
+                var ConversionValue = currencyManager.GetCurrencycunversion().Where(m => m.Id == currency).FirstOrDefault();
+                conversionval = ConversionValue.ConversionValue;
+            }
+            else
+            {
+                //var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
+                //conversionval = ConversionValue.conversionvalue;
+                conversionval = 1;
+            }
             var GRNheader = gRNHeaderManager.GetGRNId(POno);
             if (GRNheader.Count() == 0)
             {
@@ -130,7 +144,7 @@ namespace MMS.Web.Controllers
                         var qtys = (i.PoQty) - (i.grnqty);
                         PoModel.PoQty = qtys;
                         PoModel.DiscountValue = i.DiscountValue;
-                        PoModel.UnitPrice = i.UnitPrice;
+                        PoModel.UnitPrice = i.UnitPrice * conversionval;
                         PoModel.UomName = i.UomName;
                         PoModel.ProductName = i.ProductName;
                         PoModel.Productcode = i.Productcode;
@@ -139,7 +153,7 @@ namespace MMS.Web.Controllers
                         PoModel.discountpercentage = i.discountpercentage;
                         PoModel.taxpercentage = i.taxpercentage;
                         PoModel.productid = i.productid;
-                        var subtotal = qtys * i.UnitPrice;
+                        var subtotal = qtys * i.UnitPrice * conversionval;
                         var disamount = subtotal * i.discountpercentage / 100;
                         var subtotals = subtotal - disamount;
                         var taxamount1 = subtotals * (i.taxpercentage) / 100;
@@ -154,7 +168,7 @@ namespace MMS.Web.Controllers
                         var qtys = i.PoQty;
                         PoModel.PoQty = qtys;
                         PoModel.DiscountValue = i.DiscountValue;
-                        PoModel.UnitPrice = i.UnitPrice;
+                        PoModel.UnitPrice = i.UnitPrice * conversionval;
                         PoModel.UomName = i.UomName;
                         PoModel.ProductName = i.ProductName;
                         PoModel.Productcode = i.Productcode;
@@ -163,7 +177,7 @@ namespace MMS.Web.Controllers
                         PoModel.discountpercentage = i.discountpercentage;
                         PoModel.taxpercentage = i.taxpercentage;
                         PoModel.productid = i.productid;
-                        var subtotal = qtys * i.UnitPrice;
+                        var subtotal = qtys * i.UnitPrice * conversionval;
                         var disamount = subtotal * i.discountpercentage / 100;
                         var subtotals = subtotal - disamount;
                         var taxamount1 = subtotals * (i.taxpercentage) / 100;
@@ -227,20 +241,22 @@ namespace MMS.Web.Controllers
             TaxTypeManager taxTypeManager = new TaxTypeManager();
             BuyerManager buyerManager = new BuyerManager();
             PoManager poManager = new PoManager();
+            CurrencyManager currencyManager = new CurrencyManager();
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
             decimal? conversionval = 0;
-            int id = 0; int forid = 0;
-            if (model.currencyOption.ToUpper() != "ZAR")
+            int id = 0;
+            if (model.currencyOption != 0)
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                forid = ConversionValue.id;
+                var ConversionValue = currencyManager.GetCurrencycunversion().Where(m => m.Id == model.currencyOption).FirstOrDefault();
+                conversionval = ConversionValue.ConversionValue;
+                id = ConversionValue.Id;
             }
             else
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                //var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
+                //conversionval = ConversionValue.conversionvalue;
+                //id = ConversionValue.id;
+                conversionval = 1;
             }
 
             var product = productManager.GetId(model.ProductNameId);
@@ -284,11 +300,15 @@ namespace MMS.Web.Controllers
                 GRNCart.Grandtotal = total;
                 GRNCart.DiscountValue = disamount;
             }
-            if (model.currencyOption.ToUpper() == "ZAR")
+            if (model.currencyOption != 0)
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                forid = ConversionValue.id;
+                var ConversionValue = currencyManager.GetCurrencycunversion().Where(m => m.Id == model.currencyOption).FirstOrDefault();
+                conversionval = ConversionValue.ConversionValue;
+                id = ConversionValue.Id;
+
+                //var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
+                //conversionval = ConversionValue.conversionvalue;
+                //forid = ConversionValue.id;
 
                 var unitpriceS = model.UnitPrice * conversionval;
                 var subtotal = qty * unitpriceS;
@@ -299,14 +319,14 @@ namespace MMS.Web.Controllers
                 GRNCart.ForTaxValue = taxamount;
                 GRNCart.ForTotalValue = totalprice;
                 GRNCart.ForDiscountValue = disamount;
-                GRNCart.for_currencyconid = forid;
+                GRNCart.for_currencyconid = id;
                 GRNCart.for_totalunitprice = unitpriceS;
             }
-            else if (model.currencyOption.ToUpper() == "USD")
+            else if (model.currencyOption != 0)
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                var ConversionValue = currencyManager.GetCurrencycunversion().Where(m => m.Id == model.currencyOption).FirstOrDefault();
+                conversionval = ConversionValue.ConversionValue;
+                id = ConversionValue.Id;
 
                 var unitpriceS = model.UnitPrice * conversionval;
                 var subtotal = qty * unitpriceS;
@@ -396,9 +416,11 @@ namespace MMS.Web.Controllers
             }
             else
             {
-                var podetails = PoManager.Getdetails().Where(x => x.PoNumber == model.PoHeaderId).FirstOrDefault();
-                var currencyids = currencyManager.GetContainCurrencyid(model.currencyOption);
                 GRNHeader GRNHeader = new GRNHeader();
+
+                var podetails = PoManager.Getdetails().Where(x => x.PoNumber == model.PoHeaderId).FirstOrDefault();
+                var currencyids = currencyManager.GetConversionValueid(model.currencyOption);
+                GRNHeader.currencyid = currencyids.Id;
                 GRNHeader.Items = grnlist.Count();
                 GRNHeader.GrnDate = DateTime.Now;
                 GRNHeader.PoNumber = model.PoHeaderId;
@@ -417,7 +439,6 @@ namespace MMS.Web.Controllers
                 GRNHeader.OverallWeight = model.OverallWeight;
                 GRNHeader.RefInvoiceDate = model.RefInvoiceDate;
                 GRNHeader.RefInvoiceNumber = model.RefInvoiceNumber;
-                GRNHeader.currencyid = currencyids.id;
                 decimal? quantity = 0;
                 decimal? taxvalue = 0;
                 decimal? grandtotal = 0;
@@ -453,7 +474,7 @@ namespace MMS.Web.Controllers
                             quantitys += (k.Quantity);
                         }
                     }
-                    var currencyid = currencyManager.GetContainCurrencyid(model.currencyOption);
+                    var currencyid = currencyManager.GetConversionValueid(model.currencyOption);
                     GRNDetails GRNDetails = new GRNDetails();
                     GRNDetails.GrnHeaderId = headerid.GrnHeaderId;
                     GRNDetails.SupplierId = headerid.SupplierId;
@@ -472,7 +493,7 @@ namespace MMS.Web.Controllers
                     GRNDetails.BatchCode = i.BatchCode;
                     GRNDetails.StoreCode = i.StoreCode;
                     GRNDetails.Weight = model.Weight;
-                    GRNDetails.currencyid = currencyid.id;
+                    GRNDetails.currencyid = currencyid.Id;
                     GRNDetails.currencyconid = i.currencyconid;
                     GRNDetails.for_currencyconid = i.for_currencyconid;
                     GRNDetails.IsFulfilled = DateTime.Now;
@@ -600,20 +621,22 @@ namespace MMS.Web.Controllers
             ProductManager productManager = new ProductManager();
             TaxTypeManager taxTypeManager = new TaxTypeManager();
             GRNModel GRNModel = new GRNModel();
+            CurrencyManager currencyManager = new CurrencyManager();
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
             decimal? conversionval = 0;
             int id = 0;
-            if (model.currencyOption.ToUpper() != "ZAR")
+            if (model.currencyOption != 0)
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                var ConversionValue = currencyManager.GetCurrencycunversion().Where(m => m.Id == model.currencyOption).FirstOrDefault();
+                conversionval = ConversionValue.ConversionValue;
+                id = ConversionValue.Id;
             }
             else
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                //var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
+                //conversionval = ConversionValue.conversionvalue;
+                //id = ConversionValue.id;
+                conversionval = 1;
             }
 
 
@@ -661,24 +684,21 @@ namespace MMS.Web.Controllers
             SalesorderManager salesorderManager = new SalesorderManager();
             ProductManager productManager = new ProductManager();
             TaxTypeManager taxTypeManager = new TaxTypeManager();
+            CurrencyManager currencyManager = new CurrencyManager();
             GRNModel GRNModel = new GRNModel();
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
             decimal? conversionval = 0;
             int id = 0;
-            if (model.currencyOption.ToUpper() != "ZAR")
+            if (model.currencyOption != 0)
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                var ConversionValue = currencyManager.GetCurrencycunversion().Where(m => m.Id == model.currencyOption).FirstOrDefault();
+                conversionval = ConversionValue.ConversionValue;
+                id = ConversionValue.Id;
             }
             else
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                conversionval = 1;
             }
-
-
             var product = productManager.GetId(model.ProductNameId);
             var tax = taxTypeManager.GetTaxMasterId(product.TaxMasterId);
 
@@ -719,20 +739,22 @@ namespace MMS.Web.Controllers
             ProductManager productManager = new ProductManager();
             TaxTypeManager taxTypeManager = new TaxTypeManager();
             GRNModel GRNModel = new GRNModel();
+            CurrencyManager currencyManager = new CurrencyManager();
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
             decimal? conversionval = 0;
             int id = 0;
-            if (model.currencyOption.ToUpper() != "ZAR")
+            if (model.currencyOption != 0)
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                var ConversionValue = currencyManager.GetCurrencycunversion().Where(m => m.Id == model.currencyOption).FirstOrDefault();
+                conversionval = ConversionValue.ConversionValue;
+                id = ConversionValue.Id;
             }
             else
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                //var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
+                //conversionval = ConversionValue.conversionvalue;
+                //id = ConversionValue.id;
+                conversionval = 1;
             }
             var product = productManager.GetId(model.ProductNameId);
             var tax = taxTypeManager.GetTaxMasterId(product.TaxMasterId);

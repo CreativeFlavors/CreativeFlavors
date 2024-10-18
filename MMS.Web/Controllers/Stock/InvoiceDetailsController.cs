@@ -25,6 +25,7 @@ namespace MMS.Web.Controllers.Stock
             SalesorderHD_Manager salesorderManager = new SalesorderHD_Manager();
             SalesorderDT_Manager SalesorderDT_Manager = new SalesorderDT_Manager();
             CustAddressMangers custAddressMangers = new CustAddressMangers();
+            CurrencyManager currencyManager = new CurrencyManager();
             var headerdata = salesorderManager.GetSOId(SOId);
             var salesorderdt = SalesorderDT_Manager.GetSOIdS(SOId);
             var counts = 0;
@@ -37,15 +38,15 @@ namespace MMS.Web.Controllers.Stock
                 }
             }
             var custadd = custAddressMangers.GetCustAddressbuyerid(headerdata.customerid);
+            var ConversionValue = currencyManager.GetCurrencycunversion().Where(m => m.Id == headerdata.currencyid).FirstOrDefault();
             models.itemInvoiced = counts;
-            //models.shippingadd = custadd.Add1;
-            //models.Billingadd = custadd.Add2;
             models.BuyerName = headerdata.customerid;
             models.SalesorderId = headerdata.salesorderid_hd;
             models.SalesorderId_HD = headerdata.salesorderid_hd;
             models.Total_Price = Math.Round((decimal)headerdata.Total_price, 2);
             models.salesorderdate = headerdata.Salesorderdate;
             models.quantity = headerdata.quantity;
+            models.currencyOption = headerdata.currencyid;
             models.Final_Grandtotal = headerdata.grand_total;
             models.item = headerdata.items;
             List<Salesorders> totaldata = new List<Salesorders>();
@@ -69,7 +70,7 @@ namespace MMS.Web.Controllers.Stock
                     salesorder.ProductCode = i.productcode;
                     salesorder.ProductID = i.productid;
                     salesorder.invoice_qty = i.invoiceqty;
-                    var subtotal = qtys * i.unitprice;
+                    var subtotal = qtys * i.unitprice * ConversionValue.ConversionValue;
                     var disamount = subtotal * i.discountper / 100;
                     var subtotals = subtotal - disamount;
                     var taxamount1 = subtotals * int.Parse(i.Taxper) / 100;
@@ -127,20 +128,19 @@ namespace MMS.Web.Controllers.Stock
             ProductManager productManager = new ProductManager();
             TaxTypeManager taxTypeManager = new TaxTypeManager();
             Salesorders salesorders = new Salesorders();
+            CurrencyManager currencyManager = new CurrencyManager();
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
             decimal? conversionval = 0;
             int id = 0;
-            if (model.currencyOption.ToUpper() != "ZAR")
+            if (model.currencyOption != 0)
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                var ConversionValue = currencyManager.GetCurrencycunversion().Where(m => m.Id == model.currencyOption).FirstOrDefault();
+                conversionval = ConversionValue.ConversionValue;
+                id = ConversionValue.Id;
             }
             else
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                conversionval = 1;
             }
 
             var product = productManager.GetId(model.ProductID);
@@ -188,20 +188,20 @@ namespace MMS.Web.Controllers.Stock
             ProductManager productManager = new ProductManager();
             TaxTypeManager taxTypeManager = new TaxTypeManager();
             Salesorders salesorders = new Salesorders();
+            CurrencyManager currencyManager = new CurrencyManager();
+
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
             decimal? conversionval = 0;
             int id = 0;
-            if (model.currencyOption.ToUpper() != "ZAR")
+            if (model.currencyOption != 0)
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                var ConversionValue = currencyManager.GetCurrencycunversion().Where(m => m.Id == model.currencyOption).FirstOrDefault();
+                conversionval = ConversionValue.ConversionValue;
+                id = ConversionValue.Id;
             }
             else
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                conversionval = 1;
             }
 
             var product = productManager.GetId(model.ProductID);
@@ -242,7 +242,7 @@ namespace MMS.Web.Controllers.Stock
 
         }
         [HttpPost]
-        public JsonResult Invoice_Post(string buyerid, string currencyOption, decimal Total_Price, decimal Total_Subtotal, decimal Total_TaxValue, decimal Total_discountval, decimal Total_Grandtotal, string salesOrderData)
+        public JsonResult Invoice_Post(string buyerid, int currencyOption, decimal Total_Price, decimal Total_Subtotal, decimal Total_TaxValue, decimal Total_discountval, decimal Total_Grandtotal, string salesOrderData)
         {
             var salesOrderList = JsonConvert.DeserializeObject<List<SalesOrderItem>>(salesOrderData);
             var AlertMessage = "";
@@ -259,23 +259,25 @@ namespace MMS.Web.Controllers.Stock
             string dateOnly = DateTime.Now.ToString("yyyy-MM-dd");
             decimal? conversionval = 0;
             int id = 0;
-            if (currencyOption.ToUpper() != "ZAR")
+            if (currencyOption != 0)
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("USD", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                var ConversionValue = currencyManager.GetCurrencycunversion().Where(m => m.Id == currencyOption).FirstOrDefault();
+                conversionval = ConversionValue.ConversionValue;
+                id = ConversionValue.Id;
             }
             else
             {
-                var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
-                conversionval = ConversionValue.conversionvalue;
-                id = ConversionValue.id;
+                //var ConversionValue = salesorderManager.Getcurrencyconversion("ZAR", "ZAR", dateOnly);
+                //conversionval = ConversionValue.conversionvalue;
+                //id = ConversionValue.id;
+                conversionval = 1;
             }
 
             orderheader_hd orderheader = new orderheader_hd();
             orderheader.CustomerId = (Convert.ToInt32(buyerid));
             orderheader.invoicedate = DateTime.Now;
             orderheader.TotalPrice = Total_Price;
+            orderheader.currencyid = currencyOption;
             orderheader.TotalSubtotal = Total_Subtotal;
             orderheader.TotalTaxAmount = Total_TaxValue;
             orderheader.TotalDisAmount = Total_discountval;
@@ -298,7 +300,6 @@ namespace MMS.Web.Controllers.Stock
             var headerid = OrderHeaderManager.POST(orderheader);
 
             orderdetails orderdetails = new orderdetails();
-            var currencyid = currencyManager.GetContainCurrencyid(currencyOption);
             var invoisedcount = salesOrderList.Count();
             var nowinvoised = 0;
             foreach (var i in salesOrderList)
@@ -334,7 +335,7 @@ namespace MMS.Web.Controllers.Stock
                 orderdetails.DiscountPer = DT.Discountperid;
                 orderdetails.UnitPrice = product.Price;
                 orderdetails.invoicedate = DateTime.Now;
-                orderdetails.CurrencyId = currencyid.id;
+                orderdetails.CurrencyId = currencyOption;
                 orderdetails.CustAddCode = addreddcode.BuyerCode;
                 orderdetails.CustBillCode = billing.Addresshd_id.ToString();
                 orderdetails.CustShipCode = shipping.Addresshd_id.ToString();

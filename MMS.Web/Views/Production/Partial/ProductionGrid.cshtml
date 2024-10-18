@@ -12,6 +12,8 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
     <style>
         input[type=text] {
             padding: 12px;
@@ -194,22 +196,46 @@
     </div>
 
 
+    <div id="toast"></div>
 
+    <!-- page-contents end -->
+    <script src="~/Content/js/dropdown.js"></script>
 
-
-    <script src="~/Content/js/custom.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Content/js/Validation.js"></script>
 
     <script>
         $(window).on("load", function () {
             $(".report-inner-section").addClass("transection");
             $("#Production").attr('checked', true);
         });
-  $(document).ready(function() {
+        $(document).ready(function () {
+            $(document).ready(function () {
+                if (sessionStorage.getItem("showToast") === "Inserted") {
+                    showproductionprocessessToast(sessionStorage.getItem("showToast"));
+                    sessionStorage.removeItem("showToast");
+                }
+                else if (sessionStorage.getItem("showToast") === "Updated") {
+                    showproductionprocessessToast(sessionStorage.getItem("showToast"));
+                    sessionStorage.removeItem("showToast");
+                }
+                else if (sessionStorage.getItem("showToast") === "Inprogress") {
+                    InprogressToast();
+                    sessionStorage.removeItem("showToast");
+                } else if (sessionStorage.getItem("showToast") === "QualityInspection" || sessionStorage.getItem("showToast") === "Packing" || sessionStorage.getItem("showToast") === "Sequence") {
+                    showProductionProcesses1Toast(sessionStorage.getItem("showToast"));
+                    sessionStorage.removeItem("showToast");
+                } else if (sessionStorage.getItem("showToast") === "Completed" || sessionStorage.getItem("showToast") === "Pending" || sessionStorage.getItem("showToast") === "ReleasedForAssembly") {
+                    showProductionProcesses1Toast(sessionStorage.getItem("showToast"));
+                    sessionStorage.removeItem("showToast");
+                } else if (sessionStorage.getItem("showToast") === "PendingApproval" || sessionStorage.getItem("showToast") === "qualitychecking") {
+                    showProductionProcesses1Toast(sessionStorage.getItem("showToast"));
+                    sessionStorage.removeItem("showToast");
+                }
+            });
     $('#manage_customer_show_no').change(function() {
         var pageSize = parseInt($(this).val());
         window.location.href = "@Url.Action("ProductionMaster", "Production")?pageSize=" + pageSize;
@@ -248,22 +274,22 @@
                     var count = 1;
                     $.each(data, function (i, item) {
                         $("tbody").append(`
-                             <tr class="font-14">
-                                 <td>${count}</td>
-                                 <td style="text-align:left;">${item.ProductName}</td>
-                                 <td style="text-align:left;">${item.ProductCode}</td>
-                                 <td style="text-align:left;">${item.ProductionCode}</td>
-                                 <td style="text-align:right;">${item.ProductionQty}</td>
-                                  <td style="text-align:right;">${item.RequiredQty}</td>
-                                  <td style="text-align:left;";>${item.ProductionStatus}</td>
-                                  <td style="background-color: ${item.ProductionType == "Production" ? "#c3e6cb" : "#f5c6cb"};width: 6px;">${item.ProductionType}</td>
-                                 <td class="veh-1 edit-del-wrap">
-                                     <a href="javascript:void(0)" onclick="Edit('${item.ProductionId}')" class="watchlist-edit" title="Edit">
-                                     <img src="/Content/assets/images/edit-icon.png" />
-                                     </a>
-                                 </td>
-                             </tr>
-                         `);
+                                 <tr class="font-14">
+                                     <td>${count}</td>
+                                     <td style="text-align:left;">${item.ProductName}</td>
+                                     <td style="text-align:left;">${item.ProductCode}</td>
+                                     <td style="text-align:left;">${item.ProductionCode}</td>
+                                     <td style="text-align:right;">${item.ProductionQty}</td>
+                                      <td style="text-align:right;">${item.RequiredQty}</td>
+                                      <td style="text-align:left;";>${item.ProductionStatus}</td>
+                                      <td style="background-color: ${item.ProductionType == "Production" ? "#c3e6cb" : "#f5c6cb"};width: 6px;">${item.ProductionType}</td>
+                                     <td class="veh-1 edit-del-wrap">
+                                         <a href="javascript:void(0)" onclick="Edit('${item.ProductionId}')" class="watchlist-edit" title="Edit">
+                                         <img src="/Content/assets/images/edit-icon.png" />
+                                         </a>
+                                     </td>
+                                 </tr>
+                             `);
                         count++;
                     });
                 },

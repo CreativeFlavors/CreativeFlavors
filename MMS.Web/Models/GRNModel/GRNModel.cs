@@ -36,7 +36,7 @@ namespace MMS.Web.Models.GRNModel
         public DateTime GrnDate { get; set; }
         public bool IsActive { get; set; }
         public decimal ConversionValue { get; set; }
-        public string currencyOption { get; set; }
+        public int currencyOption { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public string UpdatedBy { get; set; }

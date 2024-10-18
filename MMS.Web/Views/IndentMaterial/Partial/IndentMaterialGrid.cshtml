@@ -12,6 +12,8 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
     <style>
         input[type=text] {
             padding: 12px;
@@ -38,6 +40,7 @@
             background-color: #4472C4;
             border-color: #0d6efd;
         }
+
         .switch {
             position: relative;
             display: inline-block;
@@ -164,21 +167,21 @@
                                         <td style="text-align: right; width: 5%;">@item.Price</td>
                                         <td style="text-align: right; width: 4%;">@item.IndentNumber</td>
                                         @*<td class="veh-1 edit-del-wrap">
-                                        <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.indentdetailid')" class="watchlist-delete" title="Delete"><img src="~/Content/assets/images/delete-icon.png" /></a>
-                                    </td>*@
-                                    <td style="width: 4%;">
+                                                <a href="javascript:void(0)" id="DeleteVehicleWatchList" onclick="Delete('@item.indentdetailid')" class="watchlist-delete" title="Delete"><img src="~/Content/assets/images/delete-icon.png" /></a>
+                                            </td>*@
+                                        <td style="width: 4%;">
 
-                                        @if (item.isactive == true)
-                                        {
-                                            <input type="checkbox" class="checkbox checkboxb1" id="delete-@item.indentdetailid" data-indent-id="@item.indentdetailid" />
-                                            <label for="delete-@item.indentdetailid" class="switch"></label>
-                                        }
-                                        else
-                                        {
-                                            <input type="checkbox" class="checkbox checkboxb1" id="delete-@item.indentdetailid" data-indent-id="@item.indentdetailid" checked />
-                                            <label for="delete-@item.indentdetailid" class="switch"></label>
-                                        }
-                                    </td>
+                                            @if (item.isactive == true)
+                                            {
+                                                <input type="checkbox" class="checkbox checkboxb1" id="delete-@item.indentdetailid" data-indent-id="@item.indentdetailid" />
+                                                <label for="delete-@item.indentdetailid" class="switch"></label>
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" class="checkbox checkboxb1" id="delete-@item.indentdetailid" data-indent-id="@item.indentdetailid" checked />
+                                                <label for="delete-@item.indentdetailid" class="switch"></label>
+                                            }
+                                        </td>
 
                                     </tr>
                                     startSerialNumber++;
@@ -228,15 +231,15 @@
 
         </div>
     </div>
-    </div>
 
 
-
+    <div id="toast"></div>
 
     <script src="~/Content/js/custom.js"></script>
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="~/Content/js/Validation.js"></script>
 
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
 
@@ -246,6 +249,10 @@
             $("#indent").attr('checked', true);
         });
         $(document).ready(function () {
+            if (sessionStorage.getItem("showToast") === "success") {
+                showSuccessToast();
+                sessionStorage.removeItem("showToast");
+            }
             $("tbody").on("change", ".checkbox", function () {
                 var addressId = $(this).data('indent-id');
                 var isChecked = $(this).is(':checked');
@@ -321,8 +328,10 @@
        data: { indentcartid: addressId, IsChecked: isChecked },
        success: function (data) {
            if (data === "Success") {
-           } else {
-               alert('Indent Details deletion failed.');
+               showactivatedToast();
+           }
+           else {
+               showsdeactivatedToast();
            }
        },
        error: function () {

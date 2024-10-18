@@ -14,7 +14,9 @@ namespace MMS.Data.StoredProcedureModel
         [Column("productid")]
         public int ProductId { get; set; }
         [Column("categoryname")]
-        public string CategoryName { get; set; }
+        public string CategoryName { get; set; }   
+        [Column("producttypename")]
+        public string producttypename { get; set; }
         [Column("product_code")]
         public string product_code { get; set; }
         [Column("product_name")]

@@ -169,7 +169,7 @@ namespace MMS.Repository.Managers
             }
             return oorderheader;
         }
-        public currencycunversion Getcurrencyconversion(string p_primarycurrency, string p_secondarycurrency, string todaydate)
+        public Data.StoredProcedureModel.currencycunversion Getcurrencyconversion(string p_primarycurrency, string p_secondarycurrency, string todaydate)
         {
             currencycunversion currencycunversion = new currencycunversion();
             currencycunversion = order_headerRepository.Getcurrencyconversion(p_primarycurrency, p_secondarycurrency, todaydate);

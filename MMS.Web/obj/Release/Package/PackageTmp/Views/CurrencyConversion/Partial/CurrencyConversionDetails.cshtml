@@ -1,0 +1,166 @@
+﻿@model MMS.Web.Models.Currency.CurrencyConversionModel
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
+</head>
+
+<body>
+
+    <div class="main-page">
+        <section class="inner-section">
+            <div class="edit-customer">
+                <a href="/CurrencyConversion/CurrencyConversionmaster">
+                    <div class="back-button"><img src="~/Content/assets/images/choose-plan.png" alt="back arrow"></div>
+                </a>
+                <h3 class=" font-20">Currency Conversion info</h3>
+
+            </div>
+            <div class="edit-section">
+                <h3 class="font-20">Basic Information</h3>
+                <div class="row mt-3">
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#Account">Primary Currency</label>
+                            @Html.DropDownListFor(m => m.PrimaryCurrency, MMS.Web.ExtensionMethod.HtmlHelper.forCurrencyName(), new { @class = "select-style text-field", onchange = "categorytypeCod()" })
+                            <p class="text-danger" id="error31"></p>
+                            @Html.HiddenFor(m => m.Id)
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#Account">Secondary Currency</label>
+                            @Html.DropDownListFor(m => m.SecondaryCurrency, MMS.Web.ExtensionMethod.HtmlHelper.forCurrencyName(), new { @class = "select-style text-field", onchange = "categorytypeCod()" })
+                            <p class="text-danger" id="error"></p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#Account">Conversion Value</label>
+                            @Html.TextBoxFor(m => m.ConversionValue, new { @class = "form-control text-field", placeholder = "Enter the Conversion Value", onkeyup = "categoryCod()" })
+                            <p class="text-danger" id="error"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#AccountTypeId">From-Date </label>
+                            @Html.TextBoxFor(m => m.FromDate, "{0:yyyy-MM-dd}", new { @class = "form-control text-field", @id = "FromDate", type = "date", placeholder = "DD/MM/YYYY", })
+                            <p class="text-danger" id="error3"></p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="input-part">
+                            <label class="font-14" for="#AccountTypeId">To-Date</label>
+                            @Html.TextBoxFor(m => m.ToDate, "{0:yyyy-MM-dd}", new { @class = "form-control text-field", type = "date", onkeyup = "categoryCod()", placeholder = "DD/MM/YYYY", })
+                            <p class="text-danger" id="error3"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-footer">
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 text-center">
+                            <a href="/CurrencyConversion/CurrencyConversionmaster">
+                                <button class="border-color font-15">
+                                    CANCEL
+                                </button>
+                            </a>
+                            @if (Model != null)
+                            {
+                                if (Model.Id != 0)
+                                {
+                                    <button type="submit" class="fill-color font-15" onclick="Save()">
+                                        Update
+                                    </button>
+                                }
+                            }
+                            else
+                            {
+                                <button type="submit" class="fill-color font-15" onclick="Save()">
+                                    SAVE
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <div id="toast"></div>
+
+
+    </div>
+
+    <div id="toast"></div>
+
+
+    <script src="~/Content/js/custom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="~/Content/js/Validation.js"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#Currency").attr('checked', true);
+        });
+    </script>
+
+    <script>
+        function Save() {
+            var SecondaryCurrency = $("#SecondaryCurrency").val();
+            var ConversionValue = $("#ConversionValue").val();
+            var PrimaryCurrency = $("#PrimaryCurrency").val();
+            var FromDate = $("#FromDate").val();
+            var ToDate = $("#ToDate").val();
+            var Id = $("#Id").val();
+            if (PrimaryCurrency !== "" && SecondaryCurrency !== "" && ConversionValue !== "" && ToDate !== "" && FromDate !== "") {
+                var formData = {
+                    SecondaryCurrency: SecondaryCurrency,
+                    ConversionValue: ConversionValue,
+                    PrimaryCurrency: PrimaryCurrency,
+                    FromDate: FromDate,
+                    ToDate: ToDate,
+                    Id: Id
+                };
+                var url = '/CurrencyConversion/CurrencyConversionPost';
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    contentType: 'application/json',
+                    dataType: 'html',
+                    data: JSON.stringify(formData),
+                    success: function (values) {
+                        var data = JSON.parse(values);
+                        if (data == "success") {
+                            sessionStorage.setItem("showToast", "success");
+                            location.href = "/CurrencyConversion/CurrencyConversionmaster";
+                        } else if (data == "updated") {
+                            sessionStorage.setItem("showToast", "updated");
+                            location.href = "/CurrencyConversion/CurrencyConversionmaster";
+                        } else if (data.includes("CategoryCodeThere")) {
+                            showErrorToast();
+                        }
+                    }
+                });
+            }
+        }
+
+    </script>
+
+</body>
+</html>
+

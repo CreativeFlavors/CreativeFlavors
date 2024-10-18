@@ -12,26 +12,13 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
     <style>
-        .alert {
-            position: relative;
-            padding: 5px 1rem;
-        }
-
-        .alert-danger {
-            color: #842029;
-            background-color: #f8d7da;
-            border-color: #f5c2c7;
-            width: 63%;
-        }
 
         strong#close {
             margin-left: 16%;
             cursor: pointer;
-        }
-
-        #alert {
-            margin-left: 24%;
         }
     </style>
 
@@ -100,9 +87,6 @@
         <div class="edit-section">
             <div class="d-flex">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Payment Method</h1>
-            </div>
-            <div id="alert">
-
             </div>
             <div class="edit-merchant-inner-section">
                 <div class="input-part">
@@ -180,14 +164,14 @@
         </div>
 
     </div>
-
+    <div id="toast"></div>
 
     <script src="~/Content/js/custom.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="~/content/js/bootstrap.bundle.min.js"></script>
+
     <script src="~/Content/js/Validation.js"></script>
-    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function () {
             $("#two").hide();
@@ -270,7 +254,7 @@
             var filter = /^[0-9]+(\.[0-9]+)?$/;
             if (filter.test(Cash) || (filter.test(PaymentAmount) && PaymentRefNo != "") || (filter.test(CreditNoteValue) && CreditNoteRefNo != "" && CreditNoteDate != "")) {
                 if (@Model.GrnBalanceAmount == "0.00") {
-                    alert("Full payment done already");
+                    showsfullpaymentToast();
                 }
                 else {
 
@@ -331,10 +315,10 @@
                                 }, 1500);
                             }
                             else if (data === "Done") {
-                                alert("Full payment done already");
+                                showsfullpaymentToast();
                             }
                             else if (data == "Incorrect") {
-                                alert("Give a correct payment");
+                                showscrtpaymentToast();
                             }
 
                         }
@@ -342,17 +326,6 @@
                     });
 
                 }
-            }
-            else {
-                $("#alert").append(
-                    '<div class="alert alert-danger">' +
-                    '<strong>Alert!</strong> Please enter ledger Details ' +
-                    '<strong id="close">x</strong>' +
-                    '</div>'
-                );
-                $(document).on('click', '#close', function () {
-                    $(".alert-danger").hide();
-                });
             }
         }
     </script>

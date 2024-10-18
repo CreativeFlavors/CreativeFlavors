@@ -29,7 +29,7 @@ namespace MMS.Repository.Managers
         {
             throw new NotImplementedException();
         }
-        public currencycunversion Getcurrencyconversion(string p_primarycurrency, string p_secondarycurrency, string todaydate)
+        public Data.StoredProcedureModel.currencycunversion Getcurrencyconversion(string p_primarycurrency, string p_secondarycurrency, string todaydate)
         {
             currencycunversion currencycunversion = new currencycunversion();
             currencycunversion = salesorderrep.Getcurrencyconversion(p_primarycurrency, p_secondarycurrency, todaydate);

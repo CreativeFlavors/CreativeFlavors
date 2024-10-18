@@ -13,6 +13,8 @@
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
     <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
 
     <style>
         table, th, td {
@@ -55,32 +57,17 @@
             padding: 15%;
         }
 
-        .alert {
-            position: relative;
-            padding: 7px 19px;
-        }
-
-        .alert-danger {
-            color: #842029;
-            background-color: #f8d7da;
-            border-color: #f5c2c7;
-            width: 118%;
-        }
-
         strong#close {
             margin-left: 16%;
             cursor: pointer;
         }
 
-        #alert {
-            margin-left: 24%;
-        }
         .caret {
             display: inline-block;
             width: 0;
-            margin-top: -17%;
+            margin-top: -24%;
             height: 0;
-            margin-left: 94%;
+            margin-left: 89%;
             vertical-align: middle;
             border-top: 13px dashed;
             border-top: 7px solid;
@@ -101,21 +88,18 @@
             <div class="edit-section">
                 <div class="d-flex justify-content-start">
                     <h3 class="font-20">Order Information</h3>
-                    <div id="alert" style="padding: 7px 19px;">
-
-                    </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="col-lg-3 col-md-5 col-sm-12">
                         @Html.HiddenFor(m => m.salesordernumber)
                         <div class="input-box">
                             <label class="font-14" for="#BuyerName">Buyer Name</label>
                             @Html.DropDownListFor(m => m.BuyerName, MMS.Web.ExtensionMethod.HtmlHelper.BuyerName(), new { @class = "select-style text-field ", onchange = "BuyerNamefun()" })
                             <span class="caret"></span>
                         </div>
-                        <p id="berror" style="color: red;"></p>
+                        <p id="berror" style="color: red; margin-top: -25px;"></p>
                     </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="col-lg-3 col-md-5 col-sm-12">
                         <div class="input-box">
                             <label class="font-14" for="#ProductName">List Of Product item</label>
                             <select id="ProductName" class="sel-dropdown " data-option="hidden" onchange="ProductNamefun()">
@@ -125,18 +109,16 @@
                                 }
                             </select>
                             <span class="caret"></span>
-
                         </div>
-                        <p id="perror" style="color: red;"></p>
+                        <p id="perror" style="color: red; margin-top: -25px;"></p>
                     </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12 d-flex justify-content-center">
-                        <div class="checkbox-wrapper-55" style=" margin-top: 6%;">
-                            <label class="rocker rocker-small">
-                                <input type="checkbox" id="currencyToggle">
-                                <span class="switch-left" value="USD">USD</span>
-                                <span class="switch-right" value="ZAR">ZAR</span>
-                            </label>
+                    <div class="col-lg-3 col-md-5 col-sm-12">
+                        <div class="input-box">
+                            <label class="font-14" for="#currencyOption">Currency</label>
+                            @Html.DropDownListFor(m => m.currencyOption, MMS.Web.ExtensionMethod.HtmlHelper.CurrencycunversionName(), new { @class = "select-style text-field" })
+                            <span class="caret"></span>
                         </div>
+                        @*<p id="Currencyerror" style="color: red; margin-top: -25px;"></p>*@
                     </div>
                 </div>
                 <table style="width:100%" class="salesOrder">
@@ -177,7 +159,7 @@
                     </tbody>
                 </table>
                 <p id="error2" style="color: red; margin: 0px 40%;"></p>
-                <p id="error1" style="color: red; margin: 1px 301px;"></p>
+                <p id="error1" style="color: red; margin: 1px 259px;"></p>
                 <div>
                     <div>
                         @{Html.RenderPartial("~/Views/SalesOrder/partial/salesorderproducts.cshtml", Model);}
@@ -292,9 +274,7 @@
             </div>
         </section>
     </div>
-
-
-
+    <div id="toast"></div>
     <!-- page-contents end -->
     <script src="~/Content/js/dropdown.js"></script>
 
@@ -319,10 +299,22 @@
                 direction: "asc"
             }
         });
+        new TomSelect("#currencyOption", {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            }
+        });
 
         $(document).ready(function () {
-            $("#currencyToggle").change(function () {
-                var currencyOption = $(this).is(':checked') ? $('.switch-left').attr('value') : $('.switch-right').attr('value');
+            if (sessionStorage.getItem("showToast") === "deleted") {
+                showdeletedToast();
+                sessionStorage.removeItem("showToast");
+            }
+            $("#currencyOption").change(function () {
+                var currencyOption = $('#currencyOption').val();
+                //var currencyOption = $(this).is(':checked') ? $('.switch-left').attr('value') : $('.switch-right').attr('value');
                 var quantity = $('#quantity').val();
                 var ProductID = $("#ProductName").val();
                 var buyerid = $("#BuyerName").val();
@@ -431,13 +423,15 @@
 
                             $("#quantity").keyup(function () {
                                 var quantity = $('#quantity').val();
-                                var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+                                var currencyOption = $('#currencyOption').val();
                                 var ProductID = $("#ProductName").val();
                                 var buyerid = $("#BuyerName").val();
+                                var discountperid = $('#discountperid').val();
                                 var salesordernumber = $("#salesordernumber").val();
                                 var formdata = new FormData();
                                 formdata.append("salesordernumber", salesordernumber);
                                 formdata.append("buyerid", buyerid);
+                                formdata.append("discountperid", discountperid);
                                 formdata.append("ProductID", ProductID);
                                 formdata.append("quantity", quantity);
                                 formdata.append("currencyOption", currencyOption);
@@ -477,7 +471,7 @@
 
                             $("#discountperid").keyup(function () {
                                 var quantity = $('#quantity').val();
-                                var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+                                var currencyOption = $('#currencyOption').val();
                                 var ProductID = $("#ProductName").val();
                                 var buyerid = $("#BuyerName").val();
                                 var discountperid = $('#discountperid').val();
@@ -535,7 +529,7 @@
                                             $("#Total_TaxValue").val("");
                                             $("#Total_Grandtotal").val("");
                                             $('#discountperid').css("border", "3px solid red");
-                                            alert("Discount must be less than 100");
+                                            showsdiscountlessToast();
                                         }
                                     }
                                     else {
@@ -633,13 +627,16 @@
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#d33",
-                confirmButtonText: "Yes,cancel it!"
+                confirmButtonText: "Yes!"
             }).then((result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
-                        title: "Deleted!",
-                        text: "Your order has been deleted successfully",
-                        icon: "success"
+                        title: "Cancelled !",
+                        text: "Your order has been cancelled successfully",
+                        icon: "success",
+                        timer: 1500,
+                        timerProgressBar: true,
+                        showConfirmButton: false
                     }).then(() => {
                         window.location.href = "/SalesOrder/SalesOrderMaster";
                     });
@@ -650,6 +647,7 @@
             var quantity = $("#quantity").val();
             var ProductID = $("#ProductName").val();
             var buyerid = $("#BuyerName").val();
+            var currencyOption = $('#currencyOption').val();
             $(".alert-danger").hide();
             if (ProductID != "") {
                 if (buyerid != "") {
@@ -658,7 +656,6 @@
                     var salesordernumber = $("#salesordernumber").val();
                     var quantity = $("#quantity").val();
                     var discountperid = $("#discountperid").val();
-                    var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
                     var Specialinstruction = $("#Specialinstruction").val();
                     var Additionalcommends = $("#Additionalcommends").val();
 
@@ -685,15 +682,6 @@
                                     $("#BuyerName").prop("disabled", true);
                                     var data = JSON.parse(values);
                                     if (data.AlertMessage === "Added Successfully") {
-                                        Swal.fire({
-                                            title: 'Success!!',
-                                            text: 'Added Successfully!',
-                                            icon: 'success',
-                                            timer: 1500,
-                                            timerProgressBar: true,
-                                            showConfirmButton: false
-                                        });
-
                                         setTimeout(function () {
                                             var custid = data.customerid;
                                             var salesno = data.salesorderno;
@@ -742,10 +730,15 @@
                                                 }
                                             });
                                         }, 1500);
+                                        showSuccessToast();
+                                    }
+                                    else if (data.AlertMessage === "Already") {
+                                        showsproductToast();
                                     }
                                     else if (data.AlertMessage === "Not Existed") {
-                                        alert("Address Not added");
+                                        showsbuyeraddToast();
                                     }
+                                   
                                 },
                                 error: function (xhr, status, error) {
                                     console.error('Error adding sales order details:', error);
@@ -756,7 +749,7 @@
                     }
 
                     else {
-                        if (quantity != "" && discountperid != "" && filter.test(quantity) && filter.test(discountperid)) {
+                        if (quantity != "" && discountperid != "" && filter.test(quantity) && filter.test(discountperid) && discountperid <=100 ) {
                             $.ajax({
                                 type: 'POST',
                                 url: '/SalesOrder/SalesorderDetails',
@@ -827,7 +820,10 @@
                                         }, 1500);
                                     }
                                     else if (data.AlertMessage === "Not Existed") {
-                                        alert("Address Not added");
+                                        showsbuyeraddToast();
+                                    }
+                                    else if (data.AlertMessage === "Already") {
+                                        showsproductToast();
                                     }
                                 },
                                 error: function (xhr, status, error) {
@@ -838,28 +834,11 @@
                     }
                 }
                 else {
-                    $("#alert").append(
-                        '<div class="alert alert-danger"style="padding: 7px 19px;">' +
-                        '<strong>Alert!</strong> Buyer not selected ' +
-                        '<strong id="close">x</strong>' +
-                        '</div>'
-                    );
-                    $(document).on('click', '#close', function () {
-                        $(".alert-danger").hide();
-                    });
+                    showsbuyernotToast();
                 }
             }
             else {
-                $("#alert").append(
-                    '<div class="alert alert-danger"style="padding: 7px 19px;">' +
-                    '<strong>Alert!</strong> Purchase item not selected ' +
-                    '<strong id="close">x</strong>' +
-                    '</div>'
-                );
-                $(document).on('click', '#close', function () {
-                    $(".alert-danger").hide();
-                });
-
+                showsSOaddproToast();
             }
 
         }
@@ -872,7 +851,7 @@
                 data: { SOId: arg, Buyerid: buyerid, Salesordernumber: salesordernumber },
                 success: function (values) {
                     if (values.AlertMessage === "Success") {
-                        alert("Deleted Successfully.");
+                        showdeletedToast();
                         setTimeout(function () {
                             $('#newordergrid').empty();
                             if (Array.isArray(values.SalesOrderList) && values.SalesOrderList.length > 0) {
@@ -900,11 +879,8 @@
                             }
                         }, 1000);
                     } else {
-                        alert("Failed to delete.");
+                        showdeleteprocessToast();
                     }
-                },
-                error: function (xhr, status, error) {
-                    alert("An error occurred: " + xhr.responseText);
                 }
             });
         }
@@ -915,7 +891,7 @@
             var Total_Subtotal = $("#Total_Subtotal").val();
             var Total_TaxValue = $("#Total_TaxValue").val();
             var Total_Grandtotal = $("#Total_Grandtotal").val();
-            var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+            var currencyOption = $('#currencyOption').val();
             var salesordernumber = $("#salesordernumber").val();
             var Specialinstruction = $("#Specialinstruction").val();
             var Additionalcommends = $("#Additionalcommends").val();
@@ -956,7 +932,7 @@
                         }, 2000);
                     }
                     else if (data.AlertMessage === "Not Existed") {
-                        alert("Before Confirm you must add the Product");
+                        showsSOCfToast();
                     }
                 }
 
@@ -988,7 +964,7 @@
                         dataType: 'json',
                         success: function (data) {
                             if (data == 1) {
-                                alert("All ready product added ");
+                                showsproductToast();
                             }
                         }
                     });
@@ -1006,7 +982,7 @@
                     window.location.href = "@Url.Action("Searchsalesorder", "AddressDetails")?Buyerid=" + buyerid;
                 }
                 else {
-                    alert("Buyer Not selected");
+                    showsbuyernotToast();
                 }
             });
         });

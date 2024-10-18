@@ -1,0 +1,457 @@
+﻿@model IEnumerable<MMS.Web.Models.Currency.CurrencyConversionModel>
+@{
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int pageSize = ViewBag.PageSize ?? 9;
+    int totalItems = Model.Count();
+    int startSerialNumber = (currentPage - 1) * pageSize + 1;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/Content/css1/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css1/custom.css" rel="stylesheet" />
+    <link href="~/Content/css1/responsive.css" rel="stylesheet" />
+    <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
+    <style>
+        .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
+            padding: 16px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 33px;
+            height: 16px;
+            background-color: #198754;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+            .switch::after {
+                content: '';
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background-color: white;
+                top: 3px;
+                left: 5px;
+                transition: all 0.3s;
+            }
+
+        .checkbox:checked + .switch::after {
+            left: 18px;
+        }
+
+        .checkbox:checked + .switch {
+            background-color: #dc3545;
+        }
+
+        .checkbox {
+            display: none;
+        }
+
+        img#paynows {
+            width: 26%;
+        }
+
+        .page-item.active .page-link {
+            z-index: 3;
+            color: #fff;
+            background-color: #4472C4;
+            border-color: #0d6efd;
+        }
+
+        .manage_customers_table_responsive, .reports .reports_table_responsive {
+            padding: 1px 15px 13px;
+            box-sizing: border-box;
+            overflow-x: unset;
+        }
+
+        .form-floating {
+            position: relative;
+            width: 193px;
+        }
+
+            .form-floating label {
+                padding: 0;
+                background: #fff;
+                height: fit-content;
+                opacity: 1 !important;
+                left: 11px;
+                top: -5px;
+                width: 169px;
+            }
+
+        .sub_merchants .merchant_btn, .manage_customers .manage_customers_btn, .common_Manage_subMerchant .manage_customers_btn {
+            background: #4472C4;
+            border-radius: 5px;
+            padding: 11px 61px;
+            border: 1px solid transparent;
+            font-style: normal;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-page">
+        <div id="transaction_report" class="reports common_Manage_subMerchant">
+            <div class="d-flex justify-content-between align-items-center manage_customers_head">
+                <div class="manage_customers_main_head">
+                    <h6 class="font-20">Currency Conversion info</h6>
+                </div>
+                <div>
+                    <a href="/CurrencyConversion/CurrencyConversionDetails">
+                        <button type="button" class="manage_customers_btn font-15" id="add" style="color:white;">
+                            ADD
+                        </button>
+                    </a>
+                </div>
+            </div>
+            <div class="table-responsive reports_table_responsive">
+                <div class="d-flex justify-content-evenly mt-4">
+                    <div class="form-floating">
+                        <select id="primarycurr" class="form-select">
+                            @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.forCurrencyName())
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                        <label for="floatingSelectGrid">Primary Currency</label>
+                    </div>
+
+                    <div class="form-floating">
+                        <select id="secondarycurr" class="form-select">
+                            @foreach (var item in MMS.Web.ExtensionMethod.HtmlHelper.forCurrencyName())
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                        <label for="floatingSelectGrid">Secondary Currency</label>
+                    </div>
+
+                    <div id="transaction_reports_search4_container" class="reports_search_container_btn">
+                        <button type="button" class="manage_customers_btn font-15" id="Search">
+                            FILTER
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="manage_customers_table_in_responsive" id="form">
+
+                    <table class="table table-striped text-center">
+                        <thead>
+                            <tr class="font-16">
+                                <th scope="col">
+                                    <span>Si.No</span>
+                                </th>
+                                <th scope="col">
+                                    <span>Primary Currency</span>
+                                </th>
+                                <th scope="col">
+                                    <span>Secondary Currency</span>
+                                </th>
+                                <th scope="col">
+                                    <span>Conversion Value</span>
+                                </th>
+                                <th scope="col">
+                                    <span>Fromdate</span>
+                                </th>
+                                <th scope="col">
+                                    <span>Todate</span>
+                                </th>
+                                <th scope="col">
+                                    <span>Status</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        @if (Model != null && Model.Count() != 0)
+                        {
+
+                            <tbody id="currencygrid">
+                                @foreach (var i in Model)
+                                {
+
+                                    <tr class="font-14">
+                                        <td class="veh-1" style="width: 12%; ">@startSerialNumber</td>
+                                        <td class="veh-2" style="width: 12%; text-align:left"> @i.PrimaryCurrency1</td>
+                                        <td class="veh-2" style="width: 12%; text-align:left">@i.SecondaryCurrency1</td>
+                                        <td class="veh-2" style="width: 12%; text-align:right">@i.ConversionValue</td>
+                                        <td class="veh-2" style="width: 12%; text-align:center">@((i.FromDate != null) ? i.FromDate.Value.ToString("dd/MM/yyyy") : "N/A")</td>
+                                        <td class="veh-2" style="width: 12%; text-align:center">@((i.ToDate != null) ? i.ToDate.Value.ToString("dd/MM/yyyy") : "N/A")</td>
+                                        <td class="veh-1 edit-del-wrap" style="width: 12%; text-align:center">
+                                            <span class="table_icons">
+                                                <img src="~/Content/Images/editpng.png" onclick="Edit('@i.Id') " style="width: 24px; height: 24px; margin-top: -10px; " />
+                                            </span>
+                                            <input type="checkbox" class="checkbox" id="delete-@i.Id" data-po-id="@i.Id" @(i.IsActive ? "" : "checked") />
+                                            <label for="delete-@i.Id" class="switch"></label>
+                                        </td>
+
+                                    </tr>
+                                    startSerialNumber++;
+                                }
+                            </tbody>
+                        }
+
+                    </table>
+                </div>
+
+                <div class="row manage_customer_show">
+                    <div class="font-14 manage_customer_show_I col-xl-6">
+                        <span>Showing </span>
+                        <select class="form-select font-16" name="manage_details_page_size" id="manage_details_page_size" aria-label="select example">
+                            <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
+                            <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
+                            <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
+                            <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
+                        </select>
+                    </div>
+
+                    <div class="col-xl-6 manage_customer_show_II">
+                        <nav class="float-xl-end">
+                            <ul class="pagination font-14" id="paginationDetails">
+                                <li class="page-item">
+                                    <a href="" id="previousPage1" class="page-link">Previous</a>
+                                </li>
+                                @for (int i = 1; i <= ViewBag.TotalPage; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                        <a href="#" class="page-link" data-page="@i">@i</a>
+                                    </li>
+                                }
+                                <li class="page-item">
+                                    <a href="" id="nextPage1" class="page-link">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="toast"></div>
+
+
+    <script src="~/Content/js/custom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="~/Content/js/Validation.js"></script>
+
+    <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(window).on("load", function () {
+            $(".report-inner-section").addClass("transection");
+            $("#Currency").attr('checked', true);
+
+        });
+        $(document).ready(function () {
+            if (sessionStorage.getItem("showToast") === "success") {
+                showSuccessToast();
+                sessionStorage.removeItem("showToast");
+            }
+            else if (sessionStorage.getItem("showToast") === "updated") {
+                showupdateToast();
+                sessionStorage.removeItem("showToast");
+            }
+            else if (sessionStorage.getItem("showToast") === "deleted") {
+                showdeletedToast();
+                sessionStorage.removeItem("showToast");
+            }
+            $(document).on("click", "#Search", function () {
+                var secondarycurr = $("#secondarycurr").val();
+                var primarycurr = $("#primarycurr").val();
+                if (secondarycurr == "" && primarycurr == "") {
+                    var secondarycurr =0;
+                    var primarycurr = 0;
+                }
+                $.ajax({
+                    type: 'GET',
+                    url: '/CurrencyConversion/searchs',
+                    data: { Secondarycurr: secondarycurr, Primarycurr: primarycurr },
+                    contentType: 'application/json',
+                    success: function (data) {
+                        $("#currencygrid").empty(); 
+                        var count = 1;
+
+                        if (Array.isArray(data) && data.length > 0) {
+                            $.each(data, function (i, item) {
+                                const formattedDate = convertToReadableDate(item.FromDate);
+                                const formattedDate1 = convertToReadableDate(item.ToDate);
+
+                                $("#currencygrid").append(`
+                        <tr class="font-14">
+                            <td class="veh1-5" style="width: 12%; ">${count}</td>
+                            <td class="veh1-5" style="width: 12%; text-align:left;">${item.PrimaryCurrency1}</td>
+                            <td class="veh1-5" style="width: 12%; text-align:left;">${item.SecondaryCurrency1}</td>
+                            <td class="veh1-5" style="width: 12%; text-align:right;">${item.ConversionValue}</td>
+                            <td class="veh1-5" style="width: 12%; text-align:center;">${formattedDate}</td>
+                            <td class="veh1-5" style="width: 12%; text-align:center;">${formattedDate1}</td>
+                            <td class="veh-1 edit-del-wrap" style="width: 12%;>
+                                <span class="table_icons" style="padding: 7px 9px;">
+                                    <img src="/Content/Images/editpng.png" onclick="Edit('${item.Id}')" style="width: 34px; height: 31px; margin-top: -10px;" />
+                                </span>
+                                <input type="checkbox" class="checkbox" id="delete-${item.Id}" data-po-id="${item.Id}" ${item.IsActive ? '' : 'checked'} />
+                                <label for="delete-${item.Id}" class="switch"></label>
+                            </td>
+                        </tr>
+                    `);
+                                count++;
+                            });
+                        } else {
+                            $("#currencygrid").append(`<tr><td colspan="14">No records found.</td></tr>`);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error occurred:", error);
+                        $("#currencygrid").append(`<tr><td colspan="14">An error occurred while fetching records.</td></tr>`);
+                    }
+                });
+            });
+
+        });
+        function convertToReadableDate(dateString) {
+            const match = dateString.match(/\d+/);
+            if (match) {
+                const timestamp = parseInt(match[0], 10);
+                const date = new Date(timestamp);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+            return "Invalid Date";
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("tbody").on("change", ".checkbox", function () {
+                var currencyId = $(this).data('po-id');
+                var isChecked = $(this).is(':checked');
+                performAjaxRequest(currencyId, !isChecked);
+            });
+        $('#manage_details_page_size').change(function () {
+        var pageSize = parseInt($('#manage_details_page_size').val());
+        $.ajax({
+            url: '/CurrencyConversion/CurrencyConversionGrid',
+            type: "GET",
+            data: { pageSize: pageSize },
+            success: function (data) {
+                $("#SODetails").html(data).show();
+            },
+            error: function () {
+                alert('Error loading data');
+            }
+        });
+    });
+
+    // Pagination click handler
+    $(document).on("click", "#paginationDetails .page-link[data-page]", function (e) {
+        e.preventDefault();
+        var page = $(this).data("page");
+        var pageSize = parseInt($('#manage_details_page_size').val());
+        $.ajax({
+            url: '/CurrencyConversion/CurrencyConversionGrid',
+            type: "GET",
+            data: { page: page, pageSize: pageSize },
+            success: function (data) {
+                $("#SODetails").html(data).show();
+            },
+            error: function () {
+                alert('Error loading data');
+            }
+        });
+    });
+
+    // Previous page button
+    $('#previousPage1').click(function (e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        if (currentPage > 1) {
+            var previousPage = currentPage - 1;
+            var pageSize = parseInt('@ViewBag.PageSize');
+            $.ajax({
+                url: '/CurrencyConversion/CurrencyConversionGrid',
+                type: "GET",
+                data: { page: previousPage, pageSize: pageSize },
+                success: function (values) {
+                    $("#SODetails").html(values).show();
+                },
+                error: function () {
+                    alert('Error loading data');
+                }
+            });
+        }
+    });
+
+    // Next page button
+    $('#nextPage1').click(function (e) {
+        e.preventDefault();
+        var currentPage = parseInt('@ViewBag.CurrentPage');
+        var totalPages = parseInt('@ViewBag.TotalPage');
+        if (currentPage < totalPages) {
+            var nextPage = currentPage + 1;
+            var pageSize = parseInt('@ViewBag.PageSize');
+            $.ajax({
+                url: '/CurrencyConversion/CurrencyConversionGrid',
+                type: "GET",
+                data: { page: nextPage, pageSize: pageSize },
+                success: function (values) {
+                    $("#SODetails").html(values).show();
+                },
+                error: function () {
+                    alert('Error loading data');
+                }
+            });
+        }
+    });
+
+  });
+    </script>
+
+
+    <script>
+        //get Category id
+
+        function Edit(id) {
+            $('.main-page').hide();
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("CurrencypageEdit", "CurrencyConversion")',
+                data: { Id: id },
+                success: function (response) {
+                    $(".main-page").html(response);
+                    $(".main-page").show();
+                }
+            });
+        }
+
+        function performAjaxRequest(currencyId, isChecked) {
+   $.ajax({
+       type: 'POST',
+       url: '@Url.Action("currencystatus", "CurrencyConversion")',
+       data: { CurrencyId: currencyId, IsChecked: isChecked },
+       success: function (data) {
+           if (data === "Success") {
+               showactivatedToast();
+           }
+           else {
+               showsdeactivatedToast();
+           }
+       },
+       error: function () {
+           alert('Error occurred during the delete operation.');
+       }
+   });
+}
+    </script>
+
+</body>
+</html>
+

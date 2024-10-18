@@ -64,7 +64,6 @@ namespace MMS.Repository.Managers
                     model.SubassemblyId = arg.SubassemblyId;
                     model.IsActive = arg.IsActive;
                     model.BomId = arg.BomId;
-                    model.ProductId = arg.ProductId;
                     model.RequiredQty = arg.RequiredQty;
                     model.UpdatedDate = DateTime.Now;
                     string username = HttpContext.Current.Session["UserName"].ToString();

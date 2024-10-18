@@ -32,6 +32,7 @@ namespace MMS.Data.Mapping
             Property(t => t.UpdatedDate).HasColumnName("updateddate");
             Property(t => t.createdby).HasColumnName("createdby");
             Property(t => t.Updatedby).HasColumnName("updatedby");
+            Property(t => t.currencyid).HasColumnName("currencyid");
             ToTable("salesorder_hd");
         }
     }

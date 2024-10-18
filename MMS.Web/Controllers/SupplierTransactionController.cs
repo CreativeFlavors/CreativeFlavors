@@ -215,14 +215,14 @@ namespace MMS.Web.Controllers
         #region filterion
 
         [HttpGet]
-        public ActionResult SupplierTransactionSearch(int Supplierid)
+        public ActionResult SupplierTransactionSearch(int Supplierid , int GRNNo)
         {
             try
             {
                 SupplierTransaction model = new SupplierTransaction();
 
                 GRNHeaderManager manager = new GRNHeaderManager();
-                var suppliertransactionlist = manager.Get();
+                var suppliertransactionlist = manager.Get().OrderByDescending(m=>m.GrnHeaderId);
 
                 Supplier_masterManager supplierMasterManager = new Supplier_masterManager();
                 var data1 = supplierMasterManager.Get();
@@ -238,14 +238,13 @@ namespace MMS.Web.Controllers
 
                 foreach (var item in suppliertransactionlist)
                 {
-                    if (item.SupplierId == Supplierid)
-                    {
                         SupplierTransaction supplierTransaction = new SupplierTransaction();
                         decimal? paid = 0;
                         supplierTransaction.GrnDate = item.GrnDate;
                         supplierTransaction.GrnAmount = item.total_unitprice;
                         supplierTransaction.GrnRefNumber = item.GRNNumber;
                         supplierTransaction.Grnqty = item.Quantity;
+                        supplierTransaction.SupplierId = item.SupplierId;
                         supplierTransaction.Id = item.GrnHeaderId;
                         supplierTransaction.SupplierMaster = data1.Where(W => W.SupplierId == item.SupplierId).ToList().FirstOrDefault();
                         List<supplierTransaction> suppliertransactions = data2.Where(W => W.GrnRefNumber == item.GRNNumber).ToList();
@@ -256,9 +255,12 @@ namespace MMS.Web.Controllers
                         supplierTransaction.GrnPaidAmount = paid;
                         supplierTransaction.GrnBalanceAmount = item.total_unitprice - paid;
                         totalList.Add(supplierTransaction);
-                    }
                 }
-                return Json(totalList, JsonRequestBehavior.AllowGet);
+
+                var roundtoatlist = (Supplierid == 0 && GRNNo == 0)
+       ? totalList
+       : totalList.Where(m => m.SupplierId == Supplierid && m.GrnRefNumber == GRNNo);
+                return Json(roundtoatlist, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {

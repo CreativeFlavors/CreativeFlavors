@@ -14,7 +14,9 @@ namespace MMS.Core.Entities
         [Column("addressdt_id")]
         public int addressdt_id { get; set; }   
         [Column("addresshd_id")]
-        public int Addresshd_id { get; set; }
+        public int? Addresshd_id { get; set; }   
+        [Column("suppaddresshdid")]
+        public int? suppaddresshdid { get; set; }
         [Column("addresstypeid")]
         public int addresstypeid { get; set; }    
         [Column("buyerid")]

@@ -13,7 +13,9 @@ namespace MMS.Core.Entities
     {
         [System.ComponentModel.DataAnnotations.Key]
         [Column("dcid_hd")]
-        public int DCid_hd { get; set; }
+        public int DCid_hd { get; set; }  
+        [Column("currencyid")]
+        public int? currencyid { get; set; }
         [Column("deliverychallandate")]
         public DateTime DeliveryChallandate { get; set; }
         [Column("customerid")]

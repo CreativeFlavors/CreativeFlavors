@@ -12,6 +12,8 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
     <style>
         .page-item.active .page-link {
             z-index: 3;
@@ -19,6 +21,7 @@
             background-color: #4472C4;
             border-color: #0d6efd;
         }
+
         .form-floating {
             position: relative;
             width: 15%;
@@ -64,7 +67,7 @@
                         <label for="floatingSelectGrid">Status</label>
                     </div>
 
-                    <div class="form-floating">
+                    @*<div class="form-floating">
                         <input type="date" class="form-control" id="Grndate" />
                         <label for="Grndate">From Date</label>
                     </div>
@@ -72,7 +75,7 @@
                     <div class="form-floating">
                         <input type="date" class="form-control" id="GrnDueDate" />
                         <label for="GrnDueDate">To Date</label>
-                    </div>
+                    </div>*@
 
                     <div id="transaction_reports_search4_container" class="reports_search_container_btn">
                         <button type="button" class="manage_customers_btn font-15">
@@ -86,52 +89,28 @@
                             <tr class="font-16">
                                 <th scope="col">
                                     <span>Si.No</span>
-                                    <span>
-                                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
-                                    </span>
                                 </th>
                                 <th scope="col">
                                     <span>Supplier Name</span>
-                                    <span>
-                                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
-                                    </span>
                                 </th>
                                 <th scope="col">
                                     <span>Grn NO</span>
-                                    <span>
-                                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
-                                    </span>
                                 </th>
                                 <th scope="col">
                                     <span>Grn Date</span>
-                                    <span>
-                                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
-                                    </span>
                                 </th>
                                 <th scope="col">
                                     <span>Grn Value</span>
-                                    <span>
-                                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
-                                    </span>
                                 </th>
                                 <th scope="col">
                                     <span>Amount Paid</span>
-                                    <span>
-                                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
-                                    </span>
                                 </th>
                                 <th scope="col">
                                     <span>Balance Amount</span>
-                                    <span>
-                                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
-                                    </span>
                                 </th>
 
                                 <th scope="col">
                                     <span>Grn Qty</span>
-                                    <span>
-                                        <img src="assets/images/sort-arrows-couple-pointing-up-and-down.png" alt="">
-                                    </span>
                                 </th>
                                 <th scope="col"><span>Payments</span></th>
                             </tr>
@@ -230,6 +209,7 @@
     </div>
 
 
+    <div id="toast"></div>
 
 
     <script src="~/Content/js/dropdown.js"></script>
@@ -301,28 +281,35 @@
     <script>
         function Search() {
             var supplierid = $("#supplierid").val();
+            var GRNno = $("#GRNno").val();
+            if (supplierid == "" && GRNno == "") {
+                var supplierid = 0;
+                var GRNno = 0;
+            }
             $.ajax({
                 type: "GET",
                 url: '/SupplierTransaction/SupplierTransactionSearch',
-                data: { Supplierid: supplierid },
+                data: { Supplierid: supplierid , GRNNo: GRNno },
                 dataType: 'json',
                 success: function (data) {
                     $("tbody").empty();
                     var startSerialNumber = 1;
                     $.each(data, function (index, i) {
+                        const formattedDate = convertToReadableDate(i.GrnDate);
+
                         $("tbody").append(`
-                                    <tr class="font-14">
-                                        <td>${startSerialNumber}</td>
-                                        <td>${i.SupplierMaster != null ? i.SupplierMaster.SupplierName : ""}
-                                        <td>${i.GrnRefNumber}</td>
-                                        <td>${i.GrnDate}</td>
-                                        <td>${i.GrnAmount}</td>
-                                        <td>${i.suppliertransaction == null ? '0' : i.suppliertransaction.GrnPaidAmount ?? '0'}</td>
-                                        <td>${i.suppliertransaction == null ? i.GrnAmount : i.suppliertransaction.GrnBalanceAmount ?? '0'}</td>
-                                        <td>${i.Grnqty}</td>
-                                        <td><button class="btn btn-success" onclick="paynow('${i.Id}')" title="Pay Now">Pay Now</button></td>
-                                    </tr>
-                                `);
+                                        <tr class="font-14">
+                                            <td>${startSerialNumber}</td>
+                                            <td style="text-align:left;">${i.SupplierMaster != null ? i.SupplierMaster.Suppliername : ""}
+                                            <td style="text-align:right;">${i.GrnRefNumber}</td>
+                                            <td style="text-align:center;">${formattedDate}</td>
+                                            <td style="text-align:right;">${i.GrnAmount}</td> 
+                                            <td style="text-align:right;">${i.GrnPaidAmount == 0 ? '0' : i.GrnPaidAmount ?? '0'}</td>
+                                            <td style="text-align:right;">${i.GrnPaidAmount == 0 ? i.GrnBalanceAmount : i.GrnBalanceAmount ?? '0'}</td>
+                                            <td style="text-align:right;">${i.Grnqty}</td>
+                                            <td><button class="btn btn-success" onclick="paynow('${i.Id}')" title="Pay Now">Pay Now</button></td>
+                                        </tr>
+                                    `);
                         startSerialNumber++;
                     });
                 },
@@ -330,6 +317,18 @@
                     console.error("Error occurred:", status, error);
                 }
             });
+        }
+        function convertToReadableDate(dateString) {
+            const match = dateString.match(/\d+/);
+            if (match) {
+                const timestamp = parseInt(match[0], 10);
+                const date = new Date(timestamp);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+            return "Invalid Date";
         }
     </script>
 

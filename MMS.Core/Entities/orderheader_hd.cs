@@ -12,7 +12,9 @@ namespace MMS.Core.Entities
     {
         [System.ComponentModel.DataAnnotations.Key]
         [Column("invoicehd_id")]
-        public int invoicehd_id { get; set; }
+        public int invoicehd_id { get; set; }   
+        [Column("currencyid")]
+        public int? currencyid { get; set; }
         [Column("invoicedate")]
         public DateTime invoicedate { get; set; }
         [Column("customerid")]

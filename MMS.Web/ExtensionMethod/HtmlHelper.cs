@@ -933,6 +933,48 @@ namespace MMS.Web.ExtensionMethod
             return new SelectList(items, "Value", "Text");
 
         }
+        //public static SelectList CurrencycunversionName()
+        //{
+        //    CurrencyManager Manager = new CurrencyManager();
+        //    List<System.Web.Mvc.SelectListItem> items = Manager.GetccList().OrderBy(x => x.id).Select(
+        //                                         item => new System.Web.Mvc.SelectListItem()
+        //                                         {
+        //                                             Text = item.primarycurrency + " - " + item.secondarycurrency,
+        //                                             Value = item.id.ToString()
+        //                                         }).ToList();
+        //    var ShotName = new System.Web.Mvc.SelectListItem()
+        //    {
+        //        Value = "",
+        //        Text = "Please Select"
+        //    };
+        //    items.Insert(0, ShotName);
+        //    return new SelectList(items, "Value", "Text");
+
+        //}
+        public static SelectList CurrencycunversionName()
+        {
+            CurrencyManager manager = new CurrencyManager();
+            var items = manager.GetccList()
+                .GroupBy(x => new { x.primarycurrency, x.secondarycurrency })
+                .Select(g => g.OrderByDescending(x => x.createddate).First())
+                .OrderBy(x => x.id)
+                .Select(item => new System.Web.Mvc.SelectListItem()
+                {
+                    Text = item.primarycurrency + " - " + item.secondarycurrency,
+                    Value = item.id.ToString()
+                })
+                .ToList();
+
+            var shotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select"
+            };
+
+            items.Insert(0, shotName);
+            return new SelectList(items, "Value", "Text");
+        }
+
         public static SelectList MaterialGroupName()
         {
             MaterialGroupManager Manager = new MaterialGroupManager();
@@ -1046,7 +1088,7 @@ namespace MMS.Web.ExtensionMethod
             List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.SupplierId).Select(
                                                  item => new System.Web.Mvc.SelectListItem()
                                                  {
-                                                     Text = item.Suppliername,
+                                                     Text = item.Suppliername + " - " + item.suppliercode,
                                                      Value = Convert.ToString(item.SupplierId)
                                                  }).ToList();
             var ColorName = new System.Web.Mvc.SelectListItem()
@@ -1826,7 +1868,7 @@ namespace MMS.Web.ExtensionMethod
             List<System.Web.Mvc.SelectListItem> items = Manager.Get().OrderBy(x => x.CustomerName).Select(
                                                   item => new System.Web.Mvc.SelectListItem()
                                                   {
-                                                      Text = item.CustomerName,
+                                                      Text = item.CustomerName + " - " + item.BuyerCode,
                                                       Value = item.BuyerMasterId.ToString()
                                                   }).ToList();
             var ShotName = new System.Web.Mvc.SelectListItem()
@@ -1877,7 +1919,7 @@ namespace MMS.Web.ExtensionMethod
             List<System.Web.Mvc.SelectListItem> items = Manager.Get().Where(m=>m.IsActive ==true).OrderBy(x => x.ProductName).Select(
                                                   item => new System.Web.Mvc.SelectListItem()
                                                   {
-                                                      Text = item.ProductName,
+                                                      Text = item.ProductName + " - " + item.ProductCode,
                                                       Value = item.ProductId.ToString()
                                                   }).ToList();
             var ShotName = new System.Web.Mvc.SelectListItem()
@@ -1896,7 +1938,7 @@ namespace MMS.Web.ExtensionMethod
             List<System.Web.Mvc.SelectListItem> items = filteredProducts.Select(
                                                  item => new System.Web.Mvc.SelectListItem()
                                                  {
-                                                     Text = item.ProductName,
+                                                     Text = item.ProductName + " - " + item.ProductCode,
                                                      Value = item.ProductId.ToString()
                                                  }).ToList();
 
@@ -1918,7 +1960,7 @@ namespace MMS.Web.ExtensionMethod
             List<System.Web.Mvc.SelectListItem> items = filteredProducts.Select(
                                                  item => new System.Web.Mvc.SelectListItem()
                                                  {
-                                                     Text = item.ProductName,
+                                                     Text = item.ProductName +" - "+ item.ProductCode,
                                                      Value = item.ProductId.ToString()
                                                  }).ToList();
 
@@ -1941,7 +1983,7 @@ namespace MMS.Web.ExtensionMethod
             List<System.Web.Mvc.SelectListItem> items = filteredProducts.Select(
                                                  item => new System.Web.Mvc.SelectListItem()
                                                  {
-                                                     Text = item.ProductName,
+                                                     Text = item.ProductName + " - " + item.ProductCode,
                                                      Value = item.ProductId.ToString()
                                                  }).ToList();
 
@@ -2729,6 +2771,23 @@ namespace MMS.Web.ExtensionMethod
             {
                 Value = "",
                 Text = "Please Select Product Type"
+            };
+            items.Insert(0, ShotName);
+            return new SelectList(items, "Value", "Text");
+        }      
+        public static SelectList CategoryType()
+        {
+            Product_TypeManger productTypeManager = new Product_TypeManger();
+            List<System.Web.Mvc.SelectListItem> items = productTypeManager.Get().OrderBy(x => x.ProductTypeName).Select(
+                                                  item => new System.Web.Mvc.SelectListItem()
+                                                  {
+                                                      Text = item.ProductTypeName,
+                                                      Value = item.ProductTypeID.ToString()
+                                                  }).ToList();
+            var ShotName = new System.Web.Mvc.SelectListItem()
+            {
+                Value = "",
+                Text = "Please Select Category Type"
             };
             items.Insert(0, ShotName);
             return new SelectList(items, "Value", "Text");

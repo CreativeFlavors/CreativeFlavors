@@ -46,188 +46,140 @@
     </style>
 </head>
 <body>
+    <div id="headergrid">
 
-    <div class="main-page">
-        <div id="transaction_report" class="reports common_Manage_subMerchant">
-            <nav class="reports_customers_head d-flex justify-content-between" aria-label="breadcrumb">
-                <div>
-                    <ol class="breadcrumb font-20">
-                        <li class="breadcrumb-item " aria-current="page">Pre-Production</li>
-                    </ol>
-                </div>
-                <div class="checkbox-wrapper-10">
-                    <input class="tgl tgl-flip" id="cb5" type="checkbox" checked />
-                    <label class="tgl-btn" data-tg-off="Details" data-tg-on="Summary" for="cb5"></label>
-                </div>
+        <div class="table-responsive reports_table_responsive">
+            <ol class="breadcrumb font-20 d-flex justify-content-center">
+                <li class="breadcrumb-item " aria-current="page" style="font-size: 112%;">Pre-Production Summary</li>
+            </ol>
+            <div class="customer_manage_search_container">
 
-            </nav>
+                <input type="text" class="font-14" name="search_manage_customers" id="customer_manage_search1" placeholder="search by Product Name">
 
-            <div class="table-responsive reports_table_responsive">
-                <ol class="breadcrumb font-20 d-flex justify-content-center">
-                    <li class="breadcrumb-item " aria-current="page" style="font-size: 112%;">Pre-Production Summary</li>
-                </ol>
-                <div class="customer_manage_search_containers" style="width:40%;">
-                    <input type="text" placeholder="Search by Product Name" id="SearchID" name="search2">
-                    <button class="buttonone" onclick="Search()" title="Filter" type="submit"><i class="fa fa-search"></i></button>
+            </div>
 
-                </div>
-                <div class="manage_customers_table_in_responsive mt-3" id="form">
-                    <table class="table table-striped text-center">
-                        <thead>
-                            <tr class="font-16">
-                                <th scope="col">
-                                    <span id="add">Si.No</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>SalesOrder No</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
+            <div class="manage_customers_table_in_responsive mt-3" id="form">
+                <table class="table table-striped text-center">
+                    <thead>
+                        <tr class="font-16">
+                            <th scope="col">
+                                <span id="add">Si.No</span>
+                                <span>
+                                    <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                </span>
+                            </th>
+                            <th scope="col">
+                                <span>SalesOrder No</span>
+                                <span>
+                                    <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                </span>
+                            </th>
 
-                                <th scope="col">
-                                    <span>Buyer Name</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
+                            <th scope="col">
+                                <span>Buyer Name</span>
+                                <span>
+                                    <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                </span>
+                            </th>
 
-                                <th scope="col">
-                                    <span>Product Name</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>Product Item</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>Product Type</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                <th scope="col">
-                                    <span>Production Type</span>
-                                    <span>
-                                        <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                    </span>
-                                </th>
-                                @*<th scope="col">
-                                        <span>Discount</span>
-                                        <span>
-                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                        </span>
-                                    </th>
-                                    <th scope="col">
-                                        <span>Sub Total</span>
-                                        <span>
-                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                        </span>
-                                    </th>
+                            <th scope="col">
+                                <span>Product Name</span>
+                                <span>
+                                    <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                </span>
+                            </th>
+                            <th scope="col">
+                                <span>Product Item</span>
+                                <span>
+                                    <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                </span>
+                            </th>
+                            <th scope="col">
+                                <span>Product Type</span>
+                                <span>
+                                    <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                </span>
+                            </th>
+                            <th scope="col">
+                                <span>Production Type</span>
+                                <span>
+                                    <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
+                    @if (Model.temp_ProductionModel.Count() > 0)
+                    {
+                        <tbody id="details">
+                            @{
+                                int currentPage = ViewBag.CurrentPage ?? 1;
+                                int pageSize = ViewBag.PageSize ?? 8;
+                                int totalItems = Model.temp_ProductionModel.Count();
+                                int startSerialNumber = (currentPage - 1) * pageSize + 1;
+                            }
+                            @foreach (var item in Model.temp_ProductionModel)
+                            {
+                                <tr class="font-14">
+                                    <td>@startSerialNumber</td>
+                                    <td style="text-align:center; width: 15%;">@item.SalesOrderId</td>
+                                    <td style="text-align:left; width: 15%;">@item.BuyerName</td>
+                                    <td style="text-align:left; width: 15%;">@item.ProductName</td>
+                                    <td style="text-align:center; width: 15%;">@item.ProductItem</td>
+                                    <td style="text-align:left; width: 15%;">@item.ProductTypeName</td>
+                                    <td style="background-color: @(item.ProductionType == "Production" ? "#c3e6cb" : "#f5c6cb");width: 6px;">@item.ProductionType</td>
 
-                                    <th scope="col">
-                                        <span>Tax Amount</span>
-                                        <span>
-                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                        </span>
-                                    </th>
-                                    <th scope="col">
-                                        <span>Total Price</span>  <span>
-                                            <img src="~/Content/assets/images/sort-arrows-couple-pointing-up-and-down.png" />
-                                        </span>
-                                    </th>
-                                    <th scope="col">
-                                        <span>Stock/Qty</span>
-                                    </th>*@
-                            </tr>
-                        </thead>
-                        @if (ViewBag.Productions != null)
-                        {
-                            <tbody>
-                                @{
-                                    int currentPage = ViewBag.CurrentPage ?? 1;
-                                    int pageSize = ViewBag.PageSize ?? 8;
-                                    int totalItems = ViewBag.Productions.Count;
-                                    int startSerialNumber = (currentPage - 1) * pageSize + 1;
-                                }
-                                @foreach (var item in ViewBag.Productions)
-                                {
-                                    <tr class="font-14">
-                                        <td>@startSerialNumber</td>
-                                        <td>@item.SalesOrderId</td>
-                                        <td>@item.BuyerName</td>
-                                        <td>@item.ProductName</td>
-                                        <td>@item.ProductItem</td>
-                                        <td>@item.ProductTypeName</td>
-                                        <td style="background-color: @(item.ProductionType == "Production" ? "#c3e6cb" : "#f5c6cb");width: 6px;">@item.ProductionType</td>
-                                        @*<td class="veh-1 edit-del-wrap">
-                                                @if (@item.ProductionType == "Production")
-                                                {
-                                                    <a href="javascript:void(0)" onclick="Edit('@item.ProductionId', true)" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
-                                                }
-                                                else if (@item.ProductionType == "Subassembly")
-                                                {
-                                                    <a href="javascript:void(0)" onclick="Edit('@item.ProductionId', false)" class="watchlist-edit" title="Edit"><img src="~/Content/assets/images/edit-icon.png" /></a>
-                                                }
-                                            </td>*@
-                                    </tr>
-                                    startSerialNumber++;
-                                }
-                            </tbody>
-                        }
-                    </table>
+                                </tr>
+                                startSerialNumber++;
+                            }
+                        </tbody>
+                    }
+                    else
+                    {
+                        <tbody>
+                            <tr><td colspan="15">No records found</td></tr>
+                        </tbody>
+
+                    }
+                </table>
+            </div>
+
+            <div class="row manage_customer_show">
+                <div class="font-14 manage_customer_show_I col-xl-6">
+                    <span>Showing </span>
+                    <select class="form-select font-16" name="manage_summary_page_size" id="manage_summary_page_size" aria-label="select example">
+                        <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
+                        <option value="30" @(ViewBag.PageSize == 30 ? "selected" : "")>30</option>
+                        <option value="45" @(ViewBag.PageSize == 45 ? "selected" : "")>45</option>
+                        <option value="60" @(ViewBag.PageSize == 60 ? "selected" : "")>60</option>
+                    </select>
+
+
                 </div>
 
-                <div class="row manage_customer_show">
-                    <div class="font-14 manage_customer_show_I col-xl-6">
-                        <span>Showing </span>
-                        <select class="form-select font-16" name="manage_customer_show_content" id="manage_customer_show_no" aria-label="select example">
-                            <option value="5" @(ViewBag.PageSize == 5 ? "selected" : "")>5</option>
-                            <option value="10" @(ViewBag.PageSize == 10 ? "selected" : "")>10</option>
-                            <option value="15" @(ViewBag.PageSize == 15 ? "selected" : "")>15</option>
-                            <option value="20" @(ViewBag.PageSize == 20 ? "selected" : "")>20</option>
-                        </select>
-                    </div>
-
-                    <div class="col-xl-6 manage_customer_show_II">
-                        <nav class="float-xl-end">
-                            <ul class="pagination font-14">
-                                <li class="page-item">
-                                    <a href="##" id="previousPage" class="page-link">Previous</a>
+                <div class="col-xl-6 manage_customer_show_II">
+                    <nav class="float-xl-end">
+                        <ul class="pagination font-14" id="paginationSummary">
+                            <li class="page-item">
+                                <a href="#" id="previousPage" class="page-link">Previous</a>
+                            </li>
+                            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                    <a href="#" class="page-link" data-page="@i">@i</a>
                                 </li>
-                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                                {
-                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                        <a href="@Url.Action("PreProductionReportMaster", "PreProductionReport", new { page = i })" class="page-link">@i</a>
-                                    </li>
-                                }
-                                <li class="page-item">
-                                    <a class="page-link" id="nextPage" href="##">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
+                            }
+                            <li class="page-item">
+                                <a href="#" class="page-link" id="nextPage">Next</a>
+                            </li>
+                        </ul>
 
-
+                    </nav>
                 </div>
 
             </div>
 
         </div>
-    </div>
-    <div id='myModal' class='modal'>
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div id='details' class="myModalContent"></div>
-            </div>
-        </div>
+
     </div>
 
     <script src="~/Content/js/custom.js"></script>
@@ -241,101 +193,122 @@
             $(".report-inner-section").addClass("transection");
             $("#PreProduction").attr('checked', true);
         });
-        $(document).ready(function () {
+    </script>
+    <script>
 
-
-    $('#manage_customer_show_no').change(function() {
-        var pageSize = parseInt($(this).val());
-        window.location.href = "@Url.Action("PreProductionReportMaster", "PreProductionReport")?pageSize=" + pageSize;
-    });
-
-    $('#previousPage').click(function(e) {
-        e.preventDefault();
-        var currentPage = parseInt('@ViewBag.CurrentPage');
-        if (currentPage > 1) {
-            var previousPage = currentPage - 1;
-            window.location.href = "@Url.Action("PreProductionReportMaster", "PreProductionReport")?page=" + previousPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
-        }
-    });
-
-    $('#nextPage').click(function(e) {
-        e.preventDefault();
-        var currentPage = parseInt('@ViewBag.CurrentPage');
-        var totalPages = parseInt('@ViewBag.TotalPages');
-        if (currentPage < totalPages) {
-            var nextPage = currentPage + 1;
-            window.location.href = "@Url.Action("PreProductionReportMaster", "PreProductionReport")?page=" + nextPage + "&pageSize=" + parseInt('@ViewBag.PageSize');
-        }
-    });
-
-});
-
-        document.querySelector('.tgl-btn').addEventListener('click', function () {
-            var toggleState = this.getAttribute('data-tg-on');
-            if (toggleState === "Summary") {
-                getsummery();
-                this.setAttribute('data-tg-on', 'Details');
-            } else {
-                getproductdetails();
-                this.setAttribute('data-tg-on', 'Summary');
-                this.setAttribute('data-tg-off', 'Details');
-            }
-        });
-        function getsummery() {
-            $(".table-responsive").hide();
+            $(document).ready(function () {
+        $('#manage_summary_page_size').change(function () {
+            var pageSize = parseInt($('#manage_summary_page_size').val());
             $.ajax({
-                type: 'GET',
-                url: '/PreProductionReport/PreProductionReportDetailsGrid',
-                contentType: 'application/json',
+                url: '/PreProductionReport/PreProductionReportHeaderGrid',
+                type: "GET",
+                data: { pageSize: pageSize },
                 success: function (data) {
-                    $(".table-responsive").html(data).show();
+                    $("#headergrid").html(data).show();
+                },
+                error: function () {
+                    alert('Error loading data');
                 }
             });
-        }
-        function getproductdetails() {
-            window.location.href = "/PreProductionReport/PreProductionReportMaster";
-        }
+        });
+    // Click event for page links
+        $(document).on("click", "#paginationSummary .page-link[data-page]", function (e) {
+        e.preventDefault();
+        var page = $(this).data("page");
+        $.ajax({
+            url: '@Url.Action("PreProductionReportHeaderGrid", "PreProductionReport")',
+            type: "GET",
+            data: { page: page },
+            success: function(data) {
+                $("#headergrid").html(data).show();
+            }
+        });
+        });
+
+          // Previous page button
+        $('#previousPage').click(function (e) {
+      e.preventDefault();
+      var currentPage = parseInt('@ViewBag.CurrentPage');
+      if (currentPage > 1) {
+          var previousPage = currentPage - 1;
+          var pageSize = parseInt('@ViewBag.PageSize');
+          $.ajax({
+              url: '/PreProductionReport/PreProductionReportHeaderGrid',
+              type: "GET",
+              data: { page: previousPage, pageSize: pageSize },
+              success: function (values) {
+                  $("#headergrid").html(values).show();
+              },
+              error: function () {
+                  alert('Error loading data');
+              }
+          });
+      }
+  });
+
+  // Next page button
+        $('#nextPage').click(function (e) {
+      e.preventDefault();
+      var currentPage = parseInt('@ViewBag.CurrentPage');
+      var totalPages = parseInt('@ViewBag.TotalPages');
+      if (currentPage < totalPages) {
+          var nextPage = currentPage + 1;
+          var pageSize = parseInt('@ViewBag.PageSize');
+          $.ajax({
+              url: '/PreProductionReport/PreProductionReportHeaderGrid',
+              type: "GET",
+              data: { page: nextPage, pageSize: pageSize },
+              success: function (values) {
+                  $("#headergrid").html(values).show();
+              },
+              error: function () {
+                  alert('Error loading data');
+              }
+          });
+      }
+        });
+            });
+
 
     </script>
 
     <script>
-        function Search() {
-            $.ajax({
-                type: "GET",
-                url: '/PreProductionReport/PreProductionReportSearch',
-                data: { filter: $('#SearchID').val() },
-                dataType: 'json',
-                success: function (data) {
-                    $("tbody").empty();
-                    var count = 1;
-                    $.each(data, function (i, item) {
-                        $("tbody").append(`
-                         <tr class="font-14">
-                             <td>${count}</td>
-                             <td>${item.SalesOrderId}</td>
-                             <td>${item.BuyerName}</td>
-                             <td>${item.ProductName}</td>
-                             <td>${item.ProductItem}</td>
-                             <td>${item.ProductTypeName}</td>
-                             <td>${item.ProductionType}</td>
-                         </tr>
-                     `);
-                        count++;
-                    });
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error occurred:", status, error);
-                }
+        $(document).ready(function () {
+
+            $("#customer_manage_search1").keyup(function () {
+                var bomsearch = $("#customer_manage_search1").val();
+                $.ajax({
+                    type: "GET",
+                    url: '/PreProductionReport/PreProductionReportHeaderSearch',
+                    data: { filter: bomsearch },
+                    dataType: 'json',
+                    success: function (data) {
+                        $("#details").empty();
+                        var count = 1;
+                        $.each(data, function (i, item) {
+                            $("#details").append(`
+                                                     <tr class="font-14">
+                                                              <td style="width: 5%;">${count}</td>
+                                                              <td style="text-align:right;width: 5%">${item.SalesOrderId}</td>
+                                                              <td style="text-align:left; width: 15%;">${item.BuyerName}</td>
+                                                              <td style="text-align:left; width: 15%;">${item.ProductName}</td>
+                                                              <td style="text-align:left; width: 15%;">${item.ProductItem}</td>
+                                                              <td style="text-align:left; width: 15%;">${item.ProductTypeName}</td>
+                                                              <td style="text-align:left; width: 15%;">${item.ProductionType}</td>
+                                                          </tr>
+                                         `);
+                            count++;
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error occurred:", status, error);
+                    }
+                });
             });
-        }
+        });
 
     </script>
-    @*<script>
-            $(window).on("load", function () {
-                $(".report-inner-section").addClass("transection");
-                $("#order").attr('checked', true);
-            });
-        </script>*@
+
 
 
 </body>

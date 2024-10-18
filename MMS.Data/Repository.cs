@@ -308,6 +308,18 @@ namespace MMS.Data
                 throw;
             }
 
+        }    
+        public List<MMS.Data.StoredProcedureModel.currencyconversiongrid> Get_currencyconversiongrid()
+        {
+            try
+            {
+                var ResultList = context.Database.SqlQuery<MMS.Data.StoredProcedureModel.currencyconversiongrid>("SELECT * FROM currencyconversiongrid()").ToList();
+                return ResultList;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
         public List<MMS.Data.StoredProcedureModel.FineshedgoodsReport> Fineshedgoods()
         {

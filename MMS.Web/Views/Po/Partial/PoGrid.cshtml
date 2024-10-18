@@ -11,6 +11,8 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
     <style>
         input[type=text] {
             padding: 12px;
@@ -37,6 +39,7 @@
             background-color: #4472C4;
             border-color: #0d6efd;
         }
+
         .switch {
             position: relative;
             display: inline-block;
@@ -111,10 +114,12 @@
     </div>
 
 
+    <div id="toast"></div>
 
 
     <script src="~/Content/js/custom.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="~/Content/js/Validation.js"></script>
 
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
 
@@ -126,11 +131,18 @@
         });
     </script>
     <script>
+        $(document).ready(function () {
+             if (sessionStorage.getItem("showToast") === "updated") {
+                showupdateToast();
+                sessionStorage.removeItem("showToast");
+            }
+        });
         $("tbody").on("change", ".checkbox", function () {
             var addressId = $(this).data('po-id');
             var isChecked = $(this).is(':checked');
             performAjaxRequest(addressId, !isChecked);
         });
+
         $("#summerygrid").hide();
         $("#add1").click(function () {
             $("#summerygrid").show();
@@ -193,8 +205,10 @@
         data: { poId: addressId, IsChecked: isChecked },
         success: function (data) {
             if (data === "Success") {
-            } else {
-                alert('Po Details deletion failed.');
+                showactivatedToast();
+            }
+            else {
+                showsdeactivatedToast();
             }
         },
         error: function () {

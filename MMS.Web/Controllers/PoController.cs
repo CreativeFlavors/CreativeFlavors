@@ -52,7 +52,7 @@ namespace MMS.Web.Controllers
             int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
             int startIndex = (page - 1) * pageSize;
             int endIndex = Math.Min(startIndex + pageSize - 1, totalCount - 1);
-            totalList = totalList
+            totalList = totalList                                                            
                          .Skip(startIndex)
                          .Take(pageSize)
                          .ToList();
@@ -441,7 +441,14 @@ namespace MMS.Web.Controllers
             var vindentpomapping = poManager.Getpoid(poId);
             if (vindentpomapping != null)
             {
-                status = "Success";
+                if (IsChecked == true)
+                {
+                    status = "Success";
+                }
+                else
+                {
+                    status = "failer";
+                }
                 poManager.Deletepodt(poId, IsChecked);
             }
             return Json(status, JsonRequestBehavior.AllowGet);

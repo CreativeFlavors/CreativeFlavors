@@ -9,6 +9,8 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
     <style>
         .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
             padding: 10px;
@@ -40,6 +42,7 @@
             background-color: #4472C4;
             border-color: #0d6efd;
         }
+
         .switch {
             position: relative;
             display: inline-block;
@@ -152,7 +155,7 @@
                                         </td>
                                         <td class="veh-4" style="width:2%;">
                                             <span class="table_icons">
-                                                <img src="~/Content/Images/editpng.png" onclick="Edit('@i.Bomid') " style="width: 24px; height: 24px; margin-top: -10px; "/>
+                                                <img src="~/Content/Images/editpng.png" onclick="Edit('@i.Bomid') " style="width: 24px; height: 24px; margin-top: -10px; " />
                                             </span>
                                             @if (i.isdeleted == true)
                                             {
@@ -165,7 +168,7 @@
                                                 <label for="delete-@i.Bomid" class="switch"></label>
                                             }
                                         </td>
-                               
+
                                     </tr>
                                     startSerialNumber++;
                                 }
@@ -221,12 +224,13 @@
         </div>
 
     </div>
+    <div id="toast"></div>
+
     <script src="~/Content/js/custom.js"></script>
-    <link href="~/Content/css1/sweetalert.css" rel="stylesheet" />
-
+    <script src="~/Content/js/dropdown.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Content/js/Validation.js"></script>
 
     <script>
         $(window).on("load", function () {
@@ -243,6 +247,18 @@
                 var isChecked = $(this).is(':checked');
                 performAjaxRequest(addressId, !isChecked);
             });
+            if (sessionStorage.getItem("showToast") === "success") {
+                showSuccessToast();
+                sessionStorage.removeItem("showToast");
+            }
+            else if (sessionStorage.getItem("showToast") === "updated") {
+                showupdateToast();
+                sessionStorage.removeItem("showToast");
+            }
+            else if (sessionStorage.getItem("showToast") === "deleted") {
+                showdeletedToast();
+                sessionStorage.removeItem("showToast");
+            }
             $("#customer_manage_search").keyup(function () {
                 var bomsearch = $("#customer_manage_search").val();
 
@@ -319,19 +335,6 @@
         function Edit(arg) {
             window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + arg;
         }
-        @*function Delete(arg) {
-       $.ajax({
-           type: "POST",
-           url: ' @Url.Action("BOMGridDelete", "BillOfMaterial")',
-           data: { BomId: arg },
-           success: function (values) {
-               if (values === "Success") {
-                   alert("Deleted Successfully.");
-                   location.href = "/BillOfMaterial/BOMMaterialListGrid";
-               }
-           }
-       });
-        }*@
 
         function performAjaxRequest(addressId, isChecked) {
     $.ajax({
@@ -340,12 +343,11 @@
         data: { BomId: addressId, IsChecked: isChecked },
         success: function (data) {
             if (data === "Success") {
-            } else {
-                alert('Bom Details deletion failed.');
+                showactivatedToast();
             }
-        },
-        error: function () {
-            alert('Error occurred during the delete operation.');
+            else {
+                showsdeactivatedToast();
+            }
         }
     });
  }

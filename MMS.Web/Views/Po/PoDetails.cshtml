@@ -14,6 +14,8 @@
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
     <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
     <style>
         table, th, td {
             border: 1px solid #C9C9C9;
@@ -55,27 +57,10 @@
             padding: 15%;
         }
 
-        .alert {
-            position: relative;
-            padding: 7px 19px;
-        }
-
-        .alert-danger {
-            color: #842029;
-            background-color: #f8d7da;
-            border-color: #f5c2c7;
-            width: 118%;
-        }
-
         strong#close {
             margin-left: 16%;
             cursor: pointer;
         }
-
-        #alert {
-            margin-left: 24%;
-        }
-
         div#form {
             border-style: solid;
             border-color: #e9ecef;
@@ -251,9 +236,6 @@
             <div class="edit-section">
                 <div class="d-flex justify-content-start">
                     <h3 class="font-20">Purchase Order Information</h3>
-                    <div id="alert" style="padding: 7px 19px;">
-
-                    </div>
                 </div>
                 <div class="checkbox1-wrapper-55 d-flex justify-content-end" style="margin-bottom: -17px;">
                     <label class="rocker rocker-small" style="margin-top:-29px;">
@@ -442,9 +424,12 @@
                         </div>
                     </div>
                     <div class="inner-section-button" style="margin-bottom:-98px;">
-                        <button class="fill-color font-15" onclick="confirmorder(); pocon()">
-                            Raise Po
-                        </button>
+                        <div id="cm">
+                            <button class="fill-color font-15" onclick="confirmorder(); pocon()">
+                                Raise Po
+                            </button>
+                        </div>
+ 
                         <a href="/Po/PoMaster">
                             <button class="border-color font-15">
 
@@ -456,7 +441,7 @@
             </div>
         </section>
     </div>
-
+    <div id="toast"></div>
     <!-- page-contents end -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="~/Content/js/bootstrap.bundle.min.js"></script>
@@ -502,7 +487,7 @@
                     inputField.css('border', '#fff');
                 } else {
                     inputField.css('border', '3px solid red');
-                    alert("Please enter a valid number");
+                    showsvalidnumToast();
                 }
             });
             $(document).on('keyup', '.discount-percentage', function () {
@@ -511,12 +496,12 @@
                 var filter = /^[0-9]+(\.[0-9]+)?$/;
                 if (poqty === "") {
                     inputField.css('border', '#fff');
-                } 
+                }
                 else if (filter.test(poqty)) {
                     inputField.css('border', '#fff');
                 } else {
                     inputField.css('border', '3px solid red');
-                    alert("Please enter a valid number");
+                    showsvalidnumToast();
                 }
             });
             $('#IndentNumber').on('change', function () {
@@ -564,7 +549,7 @@
                     '<td style="background-color: #eee;text-align:right;"><input type="text" class="form-control discount-value" id="DiscountValue_' + index + '" readonly /></td>' +
                     '<td style="background-color: #eee;text-align:right;"><input type="text" class="form-control subtotal" id="Subtotal_' + index + '" readonly /></td>' +
                     '<td style="background-color: #eee;text-align:right;"><input type="text" class="form-control total-value" id="TotalValue_' + index + '" readonly /></td>' +
-                    '<td style="background-color: #eee;"><button type="button" class="btn btn-primary btn-sm save-btn" data-index="' + index + '">Add</button></td>' +
+                    '<td style="background-color: #eee;"><button type="button" class="btn btn-primary btn-sm save-btn" onclick="pocon()" data-index="' + index + '">Add</button></td>' +
                     '</tr>';
 
                 tbody.append(row);
@@ -643,30 +628,30 @@
             var UomId = item.UomId;
             var TaxPercentage = item.TaxNameId;
             var PoNumber = $('#PoNumber').val();
-            var IndentNumber = $('#IndentNumber').val();    
+            var IndentNumber = $('#IndentNumber').val();
             /* var IndentPoMapId = item.IndentPoMapId*/
             $(".alert-danger").hide();
-                var formData = new FormData();
-                /*  formData.append("IndentPoMapId", IndentPoMapId);*/
-                formData.append("SupplierId", SupplierId);
-                formData.append("ProductId", ProductId);
-                formData.append("StoreCode", StoreCode);
-                formData.append("UnitPrice", UnitPrice);
-                formData.append("IndentQty", IndentQty);
-                formData.append("PoQty", PoQty);
-                formData.append("PoDate", PoDate);
-                formData.append("UomId", UomId);
-                formData.append("TaxValue", TaxValue);
-                formData.append("DiscountPercentage", DiscountPercentage);
-                formData.append("DiscountValue", DiscountValue);
-                formData.append("Subtotal", Subtotal);
-                formData.append("TotalValue", TotalValue);
-                formData.append("PoNumber", PoNumber);
-                formData.append("IndentNumber", IndentNumber);
-                formData.append("TaxPercentage", TaxPercentage);
-                var filter = /^[0-9]+$/;
-              if (DiscountPercentage != "") {
-                  if (PoQty != "" && DiscountPercentage != "" && filter.test(PoQty) && filter.test(DiscountPercentage) && SupplierId != "") {
+            var formData = new FormData();
+            /*  formData.append("IndentPoMapId", IndentPoMapId);*/
+            formData.append("SupplierId", SupplierId);
+            formData.append("ProductId", ProductId);
+            formData.append("StoreCode", StoreCode);
+            formData.append("UnitPrice", UnitPrice);
+            formData.append("IndentQty", IndentQty);
+            formData.append("PoQty", PoQty);
+            formData.append("PoDate", PoDate);
+            formData.append("UomId", UomId);
+            formData.append("TaxValue", TaxValue);
+            formData.append("DiscountPercentage", DiscountPercentage);
+            formData.append("DiscountValue", DiscountValue);
+            formData.append("Subtotal", Subtotal);
+            formData.append("TotalValue", TotalValue);
+            formData.append("PoNumber", PoNumber);
+            formData.append("IndentNumber", IndentNumber);
+            formData.append("TaxPercentage", TaxPercentage);
+            var filter = /^[0-9]+$/;
+            if (DiscountPercentage != "") {
+                if (PoQty != "" && DiscountPercentage != "" && filter.test(PoQty) && filter.test(DiscountPercentage) && SupplierId != "") {
                     $.ajax({
                         type: 'POST',
                         url: '/Po/SavePoIndentMapping',
@@ -679,40 +664,31 @@
 
                             if (data && data.Success) {
                                 if (data.message === "Inserted") {
-                                    alert("PO Added successful");
+                                    showSuccessToast();
                                     // Update table with new indents for the current IndentNo
                                     updateIndentTable(data.Indents);
                                 }
                                 else if (data.message === "Updated") {
-                                    alert("PO Updated successful");
+                                    sessionStorage.setItem("showToast", "updated");
                                 } else {
-                                    alert("Unknown response or operation failed.");
+                                    showsaveprocessToast();
                                 }
                             } else {
-                                alert("Unknown response or operation failed.");
+                                showsaveprocessToast();
                             }
                         },
                         error: function (error) {
                             console.error('Error:', error);
-                            alert("Error occurred while saving indent. Please try again.");
                         }
                     });
                 }
 
                 else {
-                    $("#alert").append(
-                        '<div class="alert alert-danger">' +
-                        '<strong>Alert!</strong> Fill all feild properly ' +
-                        '<strong id="close">x</strong>' +
-                        '</div>'
-                    );
-                    $(document).on('click', '#close', function () {
-                        $(".alert-danger").hide();
-                    });
+                    showsSOaddproToast();
                 }
             }
             else {
-                  if (PoQty != "" && filter.test(PoQty) && SupplierId != "") {
+                if (PoQty != "" && filter.test(PoQty) && SupplierId != "") {
                     $.ajax({
                         type: 'POST',
                         url: '/Po/SavePoIndentMapping',
@@ -725,39 +701,31 @@
 
                             if (data && data.Success) {
                                 if (data.message === "Inserted") {
-                                    alert("PO Added successful");
+                                    showSuccessToast()
                                     // Update table with new indents for the current IndentNo
                                     updateIndentTable(data.Indents);
                                 }
                                 else if (data.message === "Updated") {
-                                    alert("PO Updated successful");
+                                    sessionStorage.setItem("showToast", "updated");
+
                                 } else {
-                                    alert("Unknown response or operation failed.");
+                                    showsaveprocessToast();
                                 }
                             } else {
-                                alert("Unknown response or operation failed.");
+                                showsaveprocessToast();
                             }
                         },
                         error: function (error) {
                             console.error('Error:', error);
-                            alert("Error occurred while saving indent. Please try again.");
                         }
                     });
                 }
 
                 else {
-                    $("#alert").append(
-                        '<div class="alert alert-danger">' +
-                        '<strong>Alert!</strong> Fill all feild properly ' +
-                        '<strong id="close">x</strong>' +
-                        '</div>'
-                    );
-                    $(document).on('click', '#close', function () {
-                        $(".alert-danger").hide();
-                    });
+                    showsSOaddproToast();
                 }
             }
-           
+
         }
 
         function updateIndentTable(indents) {
@@ -822,8 +790,18 @@
 
                         if (data && data.Success) {
                             if (data.message === "Inserted") {
-                                alert("PO confirmed successful");
-                                location.href = "/Po/PoMaster";
+                                Swal.fire({
+                                    title: 'Success!!',
+                                    text: 'Your PO Confirmed Successfully!',
+                                    icon: 'success',
+                                    timer: 2000,
+                                    timerProgressBar: true,
+                                    showConfirmButton: false
+                                });
+                                setTimeout(function () {
+                                    location.href = "/Po/PoMaster";
+                                    return false;
+                                }, 2000);
                                 // Clear form fields or reset as needed
                                 $('#MaterialId').val('');
                                 $('#Price').val('');
@@ -833,20 +811,20 @@
 
                             }
                             else {
-                                alert("Unknown response or operation failed.");
+                                showsaveprocessToast();
                             }
                         }
                         else {
-                            alert("Unknown response or operation failed.");
+                            showsaveprocessToast();
                         }
                     },
                     error: function (error) {
                         console.error('Error:', error);
-                        alert("Error occurred while saving indent. Please try again.");
                     }
                 });
 
             }
+
 
         }
 
@@ -854,8 +832,7 @@
     <script>
     $(document).ready(function () {
     var data = @Html.Raw(ViewBag.DataListJson); // Deserialize server-side serialized JSON
-    console.log('Data received:', data);
-
+        $("#cm").hide();
     var tbody = $('#indentDetailGrid tbody');
     tbody.empty();
 
@@ -1007,23 +984,22 @@ function updateCalculations() {
 
                     if (data && data.Success) {
                         if (data.message === "Inserted") {
-                            alert("PO Added successful");
+                            showSuccessToast();
                             // Update table with new indents for the current IndentNo
                             updateIndentTable(data.Indents);
                         }
                         else if (data.message === "Updated") {
-                            alert("PO Updated successful");
+                            sessionStorage.setItem("showToast", "updated");
                             location.href = "/Po/PoMaster";
                         } else {
-                            alert("Unknown response or operation failed.");
+                            showsaveprocessToast();
                         }
                     } else {
-                        alert("Unknown response or operation failed.");
+                        showsaveprocessToast();
                     }
                 },
                 error: function (error) {
                     console.error('Error:', error);
-                    alert("Error occurred while saving indent. Please try again.");
                 }
             });
         }

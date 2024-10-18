@@ -12,7 +12,8 @@
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
     <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
     <style>
         .button {
             padding: 7px 19px;
@@ -79,13 +80,8 @@
                         </div>
                         <div class="input-part">
                             <label class="font-14" for="Date">Date</label>
-                            @Html.TextBoxFor(m => m.Date, new { @class = "form-control text-field", @readonly = "readonly", style = "background-color: #eee !important;" })
+                            @Html.TextBoxFor(m => m.Date, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
                         </div>
-                        @*<div class="input-part">
-                                <label class="font-14" for="ParentBomNo">Parent BOM No.</label>
-                                @Html.DropDownListFor(m => m.ParentBomNo, MMS.Web.ExtensionMethod.HtmlHelper.GetBomNo(), " -- Please Select -- ", new { @class = "select-style text-field " })
-
-                            </div>*@
                         <div class="input-part">
                             <label class="font-14" for="LastBomNoEntered">Last BOM No. Entered</label>
                             @Html.TextBoxFor(m => m.Lastbom, new { @class = "form-control text-field", @readonly = "true", style = "background-color: #eee !important;" })
@@ -176,7 +172,7 @@ style = "background-color: #eee !important;"
                 </div>
         </section>
     </div>
-
+    <div id="toast"></div>
     <script src="~/Content/js/custom.js"></script>
     <script src="~/Content/js/dropdown.js"></script>
 
@@ -192,6 +188,20 @@ style = "background-color: #eee !important;"
         });
     </script>
     <script>
+        $(document).ready(function () {
+            if (sessionStorage.getItem("showToast") === "success") {
+                showSuccessToast();
+                sessionStorage.removeItem("showToast");
+            }
+            else if (sessionStorage.getItem("showToast") === "updated") {
+                showupdateToast();
+                sessionStorage.removeItem("showToast");
+            }
+            else if (sessionStorage.getItem("showToast") === "deleted") {
+                showdeletedToast();
+                sessionStorage.removeItem("showToast");
+            }
+        });
         function initializeTomSelect(selectors, options) {
             selectors.forEach(selector => {
                 new TomSelect(selector, options);
@@ -241,18 +251,18 @@ style = "background-color: #eee !important;"
                             success: function (values) {
                                 var data = JSON.parse(values);
                                 if (data.AlertMessage === "Saved Successfully") {
-                                    alert("Added Successfully.");
+                                    sessionStorage.setItem("showToast", "success");
                                     window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.bomids;
                                 }
                                 else if (data == "Already Existed") {
-                                    alert("BOM no Already  Existed");
+                                    showsbomnoToast();
                                     return false;
                                 } else if (data == "Already Existed Product") {
-                                    alert("Product Already  Existed");
+                                    showsproductthereToast();
                                     return false;
                                 }
                                 else {
-                                    alert('Save process Failed.');
+                                    showsaveprocessToast();
                                 }
 
                             }
@@ -270,26 +280,28 @@ style = "background-color: #eee !important;"
                             success: function (values) {
                                 var data = JSON.parse(values);
                                 if (data.AlertMessage === "Updated Successfully") {
-                                    alert("Updated Successfully.");
-
+                                    sessionStorage.setItem("showToast", "updated");
+                                    window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.update;
+                                }
+                                else if (data.AlertMessage === "Saved Successfully") {
+                                    sessionStorage.setItem("showToast", "success");
                                     window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.update;
                                 }
                                 else if (data == "Already Existed") {
-                                    alert("BOM no Already  Existed");
+                                    showsbomnoToast();
                                     return false;
                                 }
                                 else if (data == "Already Existed Product") {
-                                    alert("Product Already  Existed");
+                                    showsproductthereToast();
                                     return false;
                                 }
-
+                                else {
+                                    showsaveprocessToast();
+                                }
                             }
 
                         });
                     }
-                }
-                else {
-                    alert("Please select All field");
                 }
             }
             else {
@@ -308,15 +320,19 @@ style = "background-color: #eee !important;"
                                     alert("Added Successfully.");
                                     window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.bomids;
                                 }
+                                else if (data.AlertMessage === "Updated Successfully") {
+                                    sessionStorage.setItem("showToast", "updated");
+                                    window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.bomids;
+                                }
                                 else if (data == "Already Existed") {
-                                    alert("BOM no Already  Existed");
+                                    showsbomnoToast();
                                     return false;
                                 } else if (data == "Already Existed Product") {
-                                    alert("Product Already  Existed");
+                                    showsproductthereToast();
                                     return false;
                                 }
                                 else {
-                                    alert('Save process Failed.');
+                                    showsaveprocessToast();
                                 }
 
                             }
@@ -334,25 +350,29 @@ style = "background-color: #eee !important;"
                             success: function (values) {
                                 var data = JSON.parse(values);
                                 if (data.AlertMessage === "Updated Successfully") {
-                                    alert("Updated Successfully.");
+                                    sessionStorage.setItem("showToast", "updated");
 
                                     window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.update;
                                 }
+                                else if (data.AlertMessage === "Saved Successfully") {
+                                    alert("Added Successfully.");
+                                    window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.update;
+                                }
                                 else if (data == "Already Existed") {
-                                    alert("BOM no Already  Existed");
+                                    showsbomnoToast();
+
                                     return false;
                                 } else if (data == "Already Existed Product") {
-                                    alert("Product Already  Existed");
+                                    showsproductthereToast();
                                     return false;
                                 }
-
+                                else {
+                                    showsaveprocessToast();
+                                }
                             }
 
                         });
                     }
-                }
-                else {
-                    alert("Please select All field");
                 }
             }
 
@@ -389,19 +409,18 @@ style = "background-color: #eee !important;"
                             success: function (values) {
                                 var data = JSON.parse(values);
                                 if (data.AlertMessage === "Saved Successfully") {
-                                    alert("Added Successfully.");
+                                    sessionStorage.setItem("showToast", "success");
                                     window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.bomids;
                                 }
                                 else if (data == "Already Existed") {
-                                    alert("BOM no Already  Existed");
-                                    return false;
+                                    showsbomnoToast();
                                 }
                                 else if (data == "Already Existed SUB") {
-                                    alert("SubAssembly Material Already  Exist");
-                                    return false;
+                                    /* alert("SubAssembly Material Already  Exist");*/
+                                    showsproductthereToast();
                                 }
                                 else {
-                                    alert('Save process Failed.');
+                                    showsaveprocessToast();
                                 }
 
                             }
@@ -419,25 +438,25 @@ style = "background-color: #eee !important;"
                             success: function (values) {
                                 var data = JSON.parse(values);
                                 if (data.AlertMessage === "Updated Successfully") {
-                                    alert("Updated Successfully.");
+                                    sessionStorage.setItem("showToast", "updated");
+                                    window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.update;
+                                }
+                                else if (data.AlertMessage === "Saved Successfully") {
+                                    sessionStorage.setItem("showToast", "success");
                                     window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.update;
                                 }
                                 else if (data == "Already Existed") {
-                                    alert("BOM no Already  Existed");
-                                    return false;
+                                    showsbomnoToast();
                                 }
                                 else if (data == "Already Existed SUB") {
-                                    alert("SubAssembly Material Already  Exist");
-                                    return false;
+                                    /* alert("SubAssembly Material Already  Exist");*/
+                                    showsproductthereToast();
                                 }
 
                             }
 
                         });
                     }
-                }
-                else {
-                    alert("Please select All field");
                 }
             }
             else {
@@ -453,19 +472,22 @@ style = "background-color: #eee !important;"
                             success: function (values) {
                                 var data = JSON.parse(values);
                                 if (data.AlertMessage === "Saved Successfully") {
-                                    alert("Added Successfully.");
+                                    sessionStorage.setItem("showToast", "success");
+                                    window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.bomids;
+                                }
+                                else if (data.AlertMessage === "Saved Successfully") {
+                                    sessionStorage.setItem("showToast", "success");
                                     window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.bomids;
                                 }
                                 else if (data == "Already Existed") {
-                                    alert("BOM no Already  Existed");
-                                    return false;
+                                    showsbomnoToast();
                                 }
                                 else if (data == "Already Existed SUB") {
-                                    alert("SubAssembly Material Already  Exist");
-                                    return false;
+                                    showsproductthereToast();
+                                    //alert("SubAssembly Material Already  Exist");
                                 }
                                 else {
-                                    alert('Save process Failed.');
+                                    showsaveprocessToast();
                                 }
 
                             }
@@ -483,21 +505,28 @@ style = "background-color: #eee !important;"
                             success: function (values) {
                                 var data = JSON.parse(values);
                                 if (data.AlertMessage === "Updated Successfully") {
-                                    alert("Updated Successfully.");
+                                    sessionStorage.setItem("showToast", "updated");
+                                    window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.update;
+                                }
+                                else if (data.AlertMessage === "Saved Successfully") {
+                                    sessionStorage.setItem("showToast", "success");
                                     window.location.href = "/BillOfMaterial/EditBOMDetails?BOMID=" + data.update;
                                 }
                                 else if (data == "Already Existed") {
-                                    alert("BOM no Already  Existed");
+                                    showsbomnoToast();
                                     return false;
                                 }
-
+                                else if (data == "Already Existed SUB") {
+                                    showsproductthereToast();
+                                    //alert("SubAssembly Material Already  Exist");
+                                }
+                                else {
+                                    showsaveprocessToast();
+                                }
                             }
 
                         });
                     }
-                }
-                else {
-                    alert("Please select All field");
                 }
             }
         }
@@ -566,7 +595,7 @@ style = "background-color: #eee !important;"
                      if (data.Message == "Already Existed") {
                          $('#Description').val("");
                          $('#Bomno').val("");
-                         alert("Already Existed please try another BOM.");
+                         showsbomnoToast();
                          $('#Bomno').val('');
                          return false;
                      }
@@ -579,10 +608,6 @@ style = "background-color: #eee !important;"
              });
 
          }
-     }
-     else {
-         alert("Please enter the BOM.");
-         return false;
      }
  });
 });

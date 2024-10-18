@@ -19,6 +19,8 @@
     <link href="~/Content/css1/custom.css" rel="stylesheet" />
     <link href="~/Content/css1/responsive.css" rel="stylesheet" />
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
 
     <style>
         .manage_customers .table tr th, .manage_customers .table tr td, .common_Manage_subMerchant .table tr th, .common_Manage_subMerchant .table tr td {
@@ -198,8 +200,8 @@
                                 }
                             </tbody>
                         }
- 
-                        </table>
+
+                    </table>
                 </div>
 
                 <div class="row manage_customer_show">
@@ -236,6 +238,7 @@
             </div>
         </div>
     </div>
+    <div id="toast"></div>
 
 
 
@@ -256,7 +259,18 @@
         var currentPage = @(currentPage);
 
           $(document).ready(function () {
-
+              if (sessionStorage.getItem("showToast") === "success") {
+                  showSuccessToast();
+                  sessionStorage.removeItem("showToast");
+              }
+              else if (sessionStorage.getItem("showToast") === "updated") {
+                  showupdateToast();
+                  sessionStorage.removeItem("showToast");
+              }
+              else if (sessionStorage.getItem("showToast") === "deleted") {
+                  showdeletedToast();
+                  sessionStorage.removeItem("showToast");
+              }
               $(document).on('change', '#manage_customer_show_no', function () {
                   var pageSize = parseInt($(this).val());
                   //var pageSize = this.value;
@@ -359,24 +373,24 @@
                         var count = 1;
                         $.each(response, function (i, item) {
                             $("tbody").append(`
-                                    <tr class="font-14">
-                                        <td class="veh1-5">${count}</td>
-                                        <td class="veh1-5" style="width: 12%; text-align:left">${item.Suppliername}</td>
-                                        <td class="veh1-5" style="width: 12%; text-align:left">${item.suppliercode}</td>
-                                        <td class="veh1-5" style="width: 12%; text-align:left">${item.Telephone1}</td>
-                                        <td class="veh1-5" style="width: 12%; text-align:left">${item.EmailContact}</td>
-                                        <td class="veh1-5" style="width: 12%; text-align:left">${item.AccountName}</td>
-                                        <td class="veh1-5" style="width: 12%; text-align:left">${item.PhysicalCode}</td>
-                                        <td class="veh-4" style="width:12%;">
-                                            <span class="table_icons">
-                                                <img src="/Content/assets/images/edit-icon.png" onclick="Edit('${item.SupplierId}')" />
-                                            </span>
-                                            <span class="table_icons">
-                                                <img src="/Content/assets/images/delete-icon.png" onclick="Delete('${item.SupplierId}')" />
-                                            </span>
-                                        </td>
-                                    </tr>
-                                `);
+                                        <tr class="font-14">
+                                            <td class="veh1-5">${count}</td>
+                                            <td class="veh1-5" style="width: 12%; text-align:left">${item.Suppliername}</td>
+                                            <td class="veh1-5" style="width: 12%; text-align:left">${item.suppliercode}</td>
+                                            <td class="veh1-5" style="width: 12%; text-align:left">${item.Telephone1}</td>
+                                            <td class="veh1-5" style="width: 12%; text-align:left">${item.EmailContact}</td>
+                                            <td class="veh1-5" style="width: 12%; text-align:left">${item.AccountName}</td>
+                                            <td class="veh1-5" style="width: 12%; text-align:left">${item.PhysicalCode}</td>
+                                            <td class="veh-4" style="width:12%;">
+                                                <span class="table_icons">
+                                                    <img src="/Content/assets/images/edit-icon.png" onclick="Edit('${item.SupplierId}')" />
+                                                </span>
+                                                <span class="table_icons">
+                                                    <img src="/Content/assets/images/delete-icon.png" onclick="Delete('${item.SupplierId}')" />
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `);
                             count++;
                         });
                     }
@@ -404,25 +418,16 @@
 
 
         function Delete(id) {
-            var answer = confirm("Are u sure want to delete");
-            if (answer) {
                 $.ajax({
                     type: 'POST',
                     url: '@Url.Action("Delete", "SupplierMaster")',
                     data: { id: id },
                     success: function (response) {
-                        alert("Delete Successfully");
+                        sessionStorage.setItem("showToast", "deleted");
                         window.location.href = '/SupplierMaster/SupplierMaster';
                         return false;
-                    },
-                    else: function (ex) {
-                        alert('This address Already Exist in the database.');
                     }
                 });
-            }
-            else {
-                return false;
-            }
         }
 
     </script>

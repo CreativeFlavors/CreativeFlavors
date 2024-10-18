@@ -19,6 +19,7 @@ namespace MMS.Data.Mapping
             Property(t => t.CreatedDate);
             Property(t => t.UpdatedDate);
             Property(t => t.CreatedBy);
+            Property(t => t.currencyid);
             Property(t => t.UpdatedBy);
             Property(t => t.CustomerId);
             Property(t => t.ItemsDc);

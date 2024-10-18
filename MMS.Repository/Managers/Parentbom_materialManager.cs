@@ -71,7 +71,6 @@ namespace MMS.Repository.Managers
                     model.BomMaterialId = arg.BomMaterialId;
                     model.IsActive = arg.IsActive;
                     model.BomID = arg.BomID;
-                    model.ProductId = arg.ProductId;;
                     model.RequiredQty = arg.RequiredQty;
                     model.UpdatedDate = DateTime.Now;
                     string username = HttpContext.Current.Session["UserName"].ToString();

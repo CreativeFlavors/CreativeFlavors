@@ -29,10 +29,7 @@
 <script src="~/Content/js/Validation.js"></script>
 
 
-
 <script>
-
-
     function Save() {
         var BuyerMasterId = $("#BuyerMasterId").val();
         var CustomerName = $("#CustomerName").val();
@@ -43,9 +40,7 @@
         var AccountDescription = $("#AccountDescription").val();
         var SwiftCode = $("#SwiftCode").val();
         var Physical1 = $("#Physical1").val();
-
         var PhysicalCode = $("#PhysicalCode").val();
-
         var CurrencyId = $("#CurrencyId").val();
         var Telephone1 = $("#Telephone1").val();
         var Telephone2 = $("#Telephone2").val();
@@ -55,17 +50,12 @@
         var AccountTypeId = $("#AccountTypeId").val();
         var VatNumber = $("#VatNumber").val();
         var RegNumber = $("#RegNumber").val();
-
         var CreditLimit = $("#CreditLimit").val();
-        var ChargeInterest = $("#ChargeInterest").val();
         var Interest = $("#Interest").val();
-        var DateAdded = $("#DateAdded").val();
         var TaxTypeId = $("#TaxTypeId").val();
         var ForeignCurrency = $("#ForeignCurrency").val();
         var DcBalance = $("#DcBalance").val();
-        var ForeignDcBalance = $("#ForeignDcBalance").val();
         var Website = $("#Website").val();
-
 
         var formdata = new FormData();
         formdata.append("BuyerMasterId", BuyerMasterId);
@@ -77,9 +67,7 @@
         formdata.append("AccountDescription", AccountDescription);
         formdata.append("SwiftCode", SwiftCode);
         formdata.append("Physical1", Physical1);
-
         formdata.append("PhysicalCode", PhysicalCode);
-
         formdata.append("CurrencyId", CurrencyId);
         formdata.append("Telephone1", Telephone1);
         formdata.append("Telephone2", Telephone2);
@@ -89,504 +77,52 @@
         formdata.append("AccountTypeId", AccountTypeId);
         formdata.append("VatNumber", VatNumber);
         formdata.append("RegNumber", RegNumber);
-
         formdata.append("CreditLimit", CreditLimit);
-        formdata.append("ChargeInterest", ChargeInterest);
         formdata.append("Interest", Interest);
-        formdata.append("DateAdded", DateAdded);
         formdata.append("TaxTypeId", TaxTypeId);
         formdata.append("ForeignCurrency", ForeignCurrency);
         formdata.append("DcBalance", DcBalance);
-        formdata.append("ForeignDcBalance", ForeignDcBalance);
         formdata.append("Website", Website);
+        var email = /^(([^<>()[\]\\.,;:\s"]+(\.[^<>()[\]\\.,;:\s"]+)*)|.(".+"))((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        var filter = /^[0-9]+(\.[0-9]+)?$/;
+        var phoneregx = /^[a-zA-Z\s\.]*$/;
+        // Validation check
+        if (CustomerName && BuyerCode && EmailContact && BuyerShortName && Physical1 && PhysicalCode &&
+            Telephone1 && EmailEmergency && EmailAccounts && AccountTypeId && VatNumber && RegNumber &&
+            CreditLimit && Interest && TaxTypeId && ForeignCurrency && DcBalance && Website && email.test(EmailContact) &&
+            email.test(EmailAccounts) && email.test(EmailEmergency) && filter.test(DcBalance) && filter.test(Interest) & filter.test(CreditLimit) && phoneregx.test(CustomerName)) {
 
+            // Choose the correct URL based on BuyerMasterId
+            var url = BuyerMasterId === "0" ? '/BuyerMater/BuyerModel' : '/BuyerMater/Update';
 
-
-        if (CustomerName != "" && BuyerCode != "" && EmailContact != "" && BuyerShortName != "" && Physical1 != "" && PhysicalCode != "" && Telephone1 != "" && EmailEmergency != "" &&
-            EmailAccounts != "" && AccountTypeId != "" && VatNumber != "" && RegNumber != "" && CreditLimit != "" && Interest != "" && TaxTypeId != "" && ForeignCurrency != "" && DcBalance != "" && Website != "") {
-
-            //for (var [key, value] of formdata.entries()) {
-            //    console.log(`${key}: ${value}`);
-            //}
-
-            if (areAllFieldsValid() == true) {
-
-                if (BuyerMasterId == "0") {
-                    $.ajax({
-                        type: 'POST',
-                        url: '/BuyerMater/BuyerModel',
-                        contentType: false,
-                        processData: false,
-                        dataType: 'html',
-                        data: formdata,
-                        success: function (data) {
-                            data = JSON.parse(data);
-                            console.log(data);
-
-                            if (data.success == true) {
-                                alert('Saved Successfully.');
-                                window.location.href = "/BuyerMater/BuyerMater";
-                                return false;
-                            }
-                            else if (data.message == "already exist") {
-                                alert('Buyer already exists in the database.');
-                                window.location.href = "/BuyerMater/BuyerMasteDetails";
-                                return false;
-                            }
-                            else if (data.success == false) {
-                                alert('Save process Failed.');
-                                window.location.href = "/BuyerMater/BuyerMasteDetails";
-                                return false;
-
-                            }
-
-                        },
-                        error: function (ex) {
-                            alert('Already Exist in the database.');
-                        }
-
-                    });
-                }
-                else {
-                    $.ajax({
-                        type: 'POST',
-                        url: '/BuyerMater/Update',
-                        contentType: false,
-                        processData: false,
-                        dataType: 'html',  // due to thi we can parse the json object 
-                        data: formdata,
-                        success: function (data) {
-
-                            console.log(data);
-                            data = JSON.parse(data);
-                            console.log("json :", data);
-                            if (data.AlertMessage == "Updated") {
-                                alert('updates Successfully.');
-                                window.location.href = "/BuyerMater/BuyerMater";
-                                return false;
-                            }
-                            else if (data.values == "already exist") {
-                                alert('Buyer already exists in the database.');
-                                window.location.href = "/BuyerMater/BuyerMater";
-                                return false;
-                            }
-                            else {
-                                alert('updates process Failed.');
-                                window.location.href = "/BuyerMater/BuyerMasteDetails";
-                                return false;
-                            }
-                        }
-                    });
-                }
-            }
-            else {
-                alert("validation js alert");
-                alert('Please fill in all required fields.');
-                return false;
-            }
-        }
-
-        else {
-            var errorFields = [];
-            ///validation fore all fields
-            if (CustomerName == "") {
-                $("#CustomerNameResult").text("Please enter Customer Name");
-                $("#CustomerNameResult").show();
-                errorFields.push("CustomerName");
-            }
-
-            $("#CustomerName").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#CustomerNameResult").hide();
-                    ValidateCustomerName();
-                } else {
-                    $("#CustomerNameResult").text("Please enter Customer Name");
-                    $("#CustomerNameResult").show();
+            $.ajax({
+                type: 'POST',
+                url: url,
+                contentType: false,
+                processData: false,
+                dataType: 'json', // Expecting a JSON response
+                data: formdata,
+                success: function (data) {
+                    if (data.AlertMessage == "Updated") {
+                        sessionStorage.setItem("showToast", "updated");
+                        window.location.href = "/BuyerMater/BuyerMater";
+                    }
+                    else if (data.AlertMessage === "saved") {
+                        sessionStorage.setItem("showToast", "success");
+                        window.location.href = "/BuyerMater/BuyerMater";
+                    }
+                    else if (data.AlertMessage === "already exist") {
+                        showErrorToast();
+                    }
+                    else {
+                        showsaveprocessToast();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', status, error);
                 }
             });
-
-            if (BuyerCode == "") {
-                $("#BuyerCodeResult").text("Please enter Buyer Code");
-                $("#BuyerCodeResult").show();
-                errorFields.push("BuyerCode");
-            }
-
-            $("#BuyerCode").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#BuyerCodeResult").hide();
-                    ValidateBuyerCode();
-                } else {
-                    $("#BuyerCodeResult").text("Please enter Buyer Name");
-                    $("#BuyerCodeResult").show();
-                }
-            });
-
-
-            if (BuyerShortName == "") {
-                $("#NameResult").text("Please enter Account");
-                $("#NameResult").show();
-                errorFields.push("BuyerShortName");
-            }
-            $("#BuyerShortName").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#NameResult").hide();
-                    validateName();
-
-                } else {
-                    $("#NameResult").text("Please enter Account");
-                    $("#NameResult").show();
-                }
-            });
-
-
-
-            if (EmailContact == "") {
-                $("#EmailResult").text("Please enter EmailContact");
-                $("#EmailResult").show();
-                errorFields.push("EmailContact");
-            }
-            $("#EmailContact").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#EmailResult").hide();
-                    //var a = $("#EmailContact").val();
-                    validate();
-                } else {
-                    $("#EmailResult").text("Please enter EmailContact");
-                    $("#EmailResult").show();
-                }
-            });
-
-            if (Account == "") {
-                $("#AccountResult").text("Please enter Account");
-                $("#AccountResult").show();
-                errorFields.push("Account");
-            }
-            $("#Account").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#AccountResult").hide();
-                    _ValidateAccount();
-                } else {
-                    $("#AccountResult").text("Please enter Account");
-                    $("#AccountResult").show();
-                }
-            });
-
-
-            if (AccountName == "") {
-                $("#AccountNameResult").text("Please enter AccountName");
-                $("#AccountNameResult").show();
-                errorFields.push("AccountName");
-            }
-            $("#AccountName").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#AccountNameResult").hide();
-                    _ValidateAccountName();
-                } else {
-                    $("#AccountNameResult").text("Please enter AccountName");
-                    $("#AccountNameResult").show();
-                }
-            });
-
-            if (AccountDescription == "") {
-                $("#AccountDescriptionResult").text("Please enter AccountDescription");
-                $("#AccountDescriptionResult").show();
-                errorFields.push("AccountDescription");
-            }
-            $("#AccountDescription").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#AccountDescriptionResult").hide();
-                    _ValidateAccountDescription();
-                } else {
-                    $("#AccountDescriptionResult").text("Please enter Account description");
-                    $("#AccountDescriptionResult").show();
-                }
-            });
-
-            if (SwiftCode == "") {
-                $("#SwiftCodeResult").text("Please enter SwiftCode");
-                $("#SwiftCodeResult").show();
-                errorFields.push("SwiftCode");
-            }
-            $("#SwiftCode").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#SwiftCodeResult").hide();
-                    _ValidateSwiftCode();
-                } else {
-                    $("#SwiftCodeResult").text("Please enter swift code");
-                    $("#SwiftCodeResult").show();
-                }
-            });
-
-
-
-            if (Physical1 == "") {
-                $("#Physical1Result").text("Please enter physical1");
-                $("#Physical1Result").show();
-                errorFields.push("Physical1");
-            }
-            $("#Physical1").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#Physical1Result").hide();
-                    _ValidateAddressValidation();
-                } else {
-                    $("#Physical1Result").text("Please enter physical1");
-                    $("#Physical1Result").show();
-                }
-            });
-
-
-
-
-
-            if (PhysicalCode == "") {
-                $("#PhysicalCodeResult").text("Please enter PhysicalCode");
-                $("#PhysicalCodeResult").show();
-                errorFields.push("PhysicalCode");
-            }
-            $("#PhysicalCode").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#PhysicalCodeResult").hide();
-                    _ValidatePhysicalCode();
-                } else {
-                    $("#PhysicalCodeResult").text("Please enter PhysicalCode");
-                    $("#PhysicalCodeResult").show();
-                }
-            });
-
-
-
-
-
-            if ($("#CurrencyId").val() == "") {
-                $("#CurrencyIdResult").text("Please select CurrencyId");
-                $("#CurrencyIdResult").show();
-                errorFields.push("CurrencyId");
-            }
-            $("#CurrencyId").on("change", function () {
-                if ($(this).val() != "") {
-                    $("#CurrencyIdResult").hide();
-                } else {
-                    $("#CurrencyIdResult").text("Please select CurrencyId");
-                    $("#CurrencyIdResult").show();
-                }
-            });
-
-
-            if (Telephone1 == "") {
-                $("#Telephone1Result").text("Please enter Telephone1");
-                $("#Telephone1Result").show();
-                errorFields.push("Telephone1");
-            }
-            $("#Telephone1").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#Telephone1Result").hide();
-                    _ValidateTelephone1();
-                } else {
-                    $("#Telephone1Result").text("Please enter Telephone1");
-                    $("#Telephone1Result").show();
-                }
-            });
-
-            if (Telephone2 == "") {
-                $("#Telephone2Result").text("Please enter Telephone2");
-                $("#Telephone2Result").show();
-                errorFields.push("Telephone2");
-            }
-            $("#Telephone2").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#Telephone2Result").hide();
-                    _ValidateTelephone2();
-                } else {
-                    $("#Telephone2Result").text("Please enter Telephone2");
-                    $("#Telephone2Result").show();
-                }
-            });
-
-
-
-            if (EmailEmergency == "") {
-                $("#EmailEmergencyResult").text("Please enter EmailEmergency");
-                $("#EmailEmergencyResult").show();
-                errorFields.push("EmailEmergency");
-            }
-            $("#EmailEmergency").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#EmailEmergencyResult").hide();
-                    _validateEmailEmergency();
-                } else {
-                    $("#EmailEmergencyResult").text("Please enter EmailEmergency");
-                    $("#EmailEmergencyResult").show();
-                }
-            });
-
-            if (EmailAccounts == "") {
-                $("#EmailAccountsResult").text("Please enter EmailAccounts");
-                $("#EmailAccountsResult").show();
-                errorFields.push("EmailAccounts");
-            }
-            $("#EmailAccounts").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#EmailAccountsResult").hide();
-                    _validateEmailAccount();
-                } else {
-                    $("#EmailAccountsResult").text("Please enter Emailemergency");
-                    $("#EmailAccountsResult").show();
-                }
-            });
-
-            if (VatNumber == "") {
-                $("#VatNumberResult").text("Please enter VatNumber");
-                $("#VatNumberResult").show();
-                errorFields.push("VatNumber");
-            }
-            $("#VatNumber").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#VatNumberResult").hide();
-                    _ValidateVatNumber();
-                } else {
-                    $("#VatNumberResult").text("Please enter VatNumber");
-                    $("#VatNumberResult").show();
-                }
-            });
-
-            if (RegNumber == "") {
-                $("#RegNumberResult").text("Please enter RegNumber");
-                $("#RegNumberResult").show();
-                errorFields.push("RegNumber");
-            }
-            $("#RegNumber").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#RegNumberResult").hide();
-                    _validateRegNo();
-                } else {
-                    $("#RegNumberResult").text("Please enter RegNumber");
-                    $("#RegNumberResult").show();
-                }
-            });
-
-
-            if (CreditLimit == "") {
-                $("#CreditLimitResult").text("Please enter CreditLimit");
-                $("#CreditLimitResult").show();
-                errorFields.push("CreditLimit");
-            }
-            $("#CreditLimit").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#CreditLimitResult").hide();
-                    _validateCreditLimit();
-                } else {
-                    $("#CreditLimitResult").text("Please enter CreditLimit");
-                    $("#CreditLimitResult").show();
-                }
-            });
-
-
-            if (Interest == "") {
-                $("#InterestResult").text("Please enter Interest");
-                $("#InterestResult").show();
-                errorFields.push("Interest");
-            }
-            $("#Interest").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#InterestResult").hide();
-                    _validateInterest();
-                } else {
-                    $("#InterestResult").text("Please enter Interest");
-                    $("#InterestResult").show();
-                }
-            });
-
-
-
-            if ($("#TaxTypeId").val() == "") {
-                $("#TaxTypeIdResult").text("Please select TaxType");
-                $("#TaxTypeIdResult").show();
-                errorFields.push("TaxTypeId");
-            }
-
-            $("#TaxTypeId").on("change", function () {
-                if ($(this).val() != "") {
-                    $("#TaxTypeIdResult").hide();
-                } else {
-                    $("#TaxTypeIdResult").text("Please select TaxType");
-                    $("#TaxTypeIdResult").show();
-                }
-            });
-            if ($("#AccountTypeId").val() == "") {
-                $("#AccountTypeIdResult").text("Please select AccountType");
-                $("#AccountTypeIdResult").show();
-                errorFields.push("AccountTypeId");
-            }
-
-            $("#AccountTypeId").on("change", function () {
-                if ($(this).val() != "") {
-                    $("#AccountTypeIdResult").hide();
-                } else {
-                    $("#AccountTypeIdResult").text("Please select AccountType");
-                    $("#AccountTypeIdResult").show();
-                }
-            });
-
-            if ($("#ForeignCurrency").val() == "") {
-                $("#ForeignCurrencyResult").text("Please select ForeignCurrency");
-                $("#ForeignCurrencyResult").show();
-                errorFields.push("ForeignCurrency");
-            }
-            $("#ForeignCurrency").on("change", function () {
-                if ($(this).val() != "") {
-                    $("#ForeignCurrencyResult").hide();
-                } else {
-                    $("#ForeignCurrencyResult").text("Please select ForeignCurrency");
-                    $("#ForeignCurrencyResult").show();
-                }
-            });
-
-            if (DcBalance == "") {
-                $("#DcBalanceResult").text("Please enter DcBalance");
-                $("#DcBalanceResult").show();
-                errorFields.push("DcBalance");
-            }
-            $("#DcBalance").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#DcBalanceResult").hide();
-                    _DcBalanceResult();
-                } else {
-                    $("#DcBalanceResult").text("Please enter DcBalance");
-                    $("#DcBalanceResult").show();
-                }
-            });
-
-            //if (ForeignDcBalance == "") {
-            //    $("#ForeignDcBalanceResult").text("Please enter ForeignDcBalance");
-            //    $("#ForeignDcBalanceResult").show();
-            //    errorFields.push("ForeignDcBalance");
-            //}
-            //$("#ForeignDcBalance").on("keyup blur", function () {
-            //    if ($(this).val() != "") {
-            //        $("#ForeignDcBalanceResult").hide();
-            //        _ForeignDcBalanceResult();
-            //    } else {
-            //        $("#ForeignDcBalanceResult").text("Please enter ForeignDcBalance");
-            //        $("#ForeignDcBalanceResult").show();
-            //    }
-            //});
-
-            if (Website == "") {
-                $("#WebsiteResult").text("Please enter Website");
-                $("#WebsiteResult").show();
-                errorFields.push("ForeignDcBalance");
-            }
-            $("#Website").on("keyup blur", function () {
-                if ($(this).val() != "") {
-                    $("#WebsiteResult").hide();
-                    // _ForeignDcBalanceResult();
-                } else {
-                    $("#WebsiteResult").text("Please enter ForeignDcBalance");
-                    $("#WebsiteResult").show();
-                }
-            });
-
-
         }
     }
+
 </script>

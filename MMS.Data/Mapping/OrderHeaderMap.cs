@@ -16,6 +16,7 @@ namespace MMS.Data.Mapping
             HasKey(t => t.invoicehd_id);
             Property(t => t.invoicehd_id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             Property(t => t.invoicedate);
+            Property(t => t.currencyid);
             Property(t => t.CreatedDate);
             Property(t => t.UpdatedDate);
             Property(t => t.CreatedBy);

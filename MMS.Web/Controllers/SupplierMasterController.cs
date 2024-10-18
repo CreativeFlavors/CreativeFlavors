@@ -67,12 +67,6 @@ namespace MMS.Web.Controllers
             if (model.SupplierId == 0)
             {
                 var totallist = _supplyMasterManager.Get();
-                var supplierList = totallist.Where(x => x.Suppliername.ToLower().Contains(model.Suppliername.ToLower()) || x.suppliercode.ToString().ToLower().Contains(model.suppliercode.ToString().ToLower())).ToList();
-                if (supplierList.Count() != 0)
-                {
-                    AlertMessage = "SupplierThere";
-                    return Json(AlertMessage, JsonRequestBehavior.AllowGet);
-                }
                 var suppliercode = totallist.Where(x => x.suppliercode.ToLower().Contains(model.suppliercode.ToLower())).ToList();
                 if (suppliercode.Count() != 0)
                 {
@@ -106,12 +100,6 @@ namespace MMS.Web.Controllers
             else
             {
                 var totallist = _supplyMasterManager.Get();
-                var supplierList = totallist.Where(x => x.Suppliername.ToLower().Contains(model.Suppliername.ToLower()) || x.suppliercode.ToString().ToLower().Contains(model.suppliercode.ToString().ToLower())).ToList();
-                if (supplierList.Count() >=2)
-                {
-                    AlertMessage = "SupplierThere";
-                    return Json(AlertMessage, JsonRequestBehavior.AllowGet);
-                }
                 var suppliercode = totallist.Where(x => x.suppliercode.ToLower().Contains(model.suppliercode.ToLower())).ToList();
                 if (suppliercode.Count() >=2)
                 {

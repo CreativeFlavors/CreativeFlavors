@@ -246,7 +246,14 @@ namespace MMS.Web.Controllers
             indentCart = indentnewMaterialManager.Getindentcartid(indentcartid);
             if (indentCart.IndentDetailId == indentcartid)
             {
-                status = "Success";
+                if (IsChecked == true)
+                {
+                    status = "Success";
+                }
+                else
+                {
+                    status = "failer";
+                }
                 indentnewMaterialManager.Delete(indentcartid, IsChecked);
             }
             return Json(status, JsonRequestBehavior.AllowGet);

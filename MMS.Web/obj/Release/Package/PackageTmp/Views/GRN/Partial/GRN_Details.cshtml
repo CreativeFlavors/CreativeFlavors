@@ -14,6 +14,8 @@
     <link href="~/Content/css1/variables.css" rel="stylesheet" />
     <link href="~/Content/css1/dropdown.css" rel="stylesheet" />
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link href="~/Content/css1/Toast.css" rel="stylesheet" />
     <style>
         table, th, td {
             border: 1px solid #C9C9C9;
@@ -33,7 +35,7 @@
 
         .salesOrder td input {
             border: navajowhite;
-            width: 162px;
+            width: 147px;
             text-align: center;
         }
 
@@ -50,7 +52,11 @@
             border: navajowhite;
             color: #fff;
         }
-
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            width: 102%;
+        }
     </style>
 </head>
 
@@ -79,7 +85,7 @@
                     <div class="col-lg-2 col-md-5 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="SupplierId">Supplier</label>
-                            @Html.DropDownListFor(m => m.SupplierId, MMS.Web.ExtensionMethod.HtmlHelper.SupplierName(), new { @class = "select-style text-field ",onchange= "supplierfun()" })
+                            @Html.DropDownListFor(m => m.SupplierId, MMS.Web.ExtensionMethod.HtmlHelper.SupplierName(), new { @class = "select-style text-field ", onchange = "supplierfun()" })
                         </div>
                         <p id="sperror" style="color: red; margin: 0px 0%;"></p>
                     </div>
@@ -94,8 +100,15 @@
                     </div>
                     <div class="col-lg-2 col-md-5 col-sm-12">
                         <div class="input-part">
+                            <label class="font-14" for="#currencyOption">Currency</label>
+                            @Html.DropDownListFor(m => m.currencyOption, MMS.Web.ExtensionMethod.HtmlHelper.CurrencycunversionName(), new { @class = "select-style text-field" })
+                        </div>
+                        @*<p id="Currencyerror" style="color: red;"></p>*@
+                    </div>
+                    <div class="col-lg-2 col-md-5 col-sm-12">
+                        <div class="input-part">
                             <label class="font-14" for="RefInvoiceDate">Ref Invoice Number</label>
-                            @Html.TextBoxFor(m => m.RefInvoiceNumber, new { @class = "form-control text-field", @id = "RefInvoiceNumber", placeholder = "Enter the Ref Invoice Number",onkeyup = "Inreffun()" })
+                            @Html.TextBoxFor(m => m.RefInvoiceNumber, new { @class = "form-control text-field", @id = "RefInvoiceNumber", placeholder = "Enter the Ref Invoice Number", onkeyup = "Inreffun()" })
                         </div>
                         <p id="reinerror" style="color: red; margin: 0px 0%;"></p>
                     </div>
@@ -107,15 +120,15 @@
                         <p id="indateerror" style="color: red; margin: 0px 0%;"></p>
                     </div>
 
-                    <div class="col-lg-3 col-md-5 col-sm-12 d-flex justify-content-center">
-                        <div class="checkbox-wrapper-55" style=" margin-top: 6%;">
-                            <label class="rocker rocker-small">
-                                <input type="checkbox" id="currencyToggle">
-                                <span class="switch-left" value="USD">USD</span>
-                                <span class="switch-right" value="ZAR">ZAR</span>
-                            </label>
-                        </div>
-                    </div>
+                    @*<div class="col-lg-3 col-md-5 col-sm-12 d-flex justify-content-center">
+            <div class="checkbox-wrapper-55" style=" margin-top: 6%;">
+                <label class="rocker rocker-small">
+                    <input type="checkbox" id="currencyToggle">
+                    <span class="switch-left" value="USD">USD</span>
+                    <span class="switch-right" value="ZAR">ZAR</span>
+                </label>
+            </div>
+        </div>*@
 
                     <table style="width:100%" class="salesOrder mt-4">
                         <thead>
@@ -204,7 +217,7 @@
         </section>
     </div>
 
-
+    <div id="toast"></div>
 
     <!-- page-contents end -->
     <script src="~/Content/js/custom.js"></script>
@@ -223,6 +236,13 @@
                 direction: "asc"
             }
         });
+        //new TomSelect("#currencyOption", {
+        //    create: false,
+        //    sortField: {
+        //        field: "text",
+        //        direction: "asc"
+        //    }
+        //});
         $(window).on("load", function () {
             $(".report-inner-section").addClass("transection");
             $("#GRN").attr('checked', true);
@@ -232,7 +252,7 @@
             var PoHeaderId = $("#PoHeaderId").val();
             var RefInvoiceNumber = $("#RefInvoiceNumber").val();
             var RefInvoiceDate = $("#RefInvoiceDate").val();
-            var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+            var currencyOption = $("#currencyOption").val();
             var Total_TaxValue = $("#Total_TaxValue").val();
              var grnnumber = @Model.grnnumber;
             var Total_Subtotal = $("#Total_Subtotal").val();
@@ -280,14 +300,12 @@
                             }, 2000);
                         }
                         else if (data.AlertMessage === "Not Existed") {
-                            alert("Before Confirm you must add the Product");
+                            showsSOCfToast();
                         }
                     }
 
                 });
 
-            } else {
-                alert("Please select all feild");
             }
         }
         function Delete(arg) {
@@ -297,7 +315,7 @@
                 data: { SOId: arg },
                 success: function (values) {
                     if (values.AlertMessage === "Success") {
-                        alert("Deleted Successfully.");
+                        showdeletedToast();
                         $("#grncart").empty();
                         $.each(values.model.grnCarlist, function (i, item) {
                             $("#grncart").append(`
@@ -319,11 +337,10 @@
                                              `);
                         });
                     } else {
-                        alert("Failed to delete.");
+                        showdeleteprocessToast();
                     }
                 },
                 error: function (xhr, status, error) {
-                    alert("An error occurred: " + xhr.responseText);
                 }
             });
         }
@@ -331,12 +348,16 @@
     <script>
         $(document).ready(function () {
 
-            $('#PoHeaderId').change(function () {
-                var PoHeaderId = $(this).val();
+            $('#PoHeaderId, #currencyOption').change(function () {
+                var poheaderid = $("#PoHeaderId").val();
+                var currencyOption = $("#currencyOption").val();
+                if (currencyOption == "") {
+                    var currencyOption = 0;
+                }
                 $.ajax({
                     url: '/GRN/GetPODetails',
                     type: 'GET',
-                    data: { POno: PoHeaderId },
+                    data: { POno: poheaderid, currency: currencyOption },
                     success: function (response) {
                         $("#polist").empty();
                         $("#Total_Price").val("");
@@ -351,39 +372,39 @@
                         $("#Total_Grandtotal").val(response.Total_Grandtotal);
                         $.each(response.polist, function (i, item) {
                             var DcqtyCell = item.PoQty == 0 ? `<div class="add-remove">
-            <button class="decrementbtn btn" disabled><span>-</span></button>
-            <input type="text" class="quantityInput" style="width:90px;" disabled value="${item.PoQty}">
-            <button class="incrementbtn btn" disabled>+</button>
+                <button class="decrementbtn btn" disabled><span>-</span></button>
+                <input type="text" class="quantityInput" style="width:90px;" disabled value="${item.PoQty}">
+                <button class="incrementbtn btn" disabled>+</button>
 </div>` : `<div class="add-remove">
-            <button class="decrementbtn btn" ><span>-</span></button>
-            <input type="text" class="quantityInput" style="width:90px;" disabled value="${item.PoQty}">
-            <button class="incrementbtn btn" >+</button>
+                <button class="decrementbtn btn" ><span>-</span></button>
+                <input type="text" class="quantityInput" style="width:90px;" disabled value="${item.PoQty}">
+                <button class="incrementbtn btn" >+</button>
 </div>`;
-                            var addcon = item.PoQty == 0 ? `<button class="fill-color font-15 add"  id="add" disabled>Add</button> ` : `<button class="fill-color font-15 add" id="add">Add</button>`
+                            var addcon = item.PoQty == 0 ? `<button class="fill-color font-15 add"  id="add" disabled>Add</button> ` : `<button class="fill-color font-15 add"  id="add">Add</button>`
 
                             $("#polist").append(`
-                                                                                                  <tr>
-                                                                                              <td style="background-color: #e9ecef;    width: 19%;text-align: left; id="productname">${item.ProductName}</td>
-                                                                                              <td style="background-color: #e9ecef;    text-align: left;" id="Productcode">${item.Productcode}</td>
-                                                                                              <td><input type="text" id="BatchCode" class="form-control" /></td>
-                                                                                              <td><input type="date" id="ExpiryDate" class="form-control" /></td>
-                                                                                              <td data-max-quantity="${item.PoQty}" style=" width:108%;">${DcqtyCell}
-                                                                                              </td>
-                                                                                              <td id="productid" style="display: none;">${item.productid}</td>
-                                                                                               <td id="podetail" style="display: none;">${item.podetail}</td>
-                                                                                              <td style="background-color: #e9ecef; text-align: left;" id="uomtype">${item.UomName}</td>
-                                                                                              <td ><input type="text" id="UnitPrice" onKeyUp="GRNUnitPrice()" class="UnitPrice form-control"value="${item.UnitPrice}" /></td>
-                                                                                              <td style="background-color: #e9ecef; text-align: right;" id="discount">${item.discountpercentage}</td>
-                                                                                              <td style="background-color: #e9ecef; text-align: right;" id="discountvalue">${item.DiscountValue}</td>
-                                                                                              <td style="background-color: #e9ecef; text-align: right;" id="subtotal">${item.SubtotalValue}</td>
-                                                                                              <td style="background-color: #e9ecef; text-align: right;" id="taxper">${item.taxpercentage}</td>
-                                                                                              <td style="background-color: #e9ecef; text-align: right;" id="TaxValue">${item.TaxValue}</td>
-                                                                                              <td style="background-color: #e9ecef; text-align: right;" id="Grandtotal">${item.TotalValue}</td>
-                                                                                              <td style="background-color: #e9ecef">
-                                                                                                  ${addcon}
-                                                                                              </td>
-                                                                                          </tr>
-                                                                                                                    `);
+                                                                                                      <tr>
+                                                                                                  <td style="background-color: #e9ecef;    width: 19%;text-align: left; id="productname">${item.ProductName}</td>
+                                                                                                  <td style="background-color: #e9ecef;    text-align: left;" id="Productcode">${item.Productcode}</td>
+                                                                                                  <td><input type="text" id="BatchCode" class="form-control" /></td>
+                                                                                                   <td><input type="date" id="ExpiryDate" class="form-control" /></td>
+                                                                                                  <td data-max-quantity="${item.PoQty}" style=" width:108%;">${DcqtyCell}
+                                                                                                  </td>
+                                                                                                  <td id="productid" style="display: none;">${item.productid}</td>
+                                                                                                   <td id="podetail" style="display: none;">${item.podetail}</td>
+                                                                                                  <td style="background-color: #e9ecef; text-align: left;" id="uomtype">${item.UomName}</td>
+                                                                                                  <td ><input type="text" id="UnitPrice" onKeyUp="GRNUnitPrice()" class="UnitPrice form-control"value="${item.UnitPrice}" /></td>
+                                                                                                  <td style="background-color: #e9ecef; text-align: right;" id="discount">${item.discountpercentage}</td>
+                                                                                                  <td style="background-color: #e9ecef; text-align: right;" id="discountvalue">${item.DiscountValue}</td>
+                                                                                                  <td style="background-color: #e9ecef; text-align: right;" id="subtotal">${item.SubtotalValue}</td>
+                                                                                                  <td style="background-color: #e9ecef; text-align: right;" id="taxper">${item.taxpercentage}</td>
+                                                                                                  <td style="background-color: #e9ecef; text-align: right;" id="TaxValue">${item.TaxValue}</td>
+                                                                                                  <td style="background-color: #e9ecef; text-align: right;" id="Grandtotal">${item.TotalValue}</td>
+                                                                                                  <td style="background-color: #e9ecef">
+                                                                                                      ${addcon}
+                                                                                                  </td>
+                                                                                              </tr>
+                                                                                                                        `);
                         });
                     },
                     error: function (error) {
@@ -397,7 +418,7 @@
 
         $(document).ready(function () {
             $(document).on("click", ".add", function () {
-                var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+                var currencyOption = $("#currencyOption").val();
                 var row = $(this).closest('tr');
                 var ProductNameId = row.find('#productid').text();
                 var PoDetailId = row.find('#podetail').text();
@@ -429,7 +450,7 @@
                 formdata.append("Total_discountval", totaldis);
                 formdata.append("Total_Grandtotal", totaldgrand);
                 var filter = /^[0-9]+$/;
-                if (UnitPrice != "" && filter.test(UnitPrice)) {
+                if (UnitPrice != "" && filter.test(UnitPrice) ) {
                     $.ajax({
                         url: '/GRN/GRNCartDetails',
                         type: 'POST',
@@ -521,7 +542,7 @@
 
                 }
                 else {
-                    alert("Please enter valid number");
+                    showsgrnsToast();
                 }
 
             });
@@ -530,7 +551,7 @@
                 var $quantityInput = $row.find('.quantityInput');
                 var Quantity = parseInt($quantityInput.val(), 10);
                 if (Quantity > 0) {
-                    var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+                    var currencyOption = $("#currencyOption").val();
                     var row = $(this).closest('tr');
                     var ProductNameId = row.find('#productid').text();
                     var UnitPrice = row.find('#UnitPrice').val();
@@ -588,7 +609,7 @@
                 if (quantityValue > 0) {
                     $quantityInput.val(quantityValue - 1);
                     var Quantity = (quantityValue - 1);
-                    var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+                    var currencyOption = $("#currencyOption").val();
                     var row = $(this).closest('tr');
                     var ProductNameId = row.find('#productid').text();
                     var UnitPrice = row.find('#UnitPrice').val();
@@ -647,7 +668,7 @@
                 if (quantityValue < maxQuantity) {
                     $quantityInput.val(quantityValue + 1);
                     var Quantity = (quantityValue + 1);
-                    var currencyOption = $('#currencyToggle').is(':checked') ? 'USD' : 'ZAR';
+                    var currencyOption = $("#currencyOption").val();
                     var row = $(this).closest('tr');
                     var ProductNameId = row.find('#productid').text();
                     var UnitPrice = row.find('#UnitPrice').val();
@@ -687,7 +708,6 @@
                             row.find("#TaxValue").text(data.TaxValue);
                             row.find("#Grandtotal").text(data.GrandTotal);
                             row.find("#discountvalue").text(data.DiscountValue);
-
                             $("#Total_discountval").val(data.Total_discountval);
                             $("#Total_Subtotal").val(data.Total_Subtotal);
                             $("#Total_TaxValue").val(data.Total_TaxValue);
@@ -730,13 +750,16 @@
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#d33",
-                confirmButtonText: "Yes,cancel it!"
+                confirmButtonText: "Yes!"
             }).then((result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
                         title: "Deleted!",
                         text: "Your GRN has been deleted successfully",
-                        icon: "success"
+                        icon: "success",
+                        timer: 1500,
+                        timerProgressBar: true,
+                        showConfirmButton: false
                     }).then(() => {
                         window.location.href = "/GRN/GRNMaster";
                     });

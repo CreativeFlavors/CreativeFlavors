@@ -195,7 +195,7 @@ namespace MMS.Web.Controllers.Stock
                     subassembly.ProductId = model.ProductSUBid;
                     subassembly.RequiredQty = model.Requiredqty;
                     var bOMMaterial = subassemblyManager.Post(subassembly);
-                    AlertMessage = "Updated Successfully";
+                    AlertMessage = "Saved Successfully";
                     return Json(new { bomid = parentboms.BomId, AlertMessage = AlertMessage, update = model.Bomid }, JsonRequestBehavior.AllowGet);
 
                 }
@@ -213,12 +213,12 @@ namespace MMS.Web.Controllers.Stock
                 parentboms.LastBom = model.Lastbom;
                 string AlertMessage = "";
                 var totallist1 = subassemblyManager.Get();
-                var productListcode = totallist1.Where(x => x.ProductId.ToString().ToLower().Contains(model.ProductSUBid.ToString().ToLower()) && x.BomId.ToString().ToLower().Contains(model.Bomid.ToString().ToLower())).ToList();
-                if (productListcode.Count() != 0 && model.Bomid != 0)
-                {
-                    AlertMessage = "Already Existed SUB";
-                    return Json(AlertMessage, JsonRequestBehavior.AllowGet);
-                }
+                //var productListcode = totallist1.Where(x => x.ProductId.ToString().ToLower().Contains(model.ProductSUBid.ToString().ToLower()) && x.BomId.ToString().ToLower().Contains(model.Bomid.ToString().ToLower())).ToList();
+                //if (productListcode.Count() == 2 && model.Bomid != 0)
+                //{
+                //    AlertMessage = "Already Existed SUB";
+                //    return Json(AlertMessage, JsonRequestBehavior.AllowGet);
+                //}
                 subassembly subassembly = new subassembly();
                 subassembly.BomId = model.Bomid;
                 subassembly.ProductId = model.ProductSUBid;
@@ -279,7 +279,7 @@ namespace MMS.Web.Controllers.Stock
                     ParentbomManager manager = new ParentbomManager();
                     parentboms.BomNo = model.Bomno;
                     string AlertMessage = "";
-                    var totallist1 = parentbom_materialManager.Get();
+                    var totallist1 = parentbom_materialManager.Get().Where(m=>m.IsDelete == true);
                     var productListcode = totallist1.Where(x => x.ProductId.ToString().ToLower().Contains(model.Productid.ToString().ToLower()) && x.BomID.ToString().ToLower().Contains(model.Bomid.ToString().ToLower())).ToList();
                     if (productListcode.Count() != 0 && model.Bomid != 0)
                     {
@@ -292,7 +292,7 @@ namespace MMS.Web.Controllers.Stock
                     parentbom_Material.UomId = model.Uomid;
                     parentbom_Material.RequiredQty = model.Requiredqty;
                     var bOMMaterial = parentbom_materialManager.Post(parentbom_Material);
-                    AlertMessage = "Updated Successfully";
+                    AlertMessage = "Saved Successfully";
                     return Json(new { bomid = parentboms.BomId, AlertMessage = AlertMessage, update = model.Bomid }, JsonRequestBehavior.AllowGet);
 
                 }
@@ -307,12 +307,12 @@ namespace MMS.Web.Controllers.Stock
                 parentboms.Description = model.Bomno;
                 string AlertMessage = "";
                 var totallist1 = parentbom_materialManager1.Get();
-                var productListcode = totallist1.Where(x => x.ProductId.ToString().ToLower().Contains(model.Productid.ToString().ToLower()) && x.BomID.ToString().ToLower().Contains(model.Bomid.ToString().ToLower())).ToList();
-                if (productListcode.Count() != 0 && model.Bomid != 0)
-                {
-                    AlertMessage = "Already Existed Product";
-                    return Json(AlertMessage, JsonRequestBehavior.AllowGet);
-                }
+                //var productListcode = totallist1.Where(x => x.ProductId.ToString().ToLower().Contains(model.Productid.ToString().ToLower()) && x.BomID.ToString().ToLower().Contains(model.Bomid.ToString().ToLower())).ToList();
+                //if (productListcode.Count() == 2 && model.Bomid != 0)
+                //{
+                //    AlertMessage = "Already Existed Product";
+                //    return Json(AlertMessage, JsonRequestBehavior.AllowGet);
+                //}
                 parentbom_material parentbom_Material = new parentbom_material();
                 Parentbom_materialManager parentbom_materialManager = new Parentbom_materialManager();
                 parentbom_Material.BomMaterialId = model.Bommaterialid;
@@ -427,7 +427,14 @@ namespace MMS.Web.Controllers.Stock
             parentbom = ParentbomManager.Getbomid(BomId);
             if (parentbom != null)
             {
-                status = "Success";
+                if(IsChecked == true)
+                {
+                    status = "Success";
+                }
+                else
+                {
+                    status = "failier";
+                }
                 ParentbomManager.Delete(parentbom.BomId, IsChecked);
             }
             return Json(status, JsonRequestBehavior.AllowGet);
