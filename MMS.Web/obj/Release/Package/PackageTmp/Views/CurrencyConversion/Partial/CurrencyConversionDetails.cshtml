@@ -32,23 +32,23 @@
                     <div class="col-lg-3 col-md-6 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="#Account">Primary Currency</label>
-                            @Html.DropDownListFor(m => m.PrimaryCurrency, MMS.Web.ExtensionMethod.HtmlHelper.forCurrencyName(), new { @class = "select-style text-field", onchange = "categorytypeCod()" })
-                            <p class="text-danger" id="error31"></p>
+                            @Html.DropDownListFor(m => m.PrimaryCurrency, MMS.Web.ExtensionMethod.HtmlHelper.forCurrencyName(), new { @class = "select-style text-field", onchange = "PrimaryCurrencyfun()" })
+                            <p class="text-danger" id="Primaryerror1"></p>
                             @Html.HiddenFor(m => m.Id)
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="#Account">Secondary Currency</label>
-                            @Html.DropDownListFor(m => m.SecondaryCurrency, MMS.Web.ExtensionMethod.HtmlHelper.forCurrencyName(), new { @class = "select-style text-field", onchange = "categorytypeCod()" })
-                            <p class="text-danger" id="error"></p>
+                            @Html.DropDownListFor(m => m.SecondaryCurrency, MMS.Web.ExtensionMethod.HtmlHelper.forCurrencyName(), new { @class = "select-style text-field", onchange = "SecondaryCurrencyfun()" })
+                            <p class="text-danger" id="Secondaryerror"></p>
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="#Account">Conversion Value</label>
-                            @Html.TextBoxFor(m => m.ConversionValue, new { @class = "form-control text-field", placeholder = "Enter the Conversion Value", onkeyup = "categoryCod()" })
-                            <p class="text-danger" id="error"></p>
+                            @Html.TextBoxFor(m => m.ConversionValue, new { @class = "form-control text-field", placeholder = "Enter the Conversion Value", onkeyup = "Conversionerrorfun()" })
+                            <p class="text-danger" id="Conversionerror"></p>
                         </div>
                     </div>
                 </div>
@@ -56,15 +56,15 @@
                     <div class="col-lg-3 col-md-6 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="#AccountTypeId">From-Date </label>
-                            @Html.TextBoxFor(m => m.FromDate, "{0:yyyy-MM-dd}", new { @class = "form-control text-field", @id = "FromDate", type = "date", placeholder = "DD/MM/YYYY", })
-                            <p class="text-danger" id="error3"></p>
+                            @Html.TextBoxFor(m => m.FromDate, "{0:yyyy-MM-dd}", new { @class = "form-control text-field", @id = "FromDate", type = "date", placeholder = "DD/MM/YYYY", onchange = "FromDatefun()" })
+                            <p class="text-danger" id="Fromerror3"></p>
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 col-sm-12">
                         <div class="input-part">
                             <label class="font-14" for="#AccountTypeId">To-Date</label>
-                            @Html.TextBoxFor(m => m.ToDate, "{0:yyyy-MM-dd}", new { @class = "form-control text-field", type = "date", onkeyup = "categoryCod()", placeholder = "DD/MM/YYYY", })
-                            <p class="text-danger" id="error3"></p>
+                            @Html.TextBoxFor(m => m.ToDate, "{0:yyyy-MM-dd}", new { @class = "form-control text-field", type = "date", onkeyup = "categoryCod()", placeholder = "DD/MM/YYYY", onchange = "ToDatefun()" })
+                            <p class="text-danger" id="Toerror3"></p>
                         </div>
                     </div>
                 </div>
@@ -80,14 +80,14 @@
                             {
                                 if (Model.Id != 0)
                                 {
-                                    <button type="submit" class="fill-color font-15" onclick="Save()">
+                                    <button type="submit" class="fill-color font-15" onclick="Save(); currencyconversionfun();">
                                         Update
                                     </button>
                                 }
                             }
                             else
                             {
-                                <button type="submit" class="fill-color font-15" onclick="Save()">
+                                <button type="submit" class="fill-color font-15" onclick="Save(); currencyconversionfun();">
                                     SAVE
                                 </button>
                             }
@@ -126,7 +126,8 @@
             var FromDate = $("#FromDate").val();
             var ToDate = $("#ToDate").val();
             var Id = $("#Id").val();
-            if (PrimaryCurrency !== "" && SecondaryCurrency !== "" && ConversionValue !== "" && ToDate !== "" && FromDate !== "") {
+            var filter = /^[0-9]+(\.[0-9]+)?$/;
+            if (PrimaryCurrency !== "" && SecondaryCurrency !== "" && ConversionValue !== "" && ToDate !== "" && FromDate !== "" && filter.test(ConversionValue)) {
                 var formData = {
                     SecondaryCurrency: SecondaryCurrency,
                     ConversionValue: ConversionValue,

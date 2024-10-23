@@ -1859,3 +1859,60 @@ function buyerformsave() {
     BuyerShortNamefun();
 }
 
+function PrimaryCurrencyfun() {
+    var City2 = $('#PrimaryCurrency').val();
+    if (City2 === "" || City2 === null) {
+        $('#Primaryerror1').text("Please Select Primary-Currency");
+    } else {
+        $('#Primaryerror1').text("");
+    }
+}
+function SecondaryCurrencyfun() {
+    var City2 = $('#SecondaryCurrency').val();
+    if (City2 === "" || City2 === null) {
+        $('#Secondaryerror').text("Please Select Secondary-Currency");
+    } else {
+        $('#Secondaryerror').text("");
+    }
+}
+
+
+
+function Conversionerrorfun() {
+    var number = $('#ConversionValue').val();
+    var filter = /^[0-9]+(\.[0-9]+)?$/;
+    if (number == "") {
+        $('#Conversionerror').text("Please Enter the ConversionValue");
+    }
+    else if (filter.test(number)) {
+        $('#Conversionerror').text("");
+    }
+    else {
+        $('#Conversionerror').text("Please enter valid number");
+    }
+}
+function FromDatefun() {
+    var City2 = $('#FromDate').val();
+    if (City2 === "" || City2 === null) {
+        $('#Fromerror3').text("Please Select FromDate");
+    } else {
+        $('#Fromerror3').text("");
+    }
+}
+
+function ToDatefun() {
+    var City2 = $('#ToDate').val();
+    if (City2 === "" || City2 === null) {
+        $('#Toerror3').text("Please Select ToDate");
+    } else {
+        $('#Toerror3').text("");
+    }
+}
+
+function currencyconversionfun() {
+    ToDatefun();
+    FromDatefun();
+    Conversionerrorfun();
+    SecondaryCurrencyfun();
+    PrimaryCurrencyfun();
+}
